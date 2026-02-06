@@ -3469,8 +3469,7 @@ the behavior of the forecaster.</p>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
 <span class="normal"><a href="#__codelineno-0-445">445</a></span>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">class</span><span class="w"> </span><span class="nc">ForecasterBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">class</span><span class="w"> </span><span class="nc">ForecasterBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all forecasters in spotforecast2.</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    All forecasters should specify all the parameters that can be set at</span>
@@ -3852,32 +3851,31 @@ the behavior of the forecaster.</p>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            &gt;&gt;&gt; unpickled_forecaster = pickle.loads(pickled_forecaster)</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="c1"># Migration: &#39;regressor&#39; renamed to &#39;estimator&#39; in version 0.18.0</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">regressor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated property. Use estimator instead.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            The estimator object.</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            &gt;&gt;&gt; from spotforecast2_safe.forecaster.recursive import ForecasterRecursive</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            &gt;&gt;&gt; forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            &gt;&gt;&gt; forecaster.regressor # Raises FutureWarning</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            Ridge()</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;The `regressor` attribute is deprecated and will be removed in future &quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="s2">&quot;versions. Use `estimator` instead.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="ne">FutureWarning</span><span class="p">,</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="p">)</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">regressor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated property. Use estimator instead.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            The estimator object.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            &gt;&gt;&gt; from spotforecast2_safe.forecaster.recursive import ForecasterRecursive</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            &gt;&gt;&gt; forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            &gt;&gt;&gt; forecaster.regressor # Raises FutureWarning</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            Ridge()</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="s2">&quot;The `regressor` attribute is deprecated and will be removed in future &quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;versions. Use `estimator` instead.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="ne">FutureWarning</span><span class="p">,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="p">)</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -4054,8 +4052,7 @@ It handles the migration of deprecated attributes to their new names.</p>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span>
-<span class="normal"><a href="#__codelineno-0-427">427</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom __setstate__ to ensure backward compatibility when unpickling.</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    This method is called when an object is unpickled (deserialized).</span>
@@ -4076,11 +4073,10 @@ It handles the migration of deprecated attributes to their new names.</p>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        &gt;&gt;&gt; unpickled_forecaster = pickle.loads(pickled_forecaster)</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="c1"># Migration: &#39;regressor&#39; renamed to &#39;estimator&#39; in version 0.18.0</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8201,7 +8197,7 @@ of estimator. Defaults to None.</p>
     <div class="doc doc-contents first">
 
         <p>ForecasterBase class.</p>
-<p>This module contains the base class for all forecasters in spotforecast2.
+<p>This module contains the base class for all forecasters in spotforecast2_safe and spotforecast.
 All forecasters should specify all the parameters that can be set at the
 class level in their <strong>init</strong>.</p>
 
@@ -8718,8 +8714,7 @@ the behavior of the forecaster.</p>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
 <span class="normal"><a href="#__codelineno-0-445">445</a></span>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">class</span><span class="w"> </span><span class="nc">ForecasterBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="k">class</span><span class="w"> </span><span class="nc">ForecasterBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all forecasters in spotforecast2.</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    All forecasters should specify all the parameters that can be set at</span>
@@ -9101,32 +9096,31 @@ the behavior of the forecaster.</p>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            &gt;&gt;&gt; unpickled_forecaster = pickle.loads(pickled_forecaster)</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="c1"># Migration: &#39;regressor&#39; renamed to &#39;estimator&#39; in version 0.18.0</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">regressor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated property. Use estimator instead.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            The estimator object.</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            &gt;&gt;&gt; from spotforecast2_safe.forecaster.recursive import ForecasterRecursive</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            &gt;&gt;&gt; forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            &gt;&gt;&gt; forecaster.regressor # Raises FutureWarning</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            Ridge()</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;The `regressor` attribute is deprecated and will be removed in future &quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="s2">&quot;versions. Use `estimator` instead.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="ne">FutureWarning</span><span class="p">,</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="p">)</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">regressor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated property. Use estimator instead.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            The estimator object.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            &gt;&gt;&gt; from spotforecast2_safe.forecaster.recursive import ForecasterRecursive</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            &gt;&gt;&gt; forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            &gt;&gt;&gt; forecaster.regressor # Raises FutureWarning</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            Ridge()</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="s2">&quot;The `regressor` attribute is deprecated and will be removed in future &quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;versions. Use `estimator` instead.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="ne">FutureWarning</span><span class="p">,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="p">)</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -9303,8 +9297,7 @@ It handles the migration of deprecated attributes to their new names.</p>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span>
-<span class="normal"><a href="#__codelineno-0-427">427</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom __setstate__ to ensure backward compatibility when unpickling.</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    This method is called when an object is unpickled (deserialized).</span>
@@ -9325,11 +9318,10 @@ It handles the migration of deprecated attributes to their new names.</p>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        &gt;&gt;&gt; unpickled_forecaster = pickle.loads(pickled_forecaster)</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="c1"># Migration: &#39;regressor&#39; renamed to &#39;estimator&#39; in version 0.18.0</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="k">if</span> <span class="s2">&quot;regressor&quot;</span> <span class="ow">in</span> <span class="n">state</span> <span class="ow">and</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;regressor&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
