@@ -23,13 +23,7 @@ Core forecasting classes and utilities.
       docstring_style: google
       show_source: true
 
-## Forecasting Metrics
 
-### metrics
-::: spotforecast2_safe.forecaster.metrics
-    options:
-      docstring_style: google
-      show_source: true
 
 ## Forecasting Utilities
 
