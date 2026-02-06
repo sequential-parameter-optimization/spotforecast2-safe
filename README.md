@@ -27,7 +27,7 @@
 
 `spotforecast2-safe` is a specialized Python library designed to **facilitate** time series forecasting in safety-critical production environments and embedded systems. 
 
-Unlike standard ML libraries, it follows a strict **"Safety-First"** architecture by design. **However, users must independently verify that these features meet their specific regulatory requirements:**
+Unlike standard machine and dep learning libraries, it follows a strict **"Safety-First"** architecture by design. **However, users must independently verify that these features meet their specific regulatory requirements:**
 
 - **Zero Dead Code**: We aim to minimize the attack surface by excluding visualization and training logic.
 - **Deterministic Logic**: The algorithms are designed to be purely mathematical and deterministic.
