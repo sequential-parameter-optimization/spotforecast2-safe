@@ -8,7 +8,7 @@
 - **Developers**: bartzbeielstein
 - **Repository**: [https://github.com/sequential-parameter-optimization/spotforecast2-safe](https://github.com/sequential-parameter-optimization/spotforecast2-safe)
 - **Core Dependencies**: `numpy`, `pandas` (Minimal Dependency Footprint).
-- **Prohibited Dependencies**: `plotly`, `matplotlib`, `optuna`, `torch`, `tensorflow`.
+- **Prohibited Dependencies**: `plotly`, `matplotlib`, `spotoptim`, `optuna`, `torch`, `tensorflow`.
 
 ## 2. Intended Use
 ### Primary Use Cases
@@ -18,7 +18,7 @@
 
 ### Out-of-Scope
 - **Interactive Visualization**: The package deliberately contains no plotting functions to minimize the attack surface.
-- **Automated Hyperparameter Tuning**: Optimization (e.g., via Optuna) must take place outside the "Safe Environment".
+- **Automated Hyperparameter Tuning**: Optimization (e.g., via spotoptim or Optuna) must take place outside the "Safe Environment".
 - **Silent Data Cleaning**: The package does not perform "silent" data imputation. Missing values (NaNs) lead to explicit errors (Fail-Safe), not estimations.
 
 ## 3. Algorithm & Logic
