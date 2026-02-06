@@ -9,8 +9,6 @@ from .outlier import (
     mark_outliers,
     manual_outlier_removal,
     get_outliers,
-    visualize_outliers_hist,
-    visualize_outliers_plotly_scatter,
 )
 
 from .imputation import custom_weights, get_missing_weights, WeightFunction
@@ -28,8 +26,6 @@ __all__ = [
     "mark_outliers",
     "manual_outlier_removal",
     "get_outliers",
-    "visualize_outliers_hist",
-    "visualize_outliers_plotly_scatter",
     "custom_weights",
     "get_missing_weights",
     "WeightFunction",

@@ -15,12 +15,6 @@ Outlier detection is crucial for time series forecasting as extreme values can d
       docstring_style: google
       show_source: true
 
-### Visualize Outliers
-
-::: spotforecast2_safe.preprocessing.outlier.visualize_outliers_plotly_scatter
-    options:
-      docstring_style: google
-      show_source: true
 
 ## Outlier Module
 
