@@ -1,3 +1,10 @@
+## [0.0.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.3...v0.0.4) (2026-02-06)
+
+
+### Code Refactoring
+
+* tasks and convert_to_utc ([a48f852](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a48f8527415a1ee9fb6572bc23fbe693fafbd84f))
+
 ## [0.0.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.2...v0.0.3) (2026-02-06)
 
 
