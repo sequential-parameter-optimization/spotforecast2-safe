@@ -19,7 +19,7 @@ def convert_to_utc(df: pd.DataFrame, timezone: Optional[str]) -> pd.DataFrame:
             timezone is None.
 
     Examples:
-        >>> from spotforecast2.utils.convert_to_utc import convert_to_utc
+        >>> from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
         >>> df = pd.DataFrame({"value": [1, 2, 3]}, index=pd.to_datetime(["2022-01-01", "2022-01-02", "2022-01-03"]))
         >>> convert_to_utc(df, "Europe/Berlin")
                    value

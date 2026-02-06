@@ -5,6 +5,16 @@ This module implements a complete end-to-end pipeline for multi-step time series
 forecasting with exogenous variables (weather, holidays, calendar features),
 followed by prediction aggregation using configurable weights.
 
+Logging Mechanism:
+    This script implements a production-grade logging system designed for safety-critical
+    environments:
+    1.  **Console Handler**: Provides real-time progress updates to `stdout`.
+    2.  **File Handler**: Automatically persists execution logs to a timestamped file
+        in `~/spotforecast2_safe_models/logs/`.
+
+    Log File Location:
+        By default, logs are saved to `~/spotforecast2_safe_models/logs/task_safe_n_to_1_YYYYMMDD_HHMMSS.log`.
+
 The pipeline:
     1. Performs multi-output recursive forecasting with exogenous covariates
     2. Aggregates predictions using weighted combinations
@@ -18,89 +28,18 @@ Key Features:
     - Weighted prediction aggregation
     - Comprehensive parameter flexibility via **kwargs
     - Detailed logging and progress tracking
-
-Examples:
-    Basic usage with default parameters:
-
-    >>> from spotforecast2_safe.scripts.n_to_1_with_covariates import main
-    >>> main()
-
-    With custom forecast horizon and weights:
-
-    >>> predictions = main(
-    ...     forecast_horizon=48,
-    ...     weights=[1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
-    ... )
-
-    With custom location (latitude, longitude):
-
-    >>> predictions = main(
-    ...     forecast_horizon=24,
-    ...     latitude=48.1351,
-    ...     longitude=11.5820,
-    ...     verbose=True
-    ... )
-
-    With feature engineering options:
-
-    >>> predictions = main(
-    ...     forecast_horizon=24,
-    ...     include_weather_windows=True,
-    ...     include_holiday_features=True,
-    ...     include_poly_features=True,
-    ... )
-
-    Passing custom estimator object:
-
-    >>> from lightgbm import LGBMRegressor
-    >>> estimator = LGBMRegressor(n_estimators=200, learning_rate=0.01)
-    >>> predictions = main(forecast_horizon=24, estimator=estimator)
-
-Available Parameters:
-
-Forecasting Parameters:
-    forecast_horizon (int): Number of steps ahead to forecast. Default: 24.
-    contamination (float): Outlier detection threshold [0, 1]. Default: 0.01.
-    window_size (int): Rolling window size for feature engineering. Default: 72.
-    lags (int): Number of lag features to create. Default: 24.
-    train_ratio (float): Train-test split ratio [0, 1]. Default: 0.8.
-    verbose (bool): Enable detailed progress logging. Default: True.
-
-Location & Time Parameters:
-    latitude (float): Location latitude for sun features. Default: 51.5136 (Dortmund).
-    longitude (float): Location longitude for sun features. Default: 7.4653 (Dortmund).
-    timezone (str): Timezone for data processing. Default: "UTC".
-    country_code (str): Country code for holidays (ISO 3166-1 alpha-2). Default: "DE".
-    state (str): State/region code for holidays (depends on country). Default: "NW".
-
-Feature Engineering Parameters:
-    include_weather_windows (bool): Include rolling weather statistics. Default: False.
-    include_holiday_features (bool): Include holiday indicator features. Default: False.
-    include_poly_features (bool): Include polynomial interaction features. Default: False.
-
-Model Parameters:
-    estimator (Optional[Union[str, object]]): Forecaster estimator. Can be:
-        - None: Uses default LGBMRegressor(n_estimators=100)
-        - "ForecasterRecursive": String reference (uses default)
-        - LGBMRegressor(...): Custom estimator object
-        Default: None.
-
-Aggregation Parameters:
-    weights (Optional[Union[Dict[str, float], List[float], np.ndarray]]):
-        Weights for prediction aggregation. Can be:
-        - None: Defaults to uniform weights (1.0 for each column)
-        - Dict: Column name -> weight mapping
-        - List/Array: Weights in column order
-        Default: [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0].
 """
 
+import argparse
+import logging
+import sys
 import warnings
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from lightgbm import LGBMRegressor
-
 
 from spotforecast2_safe.data.fetch_data import fetch_data
 from spotforecast2_safe.processing.agg_predict import agg_predict
@@ -109,6 +48,67 @@ from spotforecast2_safe.processing.n2n_predict_with_covariates import (
 )
 
 warnings.simplefilter("ignore")
+
+
+def _parse_bool(value: str) -> bool:
+    """Parse case-insensitive boolean strings for CLI arguments."""
+    normalized = value.strip().lower()
+    if normalized in {"true", "t", "yes", "1"}:
+        return True
+    if normalized in {"false", "f", "no", "0"}:
+        return False
+    raise argparse.ArgumentTypeError(
+        f"Expected a boolean value, got: {value}"
+    )
+
+
+def setup_logging(
+    level: int = logging.INFO,
+    log_dir: Optional[Path] = None
+) -> Tuple[logging.Logger, Optional[Path]]:
+    """
+    Configure robust logging for safety-critical execution.
+    Sets up both a stream (stdout) and an optional informative file handler.
+    Always logs INFO level or higher to the file, regardless of console level.
+    """
+    logger = logging.getLogger("task_safe_n_to_1")
+    logger.setLevel(logging.DEBUG)  # Root level allows handlers to filter
+
+    # Avoid duplicate handlers if main is called multiple times
+    if logger.handlers:
+        existing_path = None
+        for h in logger.handlers:
+            if isinstance(h, logging.FileHandler):
+                existing_path = Path(h.baseFilename)
+        return logger, existing_path
+
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+
+    # 1. Console Handler (Respects the requested level)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(level)
+    logger.addHandler(console_handler)
+
+    # 2. File Handler (Always INFO+ for audit durability)
+    log_file_path = None
+    if log_dir:
+        try:
+            log_dir.mkdir(parents=True, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_file_path = log_dir / f"task_safe_n_to_1_{timestamp}.log"
+            
+            file_handler = logging.FileHandler(log_file_path)
+            file_handler.setFormatter(formatter)
+            file_handler.setLevel(logging.INFO)
+            logger.addHandler(file_handler)
+            logger.info(f"Persistent logging initialized at: {log_file_path}")
+        except Exception as e:
+            logger.warning(f"Failed to initialize file logging in {log_dir}: {e}")
+
+    return logger, log_file_path
 
 
 def n_to_1_with_covariates(
@@ -313,35 +313,36 @@ def n_to_1_with_covariates(
         >>> print(f"Model Metrics: {metrics}")
         >>> print(f"Feature Info: {features}")
     """
+    logger = logging.getLogger("task_safe_n_to_1")
+
     # Default weights if not provided
     if weights is None:
         weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
 
-
     if verbose:
-        print("=" * 80)
-        print("N-to-1 Forecasting with Exogenous Covariates")
-        print("=" * 80)
-        print(f"\nConfiguration:")
-        print(f"  Forecast Horizon: {forecast_horizon} steps")
-        print(f"  Contamination Level: {contamination}")
-        print(f"  Window Size: {window_size}")
-        print(f"  Lags: {lags}")
-        print(f"  Train Ratio: {train_ratio}")
-        print(f"  Location: Lat={latitude}, Lon={longitude}")
-        print(f"  Timezone: {timezone}")
-        print(f"  Country Code: {country_code}, State: {state}")
-        print(f"  Estimator: {estimator}")
-        print(f"  Feature Engineering:")
-        print(f"    - Weather Windows: {include_weather_windows}")
-        print(f"    - Holiday Features: {include_holiday_features}")
-        print(f"    - Polynomial Features: {include_poly_features}")
-        print(f"  Weights Type: {type(weights).__name__}")
-        print(f"\n{'=' * 80}\n")
+        logger.info("=" * 80)
+        logger.info("N-to-1 Forecasting with Exogenous Covariates")
+        logger.info("=" * 80)
+        logger.info("Configuration:")
+        logger.info(f"  Forecast Horizon: {forecast_horizon} steps")
+        logger.info(f"  Contamination Level: {contamination}")
+        logger.info(f"  Window Size: {window_size}")
+        logger.info(f"  Lags: {lags}")
+        logger.info(f"  Train Ratio: {train_ratio}")
+        logger.info(f"  Location: Lat={latitude}, Lon={longitude}")
+        logger.info(f"  Timezone: {timezone}")
+        logger.info(f"  Country Code: {country_code}, State: {state}")
+        logger.info(f"  Estimator: {estimator}")
+        logger.info("  Feature Engineering:")
+        logger.info(f"    - Weather Windows: {include_weather_windows}")
+        logger.info(f"    - Holiday Features: {include_holiday_features}")
+        logger.info(f"    - Polynomial Features: {include_poly_features}")
+        logger.info(f"  Weights Type: {type(weights).__name__}")
+        logger.info(f"{'=' * 80}")
 
     # --- Step 1: Multi-Output Recursive Forecasting with Covariates ---
     if verbose:
-        print("Step 1: Executing multi-output recursive forecasting...")
+        logger.info("Step 1: Executing multi-output recursive forecasting...")
 
     # Prepare kwargs for n2n_predict_with_covariates
     forecast_kwargs = {
@@ -372,111 +373,194 @@ def n_to_1_with_covariates(
         **forecast_kwargs
     )
 
-
     if verbose:
-        print(f"\nMulti-output predictions shape: {predictions.shape}")
-        print(f"Output columns: {list(predictions.columns)}")
-        print(f"Date range: {predictions.index[0]} to {predictions.index[-1]}")
+        logger.info(f"Multi-output predictions shape: {predictions.shape}")
+        logger.info(f"Output columns: {list(predictions.columns)}")
+        logger.info(f"Date range: {predictions.index[0]} to {predictions.index[-1]}")
 
     # --- Step 2: Prediction Aggregation ---
     if verbose:
-        print("\nStep 2: Aggregating predictions using weighted combination...")
+        logger.info("Step 2: Aggregating predictions using weighted combination...")
 
     combined_prediction = agg_predict(predictions, weights=weights)
 
-
     if verbose:
-        print(f"Combined prediction shape: {combined_prediction.shape}")
-        print(f"\nAggregation Summary:")
-        print(f"  Combined Prediction Head:")
-        print(combined_prediction.head())
-        print(f"\n  Combined Prediction Statistics:")
-        print(f"    Mean: {combined_prediction.mean():.4f}")
-        print(f"    Std:  {combined_prediction.std():.4f}")
-        print(f"    Min:  {combined_prediction.min():.4f}")
-        print(f"    Max:  {combined_prediction.max():.4f}")
-        print(f"\n{'=' * 80}\n")
+        logger.info(f"Combined prediction shape: {combined_prediction.shape}")
+        logger.info("Aggregation Summary:")
+        logger.info("  Combined Prediction Head:")
+        logger.info(f"\n{combined_prediction.head()}")
+        logger.info("  Combined Prediction Statistics:")
+        logger.info(f"    Mean: {combined_prediction.mean():.4f}")
+        logger.info(f"    Std:  {combined_prediction.std():.4f}")
+        logger.info(f"    Min:  {combined_prediction.min():.4f}")
+        logger.info(f"    Max:  {combined_prediction.max():.4f}")
+        logger.info(f"{'=' * 80}")
 
     return predictions, combined_prediction, model_metrics, feature_info
 
 
-def main() -> None:
-    """Execute the complete N-to-1 forecasting pipeline with default parameters.
+def main(
+    forecast_horizon: int = 24,
+    contamination: float = 0.01,
+    window_size: int = 72,
+    lags: int = 24,
+    train_ratio: float = 0.8,
+    latitude: float = 51.5136,
+    longitude: float = 7.4653,
+    timezone: str = "UTC",
+    country_code: str = "DE",
+    state: str = "NW",
+    include_weather_windows: bool = False,
+    include_holiday_features: bool = False,
+    include_poly_features: bool = False,
+    verbose: bool = False,
+    weights: Optional[List[float]] = None,
+    log_dir: Optional[Path] = None,
+    logging_enabled: bool = False,
+) -> None:
+    """Execute the complete N-to-1 forecasting pipeline with configurable parameters.
 
-    This is the entry point when running the script directly. It executes the full
-    forecasting pipeline with default settings and prints comprehensive results.
-
-    The default configuration:
-    - Forecasts 24 steps ahead
-    - Uses Dortmund, Germany coordinates
-    - Applies default contamination and window parameters
-    - Aggregates with predefined weights
-    - Provides verbose output
-
-    Returns:
-        None. Results are printed to stdout.
-
-    Examples:
-        Run the script directly:
-
-        >>> python n_to_1_with_covariates.py
-
-        Or call main() programmatically:
-
-        >>> from spotforecast2_safe.scripts.n_to_1_with_covariates import main
-        >>> main()
+    Args:
+        forecast_horizon (int): Number of steps ahead to forecast. Default: 24.
+        contamination (float): Outlier contamination parameter [0, 1]. Default: 0.01.
+        window_size (int): Rolling window size for features. Default: 72.
+        lags (int): Number of lags for recursive model. Default: 24.
+        train_ratio (float): Training data split ratio. Default: 0.8.
+        latitude (float): Geographic latitude. Default: 51.5136.
+        longitude (float): Geographic longitude. Default: 7.4653.
+        timezone (str): Data timezone. Default: "UTC".
+        country_code (str): Holiday country code. Default: "DE".
+        state (str): Holiday state code. Default: "NW".
+        include_weather_windows (bool): Toggle weather window features. Default: False.
+        include_holiday_features (bool): Toggle holiday features. Default: False.
+        include_poly_features (bool): Toggle polynomial features. Default: False.
+        verbose (bool): Toggle detailed logging. Default: False.
+        weights (Optional[List[float]]): List of weights for prediction aggregation.
+            Default: [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0].
+        log_dir (Optional[Path]): Directory to save log files. If None, uses default path.
+        logging_enabled (bool): Toggle overall logging (console and file). Default: False.
     """
+    # Use default log directory if none provided
+    if log_dir is None:
+        log_dir = Path.home() / "spotforecast2_safe_models" / "logs"
+
+    # Setup Logging if enabled
+    log_file = None
+    if logging_enabled:
+        logger, log_file = setup_logging(
+            level=logging.INFO if verbose else logging.WARNING, 
+            log_dir=log_dir
+        )
+    else:
+        logger = logging.getLogger("task_safe_n_to_1")
+        logger.addHandler(logging.NullHandler())
+
+    if weights is None:
+        weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+
     data = fetch_data()
 
-    FORECAST_HORIZON = 24
-    CONTAMINATION = 0.01
-    WINDOW_SIZE = 72
-    LAGS = 24
-    TRAIN_RATIO = 0.8
-    LATITUDE = 51.5136
-    LONGITUDE = 7.4653
-    TIMEZONE = "UTC"
-    COUNTRY_CODE = "DE"
-    STATE = "NW"
-    INCLUDE_WEATHER_WINDOWS = False
-    INCLUDE_HOLIDAY_FEATURES = False
-    INCLUDE_POLY_FEATURES = False
-    VERBOSE = False
-    WEIGHTS = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
-
-    print("--- Starting n_to_1_with_covariates using modular functions ---")
+    logger.info("--- Starting n_to_1_with_covariates using modular functions ---")
 
     # Execute the forecasting pipeline
     predictions, combined_prediction, model_metrics, feature_info = (
         n_to_1_with_covariates(
             data=data,
-            forecast_horizon=FORECAST_HORIZON,
-            contamination=CONTAMINATION,
-            window_size=WINDOW_SIZE,
-            lags=LAGS,
-            train_ratio=TRAIN_RATIO,
-            latitude=LATITUDE,
-            longitude=LONGITUDE,
-            timezone=TIMEZONE,
-            country_code=COUNTRY_CODE,
-            state=STATE,
+            forecast_horizon=forecast_horizon,
+            contamination=contamination,
+            window_size=window_size,
+            lags=lags,
+            train_ratio=train_ratio,
+            latitude=latitude,
+            longitude=longitude,
+            timezone=timezone,
+            country_code=country_code,
+            state=state,
             estimator=None,
-            include_weather_windows=INCLUDE_WEATHER_WINDOWS,
-            include_holiday_features=INCLUDE_HOLIDAY_FEATURES,
-            include_poly_features=INCLUDE_POLY_FEATURES,
-            weights=WEIGHTS,
-            verbose=VERBOSE,
+            include_weather_windows=include_weather_windows,
+            include_holiday_features=include_holiday_features,
+            include_poly_features=include_poly_features,
+            weights=weights,
+            verbose=verbose,
         )
     )
 
-    # Print results (similar to n_to_1_task.py)
+    # Print results to stdout even if logging is low-level
     print("\nMulti-output predictions head:")
-    print(predictions)
+    print(predictions.head())
 
-    print("Calculating combined prediction...")
-    print("Combined Prediction:")
-    print(combined_prediction)
+    print("\nCombined Prediction Head:")
+    print(combined_prediction.head())
+
+    if log_file:
+        print(f"\nFinalized logging info saved to: {log_file}")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Run the safety-critical N-to-1 forecasting demo with exogenous covariates.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    # Technical Parameters
+    parser.add_argument("--forecast_horizon", type=int, default=24, help="Number of steps ahead to forecast.")
+    parser.add_argument("--contamination", type=float, default=0.01, help="Outlier contamination parameter [0, 1].")
+    parser.add_argument("--window_size", type=int, default=72, help="Rolling window size for feature extraction.")
+    parser.add_argument("--lags", type=int, default=24, help="Number of lags for recursive model.")
+    parser.add_argument("--train_ratio", type=float, default=0.8, help="Fraction of data used for training.")
+
+    # Location Parameters
+    parser.add_argument("--latitude", type=float, default=51.5136, help="Location latitude for solar features.")
+    parser.add_argument("--longitude", type=float, default=7.4653, help="Location longitude for solar features.")
+    parser.add_argument("--timezone", type=str, default="UTC", help="Timezone for data processing.")
+    parser.add_argument("--country_code", type=str, default="DE", help="Country code for holidays (ISO 3166).")
+    parser.add_argument("--state", type=str, default="NW", help="State code for regional holidays.")
+
+    # Feature Engineering Flags
+    parser.add_argument("--include_weather_windows", type=_parse_bool, default=False, help="Enable rolling weather statistics.")
+    parser.add_argument("--include_holiday_features", type=_parse_bool, default=False, help="Enable holiday binary indicators.")
+    parser.add_argument("--include_poly_features", type=_parse_bool, default=False, help="Enable polynomial interaction terms.")
+
+    # Execution Controls
+    parser.add_argument("--verbose", type=_parse_bool, default=False, help="Enable verbose mission-critical logging.")
+    parser.add_argument(
+        "--weights",
+        type=float,
+        nargs="+",
+        default=[1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0],
+        help="Space-separated list of weights for prediction aggregation."
+    )
+    parser.add_argument(
+        "--logging",
+        type=_parse_bool,
+        default=False,
+        help="Enable overall logging (console and file)."
+    )
+    parser.add_argument(
+        "--log_dir",
+        type=str,
+        default=None,
+        help="Custom directory for execution logs."
+    )
+
+    args = parser.parse_args()
+    
+    # Process path
+    specified_log_dir = Path(args.log_dir) if args.log_dir else None
+
+    # Filter out log_dir and rename logging to logging_enabled for main kwargs
+    kwargs = vars(args)
+    if specified_log_dir:
+        kwargs["log_dir"] = specified_log_dir
+    
+    # Map 'logging' arg to 'logging_enabled' parameter
+    kwargs["logging_enabled"] = kwargs.pop("logging")
+
+    try:
+        main(**kwargs)
+    except KeyboardInterrupt:
+        print("\nShutdown requested by user.")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\nCritical failure: {e}")
+        sys.exit(1)
