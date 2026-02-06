@@ -59,10 +59,14 @@ Many thanks to the [skforecast team](https://skforecast.org/0.20.0/more/about-sk
 
 # References
 
-## skforecast: 
+## spotforecast2
+
+The "full" version of `spotforecast2-safe`, which is named `spotforecast`, is available at: [https://sequential-parameter-optimization.github.io/spotforecast2/](https://sequential-parameter-optimization.github.io/spotforecast2/)
+
+## skforecast 
 
 * Amat Rodrigo, J., & Escobar Ortiz, J. (2026). skforecast (Version 0.20.0) [Computer software]. https://doi.org/10.5281/zenodo.8382788 
 
-## spotoptim:
+## spotoptim
 
 * [spotoptim documentation](https://sequential-parameter-optimization.github.io/spotoptim/)
