@@ -20,13 +20,7 @@
 
 [![Maintenance](https://img.shields.io/badge/maintenance-active-green)](https://github.com/sequential-parameter-optimization/spotforecast2-safe)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-## ⚠️ Disclaimer & Liability
 
-**IMPORTANT**: This software is provided "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. 
-
-In no event shall the authors, copyright holders, or contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
-
-**The use of this software in safety-critical systems is at the sole risk of the user.**
 
 
 ## Safety-Critical Design
@@ -41,6 +35,15 @@ Unlike standard ML libraries, it follows a strict **"Safety-First"** architectur
 
 For a detailed technical audit of our safety mechanisms, see our **[MODEL_CARD.md](MODEL_CARD.md)**.
 
+## ⚠️ Disclaimer & Liability
+
+**IMPORTANT**: This software is provided "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. 
+
+In no event shall the authors, copyright holders, or contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
+
+**The use of this software in safety-critical systems is at the sole risk of the user.**
+
+## Attributions
 
 Parts of the code are ported from `skforecast` to reduce external dependencies.
 Many thanks to the [skforecast team](https://skforecast.org/0.20.0/more/about-skforecast.html) for their great work!
