@@ -28,7 +28,7 @@ def mark_outliers(
 
     Examples:
         >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.outlier import mark_outliers
+        >>> from spotforecast2_safe.preprocessing.outlier import mark_outliers
         >>> data = fetch_data()
         >>> cleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)
     """
@@ -75,7 +75,7 @@ def manual_outlier_removal(
 
     Examples:
         >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.outlier import manual_outlier_removal
+        >>> from spotforecast2_safe.preprocessing.outlier import manual_outlier_removal
         >>> data = fetch_data()
         >>> data, n_manual_outliers = manual_outlier_removal(
         ...     data,
@@ -148,7 +148,7 @@ def get_outliers(
     Examples:
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from spotforecast2.preprocessing.outlier import get_outliers
+        >>> from spotforecast2_safe.preprocessing.outlier import get_outliers
         >>>
         >>> # Create sample data with outliers
         >>> np.random.seed(42)
