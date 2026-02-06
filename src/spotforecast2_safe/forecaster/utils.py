@@ -341,7 +341,7 @@ def initialize_window_features(
         TypeError: If `window_sizes` or `features_names` have incorrect types.
 
     Examples:
-        >>> from spotforecast2.forecaster.preprocessing import RollingFeatures
+        >>> from spotforecast2_safe.forecaster.preprocessing import RollingFeatures
         >>> wf = RollingFeatures(stats=['mean', 'std'], window_sizes=[7, 14])
         >>> wf_list, names, max_size = initialize_window_features(wf)
         >>> print(f"Max window size: {max_size}")
@@ -824,8 +824,8 @@ def predict_multivariate(
     Examples:
         >>> import pandas as pd
         >>> from sklearn.linear_model import LinearRegression
-        >>> from spotforecast2.forecaster.recursive import ForecasterRecursive
-        >>> from spotforecast2.forecaster.utils import predict_multivariate
+        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        >>> from spotforecast2_safe.forecaster.utils import predict_multivariate
         >>> y1 = pd.Series([1, 2, 3, 4, 5])
         >>> y2 = pd.Series([2, 4, 6, 8, 10])
         >>> f1 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
@@ -902,7 +902,7 @@ def initialize_transformer_series(
 
     Examples:
         No transformation:
-        >>> from spotforecast2.forecaster.utils import initialize_transformer_series
+        >>> from spotforecast2_safe.forecaster.utils import initialize_transformer_series
         >>> series = ['series1', 'series2', 'series3']
         >>> result = initialize_transformer_series(
         ...     forecaster_name='ForecasterDirectMultiVariate',

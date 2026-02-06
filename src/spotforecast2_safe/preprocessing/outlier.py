@@ -27,7 +27,7 @@ def mark_outliers(
         tuple[pd.DataFrame, np.ndarray]: A tuple containing the modified dataset with outliers marked as NaN and the outlier labels.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
         >>> from spotforecast2_safe.preprocessing.outlier import mark_outliers
         >>> data = fetch_data()
         >>> cleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)
@@ -74,7 +74,7 @@ def manual_outlier_removal(
         tuple[pd.DataFrame, int]: A tuple containing the modified dataset with outliers marked as NaN and the number of outliers marked.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
         >>> from spotforecast2_safe.preprocessing.outlier import manual_outlier_removal
         >>> data = fetch_data()
         >>> data, n_manual_outliers = manual_outlier_removal(

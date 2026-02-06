@@ -7,7 +7,7 @@ Examples:
     Using custom warnings::
 
         import warnings
-        from spotforecast2.exceptions import MissingValuesWarning
+        from spotforecast2_safe.exceptions import MissingValuesWarning
 
         # Raise a warning
         warnings.warn(
@@ -499,7 +499,7 @@ class NotFittedError(ValueError, AttributeError):
     exception handling and backward compatibility.
 
     Examples:
-        >>> from spotforecast2.exceptions import NotFittedError
+        >>> from spotforecast2_safe.exceptions import NotFittedError
         >>> try:
         ...     raise NotFittedError("Forecaster not fitted")
         ... except NotFittedError as e:

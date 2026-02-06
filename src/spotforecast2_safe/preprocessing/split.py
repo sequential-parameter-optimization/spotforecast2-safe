@@ -21,8 +21,8 @@ def split_abs_train_val_test(
             - data_test (pd.DataFrame): The test set.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.split import split_train_val_test
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.preprocessing.split import split_train_val_test
         >>> data = fetch_data()
         >>> end_train = pd.Timestamp('2020-12-31 23:00:00')
         >>> end_validation = pd.Timestamp('2021-06-30 23:00:00')
@@ -81,8 +81,8 @@ def split_rel_train_val_test(
             - data_test (pd.DataFrame): The test set.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.split import split_rel_train_val_test
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
         >>> data = fetch_data()
         >>> data_train, data_val, data_test = split_rel_train_val_test(
         ...     data,

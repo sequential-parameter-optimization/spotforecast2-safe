@@ -68,8 +68,8 @@ def custom_weights(index, weights_series: pd.Series) -> float:
         float: The weight corresponding to the index.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.imputation import custom_weights
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.preprocessing.imputation import custom_weights
         >>> data = fetch_data()
         >>> _, missing_weights = get_missing_weights(data, window_size=72, verbose=False)
         >>> for idx in data.index[:5]:
@@ -106,8 +106,8 @@ def get_missing_weights(
             A tuple containing the forward and backward filled DataFrame and a boolean series where True indicates missing weights.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.imputation import get_missing_weights
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.preprocessing.imputation import get_missing_weights
         >>> data = fetch_data()
         >>> filled_data, missing_weights = get_missing_weights(data, window_size=72, verbose=True)
 

@@ -114,7 +114,7 @@ class ForecasterRecursive(ForecasterBase):
 
         >>> import numpy as np
         >>> from sklearn.linear_model import LinearRegression
-        >>> from spotforecast2.forecaster.recursive import ForecasterRecursive
+        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
         >>> y = np.random.randn(100)
         >>> forecaster = ForecasterRecursive(
         ...     estimator=LinearRegression(),
@@ -127,7 +127,7 @@ class ForecasterRecursive(ForecasterBase):
 
         >>> from sklearn.ensemble import RandomForestRegressor
         >>> from sklearn.preprocessing import StandardScaler
-        >>> from spotforecast2.preprocessing import RollingMeanWindow
+        >>> from spotforecast2_safe.preprocessing import RollingMeanWindow
         >>> y = np.random.randn(100)
         >>> forecaster = ForecasterRecursive(
         ...     estimator=RandomForestRegressor(n_estimators=100),

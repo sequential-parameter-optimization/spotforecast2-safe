@@ -9,7 +9,7 @@ from sklearn.exceptions import NotFittedError
 from spotforecast2_safe.exceptions import MissingValuesWarning
 from spotforecast2_safe.preprocessing import QuantileBinner
 
-# from spotforecast2._version import __version__ # Skipping version for now or mock it
+# from spotforecast2_safe._version import __version__ # Skipping version for now or mock it
 from spotforecast2_safe.forecaster.utils import (
     check_extract_values_and_index,
     get_style_repr_html,
@@ -123,7 +123,7 @@ class ForecasterEquivalentDate:
     Examples:
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from spotforecast2.forecaster.recursive import ForecasterEquivalentDate
+        >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
         >>> # Series with daily frequency
         >>> data = pd.Series(
         ...     data = np.arange(14),

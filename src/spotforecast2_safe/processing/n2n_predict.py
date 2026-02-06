@@ -11,7 +11,7 @@ serialization and deserialization of trained forecasters.
 Examples:
     Basic usage with default parameters:
 
-    >>> from spotforecast2.processing.n2n_predict import n2n_predict
+    >>> from spotforecast2_safe.processing.n2n_predict import n2n_predict
     >>> predictions = n2n_predict(forecast_horizon=24, verbose=True)
 
     Using cached models:

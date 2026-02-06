@@ -39,7 +39,7 @@ def initialize_lags(
 
     Examples:
         >>> import numpy as np
-        >>> from spotforecast2.utils.forecaster_config import initialize_lags
+        >>> from spotforecast2_safe.utils.forecaster_config import initialize_lags
         >>>
         >>> # Integer input
         >>> lags, names, max_lag = initialize_lags("ForecasterRecursive", 3)
@@ -158,7 +158,7 @@ def initialize_weights(
     Examples:
         >>> import numpy as np
         >>> from sklearn.linear_model import Ridge
-        >>> from spotforecast2.utils.forecaster_config import initialize_weights
+        >>> from spotforecast2_safe.utils.forecaster_config import initialize_weights
         >>>
         >>> # Simple weight function
         >>> def custom_weights(index):
@@ -286,7 +286,7 @@ def check_select_fit_kwargs(estimator: Any, fit_kwargs: Optional[dict] = None) -
 
     Examples:
         >>> from sklearn.linear_model import Ridge
-        >>> from spotforecast2.utils.forecaster_config import check_select_fit_kwargs
+        >>> from spotforecast2_safe.utils.forecaster_config import check_select_fit_kwargs
         >>>
         >>> estimator = Ridge()
         >>> # Valid argument for Ridge.fit

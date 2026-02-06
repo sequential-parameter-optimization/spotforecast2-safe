@@ -32,7 +32,7 @@ def input_to_frame(
 
     Examples:
         >>> import pandas as pd
-        >>> from spotforecast2.utils.data_transform import input_to_frame
+        >>> from spotforecast2_safe.utils.data_transform import input_to_frame
         >>>
         >>> # Series with name
         >>> y = pd.Series([1, 2, 3], name="sales")
@@ -90,7 +90,7 @@ def expand_index(index: Union[pd.Index, None], steps: int) -> pd.Index:
 
     Examples:
         >>> import pandas as pd
-        >>> from spotforecast2.utils.data_transform import expand_index
+        >>> from spotforecast2_safe.utils.data_transform import expand_index
         >>>
         >>> # DatetimeIndex
         >>> dates = pd.date_range("2023-01-01", periods=5, freq="D")

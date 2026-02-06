@@ -12,7 +12,7 @@ serialization and deserialization of trained forecasters.
 Examples:
     Basic usage with default parameters:
 
-    >>> from spotforecast2.processing.n2n_predict_with_covariates import (
+    >>> from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     ...     n2n_predict_with_covariates
     ... )
     >>> predictions = n2n_predict_with_covariates(

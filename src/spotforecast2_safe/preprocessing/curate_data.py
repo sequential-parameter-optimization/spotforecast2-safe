@@ -22,7 +22,7 @@ def get_start_end(
             Date strings in the format "YYYY-MM-DDTHH:MM" for data and covariate ranges.
 
     Examples:
-        >>> from spotforecast2.preprocessing.curate_data import get_start_end
+        >>> from spotforecast2_safe.preprocessing.curate_data import get_start_end
         >>> import pandas as pd
         >>> date_rng = pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')
         >>> data = pd.DataFrame(date_rng, columns=['date'])
@@ -61,8 +61,8 @@ def curate_holidays(
             The forecast horizon in hours.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data, fetch_holiday_data
-        >>> from spotforecast2.preprocessing.curate_data import get_start_end, curate_holidays
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data, fetch_holiday_data
+        >>> from spotforecast2_safe.preprocessing.curate_data import get_start_end, curate_holidays
         >>> data = fetch_data()
         >>> START, END, COV_START, COV_END = get_start_end(
         ...     data=data,
@@ -103,8 +103,8 @@ def curate_weather(weather_df: pd.DataFrame, data: pd.DataFrame, forecast_horizo
             The forecast horizon in hours.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data, fetch_weather_data
-        >>> from spotforecast2.preprocessing.curate_data import get_start_end, curate_weather
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data, fetch_weather_data
+        >>> from spotforecast2_safe.preprocessing.curate_data import get_start_end, curate_weather
         >>> data = fetch_data()
         >>> START, END, COV_START, COV_END = get_start_end(
         ...     data=data,
@@ -143,8 +143,8 @@ def basic_ts_checks(data: pd.DataFrame, verbose: bool = False) -> bool:
             Whether to print additional information.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_data
-        >>> from spotforecast2.preprocessing.curate_data import basic_ts_checks
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.preprocessing.curate_data import basic_ts_checks
         >>> data = fetch_data()
         >>> basic_ts_checks(data)
 
@@ -231,7 +231,7 @@ def agg_and_resample_data(
         - .agg({...: by}): Aggregates values within each time bin
 
     Examples::
-        >>> from spotforecast2.preprocessing.curate_data import agg_and_resample_data
+        >>> from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
         >>> import pandas as pd
         >>> date_rng = pd.date_range(start='2023-01-01', end='2023-01-02', freq='15T')
         >>> data = pd.DataFrame(date_rng, columns=['date'])

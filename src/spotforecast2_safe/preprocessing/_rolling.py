@@ -49,7 +49,7 @@ class RollingFeatures:
         Create a transformer with single statistic and window size:
 
         >>> import numpy as np
-        >>> from spotforecast2.preprocessing import RollingFeatures
+        >>> from spotforecast2_safe.preprocessing import RollingFeatures
         >>> y = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
         >>> rf = RollingFeatures(stats='mean', window_sizes=3)
         >>> rf.fit(y)

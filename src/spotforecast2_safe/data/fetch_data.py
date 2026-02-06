@@ -68,7 +68,7 @@ def get_cache_home(cache_home: Optional[Union[str, Path]] = None) -> Path:
         OSError: If the directory cannot be created due to permission issues.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import get_cache_home
+        >>> from spotforecast2_safe.data.fetch_data import get_cache_home
         >>> cache_dir = get_cache_home()
         >>> cache_dir.name
         'spotforecast2_cache'
@@ -138,7 +138,7 @@ def fetch_data(
 
     Examples:
         Load from CSV (default):
-        >>> from spotforecast2.data.fetch_data import fetch_data
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data
         >>> data = fetch_data(columns=["col1", "col2"])
         >>> data.head()
                         Header1  Header2  Header3
@@ -217,7 +217,7 @@ def fetch_holiday_data(
         pd.DataFrame: DataFrame containing holiday information.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_holiday_data
+        >>> from spotforecast2_safe.data.fetch_data import fetch_holiday_data
         >>> holiday_df = fetch_holiday_data(
         ...     start='2023-01-01T00:00',
         ...     end='2023-01-10T00:00',
@@ -268,7 +268,7 @@ def fetch_weather_data(
         pd.DataFrame: DataFrame containing weather information.
 
     Examples:
-        >>> from spotforecast2.data.fetch_data import fetch_weather_data
+        >>> from spotforecast2_safe.data.fetch_data import fetch_weather_data
         >>> weather_df = fetch_weather_data(
         ...     cov_start='2023-01-01T00:00',
         ...     cov_end='2023-01-11T00:00',

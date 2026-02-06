@@ -50,7 +50,7 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
     Examples:
         >>> import numpy as np
-        >>> from spotforecast2.preprocessing import QuantileBinner
+        >>> from spotforecast2_safe.preprocessing import QuantileBinner
         >>>
         >>> # Basic usage: create 3 quantile bins
         >>> X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -113,7 +113,7 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
         Examples:
             >>> import numpy as np
-            >>> from spotforecast2.preprocessing import QuantileBinner
+            >>> from spotforecast2_safe.preprocessing import QuantileBinner
             >>>
             >>> # Valid parameters work fine
             >>> binner = QuantileBinner(n_bins=5, method='linear')
@@ -181,7 +181,7 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
         Examples:
             >>> import numpy as np
-            >>> from spotforecast2.preprocessing import QuantileBinner
+            >>> from spotforecast2_safe.preprocessing import QuantileBinner
             >>>
             >>> # Fit with basic data
             >>> X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -260,7 +260,7 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
         Examples:
             >>> import numpy as np
-            >>> from spotforecast2.preprocessing import QuantileBinner
+            >>> from spotforecast2_safe.preprocessing import QuantileBinner
             >>>
             >>> # Fit and transform
             >>> X_train = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -330,7 +330,7 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
         Examples:
             >>> import numpy as np
-            >>> from spotforecast2.preprocessing import QuantileBinner
+            >>> from spotforecast2_safe.preprocessing import QuantileBinner
             >>>
             >>> binner = QuantileBinner(n_bins=5, method='median_unbiased', subsample=1000)
             >>> params = binner.get_params()
@@ -362,7 +362,7 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
         Examples:
             >>> import numpy as np
-            >>> from spotforecast2.preprocessing import QuantileBinner
+            >>> from spotforecast2_safe.preprocessing import QuantileBinner
             >>>
             >>> binner = QuantileBinner(n_bins=3)
             >>> print(binner.n_bins)

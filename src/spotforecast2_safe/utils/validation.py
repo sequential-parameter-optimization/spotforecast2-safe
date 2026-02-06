@@ -29,7 +29,7 @@ def check_y(y: Any, series_id: str = "`y`") -> None:
     Examples:
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from spotforecast2.utils.validation import check_y
+        >>> from spotforecast2_safe.utils.validation import check_y
         >>>
         >>> # Valid series
         >>> y = pd.Series([1, 2, 3, 4, 5])
@@ -91,7 +91,7 @@ def check_exog(
     Examples:
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from spotforecast2.utils.validation import check_exog
+        >>> from spotforecast2_safe.utils.validation import check_exog
         >>>
         >>> # Valid DataFrame
         >>> exog_df = pd.DataFrame({"temp": [20, 21, 22], "humidity": [50, 55, 60]})
@@ -166,7 +166,7 @@ def check_exog_dtypes(
     Examples:
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from spotforecast2.utils.validation import check_exog_dtypes
+        >>> from spotforecast2_safe.utils.validation import check_exog_dtypes
         >>>
         >>> # Valid types (float, int)
         >>> df_valid = pd.DataFrame({
@@ -253,7 +253,7 @@ def get_exog_dtypes(exog: Union[pd.Series, pd.DataFrame]) -> Dict[str, type]:
     Examples:
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from spotforecast2.utils.validation import get_exog_dtypes
+        >>> from spotforecast2_safe.utils.validation import get_exog_dtypes
         >>>
         >>> # DataFrame with mixed types
         >>> exog_df = pd.DataFrame({
@@ -310,7 +310,7 @@ def check_interval(
             lower >= upper, or intervals not symmetric when required.
 
     Examples:
-        >>> from spotforecast2.utils.validation import check_interval
+        >>> from spotforecast2_safe.utils.validation import check_interval
         >>>
         >>> # Valid 95% confidence interval
         >>> check_interval(interval=[2.5, 97.5])  # No error
