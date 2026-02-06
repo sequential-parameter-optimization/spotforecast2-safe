@@ -1,3 +1,11 @@
+## [0.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.1...v0.0.2) (2026-02-06)
+
+
+### Bug Fixes
+
+* compliance ([ab2b4e3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ab2b4e36aa684570723548173e5f1ff3938935d5))
+* plot removed (outlier.py) and mv to spotforecast2 (outlier_plot.py) ([7d4520c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7d4520c55a2c6426026b021134e7d3ea53c91236))
+
 ## 1.0.0 (2026-02-06)
 
 
