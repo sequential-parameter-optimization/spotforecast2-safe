@@ -23,17 +23,18 @@
 
 
 
-## Safety-Critical Design
+## Safety-Critical Design Goals
 
-`spotforecast2-safe` is a specialized Python library designed for time series forecasting in **safety-critical production environments** and **embedded systems**. 
+`spotforecast2-safe` is a specialized Python library designed to **facilitate** time series forecasting in safety-critical production environments and embedded systems. 
 
-Unlike standard ML libraries, it follows a strict **"Safety-First"** architecture:
-- **Zero Dead Code**: The package contains no visualization (Plotly), optimization (Optuna), or training logic. This significantly simplifies code audits and minimizes the cybersecurity attack surface (CVE reduction).
-- **Deterministic Logic**: Transformations are purely mathematical and deterministic. Identical inputs always yield identical, bit-perfect outputs.
-- **Fail-Safe Operation**: Explicit rejection of incomplete or "dirty" data (NaNs/Infs). The system favors a controlled crash over a silent failure.
-- **EU AI Act Compliance**: Engineered for transparency and data governance as required for high-risk AI components.
+Unlike standard ML libraries, it follows a strict **"Safety-First"** architecture by design. **However, users must independently verify that these features meet their specific regulatory requirements:**
 
-For a detailed technical audit of our safety mechanisms, see our **[MODEL_CARD.md](MODEL_CARD.md)**.
+- **Zero Dead Code**: We aim to minimize the attack surface by excluding visualization and training logic.
+- **Deterministic Logic**: The algorithms are designed to be purely mathematical and deterministic.
+- **Fail-Safe Operation**: The system is designed to favor explicit errors over silent failures when encountering invalid data.
+- **EU AI Act Support**: The architecture supports transparency and data governance, helping users build compliant high-risk AI components.
+
+For a detailed technical overview of our safety mechanisms, see our **[MODEL_CARD.md](MODEL_CARD.md)**.
 
 ## ⚠️ Disclaimer & Liability
 
