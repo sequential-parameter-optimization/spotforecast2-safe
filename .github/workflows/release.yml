@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+          pip install -e ".[dev]"
+      
+      - name: Run tests
+        run: |
+          pytest tests/ -v
+      
+      - name: Verify package name in pyproject.toml
+        run: |
+          grep -q "name = \"spotforecast2-safe\"" pyproject.toml || (echo "ERROR: Package name mismatch in pyproject.toml" && exit 1)
+          echo "✓ Package name verified: spotforecast2-safe"
+      
+      - name: Build distribution packages
+        run: |
+          python -m build
+          echo "Build artifacts created:"
+          ls -lah dist/
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install semantic-release
+        run: |
+          npm install -g semantic-release@23 \
+            @semantic-release/git@10 \
+            @semantic-release/changelog@6 \
+            @semantic-release/exec@6 \
+            conventional-changelog-conventionalcommits@7
+      
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+      
+      - name: Build documentation
+        if: success()
+        run: |
+          pip install mkdocs-material mkdocstrings[python]
+          mkdocs build
+      
+      - name: Deploy documentation
+        if: success()
+        run: |
+          mkdocs gh-deploy --force
+      
+      - name: Verify PyPI Release
+        if: success()
+        run: |
+          echo "Release completed successfully!"
+          echo "Verifying package on PyPI..."
+          for i in {1..30}; do
+            if python -c "import urllib.request; urllib.request.urlopen('https://pypi.org/project/spotforecast2-safe/')" 2>/dev/null; then
+              echo "✓ Package found on PyPI"
+              break
+            fi
+            if [ $i -lt 30 ]; then
+              echo "Waiting for PyPI to sync (attempt $i/30)..."
+              sleep 10
+            fi
+          done
