@@ -1,3 +1,10 @@
+## [0.0.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.2...v0.0.3) (2026-02-06)
+
+
+### Bug Fixes
+
+* correct import (outlier.py) ([b4c0e89](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b4c0e893220dca1890946d2e9e889b81098292cc))
+
 ## [0.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.1...v0.0.2) (2026-02-06)
 
 
