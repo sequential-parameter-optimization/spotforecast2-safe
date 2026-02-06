@@ -2572,7 +2572,7 @@ raises no warning about NaN values. Defaults to True.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid DataFrame</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">exog_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span> <span class="s2">&quot;humidity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">60</span><span class="p">]})</span>
@@ -2700,7 +2700,7 @@ raises no warning about NaN values. Defaults to True.</p>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_exog</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_exog</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        &gt;&gt;&gt; # Valid DataFrame</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">        &gt;&gt;&gt; exog_df = pd.DataFrame({&quot;temp&quot;: [20, 21, 22], &quot;humidity&quot;: [50, 55, 60]})</span>
@@ -2881,7 +2881,7 @@ are found.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog_dtypes</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog_dtypes</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid types (float, int)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">df_valid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -3037,7 +3037,7 @@ are found.</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_exog_dtypes</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_exog_dtypes</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        &gt;&gt;&gt; # Valid types (float, int)</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        &gt;&gt;&gt; df_valid = pd.DataFrame({</span>
@@ -3261,7 +3261,7 @@ lower &gt;= upper, or intervals not symmetric when required.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_interval</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_interval</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid 95% confidence interval</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">check_interval</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>  <span class="c1"># No error</span>
@@ -3418,7 +3418,7 @@ lower &gt;= upper, or intervals not symmetric when required.</p>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            lower &gt;= upper, or intervals not symmetric when required.</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_interval</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_interval</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        &gt;&gt;&gt; # Valid 95% confidence interval</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        &gt;&gt;&gt; check_interval(interval=[2.5, 97.5])  # No error</span>
@@ -4379,7 +4379,7 @@ or if 'sample_weight' is present (it gets removed).</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_select_fit_kwargs</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_select_fit_kwargs</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">estimator</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">()</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid argument for Ridge.fit</span>
@@ -4501,7 +4501,7 @@ or if 'sample_weight' is present (it gets removed).</p>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.forecaster_config import check_select_fit_kwargs</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.forecaster_config import check_select_fit_kwargs</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        &gt;&gt;&gt; estimator = Ridge()</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        &gt;&gt;&gt; # Valid argument for Ridge.fit</span>
@@ -4666,7 +4666,7 @@ for forecasting: it must be a pandas Series and must not contain any NaN values.
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_y</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_y</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid series</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
@@ -4757,7 +4757,7 @@ for forecasting: it must be a pandas Series and must not contain any NaN values.
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_y</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_y</span>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">        &gt;&gt;&gt; # Valid series</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; y = pd.Series([1, 2, 3, 4, 5])</span>
@@ -5198,7 +5198,7 @@ nor RangeIndex.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_index</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_index</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># DatetimeIndex</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
@@ -5319,7 +5319,7 @@ nor RangeIndex.</p>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.data_transform import expand_index</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.data_transform import expand_index</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        &gt;&gt;&gt; # DatetimeIndex</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        &gt;&gt;&gt; dates = pd.date_range(&quot;2023-01-01&quot;, periods=5, freq=&quot;D&quot;)</span>
@@ -5446,7 +5446,7 @@ For Series, uses the series name as the key. For DataFrames, uses all column nam
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_exog_dtypes</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_exog_dtypes</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># DataFrame with mixed types</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">exog_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -5527,7 +5527,7 @@ For Series, uses the series name as the key. For DataFrames, uses all column nam
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import get_exog_dtypes</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import get_exog_dtypes</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        &gt;&gt;&gt; # DataFrame with mixed types</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        &gt;&gt;&gt; exog_df = pd.DataFrame({</span>
@@ -5721,7 +5721,7 @@ or array contains non-integer values.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_lags</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_lags</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Integer input</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">lags</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">max_lag</span> <span class="o">=</span> <span class="n">initialize_lags</span><span class="p">(</span><span class="s2">&quot;ForecasterRecursive&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -5906,7 +5906,7 @@ or array contains non-integer values.</p>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.forecaster_config import initialize_lags</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.forecaster_config import initialize_lags</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        &gt;&gt;&gt; # Integer input</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        &gt;&gt;&gt; lags, names, max_lag = initialize_lags(&quot;ForecasterRecursive&quot;, 3)</span>
@@ -6202,7 +6202,7 @@ or if series_weights is not a dict.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_weights</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_weights</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Simple weight function</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">custom_weights</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
@@ -6412,7 +6412,7 @@ or if series_weights is not a dict.</p>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.forecaster_config import initialize_weights</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.forecaster_config import initialize_weights</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        &gt;&gt;&gt; # Simple weight function</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">        &gt;&gt;&gt; def custom_weights(index):</span>
@@ -6622,7 +6622,7 @@ it's converted to a single-column DataFrame.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">input_to_frame</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">input_to_frame</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Series with name</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sales&quot;</span><span class="p">)</span>
@@ -6731,7 +6731,7 @@ it's converted to a single-column DataFrame.</p>
 <a id="__codelineno-0-32" name="__codelineno-0-32"></a>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.data_transform import input_to_frame</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.data_transform import input_to_frame</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">        &gt;&gt;&gt; # Series with name</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">        &gt;&gt;&gt; y = pd.Series([1, 2, 3], name=&quot;sales&quot;)</span>
@@ -7471,7 +7471,7 @@ nor RangeIndex.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_index</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_index</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># DatetimeIndex</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
@@ -7592,7 +7592,7 @@ nor RangeIndex.</p>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.data_transform import expand_index</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.data_transform import expand_index</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        &gt;&gt;&gt; # DatetimeIndex</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        &gt;&gt;&gt; dates = pd.date_range(&quot;2023-01-01&quot;, periods=5, freq=&quot;D&quot;)</span>
@@ -7748,7 +7748,7 @@ it's converted to a single-column DataFrame.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">input_to_frame</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">input_to_frame</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Series with name</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sales&quot;</span><span class="p">)</span>
@@ -7857,7 +7857,7 @@ it's converted to a single-column DataFrame.</p>
 <a id="__codelineno-0-32" name="__codelineno-0-32"></a>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.data_transform import input_to_frame</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.data_transform import input_to_frame</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">        &gt;&gt;&gt; # Series with name</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">        &gt;&gt;&gt; y = pd.Series([1, 2, 3], name=&quot;sales&quot;)</span>
@@ -8374,7 +8374,7 @@ or if 'sample_weight' is present (it gets removed).</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_select_fit_kwargs</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_select_fit_kwargs</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">estimator</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">()</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid argument for Ridge.fit</span>
@@ -8496,7 +8496,7 @@ or if 'sample_weight' is present (it gets removed).</p>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.forecaster_config import check_select_fit_kwargs</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.forecaster_config import check_select_fit_kwargs</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        &gt;&gt;&gt; estimator = Ridge()</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        &gt;&gt;&gt; # Valid argument for Ridge.fit</span>
@@ -8724,7 +8724,7 @@ or array contains non-integer values.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_lags</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_lags</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Integer input</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">lags</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">max_lag</span> <span class="o">=</span> <span class="n">initialize_lags</span><span class="p">(</span><span class="s2">&quot;ForecasterRecursive&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -8909,7 +8909,7 @@ or array contains non-integer values.</p>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.forecaster_config import initialize_lags</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.forecaster_config import initialize_lags</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        &gt;&gt;&gt; # Integer input</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        &gt;&gt;&gt; lags, names, max_lag = initialize_lags(&quot;ForecasterRecursive&quot;, 3)</span>
@@ -9205,7 +9205,7 @@ or if series_weights is not a dict.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ridge</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_weights</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.forecaster_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_weights</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Simple weight function</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">custom_weights</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
@@ -9415,7 +9415,7 @@ or if series_weights is not a dict.</p>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        &gt;&gt;&gt; from sklearn.linear_model import Ridge</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.forecaster_config import initialize_weights</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.forecaster_config import initialize_weights</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        &gt;&gt;&gt; # Simple weight function</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">        &gt;&gt;&gt; def custom_weights(index):</span>
@@ -10043,7 +10043,7 @@ raises no warning about NaN values. Defaults to True.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid DataFrame</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">exog_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span> <span class="s2">&quot;humidity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">60</span><span class="p">]})</span>
@@ -10171,7 +10171,7 @@ raises no warning about NaN values. Defaults to True.</p>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_exog</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_exog</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        &gt;&gt;&gt; # Valid DataFrame</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">        &gt;&gt;&gt; exog_df = pd.DataFrame({&quot;temp&quot;: [20, 21, 22], &quot;humidity&quot;: [50, 55, 60]})</span>
@@ -10352,7 +10352,7 @@ are found.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog_dtypes</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_exog_dtypes</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid types (float, int)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">df_valid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -10508,7 +10508,7 @@ are found.</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_exog_dtypes</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_exog_dtypes</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        &gt;&gt;&gt; # Valid types (float, int)</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        &gt;&gt;&gt; df_valid = pd.DataFrame({</span>
@@ -10732,7 +10732,7 @@ lower &gt;= upper, or intervals not symmetric when required.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_interval</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_interval</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid 95% confidence interval</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">check_interval</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>  <span class="c1"># No error</span>
@@ -10889,7 +10889,7 @@ lower &gt;= upper, or intervals not symmetric when required.</p>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            lower &gt;= upper, or intervals not symmetric when required.</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_interval</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_interval</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        &gt;&gt;&gt; # Valid 95% confidence interval</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        &gt;&gt;&gt; check_interval(interval=[2.5, 97.5])  # No error</span>
@@ -11813,7 +11813,7 @@ for forecasting: it must be a pandas Series and must not contain any NaN values.
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_y</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_y</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Valid series</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
@@ -11904,7 +11904,7 @@ for forecasting: it must be a pandas Series and must not contain any NaN values.
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import check_y</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import check_y</span>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">        &gt;&gt;&gt; # Valid series</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">        &gt;&gt;&gt; y = pd.Series([1, 2, 3, 4, 5])</span>
@@ -12014,7 +12014,7 @@ For Series, uses the series name as the key. For DataFrames, uses all column nam
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_exog_dtypes</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_exog_dtypes</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># DataFrame with mixed types</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">exog_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -12095,7 +12095,7 @@ For Series, uses the series name as the key. For DataFrames, uses all column nam
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2.utils.validation import get_exog_dtypes</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.utils.validation import get_exog_dtypes</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        &gt;&gt;&gt;</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        &gt;&gt;&gt; # DataFrame with mixed types</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        &gt;&gt;&gt; exog_df = pd.DataFrame({</span>
