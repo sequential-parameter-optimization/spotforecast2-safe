@@ -1,3 +1,16 @@
+## [1.0.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v1.0.2...v1.0.3) (2026-02-06)
+
+
+### Bug Fixes
+
+* fixes for documentation and links ([00af598](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/00af598a296be2ec15595d3bb8d74e17c87cac65))
+
+
+### Documentation
+
+* finalize landing page with safety features and valid links ([9b44ede](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9b44edec18d2b138bf3b88fef03ddd67ec2f6c69))
+* formalize safety-critical identity and add EU AI Act Model Card ([cc29201](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cc29201ef767477e1af348549c6c505de2a1def8))
+
 ## [1.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v1.0.1...v1.0.2) (2026-02-06)
 
 
