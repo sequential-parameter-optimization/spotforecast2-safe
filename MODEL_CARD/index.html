@@ -1420,7 +1420,7 @@
 <li><strong>Developers</strong>: bartzbeielstein</li>
 <li><strong>Repository</strong>: <a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe">https://github.com/sequential-parameter-optimization/spotforecast2-safe</a></li>
 <li><strong>Core Dependencies</strong>: <code>numpy</code>, <code>pandas</code> (Minimal Dependency Footprint).</li>
-<li><strong>Prohibited Dependencies</strong>: <code>plotly</code>, <code>matplotlib</code>, <code>optuna</code>, <code>torch</code>, <code>tensorflow</code>.</li>
+<li><strong>Prohibited Dependencies</strong>: <code>plotly</code>, <code>matplotlib</code>, <code>spotoptim</code>, <code>optuna</code>, <code>torch</code>, <code>tensorflow</code>.</li>
 </ul>
 <h2 id="2-intended-use">2. Intended Use</h2>
 <h3 id="primary-use-cases">Primary Use Cases</h3>
@@ -1432,7 +1432,7 @@
 <h3 id="out-of-scope">Out-of-Scope</h3>
 <ul>
 <li><strong>Interactive Visualization</strong>: The package deliberately contains no plotting functions to minimize the attack surface.</li>
-<li><strong>Automated Hyperparameter Tuning</strong>: Optimization (e.g., via Optuna) must take place outside the "Safe Environment".</li>
+<li><strong>Automated Hyperparameter Tuning</strong>: Optimization (e.g., via spotoptim or Optuna) must take place outside the "Safe Environment".</li>
 <li><strong>Silent Data Cleaning</strong>: The package does not perform "silent" data imputation. Missing values (NaNs) lead to explicit errors (Fail-Safe), not estimations.</li>
 </ul>
 <h2 id="3-algorithm-logic">3. Algorithm &amp; Logic</h2>
