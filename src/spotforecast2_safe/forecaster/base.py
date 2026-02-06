@@ -1,6 +1,6 @@
 """ForecasterBase class.
 
-This module contains the base class for all forecasters in spotforecast2.
+This module contains the base class for all forecasters in spotforecast2_safe and spotforecast.
 All forecasters should specify all the parameters that can be set at the
 class level in their __init__.
 
@@ -420,7 +420,6 @@ class ForecasterBase(ABC):
             >>> unpickled_forecaster = pickle.loads(pickled_forecaster)
         """
 
-        # Migration: 'regressor' renamed to 'estimator' in version 0.18.0
         if "regressor" in state and "estimator" not in state:
             state["estimator"] = state.pop("regressor")
 
