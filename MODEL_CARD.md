@@ -62,3 +62,9 @@ For auditors who need to validate this package:
 1. Check `pyproject.toml` to confirm the absence of unsafe libraries.
 2. Run `pytest tests/` to verify the functional correctness of the matrix transformation.
 3. Check the hash values of input and output data to prove determinism.
+
+## 8. Disclaimer & Liability
+**LIMITATION OF LIABILITY**: While this library is designed with safety principles and deterministic logic in mind, it is provided "AS IS" without any warranties. The developers and contributors assume **NO LIABILITY** for any direct or indirect damages, system failures, or financial losses resulting from the use of this software. 
+
+It is the sole responsibility of the system integrator to perform a full system-level safety validation (e.g., as per ISO 26262, IEC 61508, or the EU AI Act) before deploying this software in a production or safety-critical environment.
+
