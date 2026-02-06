@@ -39,6 +39,8 @@ Unlike standard machine and dep learning libraries, it follows a strict **"Safet
 
 For a detailed technical overview of our safety mechanisms, see our **[MODEL_CARD.md](MODEL_CARD.md)**.
 
+An extended version of this library with visualization and additional features is available at: [https://sequential-parameter-optimization.github.io/spotforecast2/](https://sequential-parameter-optimization.github.io/spotforecast2/)
+
 ## ⚠️ Disclaimer & Liability
 
 **IMPORTANT**: This software is provided "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. 
