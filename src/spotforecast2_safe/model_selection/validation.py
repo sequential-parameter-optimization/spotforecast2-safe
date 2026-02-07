@@ -14,8 +14,10 @@ from spotforecast2_safe.exceptions import (
     set_skforecast_warnings,
 )
 from spotforecast2_safe.model_selection.split_ts_cv import TimeSeriesFold
+from spotforecast2_safe.model_selection.split_one_step import OneStepAheadFold
 from spotforecast2_safe.model_selection.utils_common import (
     check_backtesting_input,
+    check_one_step_ahead_input,
     select_n_jobs_backtesting,
 )
 
@@ -452,6 +454,181 @@ def _backtesting_forecaster(
     return metric_values, backtest_predictions
 
 
+def backtesting_forecaster_one_step(
+    forecaster: object,
+    y: pd.Series,
+    cv: OneStepAheadFold,
+    metric: str | Callable | list[str | Callable],
+    exog: pd.Series | pd.DataFrame | None = None,
+    interval: float | list[float] | tuple[float] | str | object | None = None,
+    interval_method: str = "bootstrapping",
+    n_boot: int = 250,
+    use_in_sample_residuals: bool = True,
+    use_binned_residuals: bool = True,
+    random_state: int = 123,
+    return_predictors: bool = False,
+    n_jobs: int | str = "auto",
+    verbose: bool = False,
+    show_progress: bool = True,
+    suppress_warnings: bool = False,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Backtesting of forecaster model using one-step-ahead predictions.
+
+    Args:
+        forecaster (ForecasterRecursive, ForecasterDirect, ForecasterEquivalentDate):
+            Forecaster model.
+        y (pd.Series): Training time series.
+        cv (OneStepAheadFold): OneStepAheadFold object with the information needed to
+            split the data into folds.
+        metric (str | Callable | list): Metric used to quantify the goodness of fit
+            of the model.
+        exog (pd.Series | pd.DataFrame, optional): Exogenous variable/s included as
+            predictor/s. Defaults to None.
+        interval (float | list | tuple | str | object, optional): Specifies whether
+            probabilistic predictions should be estimated.
+        interval_method (str, optional): Technique used to estimate prediction intervals.
+        n_boot (int, optional): Number of bootstrapping iterations.
+        use_in_sample_residuals (bool, optional): Use residuals from training data.
+        use_binned_residuals (bool, optional): Use binned residuals for intervals.
+        random_state (int, optional): Seed for reproducibility.
+        return_predictors (bool, optional): Return predictors used for each prediction.
+        n_jobs (int | str, optional): Number of jobs to run in parallel.
+        verbose (bool, optional): Print information about the process.
+        show_progress (bool, optional): Whether to show a progress bar.
+        suppress_warnings (bool, optional): Suppress spotforecast warnings.
+
+    Returns:
+        tuple (pd.DataFrame, pd.DataFrame):
+            - metric_values: Value(s) of the metric(s).
+            - backtest_predictions: Value of predictions.
+    """
+
+    set_skforecast_warnings(suppress_warnings, action="ignore")
+
+    forecaster = deepcopy(forecaster)
+    cv = deepcopy(cv)
+
+    check_one_step_ahead_input(
+        forecaster=forecaster,
+        cv=cv,
+        y=y,
+        metric=metric,
+        exog=exog,
+        show_progress=show_progress,
+        suppress_warnings=suppress_warnings,
+    )
+
+    cv.set_params(
+        {
+            "window_size": forecaster.window_size,
+            "differentiation": forecaster.differentiation_max,
+            "verbose": verbose,
+        }
+    )
+
+    if not isinstance(metric, list):
+        metrics = [
+            (
+                _get_metric(metric=metric)
+                if isinstance(metric, str)
+                else add_y_train_argument(metric)
+            )
+        ]
+    else:
+        metrics = [
+            _get_metric(metric=m) if isinstance(m, str) else add_y_train_argument(m)
+            for m in metric
+        ]
+
+    # Split data to get training set for fitting
+    X_train, y_train, X_test, y_test = forecaster._train_test_split_one_step_ahead(
+        y=y, initial_train_size=cv.initial_train_size, exog=exog
+    )
+
+    # Fit the forecaster
+    forecaster.fit(
+        y=y_train,
+        exog=exog.iloc[:cv.initial_train_size] if exog is not None else None,
+        store_in_sample_residuals=use_in_sample_residuals,
+    )
+
+    # Predictions
+    if interval is not None:
+        if interval_method == "bootstrapping":
+            if interval == "bootstrapping":
+                backtest_predictions = forecaster.predict_bootstrapping(
+                    steps=len(X_test),
+                    last_window=None,  # Not used in one-step batch
+                    exog=X_test,
+                    n_boot=n_boot,
+                    use_in_sample_residuals=use_in_sample_residuals,
+                    use_binned_residuals=use_binned_residuals,
+                    random_state=random_state,
+                )
+            else:
+                backtest_predictions = forecaster.predict_interval(
+                    steps=len(X_test),
+                    last_window=None,
+                    exog=X_test,
+                    method="bootstrapping",
+                    interval=interval,
+                    n_boot=n_boot,
+                    use_in_sample_residuals=use_in_sample_residuals,
+                    use_binned_residuals=use_binned_residuals,
+                    random_state=random_state,
+                )
+        else:
+            backtest_predictions = forecaster.predict_interval(
+                steps=len(X_test),
+                last_window=None,
+                exog=X_test,
+                method="conformal",
+                interval=interval,
+                n_boot=n_boot,
+                use_in_sample_residuals=use_in_sample_residuals,
+                use_binned_residuals=use_binned_residuals,
+                random_state=random_state,
+            )
+        
+        # Add 'pred' column
+        if "pred" not in backtest_predictions.columns:
+            pred = forecaster.predict(steps=len(X_test), last_window=None, exog=X_test)
+            backtest_predictions.insert(0, "pred", pred)
+    else:
+        backtest_predictions = forecaster.predict(
+            steps=len(X_test), last_window=None, exog=X_test
+        )
+        if isinstance(backtest_predictions, pd.Series):
+            backtest_predictions = backtest_predictions.to_frame()
+
+    if return_predictors:
+        X_predict = forecaster.create_predict_X(
+            steps=len(X_test), last_window=None, exog=X_test
+        )
+        backtest_predictions = pd.concat([backtest_predictions, X_predict], axis=1)
+
+    backtest_predictions.insert(0, "fold", 0)
+
+    # Calculate metrics
+    y_true = y_test
+    # Metrics expect y_true, y_pred, y_train
+    # y_train should not include first window_size observations
+    y_train_metrics = y_train.iloc[forecaster.window_size :]
+    
+    metric_values = []
+    for m in metrics:
+        metric_values.append(m(y_true=y_true, y_pred=backtest_predictions["pred"], y_train=y_train_metrics))
+    
+    metric_values = pd.DataFrame(
+        data=[metric_values], columns=[m.__name__ for m in metrics]
+    )
+
+    set_skforecast_warnings(suppress_warnings, action="default")
+
+    return metric_values, backtest_predictions
+
+
 def backtesting_forecaster(
     forecaster: object,
     y: pd.Series,
@@ -625,18 +802,24 @@ def backtesting_forecaster(
         9     2  9.31
     """
 
-    forecaters_allowed = [
-        "ForecasterRecursive",
-        "ForecasterDirect",
-        "ForecasterEquivalentDate",
-        "ForecasterRecursiveClassifier",
-    ]
-
-    if type(forecaster).__name__ not in forecaters_allowed:
-        raise TypeError(
-            f"`forecaster` must be of type {forecaters_allowed}. For all other "
-            f"types of forecasters use the other functions available in the "
-            f"`model_selection` module."
+    if type(cv).__name__ == "OneStepAheadFold":
+        return backtesting_forecaster_one_step(
+            forecaster=forecaster,
+            y=y,
+            cv=cv,
+            metric=metric,
+            exog=exog,
+            interval=interval,
+            interval_method=interval_method,
+            n_boot=n_boot,
+            use_in_sample_residuals=use_in_sample_residuals,
+            use_binned_residuals=use_binned_residuals,
+            random_state=random_state,
+            return_predictors=return_predictors,
+            n_jobs=n_jobs,
+            verbose=verbose,
+            show_progress=show_progress,
+            suppress_warnings=suppress_warnings,
         )
 
     check_backtesting_input(

@@ -7,6 +7,11 @@ for time series forecasting.
 
 from .validation import backtesting_forecaster, _backtesting_forecaster
 from .split_ts_cv import TimeSeriesFold
+from .split_one_step import OneStepAheadFold
 
-__all__ = ["backtesting_forecaster", "_backtesting_forecaster", "TimeSeriesFold"]
-
+__all__ = [
+    "backtesting_forecaster",
+    "_backtesting_forecaster",
+    "TimeSeriesFold",
+    "OneStepAheadFold",
+]
