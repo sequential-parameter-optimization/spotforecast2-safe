@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: skforecast team
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later AND BSD-3-Clause
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted

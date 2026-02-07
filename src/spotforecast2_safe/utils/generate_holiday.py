@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Utilities for generating holiday dataframe as covariate."""
 
 from typing import Union

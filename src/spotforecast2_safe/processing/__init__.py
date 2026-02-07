@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Processing module for end-to-end forecasting pipelines."""
 
 from .agg_predict import agg_predict

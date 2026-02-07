@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """spotforecast2-safe: Safety-critical time series forecasting library.
 
 Version management: The package version is defined in pyproject.toml and exposed

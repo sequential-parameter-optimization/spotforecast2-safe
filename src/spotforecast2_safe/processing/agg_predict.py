@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from typing import Dict, Optional, Union, List
 import pandas as pd
 import numpy as np

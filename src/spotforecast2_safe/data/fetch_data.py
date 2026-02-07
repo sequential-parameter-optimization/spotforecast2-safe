@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 import pandas as pd
 from spotforecast2_safe.data.data import Data
 from pathlib import Path

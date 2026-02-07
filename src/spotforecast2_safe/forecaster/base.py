@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: skforecast team
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later AND BSD-3-Clause
+
+
 """ForecasterBase class.
 
 This module contains the base class for all forecasters in spotforecast2_safe and spotforecast.

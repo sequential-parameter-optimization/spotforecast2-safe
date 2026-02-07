@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: skforecast team
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later AND BSD-3-Clause
+
 from typing import Any, List, Optional, Tuple, Union
 import pandas as pd
 import numpy as np
