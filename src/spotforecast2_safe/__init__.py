@@ -7,6 +7,7 @@ via __version__ for programmatic access and documentation generation.
 try:
     # Modern approach: importlib.metadata (Python 3.8+)
     from importlib.metadata import version as _get_version
+
     __version__ = _get_version("spotforecast2-safe")
 except Exception:
     # Fallback for development environments

@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import warnings
 import uuid
-from importlib.util import find_spec
 from sklearn.compose import ColumnTransformer
 from spotforecast2_safe.utils import (
     initialize_lags,
@@ -19,7 +18,12 @@ from spotforecast2_safe.utils import (
     expand_index,
     transform_dataframe,
 )
-from spotforecast2_safe.exceptions import set_skforecast_warnings, UnknownLevelWarning
+from spotforecast2_safe.exceptions import (
+    set_skforecast_warnings,
+    UnknownLevelWarning,
+    IgnoredArgumentWarning,
+    InputTypeWarning,
+)
 
 try:
     from tqdm.auto import tqdm
@@ -27,8 +31,242 @@ except ImportError:  # pragma: no cover - fallback when tqdm is not installed
     tqdm = None
 
 
-def check_preprocess_series(series):
-    pass
+def check_preprocess_series(
+    series: pd.DataFrame | dict[str, pd.Series | pd.DataFrame],
+) -> tuple[dict[str, pd.Series], dict[str, pd.Index]]:
+    """
+    Check and preprocess `series` argument in `ForecasterRecursiveMultiSeries` class.
+
+    - If `series` is a wide-format pandas DataFrame, each column represents a
+    different time series, and the index must be either a `DatetimeIndex` or
+    a `RangeIndex` with frequency or step size, as appropriate
+    - If `series` is a long-format pandas DataFrame with a MultiIndex, the
+    first level of the index must contain the series IDs, and the second
+    level must be a `DatetimeIndex` with the same frequency across all series.
+    - If series is a dictionary, each key must be a series ID, and each value
+    must be a named pandas Series. All series must have the same index, which
+    must be either a `DatetimeIndex` or a `RangeIndex`, and they must share the
+    same frequency or step size, as appropriate.
+
+    When `series` is a pandas DataFrame, it is converted to a dictionary of pandas
+    Series, where the keys are the series IDs and the values are the Series with
+    the same index as the original DataFrame.
+
+    Args:
+        series: pandas DataFrame or dictionary of pandas Series/DataFrames
+
+    Returns:
+        tuple[dict[str, pd.Series], dict[str, pd.Index]]:
+            - series_dict: Dictionary where keys are series IDs and values are pandas Series.
+            - series_indexes: Dictionary where keys are series IDs and values are the index of each series.
+    Raises:
+        TypeError:
+            If `series` is not a pandas DataFrame or a dictionary of pandas Series/DataFrames.
+        TypeError:
+            If the index of `series` is not a DatetimeIndex or RangeIndex with frequency/step size.
+        ValueError:
+            If the series in `series` have different frequencies or step sizes.
+        ValueError:
+            If all values of any series are NaN.
+        UserWarning:
+            If `series` is a wide-format DataFrame, only the first column will be used as series values.
+        UserWarning:
+            If `series` is a DataFrame (either wide or long format), additional internal transformations are required, which can increase computational time.
+            It is recommended to use a dictionary of pandas Series instead.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from spotforecast2_safe.forecaster.utils import check_preprocess_series
+        >>> # Example with wide-format DataFrame
+        >>> dates = pd.date_range('2020-01-01', periods=5, freq='D')
+        >>> df_wide = pd.DataFrame({
+        ...     'series_1': [1, 2, 3, 4, 5],
+        ...     'series_2': [5, 4, 3, 2, 1],
+        ... }, index=dates)
+        >>> series_dict, series_indexes = check_preprocess_series(df_wide)
+        UserWarning: `series` DataFrame has multiple columns. Only the values of first column, 'series_1', will be used as series values. All other columns will be ignored.
+        UserWarning: Passing a DataFrame (either wide or long format) as `series` requires additional internal transformations, which can increase computational time.
+        It is recommended to use a dictionary of pandas Series instead.
+        >>> print(series_dict['series_1'])
+        2020-01-01    1
+        2020-01-02    2
+        2020-01-03    3
+        2020-01-04    4
+        2020-01-05    5
+        Name: series_1, dtype: int64
+        >>> print(series_indexes['series_1'])
+        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
+                       '2020-01-05'],
+                      dtype='datetime64[ns]', freq='D')
+        >>> # Example with long-format DataFrame
+        >>> df_long = pd.DataFrame({
+        ...     'series_id': ['series_1'] * 5 + ['series_2'] * 5,
+        ...     'value': [1, 2, 3, 4, 5, 5, 4, 3, 2, 1],
+        ... }, index=pd.MultiIndex.from_product([['series_1', 'series_2'], dates], names=['series_id', 'date']))
+        >>> series_dict, series_indexes = check_preprocess_series(df_long)
+        UserWarning: `series` DataFrame has multiple columns. Only the values of first column, 'value', will be used as series values. All other columns will be ignored.
+        UserWarning: Passing a DataFrame (either wide or long format) as `series` requires additional internal transformations, which can increase computational time.
+        It is recommended to use a dictionary of pandas Series instead.
+        >>> print(series_dict['series_1'])
+        2020-01-01    1
+        2020-01-02    2
+        2020-01-03    3
+        2020-01-04    4
+        2020-01-05    5
+        Name: series_1, dtype: int64
+        >>> print(series_indexes['series_1'])
+        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
+                          '2020-01-05'],
+                         dtype='datetime64[ns]', freq='D')
+
+        >>> # Example with dictionary of Series
+        >>> series_dict_input = {
+        ...     'series_1': pd.Series([1, 2, 3, 4, 5], index=dates),
+        ...     'series_2': pd.Series([5, 4, 3, 2, 1], index=dates),
+        ... }
+        >>> series_dict, series_indexes = check_preprocess_series(series_dict_input)
+        >>> print(series_dict['series_1'])
+        2020-01-01    1
+        2020-01-02    2
+        2020-01-03    3
+        2020-01-04    4
+        2020-01-05    5
+        Name: series_1, dtype: int64
+        >>> print(series_indexes['series_1'])
+        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
+                       '2020-01-05'],
+                      dtype='datetime64[ns]', freq='D')
+            >>> # Example with dictionary of DataFrames
+            >>> df_series_1 = pd.DataFrame({'value': [1, 2, 3, 4, 5]}, index=dates)
+            >>> df_series_2 = pd.DataFrame({'value': [5, 4, 3, 2, 1]}, index=dates)
+            >>> series_dict_input = {
+            ...     'series_1': df_series_1,
+            ...     'series_2': df_series_2,
+            ... }
+            >>> series_dict, series_indexes = check_preprocess_series(series_dict_input)
+            >>> print(series_dict['series_1'])
+        2020-01-01    1
+        2020-01-02    2
+        2020-01-03    3
+        2020-01-04    4
+        2020-01-05    5
+        Name: series_1, dtype: int64
+        >>> print(series_indexes['series_1'])
+        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
+                       '2020-01-05'],
+                      dtype='datetime64[ns]', freq='D')
+    """
+    if not isinstance(series, (pd.DataFrame, dict)):
+        raise TypeError(
+            f"`series` must be a pandas DataFrame or a dict of DataFrames or Series. "
+            f"Got {type(series)}."
+        )
+
+    if isinstance(series, pd.DataFrame):
+
+        if not isinstance(series.index, pd.MultiIndex):
+            _, _ = check_extract_values_and_index(
+                data=series, data_label="`series`", return_values=False
+            )
+            series = series.copy()
+            series.index.name = None
+            series_dict = series.to_dict(orient="series")
+        else:
+            if not isinstance(series.index.levels[1], pd.DatetimeIndex):
+                raise TypeError(
+                    f"The second level of the MultiIndex in `series` must be a "
+                    f"pandas DatetimeIndex with the same frequency for each series. "
+                    f"Found {type(series.index.levels[1])}."
+                )
+
+            first_col = series.columns[0]
+            if len(series.columns) != 1:
+                warnings.warn(
+                    f"`series` DataFrame has multiple columns. Only the values of "
+                    f"first column, '{first_col}', will be used as series values. "
+                    f"All other columns will be ignored.",
+                    IgnoredArgumentWarning,
+                )
+
+            series = series.copy()
+            series.index = series.index.set_names([series.index.names[0], None])
+            series_dict = {
+                series_id: series.loc[series_id][first_col].rename(series_id)
+                for series_id in series.index.levels[0]
+            }
+
+        warnings.warn(
+            "Passing a DataFrame (either wide or long format) as `series` requires "
+            "additional internal transformations, which can increase computational "
+            "time. It is recommended to use a dictionary of pandas Series instead. ",
+            InputTypeWarning,
+        )
+
+    else:
+
+        not_valid_series = [
+            k for k, v in series.items() if not isinstance(v, (pd.Series, pd.DataFrame))
+        ]
+        if not_valid_series:
+            raise TypeError(
+                f"If `series` is a dictionary, all series must be a named "
+                f"pandas Series or a pandas DataFrame with a single column. "
+                f"Review series: {not_valid_series}"
+            )
+
+        series_dict = {k: v.copy() for k, v in series.items()}
+
+    not_valid_index = []
+    indexes_freq = set()
+    series_indexes = {}
+    for k, v in series_dict.items():
+        if isinstance(v, pd.DataFrame):
+            if v.shape[1] != 1:
+                raise ValueError(
+                    f"If `series` is a dictionary, all series must be a named "
+                    f"pandas Series or a pandas DataFrame with a single column. "
+                    f"Review series: '{k}'"
+                )
+            series_dict[k] = v.iloc[:, 0]
+
+        series_dict[k].name = k
+        idx = v.index
+        if isinstance(idx, pd.DatetimeIndex):
+            indexes_freq.add(idx.freq)
+        elif isinstance(idx, pd.RangeIndex):
+            indexes_freq.add(idx.step)
+        else:
+            not_valid_index.append(k)
+
+        if v.isna().to_numpy().all():
+            raise ValueError(f"All values of series '{k}' are NaN.")
+
+        series_indexes[k] = idx
+
+    if not_valid_index:
+        raise TypeError(
+            f"If `series` is a dictionary, all series must have a Pandas "
+            f"RangeIndex or DatetimeIndex with the same step/frequency. "
+            f"Review series: {not_valid_index}"
+        )
+    if None in indexes_freq:
+        raise ValueError(
+            "If `series` is a dictionary, all series must have a Pandas "
+            "RangeIndex or DatetimeIndex with the same step/frequency. "
+            "If it a MultiIndex DataFrame, the second level must be a DatetimeIndex "
+            "with the same frequency for each series. Found series with no "
+            "frequency or step."
+        )
+    if not len(indexes_freq) == 1:
+        raise ValueError(
+            f"If `series` is a dictionary, all series must have a Pandas "
+            f"RangeIndex or DatetimeIndex with the same step/frequency. "
+            f"If it a MultiIndex DataFrame, the second level must be a DatetimeIndex "
+            f"with the same frequency for each series. "
+            f"Found frequencies: {sorted(indexes_freq)}"
+        )
+
+    return series_dict, series_indexes
 
 
 def check_preprocess_exog_multiseries(exog):
@@ -361,8 +599,7 @@ def initialize_window_features(
 
         link_to_docs = (
             "\nVisit the documentation for more information about how to create "
-            "custom window features:\n"
-            "https://skforecast.org/latest/user_guides/window-features-and-custom-features.html#create-your-custom-window-features"
+            "custom window features."
         )
 
         max_window_sizes = []
