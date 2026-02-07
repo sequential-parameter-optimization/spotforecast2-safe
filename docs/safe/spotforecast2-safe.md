@@ -71,3 +71,78 @@ To maintain a green build and avoid import errors, the following non-essential t
 
 ## Conclusion
 The resulting `spotforecast2_safe` project is a hardened version of the original, with $0$ unreachable code paths for the specified tasks and $100\%$ test coverage on the remaining logic.
+
+## Essential Classes and Functions (Positive List)
+The following classes and functions (including internal helpers) are strictly required for the execution of `task_safe_demo.py` and `task_safe_n_to_1_with_covariates_and_dataframe.py`:
+
+### Orchestration & Processing
+- `agg_predict` (Function)
+- `n2n_predict` (Function)
+- `n2n_predict_with_covariates` (Function)
+
+### Data & Environmental Services
+- `fetch_data` (Function)
+- `fetch_holiday_data` (Function)
+- `fetch_weather_data` (Function)
+- `WeatherClient` (Class)
+- `create_holiday_df` (Function)
+- `convert_to_utc` (Function)
+
+### Forecasting Engine
+- `ForecasterRecursive` (Class)
+- `ForecasterEquivalentDate` (Class)
+- `ForecasterBase` (Class)
+- `predict_multivariate` (Function)
+- `initialize_lags` (Function)
+- `initialize_weights` (Function)
+- `initialize_estimator` (Function)
+- `initialize_window_features` (Function)
+
+### Preprocessing & Validation
+- `agg_and_resample_data` (Function)
+- `basic_ts_checks` (Function)
+- `curate_holidays` (Function)
+- `curate_weather` (Function)
+- `get_start_end` (Function)
+- `mark_outliers` (Function)
+- `get_missing_weights` (Function)
+- `split_rel_train_val_test` (Function)
+- `check_y` (Function)
+- `check_exog` (Function)
+- `check_predict_input` (Function)
+- `check_interval` (Function)
+- `input_to_frame` (Function)
+- `expand_index` (Function)
+- `transform_dataframe` (Function)
+- `check_extract_values_and_index` (Function)
+
+### Feature Engineering
+- `RollingFeatures` (Class)
+- `TimeSeriesDifferentiator` (Class)
+- `QuantileBinner` (Class)
+
+## Unused Classes and Functions (Negative List)
+The following components are present in the `spotforecast2_safe` codebase but are **not invoked** by the primary safety-critical tasks mentioned above.
+
+### Utilities
+- `check_preprocess_series` (Function)
+- `check_preprocess_exog_multiseries` (Function)
+- `set_skforecast_warnings` (Function)
+- `initialize_transformer_series` (Function)
+- `date_to_index_position` (Function)
+- `prepare_steps_direct` (Function)
+- `exog_to_direct` (Function)
+- `exog_to_direct_numpy` (Function)
+- `transform_numpy` (Function)
+- `select_n_jobs_fit_forecaster` (Function)
+- `get_style_repr_html` (Function)
+
+### Preprocessing
+- `manual_outlier_removal` (Function)
+- `get_outliers` (Function)
+- `custom_weights` (Function)
+- `WeightFunction` (Class)
+- `split_abs_train_val_test` (Function)
+
+### Internal Details
+- `check_residuals_input` (Function)
