@@ -8,7 +8,10 @@ import itertools
 import numpy as np
 import pandas as pd
 
-from spotforecast2_safe.forecaster.utils import date_to_index_position, get_style_repr_html
+from spotforecast2_safe.forecaster.utils import (
+    date_to_index_position,
+    get_style_repr_html,
+)
 from spotforecast2_safe.exceptions import IgnoredArgumentWarning
 from .split_base import BaseFold
 
