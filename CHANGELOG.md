@@ -1,3 +1,11 @@
+## [0.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.1.0...v0.2.0) (2026-02-07)
+
+
+### Features
+
+* add model_selection module with backtesting_forecaster and TimeSeriesFold ([8756d01](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8756d0193b7143654540796518ecc46eed580e5a))
+* prediction intervals implemented. extensive refactoring. ([db89da1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/db89da10db786a3b83f25cfe31445e3e98f07513))
+
 ## [0.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.7...v0.1.0) (2026-02-07)
 
 
