@@ -1624,10 +1624,7 @@ serialization of sklearn-compatible estimators.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/processing/n2n_predict_with_covariates.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-618">618</a></span>
-<span class="normal"><a href="#__codelineno-0-619">619</a></span>
-<span class="normal"><a href="#__codelineno-0-620">620</a></span>
-<span class="normal"><a href="#__codelineno-0-621">621</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-621">621</a></span>
 <span class="normal"><a href="#__codelineno-0-622">622</a></span>
 <span class="normal"><a href="#__codelineno-0-623">623</a></span>
 <span class="normal"><a href="#__codelineno-0-624">624</a></span>
@@ -1665,48 +1662,51 @@ serialization of sklearn-compatible estimators.</p>
 <span class="normal"><a href="#__codelineno-0-656">656</a></span>
 <span class="normal"><a href="#__codelineno-0-657">657</a></span>
 <span class="normal"><a href="#__codelineno-0-658">658</a></span>
-<span class="normal"><a href="#__codelineno-0-659">659</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="k">def</span><span class="w"> </span><span class="nf">_save_forecasters</span><span class="p">(</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>    <span class="n">forecasters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>    <span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Save trained forecasters to disk using joblib.</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    Follows scikit-learn persistence conventions using joblib for efficient</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">    serialization of sklearn-compatible estimators.</span>
+<span class="normal"><a href="#__codelineno-0-659">659</a></span>
+<span class="normal"><a href="#__codelineno-0-660">660</a></span>
+<span class="normal"><a href="#__codelineno-0-661">661</a></span>
+<span class="normal"><a href="#__codelineno-0-662">662</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="k">def</span><span class="w"> </span><span class="nf">_save_forecasters</span><span class="p">(</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>    <span class="n">forecasters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>    <span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Save trained forecasters to disk using joblib.</span>
 <a id="__codelineno-0-627" name="__codelineno-0-627"></a>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">        forecasters: Dictionary mapping target names to trained ForecasterRecursive objects.</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        model_dir: Directory to save models. Created if it doesn&#39;t exist.</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">        verbose: Print progress messages. Default: False.</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        Dict[str, Path]: Dictionary mapping target names to saved model filepaths.</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">    Follows scikit-learn persistence conventions using joblib for efficient</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">    serialization of sklearn-compatible estimators.</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        forecasters: Dictionary mapping target names to trained ForecasterRecursive objects.</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        model_dir: Directory to save models. Created if it doesn&#39;t exist.</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        verbose: Print progress messages. Default: False.</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">        OSError: If models cannot be written to disk.</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        TypeError: If forecasters contain non-serializable objects.</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        &gt;&gt;&gt; forecasters = {&quot;power&quot;: forecaster_obj}</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        &gt;&gt;&gt; paths = _save_forecasters(forecasters, &quot;./models&quot;, verbose=True)</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">        &gt;&gt;&gt; print(paths[&quot;power&quot;])</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        models/forecaster_power.joblib</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>    <span class="n">model_path</span> <span class="o">=</span> <span class="n">_ensure_model_dir</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>    <span class="n">saved_paths</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>    <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">forecaster</span> <span class="ow">in</span> <span class="n">forecasters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="n">filepath</span> <span class="o">=</span> <span class="n">_get_model_filepath</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>            <span class="n">dump</span><span class="p">(</span><span class="n">forecaster</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>            <span class="n">saved_paths</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">filepath</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Saved forecaster for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save model for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="k">return</span> <span class="n">saved_paths</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">        Dict[str, Path]: Dictionary mapping target names to saved model filepaths.</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">        OSError: If models cannot be written to disk.</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        TypeError: If forecasters contain non-serializable objects.</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        &gt;&gt;&gt; forecasters = {&quot;power&quot;: forecaster_obj}</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        &gt;&gt;&gt; paths = _save_forecasters(forecasters, &quot;./models&quot;, verbose=True)</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        &gt;&gt;&gt; print(paths[&quot;power&quot;])</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        models/forecaster_power.joblib</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>    <span class="n">model_path</span> <span class="o">=</span> <span class="n">_ensure_model_dir</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>    <span class="n">saved_paths</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>    <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">forecaster</span> <span class="ow">in</span> <span class="n">forecasters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>        <span class="n">filepath</span> <span class="o">=</span> <span class="n">_get_model_filepath</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="n">dump</span><span class="p">(</span><span class="n">forecaster</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>            <span class="n">saved_paths</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">filepath</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Saved forecaster for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save model for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="k">return</span> <span class="n">saved_paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1853,10 +1853,7 @@ are indicated in the return value for selective retraining.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/processing/n2n_predict_with_covariates.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-662">662</a></span>
-<span class="normal"><a href="#__codelineno-0-663">663</a></span>
-<span class="normal"><a href="#__codelineno-0-664">664</a></span>
-<span class="normal"><a href="#__codelineno-0-665">665</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-665">665</a></span>
 <span class="normal"><a href="#__codelineno-0-666">666</a></span>
 <span class="normal"><a href="#__codelineno-0-667">667</a></span>
 <span class="normal"><a href="#__codelineno-0-668">668</a></span>
@@ -1900,54 +1897,57 @@ are indicated in the return value for selective retraining.</p>
 <span class="normal"><a href="#__codelineno-0-706">706</a></span>
 <span class="normal"><a href="#__codelineno-0-707">707</a></span>
 <span class="normal"><a href="#__codelineno-0-708">708</a></span>
-<span class="normal"><a href="#__codelineno-0-709">709</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="k">def</span><span class="w"> </span><span class="nf">_load_forecasters</span><span class="p">(</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="n">target_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load trained forecasters from disk using joblib.</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">    Attempts to load all forecasters for given targets. Missing models</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">    are indicated in the return value for selective retraining.</span>
+<span class="normal"><a href="#__codelineno-0-709">709</a></span>
+<span class="normal"><a href="#__codelineno-0-710">710</a></span>
+<span class="normal"><a href="#__codelineno-0-711">711</a></span>
+<span class="normal"><a href="#__codelineno-0-712">712</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="k">def</span><span class="w"> </span><span class="nf">_load_forecasters</span><span class="p">(</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="n">target_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>    <span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load trained forecasters from disk using joblib.</span>
 <a id="__codelineno-0-671" name="__codelineno-0-671"></a>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        target_columns: List of target variable names to load.</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        model_dir: Directory containing saved models.</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        verbose: Print progress messages. Default: False.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">        Tuple[Dict[str, object], List[str]]:</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">        - forecasters: Dictionary of successfully loaded ForecasterRecursive objects.</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        - missing_targets: List of target names without saved models.</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">        &gt;&gt;&gt; forecasters, missing = _load_forecasters(</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        ...     [&quot;power&quot;, &quot;energy&quot;],</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        ...     &quot;./models&quot;,</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">        ...     verbose=True</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        &gt;&gt;&gt; print(missing)</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        [&#39;energy&#39;]</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>    <span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>    <span class="n">forecasters</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>    <span class="n">missing_targets</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>    <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">target_columns</span><span class="p">:</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">filepath</span> <span class="o">=</span> <span class="n">_get_model_filepath</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="k">if</span> <span class="n">filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                <span class="n">forecasters</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Loaded forecaster for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">    Attempts to load all forecasters for given targets. Missing models</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">    are indicated in the return value for selective retraining.</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        target_columns: List of target variable names to load.</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        model_dir: Directory containing saved models.</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">        verbose: Print progress messages. Default: False.</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        Tuple[Dict[str, object], List[str]]:</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        - forecasters: Dictionary of successfully loaded ForecasterRecursive objects.</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">        - missing_targets: List of target names without saved models.</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">        &gt;&gt;&gt; forecasters, missing = _load_forecasters(</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        ...     [&quot;power&quot;, &quot;energy&quot;],</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        ...     &quot;./models&quot;,</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        ...     verbose=True</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">        &gt;&gt;&gt; print(missing)</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">        [&#39;energy&#39;]</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>    <span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>    <span class="n">forecasters</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>    <span class="n">missing_targets</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">target_columns</span><span class="p">:</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="n">filepath</span> <span class="o">=</span> <span class="n">_get_model_filepath</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>        <span class="k">if</span> <span class="n">filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                <span class="n">forecasters</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
 <a id="__codelineno-0-703" name="__codelineno-0-703"></a>                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✗ Failed to load </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="n">missing_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="n">missing_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>    <span class="k">return</span> <span class="n">forecasters</span><span class="p">,</span> <span class="n">missing_targets</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Loaded forecaster for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✗ Failed to load </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>                <span class="n">missing_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="n">missing_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>    <span class="k">return</span> <span class="n">forecasters</span><span class="p">,</span> <span class="n">missing_targets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2048,10 +2048,7 @@ are indicated in the return value for selective retraining.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/processing/n2n_predict_with_covariates.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-583">583</a></span>
-<span class="normal"><a href="#__codelineno-0-584">584</a></span>
-<span class="normal"><a href="#__codelineno-0-585">585</a></span>
-<span class="normal"><a href="#__codelineno-0-586">586</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-586">586</a></span>
 <span class="normal"><a href="#__codelineno-0-587">587</a></span>
 <span class="normal"><a href="#__codelineno-0-588">588</a></span>
 <span class="normal"><a href="#__codelineno-0-589">589</a></span>
@@ -2062,21 +2059,24 @@ are indicated in the return value for selective retraining.</p>
 <span class="normal"><a href="#__codelineno-0-594">594</a></span>
 <span class="normal"><a href="#__codelineno-0-595">595</a></span>
 <span class="normal"><a href="#__codelineno-0-596">596</a></span>
-<span class="normal"><a href="#__codelineno-0-597">597</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">_ensure_model_dir</span><span class="p">(</span><span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure model directory exists.</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">        model_dir: Directory path for model storage.</span>
+<span class="normal"><a href="#__codelineno-0-597">597</a></span>
+<span class="normal"><a href="#__codelineno-0-598">598</a></span>
+<span class="normal"><a href="#__codelineno-0-599">599</a></span>
+<span class="normal"><a href="#__codelineno-0-600">600</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="k">def</span><span class="w"> </span><span class="nf">_ensure_model_dir</span><span class="p">(</span><span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure model directory exists.</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">        Path: Validated Path object.</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">        model_dir: Directory path for model storage.</span>
 <a id="__codelineno-0-591" name="__codelineno-0-591"></a>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        OSError: If directory cannot be created.</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>    <span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>    <span class="k">return</span> <span class="n">model_path</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        Path: Validated Path object.</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">        OSError: If directory cannot be created.</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>    <span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>    <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>    <span class="k">return</span> <span class="n">model_path</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2153,25 +2153,25 @@ are indicated in the return value for selective retraining.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/processing/n2n_predict_with_covariates.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-712">712</a></span>
-<span class="normal"><a href="#__codelineno-0-713">713</a></span>
-<span class="normal"><a href="#__codelineno-0-714">714</a></span>
-<span class="normal"><a href="#__codelineno-0-715">715</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-715">715</a></span>
 <span class="normal"><a href="#__codelineno-0-716">716</a></span>
 <span class="normal"><a href="#__codelineno-0-717">717</a></span>
 <span class="normal"><a href="#__codelineno-0-718">718</a></span>
 <span class="normal"><a href="#__codelineno-0-719">719</a></span>
 <span class="normal"><a href="#__codelineno-0-720">720</a></span>
-<span class="normal"><a href="#__codelineno-0-721">721</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">_model_directory_exists</span><span class="p">(</span><span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if model directory exists.</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">        model_dir: Directory path to check.</span>
+<span class="normal"><a href="#__codelineno-0-721">721</a></span>
+<span class="normal"><a href="#__codelineno-0-722">722</a></span>
+<span class="normal"><a href="#__codelineno-0-723">723</a></span>
+<span class="normal"><a href="#__codelineno-0-724">724</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-715" name="__codelineno-0-715"></a><span class="k">def</span><span class="w"> </span><span class="nf">_model_directory_exists</span><span class="p">(</span><span class="n">model_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if model directory exists.</span>
 <a id="__codelineno-0-717" name="__codelineno-0-717"></a>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">        bool: True if directory exists, False otherwise.</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">        model_dir: Directory path to check.</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        bool: True if directory exists, False otherwise.</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
