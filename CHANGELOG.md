@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.1...v0.2.2) (2026-02-07)
+
+
+### Bug Fixes
+
+* init.py ([4a9548b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4a9548b700bd9e08c20ac8dec415454b534d9ecd))
+
 ## [0.2.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.0...v0.2.1) (2026-02-07)
 
 
