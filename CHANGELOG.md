@@ -1,3 +1,11 @@
+## [0.2.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.2...v0.2.3) (2026-02-07)
+
+
+### Bug Fixes
+
+* formatting (PEP) ([8333269](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/83332690cca1788306f0cf9f35e1a58b2b49a140))
+* validation ([52d901c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/52d901c3bd626de5e271197b07ce7b544d0641c4))
+
 ## [0.2.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.1...v0.2.2) (2026-02-07)
 
 
