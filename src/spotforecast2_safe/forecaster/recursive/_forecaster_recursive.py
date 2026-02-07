@@ -27,7 +27,7 @@ from spotforecast2_safe.forecaster.utils import (
     initialize_estimator,
 )
 
-# Version handling - placeholder if not defined
+# TODO: Version handling - placeholder if not defined
 try:
     from spotforecast2_safe import __version__
 except ImportError:
@@ -263,7 +263,7 @@ class ForecasterRecursive(ForecasterBase):
             self.differentiation_max = differentiation
             self.window_size += differentiation
             self.differentiator = TimeSeriesDifferentiator(
-                order=differentiation  # , window_size=self.window_size # Note: TimeSeriesDifferentiator in preprocessing I created only takes order
+                order=differentiation  # , window_size=self.window_size # TODO: TimeSeriesDifferentiator in preprocessing created only takes order, add window_size if needed
             )
 
         self.fit_kwargs = check_select_fit_kwargs(
@@ -739,22 +739,25 @@ class ForecasterRecursive(ForecasterBase):
                 data=exog, data_label="`exog`", ignore_freq=True, return_values=False
             )
 
-            _ = len(y_values) + (
-                self.differentiation if self.differentiation else 0
-            )  # Adjust for differentiation loss of length if needed? No, y_values has NaNs at start
-            # But y_values from check_extract... is raw values.
-            # Differentiator might introduce NaNs. Sklearn transformer keeps length.
-            # My ported differentiator creates NaNs at start.
-
-            # Re-evaluate logic:
-            # y_values (raw) length = N
-            # differentiator transform -> length N, first 'order' are NaN.
-
+            len_y_original = len(y)
             len_exog = len(exog)
-            # The check logic depends on alignment.
+            len_train = len(train_index)
 
-            # Simplified check from original code
-            # ... (omitted for brevity, assume caller passed valid data or minimal check)
+            # Safety-critical validation: exog must be either full-length or pre-aligned
+            if len_exog == len_y_original:
+                # Standard case: exog covers full y range, trim by window_size
+                exog = exog.iloc[self.window_size :, :]
+            elif len_exog == len_train:
+                # Alternative case: exog already aligned to training index
+                pass
+            else:
+                raise ValueError(
+                    f"Length mismatch for exogenous variables. Expected either:\n"
+                    f"  - Full length matching `y`: {len_y_original} observations, OR\n"
+                    f"  - Pre-aligned length: {len_train} observations (y length - window_size)\n"
+                    f"Got: {len_exog} observations.\n"
+                    f"Window size: {self.window_size}"
+                )
 
             exog_names_in_ = exog.columns.to_list()
             exog_dtypes_in_ = get_exog_dtypes(exog=exog)
@@ -774,18 +777,12 @@ class ForecasterRecursive(ForecasterBase):
                 for dtype in set(exog.dtypes)
             )
 
-            # Alignment logic
-            if len_exog == len(y):
-                exog = exog.iloc[self.window_size :,]
-            else:
-                pass  # Assume aligned start
-
         X_train = []
         X_train_features_names_out_ = []
 
         # Create lags
         # Note: y_values might have NaNs from differentiation.
-        # create_lags handles this?
+        # TODO: check if _create_lags handles this!
         X_train_lags, y_train = self._create_lags(
             y=y_values, X_as_pandas=X_as_pandas, train_index=train_index
         )
