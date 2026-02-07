@@ -1,3 +1,17 @@
+## [0.0.7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.6...v0.0.7) (2026-02-07)
+
+
+### Documentation
+
+* (MODEL_CARD, VERSION) ([7129013](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/71290137916af665d2c442e06be8237e3b1e7c8c))
+* (MODEL_CARD) ([8da8569](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8da856938ae9fd8f6396f3bf59952e845815b038))
+* upddate safe positive list ([fe0d138](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/fe0d1387c6a12f6a97590c2de455a41b6af2e67b))
+
+
+### Code Refactoring
+
+* version management ([13d2bbe](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/13d2bbef70e00b98ba1f5bfddfa7eb92d137c346))
+
 ## [0.0.6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.5...v0.0.6) (2026-02-07)
 
 
