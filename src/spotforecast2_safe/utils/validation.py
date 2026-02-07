@@ -8,7 +8,11 @@ from typing import Any, Union, List, Tuple, Optional, Dict
 import warnings
 import pandas as pd
 import numpy as np
-from spotforecast2_safe.exceptions import MissingValuesWarning, DataTypeWarning
+from spotforecast2_safe.exceptions import (
+    MissingValuesWarning,
+    DataTypeWarning,
+    UnknownLevelWarning,
+)
 
 
 def check_y(y: Any, series_id: str = "`y`") -> None:
@@ -567,3 +571,130 @@ def check_predict_input(
             check_y(last_window, series_id="`last_window`")
 
     return
+
+
+def check_residuals_input(
+    forecaster_name: str,
+    use_in_sample_residuals: bool,
+    in_sample_residuals_: np.ndarray | dict[str, np.ndarray] | None,
+    out_sample_residuals_: np.ndarray | dict[str, np.ndarray] | None,
+    use_binned_residuals: bool,
+    in_sample_residuals_by_bin_: (
+        dict[str | int, np.ndarray | dict[int, np.ndarray]] | None
+    ),
+    out_sample_residuals_by_bin_: (
+        dict[str | int, np.ndarray | dict[int, np.ndarray]] | None
+    ),
+    levels: list[str] | None = None,
+    encoding: str | None = None,
+) -> None:
+    """
+    Check residuals input arguments in Forecasters.
+
+    Parameters
+    ----------
+    forecaster_name : str
+        Forecaster name.
+    use_in_sample_residuals : bool
+        Indicates if in sample or out sample residuals are used.
+    in_sample_residuals_ : numpy ndarray, dict
+        Residuals of the model when predicting training data.
+    out_sample_residuals_ : numpy ndarray, dict
+        Residuals of the model when predicting non training data.
+    use_binned_residuals : bool
+        Indicates if residuals are binned.
+    in_sample_residuals_by_bin_ : dict
+        In sample residuals binned according to the predicted value each residual
+        is associated with.
+    out_sample_residuals_by_bin_ : dict
+        Out of sample residuals binned according to the predicted value each residual
+        is associated with.
+    levels : list, default None
+        Names of the series (levels) to be predicted (Forecasters multiseries).
+    encoding : str, default None
+        Encoding used to identify the different series (ForecasterRecursiveMultiSeries).
+
+    Returns
+    -------
+    None
+
+    """
+
+    forecasters_multiseries = (
+        "ForecasterRecursiveMultiSeries",
+        "ForecasterDirectMultiVariate",
+        "ForecasterRnn",
+    )
+
+    if use_in_sample_residuals:
+        if use_binned_residuals:
+            residuals = in_sample_residuals_by_bin_
+            literal = "in_sample_residuals_by_bin_"
+        else:
+            residuals = in_sample_residuals_
+            literal = "in_sample_residuals_"
+
+        # Check if residuals are empty or None
+        is_empty = (
+            residuals is None
+            or (isinstance(residuals, dict) and not residuals)
+            or (isinstance(residuals, np.ndarray) and residuals.size == 0)
+        )
+        if is_empty:
+            raise ValueError(
+                f"`forecaster.{literal}` is either None or empty. Use "
+                f"`store_in_sample_residuals = True` when fitting the forecaster "
+                f"or use the `set_in_sample_residuals()` method before predicting."
+            )
+
+        if forecaster_name in forecasters_multiseries:
+            if encoding is not None:
+                unknown_levels = set(levels) - set(residuals.keys())
+                if unknown_levels:
+                    warnings.warn(
+                        f"`levels` {unknown_levels} are not present in `forecaster.{literal}`, "
+                        f"most likely because they were not present in the training data. "
+                        f"A random sample of the residuals from other levels will be used. "
+                        f"This can lead to inaccurate intervals for the unknown levels.",
+                        UnknownLevelWarning,
+                    )
+    else:
+        if use_binned_residuals:
+            residuals = out_sample_residuals_by_bin_
+            literal = "out_sample_residuals_by_bin_"
+        else:
+            residuals = out_sample_residuals_
+            literal = "out_sample_residuals_"
+
+        is_empty = (
+            residuals is None
+            or (isinstance(residuals, dict) and not residuals)
+            or (isinstance(residuals, np.ndarray) and residuals.size == 0)
+        )
+        if is_empty:
+            raise ValueError(
+                f"`forecaster.{literal}` is either None or empty. Use "
+                f"`use_in_sample_residuals = True` or the "
+                f"`set_out_sample_residuals()` method before predicting."
+            )
+
+        if forecaster_name in forecasters_multiseries:
+            if encoding is not None:
+                unknown_levels = set(levels) - set(residuals.keys())
+                if unknown_levels:
+                    warnings.warn(
+                        f"`levels` {unknown_levels} are not present in `forecaster.{literal}`. "
+                        f"A random sample of the residuals from other levels will be used. "
+                        f"This can lead to inaccurate intervals for the unknown levels. "
+                        f"Otherwise, Use the `set_out_sample_residuals()` method before "
+                        f"predicting to set the residuals for these levels.",
+                        UnknownLevelWarning,
+                    )
+
+    if forecaster_name in forecasters_multiseries:
+        for level in residuals.keys():
+            level_residuals = residuals[level]
+            if level_residuals is None or len(level_residuals) == 0:
+                raise ValueError(
+                    f"Residuals for level '{level}' are None. Check `forecaster.{literal}`."
+                )

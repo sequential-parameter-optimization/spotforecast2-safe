@@ -142,3 +142,82 @@ When `differentiation > 0` is set:
 2.  The model is trained to predict the differenced values.
 3.  During prediction, the model generates differenced forecasts.
 4.  These forecasts are automatically integrated (undifferenced) using the `TimeSeriesDifferentiator` and the `last_window_` to return predictions in the original scale. This process is seamless to the user but critical for handling trends.
+
+### 4. Probabilistic Forecasting (Prediction Intervals)
+
+`ForecasterRecursive` supports probabilistic forecasting, allowing you to estimate prediction intervals. This is crucial for safety-critical applications where quantifying uncertainty is as important as the point forecast itself.
+
+Two methods are available:
+*   Bootstrapping: Resamples residuals from the training phase to generate a distribution of possible future paths.
+*   Conformal Prediction: Uses a calibration dataset (out-of-sample residuals) to guarantee a statistical coverage rate (e.g., 95%).
+
+#### Bootstrapping Example
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+# 1. Generate synthetic data with noise
+np.random.seed(123)
+steps = 100
+t = np.arange(steps)
+y = pd.Series(
+    data=0.5 * t + 2 * np.sin(2 * np.pi * t / 12) + np.random.normal(0, 1.5, steps),
+    index=pd.date_range(start='2023-01-01', periods=steps, freq='D'),
+    name='y'
+)
+
+# 2. Initialize and Fit
+forecaster = ForecasterRecursive(
+    estimator=LinearRegression(),
+    lags=12
+)
+forecaster.fit(y=y, store_in_sample_residuals=True)
+
+# 3. Predict with Intervals (Bootstrapping)
+# We predict the next 10 days with a 95% confidence interval (2.5% to 97.5%)
+results = forecaster.predict_interval(
+    steps=10,
+    method='bootstrapping',
+    interval=[5, 95],
+    n_boot=250,
+    random_state=123
+)
+
+print("Bootstrapping Intervals:")
+print(results.head())
+```
+
+#### Conformal Prediction Example
+
+Conformal prediction often requires out-of-sample residuals for calibration to ensure the coverage guarantee holds.
+
+```python
+# ... (Assuming same setup as above)
+
+# 1. Split data into training and calibration sets
+# We use the last 20 points for calibration (out-of-sample residuals)
+y_train = y.iloc[:-20]
+y_calibration = y.iloc[-20:]
+
+forecaster.fit(y=y_train)
+
+# 2. Compute out-of-sample residuals
+# This is a critical step for conformal prediction
+y_pred = forecaster.predict(steps=len(y_calibration))
+forecaster.set_out_sample_residuals(y_true=y_calibration, y_pred=y_pred)
+
+# 3. Predict with Intervals (Conformal)
+# We request a 95% confidence level (nominal coverage)
+results_conformal = forecaster.predict_interval(
+    steps=10,
+    method='conformal',
+    interval=0.95,  # 0.95 means 95% coverage
+    use_in_sample_residuals=False # Use the calibration residuals we just set
+)
+
+print("\nConformal Prediction Intervals:")
+print(results_conformal.head())
+```

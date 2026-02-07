@@ -9,6 +9,7 @@ from spotforecast2_safe.utils.validation import (
     DataTypeWarning,
     check_exog_dtypes,
     check_predict_input,
+    check_residuals_input,
 )
 from spotforecast2_safe.utils.data_transform import (
     input_to_frame,
@@ -40,4 +41,5 @@ __all__ = [
     "transform_dataframe",
     "convert_to_utc",
     "create_holiday_df",
+    "check_residuals_input",
 ]

@@ -4,8 +4,11 @@ import sys
 import numpy as np
 import pandas as pd
 from copy import copy
+from sklearn.linear_model._base import LinearModel
+import warnings
 
 from spotforecast2_safe.forecaster.base import ForecasterBase
+from spotforecast2_safe.exceptions import NotFittedError
 from spotforecast2_safe.preprocessing import TimeSeriesDifferentiator, QuantileBinner
 from spotforecast2_safe.utils import (
     check_y,
@@ -19,12 +22,15 @@ from spotforecast2_safe.utils import (
     check_exog_dtypes,
     check_predict_input,
     transform_dataframe,
+    check_interval,
+    check_residuals_input,
 )
 from spotforecast2_safe.forecaster.utils import (
     initialize_window_features,
     check_extract_values_and_index,
     get_style_repr_html,
     initialize_estimator,
+    transform_numpy,
 )
 from spotforecast2_safe import __version__
 
@@ -685,7 +691,9 @@ class ForecasterRecursive(ForecasterBase):
             ...     lags=3,
             ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
             ... )
-            >>> X_train, y_train, exog_names_in_, window_features_names, exog_names_out, feature_names, exog_dtypes_in_, exog_dtypes_out_ = forecaster._create_train_X_y(y=y, exog=exog)
+            >>> (X_train, y_train, exog_names_in_, window_features_names,
+            ...  exog_names_out, feature_names, exog_dtypes_in_,
+            ...  exog_dtypes_out_) = forecaster._create_train_X_y(y=y, exog=exog)
             >>> isinstance(X_train, pd.DataFrame)
             True
             >>> isinstance(y_train, pd.Series)
@@ -891,7 +899,9 @@ class ForecasterRecursive(ForecasterBase):
             ...     lags=3,
             ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
             ... )
-            >>> X_train, y_train, exog_names_in_, window_features_names, exog_names_out, feature_names, exog_dtypes_in_, exog_dtypes_out_ = forecaster.create_train_X_y(y=y, exog=exog)
+            >>> (X_train, y_train, exog_names_in_, window_features_names,
+            ...  exog_names_out, feature_names, exog_dtypes_in_,
+            ...  exog_dtypes_out_) = forecaster.create_train_X_y(y=y, exog=exog)
             >>> isinstance(X_train, pd.DataFrame)
             True
             >>> isinstance(y_train, pd.Series)
@@ -1169,49 +1179,26 @@ class ForecasterRecursive(ForecasterBase):
         self.is_fitted = True
         self.fit_date = pd.Timestamp.today().strftime("%Y-%m-%d %H:%M:%S")
 
-        residuals = y_train - self.estimator.predict(X_train)
+        self.in_sample_residuals_ = None
+        self.binner_intervals_ = None
+        self.in_sample_residuals_by_bin_ = None
 
-        if len(residuals) > 1000:
-            rng = np.random.default_rng(seed=123)
-            residuals = rng.choice(residuals, size=1000, replace=False)
-
-        self.in_sample_residuals_ = residuals
-
-        if self.binner_kwargs is not None:
-            self.binner = QuantileBinner(**self.binner_kwargs)
-            if isinstance(residuals, pd.Series):
-                residuals = residuals.to_numpy()
-            self.binner.fit(residuals)
-
-            # Construct intervals_ manually if not in binner
-            if hasattr(self.binner, "intervals_"):
-                self.binner_intervals_ = self.binner.intervals_
-            else:
-                self.binner_intervals_ = {
-                    i: (self.binner.bins_[i - 1], self.binner.bins_[i])
-                    for i in range(1, len(self.binner.bins_))
-                }
-
-            residuals_binned = self.binner.transform(residuals)
-            self.in_sample_residuals_by_bin_ = {
-                bin: residuals[residuals_binned == bin]
-                for bin in self.binner_intervals_.keys()
-            }
-
-            # Limit residuals stored per bin
-            max_residuals_per_bin = 1000 // self.binner.n_bins
-            for bin, res in self.in_sample_residuals_by_bin_.items():
-                if len(res) > max_residuals_per_bin:
-                    rng = np.random.default_rng(seed=123)
-                    self.in_sample_residuals_by_bin_[bin] = rng.choice(
-                        res, size=max_residuals_per_bin, replace=False
-                    )
+        y_pred = self.estimator.predict(X_train)
+        self._binning_in_sample_residuals(
+            y_true=y_train.to_numpy(),
+            y_pred=y_pred,
+            store_in_sample_residuals=store_in_sample_residuals,
+            random_state=random_state,
+        )
 
     def _create_predict_inputs(
         self,
         steps: int,
         last_window: Union[pd.Series, pd.DataFrame, None] = None,
         exog: Union[pd.Series, pd.DataFrame, None] = None,
+        predict_probabilistic: bool = False,
+        use_in_sample_residuals: bool = True,
+        use_binned_residuals: bool = True,
         check_inputs: bool = True,
     ) -> Tuple[np.ndarray, Union[np.ndarray, None], pd.Index, pd.Index]:
         """
@@ -1296,6 +1283,17 @@ class ForecasterRecursive(ForecasterBase):
                 interval=None,
                 # alpha=None, # Removed alpha check for now
             )
+
+            if predict_probabilistic:
+                check_residuals_input(
+                    forecaster_name=type(self).__name__,
+                    use_in_sample_residuals=use_in_sample_residuals,
+                    in_sample_residuals_=self.in_sample_residuals_,
+                    out_sample_residuals_=self.out_sample_residuals_,
+                    use_binned_residuals=use_binned_residuals,
+                    in_sample_residuals_by_bin_=self.in_sample_residuals_by_bin_,
+                    out_sample_residuals_by_bin_=self.out_sample_residuals_by_bin_,
+                )
 
         last_window = input_to_frame(data=last_window, input_name="last_window")
         _, last_window_index = check_extract_values_and_index(
@@ -1429,6 +1427,142 @@ class ForecasterRecursive(ForecasterBase):
 
         return predictions
 
+    def _recursive_predict_bootstrapping(
+        self,
+        steps: int,
+        last_window_values: np.ndarray,
+        sampled_residuals: np.ndarray,
+        use_binned_residuals: bool,
+        n_boot: int,
+        exog_values: np.ndarray | None = None,
+    ) -> np.ndarray:
+        """
+        Vectorized bootstrap prediction - predict all n_boot iterations per step.
+        Instead of running n_boot sequential predictions, this method predicts
+        all bootstrap samples at once per step, significantly reducing overhead.
+
+        Args:
+            steps:
+                Number of steps to predict.
+            last_window_values:
+                Series values used to create the predictors needed in the first
+                iteration of the prediction (t + 1).
+            sampled_residuals:
+                Pre-sampled residuals for all bootstrap iterations.
+                - If `use_binned_residuals=True`: 3D array of shape (n_bins, steps, n_boot)
+                - If `use_binned_residuals=False`: 2D array of shape (steps, n_boot)
+            use_binned_residuals:
+                If `True`, residuals are selected based on the predicted values.
+                If `False`, residuals are selected randomly.
+            n_boot:
+                Number of bootstrap iterations.
+            exog_values:
+                Exogenous variable/s included as predictor/s. Defaults to None.
+
+        Returns:
+            Numpy ndarray with the predicted values. Shape (steps, n_boot).
+
+        Raises:
+            ValueError:
+                If `sampled_residuals` does not match the expected shape/dimensions.
+            IndexError:
+                If `last_window_values` or `exog_values` are not of expected lengths.
+
+        Examples:
+            >>> import numpy as np
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=2)
+            >>> _ = forecaster.fit(y=pd.Series(np.arange(10)))
+            >>> last_window = np.array([8, 9])
+            >>> residuals = np.random.normal(size=(3, 5)) # 3 steps, 5 boots
+            >>> preds = forecaster._recursive_predict_bootstrapping(
+            ...     steps=3,
+            ...     last_window_values=last_window,
+            ...     sampled_residuals=residuals,
+            ...     use_binned_residuals=False,
+            ...     n_boot=5
+            ... )
+            >>> preds.shape
+            (3, 5)
+        """
+
+        n_lags = len(self.lags) if self.lags is not None else 0
+        n_window_features = (
+            len(self.X_train_window_features_names_out_)
+            if self.window_features is not None
+            else 0
+        )
+        n_exog = exog_values.shape[1] if exog_values is not None else 0
+        n_features = n_lags + n_window_features + n_exog
+
+        # Input matrix for prediction: shape (n_boot, n_features)
+        X = np.full((n_boot, n_features), fill_value=np.nan, dtype=float)
+
+        # Output predictions: shape (steps, n_boot)
+        predictions = np.full((steps, n_boot), fill_value=np.nan, dtype=float)
+
+        # Expand last_window to 2D: (window_size + steps, n_boot)
+        # Each column represents a separate bootstrap trajectory
+        last_window = np.tile(last_window_values[:, np.newaxis], (1, n_boot))
+        last_window = np.vstack([last_window, np.full((steps, n_boot), np.nan)])
+
+        estimator_name = type(self.estimator).__name__
+        is_linear = isinstance(self.estimator, LinearModel)
+        is_lightgbm = estimator_name == "LGBMRegressor"
+        is_xgboost = estimator_name == "XGBRegressor"
+
+        if is_linear:
+            coef = self.estimator.coef_
+            intercept = self.estimator.intercept_
+        elif is_lightgbm:
+            booster = self.estimator.booster_
+        elif is_xgboost:
+            booster = self.estimator.get_booster()
+
+        has_lags = self.lags is not None
+        has_window_features = self.window_features is not None
+        has_exog = exog_values is not None
+
+        for i in range(steps):
+
+            if has_lags:
+                for j, lag in enumerate(self.lags):
+                    X[:, j] = last_window[-(lag + steps - i), :]
+
+            if has_window_features:
+                window_data = last_window[: -(steps - i), :]
+                # transform accepts 2D: (window_length, n_boot) -> (n_boot, n_stats)
+                # and concatenate along axis=1: (n_boot, total_window_features)
+                X[:, n_lags : n_lags + n_window_features] = np.concatenate(
+                    [wf.transform(window_data) for wf in self.window_features], axis=1
+                )
+
+            if has_exog:
+                X[:, n_lags + n_window_features :] = exog_values[i]
+
+            if is_linear:
+                pred = np.dot(X, coef) + intercept
+            elif is_lightgbm:
+                pred = booster.predict(X)
+            elif is_xgboost:
+                pred = booster.inplace_predict(X)
+            else:
+                pred = self.estimator.predict(X).ravel()
+
+            if use_binned_residuals:
+                # sampled_residuals is a 3D array: (n_bins, steps, n_boot)
+                boot_indices = np.arange(n_boot)
+                pred_bins = self.binner.transform(pred).astype(int)
+                pred += sampled_residuals[pred_bins, i, boot_indices]
+            else:
+                pred += sampled_residuals[i, :]
+
+            predictions[i, :] = pred
+            last_window[-(steps - i), :] = pred
+
+        return predictions
+
     def predict(
         self,
         steps: int,
@@ -1505,3 +1639,691 @@ class ForecasterRecursive(ForecasterBase):
         predictions.index = prediction_index
 
         return predictions
+
+    def predict_bootstrapping(
+        self,
+        steps: int | str | pd.Timestamp,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        n_boot: int = 250,
+        use_in_sample_residuals: bool = True,
+        use_binned_residuals: bool = True,
+        random_state: int = 123,
+    ) -> pd.DataFrame:
+        """
+        Generate multiple forecasting predictions using a bootstrapping process.
+        By sampling from a collection of past observed errors (the residuals),
+        each iteration of bootstrapping generates a different set of predictions.
+        See the References section for more information.
+
+        Args:
+            steps:
+                Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            last_window:
+                Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in `self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data. Defaults to None.
+            exog:
+                Exogenous variable/s included as predictor/s. Defaults to None.
+            n_boot:
+                Number of bootstrapping iterations to perform when estimating prediction
+                intervals. Defaults to 250.
+            use_in_sample_residuals:
+                If `True`, residuals from the training data are used as proxy of
+                prediction error to create predictions.
+                If `False`, out of sample residuals (calibration) are used.
+                Out-of-sample residuals must be precomputed using Forecaster's
+                `set_out_sample_residuals()` method. Defaults to True.
+            use_binned_residuals:
+                If `True`, residuals are selected based on the predicted values
+                (binned selection).
+                If `False`, residuals are selected randomly. Defaults to True.
+            random_state:
+                Seed for the random number generator to ensure reproducibility. Defaults to 123.
+
+        Returns:
+            Pandas DataFrame with predictions generated by bootstrapping. Shape: (steps, n_boot).
+
+        Raises:
+            ValueError:
+                If `steps` is not an integer or a valid date.
+            ValueError:
+                If `exog` is missing or has invalid shape.
+            ValueError:
+                If `n_boot` is not a positive integer.
+            ValueError:
+                If `use_in_sample_residuals=True` and `in_sample_residuals_` are not available.
+            ValueError:
+                If `use_in_sample_residuals=False` and `out_sample_residuals_` are not available.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> rng = np.random.default_rng(123)
+            >>> y = pd.Series(rng.normal(size=100), name='y')
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> _ = forecaster.fit(y=y)
+            >>> boot_preds = forecaster.predict_bootstrapping(steps=3, n_boot=5)
+            >>> boot_preds.shape
+            (3, 5)
+
+        References:
+            .. [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos.
+                   https://otexts.com/fpp3/prediction-intervals.html
+        """
+
+        (
+            last_window_values,
+            exog_values,
+            prediction_index,
+            exog_index,  # Added missing exog_index and ignored steps return which is not there
+        ) = self._create_predict_inputs(
+            steps=steps,
+            last_window=last_window,
+            exog=exog,
+            predict_probabilistic=True,
+            use_in_sample_residuals=use_in_sample_residuals,
+            use_binned_residuals=use_binned_residuals,
+            check_inputs=True,
+        )
+
+        if use_in_sample_residuals:
+            residuals = self.in_sample_residuals_
+            residuals_by_bin = self.in_sample_residuals_by_bin_
+        else:
+            residuals = self.out_sample_residuals_
+            residuals_by_bin = self.out_sample_residuals_by_bin_
+
+        rng = np.random.default_rng(seed=random_state)
+        if use_binned_residuals:
+            # Create 3D array with sampled residuals: (n_bins, steps, n_boot)
+            n_bins = len(residuals_by_bin)
+            sampled_residuals = np.stack(
+                [
+                    residuals_by_bin[k][
+                        rng.integers(
+                            low=0, high=len(residuals_by_bin[k]), size=(steps, n_boot)
+                        )
+                    ]
+                    for k in range(n_bins)
+                ],
+                axis=0,
+            )
+        else:
+            sampled_residuals = residuals[
+                rng.integers(low=0, high=len(residuals), size=(steps, n_boot))
+            ]
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            boot_predictions = self._recursive_predict_bootstrapping(
+                steps=steps,
+                last_window_values=last_window_values,
+                exog_values=exog_values,
+                sampled_residuals=sampled_residuals,
+                use_binned_residuals=use_binned_residuals,
+                n_boot=n_boot,
+            )
+
+        if self.differentiation is not None:
+            boot_predictions = self.differentiator.inverse_transform_next_window(
+                boot_predictions
+            )
+
+        if self.transformer_y:
+            boot_predictions = transform_numpy(
+                array=boot_predictions,
+                transformer=self.transformer_y,
+                fit=False,
+                inverse_transform=True,
+            )
+
+        boot_columns = [f"pred_boot_{i}" for i in range(n_boot)]
+        boot_predictions = pd.DataFrame(
+            data=boot_predictions, index=prediction_index, columns=boot_columns
+        )
+
+        return boot_predictions
+
+    def _predict_interval_conformal(
+        self,
+        steps: int | str | pd.Timestamp,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        nominal_coverage: float = 0.95,
+        use_in_sample_residuals: bool = True,
+        use_binned_residuals: bool = True,
+    ) -> pd.DataFrame:
+        """
+        Generate prediction intervals using the conformal prediction
+        split method [1]_.
+
+        Args:
+            steps:
+                Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            last_window:
+                Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in` self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data. Defaults to None.
+            exog:
+                Exogenous variable/s included as predictor/s. Defaults to None.
+            nominal_coverage:
+                Nominal coverage, also known as expected coverage, of the prediction
+                intervals. Must be between 0 and 1. Defaults to 0.95.
+            use_in_sample_residuals:
+                If `True`, residuals from the training data are used as proxy of
+                prediction error to create predictions.
+                If `False`, out of sample residuals (calibration) are used.
+                Out-of-sample residuals must be precomputed using Forecaster's
+                `set_out_sample_residuals()` method. Defaults to True.
+            use_binned_residuals:
+                If `True`, residuals are selected based on the predicted values
+                (binned selection).
+                If `False`, residuals are selected randomly. Defaults to True.
+
+        Returns:
+            Pandas DataFrame with values predicted by the forecaster and their estimated interval.
+            - pred: predictions.
+            - lower_bound: lower bound of the interval.
+            - upper_bound: upper bound of the interval.
+
+        Raises:
+            ValueError:
+                If `nominal_coverage` is not between 0 and 1.
+            ValueError:
+                If inputs are invalid (checked by `_create_predict_inputs`).
+
+        Examples:
+            >>> # Internal method, typically used via predict_interval(method='conformal')
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> rng = np.random.default_rng(123)
+            >>> y = pd.Series(rng.normal(size=100), name='y')
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> _ = forecaster.fit(y=y)
+            >>> preds = forecaster._predict_interval_conformal(steps=3, nominal_coverage=0.9)
+            >>> preds.columns.tolist()
+            ['pred', 'lower_bound', 'upper_bound']
+
+        References:
+            .. [1] MAPIE - Model Agnostic Prediction Interval Estimator.
+                   https://mapie.readthedocs.io/en/stable/theoretical_description_regression.html#the-split-method
+        """
+
+        last_window_values, exog_values, prediction_index, exog_index = (
+            self._create_predict_inputs(
+                steps=steps,
+                last_window=last_window,
+                exog=exog,
+                predict_probabilistic=True,
+                use_in_sample_residuals=use_in_sample_residuals,
+                use_binned_residuals=use_binned_residuals,
+                check_inputs=True,
+            )
+        )
+
+        if use_in_sample_residuals:
+            residuals = self.in_sample_residuals_
+            residuals_by_bin = self.in_sample_residuals_by_bin_
+        else:
+            residuals = self.out_sample_residuals_
+            residuals_by_bin = self.out_sample_residuals_by_bin_
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            predictions = self._recursive_predict(
+                steps=steps,
+                last_window_values=last_window_values,
+                exog_values=exog_values,
+            )
+
+        if use_binned_residuals:
+            # Fallback to global residuals if bin is empty
+            if len(residuals) > 0:
+                global_cf = np.quantile(np.abs(residuals), nominal_coverage)
+            else:
+                global_cf = np.nan
+
+            correction_factor_by_bin = {}
+            for k, v in residuals_by_bin.items():
+                if len(v) > 0:
+                    correction_factor_by_bin[k] = np.quantile(
+                        np.abs(v), nominal_coverage
+                    )
+                else:
+                    correction_factor_by_bin[k] = global_cf
+
+            replace_func = np.vectorize(
+                lambda x: correction_factor_by_bin.get(x, global_cf)
+            )
+
+            predictions_bin = self.binner.transform(predictions)
+            correction_factor = replace_func(predictions_bin)
+        else:
+            correction_factor = np.quantile(np.abs(residuals), nominal_coverage)
+
+        lower_bound = predictions - correction_factor
+        upper_bound = predictions + correction_factor
+        predictions = np.column_stack([predictions, lower_bound, upper_bound])
+
+        if self.differentiation is not None:
+            predictions = self.differentiator.inverse_transform_next_window(predictions)
+
+        if self.transformer_y:
+            predictions = transform_numpy(
+                array=predictions,
+                transformer=self.transformer_y,
+                fit=False,
+                inverse_transform=True,
+            )
+
+        predictions = pd.DataFrame(
+            data=predictions,
+            index=prediction_index,
+            columns=["pred", "lower_bound", "upper_bound"],
+        )
+
+        return predictions
+
+    def predict_interval(
+        self,
+        steps: int | str | pd.Timestamp,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        method: str = "bootstrapping",
+        interval: float | list[float] | tuple[float] = [5, 95],
+        n_boot: int = 250,
+        use_in_sample_residuals: bool = True,
+        use_binned_residuals: bool = True,
+        random_state: int = 123,
+    ) -> pd.DataFrame:
+        """
+        Predict n steps ahead and estimate prediction intervals using either
+        bootstrapping or conformal prediction methods. Refer to the References
+        section for additional details on these methods.
+
+        Args:
+            steps:
+                Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            last_window:
+                Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in `self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data. Defaults to None.
+            exog:
+                Exogenous variable/s included as predictor/s. Defaults to None.
+            method:
+                Technique used to estimate prediction intervals. Available options:
+                - 'bootstrapping': Bootstrapping is used to generate prediction
+                  intervals [1]_.
+                - 'conformal': Employs the conformal prediction split method for
+                  interval estimation [2]_.
+                Defaults to 'bootstrapping'.
+            interval:
+                Confidence level of the prediction interval. Interpretation depends
+                on the method used:
+                - If `float`, represents the nominal (expected) coverage (between 0
+                  and 1). For instance, `interval=0.95` corresponds to `[2.5, 97.5]`
+                  percentiles.
+                - If `list` or `tuple`, defines the exact percentiles to compute, which
+                  must be between 0 and 100 inclusive. For example, interval
+                  of 95% should be as `interval = [2.5, 97.5]`.
+                - When using `method='conformal'`, the interval must be a float or
+                  a list/tuple defining a symmetric interval.
+                Defaults to [5, 95].
+            n_boot:
+                Number of bootstrapping iterations to perform when estimating prediction
+                intervals. Defaults to 250.
+            use_in_sample_residuals:
+                If `True`, residuals from the training data are used as proxy of
+                prediction error to create predictions.
+                If `False`, out of sample residuals (calibration) are used.
+                Out-of-sample residuals must be precomputed using Forecaster's
+                `set_out_sample_residuals()` method. Defaults to True.
+            use_binned_residuals:
+                If `True`, residuals are selected based on the predicted values
+                (binned selection).
+                If `False`, residuals are selected randomly. Defaults to True.
+            random_state:
+                Seed for the random number generator to ensure reproducibility. Defaults to 123.
+
+        Returns:
+            Pandas DataFrame with values predicted by the forecaster and their estimated interval.
+            - pred: predictions.
+            - lower_bound: lower bound of the interval.
+            - upper_bound: upper bound of the interval.
+
+        Raises:
+            ValueError:
+                If `method` is not 'bootstrapping' or 'conformal'.
+            ValueError:
+                 If `interval` is invalid or not compatible with the chosen method.
+            ValueError:
+                If inputs (`steps`, `exog`, etc.) are invalid.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> rng = np.random.default_rng(123)
+            >>> y = pd.Series(rng.normal(size=100), name='y')
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> _ = forecaster.fit(y=y)
+            >>> # Bootstrapping method
+            >>> intervals_boot = forecaster.predict_interval(
+            ...     steps=3, method='bootstrapping', interval=[5, 95]
+            ... )
+            >>> intervals_boot.columns.tolist()
+            ['pred', 'lower_bound', 'upper_bound']
+
+            >>> # Conformal method
+            >>> intervals_conf = forecaster.predict_interval(
+            ...     steps=3, method='conformal', interval=0.95
+            ... )
+            >>> intervals_conf.columns.tolist()
+            ['pred', 'lower_bound', 'upper_bound']
+
+        References:
+            .. [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos.
+                   https://otexts.com/fpp3/prediction-intervals.html
+            .. [2] MAPIE - Model Agnostic Prediction Interval Estimator.
+                   https://mapie.readthedocs.io/en/stable/theoretical_description_regression.html#the-split-method
+        """
+
+        if method == "bootstrapping":
+
+            if isinstance(interval, (list, tuple)):
+                check_interval(interval=interval, ensure_symmetric_intervals=False)
+                interval = np.array(interval) / 100
+            else:
+                check_interval(alpha=interval, alpha_literal="interval")
+                interval = np.array([0.5 - interval / 2, 0.5 + interval / 2])
+
+            boot_predictions = self.predict_bootstrapping(
+                steps=steps,
+                last_window=last_window,
+                exog=exog,
+                n_boot=n_boot,
+                random_state=random_state,
+                use_in_sample_residuals=use_in_sample_residuals,
+                use_binned_residuals=use_binned_residuals,
+            )
+
+            predictions = self.predict(
+                steps=steps, last_window=last_window, exog=exog, check_inputs=False
+            )
+
+            predictions_interval = boot_predictions.quantile(
+                q=interval, axis=1
+            ).transpose()
+            predictions_interval.columns = ["lower_bound", "upper_bound"]
+            predictions = pd.concat((predictions, predictions_interval), axis=1)
+
+        elif method == "conformal":
+
+            if isinstance(interval, (list, tuple)):
+                check_interval(interval=interval, ensure_symmetric_intervals=True)
+                nominal_coverage = (interval[1] - interval[0]) / 100
+            else:
+                check_interval(alpha=interval, alpha_literal="interval")
+                nominal_coverage = interval
+
+            predictions = self._predict_interval_conformal(
+                steps=steps,
+                last_window=last_window,
+                exog=exog,
+                nominal_coverage=nominal_coverage,
+                use_in_sample_residuals=use_in_sample_residuals,
+                use_binned_residuals=use_binned_residuals,
+            )
+        else:
+            raise ValueError(
+                f"Invalid `method` '{method}'. Choose 'bootstrapping' or 'conformal'."
+            )
+
+        return predictions
+
+    def _binning_in_sample_residuals(
+        self,
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+        store_in_sample_residuals: bool = False,
+        random_state: int = 123,
+    ) -> None:
+        """
+        Bin residuals according to the predicted value each residual is
+        associated with.
+        """
+        residuals = y_true - y_pred
+
+        if self.binner_kwargs is not None:
+            self.binner.fit(y_pred)
+            if hasattr(self.binner, "intervals_"):
+                self.binner_intervals_ = self.binner.intervals_
+            else:
+                self.binner_intervals_ = {
+                    i: (self.binner.bins_[i - 1], self.binner.bins_[i])
+                    for i in range(1, len(self.binner.bins_))
+                }
+
+        if store_in_sample_residuals:
+            rng = np.random.default_rng(seed=random_state)
+
+            if self.binner_kwargs is not None:
+                data = pd.DataFrame({"prediction": y_pred, "residuals": residuals})
+                data["bin"] = self.binner.transform(y_pred).astype(int)
+                self.in_sample_residuals_by_bin_ = (
+                    data.groupby("bin")["residuals"].apply(np.array).to_dict()
+                )
+
+                max_sample = 10_000 // self.binner.n_bins
+                for k, v in self.in_sample_residuals_by_bin_.items():
+                    if len(v) > max_sample:
+                        self.in_sample_residuals_by_bin_[k] = rng.choice(
+                            v, size=max_sample, replace=False
+                        )
+
+            if len(residuals) > 10_000:
+                residuals = rng.choice(residuals, size=10_000, replace=False)
+
+            self.in_sample_residuals_ = residuals
+
+    def set_in_sample_residuals(
+        self,
+        y: pd.Series,
+        exog: pd.Series | pd.DataFrame | None = None,
+        random_state: int = 123,
+    ) -> None:
+        """
+        Set in-sample residuals in case they were not calculated during the
+        training process.
+        """
+        if not self.is_fitted:
+            raise NotFittedError(
+                "This forecaster is not fitted yet. Call `fit` with appropriate "
+                "arguments before using `set_in_sample_residuals()`."
+            )
+
+        check_y(y=y)
+        y_index_range = check_extract_values_and_index(
+            data=y, data_label="`y`", return_values=False
+        )[1][[0, -1]]
+
+        if not y_index_range.equals(self.training_range_):
+            raise IndexError(
+                f"The index range of `y` does not match the range "
+                f"used during training. Please ensure the index is aligned "
+                f"with the training data.\n"
+                f"    Expected : {self.training_range_}\n"
+                f"    Received : {y_index_range}"
+            )
+
+        (
+            X_train,
+            y_train,
+            _,
+            _,
+            _,
+            X_train_features_names_out_,
+            *_,
+        ) = self._create_train_X_y(y=y, exog=exog)
+
+        if not X_train_features_names_out_ == self.X_train_features_names_out_:
+            raise ValueError(
+                f"Feature mismatch detected after matrix creation. The features "
+                f"generated from the provided data do not match those used during "
+                f"the training process. To correctly set in-sample residuals, "
+                f"ensure that the same data and preprocessing steps are applied.\n"
+                f"    Expected output : {self.X_train_features_names_out_}\n"
+                f"    Current output  : {X_train_features_names_out_}"
+            )
+
+        self._binning_in_sample_residuals(
+            y_true=y_train.to_numpy(),
+            y_pred=self.estimator.predict(X_train).ravel(),
+            store_in_sample_residuals=True,
+            random_state=random_state,
+        )
+
+    def set_out_sample_residuals(
+        self,
+        y_true: np.ndarray | pd.Series,
+        y_pred: np.ndarray | pd.Series,
+        append: bool = False,
+        random_state: int = 123,
+    ) -> None:
+        """
+        Set new values to the attribute `out_sample_residuals_`.
+        """
+        if not self.is_fitted:
+            raise NotFittedError(
+                "This forecaster is not fitted yet. Call `fit` with appropriate "
+                "arguments before using `set_out_sample_residuals()`."
+            )
+
+        if not isinstance(y_true, (np.ndarray, pd.Series)):
+            raise TypeError(
+                f"`y_true` argument must be `numpy ndarray` or `pandas Series`. "
+                f"Got {type(y_true)}."
+            )
+
+        if not isinstance(y_pred, (np.ndarray, pd.Series)):
+            raise TypeError(
+                f"`y_pred` argument must be `numpy ndarray` or `pandas Series`. "
+                f"Got {type(y_pred)}."
+            )
+
+        if len(y_true) != len(y_pred):
+            raise ValueError(
+                f"`y_true` and `y_pred` must have the same length. "
+                f"Got {len(y_true)} and {len(y_pred)}."
+            )
+
+        if isinstance(y_true, pd.Series) and isinstance(y_pred, pd.Series):
+            if not y_true.index.equals(y_pred.index):
+                raise ValueError("`y_true` and `y_pred` must have the same index.")
+
+        if not isinstance(y_pred, np.ndarray):
+            y_pred = y_pred.to_numpy()
+        if not isinstance(y_true, np.ndarray):
+            y_true = y_true.to_numpy()
+
+        if self.transformer_y:
+            y_true = transform_numpy(
+                array=y_true,
+                transformer=self.transformer_y,
+                fit=False,
+                inverse_transform=False,
+            )
+            y_pred = transform_numpy(
+                array=y_pred,
+                transformer=self.transformer_y,
+                fit=False,
+                inverse_transform=False,
+            )
+
+        if self.differentiation is not None:
+            differentiator = copy(self.differentiator)
+            differentiator.set_params(window_size=None)
+            y_true = differentiator.fit_transform(y_true)[self.differentiation :]
+            y_pred = differentiator.fit_transform(y_pred)[self.differentiation :]
+
+        data = pd.DataFrame(
+            {"prediction": y_pred, "residuals": y_true - y_pred}
+        ).dropna()
+        y_pred = data["prediction"].to_numpy()
+        residuals = data["residuals"].to_numpy()
+
+        if self.binner is not None:
+            data["bin"] = self.binner.transform(y_pred).astype(int)
+            residuals_by_bin = (
+                data.groupby("bin")["residuals"].apply(np.array).to_dict()
+            )
+        else:
+            residuals_by_bin = {}
+
+        out_sample_residuals = (
+            np.array([])
+            if self.out_sample_residuals_ is None
+            else self.out_sample_residuals_
+        )
+        out_sample_residuals_by_bin = (
+            {}
+            if self.out_sample_residuals_by_bin_ is None
+            else self.out_sample_residuals_by_bin_
+        )
+        if append:
+            out_sample_residuals = np.concatenate([out_sample_residuals, residuals])
+            for k, v in residuals_by_bin.items():
+                if k in out_sample_residuals_by_bin:
+                    out_sample_residuals_by_bin[k] = np.concatenate(
+                        (out_sample_residuals_by_bin[k], v)
+                    )
+                else:
+                    out_sample_residuals_by_bin[k] = v
+        else:
+            out_sample_residuals = residuals
+            out_sample_residuals_by_bin = residuals_by_bin
+
+        if self.binner is not None:
+            max_samples = 10_000 // self.binner.n_bins
+            rng = np.random.default_rng(seed=random_state)
+            for k, v in out_sample_residuals_by_bin.items():
+                if len(v) > max_samples:
+                    out_sample_residuals_by_bin[k] = rng.choice(
+                        v, size=max_samples, replace=False
+                    )
+
+            bin_keys = (
+                [] if self.binner_intervals_ is None else self.binner_intervals_.keys()
+            )
+            for k in bin_keys:
+                if k not in out_sample_residuals_by_bin:
+                    out_sample_residuals_by_bin[k] = np.array([])
+
+        self.out_sample_residuals_ = out_sample_residuals
+        self.out_sample_residuals_by_bin_ = out_sample_residuals_by_bin
