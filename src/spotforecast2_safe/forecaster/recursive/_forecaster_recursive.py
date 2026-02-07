@@ -353,6 +353,19 @@ class ForecasterRecursive(ForecasterBase):
         """
         HTML representation of the object.
         The "General Information" section is expanded by default.
+
+        Args:
+            None
+
+        Returns:
+            HTML string representation of the forecaster.
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> forecaster._repr_html_()  # doctest: +ELLIPSIS
+            '<div class="container-...">...</div>'
         """
 
         params = (
@@ -422,7 +435,29 @@ class ForecasterRecursive(ForecasterBase):
         return style + content
 
     def __setstate__(self, state: dict) -> None:
-        """Custom __setstate__ to ensure backward compatibility when unpickling."""
+        """Custom __setstate__ to ensure backward compatibility when unpickling.
+        This method ensures that when unpickling an object, if the attribute `__spotforecast_tags__` is missing
+        (which would be the case for objects pickled with versions of the code before this attribute was added),
+        it will be initialized with the correct tags.
+        This maintains compatibility with older pickled objects while ensuring that all forecaster instances
+        have the necessary metadata for integration within the spotforecast ecosystem.
+
+        Args:
+            state: State dictionary from the pickled object.
+
+        Returns:
+            None
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> import pickle
+            >>> pickled = pickle.dumps(forecaster)
+            >>> unpickled_forecaster = pickle.loads(pickled)
+            >>> hasattr(unpickled_forecaster, "__spotforecast_tags__")
+            True
+        """
         super().__setstate__(state)
         if not hasattr(self, "_ForecasterRecursive__spotforecast_tags__"):
             self.__spotforecast_tags__ = {
@@ -478,6 +513,26 @@ class ForecasterRecursive(ForecasterBase):
                   if no lags are configured.
                 - y_data: Target values aligned to the lagged predictors with
                   shape (n_rows,).
+
+        Raises:
+            ValueError: If `X_as_pandas` is True but `train_index` is not provided.
+            ValueError: If the length of `y` is not sufficient to create the
+                specified lags.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(lags=3)
+            >>> y = np.arange(10)
+            >>> train_index = pd.RangeIndex(start=3, stop=10)
+            >>> X_data, y_data = forecaster._create_lags(y=y, X_as_pandas=True, train_index=train_index)
+            >>> isinstance(X_data, pd.DataFrame)
+            True
+            >>> X_data.shape
+            (7, 3)
+            >>> y_data.shape
+            (7,)
         """
         X_data = None
         if self.lags is not None:
@@ -519,6 +574,38 @@ class ForecasterRecursive(ForecasterBase):
                   per window feature transformer.
                 - X_train_window_features_names_out_: List of feature names for
                   all generated window features.
+
+        Raises:
+            TypeError: If any window feature's `transform_batch` method does not
+                return a pandas DataFrame.
+            ValueError: If the output DataFrame from any window feature does not
+                have the same number of rows as `train_index` or if the index
+                does not match `train_index`.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> from spotforecast2_safe.preprocessing import RollingMeanWindow
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> train_index = y.index[3:]  # Assuming window_size is 3
+            >>> X_train_window_features, feature_names = forecaster._create_window_features(
+            ...     y=y,
+            ...     train_index=train_index,
+            ...     X_as_pandas=True
+            ... )
+            >>> isinstance(X_train_window_features[0], pd.DataFrame)
+            True
+            >>> X_train_window_features[0].shape[0] == len(train_index)
+            True
+            >>> (X_train_window_features[0].index == train_index).all()
+            True
+
         """
 
         len_train_index = len(train_index)
@@ -564,7 +651,50 @@ class ForecasterRecursive(ForecasterBase):
         Dict[str, type],
         Dict[str, type],
     ]:
+        """ "Create training predictors and target values.
 
+        Args:
+            y: Target series for training. Must be a pandas Series.
+            exog:
+                Optional exogenous variables for training. Can be a pandas Series or DataFrame.
+                Must have the same index as `y` and cover the same time range.
+
+        Returns:
+            Tuple containing:
+                - X_train: DataFrame of training predictors including lags, window features, and exogenous variables (if provided).
+                - y_train: Series of target values aligned with the predictors.
+                - X_train_features_names_out_: List of all predictor feature names.
+                - lags_names: List of lag feature names.
+                - window_features_names: List of window feature names.
+                - exog_names_in_: List of exogenous variable names (if exogenous variables are used).
+                - exog_dtypes_in_: Dictionary of input data types for exogenous variables.
+                - exog_dtypes_out_: Dictionary of output data types for exogenous variables after transformation (if exogenous variables are used).
+
+        Raises:
+            ValueError: If the length of `y` is not sufficient to create the specified lags and window features.
+            ValueError: If `exog` is provided but does not have the same index as `y` or does not cover the same time range.
+            ValueError: If `exog` is provided but contains data types that are not supported after transformation.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     lags=3,
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> X_train, y_train, feature_names, lags_names, window_features_names, exog_names_in_, exog_dtypes_in_, exog_dtypes_out_ = forecaster._create_train_X_y(y=y, exog=exog)
+            >>> isinstance(X_train, pd.DataFrame)
+            True
+            >>> isinstance(y_train, pd.Series)
+            True
+            >>> feature_names == lags_names + window_features_names + exog_names_in_
+            True
+        """
         check_y(y=y)
         y = input_to_frame(data=y, input_name="y")
 
@@ -732,6 +862,48 @@ class ForecasterRecursive(ForecasterBase):
         Dict[str, type],
         Dict[str, type],
     ]:
+        """Public method to create training predictors and target values.
+
+        This method is a public wrapper around the internal method `_create_train_X_y`,
+        which generates the training predictors and target values based on the provided time series and exogenous variables.
+        It ensures that the necessary transformations and feature engineering steps are applied to prepare the data for training the forecaster.
+
+        Args:
+            y: Target series for training. Must be a pandas Series.
+            exog: Optional exogenous variables for training. Can be a pandas Series or DataFrame. Must have the same index as `y` and cover the same time range. Defaults to None.
+
+        Returns:
+            Tuple containing:
+                - X_train: DataFrame of training predictors including lags, window features, and exogenous variables (if provided).
+                - y_train: Series of target values aligned with the predictors.
+                - X_train_features_names_out_: List of all predictor feature names.
+                - lags_names: List of lag feature names.
+                - window_features_names: List of window feature names.
+                - exog_names_in_: List of exogenous variable names (if exogenous variables are used).
+                - exog_dtypes_in_: Dictionary of input data types for exogenous variables.
+                - exog_dtypes_out_: Dictionary of output data types for exogenous variables after transformation (if exogenous variables are used).
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     lags=3,
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> X_train, y_train, feature_names, lags_names, window_features_names, exog_names_in_, exog_dtypes_in_, exog_dtypes_out_ = forecaster.create_train_X_y(y=y, exog=exog)
+            >>> isinstance(X_train, pd.DataFrame)
+            True
+            >>> isinstance(y_train, pd.Series)
+            True
+            >>> feature_names == lags_names + window_features_names + exog_names_in_
+            True
+
+        """
         return self._create_train_X_y(y=y, exog=exog)
 
     def _train_test_split_one_step_ahead(
@@ -762,6 +934,27 @@ class ForecasterRecursive(ForecasterBase):
                 - y_test: Values of the time series related to each row of X_test for
                     each step in the form {step: y_step_[i]} as dict.
 
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     lags=3,
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> X_train, y_train, X_test, y_test = forecaster._train_test_split_one_step_ahead(y=y, initial_train_size=20, exog=exog)
+            >>> isinstance(X_train, pd.DataFrame)
+            True
+            >>> isinstance(y_train, pd.Series)
+            True
+            >>> isinstance(X_test, pd.DataFrame)
+            True
+            >>> isinstance(y_test, pd.Series)
+            True
         """
 
         is_fitted = self.is_fitted
@@ -782,7 +975,27 @@ class ForecasterRecursive(ForecasterBase):
 
         return X_train, y_train, X_test, y_test
 
-    def get_params(self, deep=True):
+    def get_params(self, deep: bool = True) -> Dict[str, object]:
+        """
+        Get parameters for this forecaster.
+
+        Args:
+            deep: If True, will return the parameters for this forecaster and
+                contained sub-objects that are estimators.
+
+        Returns:
+            params: Dictionary of parameter names mapped to their values.
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> forecaster.get_params()  # doctest: +ELLIPSIS
+            {
+                'estimator': LinearRegression(), 'lags': 3, 'window_features': None,
+                'transformer_y': None, 'transformer_exog': None, 'weight_func': None,
+                'differentiation': None, 'fit_kwargs': {}, 'binner_kwargs': None, 'forecaster_id': '...'}
+        """
         params = {}
         for key in [
             "estimator",
@@ -809,7 +1022,25 @@ class ForecasterRecursive(ForecasterBase):
 
         return params
 
-    def set_params(self, **params):
+    def set_params(self, **params: object) -> "ForecasterRecursive":
+        """
+        Set the parameters of this forecaster.
+
+        Args:
+            **params: Dictionary of parameter names mapped to their new values.
+                Parameters can be for the forecaster itself or for the contained estimator (using the `estimator__` prefix).
+
+        Returns:
+            self: The forecaster instance with updated parameters.
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> forecaster.set_params(lags=5, estimator__fit_intercept=False)
+            ForecasterRecursive(estimator=LinearRegression(fit_intercept=False), lags=5)
+        """
+
         if not params:
             return self
 
@@ -849,6 +1080,40 @@ class ForecasterRecursive(ForecasterBase):
         random_state: int = 123,
         suppress_warnings: bool = False,
     ) -> None:
+        """
+        Fit the forecaster to the training data.
+
+        Args:
+            y:
+                  Target series for training. Must be a pandas Series.
+            exog:
+                  Optional exogenous variables for training. Can be a pandas Series or DataFrame.Must have the same index as `y` and cover the same time range. Defaults to None.
+            store_last_window:
+                  Whether to store the last window of the training series for use in prediction. Defaults to True.
+            store_in_sample_residuals:
+                  Whether to store in-sample residuals after fitting, which can be used for certain probabilistic prediction methods. Defaults to False.
+            random_state:
+                  Random seed for reproducibility when sampling residuals if `store_in_sample_residuals` is True. Defaults to 123.
+            suppress_warnings:
+                  Whether to suppress warnings during fitting, such as those related to insufficient data length for lags or window features. Defaults to False.
+
+        Returns:
+            None
+
+        Examples:
+                 >>> import numpy as np
+                 >>> import pandas as pd
+                 >>> from sklearn.linear_model import LinearRegression
+                 >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+                 >>> y = pd.Series(np.arange(30), name='y')
+                 >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+                 >>> forecaster = ForecasterRecursive(
+                 ...     estimator=LinearRegression(),
+                 ...     lags=3,
+                 ...     window_features=[RollingMeanWindow(window=3)]
+                 ... )
+                 >>> forecaster.fit(y=y, exog=exog, store_in_sample_residuals=True)
+        """
 
         # Reset values
         self.is_fitted = False
@@ -950,6 +1215,67 @@ class ForecasterRecursive(ForecasterBase):
         exog: Union[pd.Series, pd.DataFrame, None] = None,
         check_inputs: bool = True,
     ) -> Tuple[np.ndarray, Union[np.ndarray, None], pd.Index, pd.Index]:
+        """
+        Create and validate inputs needed for prediction.
+
+        Args:
+            steps:
+                Number of future steps to predict.
+            last_window:
+                Optional last window of observed values to use for prediction.
+                If None, uses the last window from training.
+                Must be a pandas Series or DataFrame with the same structure as the training target series. Defaults to None.
+            exog:
+                Optional exogenous variables for prediction.
+                Can be a pandas Series or DataFrame.
+                Must have the same structure as the exogenous variables used in training. Defaults to None.
+            check_inputs:
+                Whether to perform input validation checks. Defaults to True.
+
+        Returns:
+            Tuple containing:
+                - last_window_values:
+                    Numpy array of the last window values to use for prediction, transformed and ready for input into the prediction method.
+                - exog_values:
+                    Numpy array of exogenous variable values for prediction, transformed and ready for input into the prediction method,
+                    or None if no exogenous variables are used.
+                - prediction_index:
+                    Pandas Index for the predicted values, constructed based on the last window index and the number of steps to predict.
+                - exog_index:
+                    Pandas Index for the exogenous variable values, if exogenous variables are used; otherwise None.
+
+        Raises:
+            ValueError:
+                If input validation checks fail when `check_inputs` is True, such as if `last_window` does not have
+                the correct structure or if `exog` is not compatible with the training exogenous variables.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     lags=3,
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> forecaster.fit(y=y, exog=exog)
+            >>> last_window = y.iloc[-3:]
+            >>> exog_future = pd.DataFrame({'temp': np.random.randn(5)}, index=pd.RangeIndex(start=30, stop=35))
+            >>> last_window_values, exog_values, prediction_index, exog_index = forecaster._create_predict_inputs(
+            ...     steps=5, last_window=last_window, exog=exog_future, check_inputs=True
+            ... )
+            >>> isinstance(last_window_values, np.ndarray)
+            True
+            >>> isinstance(exog_values, np.ndarray)
+            True
+            >>> isinstance(prediction_index, pd.Index)
+            True
+            >>> isinstance(exog_index, pd.Index)
+            True
+        """
 
         if last_window is None:
             last_window = self.last_window_
@@ -1023,6 +1349,44 @@ class ForecasterRecursive(ForecasterBase):
         last_window_values: np.ndarray,
         exog_values: Union[np.ndarray, None] = None,
     ) -> np.ndarray:
+        """
+        Create predictions recursively for the specified number of steps.
+
+        Args:
+            steps:
+                Number of future steps to predict.
+            last_window_values:
+                Numpy array of the last window values to use for prediction, transformed and ready for input into the prediction method.
+            exog_values:
+                Numpy array of exogenous variable values for prediction, transformed and ready for input into the prediction method.
+
+        Returns:
+            Numpy array of predicted values for the specified number of steps.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     lags=3,
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> forecaster.fit(y=y, exog=exog)
+            >>> last_window = y.iloc[-3:]
+            >>> exog_future = pd.DataFrame({'temp': np.random.randn(5)}, index=pd.RangeIndex(start=30, stop=35))
+            >>> last_window_values, exog_values, prediction_index, exog_index = forecaster._create_predict_inputs(
+            ...     steps=5, last_window=last_window, exog=exog_future, check_inputs=True
+            ... )
+            >>> predictions = forecaster._recursive_predict(
+            ...     steps=5, last_window_values=last_window_values, exog_values=exog_values
+            ... )
+            >>> isinstance(predictions, np.ndarray)
+            True
+        """
 
         predictions = np.full(shape=steps, fill_value=np.nan)
 
@@ -1071,6 +1435,46 @@ class ForecasterRecursive(ForecasterBase):
         exog: Union[pd.Series, pd.DataFrame, None] = None,
         check_inputs: bool = True,
     ) -> pd.Series:
+        """
+        Predict future values recursively for the specified number of steps.
+
+        Args:
+            steps:
+                Number of future steps to predict.
+            last_window:
+                Optional last window of observed values to use for prediction. If None, uses the last window from training.
+                Must be a pandas Series or DataFrame with the same structure as the training target series. Defaults to None.
+            exog:
+                Optional exogenous variables for prediction. Can be a pandas Series or DataFrame.
+                Must have the same structure as the exogenous variables used in training. Defaults to None.
+            check_inputs:
+                Whether to perform input validation checks. Defaults to True.
+
+        Returns:
+            Pandas Series of predicted values for the specified number of steps,
+            indexed according to the prediction index constructed from the last window and the number of steps.
+
+        Examples:
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> y = pd.Series(np.arange(30), name='y')
+            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
+            >>> forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(),
+            ...     lags=3,
+            ...     window_features=[RollingMeanWindow(window=3)]
+            ... )
+            >>> forecaster.fit(y=y, exog=exog)
+            >>> last_window = y.iloc[-3:]
+            >>> exog_future = pd.DataFrame({'temp': np.random.randn(5)}, index=pd.RangeIndex(start=30, stop=35))
+            >>> predictions = forecaster.predict(
+            ...     steps=5, last_window=last_window, exog=exog_future, check_inputs=True
+            ... )
+            >>> isinstance(predictions, pd.Series)
+            True
+        """
 
         last_window_values, exog_values, prediction_index, _ = (
             self._create_predict_inputs(
