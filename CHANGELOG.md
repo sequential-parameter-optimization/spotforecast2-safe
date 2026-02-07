@@ -1,3 +1,16 @@
+## [0.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.7...v0.1.0) (2026-02-07)
+
+
+### Features
+
+* predict_interval ([d15fb25](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d15fb2540e542195e2966848cb2ca6389f189ee8))
+
+
+### Documentation
+
+* (recursive) ([79a5d4d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/79a5d4da2b931a89b46e8e9204c918cf6c3027c1))
+* intro to ForecasterEquivalentDate and ForecasterRecursive ([94313af](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/94313afbe227b5bed76c35045f91e0a5461a402b))
+
 ## [0.0.7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.6...v0.0.7) (2026-02-07)
 
 
