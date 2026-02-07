@@ -26,7 +26,7 @@ Usage:
 import re
 import sys
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 import argparse
 
 
@@ -64,6 +64,23 @@ def get_version_from_model_card() -> str:
     return None
 
 
+def get_version_from_docs_index() -> Optional[str]:
+    """Extract version from docs/index.md (current state)."""
+    index_path = Path(__file__).parent.parent / "docs" / "index.md"
+
+    if not index_path.exists():
+        return None
+
+    content = index_path.read_text()
+
+    # Match: Current Version: **X.Y.Z**
+    match = re.search(r"Current Version:\s*\*\*([^*]+)\*\*", content)
+    if match:
+        return match.group(1)
+
+    return None
+
+
 def update_model_card(version: str, dry_run: bool = False) -> bool:
     """Update version in MODEL_CARD.md."""
     model_card = Path(__file__).parent.parent / "docs" / "safe" / "MODEL_CARD.md"
@@ -93,17 +110,51 @@ def update_model_card(version: str, dry_run: bool = False) -> bool:
     return True
 
 
+def update_docs_index(version: str, dry_run: bool = False) -> bool:
+    """Update version badge and current version in docs/index.md."""
+    index_path = Path(__file__).parent.parent / "docs" / "index.md"
+
+    if not index_path.exists():
+        print(f"⚠ index.md not found at {index_path}")
+        return False
+
+    content = index_path.read_text()
+
+    badge_pattern = r"(https://img\.shields\.io/badge/version-)([^-]+)(-blue\.svg)"
+    current_version_pattern = r"(Current Version:\s*\*\*)([^*]+)(\*\*)"
+
+    updated = content
+    updated = re.sub(badge_pattern, rf"\g<1>{version}\g<3>", updated)
+    updated = re.sub(current_version_pattern, rf"\g<1>{version}\g<3>", updated)
+
+    if updated == content:
+        print(f"ℹ No changes needed: docs/index.md already has version {version}")
+        return False
+
+    if dry_run:
+        print(f"[DRY RUN] Would update docs/index.md:")
+        print(f"  Old version: {get_version_from_docs_index()}")
+        print(f"  New version: {version}")
+        return True
+
+    index_path.write_text(updated)
+    print(f"✓ Updated docs/index.md to version {version}")
+    return True
+
+
 def verify_consistency() -> Tuple[bool, str]:
     """Verify version consistency across all files."""
     try:
         pyproject_version = get_version_from_pyproject()
         model_card_version = get_version_from_model_card()
+        docs_index_version = get_version_from_docs_index()
         
         print(f"\n📋 Version Consistency Check:")
         print(f"  pyproject.toml:  {pyproject_version}")
         print(f"  MODEL_CARD.md:   {model_card_version}")
+        print(f"  docs/index.md:   {docs_index_version}")
         
-        if pyproject_version == model_card_version:
+        if pyproject_version == model_card_version == docs_index_version:
             print(f"✓ Versions are in sync!")
             return True, pyproject_version
         else:
@@ -149,6 +200,7 @@ def main():
             # Update if versions don't match
             print(f"\n🔄 Synchronizing to pyproject.toml version: {pyproject_version}")
             updated = update_model_card(pyproject_version, dry_run=args.dry_run)
+            updated = update_docs_index(pyproject_version, dry_run=args.dry_run) or updated
             
             if args.dry_run:
                 print("\n[DRY RUN] No files were actually modified")

@@ -1,6 +1,6 @@
 # Welcome to spotforecast2-safe (Core)
 
-[![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/releases)
+[![Version](https://img.shields.io/badge/version-0.0.6-blue.svg)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/releases)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Ready-success)](safe/spotforecast2-safe.md)
 [![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](safe/MODEL_CARD.md)
 [![Python](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
@@ -13,7 +13,7 @@
 - 📚 [API Reference](api/data.md)
 - �️ [Safety & Compliance](safe/spotforecast2-safe.md)
 - 📊 [Model/Method Card](safe/MODEL_CARD.md)
-- �🚀 Current Version: **0.0.1**
+- �🚀 Current Version: **0.0.6**
 
 ## Installation
 

@@ -76,7 +76,7 @@ python scripts/update_version.py --verify
 
 **Step 4: Commit changes**
 ```bash
-git add pyproject.toml docs/safe/MODEL_CARD.md
+git add pyproject.toml docs/safe/MODEL_CARD.md docs/index.md
 git commit -m "chore: release version 0.0.6"
 ```
 
@@ -148,6 +148,7 @@ spotforecast2-safe: Version Synchronization Script
 📋 Version Consistency Check:
   pyproject.toml:  0.0.5
   MODEL_CARD.md:   0.0.5
+  docs/index.md:   0.0.5
 ✓ Versions are in sync!
 ```
 
@@ -155,7 +156,8 @@ spotforecast2-safe: Version Synchronization Script
 
 1. **`pyproject.toml`** - Primary source
 2. **`docs/safe/MODEL_CARD.md`** - Model/Method card (for EU AI Act compliance)
-3. **`src/spotforecast2_safe/__init__.py`** - Package metadata (dynamic)
+3. **`docs/index.md`** - Documentation landing page (version badge and banner)
+4. **`src/spotforecast2_safe/__init__.py`** - Package metadata (dynamic)
 
 ## Safety & Compliance Features
 
