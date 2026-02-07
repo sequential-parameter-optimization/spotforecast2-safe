@@ -37,16 +37,16 @@ def check_preprocess_series(
     """
     Check and preprocess `series` argument in `ForecasterRecursiveMultiSeries` class.
 
-    - If `series` is a wide-format pandas DataFrame, each column represents a
-    different time series, and the index must be either a `DatetimeIndex` or
-    a `RangeIndex` with frequency or step size, as appropriate
-    - If `series` is a long-format pandas DataFrame with a MultiIndex, the
-    first level of the index must contain the series IDs, and the second
-    level must be a `DatetimeIndex` with the same frequency across all series.
-    - If series is a dictionary, each key must be a series ID, and each value
-    must be a named pandas Series. All series must have the same index, which
-    must be either a `DatetimeIndex` or a `RangeIndex`, and they must share the
-    same frequency or step size, as appropriate.
+        - If `series` is a wide-format pandas DataFrame, each column represents a
+        different time series, and the index must be either a `DatetimeIndex` or
+        a `RangeIndex` with frequency or step size, as appropriate
+        - If `series` is a long-format pandas DataFrame with a MultiIndex, the
+        first level of the index must contain the series IDs, and the second
+        level must be a `DatetimeIndex` with the same frequency across all series.
+        - If series is a dictionary, each key must be a series ID, and each value
+        must be a named pandas Series. All series must have the same index, which
+        must be either a `DatetimeIndex` or a `RangeIndex`, and they must share the
+        same frequency or step size, as appropriate.
 
     When `series` is a pandas DataFrame, it is converted to a dictionary of pandas
     Series, where the keys are the series IDs and the values are the Series with
@@ -342,6 +342,19 @@ def exog_to_direct_numpy(
             exog_direct_names: list, None
                 Names of the columns of the exogenous variables transformed. Only
                 created if `exog` is a pandas Series or DataFrame.
+
+    Examples:
+        from spotforecast2_safe.forecaster.utils import exog_to_direct_numpy
+        import numpy as np
+        exog = np.array([10, 20, 30, 40, 50])
+        steps = 3
+        exog_direct, exog_direct_names = exog_to_direct_numpy(exog, steps)
+        print(exog_direct)
+            [[10 20 30]
+            [20 30 40]
+            [30 40 50]]
+        print(exog_direct_names)
+        None
     """
 
     if isinstance(exog, (pd.Series, pd.DataFrame)):
@@ -391,6 +404,26 @@ def prepare_steps_direct(
     Returns:
         list[int]:
             Steps to be predicted.
+
+    Examples:
+        from spotforecast2_safe.forecaster.utils import prepare_steps_direct
+        max_step = 5
+        steps = 3
+        steps_direct = prepare_steps_direct(max_step, steps)
+        print(steps_direct)
+        [1, 2, 3]
+
+        max_step = 5
+        steps = [1, 3, 5]
+        steps_direct = prepare_steps_direct(max_step, steps)
+        print(steps_direct)
+        [1, 3, 5]
+
+        max_step = 5
+        steps = None
+        steps_direct = prepare_steps_direct(max_step, steps)
+        print(steps_direct)
+        [1, 2, 3, 4, 5]
     """
 
     if isinstance(steps, int):
@@ -438,11 +471,30 @@ def transform_numpy(
         Transform back the data to the original representation. This is not available
         when using transformers of class scikit-learn ColumnTransformers.
 
-    Returns
-    -------
-    array_transformed : numpy ndarray
-        Transformed array.
+    Returns:
+        numpy ndarray: Transformed array.
 
+    Raises:
+        TypeError: If `array` is not a numpy ndarray.
+        TypeError: If `transformer` is not a scikit-learn alike transformer, preprocessor, or ColumnTransformer.
+        ValueError: If `inverse_transform` is True and `transformer` is a ColumnTransformer.
+
+    Examples:
+        ffrom spotforecast2_safe.forecaster.utils import transform_numpy
+        from sklearn.preprocessing import StandardScaler
+        import numpy as np
+        array = np.array([[1, 2], [3, 4], [5, 6]])
+        transformer = StandardScaler()
+        array_transformed = transform_numpy(array, transformer, fit=True)
+        print(array_transformed)
+        [[-1.22474487 -1.22474487]
+         [ 0.          0.        ]
+         [ 1.22474487  1.22474487]]
+         array_inversed = transform_numpy(array_transformed, transformer, inverse_transform=True)
+         print(array_inversed)
+         [[1. 2.]
+          [3. 4.]
+          [5. 6.]]
     """
 
     if transformer is None:
@@ -500,9 +552,25 @@ def transform_numpy(
     return array_transformed
 
 
-def select_n_jobs_fit_forecaster(forecaster_name, estimator):
-    """
-    Select the number of jobs to run in parallel.
+def select_n_jobs_fit_forecaster(forecaster_name: str, estimator: object) -> int:
+    """Select the number of jobs to run in parallel during the fit process.
+
+    This function determines the optimal number of parallel processes for fitting
+    the forecaster based on the available system resources. In safety-critical
+    environments, this helps manage computational load and ensures system
+    predictability.
+
+    Args:
+        forecaster_name: Name of the forecaster being fitted. Currently unused but
+            reserved for granular resource allocation based on model complexity.
+        estimator: The estimator object being used by the forecaster. Currently
+            unused but reserved for checking if the estimator itself supports
+            internal parallelism.
+
+    Returns:
+        The number of jobs (CPUs) to use for parallel processing. Defaults to
+        the system CPU count, with a fallback to 1 if the count cannot be
+        determined.
     """
     import os
 
@@ -827,6 +895,25 @@ def check_residuals_input(
     Returns:
         None
 
+    Examples:
+        from spotforecast2_safe.forecaster.utils import check_residuals_input
+        import numpy as np
+        forecaster_name = "ForecasterRecursiveMultiSeries"
+        use_in_sample_residuals = True
+        in_sample_residuals_ = np.array([0.1, -0.2
+        out_sample_residuals_ = np.array([0.3, -0.1])
+        use_binned_residuals = False
+        check_residuals_input(
+            forecaster_name,
+            use_in_sample_residuals,
+            in_sample_residuals_,
+            out_sample_residuals_,
+            use_binned_residuals,
+            in_sample_residuals_by_bin_=None,
+            out_sample_residuals_by_bin_=None,
+            levels=['series_1', 'series_2'],
+            encoding='onehot'
+        )
     """
 
     forecasters_multiseries = (
@@ -940,6 +1027,28 @@ def date_to_index_position(
         this is done to include the target date in the training set when using
         pandas iloc with slices.
 
+    Raises:
+        ValueError: If `method` is not 'prediction' or 'validation'.
+        TypeError: If `date_input` is not an int, str, or pandas Timestamp.
+        TypeError: If `index` is not a pandas DatetimeIndex when `date_input` is not an int.
+        ValueError: If `date_input` is a date and does not meet the requirements based on the `method` argument.
+
+    Examples:
+        from spotforecast2_safe.forecaster.utils import date_to_index_position
+        import pandas as pd
+        index = pd.date_range(start='2020-01-01', periods=10, freq='D')
+        # Using an integer input
+        position = date_to_index_position(index, 5)
+        print(position)
+        # Output: 5
+        # Using a date input for prediction
+        position = date_to_index_position(index, '2020-01-15', method='prediction')
+        print(position)
+        # Output: 5 (number of steps from the last date in the index to the target date)
+        # Using a date input for validation
+        position = date_to_index_position(index, '2020-01-05', method='validation')
+        print(position)
+        # Output: 5 (position plus one of the target date in the index)
     """
 
     if method not in ["prediction", "validation"]:
@@ -1005,6 +1114,24 @@ def initialize_estimator(
     Returns:
         estimator or pipeline compatible with the scikit-learn API
             The valid estimator object.
+
+    Raises:
+        ValueError: If both `estimator` and `regressor` are provided. Use only `estimator`.
+        Warning: If `regressor` is provided, a FutureWarning is raised indicating that it is deprecated and will be removed in a future version.
+
+    Examples:
+        from spotforecast2_safe.forecaster.utils import initialize_estimator
+        from sklearn.linear_model import LinearRegression
+        # Using the `estimator` argument
+        estimator = LinearRegression()
+        result = initialize_estimator(estimator=estimator)
+        print(result)
+        LinearRegression()
+        # Using the deprecated `regressor` argument
+        regressor = LinearRegression()
+        result = initialize_estimator(regressor=regressor)
+        print(result)
+        LinearRegression()
 
     """
 
