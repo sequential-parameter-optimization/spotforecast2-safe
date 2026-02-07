@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.3...v0.2.4) (2026-02-07)
+
+
+### Code Refactoring
+
+* cleanup 0.1.0 ([0460f0a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/0460f0a15452665b87b6bce20a4a417901ccf578))
+
 ## [0.2.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.2...v0.2.3) (2026-02-07)
 
 
