@@ -2,7 +2,7 @@
 
 ## 1. System Details
 - **Name**: spotforecast2-safe
-- **Version**: 0.0.5 (Safety Release with Extended Testing)
+- **Version**: 0.0.6 (Safety Release with Extended Testing)
 - **Type**: Deterministic library for time series transformation and feature generation (Preprocessing).
 - **License**: BSD-3-Clause
 - **Developers**: bartzbeielstein

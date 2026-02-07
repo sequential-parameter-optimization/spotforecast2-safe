@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/releases)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Ready-success)](safe/spotforecast2-safe.md)
-[![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](MODEL_CARD.md)
+[![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](safe/MODEL_CARD.md)
 [![Python](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 
 **spotforecast2-safe** is a specialized, hardened Python package for time series forecasting in safety-critical production environments. It provides a minimal, auditable core for feature engineering and recursive forecasting.
@@ -12,7 +12,7 @@
 - 📦 [GitHub Repository](https://github.com/sequential-parameter-optimization/spotforecast2-safe)
 - 📚 [API Reference](api/data.md)
 - �️ [Safety & Compliance](safe/spotforecast2-safe.md)
-- 📊 [Model/Method Card](MODEL_CARD.md)
+- 📊 [Model/Method Card](safe/MODEL_CARD.md)
 - �🚀 Current Version: **0.0.1**
 
 ## Installation
@@ -38,7 +38,7 @@ uv sync
 
 ## ⚠️ Disclaimer & Liability
 
-**IMPORTANT**: This software is provided "as is" and any express or implied warranties are disclaimed. The use of this software in safety-critical systems is at the sole risk of the user. For full details, see the [Disclaimer in the Model Card](MODEL_CARD.md#8-disclaimer-liability).
+**IMPORTANT**: This software is provided "as is" and any express or implied warranties are disclaimed. The use of this software in safety-critical systems is at the sole risk of the user. For full details, see the [Disclaimer in the Model Card](safe/MODEL_CARD.md#8-disclaimer-liability).
 
 ## Attributions
 
