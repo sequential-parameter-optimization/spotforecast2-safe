@@ -60,7 +60,7 @@ Many thanks to the [skforecast team](https://skforecast.org/0.20.0/more/about-sk
 
 ## License
 
-`spotforecast2-safe` software: [BSD-3-Clause License](LICENSE)
+`spotforecast2-safe` software: [AGPL-3.0-or-later License](LICENSE)
 
 
 # References
