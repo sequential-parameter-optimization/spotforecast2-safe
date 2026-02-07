@@ -554,23 +554,26 @@ def backtesting_forecaster_one_step(
     )
 
     # Predictions
+    # NOTE: For one-step-ahead, we can use the estimator directly on X_test
+    # which contains all necessary lags and exog features.
     if interval is not None:
         if interval_method == "bootstrapping":
             if interval == "bootstrapping":
                 backtest_predictions = forecaster.predict_bootstrapping(
                     steps=len(X_test),
-                    last_window=None,  # Not used in one-step batch
-                    exog=X_test,
+                    last_window=None,
+                    exog=exog.iloc[cv.initial_train_size:] if exog is not None else None,
                     n_boot=n_boot,
                     use_in_sample_residuals=use_in_sample_residuals,
                     use_binned_residuals=use_binned_residuals,
                     random_state=random_state,
+                    in_sample_predict=True, # This might be needed if supported
                 )
             else:
                 backtest_predictions = forecaster.predict_interval(
                     steps=len(X_test),
                     last_window=None,
-                    exog=X_test,
+                    exog=exog.iloc[cv.initial_train_size:] if exog is not None else None,
                     method="bootstrapping",
                     interval=interval,
                     n_boot=n_boot,
@@ -582,7 +585,7 @@ def backtesting_forecaster_one_step(
             backtest_predictions = forecaster.predict_interval(
                 steps=len(X_test),
                 last_window=None,
-                exog=X_test,
+                exog=exog.iloc[cv.initial_train_size:] if exog is not None else None,
                 method="conformal",
                 interval=interval,
                 n_boot=n_boot,
@@ -593,14 +596,11 @@ def backtesting_forecaster_one_step(
         
         # Add 'pred' column
         if "pred" not in backtest_predictions.columns:
-            pred = forecaster.predict(steps=len(X_test), last_window=None, exog=X_test)
+            pred = forecaster.estimator.predict(X_test).ravel()
             backtest_predictions.insert(0, "pred", pred)
     else:
-        backtest_predictions = forecaster.predict(
-            steps=len(X_test), last_window=None, exog=X_test
-        )
-        if isinstance(backtest_predictions, pd.Series):
-            backtest_predictions = backtest_predictions.to_frame()
+        pred = forecaster.estimator.predict(X_test).ravel()
+        backtest_predictions = pd.DataFrame({"pred": pred}, index=y_test.index)
 
     if return_predictors:
         X_predict = forecaster.create_predict_X(

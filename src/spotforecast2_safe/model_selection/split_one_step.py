@@ -83,13 +83,13 @@ class OneStepAheadFold(BaseFold):
     def _repr_html_(self) -> str:
         """
         HTML representation of the object.
-        The \"General Information\" section is expanded by default.
+        The "General Information" section is expanded by default.
         """
 
         style, unique_id = get_style_repr_html()
-        content = f\"\"\"
-        <div class=\"container-{unique_id}\">
-            <p style=\"font-size: 1.5em; font-weight: bold; margin-block-start: 0.83em; margin-block-end: 0.83em;\">{type(self).__name__}</p>
+        content = f"""
+        <div class="container-{unique_id}">
+            <p style="font-size: 1.5em; font-weight: bold; margin-block-start: 0.83em; margin-block-end: 0.83em;">{type(self).__name__}</p>
             <details open>
                 <summary>General Information</summary>
                 <ul>
@@ -100,7 +100,7 @@ class OneStepAheadFold(BaseFold):
                 </ul>
             </details>
         </div>
-        \"\"\"
+        """
 
         return style + content
 
@@ -110,7 +110,7 @@ class OneStepAheadFold(BaseFold):
         as_pandas: bool = False,
         externally_fitted: Any = None,
     ) -> list | pd.DataFrame:
-        \"\"\"
+        """
         Split the time series data into train and test folds.
 
         Args:
@@ -144,12 +144,12 @@ class OneStepAheadFold(BaseFold):
             Following the python convention, the start index is inclusive and the end
             index is exclusive. This means that the last index is not included in the
             slice.
-        \"\"\"
+        """
 
         if not isinstance(X, (pd.Series, pd.DataFrame, pd.Index, dict)):
             raise TypeError(
-                f\"X must be a pandas Series, DataFrame, Index or a dictionary. \"
-                f\"Got {type(X)}.\"
+                f"X must be a pandas Series, DataFrame, Index or a dictionary. "
+                f"Got {type(X)}."
             )
 
         index = self._extract_index(X)
@@ -157,8 +157,8 @@ class OneStepAheadFold(BaseFold):
         self.initial_train_size = date_to_index_position(
             index=index,
             date_input=self.initial_train_size,
-            method=\"validation\",
-            date_literal=\"initial_train_size\",
+            method="validation",
+            date_literal="initial_train_size",
         )
 
         fold = [
@@ -192,30 +192,30 @@ class OneStepAheadFold(BaseFold):
                 fold = pd.DataFrame(
                     data=[[fold[0]] + list(itertools.chain(*fold[1:-1])) + [fold[-1]]],
                     columns=[
-                        \"fold\",
-                        \"train_start\",\
-                        \"train_end\",
-                        \"test_start\",
-                        \"test_end\",
-                        \"fit_forecaster\",
+                        "fold",
+                        "train_start",
+                        "train_end",
+                        "test_start",
+                        "test_end",
+                        "fit_forecaster",
                     ],
                 )
             else:
                 fold = pd.DataFrame(
                     data=[fold],
-                    columns=[\"fold\", \"train_index\", \"test_index\", \"fit_forecaster\"],
+                    columns=["fold", "train_index", "test_index", "fit_forecaster"],
                 )
 
         return fold
 
     def _print_info(self, index: pd.Index, fold: list[list[int]]) -> None:
-        \"\"\"
+        """
         Print information about folds.
 
         Args:
             index (pd.Index): Index of the time series data.
             fold (list): A list of lists containing the indices (position) of the fold.
-        \"\"\"
+        """
 
         if self.differentiation is None:
             differentiation = 0
@@ -225,21 +225,21 @@ class OneStepAheadFold(BaseFold):
         initial_train_size = self.initial_train_size - differentiation
         test_length = len(index) - (initial_train_size + differentiation)
 
-        print(\"Information of folds\")
-        print(\"--------------------\")
-        print(f\"Number of observations in train: {initial_train_size}\")
+        print("Information of folds")
+        print("--------------------")
+        print(f"Number of observations in train: {initial_train_size}")
         if self.differentiation is not None:
             print(
-                f\"    First {differentiation} observation/s in training set \"
-                f\"are used for differentiation\"
+                f"    First {differentiation} observation/s in training set "
+                f"are used for differentiation"
             )
-        print(f\"Number of observations in test: {test_length}\")
+        print(f"Number of observations in test: {test_length}")
 
         training_start = index[fold[1][0] + differentiation]
         training_end = index[fold[1][-1]]
         test_start = index[fold[2][0]]
         test_end = index[fold[2][-1] - 1]
 
-        print(f\"Training : {training_start} -- {training_end} (n={initial_train_size})\")
-        print(f\"Test     : {test_start} -- {test_end} (n={test_length})\")
-        print(\"\")
+        print(f"Training : {training_start} -- {training_end} (n={initial_train_size})")
+        print(f"Test     : {test_start} -- {test_end} (n={test_length})")
+        print("")
