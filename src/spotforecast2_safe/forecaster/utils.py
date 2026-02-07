@@ -26,18 +26,6 @@ try:
 except ImportError:  # pragma: no cover - fallback when tqdm is not installed
     tqdm = None
 
-optional_dependencies = {
-    "stats": ["statsmodels>=0.12, <0.16"],
-    "deeplearning": [
-        "matplotlib>=3.10.8",
-    ],
-    "plotting": [
-        "matplotlib>=3.10.8",
-        "seaborn>=0.11, <0.15",
-        "statsmodels>=0.12, <0.16",
-    ],
-}
-
 
 def check_preprocess_series(series):
     pass
@@ -981,42 +969,3 @@ def initialize_transformer_series(
             )
 
     return transformer_series_
-
-
-def _find_optional_dependency(
-    package_name: str,
-    optional_dependencies: dict[str, list[str]] = optional_dependencies,
-) -> tuple[str, str]:
-    """
-    Find if a package is an optional dependency. If True, find the version and
-    the extension it belongs to.
-    """
-
-    for extra, packages in optional_dependencies.items():
-        package_version = [package for package in packages if package_name in package]
-        if package_version:
-            return extra, package_version[0]
-
-
-def check_optional_dependency(package_name: str) -> None:
-    """
-    Check if an optional dependency is installed, if not raise an ImportError
-    with installation instructions.
-
-    Args:
-        package_name (str): Name of the package to check.
-
-    Raises:
-        ImportError: If the package is not installed.
-    """
-
-    if find_spec(package_name) is None:
-        try:
-            extra, package_version = _find_optional_dependency(
-                package_name=package_name
-            )
-            msg = f"\n'{package_name}' is an optional dependency not included in the default spotforecast installation."
-        except Exception:
-            msg = f"\n'{package_name}' is needed but not installed. Please install it."
-
-        raise ImportError(msg)
