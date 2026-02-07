@@ -7,7 +7,10 @@ from typing import Any
 import itertools
 import pandas as pd
 
-from spotforecast2_safe.forecaster.utils import date_to_index_position, get_style_repr_html
+from spotforecast2_safe.forecaster.utils import (
+    date_to_index_position,
+    get_style_repr_html,
+)
 from .split_base import BaseFold
 
 

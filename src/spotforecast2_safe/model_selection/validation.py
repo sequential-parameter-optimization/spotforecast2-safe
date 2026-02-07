@@ -549,7 +549,7 @@ def backtesting_forecaster_one_step(
     # Fit the forecaster
     forecaster.fit(
         y=y_train,
-        exog=exog.iloc[:cv.initial_train_size] if exog is not None else None,
+        exog=exog.iloc[: cv.initial_train_size] if exog is not None else None,
         store_in_sample_residuals=use_in_sample_residuals,
     )
 
@@ -562,18 +562,22 @@ def backtesting_forecaster_one_step(
                 backtest_predictions = forecaster.predict_bootstrapping(
                     steps=len(X_test),
                     last_window=None,
-                    exog=exog.iloc[cv.initial_train_size:] if exog is not None else None,
+                    exog=(
+                        exog.iloc[cv.initial_train_size :] if exog is not None else None
+                    ),
                     n_boot=n_boot,
                     use_in_sample_residuals=use_in_sample_residuals,
                     use_binned_residuals=use_binned_residuals,
                     random_state=random_state,
-                    in_sample_predict=True, # This might be needed if supported
+                    in_sample_predict=True,  # This might be needed if supported
                 )
             else:
                 backtest_predictions = forecaster.predict_interval(
                     steps=len(X_test),
                     last_window=None,
-                    exog=exog.iloc[cv.initial_train_size:] if exog is not None else None,
+                    exog=(
+                        exog.iloc[cv.initial_train_size :] if exog is not None else None
+                    ),
                     method="bootstrapping",
                     interval=interval,
                     n_boot=n_boot,
@@ -585,7 +589,7 @@ def backtesting_forecaster_one_step(
             backtest_predictions = forecaster.predict_interval(
                 steps=len(X_test),
                 last_window=None,
-                exog=exog.iloc[cv.initial_train_size:] if exog is not None else None,
+                exog=exog.iloc[cv.initial_train_size :] if exog is not None else None,
                 method="conformal",
                 interval=interval,
                 n_boot=n_boot,
@@ -593,7 +597,7 @@ def backtesting_forecaster_one_step(
                 use_binned_residuals=use_binned_residuals,
                 random_state=random_state,
             )
-        
+
         # Add 'pred' column
         if "pred" not in backtest_predictions.columns:
             pred = forecaster.estimator.predict(X_test).ravel()
@@ -615,11 +619,17 @@ def backtesting_forecaster_one_step(
     # Metrics expect y_true, y_pred, y_train
     # y_train should not include first window_size observations
     y_train_metrics = y_train.iloc[forecaster.window_size :]
-    
+
     metric_values = []
     for m in metrics:
-        metric_values.append(m(y_true=y_true, y_pred=backtest_predictions["pred"], y_train=y_train_metrics))
-    
+        metric_values.append(
+            m(
+                y_true=y_true,
+                y_pred=backtest_predictions["pred"],
+                y_train=y_train_metrics,
+            )
+        )
+
     metric_values = pd.DataFrame(
         data=[metric_values], columns=[m.__name__ for m in metrics]
     )
