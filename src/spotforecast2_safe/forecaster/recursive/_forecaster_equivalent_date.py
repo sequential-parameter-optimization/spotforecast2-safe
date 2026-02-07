@@ -8,8 +8,8 @@ from sklearn.exceptions import NotFittedError
 
 from spotforecast2_safe.exceptions import MissingValuesWarning
 from spotforecast2_safe.preprocessing import QuantileBinner
+from spotforecast2_safe import __version__
 
-# from spotforecast2_safe._version import __version__ # Skipping version for now or mock it
 from spotforecast2_safe.forecaster.utils import (
     check_extract_values_and_index,
     get_style_repr_html,
@@ -22,12 +22,6 @@ from spotforecast2_safe.utils import (
     check_predict_input,
 )
 from ._warnings import ResidualsUsageWarning
-
-# Mock version if not present
-try:
-    from spotforecast2_safe._version import __version__
-except ImportError:
-    __version__ = "0.0.1"
 
 
 class ForecasterEquivalentDate:
@@ -222,6 +216,52 @@ class ForecasterEquivalentDate:
     def __repr__(self) -> str:
         """
         Information displayed when a Forecaster object is printed.
+
+        Returns:
+            str: Information about the forecaster. It contains the following information:
+            - Offset: Value of the `offset` argument.
+            - Number of offsets: Value of the `n_offsets` argument.
+            - Aggregation function: Name of the `agg_func` function.
+            - Window size: Value of the `window_size` attribute.
+            - Series name: Name of the series provided by the user during training.
+            - Training range: First and last values of index of the data used during training.
+            - Training index type: Type of index of the data used during training.
+            - Training index frequency: Frequency of index of the data used during training.
+            - Creation date: Date of creation of the forecaster object.
+            - Last fit date: Date of last fit of the forecaster object.
+            - spotforecast version: Version of spotforecast library used to create the forecaster.
+            - Python version: Version of python used to create the forecaster.
+            - Forecaster id: Name used as an identifier of the forecaster.
+
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data = np.arange(14),
+            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
+            >>> print(forecaster)
+            ============================
+            ForecasterEquivalentDate
+            ============================
+            Offset: 7
+            Number of offsets: 1
+            Aggregation function: mean
+            Window size: 7
+            Series name: y
+            Training range: [Timestamp('2022-01-01 00:00:00'), Timestamp('2022-01-14 00:00:00')]
+            Training index type: DatetimeIndex
+            Training index frequency: D
+            Creation date: 2023-11-19 12:00:00
+            Last fit date: 2023-11-19 12:00:00
+            spotforecast version: 1.0.0
+            Python version: 3.8.10
+            Forecaster id: None
+
         """
 
         info = (
@@ -249,6 +289,38 @@ class ForecasterEquivalentDate:
         """
         HTML representation of the object.
         The "General Information" section is expanded by default.
+
+        Returns:
+            str: HTML representation of the forecaster object. It contains the same
+            information as the `__repr__` method, but in a more structured way.
+            In detail, it contains the following information:
+            - Offset: Value of the `offset` argument.
+            - Number of offsets: Value of the `n_offsets` argument.
+            - Aggregation function: Name of the `agg_func` function.
+            - Window size: Value of the `window_size` attribute.
+            - Series name: Name of the series provided by the user during training.
+            - Training range: First and last values of index of the data used during training.
+            - Training index type: Type of index of the data used during training.
+            - Training index frequency: Frequency of index of the data used during training.
+            - Creation date: Date of creation of the forecaster object.
+            - Last fit date: Date of last fit of the forecaster object.
+            - spotforecast version: Version of spotforecast library used to create the forecaster.
+            - Python version: Version of python used to create the forecaster.
+            - Forecaster id: Name used as an identifier of the forecaster.
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data = np.arange(14),
+            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
+            >>> forecaster._repr_html_()  # doctest: +ELLIPSIS
+            '<style>...</style><div class="container-...">...</div>'
+
         """
 
         style, unique_id = get_style_repr_html(self.is_fitted)
@@ -305,6 +377,17 @@ class ForecasterEquivalentDate:
 
         Returns:
             None
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data = np.arange(14),
+            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
         """
 
         if not isinstance(y, pd.Series):
@@ -430,6 +513,26 @@ class ForecasterEquivalentDate:
 
         Returns:
             None
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data = np.arange(21, dtype=float),
+            ...     index = pd.date_range(start='2022-01-01', periods=21, freq='D')
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(
+            ...     offset=7,
+            ...     binner_kwargs={'n_bins': 2, 'random_state': 123}
+            ... )
+            >>> forecaster.fit(y=data, store_in_sample_residuals=True)
+            >>> forecaster.in_sample_residuals_
+            array([7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7.])
+            >>> forecaster.in_sample_residuals_by_bin_
+            {0: array([7., 7., 7., 7., 7., 7., 7.]), 1: array([7., 7., 7., 7., 7., 7., 7.])}
+
+
         """
 
         if isinstance(self.offset, pd.tseries.offsets.DateOffset):
@@ -525,6 +628,33 @@ class ForecasterEquivalentDate:
 
         Returns:
             pd.Series: Predicted values.
+
+        Raises:
+            ValueError:
+                If all equivalent values are missing when using a pandas DateOffset as offset.
+                This can be caused by using an offset larger than the available data.
+                To avoid this, try to decrease the size of the offset, the number of `n_offsets` or increase the size of `last_window`.
+                In backtesting, this error may be caused by using an `initial_train_size` too small.
+            Warning:
+                If some equivalent values are missing when using a pandas DateOffset as offset.
+                This can be caused by using an offset larger than the available data or by using an `initial_train_size` too small in backtesting.
+                To avoid this, increase the `last_window` size or decrease the number of `n_offsets`.
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data = np.arange(14),
+            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
+            >>> forecaster.predict(steps=3)
+            2022-01-15    7
+            2022-01-16    8
+            2022-01-17    9
+            Freq: D, Name: pred, dtype: int64
         """
 
         if last_window is None:
@@ -687,9 +817,29 @@ class ForecasterEquivalentDate:
                 - lower_bound: lower bound of the interval.
                 - upper_bound: upper bound of the interval.
 
+        Raises:
+            ValueError: If `method` is not 'conformal'.
+            ValueError: If `interval` is not a float or a list/tuple defining a symmetric interval when using `method='conformal'`.
+
         References:
             .. [1] MAPIE - Model Agnostic Prediction Interval Estimator.
                 https://mapie.readthedocs.io/en/stable/theoretical_description_regression.html#the-split-method
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data = np.arange(14, dtype=float),
+            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data, store_in_sample_residuals=True)
+            >>> forecaster.predict_interval(steps=3, interval=0.8)
+                        pred  lower_bound  upper_bound
+            2022-01-15   7.0          6.0          8.0
+            2022-01-16   8.0          7.0          9.0
+            2022-01-17   9.0          8.0         10.0
         """
 
         if method != "conformal":
@@ -866,18 +1016,33 @@ class ForecasterEquivalentDate:
         10_000 residuals is stored. The number of residuals stored per bin is
         limited to `10_000 // self.binner.n_bins_`.
 
-        Parameters
-        ----------
-        y : pandas Series
-            Training time series.
-        random_state : int, default 123
-            Sets a seed to the random sampling for reproducible output.
-        exog : Ignored
-            Not used, present here for API consistency by convention.
+        Args:
+            y (pandas Series): Training time series.
+            random_state (int, optional): Sets a seed to the random sampling for
+                reproducible output. Defaults to 123.
+            exog (Ignored): Not used, present here for API consistency by convention.
 
-        Returns
-        -------
-        None
+        Returns:
+            None
+
+        Raises:
+            NotFittedError: If the forecaster has not been fitted.
+            IndexError: If the index range of `y` does not match the training range.
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data=np.arange(14, dtype=float),
+            ...     index=pd.date_range(start="2022-01-01", periods=14, freq="D"),
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
+            >>> # Recompute and store residuals if needed
+            >>> forecaster.set_in_sample_residuals(y=data, random_state=123)
+            >>> forecaster.in_sample_residuals_.shape
+            (7,)
 
         """
 
@@ -930,24 +1095,42 @@ class ForecasterEquivalentDate:
         10_000 residuals is stored. The number of residuals stored per bin is
         limited to `10_000 // self.binner.n_bins_`.
 
-        Parameters
-        ----------
-        y_true : numpy ndarray, pandas Series
-            True values of the time series from which the residuals have been
-            calculated.
-        y_pred : numpy ndarray, pandas Series
-            Predicted values of the time series.
-        append : bool, default False
-            If `True`, new residuals are added to the once already stored in the
-            forecaster. If after appending the new residuals, the limit of
-            `10_000 // self.binner.n_bins_` values per bin is reached, a random
-            sample of residuals is stored.
-        random_state : int, default 123
-            Sets a seed to the random sampling for reproducible output.
+        Args:
+            y_true (numpy ndarray, pandas Series): True values of the time series
+                from which the residuals have been calculated.
+            y_pred (numpy ndarray, pandas Series): Predicted values of the time series.
+            append (bool, optional): If `True`, new residuals are added to the once
+                already stored in the forecaster. If after appending the new
+                residuals, the limit of `10_000 // self.binner.n_bins_` values per
+                bin is reached, a random sample of residuals is stored. Defaults
+                to False.
+            random_state (int, optional): Sets a seed to the random sampling for
+                reproducible output. Defaults to 123.
 
-        Returns
-        -------
-        None
+        Returns:
+            None
+
+        Raises:
+            NotFittedError: If the forecaster has not been fitted.
+            TypeError: If `y_true` or `y_pred` are not numpy arrays or pandas Series.
+            ValueError: If `y_true` and `y_pred` have different lengths.
+            ValueError: If `y_true` and `y_pred` are pandas Series with different indexes.
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data=np.arange(21, dtype=float),
+            ...     index=pd.date_range(start="2022-01-01", periods=21, freq="D"),
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
+            >>> preds = forecaster.predict(steps=7)
+            >>> y_true = pd.Series(data[-7:].to_numpy(), index=preds.index)
+            >>> forecaster.set_out_sample_residuals(y_true=y_true, y_pred=preds)
+            >>> forecaster.out_sample_residuals_.shape
+            (7,)
 
         """
 
@@ -1059,6 +1242,13 @@ class ForecasterEquivalentDate:
 
         Returns:
             dict: Dictionary with forecaster tags.
+
+        Examples:
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> tags = forecaster.get_tags()
+            >>> sorted(tags.keys())[:3]
+            ['allowed_input_types_exog', 'allowed_input_types_series', 'forecaster_name']
         """
 
         return self.__spotforecast_tags__
@@ -1069,6 +1259,19 @@ class ForecasterEquivalentDate:
 
         Returns:
             None
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+            >>> data = pd.Series(
+            ...     data=np.arange(14, dtype=float),
+            ...     index=pd.date_range(start="2022-01-01", periods=14, freq="D"),
+            ... )
+            >>> forecaster = ForecasterEquivalentDate(offset=7)
+            >>> forecaster.fit(y=data)
+            >>> forecaster.summary()  # doctest: +ELLIPSIS
+            ============================
         """
 
         print(self)
