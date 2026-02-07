@@ -1058,10 +1058,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#guarantees" class="md-nav__link">
+  <a href="#design-objectives" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Guarantees
+        Design Objectives
       
     </span>
   </a>
@@ -1311,10 +1311,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#guarantees" class="md-nav__link">
+  <a href="#design-objectives" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Guarantees
+        Design Objectives
       
     </span>
   </a>
@@ -1466,14 +1466,14 @@
 <li><strong>Silent Data Cleaning</strong>: The package does not perform "silent" data imputation. Missing values (NaNs) lead to explicit errors (Fail-Safe), not estimations.</li>
 </ul>
 <h2 id="3-algorithm-logic">3. Algorithm &amp; Logic</h2>
-<p>The core module <code>task_n_to_1</code> implements a deterministic sliding-window transformation.</p>
+<p>The core task <code>task_n_to_1</code> implements a deterministic sliding-window transformation.</p>
 <h3 id="mathematical-description">Mathematical Description</h3>
 <p>Given a univariate time series $X = {x_1, x_2, ..., x_T}$, the system transforms this into a feature matrix $X_{feat}$ and a target vector $y$ based on the window size $w$ (lags):</p>
 <p>$$X_{row, t} = [x_{t-w}, x_{t-w+1}, ..., x_{t-1}] \rightarrow y_t = x_t$$</p>
-<h3 id="guarantees">Guarantees</h3>
+<h3 id="design-objectives">Design Objectives</h3>
 <ul>
-<li><strong>Deterministic</strong>: The same input always generates the exact same bit-level output.</li>
-<li><strong>Leakage-Free</strong>: The implementation guarantees that the target value $y_t$ is never contained within the input vector $X_{row, t}$.</li>
+<li><strong>Deterministic</strong>: The implementation strives to ensure that the same input always generates the exact same bit-level output.</li>
+<li><strong>Leakage-Free</strong>: The implementation aims to ensure that the target value $y_t$ is never contained within the input vector $X_{row, t}$.</li>
 </ul>
 <h2 id="4-performance-robustness-design-goals">4. Performance &amp; Robustness (Design Goals)</h2>
 <p>In the absence of "Accuracy" (as no model is trained), the following software metrics are design goals intended to support compliance with standards like IEC 61508 / EU AI Act. <strong>Users must verify these properties</strong>:</p>
