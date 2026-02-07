@@ -1,3 +1,16 @@
+## [0.0.6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.5...v0.0.6) (2026-02-07)
+
+
+### Bug Fixes
+
+* stub replaced (check_preprocess_series) ([56c471e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/56c471e0c695b109b65db63126d19631bae4650e))
+
+
+### Documentation
+
+* minor fix ([1b796ed](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1b796ed2b7276625d2709d4326bb26e44a533669))
+* path corrections (from spotforecast2. -> from spotforecast2_safe.) ([d3fbd68](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d3fbd682c330e0d7ca1c45f35184ad22301668dc))
+
 ## [0.0.5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.0.4...v0.0.5) (2026-02-06)
 
 
