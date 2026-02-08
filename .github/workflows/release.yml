@@ -74,7 +74,6 @@ jobs:
       - name: Build documentation
         if: success()
         run: |
-          pip install mkdocs-material mkdocstrings[python]
           mkdocs build
       
       - name: Deploy documentation
