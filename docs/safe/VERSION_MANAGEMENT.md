@@ -186,6 +186,8 @@ git log --oneline -- pyproject.toml
 
 ### GitHub Actions Example
 
+<!-- markdownlint-disable MD046 -->
+{% raw %}
 ```yaml
 name: Release
 
@@ -219,6 +221,8 @@ jobs:
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
 ```
+{% endraw %}
+<!-- markdownlint-enable MD046 -->
 
 ## Troubleshooting
 
