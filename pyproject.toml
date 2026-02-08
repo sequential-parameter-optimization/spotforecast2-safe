@@ -63,3 +63,9 @@ dev = [
 [project.scripts]
 spotforecast-safe-demo = "spotforecast2_safe.tasks.task_safe_demo:main"
 spotforecast-safe-n2o1-cov-df = "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
