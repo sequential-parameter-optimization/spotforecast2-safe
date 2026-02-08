@@ -1,3 +1,10 @@
+## [0.3.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.2...v0.3.3) (2026-02-08)
+
+
+### Code Refactoring
+
+* new persistence module ([c51e266](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c51e26614440f445b49fcc0af266ff810b0eaa17))
+
 ## [0.3.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.1...v0.3.2) (2026-02-08)
 
 
