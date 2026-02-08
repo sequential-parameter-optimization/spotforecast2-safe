@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Task demo: compare baseline, covariate, and custom LightGBM forecasts against ground truth.
 
