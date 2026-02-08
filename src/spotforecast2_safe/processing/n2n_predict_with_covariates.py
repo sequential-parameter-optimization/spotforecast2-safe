@@ -64,11 +64,6 @@ from lightgbm import LGBMRegressor
 from sklearn.preprocessing import PolynomialFeatures
 
 try:
-    from joblib import dump, load
-except ImportError:
-    raise ImportError("joblib is required. Install with: pip install joblib")
-
-try:
     from tqdm.auto import tqdm
 except ImportError:  # pragma: no cover - fallback when tqdm is not installed
     tqdm = None
@@ -91,6 +86,11 @@ from spotforecast2_safe.preprocessing.curate_data import (
 from spotforecast2_safe.preprocessing.imputation import get_missing_weights
 from spotforecast2_safe.preprocessing.outlier import mark_outliers
 from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
+from spotforecast2_safe.manager.persistence import (
+    _save_forecasters,
+    _load_forecasters,
+    _model_directory_exists,
+)
 
 try:
     from feature_engine.creation import CyclicalFeatures
@@ -580,148 +580,8 @@ def _merge_data_and_covariates(
 
 # ============================================================================
 # Model Persistence Functions
+# imported from spotforecast2_safe.manager.persistence
 # ============================================================================
-
-
-def _ensure_model_dir(model_dir: Union[str, Path]) -> Path:
-    """Ensure model directory exists.
-
-    Args:
-        model_dir: Directory path for model storage.
-
-    Returns:
-        Path: Validated Path object.
-
-    Raises:
-        OSError: If directory cannot be created.
-    """
-    model_path = Path(model_dir)
-    model_path.mkdir(parents=True, exist_ok=True)
-    return model_path
-
-
-def _get_model_filepath(model_dir: Path, target: str) -> Path:
-    """Get filepath for a single model.
-
-    Args:
-        model_dir: Directory containing models.
-        target: Target variable name.
-
-    Returns:
-        Path: Full filepath for the model.
-
-    Examples:
-        >>> path = _get_model_filepath(Path("./models"), "power")
-        >>> str(path)
-        './models/forecaster_power.joblib'
-    """
-    return model_dir / f"forecaster_{target}.joblib"
-
-
-def _save_forecasters(
-    forecasters: Dict[str, object],
-    model_dir: Union[str, Path],
-    verbose: bool = False,
-) -> Dict[str, Path]:
-    """Save trained forecasters to disk using joblib.
-
-    Follows scikit-learn persistence conventions using joblib for efficient
-    serialization of sklearn-compatible estimators.
-
-    Args:
-        forecasters: Dictionary mapping target names to trained ForecasterRecursive objects.
-        model_dir: Directory to save models. Created if it doesn't exist.
-        verbose: Print progress messages. Default: False.
-
-    Returns:
-        Dict[str, Path]: Dictionary mapping target names to saved model filepaths.
-
-    Raises:
-        OSError: If models cannot be written to disk.
-        TypeError: If forecasters contain non-serializable objects.
-
-    Examples:
-        >>> forecasters = {"power": forecaster_obj}
-        >>> paths = _save_forecasters(forecasters, "./models", verbose=True)
-        >>> print(paths["power"])
-        models/forecaster_power.joblib
-    """
-    model_path = _ensure_model_dir(model_dir)
-    saved_paths = {}
-
-    for target, forecaster in forecasters.items():
-        filepath = _get_model_filepath(model_path, target)
-        try:
-            dump(forecaster, filepath, compress=3)
-            saved_paths[target] = filepath
-            if verbose:
-                print(f"  ✓ Saved forecaster for {target} to {filepath}")
-        except Exception as e:
-            raise OSError(f"Failed to save model for {target}: {e}")
-
-    return saved_paths
-
-
-def _load_forecasters(
-    target_columns: List[str],
-    model_dir: Union[str, Path],
-    verbose: bool = False,
-) -> Tuple[Dict[str, object], List[str]]:
-    """Load trained forecasters from disk using joblib.
-
-    Attempts to load all forecasters for given targets. Missing models
-    are indicated in the return value for selective retraining.
-
-    Args:
-        target_columns: List of target variable names to load.
-        model_dir: Directory containing saved models.
-        verbose: Print progress messages. Default: False.
-
-    Returns:
-        Tuple[Dict[str, object], List[str]]:
-        - forecasters: Dictionary of successfully loaded ForecasterRecursive objects.
-        - missing_targets: List of target names without saved models.
-
-    Examples:
-        >>> forecasters, missing = _load_forecasters(
-        ...     ["power", "energy"],
-        ...     "./models",
-        ...     verbose=True
-        ... )
-        >>> print(missing)
-        ['energy']
-    """
-    model_path = Path(model_dir)
-    forecasters = {}
-    missing_targets = []
-
-    for target in target_columns:
-        filepath = _get_model_filepath(model_path, target)
-        if filepath.exists():
-            try:
-                forecasters[target] = load(filepath)
-                if verbose:
-                    print(f"  ✓ Loaded forecaster for {target} from {filepath}")
-            except Exception as e:
-                if verbose:
-                    print(f"  ✗ Failed to load {target}: {e}")
-                missing_targets.append(target)
-        else:
-            missing_targets.append(target)
-
-    return forecasters, missing_targets
-
-
-def _model_directory_exists(model_dir: Union[str, Path]) -> bool:
-    """Check if model directory exists.
-
-    Args:
-        model_dir: Directory path to check.
-
-    Returns:
-        bool: True if directory exists, False otherwise.
-    """
-    return Path(model_dir).exists()
 
 
 # ============================================================================

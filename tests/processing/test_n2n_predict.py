@@ -4,8 +4,8 @@ from spotforecast2_safe.processing.n2n_predict import n2n_predict
 
 
 @patch("spotforecast2_safe.processing.n2n_predict._model_directory_exists", return_value=False)
-@patch("spotforecast2_safe.processing.n2n_predict.dump")
-@patch("spotforecast2_safe.processing.n2n_predict.load")
+@patch("spotforecast2_safe.manager.persistence.dump")
+@patch("spotforecast2_safe.manager.persistence.load")
 @patch("spotforecast2_safe.processing.n2n_predict.fetch_data")
 @patch("spotforecast2_safe.processing.n2n_predict.get_start_end")
 @patch("spotforecast2_safe.processing.n2n_predict.basic_ts_checks")
@@ -87,8 +87,8 @@ def test_n2n_predict_flow(
 
 
 @patch("spotforecast2_safe.processing.n2n_predict._model_directory_exists", return_value=False)
-@patch("spotforecast2_safe.processing.n2n_predict.dump")
-@patch("spotforecast2_safe.processing.n2n_predict.load")
+@patch("spotforecast2_safe.manager.persistence.dump")
+@patch("spotforecast2_safe.manager.persistence.load")
 @patch("spotforecast2_safe.processing.n2n_predict.fetch_data")
 @patch("spotforecast2_safe.processing.n2n_predict.get_start_end")
 @patch("spotforecast2_safe.processing.n2n_predict.basic_ts_checks")

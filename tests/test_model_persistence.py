@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+from spotforecast2_safe.manager.persistence import (
     _ensure_model_dir,
     _get_model_filepath,
     _load_forecasters,
@@ -145,7 +145,7 @@ class TestGetModelFilepath:
 class TestSaveForecasters:
     """Tests for _save_forecasters function."""
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_save_single_forecaster(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test saving a single forecaster."""
         forecasters = {"power": mock_forecaster}
@@ -157,7 +157,7 @@ class TestSaveForecasters:
         assert isinstance(paths["power"], Path)
         mock_dump.assert_called_once()
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_save_multiple_forecasters(self, mock_dump, temp_model_dir, sample_forecasters):
         """Test saving multiple forecasters."""
         paths = _save_forecasters(sample_forecasters, temp_model_dir, verbose=False)
@@ -166,7 +166,7 @@ class TestSaveForecasters:
         assert set(paths.keys()) == {"power", "energy", "demand"}
         assert mock_dump.call_count == 3
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_directory_creation(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test that directory is created if it doesn't exist."""
         new_dir = temp_model_dir / "new" / "models" / "path"
@@ -176,7 +176,7 @@ class TestSaveForecasters:
 
         assert new_dir.exists()
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_save_returns_valid_paths(self, mock_dump, temp_model_dir, sample_forecasters):
         """Test that returned paths are valid."""
         paths = _save_forecasters(sample_forecasters, temp_model_dir, verbose=False)
@@ -185,7 +185,7 @@ class TestSaveForecasters:
             assert isinstance(path, Path)
             assert target in path.name
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_overwrite_existing_models(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test that existing models can be overwritten."""
         forecasters = {"power": mock_forecaster}
@@ -198,7 +198,7 @@ class TestSaveForecasters:
 
         assert mock_dump.call_count == 2
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_verbose_output(self, mock_dump, temp_model_dir, sample_forecasters, capsys):
         """Test verbose output during save."""
         _save_forecasters(sample_forecasters, temp_model_dir, verbose=True)
@@ -206,7 +206,7 @@ class TestSaveForecasters:
         captured = capsys.readouterr()
         assert "Saved forecaster" in captured.out
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_save_failure_handling(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test handling of save failures."""
         mock_dump.side_effect = Exception("Save failed")
@@ -214,7 +214,7 @@ class TestSaveForecasters:
         with pytest.raises(OSError, match="Failed to save model"):
             _save_forecasters({"power": mock_forecaster}, temp_model_dir)
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_save_string_path(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test that function accepts string paths."""
         paths = _save_forecasters(
@@ -234,8 +234,8 @@ class TestSaveForecasters:
 class TestLoadForecasters:
     """Tests for _load_forecasters function."""
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_load_single_forecaster(self, mock_load, mock_dump, temp_model_dir, mock_forecaster):
         """Test loading a single forecaster."""
         # First save a model
@@ -252,8 +252,8 @@ class TestLoadForecasters:
         # Verify load was attempted
         assert mock_load.called or len(missing) == 1
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_load_multiple_forecasters(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
         """Test loading multiple forecasters."""
         # Save all models
@@ -282,8 +282,8 @@ class TestLoadForecasters:
         assert len(forecasters) == 0
         assert set(missing) == {"power", "energy", "demand"}
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_load_partial_models(self, mock_load, mock_dump, temp_model_dir, mock_forecaster):
         """Test loading when only some models exist."""
         # Save only 'power' model
@@ -310,8 +310,8 @@ class TestLoadForecasters:
         assert len(forecasters) == 0
         assert set(missing) == {"power", "energy"}
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_verbose_output(self, mock_load, mock_dump, temp_model_dir, mock_forecaster, capsys):
         """Test verbose output during load."""
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
@@ -334,8 +334,8 @@ class TestLoadForecasters:
         assert len(forecasters) == 0
         assert len(missing) == 0
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_string_path_input(self, mock_load, mock_dump, temp_model_dir, mock_forecaster):
         """Test that function accepts string paths."""
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
@@ -389,8 +389,8 @@ class TestModelDirectoryExists:
 class TestModelPersistenceIntegration:
     """Integration tests for save/load cycle."""
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_save_and_load_cycle(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
         """Test complete save and load cycle."""
         # Save models
@@ -413,8 +413,8 @@ class TestModelPersistenceIntegration:
         # When dump is mocked, files aren't created, so all are missing
         assert mock_load.called or len(missing) >= 0
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_selective_model_training(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
         """Test selective retraining of missing models."""
         # Save only some models
@@ -432,8 +432,8 @@ class TestModelPersistenceIntegration:
         # Should have missing targets when dump is mocked
         assert len(missing) >= 0
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_concurrent_model_access(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
         """Test that saved models can be accessed concurrently."""
         # Save models
@@ -471,15 +471,15 @@ class TestEdgeCases:
             result = _ensure_model_dir(special_dir)
             assert result.exists()
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_very_long_target_name(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test with very long target names."""
         long_name = "a" * 100
         paths = _save_forecasters({long_name: mock_forecaster}, temp_model_dir)
         assert mock_dump.called
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
     def test_large_number_of_models(self, mock_load, mock_dump, temp_model_dir):
         """Test saving and loading many models."""
         mock_forecaster = MagicMock()
@@ -498,7 +498,7 @@ class TestEdgeCases:
         # Verify calls were made
         assert mock_load.called or len(missing) >= 0
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_unicode_target_names(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test with unicode characters in target names."""
         forecasters = {"energie": mock_forecaster}

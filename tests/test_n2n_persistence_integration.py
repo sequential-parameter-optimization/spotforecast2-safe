@@ -34,7 +34,7 @@ class TestModelDirParameter:
 
     def test_model_dir_creation(self, temp_model_dir):
         """Test that model_dir is created if it doesn't exist."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import _ensure_model_dir
+        from spotforecast2_safe.manager.persistence import _ensure_model_dir
 
         new_dir = temp_model_dir / "new" / "models"
         assert not new_dir.exists()
@@ -44,7 +44,7 @@ class TestModelDirParameter:
 
     def test_model_dir_string_path(self, temp_model_dir):
         """Test that model_dir accepts string paths."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import _ensure_model_dir
+        from spotforecast2_safe.manager.persistence import _ensure_model_dir
 
         str_path = str(temp_model_dir / "models")
         result = _ensure_model_dir(str_path)
@@ -124,7 +124,7 @@ class TestModelCachingBehavior:
 
     def test_model_directory_management(self, temp_model_dir):
         """Test model directory creation and existence checks."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+        from spotforecast2_safe.manager.persistence import (
             _ensure_model_dir,
             _model_directory_exists,
         )
@@ -144,10 +144,11 @@ class TestModelCachingBehavior:
 class TestPersistenceFunctions:
     """Tests for model persistence helper functions."""
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_save_forecasters_with_patch(self, mock_dump, temp_model_dir):
         """Test _save_forecasters with mocked dump."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+        from spotforecast2_safe.manager.persistence import (
+            _load_forecasters,
             _save_forecasters,
         )
 
@@ -161,11 +162,11 @@ class TestPersistenceFunctions:
         assert "power" in result
         assert mock_dump.called
 
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.load")
-    @patch("spotforecast2_safe.processing.n2n_predict_with_covariates.dump")
+    @patch("spotforecast2_safe.manager.persistence.load")
+    @patch("spotforecast2_safe.manager.persistence.dump")
     def test_load_forecasters_with_patch(self, mock_dump, mock_load, temp_model_dir):
         """Test _load_forecasters with mocked load."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+        from spotforecast2_safe.manager.persistence import (
             _load_forecasters,
             _save_forecasters,
         )
@@ -185,9 +186,7 @@ class TestPersistenceFunctions:
 
     def test_filepath_generation(self, temp_model_dir):
         """Test model filepath generation."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-            _get_model_filepath,
-        )
+        from spotforecast2_safe.manager.persistence import _get_model_filepath
 
         filepath = _get_model_filepath(temp_model_dir, "power")
         assert filepath.name == "forecaster_power.joblib"
@@ -214,7 +213,7 @@ class TestFunctionDocumentation:
 
     def test_persistence_functions_have_docstrings(self):
         """Test that persistence functions are documented."""
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+        from spotforecast2_safe.manager.persistence import (
             _ensure_model_dir,
             _get_model_filepath,
             _load_forecasters,

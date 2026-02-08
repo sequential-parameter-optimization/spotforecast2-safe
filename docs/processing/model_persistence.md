@@ -14,26 +14,26 @@ The model persistence functionality enables you to:
 
 ### Saving Models
 
-::: spotforecast2_safe.processing.n2n_predict_with_covariates._save_forecasters
+::: spotforecast2_safe.manager.persistence._save_forecasters
     options:
       docstring_style: google
       show_source: true
 
 ### Loading Models
 
-::: spotforecast2_safe.processing.n2n_predict_with_covariates._load_forecasters
+::: spotforecast2_safe.manager.persistence._load_forecasters
     options:
       docstring_style: google
       show_source: true
 
 ### Model Directory Management
 
-::: spotforecast2_safe.processing.n2n_predict_with_covariates._ensure_model_dir
+::: spotforecast2_safe.manager.persistence._ensure_model_dir
     options:
       docstring_style: google
       show_source: true
 
-::: spotforecast2_safe.processing.n2n_predict_with_covariates._model_directory_exists
+::: spotforecast2_safe.manager.persistence._model_directory_exists
     options:
       docstring_style: google
       show_source: true
@@ -41,7 +41,7 @@ The model persistence functionality enables you to:
 ## Examples
 
 ```python
-from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+from spotforecast2_safe.manager.persistence import (
     _save_forecasters,
     _load_forecasters,
 )
@@ -51,5 +51,8 @@ trained_forecasters = {...}  # Your trained forecasters
 _save_forecasters(trained_forecasters, model_dir="models/")
 
 # Load previously trained models
-loaded_forecasters = _load_forecasters(model_dir="models/")
+forecasters, missing = _load_forecasters(
+    target_columns=["power"], 
+    model_dir="models/"
+)
 ```
