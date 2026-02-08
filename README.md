@@ -7,6 +7,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/downloads/)
 [![PyPI Version](https://img.shields.io/pypi/v/spotforecast2-safe)](https://pypi.org/project/spotforecast2-safe/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/spotforecast2-safe)](https://pypi.org/project/spotforecast2-safe/)
+[![Total Downloads](https://static.pepy.tech/badge/spotforecast2-safe)](https://pepy.tech/project/spotforecast2-safe)
 [![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Ready-success)](MODEL_CARD.md)
 [![Dependencies](https://img.shields.io/badge/dependencies-minimal-blue)](pyproject.toml)
 [![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](MODEL_CARD.md)
