@@ -1,3 +1,16 @@
+## [0.3.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.1...v0.3.2) (2026-02-08)
+
+
+### Bug Fixes
+
+* add mkdocs-macros-plugin to optional-dependencies for CI/CD ([9c9dee9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9c9dee9c57661c8caa1558e9c45fa1c08f35bd7c))
+
+
+### Documentation
+
+* downloads ([4e1d90c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4e1d90cea1b18120a4de328035130ced9c6aa12d))
+* logo ([d5254a4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d5254a4dc5aaca94c759d91e1dc19720d0ce3d67))
+
 ## [0.3.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.0...v0.3.1) (2026-02-08)
 
 
