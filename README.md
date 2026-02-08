@@ -1,5 +1,5 @@
 <div align="left">
-  <img src="logo/spotlogo.png" alt="spotforecast2-safe Logo" width="300">
+  <img src="https://raw.githubusercontent.com/sequential-parameter-optimization/spotforecast2-safe/main/logo/spotlogo.png" alt="spotforecast2-safe Logo" width="300">
 </div>
 
 # spotforecast2-safe (Core)
