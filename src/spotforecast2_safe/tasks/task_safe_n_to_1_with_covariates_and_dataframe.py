@@ -37,7 +37,6 @@ import argparse
 import logging
 import sys
 import warnings
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -49,66 +48,10 @@ from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     n2n_predict_with_covariates,
 )
+from spotforecast2_safe.manager.logger import setup_logging
+from spotforecast2_safe.manager.tools import _parse_bool
 
 warnings.simplefilter("ignore")
-
-
-def _parse_bool(value: str) -> bool:
-    """Parse case-insensitive boolean strings for CLI arguments."""
-    normalized = value.strip().lower()
-    if normalized in {"true", "t", "yes", "1"}:
-        return True
-    if normalized in {"false", "f", "no", "0"}:
-        return False
-    raise argparse.ArgumentTypeError(f"Expected a boolean value, got: {value}")
-
-
-def setup_logging(
-    level: int = logging.INFO, log_dir: Optional[Path] = None
-) -> Tuple[logging.Logger, Optional[Path]]:
-    """
-    Configure robust logging for safety-critical execution.
-    Sets up both a stream (stdout) and an optional informative file handler.
-    Always logs INFO level or higher to the file, regardless of console level.
-    """
-    logger = logging.getLogger("task_safe_n_to_1")
-    logger.setLevel(logging.DEBUG)  # Root level allows handlers to filter
-
-    # Avoid duplicate handlers if main is called multiple times
-    if logger.handlers:
-        existing_path = None
-        for h in logger.handlers:
-            if isinstance(h, logging.FileHandler):
-                existing_path = Path(h.baseFilename)
-        return logger, existing_path
-
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-
-    # 1. Console Handler (Respects the requested level)
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    console_handler.setLevel(level)
-    logger.addHandler(console_handler)
-
-    # 2. File Handler (Always INFO+ for audit durability)
-    log_file_path = None
-    if log_dir:
-        try:
-            log_dir.mkdir(parents=True, exist_ok=True)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_file_path = log_dir / f"task_safe_n_to_1_{timestamp}.log"
-
-            file_handler = logging.FileHandler(log_file_path)
-            file_handler.setFormatter(formatter)
-            file_handler.setLevel(logging.INFO)
-            logger.addHandler(file_handler)
-            logger.info(f"Persistent logging initialized at: {log_file_path}")
-        except Exception as e:
-            logger.warning(f"Failed to initialize file logging in {log_dir}: {e}")
-
-    return logger, log_file_path
 
 
 def n_to_1_with_covariates(

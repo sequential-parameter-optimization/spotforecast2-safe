@@ -34,8 +34,72 @@ def get_model_prediction(
         successfully executes `package_prediction`. Returns None otherwise.
 
     Examples:
+        >>> import tempfile
+        >>> from pathlib import Path
         >>> from spotforecast2_safe.manager.predictor import get_model_prediction
-        >>> # prediction_pkg = get_model_prediction('lgbm')
+        >>> from joblib import dump
+        >>>
+        >>> # Example 1: No model found scenario
+        >>> with tempfile.TemporaryDirectory() as tmpdir:
+        ...     result = get_model_prediction('lgbm', model_dir=tmpdir)
+        ...     print(f"Result when no model exists: {result}")
+        Result when no model exists: None
+        >>>
+        >>> # Example 2: Model found but no package_prediction method
+        >>> class SimpleModel:  # doctest: +SKIP
+        ...     '''Simple model without package_prediction method'''
+        ...     def __init__(self):
+        ...         self.name = 'simple'
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     model_dir = Path(tmpdir)
+        ...     simple_model = SimpleModel()
+        ...     dump(simple_model, model_dir / "test_forecaster_1.joblib")
+        ...     result = get_model_prediction('test', model_dir=model_dir)
+        ...     print(f"Result without package_prediction: {result}")
+        Result without package_prediction: None
+        >>>
+        >>> # Example 3: Successful prediction package retrieval
+        >>> class ForecastModel:  # doctest: +SKIP
+        ...     '''Model with package_prediction method'''
+        ...     def __init__(self):
+        ...         self.name = 'xgb'
+        ...     def package_prediction(self):
+        ...         return {
+        ...             'predictions': [1.0, 2.0, 3.0],
+        ...             'metrics': {'mse': 0.05, 'mae': 0.02}
+        ...         }
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     model_dir = Path(tmpdir)
+        ...     forecast_model = ForecastModel()
+        ...     dump(forecast_model, model_dir / "xgb_forecaster_1.joblib")
+        ...     result = get_model_prediction('xgb', model_dir=model_dir)
+        ...     print(f"Predictions available: {'predictions' in result}")
+        ...     print(f"Metrics available: {'metrics' in result}")
+        Predictions available: True
+        Metrics available: True
+        >>>
+        >>> # Example 4: Safety-critical - verify prediction integrity
+        >>> class SafetyModel:  # doctest: +SKIP
+        ...     '''Safety model with validation'''
+        ...     def __init__(self):
+        ...         self.name = 'safety_forecaster'
+        ...     def package_prediction(self):
+        ...         return {
+        ...             'predictions': [10.5, 11.2],
+        ...             'confidence_intervals': [(10.0, 11.0), (10.8, 11.6)],
+        ...             'validation_passed': True
+        ...         }
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     model_dir = Path(tmpdir)
+        ...     safety_model = SafetyModel()
+        ...     dump(safety_model, model_dir / "safety_forecaster_forecaster_2.joblib")
+        ...     pkg = get_model_prediction('safety_forecaster', model_dir=model_dir)
+        ...     if pkg:
+        ...         print(f"Validation status: {pkg['validation_passed']}")
+        Validation status: True
     """
     n_iteration, model = get_last_model(model_name, model_dir)
 

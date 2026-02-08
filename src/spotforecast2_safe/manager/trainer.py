@@ -50,9 +50,66 @@ def train_new_model(
         The trained model instance.
 
     Examples:
+        >>> import tempfile
+        >>> import pandas as pd
+        >>> from pathlib import Path
+        >>> from unittest.mock import patch
         >>> from spotforecast2_safe.manager.trainer import train_new_model
-        >>> # Assuming MyLGBMModel is defined correctly
-        >>> # model = train_new_model(MyLGBMModel, n_iteration=1)
+        >>>
+        >>> # Example 1: Train without saving to file
+        >>> class MockModel:  # doctest: +SKIP
+        ...     '''Mock model class for testing'''
+        ...     def __init__(self, iteration, end_dev, train_size=None):
+        ...         self.iteration = iteration
+        ...         self.end_dev = end_dev
+        ...         self.train_size = train_size
+        ...         self.name = 'mock'
+        ...     def tune(self):
+        ...         '''Simulate tuning process'''
+        ...         pass
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     with patch('spotforecast2_safe.manager.trainer.fetch_data') as mock_fetch:
+        ...         mock_data = pd.DataFrame(
+        ...             {'value': [1, 2, 3]},
+        ...             index=pd.date_range('2024-01-01', periods=3, freq='H')
+        ...         )
+        ...         mock_fetch.return_value = mock_data
+        ...         model = train_new_model(
+        ...             MockModel,
+        ...             n_iteration=0,
+        ...             save_to_file=False
+        ...         )
+        ...         print(f"Model trained: {model is not None}")
+        ...         print(f"Model iteration: {model.iteration}")
+        Model trained: True
+        Model iteration: 0
+        >>>
+        >>> # Example 2: Train and save to custom directory
+        >>> class TestModel:  # doctest: +SKIP
+        ...     '''Test model class'''
+        ...     def __init__(self, iteration, end_dev, train_size=None):
+        ...         self.iteration = iteration
+        ...         self.end_dev = end_dev
+        ...         self.name = 'test'
+        ...     def tune(self):
+        ...         pass
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     with patch('spotforecast2_safe.manager.trainer.fetch_data') as mock_fetch:
+        ...         mock_fetch.return_value = pd.DataFrame(
+        ...             {'value': [10, 20, 30]},
+        ...             index=pd.date_range('2024-06-01', periods=3, freq='D')
+        ...         )
+        ...         model = train_new_model(
+        ...             TestModel,
+        ...             n_iteration=1,
+        ...             save_to_file=True,
+        ...             model_dir=tmpdir
+        ...         )
+        ...         saved_file = Path(tmpdir) / 'test_forecaster_1.joblib'
+        ...         print(f"Model saved: {saved_file.exists()}")
+        Model saved: True
     """
     logger.info("Training new model (iteration %d)...", n_iteration)
 
@@ -117,6 +174,69 @@ def get_last_model(
     Returns:
         A tuple (iteration, model_instance). If no model is found,
         returns (-1, None).
+
+    Examples:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from spotforecast2_safe.manager.trainer import get_last_model
+        >>> from joblib import dump
+        >>>
+        >>> # Example 1: No model found
+        >>> with tempfile.TemporaryDirectory() as tmpdir:
+        ...     iteration, model = get_last_model('lgbm', model_dir=tmpdir)
+        ...     print(f"Iteration: {iteration}, Model: {model}")
+        Iteration: -1, Model: None
+        >>>
+        >>> # Example 2: Single model exists
+        >>> class SimpleModel:  # doctest: +SKIP
+        ...     '''Simple model class'''
+        ...     def __init__(self, name):
+        ...         self.name = name
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     model_dir = Path(tmpdir)
+        ...     simple_model = SimpleModel('xgb')
+        ...     dump(simple_model, model_dir / 'xgb_forecaster_0.joblib')
+        ...     iteration, model = get_last_model('xgb', model_dir=model_dir)
+        ...     print(f"Found iteration: {iteration}")
+        ...     print(f"Model loaded: {model is not None}")
+        Found iteration: 0
+        Model loaded: True
+        >>>
+        >>> # Example 3: Multiple iterations - gets latest
+        >>> class IterModel:  # doctest: +SKIP
+        ...     '''Model with iteration tracking'''
+        ...     def __init__(self, iteration):
+        ...         self.iteration = iteration
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     model_dir = Path(tmpdir)
+        ...     for i in range(5):
+        ...         iter_model = IterModel(i)
+        ...         dump(iter_model, model_dir / f'lgbm_forecaster_{i}.joblib')
+        ...     iteration, model = get_last_model('lgbm', model_dir=model_dir)
+        ...     print(f"Latest iteration: {iteration}")
+        ...     print(f"Model iteration attribute: {model.iteration}")
+        Latest iteration: 4
+        Model iteration attribute: 4
+        >>>
+        >>> # Example 4: Safety-critical - verify model integrity
+        >>> class SafetyModel:  # doctest: +SKIP
+        ...     '''Safety model with validation attributes'''
+        ...     def __init__(self):
+        ...         self.validated = True
+        ...         self.checksum = 'abc123'
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     model_dir = Path(tmpdir)
+        ...     safety_model = SafetyModel()
+        ...     dump(safety_model, model_dir / 'safety_forecaster_1.joblib')
+        ...     iteration, model = get_last_model('safety', model_dir=model_dir)
+        ...     if model:
+        ...         print(f"Model validated: {model.validated}")
+        ...         print(f"Checksum present: {hasattr(model, 'checksum')}")
+        Model validated: True
+        Checksum present: True
     """
     if model_dir is None:
         model_dir = get_cache_home()
@@ -169,6 +289,75 @@ def handle_training(
         model_dir: Directory where models are stored.
         force: If True, force retraining even if the current model is recent.
         train_size: Optional size of the training set.
+
+    Examples:
+        >>> import tempfile
+        >>> import pandas as pd
+        >>> from pathlib import Path
+        >>> from unittest.mock import patch
+        >>> from spotforecast2_safe.manager.trainer import handle_training
+        >>>
+        >>> # Example 1: No existing model - triggers training
+        >>> class MockModel:  # doctest: +SKIP
+        ...     '''Mock model class'''
+        ...     def __init__(self, iteration, end_dev, train_size=None):
+        ...         self.iteration = iteration
+        ...         self.end_dev = end_dev
+        ...         self.name = 'test'
+        ...     def tune(self):
+        ...         pass
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     with patch('spotforecast2_safe.manager.trainer.get_last_model') as mock_get:
+        ...         with patch('spotforecast2_safe.manager.trainer.train_new_model') as mock_train:
+        ...             mock_get.return_value = (-1, None)
+        ...             handle_training(MockModel, model_name='test', model_dir=tmpdir)
+        ...             print(f"Training called: {mock_train.called}")
+        ...             print(f"Iteration: {mock_train.call_args[0][1]}")
+        Training called: True
+        Iteration: 0
+        >>>
+        >>> # Example 2: Recent model exists - no retraining
+        >>> class RecentModel:  # doctest: +SKIP
+        ...     '''Model with recent training'''
+        ...     def __init__(self):
+        ...         self.end_dev = pd.Timestamp.now('UTC') - pd.Timedelta(hours=24)
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     with patch('spotforecast2_safe.manager.trainer.get_last_model') as mock_get:
+        ...         with patch('spotforecast2_safe.manager.trainer.train_new_model') as mock_train:
+        ...             mock_existing = RecentModel()
+        ...             mock_get.return_value = (1, mock_existing)
+        ...             handle_training(MockModel, model_name='recent', model_dir=tmpdir)
+        ...             print(f"Training skipped: {not mock_train.called}")
+        Training skipped: True
+        >>>
+        >>> # Example 3: Old model exists - triggers retraining
+        >>> class OldModel:  # doctest: +SKIP
+        ...     '''Model with old training'''
+        ...     def __init__(self):
+        ...         self.end_dev = pd.Timestamp.now('UTC') - pd.Timedelta(days=10)
+        >>>
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     with patch('spotforecast2_safe.manager.trainer.get_last_model') as mock_get:
+        ...         with patch('spotforecast2_safe.manager.trainer.train_new_model') as mock_train:
+        ...             mock_old = OldModel()
+        ...             mock_get.return_value = (2, mock_old)
+        ...             handle_training(MockModel, model_name='old', model_dir=tmpdir)
+        ...             print(f"Retraining triggered: {mock_train.called}")
+        ...             print(f"New iteration: {mock_train.call_args[0][1]}")
+        Retraining triggered: True
+        New iteration: 3
+        >>>
+        >>> # Example 4: Force retraining even with recent model
+        >>> with tempfile.TemporaryDirectory() as tmpdir:  # doctest: +SKIP
+        ...     with patch('spotforecast2_safe.manager.trainer.get_last_model') as mock_get:
+        ...         with patch('spotforecast2_safe.manager.trainer.train_new_model') as mock_train:
+        ...             mock_recent = RecentModel()
+        ...             mock_get.return_value = (0, mock_recent)
+        ...             handle_training(MockModel, model_name='forced', model_dir=tmpdir, force=True)
+        ...             print(f"Force training executed: {mock_train.called}")
+        Force training executed: True
     """
     if model_name is None:
         model_name = model_class.__name__.lower()
