@@ -41,7 +41,7 @@ import traceback
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 from lightgbm import LGBMRegressor
@@ -65,9 +65,16 @@ def calculate_metrics(actual: pd.Series, predicted: pd.Series) -> Dict[str, floa
 @dataclass(frozen=True)
 class DemoConfig:
     """Configuration for the safety-critical demo task."""
-    data_path: Path = field(default_factory=lambda: Path.home() / "spotforecast2_data" / "data_test.csv")
-    model_root: Path = field(default_factory=lambda: Path.home() / "spotforecast2_safe_models")
-    log_root: Path = field(default_factory=lambda: Path.home() / "spotforecast2_safe_models" / "logs")
+
+    data_path: Path = field(
+        default_factory=lambda: Path.home() / "spotforecast2_data" / "data_test.csv"
+    )
+    model_root: Path = field(
+        default_factory=lambda: Path.home() / "spotforecast2_safe_models"
+    )
+    log_root: Path = field(
+        default_factory=lambda: Path.home() / "spotforecast2_safe_models" / "logs"
+    )
     forecast_horizon: int = 24
     contamination: float = 0.01
     window_size: int = 72
@@ -75,14 +82,25 @@ class DemoConfig:
     train_ratio: float = 0.8
     random_seed: int = 42
 
-    weights: List[float] = field(default_factory=lambda: [
-        1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0
-    ])
+    weights: List[float] = field(
+        default_factory=lambda: [
+            1.0,
+            1.0,
+            -1.0,
+            -1.0,
+            1.0,
+            -1.0,
+            1.0,
+            1.0,
+            1.0,
+            -1.0,
+            1.0,
+        ]
+    )
 
 
 def setup_logging(
-    level: int = logging.INFO,
-    log_dir: Optional[Path] = None
+    level: int = logging.INFO, log_dir: Optional[Path] = None
 ) -> Tuple[logging.Logger, Optional[Path]]:
     """
     Configure robust logging for safety-critical execution.
@@ -101,7 +119,7 @@ def setup_logging(
         return logger, existing_path
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # 1. Console Handler (Respects the requested level)
@@ -117,7 +135,7 @@ def setup_logging(
             log_dir.mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             log_file_path = log_dir / f"task_safe_demo_{timestamp}.log"
-            
+
             file_handler = logging.FileHandler(log_file_path)
             file_handler.setFormatter(formatter)
             file_handler.setLevel(logging.INFO)
@@ -136,9 +154,7 @@ def _parse_bool(value: str) -> bool:
         return True
     if normalized in {"false", "f", "no", "0"}:
         return False
-    raise argparse.ArgumentTypeError(
-        f"Expected a boolean value, got: {value}"
-    )
+    raise argparse.ArgumentTypeError(f"Expected a boolean value, got: {value}")
 
 
 def load_actual_combined(
@@ -156,7 +172,7 @@ def load_actual_combined(
     if missing_cols:
         raise ValueError(f"Missing columns in test data: {missing_cols}")
 
-    actual_df = data_test[columns].iloc[:config.forecast_horizon]
+    actual_df = data_test[columns].iloc[: config.forecast_horizon]
 
     # Weight validation happens inside agg_predict
     return agg_predict(actual_df, weights=config.weights)
@@ -183,7 +199,7 @@ def main(
         lags=default_config.lags,
         train_ratio=default_config.train_ratio,
         random_seed=default_config.random_seed,
-        weights=default_config.weights
+        weights=default_config.weights,
     )
 
     # Setup Logging if enabled
@@ -198,7 +214,9 @@ def main(
     logger.info(f"Validating ground truth availability: {config.data_path}")
     if not config.data_path.is_file():
         logger.error(f"FAIL-FAST: Ground truth file not found at {config.data_path}")
-        logger.error("Please ensure the file exists or specify a valid path via --data_path")
+        logger.error(
+            "Please ensure the file exists or specify a valid path via --data_path"
+        )
         return 1
     logger.info("Ground truth file verified.")
 
@@ -234,7 +252,9 @@ def main(
         )
 
         covariates_combined = agg_predict(cov_predictions, weights=config.weights)
-        logger.info(f"Covariates combined generated. Shape: {covariates_combined.shape}")
+        logger.info(
+            f"Covariates combined generated. Shape: {covariates_combined.shape}"
+        )
 
         # --- Custom LightGBM predictions ---
         logger.info("Executing custom LightGBM forecast...")
@@ -261,8 +281,12 @@ def main(
             force_train=force_train,
             model_dir=config.model_root / "task_demo_custom_lgbm",
         )
-        custom_lgbm_combined = agg_predict(custom_lgbm_predictions, weights=config.weights)
-        logger.info(f"Custom LightGBM combined generated. Shape: {custom_lgbm_combined.shape}")
+        custom_lgbm_combined = agg_predict(
+            custom_lgbm_predictions, weights=config.weights
+        )
+        logger.info(
+            f"Custom LightGBM combined generated. Shape: {custom_lgbm_combined.shape}"
+        )
 
         # --- Comparative Metrics ---
         logger.info("Comparing models...")
@@ -270,7 +294,7 @@ def main(
         logger.info(f"Indices align between baseline and covariates: {idx_match}")
 
         # --- Ground truth and Evaluation ---
-        # Note: We checked for file existence above, but load_actual_combined 
+        # Note: We checked for file existence above, but load_actual_combined
         # also performs schema validation.
         try:
             columns = list(baseline_predictions.columns)
@@ -305,7 +329,7 @@ def main(
             print(f"Finalized logging info saved to: {log_file}")
         return 0
 
-    except Exception as e:
+    except Exception as _e:  # noqa: F841
         logger.critical("Task failed with an unexpected error:")
         logger.critical(traceback.format_exc())
         if log_file:
@@ -314,7 +338,9 @@ def main(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run the spotforecast2_safe demo task.")
+    parser = argparse.ArgumentParser(
+        description="Run the spotforecast2_safe demo task."
+    )
     parser.add_argument(
         "--force_train",
         type=_parse_bool,
@@ -338,9 +364,10 @@ if __name__ == "__main__":
     # Convert string path to Path object if provided
     specified_data_path = Path(args.data_path) if args.data_path else None
 
-    sys.exit(main(
-        force_train=args.force_train,
-        data_path=specified_data_path,
-        logging_enabled=args.logging
-    ))
-
+    sys.exit(
+        main(
+            force_train=args.force_train,
+            data_path=specified_data_path,
+            logging_enabled=args.logging,
+        )
+    )

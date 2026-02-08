@@ -57,14 +57,11 @@ def _parse_bool(value: str) -> bool:
         return True
     if normalized in {"false", "f", "no", "0"}:
         return False
-    raise argparse.ArgumentTypeError(
-        f"Expected a boolean value, got: {value}"
-    )
+    raise argparse.ArgumentTypeError(f"Expected a boolean value, got: {value}")
 
 
 def setup_logging(
-    level: int = logging.INFO,
-    log_dir: Optional[Path] = None
+    level: int = logging.INFO, log_dir: Optional[Path] = None
 ) -> Tuple[logging.Logger, Optional[Path]]:
     """
     Configure robust logging for safety-critical execution.
@@ -83,7 +80,7 @@ def setup_logging(
         return logger, existing_path
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # 1. Console Handler (Respects the requested level)
@@ -99,7 +96,7 @@ def setup_logging(
             log_dir.mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             log_file_path = log_dir / f"task_safe_n_to_1_{timestamp}.log"
-            
+
             file_handler = logging.FileHandler(log_file_path)
             file_handler.setFormatter(formatter)
             file_handler.setLevel(logging.INFO)
@@ -448,8 +445,7 @@ def main(
     log_file = None
     if logging_enabled:
         logger, log_file = setup_logging(
-            level=logging.INFO if verbose else logging.WARNING, 
-            log_dir=log_dir
+            level=logging.INFO if verbose else logging.WARNING, log_dir=log_dir
         )
     else:
         logger = logging.getLogger("task_safe_n_to_1")
@@ -499,52 +495,110 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Run the safety-critical N-to-1 forecasting demo with exogenous covariates.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     # Technical Parameters
-    parser.add_argument("--forecast_horizon", type=int, default=24, help="Number of steps ahead to forecast.")
-    parser.add_argument("--contamination", type=float, default=0.01, help="Outlier contamination parameter [0, 1].")
-    parser.add_argument("--window_size", type=int, default=72, help="Rolling window size for feature extraction.")
-    parser.add_argument("--lags", type=int, default=24, help="Number of lags for recursive model.")
-    parser.add_argument("--train_ratio", type=float, default=0.8, help="Fraction of data used for training.")
+    parser.add_argument(
+        "--forecast_horizon",
+        type=int,
+        default=24,
+        help="Number of steps ahead to forecast.",
+    )
+    parser.add_argument(
+        "--contamination",
+        type=float,
+        default=0.01,
+        help="Outlier contamination parameter [0, 1].",
+    )
+    parser.add_argument(
+        "--window_size",
+        type=int,
+        default=72,
+        help="Rolling window size for feature extraction.",
+    )
+    parser.add_argument(
+        "--lags", type=int, default=24, help="Number of lags for recursive model."
+    )
+    parser.add_argument(
+        "--train_ratio",
+        type=float,
+        default=0.8,
+        help="Fraction of data used for training.",
+    )
 
     # Location Parameters
-    parser.add_argument("--latitude", type=float, default=51.5136, help="Location latitude for solar features.")
-    parser.add_argument("--longitude", type=float, default=7.4653, help="Location longitude for solar features.")
-    parser.add_argument("--timezone", type=str, default="UTC", help="Timezone for data processing.")
-    parser.add_argument("--country_code", type=str, default="DE", help="Country code for holidays (ISO 3166).")
-    parser.add_argument("--state", type=str, default="NW", help="State code for regional holidays.")
+    parser.add_argument(
+        "--latitude",
+        type=float,
+        default=51.5136,
+        help="Location latitude for solar features.",
+    )
+    parser.add_argument(
+        "--longitude",
+        type=float,
+        default=7.4653,
+        help="Location longitude for solar features.",
+    )
+    parser.add_argument(
+        "--timezone", type=str, default="UTC", help="Timezone for data processing."
+    )
+    parser.add_argument(
+        "--country_code",
+        type=str,
+        default="DE",
+        help="Country code for holidays (ISO 3166).",
+    )
+    parser.add_argument(
+        "--state", type=str, default="NW", help="State code for regional holidays."
+    )
 
     # Feature Engineering Flags
-    parser.add_argument("--include_weather_windows", type=_parse_bool, default=False, help="Enable rolling weather statistics.")
-    parser.add_argument("--include_holiday_features", type=_parse_bool, default=False, help="Enable holiday binary indicators.")
-    parser.add_argument("--include_poly_features", type=_parse_bool, default=False, help="Enable polynomial interaction terms.")
+    parser.add_argument(
+        "--include_weather_windows",
+        type=_parse_bool,
+        default=False,
+        help="Enable rolling weather statistics.",
+    )
+    parser.add_argument(
+        "--include_holiday_features",
+        type=_parse_bool,
+        default=False,
+        help="Enable holiday binary indicators.",
+    )
+    parser.add_argument(
+        "--include_poly_features",
+        type=_parse_bool,
+        default=False,
+        help="Enable polynomial interaction terms.",
+    )
 
     # Execution Controls
-    parser.add_argument("--verbose", type=_parse_bool, default=False, help="Enable verbose mission-critical logging.")
+    parser.add_argument(
+        "--verbose",
+        type=_parse_bool,
+        default=False,
+        help="Enable verbose mission-critical logging.",
+    )
     parser.add_argument(
         "--weights",
         type=float,
         nargs="+",
         default=[1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0],
-        help="Space-separated list of weights for prediction aggregation."
+        help="Space-separated list of weights for prediction aggregation.",
     )
     parser.add_argument(
         "--logging",
         type=_parse_bool,
         default=False,
-        help="Enable overall logging (console and file)."
+        help="Enable overall logging (console and file).",
     )
     parser.add_argument(
-        "--log_dir",
-        type=str,
-        default=None,
-        help="Custom directory for execution logs."
+        "--log_dir", type=str, default=None, help="Custom directory for execution logs."
     )
 
     args = parser.parse_args()
-    
+
     # Process path
     specified_log_dir = Path(args.log_dir) if args.log_dir else None
 
@@ -552,7 +606,7 @@ if __name__ == "__main__":
     kwargs = vars(args)
     if specified_log_dir:
         kwargs["log_dir"] = specified_log_dir
-    
+
     # Map 'logging' arg to 'logging_enabled' parameter
     kwargs["logging_enabled"] = kwargs.pop("logging")
 
