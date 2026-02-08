@@ -1,3 +1,10 @@
+## [0.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.4...v0.3.0) (2026-02-08)
+
+
+### Features
+
+* (manager) ([66d4b20](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/66d4b205d85accfd534c213992688e597d571140))
+
 ## [0.2.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.2.3...v0.2.4) (2026-02-07)
 
 
