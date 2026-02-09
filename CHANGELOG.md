@@ -1,3 +1,10 @@
+## [0.3.5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.4...v0.3.5) (2026-02-09)
+
+
+### Code Refactoring
+
+* exog in _safe completed ([a724fa9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a724fa9fb154b3645a7f970652d51fd5acfcc8e7))
+
 ## [0.3.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.3...v0.3.4) (2026-02-08)
 
 
