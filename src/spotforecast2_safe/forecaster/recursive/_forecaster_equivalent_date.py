@@ -12,7 +12,8 @@ from sklearn.exceptions import NotFittedError
 
 from spotforecast2_safe.exceptions import MissingValuesWarning
 from spotforecast2_safe.preprocessing import QuantileBinner
-from spotforecast2_safe import __version__
+
+# from spotforecast2_safe import __version__  # Removed to avoid circular import
 
 from spotforecast2_safe.forecaster.utils import (
     check_extract_values_and_index,
@@ -161,7 +162,12 @@ class ForecasterEquivalentDate:
         self.creation_date = pd.Timestamp.today().strftime("%Y-%m-%d %H:%M:%S")
         self.is_fitted = False
         self.fit_date = None
-        self.spotforecast_version = __version__
+        try:
+            from spotforecast2_safe import __version__
+
+            self.spotforecast_version = __version__
+        except ImportError:
+            self.spotforecast_version = "unknown"
         self.python_version = sys.version.split(" ")[0]
         self.forecaster_id = forecaster_id
         self._probabilistic_mode = "binned"
