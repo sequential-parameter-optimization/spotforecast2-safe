@@ -27,6 +27,7 @@ def train_new_model(
     save_to_file: bool = True,
     model_dir: Optional[Union[str, Path]] = None,
     end_dev: Optional[Union[str, pd.Timestamp]] = None,
+    **kwargs: Any,
 ) -> Any:
     """
     Train a new forecaster model and optionally save it to disk.
@@ -137,7 +138,10 @@ def train_new_model(
 
     # Initialize the model instance
     model = model_class(
-        iteration=n_iteration, end_dev=end_train_cutoff, train_size=train_size
+        iteration=n_iteration,
+        end_dev=end_train_cutoff,
+        train_size=train_size,
+        **kwargs,
     )
 
     # Perform hyperparameter tuning and fitting as implemented in model_class
@@ -288,6 +292,7 @@ def handle_training(
     force: bool = False,
     train_size: Optional[pd.Timedelta] = None,
     end_dev: Optional[Union[str, pd.Timestamp]] = None,
+    **kwargs: Any,
 ) -> None:
     """
     Check if a new model needs to be trained and trigger training if necessary.
@@ -387,6 +392,7 @@ def handle_training(
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
+            **kwargs,
         )
         return
 
@@ -404,6 +410,7 @@ def handle_training(
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
+            **kwargs,
         )
         return
 
@@ -431,6 +438,7 @@ def handle_training(
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
+            **kwargs,
         )
     else:
         logger.info(
