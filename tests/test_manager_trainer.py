@@ -108,6 +108,7 @@ class TestTrainer(unittest.TestCase):
             train_size=None,
             model_dir=self.test_dir,
             end_dev=None,
+            data_filename=None,
         )
 
     @patch("spotforecast2_safe.manager.trainer.train_new_model")
@@ -143,6 +144,7 @@ class TestTrainer(unittest.TestCase):
             train_size=None,
             model_dir=self.test_dir,
             end_dev=None,
+            data_filename=None,
         )
 
     @patch("spotforecast2_safe.manager.trainer.train_new_model")
@@ -163,6 +165,7 @@ class TestTrainer(unittest.TestCase):
             train_size=None,
             model_dir=self.test_dir,
             end_dev=None,
+            data_filename=None,
         )
 
 if __name__ == "__main__":

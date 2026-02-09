@@ -27,6 +27,7 @@ def train_new_model(
     save_to_file: bool = True,
     model_dir: Optional[Union[str, Path]] = None,
     end_dev: Optional[Union[str, pd.Timestamp]] = None,
+    data_filename: Optional[str] = None,
     **kwargs: Any,
 ) -> Any:
     """
@@ -119,7 +120,7 @@ def train_new_model(
     logger.info("Training new model (iteration %d)...", n_iteration)
 
     # Fetch data using the library's utility
-    current_data = fetch_data()
+    current_data = fetch_data(filename=data_filename)
     if current_data.empty:
         logger.error("No data fetched. Aborting training.")
         return None
@@ -292,6 +293,7 @@ def handle_training(
     force: bool = False,
     train_size: Optional[pd.Timedelta] = None,
     end_dev: Optional[Union[str, pd.Timestamp]] = None,
+    data_filename: Optional[str] = None,
     **kwargs: Any,
 ) -> None:
     """
@@ -392,6 +394,7 @@ def handle_training(
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
+            data_filename=data_filename,
             **kwargs,
         )
         return
@@ -410,6 +413,7 @@ def handle_training(
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
+            data_filename=data_filename,
             **kwargs,
         )
         return
@@ -438,6 +442,7 @@ def handle_training(
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
+            data_filename=data_filename,
             **kwargs,
         )
     else:
