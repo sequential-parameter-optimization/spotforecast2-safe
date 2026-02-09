@@ -1,3 +1,10 @@
+## [0.3.7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.6...v0.3.7) (2026-02-09)
+
+
+### Bug Fixes
+
+* predictor.py ([001c953](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/001c95352fcfcad06ce571789185bfda5f1d9d3d))
+
 ## [0.3.6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.5...v0.3.6) (2026-02-09)
 
 
