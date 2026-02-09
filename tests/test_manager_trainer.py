@@ -102,7 +102,12 @@ class TestTrainer(unittest.TestCase):
         handle_training(mock_model_class, "lgbm", model_dir=self.test_dir)
         
         mock_train.assert_called_once_with(
-            mock_model_class, 0, train_size=None, model_dir=self.test_dir, end_dev=None
+            mock_model_class,
+            0,
+            model_name="lgbm",
+            train_size=None,
+            model_dir=self.test_dir,
+            end_dev=None,
         )
 
     @patch("spotforecast2_safe.manager.trainer.train_new_model")
@@ -132,7 +137,12 @@ class TestTrainer(unittest.TestCase):
         handle_training(mock_model_class, "lgbm", model_dir=self.test_dir)
         
         mock_train.assert_called_once_with(
-            mock_model_class, 6, train_size=None, model_dir=self.test_dir, end_dev=None
+            mock_model_class,
+            6,
+            model_name="lgbm",
+            train_size=None,
+            model_dir=self.test_dir,
+            end_dev=None,
         )
 
     @patch("spotforecast2_safe.manager.trainer.train_new_model")
@@ -147,7 +157,12 @@ class TestTrainer(unittest.TestCase):
         handle_training(mock_model_class, "lgbm", force=True, model_dir=self.test_dir)
         
         mock_train.assert_called_once_with(
-            mock_model_class, 6, train_size=None, model_dir=self.test_dir, end_dev=None
+            mock_model_class,
+            6,
+            model_name="lgbm",
+            train_size=None,
+            model_dir=self.test_dir,
+            end_dev=None,
         )
 
 if __name__ == "__main__":
