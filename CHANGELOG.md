@@ -1,3 +1,10 @@
+## [0.3.9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.8...v0.3.9) (2026-02-09)
+
+
+### Bug Fixes
+
+* data path for entsoe ([4dc3a1d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4dc3a1df4fb223e16a087f187635fa5811c96d2a))
+
 ## [0.3.8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.7...v0.3.8) (2026-02-09)
 
 
