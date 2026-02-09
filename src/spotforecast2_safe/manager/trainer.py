@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 def train_new_model(
     model_class: type,
     n_iteration: int,
+    model_name: Optional[str] = None,
     train_size: Optional[pd.Timedelta] = None,
     save_to_file: bool = True,
     model_dir: Optional[Union[str, Path]] = None,
@@ -152,8 +153,14 @@ def train_new_model(
 
         model_dir.mkdir(parents=True, exist_ok=True)
 
-        # Get model name if available, otherwise use lowercase class name
-        model_name = getattr(model, "name", model_class.__name__.lower())
+        # Use provided model_name, or model's 'name' attribute,
+        # otherwise use lowercase class name
+        if model_name is None:
+            model_name = getattr(model, "name", model_class.__name__.lower())
+        else:
+            # Update model's internal name for consistency
+            model.name = model_name
+
         file_path = model_dir / f"{model_name}_forecaster_{n_iteration}.joblib"
 
         try:
@@ -376,6 +383,7 @@ def handle_training(
         train_new_model(
             model_class,
             0,
+            model_name=model_name,
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
@@ -392,6 +400,7 @@ def handle_training(
         train_new_model(
             model_class,
             n_iteration + 1,
+            model_name=model_name,
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
@@ -418,6 +427,7 @@ def handle_training(
         train_new_model(
             model_class,
             n_iteration + 1,
+            model_name=model_name,
             train_size=train_size,
             model_dir=model_dir,
             end_dev=end_dev,
