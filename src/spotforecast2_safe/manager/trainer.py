@@ -25,6 +25,7 @@ def train_new_model(
     train_size: Optional[pd.Timedelta] = None,
     save_to_file: bool = True,
     model_dir: Optional[Union[str, Path]] = None,
+    end_dev: Optional[Union[str, pd.Timestamp]] = None,
 ) -> Any:
     """
     Train a new forecaster model and optionally save it to disk.
@@ -45,6 +46,8 @@ def train_new_model(
             Defaults to True.
         model_dir: Directory where the model should be saved. If None, defaults to
             the library's cache home.
+        end_dev: Optional cutoff date for training. If None, it is calculated
+            from the latest available data.
 
     Returns:
         The trained model instance.
@@ -119,15 +122,17 @@ def train_new_model(
         logger.error("No data fetched. Aborting training.")
         return None
 
-    latest_idx = current_data.index[-1]
-
-    # Calculate training cutoff. In this implementation, we use data up to one day
-    # before the latest recorded index to ensure we have a full day's data for
-    # validation or the last training window.
-    end_train_cutoff = latest_idx - pd.Timedelta(days=1)
-
-    logger.debug("Latest data index: %s", latest_idx)
-    logger.debug("Training cutoff: %s", end_train_cutoff)
+    if end_dev is None:
+        latest_idx = current_data.index[-1]
+        # Calculate training cutoff. In this implementation, we use data up to one day
+        # before the latest recorded index to ensure we have a full day's data for
+        # validation or the last training window.
+        end_train_cutoff = latest_idx - pd.Timedelta(days=1)
+        logger.debug("Latest data index: %s", latest_idx)
+        logger.debug("Calculated training cutoff: %s", end_train_cutoff)
+    else:
+        end_train_cutoff = pd.to_datetime(end_dev, utc=True)
+        logger.debug("Using provided training cutoff: %s", end_train_cutoff)
 
     # Initialize the model instance
     model = model_class(
@@ -275,6 +280,7 @@ def handle_training(
     model_dir: Optional[Union[str, Path]] = None,
     force: bool = False,
     train_size: Optional[pd.Timedelta] = None,
+    end_dev: Optional[Union[str, pd.Timestamp]] = None,
 ) -> None:
     """
     Check if a new model needs to be trained and trigger training if necessary.
@@ -289,6 +295,7 @@ def handle_training(
         model_dir: Directory where models are stored.
         force: If True, force retraining even if the current model is recent.
         train_size: Optional size of the training set.
+        end_dev: Optional cutoff date for training.
 
     Examples:
         >>> import tempfile
@@ -366,7 +373,13 @@ def handle_training(
 
     if current_model is None:
         logger.info("No model found for %s. Training iteration 0...", model_name)
-        train_new_model(model_class, 0, train_size=train_size, model_dir=model_dir)
+        train_new_model(
+            model_class,
+            0,
+            train_size=train_size,
+            model_dir=model_dir,
+            end_dev=end_dev,
+        )
         return
 
     # Check how long since the model has been trained
@@ -377,7 +390,11 @@ def handle_training(
             "Current model has no 'end_dev' attribute. Cannot determine age. Forcing retraining."
         )
         train_new_model(
-            model_class, n_iteration + 1, train_size=train_size, model_dir=model_dir
+            model_class,
+            n_iteration + 1,
+            train_size=train_size,
+            model_dir=model_dir,
+            end_dev=end_dev,
         )
         return
 
@@ -399,7 +416,11 @@ def handle_training(
             n_iteration + 1,
         )
         train_new_model(
-            model_class, n_iteration + 1, train_size=train_size, model_dir=model_dir
+            model_class,
+            n_iteration + 1,
+            train_size=train_size,
+            model_dir=model_dir,
+            end_dev=end_dev,
         )
     else:
         logger.info(
