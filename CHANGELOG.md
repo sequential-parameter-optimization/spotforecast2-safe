@@ -1,3 +1,11 @@
+## [0.3.6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.5...v0.3.6) (2026-02-09)
+
+
+### Bug Fixes
+
+* tests trainer ([7cf52ff](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7cf52ff57f42dfa588038a9c93871601feade361))
+* trainer accepts end_dev arg ([cb8099e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cb8099e707c5e73fa4f1977896f1c23aef342d71))
+
 ## [0.3.5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.4...v0.3.5) (2026-02-09)
 
 
