@@ -3,6 +3,8 @@ from pathlib import Path
 import pandas as pd
 from spotforecast2_safe.manager.trainer import handle_training, get_last_model
 
+from unittest.mock import patch, MagicMock
+
 class MockModel:
     """Mock model class for testing"""
     def __init__(self, iteration, end_dev, train_size=None, **kwargs):
@@ -14,8 +16,13 @@ class MockModel:
     def tune(self):
         self.is_tuned = True
 
-def test_handle_training_with_custom_name():
+@patch("spotforecast2_safe.manager.trainer.fetch_data")
+def test_handle_training_with_custom_name(mock_fetch):
     """Verify that handle_training passes and uses custom model_name correctly."""
+    # Setup mock data for fetch_data
+    dates = pd.date_range("2024-01-01", periods=10, freq="h", tz="UTC")
+    mock_fetch.return_value = pd.DataFrame({"value": range(10)}, index=dates)
+
     with tempfile.TemporaryDirectory() as tmpdir:
         model_dir = Path(tmpdir)
         model_name = "custom_lgbm"
