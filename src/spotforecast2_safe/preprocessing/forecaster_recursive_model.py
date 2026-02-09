@@ -123,12 +123,15 @@ class ForecasterRecursiveModel:
 
         self.forecaster.fit(y=y, exog=exog)
 
-    def package_prediction(self) -> Dict[str, Any]:
+    def package_prediction(self, predict_size: Optional[int] = None) -> Dict[str, Any]:
         """
         Generate predictions and package them with metrics for the UI.
 
         This method handles data loading (from interim), alignment,
         scoring, and benchmark comparison.
+
+        Args:
+            predict_size: Optional override for the prediction horizon.
 
         Returns:
             Dict[str, Any]: A result package containing actual values,
@@ -176,8 +179,11 @@ class ForecasterRecursiveModel:
             y_train = y.loc[: self.end_dev]
             y_test = y.loc[self.end_dev :]
 
+            if predict_size is None:
+                predict_size = self.predict_size
+
             # Limit test to prediction window
-            predict_hours = self.predict_size * self.refit_size
+            predict_hours = predict_size * self.refit_size
             if len(y_test) > predict_hours:
                 y_test = y_test.iloc[:predict_hours]
 
