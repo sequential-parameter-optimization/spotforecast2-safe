@@ -86,6 +86,21 @@ class ExogBuilder:
 
         Returns:
             pd.DataFrame: DataFrame containing exogenous features.
+
+        Raises:
+            ValueError: If the date range is invalid.
+
+        Examples:
+            >>> import pandas as pd
+            >>> from spotforecast2_safe.data.data import Period
+            >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
+            >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
+            >>> builder = ExogBuilder(periods=periods, country_code="DE")
+            >>> start = pd.Timestamp("2025-01-01", tz="UTC")
+            >>> end = pd.Timestamp("2025-01-02", tz="UTC")
+            >>> exog = builder.build(start, end)
+            >>> exog.shape[1] > 0
+            True
         """
         date_range = pd.date_range(start=start_date, end=end_date, freq="h")
         X = pd.DataFrame(index=date_range)
