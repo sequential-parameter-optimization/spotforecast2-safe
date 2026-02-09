@@ -1,3 +1,11 @@
+## [0.3.8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.7...v0.3.8) (2026-02-09)
+
+
+### Bug Fixes
+
+* trainer accepts country info ([1c5aef4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1c5aef4f626c082e1f1090507da65fba297231ed))
+* trainer for entsoe ([029f8d6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/029f8d6388b8c795e112f5770b2e0fb6f78223c0))
+
 ## [0.3.7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.6...v0.3.7) (2026-02-09)
 
 
