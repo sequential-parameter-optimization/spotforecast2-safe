@@ -319,8 +319,7 @@ def n_to_1_with_covariates(
 
     # Security: Mask sensitive coordinates immediately (CWE-532, CWE-312)
     # This prevents raw latitude/longitude from being accessed in logging contexts
-    masked_latitude = _mask_latitude(latitude)
-    masked_longitude = _mask_longitude(longitude)
+
     masked_estimator = _mask_estimator(estimator)
 
     # Default weights if not provided
