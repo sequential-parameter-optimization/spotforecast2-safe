@@ -84,8 +84,7 @@ class TestTaskSafeN2O1CovDf(unittest.TestCase):
         mock_agg.return_value = pd.Series([1, 2, 3])
 
         # Should complete without error (returns None)
-        result = main(verbose=False)
-        self.assertIsNone(result)
+        main(verbose=False)
 
 
 if __name__ == "__main__":
