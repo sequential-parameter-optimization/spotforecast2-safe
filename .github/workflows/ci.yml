@@ -41,12 +41,13 @@ jobs:
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with:
           python-version: "3.13"
-          cache: 'pip'
+      
+      - name: Set up uv
+        uses: astral-sh/setup-uv@67d232f3436bb04bb932d5bbbfd15cfbc6252457  # v5.1.1
       
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          uv pip install --system -e ".[dev]"
       
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169  # v3.28.0
@@ -91,12 +92,13 @@ jobs:
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+      
+      - name: Set up uv
+        uses: astral-sh/setup-uv@67d232f3436bb04bb932d5bbbfd15cfbc6252457  # v5.1.1
       
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          uv pip install --system -e ".[dev]"
       
       - name: Run pytest
         run: |
