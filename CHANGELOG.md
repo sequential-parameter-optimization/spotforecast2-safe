@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.2...v0.4.3) (2026-02-11)
+
+
+### Bug Fixes
+
+* initialize output variable with type annotation (CodeQL py/uninitialized-local-variable) ([22245cc](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/22245cce02111e01b1ff3f73b322f44dfd92eece))
+
 ## [0.4.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.1...v0.4.2) (2026-02-11)
 
 
