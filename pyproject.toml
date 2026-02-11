@@ -12,17 +12,17 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "astral>=3.2",
-    "feature-engine>=1.9.3",
-    "flake8>=7.3.0",
-    "holidays>=0.90",
-    "lightgbm>=4.6.0",
-    "numba>=0.63.1",
-    "pandas>=3.0.0",
-    "pyarrow>=23.0.0",
-    "requests>=2.32.3",
-    "scikit-learn>=1.8.0",
-    "tqdm>=4.67.2",
+    "astral>=3.2,<4.0",
+    "feature-engine>=1.9.3,<2.0",
+    "flake8>=7.3.0,<8.0",
+    "holidays>=0.90,<1.0",
+    "lightgbm>=4.6.0,<5.0",
+    "numba>=0.63.1,<1.0",
+    "pandas>=3.0.0,<4.0",
+    "pyarrow>=23.0.0,<30.0",
+    "requests>=2.32.3,<3.0",
+    "scikit-learn>=1.8.0,<2.0",
+    "tqdm>=4.67.2,<5.0",
 ]
 
 [project.urls]
@@ -36,30 +36,38 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "cloudpickle>=3.1.2",
-    "mkdocs>=1.6.1",
-    "mkdocs-macros-plugin>=1.5.0",
-    "mkdocs-material>=9.7.1",
-    "mkdocstrings>=1.0.3",
-    "mkdocstrings-python>=2.0.1",
-    "pytest>=9.0.2",
-    "pytest-anyio>=0.0.0",
+    "cloudpickle>=3.1.2,<4.0",
+    "mkdocs>=1.6.1,<2.0",
+    "mkdocs-macros-plugin>=1.5.0,<2.0",
+    "mkdocs-material>=9.7.1,<10.0",
+    "mkdocstrings>=1.0.3,<2.0",
+    "mkdocstrings-python>=2.0.1,<3.0",
+    "pytest>=9.0.2,<10.0",
+    "pytest-anyio>=0.0.0,<1.0",
+    "pytest-cov>=6.0.0,<7.0",
+    "black>=24.1.0,<25.0",
+    "isort>=5.13.0,<6.0",
+    "ruff>=0.3.0,<1.0",
+    "safety>=3.0.0,<4.0",
+    "bandit>=1.8.0,<2.0",
+    "mypy>=1.8.0,<2.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=9.0.2",
-    "pytest-cov>=6.0.0",
-    "black>=24.1.0",
-    "isort>=5.13.0",
-    "ruff>=0.3.0",
-    "mkdocs>=1.6.1",
-    "mkdocs-macros-plugin>=1.5.0",
-    "mkdocs-material>=9.7.1",
-    "mkdocstrings>=1.0.2",
-    "mkdocstrings-python>=2.0.1",
-    "safety>=3.0.0",
-    "bandit>=1.8.0",
+    "pytest>=9.0.2,<10.0",
+    "pytest-cov>=6.0.0,<7.0",
+    "black>=24.1.0,<25.0",
+    "isort>=5.13.0,<6.0",
+    "ruff>=0.3.0,<1.0",
+    "mkdocs>=1.6.1,<2.0",
+    "mkdocs-macros-plugin>=1.5.0,<2.0",
+    "mkdocs-material>=9.7.1,<10.0",
+    "mkdocstrings>=1.0.2,<2.0",
+    "mkdocstrings-python>=2.0.1,<3.0",
+    "safety>=3.0.0,<4.0",
+    "bandit>=1.8.0,<2.0",
+    "mypy>=1.8.0,<2.0",
 ]
 
 [project.scripts]

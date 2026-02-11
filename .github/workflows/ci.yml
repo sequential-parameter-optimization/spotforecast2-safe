@@ -10,7 +10,51 @@ on:
       - main
       - develop
 
+# Principle of Least Privilege: Base permissions are read-only
+permissions:
+  contents: read
+
 jobs:
+  codeql:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+          db-location: '${{ runner.temp }}/codeql_databases'
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+          wait-for-processing: true
+
   reuse:
     name: REUSE Compliance
     runs-on: ubuntu-latest
@@ -98,6 +142,9 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     
     steps:
       - name: Checkout code
@@ -107,6 +154,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: 'pip'
       
       - name: Install dependencies
         run: |
@@ -121,4 +169,12 @@ jobs:
       - name: Security scan with bandit
         run: |
           bandit -r src/spotforecast2_safe/ -f json -o bandit-report.json
+        continue-on-error: true
+      
+      - name: Upload bandit report to security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: bandit-report.sarif
+          category: bandit
         continue-on-error: true
