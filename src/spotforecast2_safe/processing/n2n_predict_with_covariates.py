@@ -1031,9 +1031,6 @@ def n2n_predict_with_covariates(
                 model_dir=model_dir,
                 verbose=verbose,
             )
-        else:
-            if verbose:
-                print("  ⚠ Model persistence disabled (weight_func cannot be pickled)")
 
     if verbose:
         print(f"  ✓ Total forecasters available: {len(recursive_forecasters)}")

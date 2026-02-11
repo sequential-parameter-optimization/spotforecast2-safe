@@ -69,6 +69,13 @@ class OneStepAheadFold(BaseFold):
             verbose=verbose,
         )
 
+        # Explicitly assign attributes for static analysis tools
+        self.initial_train_size = initial_train_size
+        self.window_size = window_size
+        self.differentiation = differentiation
+        self.return_all_indexes = return_all_indexes
+        self.verbose = verbose
+
     def __repr__(self) -> str:
         """
         Information displayed when printed.

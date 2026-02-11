@@ -684,6 +684,9 @@ class ForecasterEquivalentDate:
 
         prediction_index = expand_index(index=last_window.index, steps=steps)
 
+        # Initialize to prevent use-before-initialization warnings
+        predictions = None
+
         if isinstance(self.offset, int):
 
             last_window_values = last_window.to_numpy(copy=True).ravel()
@@ -896,6 +899,9 @@ class ForecasterEquivalentDate:
             residuals_by_bin = self.out_sample_residuals_by_bin_
 
         prediction_index = expand_index(index=last_window.index, steps=steps)
+
+        # Initialize to prevent use-before-initialization warnings
+        predictions = None
 
         if isinstance(self.offset, int):
 

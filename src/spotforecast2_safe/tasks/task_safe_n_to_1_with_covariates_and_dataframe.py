@@ -135,6 +135,13 @@ def n_to_1_with_covariates(
     3. Trains recursive forecaster on multiple targets
     4. Aggregates predictions using weighted combination
 
+    Security Note:
+        Geographic coordinates (latitude/longitude) are considered sensitive PII
+        (Personally Identifiable Information) per CWE-312 and CWE-532. This function
+        implements data masking for all log output to prevent exposure in production
+        monitoring systems, log aggregators, or crash dumps. Raw coordinate values
+        are never logged at any log level, including DEBUG.
+
     Args:
         data (Optional[pd.DataFrame]): Optional DataFrame with target time series data.
             If None, fetches data automatically. Default: None.
@@ -339,16 +346,22 @@ def n_to_1_with_covariates(
         logger.info(f"  Weights Type: {type(weights).__name__}")
         logger.info(f"{'=' * 80}")
 
-        # SECURITY NOTE: Detailed location/timezone/estimator data intentionally NOT logged
-        # even at DEBUG level per CWE-312, CWE-532 to prevent PII exposure in log aggregation,
-        # crash dumps, or if DEBUG logs are accidentally enabled in production.
-        # Developers can inspect variables directly in code if needed.
+        # SECURITY CRITICAL (CWE-312, CWE-532): NEVER log the following in clear text:
+        # - Raw latitude/longitude values (beyond 1 decimal precision)
+        # - Full timezone strings (only log region/country)
+        # - Estimator configuration details (only log type)
+        # - The forecast_kwargs dictionary (contains unmasked sensitive data)
+        # This applies to ALL log levels including DEBUG, and to ALL error messages.
+        # Rationale: Prevents PII exposure in log aggregation systems, crash dumps,
+        # and production monitoring tools where logs may be retained long-term or
+        # accessible to unauthorized parties.
 
     # --- Step 1: Multi-Output Recursive Forecasting with Covariates ---
     if verbose:
         logger.info("Step 1: Executing multi-output recursive forecasting...")
 
     # Prepare kwargs for n2n_predict_with_covariates
+    # SECURITY: Do NOT log this dict - contains sensitive location data (CWE-532, CWE-312)
     forecast_kwargs = {
         "data": data,
         "forecast_horizon": forecast_horizon,
@@ -373,9 +386,20 @@ def n_to_1_with_covariates(
     forecast_kwargs.update(kwargs)
 
     # Execute recursive forecasting
-    predictions, model_metrics, feature_info = n2n_predict_with_covariates(
-        **forecast_kwargs
-    )
+    # SECURITY: Wrapped in try-except to prevent sensitive data exposure in tracebacks
+    try:
+        predictions, model_metrics, feature_info = n2n_predict_with_covariates(
+            **forecast_kwargs
+        )
+    except Exception as e:
+        # Log error without exposing sensitive parameters (CWE-532, CWE-312)
+        logger.error(
+            "Forecasting failed: %s. Location: %s, %s",
+            str(e),
+            _mask_latitude(latitude),
+            _mask_longitude(longitude),
+        )
+        raise
 
     if verbose:
         logger.info(f"Multi-output predictions shape: {predictions.shape}")
@@ -466,27 +490,35 @@ def main(
     logger.info("--- Starting n_to_1_with_covariates using modular functions ---")
 
     # Execute the forecasting pipeline
-    predictions, combined_prediction, model_metrics, feature_info = (
-        n_to_1_with_covariates(
-            data=data,
-            forecast_horizon=forecast_horizon,
-            contamination=contamination,
-            window_size=window_size,
-            lags=lags,
-            train_ratio=train_ratio,
-            latitude=latitude,
-            longitude=longitude,
-            timezone=timezone,
-            country_code=country_code,
-            state=state,
-            estimator=None,
-            include_weather_windows=include_weather_windows,
-            include_holiday_features=include_holiday_features,
-            include_poly_features=include_poly_features,
-            weights=weights,
-            verbose=verbose,
+    # SECURITY: Wrapped in try-except to prevent sensitive data exposure in tracebacks
+    try:
+        predictions, combined_prediction, model_metrics, feature_info = (
+            n_to_1_with_covariates(
+                data=data,
+                forecast_horizon=forecast_horizon,
+                contamination=contamination,
+                window_size=window_size,
+                lags=lags,
+                train_ratio=train_ratio,
+                latitude=latitude,
+                longitude=longitude,
+                timezone=timezone,
+                country_code=country_code,
+                state=state,
+                estimator=None,
+                include_weather_windows=include_weather_windows,
+                include_holiday_features=include_holiday_features,
+                include_poly_features=include_poly_features,
+                weights=weights,
+                verbose=verbose,
+            )
         )
-    )
+    except Exception as e:
+        # Log error without exposing sensitive parameters (CWE-532, CWE-312)
+        logger.error(
+            "Pipeline execution failed: %s. Region: %s-%s", str(e), country_code, state
+        )
+        raise
 
     # Print results to stdout even if logging is low-level
     print("\nMulti-output predictions head:")

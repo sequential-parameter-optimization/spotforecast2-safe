@@ -3,6 +3,7 @@
 
 """Data structures for input and processed data."""
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -10,6 +11,8 @@ from typing import List, Optional, Tuple
 import pandas as pd
 
 from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -88,8 +91,12 @@ class Data:
         if df.index.freq is None:
             try:
                 df.index.freq = pd.infer_freq(df.index)
-            except (ValueError, TypeError):
-                pass
+            except (ValueError, TypeError) as e:
+                logger.debug(
+                    "Could not infer frequency for index in from_csv: %s. "
+                    "Frequency will remain None.",
+                    e,
+                )
         return cls(data=df)
 
     @classmethod
@@ -128,8 +135,12 @@ class Data:
         if df.index.freq is None:
             try:
                 df.index.freq = pd.infer_freq(df.index)
-            except (ValueError, TypeError):
-                pass
+            except (ValueError, TypeError) as e:
+                logger.debug(
+                    "Could not infer frequency for index in from_dataframe: %s. "
+                    "Frequency will remain None.",
+                    e,
+                )
 
         return cls(data=df)
 

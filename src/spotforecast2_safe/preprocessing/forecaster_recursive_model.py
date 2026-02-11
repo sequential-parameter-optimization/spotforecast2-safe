@@ -65,6 +65,7 @@ class ForecasterRecursiveModel:
         random_state: int = 314159,
         predict_size: int = 24,
         refit_size: int = 7,
+        name: str = "base",
         **kwargs: Any,
     ):
         """
@@ -79,6 +80,7 @@ class ForecasterRecursiveModel:
             random_state: Random seed.
             predict_size: Forecast horizon in hours.
             refit_size: Retraining frequency in days.
+            name: Model name identifier. Defaults to "base".
             **kwargs: Additional parameters for forward compatibility.
         """
         self.iteration = iteration
@@ -91,7 +93,7 @@ class ForecasterRecursiveModel:
         self.refit_size = refit_size
 
         self.preprocessor = ExogBuilder(periods=periods, country_code=country_code)
-        self.name = "base"
+        self.name = name
         self.forecaster: Optional[ForecasterRecursive] = None
         self.is_tuned = False
 
@@ -268,8 +270,7 @@ class ForecasterRecursiveLGBM(ForecasterRecursiveModel):
             lags: Number of autoregressive lags.
             **kwargs: Passed to ForecasterRecursiveModel.
         """
-        super().__init__(iteration, **kwargs)
-        self.name = "lgbm"
+        super().__init__(iteration, name="lgbm", **kwargs)
         self.forecaster = ForecasterRecursive(
             estimator=LGBMRegressor(
                 n_jobs=-1, verbose=-1, random_state=self.random_state
@@ -302,8 +303,7 @@ class ForecasterRecursiveXGB(ForecasterRecursiveModel):
             lags: Number of autoregressive lags.
             **kwargs: Passed to ForecasterRecursiveModel.
         """
-        super().__init__(iteration, **kwargs)
-        self.name = "xgb"
+        super().__init__(iteration, name="xgb", **kwargs)
         if XGBRegressor is not None:
             self.forecaster = ForecasterRecursive(
                 estimator=XGBRegressor(n_jobs=-1, random_state=self.random_state),

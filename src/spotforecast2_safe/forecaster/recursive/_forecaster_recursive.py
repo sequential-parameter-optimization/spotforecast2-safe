@@ -1039,12 +1039,16 @@ class ForecasterRecursive(ForecasterBase):
 
         return params
 
-    def set_params(self, **params: object) -> "ForecasterRecursive":
+    def set_params(
+        self, params: Dict[str, object] = None, **kwargs: object
+    ) -> "ForecasterRecursive":
         """
         Set the parameters of this forecaster.
 
         Args:
-            **params: Dictionary of parameter names mapped to their new values.
+            params: Optional dictionary of parameter names mapped to their new values.
+                If provided, these parameters are set first.
+            **kwargs: Dictionary of parameter names mapped to their new values.
                 Parameters can be for the forecaster itself or for the contained estimator (using the `estimator__` prefix).
 
         Returns:
@@ -1059,13 +1063,19 @@ class ForecasterRecursive(ForecasterBase):
             False
         """
 
-        if not params:
+        # Merge params dict and kwargs
+        all_params = {}
+        if params is not None:
+            all_params.update(params)
+        all_params.update(kwargs)
+
+        if not all_params:
             return self
 
         valid_params = self.get_params(deep=True)
         nested_params = {}
 
-        for key, value in params.items():
+        for key, value in all_params.items():
             if key not in valid_params and "__" not in key:
                 # Relaxed check for now
                 pass

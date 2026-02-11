@@ -111,7 +111,7 @@ def runtime_deprecated(
             return wrapper
 
         # ----- Case 2: decorating a class -----
-        elif is_class:
+        else:  # is_class must be True due to earlier check
             orig_init = getattr(obj, "__init__", None)
             orig_new = getattr(obj, "__new__", None)
 

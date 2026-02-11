@@ -189,7 +189,7 @@ def n2n_predict(
             print("Fetching data from CSV...")
         data = fetch_data(columns=TARGET)
 
-    START, END, COV_START, COV_END = get_start_end(
+    _, _, _, _ = get_start_end(
         data=data,
         forecast_horizon=forecast_horizon,
         verbose=verbose,

@@ -201,6 +201,10 @@ def check_backtesting_input(
     allow_incomplete_fold = cv.allow_incomplete_fold
     refit = cv.refit
 
+    # Initialize variables to prevent use-before-initialization
+    data_name = None
+    data_length = None
+
     forecasters_uni = [
         "ForecasterRecursive",
         "ForecasterDirect",
@@ -525,6 +529,10 @@ def check_one_step_ahead_input(
         raise TypeError(f"`cv` must be a 'OneStepAheadFold' object. Got '{cv_name}'.")
 
     initial_train_size = cv.initial_train_size
+
+    # Initialize variables to prevent use-before-initialization
+    data_name = None
+    data_length = None
 
     forecasters_one_step_ahead = [
         "ForecasterRecursive",
