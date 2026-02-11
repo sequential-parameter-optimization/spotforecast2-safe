@@ -726,7 +726,21 @@ def n2n_predict_with_covariates(
     if model_dir is None:
         from spotforecast2_safe.data.fetch_data import get_cache_home
 
-        model_dir = get_cache_home() / "forecasters"
+    model_dir = get_cache_home() / "forecasters"
+
+    # Input Validation
+    if forecast_horizon <= 0:
+        raise ValueError(f"forecast_horizon must be positive, got {forecast_horizon}")
+    if not 0 <= contamination <= 0.5:
+        raise ValueError(
+            f"contamination must be between 0 and 0.5, got {contamination}"
+        )
+    if window_size <= 0:
+        raise ValueError(f"window_size must be positive, got {window_size}")
+    if lags <= 0:
+        raise ValueError(f"lags must be positive, got {lags}")
+    if not 0 < train_ratio < 1:
+        raise ValueError(f"train_ratio must be between 0 and 1, got {train_ratio}")
 
     if verbose:
         print("=" * 80)
