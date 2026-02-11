@@ -35550,7 +35550,10 @@ print(position)</p>
 <span class="normal"><a href="#__codelineno-0-1098">1098</a></span>
 <span class="normal"><a href="#__codelineno-0-1099">1099</a></span>
 <span class="normal"><a href="#__codelineno-0-1100">1100</a></span>
-<span class="normal"><a href="#__codelineno-0-1101">1101</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="k">def</span><span class="w"> </span><span class="nf">date_to_index_position</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-1101">1101</a></span>
+<span class="normal"><a href="#__codelineno-0-1102">1102</a></span>
+<span class="normal"><a href="#__codelineno-0-1103">1103</a></span>
+<span class="normal"><a href="#__codelineno-0-1104">1104</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="k">def</span><span class="w"> </span><span class="nf">date_to_index_position</span><span class="p">(</span>
 <a id="__codelineno-0-994" name="__codelineno-0-994"></a>    <span class="n">index</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
 <a id="__codelineno-0-995" name="__codelineno-0-995"></a>    <span class="n">date_input</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span>
 <a id="__codelineno-0-996" name="__codelineno-0-996"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;prediction&quot;</span><span class="p">,</span>
@@ -35618,47 +35621,50 @@ print(position)</p>
 <a id="__codelineno-0-1058" name="__codelineno-0-1058"></a>    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">]:</span>
 <a id="__codelineno-0-1059" name="__codelineno-0-1059"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`method` must be &#39;prediction&#39; or &#39;validation&#39;.&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-1060" name="__codelineno-0-1060"></a>
-<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">)):</span>
-<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">):</span>
-<a id="__codelineno-0-1063" name="__codelineno-0-1063"></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-<a id="__codelineno-0-1064" name="__codelineno-0-1064"></a>                <span class="sa">f</span><span class="s2">&quot;Index must be a pandas DatetimeIndex when `</span><span class="si">{</span><span class="n">date_literal</span><span class="si">}</span><span class="s2">` is &quot;</span>
-<a id="__codelineno-0-1065" name="__codelineno-0-1065"></a>                <span class="sa">f</span><span class="s2">&quot;not an integer. Check input series or last window.&quot;</span>
-<a id="__codelineno-0-1066" name="__codelineno-0-1066"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1067" name="__codelineno-0-1067"></a>
-<a id="__codelineno-0-1068" name="__codelineno-0-1068"></a>        <span class="n">target_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_pd_to_datetime</span><span class="p">)</span>
-<a id="__codelineno-0-1069" name="__codelineno-0-1069"></a>        <span class="n">last_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>    <span class="c1"># Initialize output to satisfy type checking; all code paths below must set it</span>
+<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a>    <span class="n">output</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-0-1063" name="__codelineno-0-1063"></a>
+<a id="__codelineno-0-1064" name="__codelineno-0-1064"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">)):</span>
+<a id="__codelineno-0-1065" name="__codelineno-0-1065"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">):</span>
+<a id="__codelineno-0-1066" name="__codelineno-0-1066"></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<a id="__codelineno-0-1067" name="__codelineno-0-1067"></a>                <span class="sa">f</span><span class="s2">&quot;Index must be a pandas DatetimeIndex when `</span><span class="si">{</span><span class="n">date_literal</span><span class="si">}</span><span class="s2">` is &quot;</span>
+<a id="__codelineno-0-1068" name="__codelineno-0-1068"></a>                <span class="sa">f</span><span class="s2">&quot;not an integer. Check input series or last window.&quot;</span>
+<a id="__codelineno-0-1069" name="__codelineno-0-1069"></a>            <span class="p">)</span>
 <a id="__codelineno-0-1070" name="__codelineno-0-1070"></a>
-<a id="__codelineno-0-1071" name="__codelineno-0-1071"></a>        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;prediction&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-1072" name="__codelineno-0-1072"></a>            <span class="k">if</span> <span class="n">target_date</span> <span class="o">&lt;=</span> <span class="n">last_date</span><span class="p">:</span>
-<a id="__codelineno-0-1073" name="__codelineno-0-1073"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-1074" name="__codelineno-0-1074"></a>                    <span class="s2">&quot;If `steps` is a date, it must be greater than the last date &quot;</span>
-<a id="__codelineno-0-1075" name="__codelineno-0-1075"></a>                    <span class="s2">&quot;in the index.&quot;</span>
-<a id="__codelineno-0-1076" name="__codelineno-0-1076"></a>                <span class="p">)</span>
-<a id="__codelineno-0-1077" name="__codelineno-0-1077"></a>            <span class="n">span_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
-<a id="__codelineno-0-1078" name="__codelineno-0-1078"></a>                <span class="n">start</span><span class="o">=</span><span class="n">last_date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">target_date</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">freq</span>
-<a id="__codelineno-0-1079" name="__codelineno-0-1079"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1080" name="__codelineno-0-1080"></a>            <span class="n">output</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">span_index</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-<a id="__codelineno-0-1081" name="__codelineno-0-1081"></a>        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-1082" name="__codelineno-0-1082"></a>            <span class="n">first_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-1083" name="__codelineno-0-1083"></a>            <span class="k">if</span> <span class="n">target_date</span> <span class="o">&lt;</span> <span class="n">first_date</span> <span class="ow">or</span> <span class="n">target_date</span> <span class="o">&gt;</span> <span class="n">last_date</span><span class="p">:</span>
-<a id="__codelineno-0-1084" name="__codelineno-0-1084"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-1085" name="__codelineno-0-1085"></a>                    <span class="s2">&quot;If `initial_train_size` is a date, it must be greater than &quot;</span>
-<a id="__codelineno-0-1086" name="__codelineno-0-1086"></a>                    <span class="s2">&quot;the first date in the index and less than the last date.&quot;</span>
-<a id="__codelineno-0-1087" name="__codelineno-0-1087"></a>                <span class="p">)</span>
-<a id="__codelineno-0-1088" name="__codelineno-0-1088"></a>            <span class="n">span_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
-<a id="__codelineno-0-1089" name="__codelineno-0-1089"></a>                <span class="n">start</span><span class="o">=</span><span class="n">first_date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">target_date</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">freq</span>
-<a id="__codelineno-0-1090" name="__codelineno-0-1090"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1091" name="__codelineno-0-1091"></a>            <span class="n">output</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">span_index</span><span class="p">)</span>
-<a id="__codelineno-0-1092" name="__codelineno-0-1092"></a>
-<a id="__codelineno-0-1093" name="__codelineno-0-1093"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
-<a id="__codelineno-0-1094" name="__codelineno-0-1094"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">date_input</span>
+<a id="__codelineno-0-1071" name="__codelineno-0-1071"></a>        <span class="n">target_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_pd_to_datetime</span><span class="p">)</span>
+<a id="__codelineno-0-1072" name="__codelineno-0-1072"></a>        <span class="n">last_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<a id="__codelineno-0-1073" name="__codelineno-0-1073"></a>
+<a id="__codelineno-0-1074" name="__codelineno-0-1074"></a>        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;prediction&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-1075" name="__codelineno-0-1075"></a>            <span class="k">if</span> <span class="n">target_date</span> <span class="o">&lt;=</span> <span class="n">last_date</span><span class="p">:</span>
+<a id="__codelineno-0-1076" name="__codelineno-0-1076"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-1077" name="__codelineno-0-1077"></a>                    <span class="s2">&quot;If `steps` is a date, it must be greater than the last date &quot;</span>
+<a id="__codelineno-0-1078" name="__codelineno-0-1078"></a>                    <span class="s2">&quot;in the index.&quot;</span>
+<a id="__codelineno-0-1079" name="__codelineno-0-1079"></a>                <span class="p">)</span>
+<a id="__codelineno-0-1080" name="__codelineno-0-1080"></a>            <span class="n">span_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
+<a id="__codelineno-0-1081" name="__codelineno-0-1081"></a>                <span class="n">start</span><span class="o">=</span><span class="n">last_date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">target_date</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">freq</span>
+<a id="__codelineno-0-1082" name="__codelineno-0-1082"></a>            <span class="p">)</span>
+<a id="__codelineno-0-1083" name="__codelineno-0-1083"></a>            <span class="n">output</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">span_index</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+<a id="__codelineno-0-1084" name="__codelineno-0-1084"></a>        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-1085" name="__codelineno-0-1085"></a>            <span class="n">first_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-1086" name="__codelineno-0-1086"></a>            <span class="k">if</span> <span class="n">target_date</span> <span class="o">&lt;</span> <span class="n">first_date</span> <span class="ow">or</span> <span class="n">target_date</span> <span class="o">&gt;</span> <span class="n">last_date</span><span class="p">:</span>
+<a id="__codelineno-0-1087" name="__codelineno-0-1087"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-1088" name="__codelineno-0-1088"></a>                    <span class="s2">&quot;If `initial_train_size` is a date, it must be greater than &quot;</span>
+<a id="__codelineno-0-1089" name="__codelineno-0-1089"></a>                    <span class="s2">&quot;the first date in the index and less than the last date.&quot;</span>
+<a id="__codelineno-0-1090" name="__codelineno-0-1090"></a>                <span class="p">)</span>
+<a id="__codelineno-0-1091" name="__codelineno-0-1091"></a>            <span class="n">span_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
+<a id="__codelineno-0-1092" name="__codelineno-0-1092"></a>                <span class="n">start</span><span class="o">=</span><span class="n">first_date</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">target_date</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">freq</span>
+<a id="__codelineno-0-1093" name="__codelineno-0-1093"></a>            <span class="p">)</span>
+<a id="__codelineno-0-1094" name="__codelineno-0-1094"></a>            <span class="n">output</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">span_index</span><span class="p">)</span>
 <a id="__codelineno-0-1095" name="__codelineno-0-1095"></a>
-<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1097" name="__codelineno-0-1097"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-<a id="__codelineno-0-1098" name="__codelineno-0-1098"></a>            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">date_literal</span><span class="si">}</span><span class="s2">` must be an integer, string, or pandas Timestamp.&quot;</span>
-<a id="__codelineno-0-1099" name="__codelineno-0-1099"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1100" name="__codelineno-0-1100"></a>
-<a id="__codelineno-0-1101" name="__codelineno-0-1101"></a>    <span class="k">return</span> <span class="n">output</span>
+<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
+<a id="__codelineno-0-1097" name="__codelineno-0-1097"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">date_input</span>
+<a id="__codelineno-0-1098" name="__codelineno-0-1098"></a>
+<a id="__codelineno-0-1099" name="__codelineno-0-1099"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1100" name="__codelineno-0-1100"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<a id="__codelineno-0-1101" name="__codelineno-0-1101"></a>            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">date_literal</span><span class="si">}</span><span class="s2">` must be an integer, string, or pandas Timestamp.&quot;</span>
+<a id="__codelineno-0-1102" name="__codelineno-0-1102"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a>
+<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a>    <span class="k">return</span> <span class="n">output</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36880,10 +36886,7 @@ LinearRegression()</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/forecaster/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1104">1104</a></span>
-<span class="normal"><a href="#__codelineno-0-1105">1105</a></span>
-<span class="normal"><a href="#__codelineno-0-1106">1106</a></span>
-<span class="normal"><a href="#__codelineno-0-1107">1107</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1107">1107</a></span>
 <span class="normal"><a href="#__codelineno-0-1108">1108</a></span>
 <span class="normal"><a href="#__codelineno-0-1109">1109</a></span>
 <span class="normal"><a href="#__codelineno-0-1110">1110</a></span>
@@ -36931,58 +36934,61 @@ LinearRegression()</p>
 <span class="normal"><a href="#__codelineno-0-1152">1152</a></span>
 <span class="normal"><a href="#__codelineno-0-1153">1153</a></span>
 <span class="normal"><a href="#__codelineno-0-1154">1154</a></span>
-<span class="normal"><a href="#__codelineno-0-1155">1155</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="k">def</span><span class="w"> </span><span class="nf">initialize_estimator</span><span class="p">(</span>
-<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a>    <span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">regressor</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-1106" name="__codelineno-0-1106"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1107" name="__codelineno-0-1107"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-1108" name="__codelineno-0-1108"></a><span class="sd">    Helper to handle the deprecation of &#39;regressor&#39; in favor of &#39;estimator&#39;.</span>
-<a id="__codelineno-0-1109" name="__codelineno-0-1109"></a><span class="sd">    Returns the valid estimator object.</span>
-<a id="__codelineno-0-1110" name="__codelineno-0-1110"></a>
-<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1112" name="__codelineno-0-1112"></a><span class="sd">        estimator: estimator or pipeline compatible with the scikit-learn API, default None</span>
-<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a><span class="sd">            An instance of a estimator or pipeline compatible with the scikit-learn API.</span>
-<a id="__codelineno-0-1114" name="__codelineno-0-1114"></a><span class="sd">        regressor: estimator or pipeline compatible with the scikit-learn API, default None</span>
-<a id="__codelineno-0-1115" name="__codelineno-0-1115"></a><span class="sd">            Deprecated. An instance of a estimator or pipeline compatible with the</span>
-<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a><span class="sd">            scikit-learn API.</span>
-<a id="__codelineno-0-1117" name="__codelineno-0-1117"></a>
-<a id="__codelineno-0-1118" name="__codelineno-0-1118"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1119" name="__codelineno-0-1119"></a><span class="sd">        estimator or pipeline compatible with the scikit-learn API</span>
-<a id="__codelineno-0-1120" name="__codelineno-0-1120"></a><span class="sd">            The valid estimator object.</span>
-<a id="__codelineno-0-1121" name="__codelineno-0-1121"></a>
-<a id="__codelineno-0-1122" name="__codelineno-0-1122"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-1123" name="__codelineno-0-1123"></a><span class="sd">        ValueError: If both `estimator` and `regressor` are provided. Use only `estimator`.</span>
-<a id="__codelineno-0-1124" name="__codelineno-0-1124"></a><span class="sd">        Warning: If `regressor` is provided, a FutureWarning is raised indicating that it is deprecated and will be removed in a future version.</span>
-<a id="__codelineno-0-1125" name="__codelineno-0-1125"></a>
-<a id="__codelineno-0-1126" name="__codelineno-0-1126"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1127" name="__codelineno-0-1127"></a><span class="sd">        from spotforecast2_safe.forecaster.utils import initialize_estimator</span>
-<a id="__codelineno-0-1128" name="__codelineno-0-1128"></a><span class="sd">        from sklearn.linear_model import LinearRegression</span>
-<a id="__codelineno-0-1129" name="__codelineno-0-1129"></a><span class="sd">        # Using the `estimator` argument</span>
-<a id="__codelineno-0-1130" name="__codelineno-0-1130"></a><span class="sd">        estimator = LinearRegression()</span>
-<a id="__codelineno-0-1131" name="__codelineno-0-1131"></a><span class="sd">        result = initialize_estimator(estimator=estimator)</span>
-<a id="__codelineno-0-1132" name="__codelineno-0-1132"></a><span class="sd">        print(result)</span>
-<a id="__codelineno-0-1133" name="__codelineno-0-1133"></a><span class="sd">        LinearRegression()</span>
-<a id="__codelineno-0-1134" name="__codelineno-0-1134"></a><span class="sd">        # Using the deprecated `regressor` argument</span>
-<a id="__codelineno-0-1135" name="__codelineno-0-1135"></a><span class="sd">        regressor = LinearRegression()</span>
-<a id="__codelineno-0-1136" name="__codelineno-0-1136"></a><span class="sd">        result = initialize_estimator(regressor=regressor)</span>
-<a id="__codelineno-0-1137" name="__codelineno-0-1137"></a><span class="sd">        print(result)</span>
-<a id="__codelineno-0-1138" name="__codelineno-0-1138"></a><span class="sd">        LinearRegression()</span>
-<a id="__codelineno-0-1139" name="__codelineno-0-1139"></a>
-<a id="__codelineno-0-1140" name="__codelineno-0-1140"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1141" name="__codelineno-0-1141"></a>
-<a id="__codelineno-0-1142" name="__codelineno-0-1142"></a>    <span class="k">if</span> <span class="n">regressor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1143" name="__codelineno-0-1143"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-1144" name="__codelineno-0-1144"></a>            <span class="s2">&quot;The `regressor` argument is deprecated and will be removed in a future &quot;</span>
-<a id="__codelineno-0-1145" name="__codelineno-0-1145"></a>            <span class="s2">&quot;version. Please use `estimator` instead.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1146" name="__codelineno-0-1146"></a>            <span class="ne">FutureWarning</span><span class="p">,</span>
-<a id="__codelineno-0-1147" name="__codelineno-0-1147"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>  <span class="c1"># Important: to point to the user&#39;s code</span>
-<a id="__codelineno-0-1148" name="__codelineno-0-1148"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1149" name="__codelineno-0-1149"></a>        <span class="k">if</span> <span class="n">estimator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1150" name="__codelineno-0-1150"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-1151" name="__codelineno-0-1151"></a>                <span class="s2">&quot;Both `estimator` and `regressor` were provided. Use only `estimator`.&quot;</span>
-<a id="__codelineno-0-1152" name="__codelineno-0-1152"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1153" name="__codelineno-0-1153"></a>        <span class="k">return</span> <span class="n">regressor</span>
-<a id="__codelineno-0-1154" name="__codelineno-0-1154"></a>
-<a id="__codelineno-0-1155" name="__codelineno-0-1155"></a>    <span class="k">return</span> <span class="n">estimator</span>
+<span class="normal"><a href="#__codelineno-0-1155">1155</a></span>
+<span class="normal"><a href="#__codelineno-0-1156">1156</a></span>
+<span class="normal"><a href="#__codelineno-0-1157">1157</a></span>
+<span class="normal"><a href="#__codelineno-0-1158">1158</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1107" name="__codelineno-0-1107"></a><span class="k">def</span><span class="w"> </span><span class="nf">initialize_estimator</span><span class="p">(</span>
+<a id="__codelineno-0-1108" name="__codelineno-0-1108"></a>    <span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">regressor</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-1109" name="__codelineno-0-1109"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1110" name="__codelineno-0-1110"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a><span class="sd">    Helper to handle the deprecation of &#39;regressor&#39; in favor of &#39;estimator&#39;.</span>
+<a id="__codelineno-0-1112" name="__codelineno-0-1112"></a><span class="sd">    Returns the valid estimator object.</span>
+<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a>
+<a id="__codelineno-0-1114" name="__codelineno-0-1114"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1115" name="__codelineno-0-1115"></a><span class="sd">        estimator: estimator or pipeline compatible with the scikit-learn API, default None</span>
+<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a><span class="sd">            An instance of a estimator or pipeline compatible with the scikit-learn API.</span>
+<a id="__codelineno-0-1117" name="__codelineno-0-1117"></a><span class="sd">        regressor: estimator or pipeline compatible with the scikit-learn API, default None</span>
+<a id="__codelineno-0-1118" name="__codelineno-0-1118"></a><span class="sd">            Deprecated. An instance of a estimator or pipeline compatible with the</span>
+<a id="__codelineno-0-1119" name="__codelineno-0-1119"></a><span class="sd">            scikit-learn API.</span>
+<a id="__codelineno-0-1120" name="__codelineno-0-1120"></a>
+<a id="__codelineno-0-1121" name="__codelineno-0-1121"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1122" name="__codelineno-0-1122"></a><span class="sd">        estimator or pipeline compatible with the scikit-learn API</span>
+<a id="__codelineno-0-1123" name="__codelineno-0-1123"></a><span class="sd">            The valid estimator object.</span>
+<a id="__codelineno-0-1124" name="__codelineno-0-1124"></a>
+<a id="__codelineno-0-1125" name="__codelineno-0-1125"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-1126" name="__codelineno-0-1126"></a><span class="sd">        ValueError: If both `estimator` and `regressor` are provided. Use only `estimator`.</span>
+<a id="__codelineno-0-1127" name="__codelineno-0-1127"></a><span class="sd">        Warning: If `regressor` is provided, a FutureWarning is raised indicating that it is deprecated and will be removed in a future version.</span>
+<a id="__codelineno-0-1128" name="__codelineno-0-1128"></a>
+<a id="__codelineno-0-1129" name="__codelineno-0-1129"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1130" name="__codelineno-0-1130"></a><span class="sd">        from spotforecast2_safe.forecaster.utils import initialize_estimator</span>
+<a id="__codelineno-0-1131" name="__codelineno-0-1131"></a><span class="sd">        from sklearn.linear_model import LinearRegression</span>
+<a id="__codelineno-0-1132" name="__codelineno-0-1132"></a><span class="sd">        # Using the `estimator` argument</span>
+<a id="__codelineno-0-1133" name="__codelineno-0-1133"></a><span class="sd">        estimator = LinearRegression()</span>
+<a id="__codelineno-0-1134" name="__codelineno-0-1134"></a><span class="sd">        result = initialize_estimator(estimator=estimator)</span>
+<a id="__codelineno-0-1135" name="__codelineno-0-1135"></a><span class="sd">        print(result)</span>
+<a id="__codelineno-0-1136" name="__codelineno-0-1136"></a><span class="sd">        LinearRegression()</span>
+<a id="__codelineno-0-1137" name="__codelineno-0-1137"></a><span class="sd">        # Using the deprecated `regressor` argument</span>
+<a id="__codelineno-0-1138" name="__codelineno-0-1138"></a><span class="sd">        regressor = LinearRegression()</span>
+<a id="__codelineno-0-1139" name="__codelineno-0-1139"></a><span class="sd">        result = initialize_estimator(regressor=regressor)</span>
+<a id="__codelineno-0-1140" name="__codelineno-0-1140"></a><span class="sd">        print(result)</span>
+<a id="__codelineno-0-1141" name="__codelineno-0-1141"></a><span class="sd">        LinearRegression()</span>
+<a id="__codelineno-0-1142" name="__codelineno-0-1142"></a>
+<a id="__codelineno-0-1143" name="__codelineno-0-1143"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1144" name="__codelineno-0-1144"></a>
+<a id="__codelineno-0-1145" name="__codelineno-0-1145"></a>    <span class="k">if</span> <span class="n">regressor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1146" name="__codelineno-0-1146"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-1147" name="__codelineno-0-1147"></a>            <span class="s2">&quot;The `regressor` argument is deprecated and will be removed in a future &quot;</span>
+<a id="__codelineno-0-1148" name="__codelineno-0-1148"></a>            <span class="s2">&quot;version. Please use `estimator` instead.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1149" name="__codelineno-0-1149"></a>            <span class="ne">FutureWarning</span><span class="p">,</span>
+<a id="__codelineno-0-1150" name="__codelineno-0-1150"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>  <span class="c1"># Important: to point to the user&#39;s code</span>
+<a id="__codelineno-0-1151" name="__codelineno-0-1151"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1152" name="__codelineno-0-1152"></a>        <span class="k">if</span> <span class="n">estimator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1153" name="__codelineno-0-1153"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-1154" name="__codelineno-0-1154"></a>                <span class="s2">&quot;Both `estimator` and `regressor` were provided. Use only `estimator`.&quot;</span>
+<a id="__codelineno-0-1155" name="__codelineno-0-1155"></a>            <span class="p">)</span>
+<a id="__codelineno-0-1156" name="__codelineno-0-1156"></a>        <span class="k">return</span> <span class="n">regressor</span>
+<a id="__codelineno-0-1157" name="__codelineno-0-1157"></a>
+<a id="__codelineno-0-1158" name="__codelineno-0-1158"></a>    <span class="k">return</span> <span class="n">estimator</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -37622,10 +37628,7 @@ are not present in the dict keys (those series get no transformation).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/forecaster/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1224">1224</a></span>
-<span class="normal"><a href="#__codelineno-0-1225">1225</a></span>
-<span class="normal"><a href="#__codelineno-0-1226">1226</a></span>
-<span class="normal"><a href="#__codelineno-0-1227">1227</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1227">1227</a></span>
 <span class="normal"><a href="#__codelineno-0-1228">1228</a></span>
 <span class="normal"><a href="#__codelineno-0-1229">1229</a></span>
 <span class="normal"><a href="#__codelineno-0-1230">1230</a></span>
@@ -37737,122 +37740,125 @@ are not present in the dict keys (those series get no transformation).</p>
 <span class="normal"><a href="#__codelineno-0-1336">1336</a></span>
 <span class="normal"><a href="#__codelineno-0-1337">1337</a></span>
 <span class="normal"><a href="#__codelineno-0-1338">1338</a></span>
-<span class="normal"><a href="#__codelineno-0-1339">1339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1224" name="__codelineno-0-1224"></a><span class="k">def</span><span class="w"> </span><span class="nf">initialize_transformer_series</span><span class="p">(</span>
-<a id="__codelineno-0-1225" name="__codelineno-0-1225"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a>    <span class="n">series_names_in_</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1228" name="__codelineno-0-1228"></a>    <span class="n">transformer_series</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1229" name="__codelineno-0-1229"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<a id="__codelineno-0-1230" name="__codelineno-0-1230"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize transformer_series_ attribute for multivariate/multiseries forecasters.</span>
-<a id="__codelineno-0-1231" name="__codelineno-0-1231"></a>
-<a id="__codelineno-0-1232" name="__codelineno-0-1232"></a><span class="sd">    Creates a dictionary of transformers for each time series in multivariate or</span>
-<a id="__codelineno-0-1233" name="__codelineno-0-1233"></a><span class="sd">    multiseries forecasting. Handles three cases: no transformation (None), same</span>
-<a id="__codelineno-0-1234" name="__codelineno-0-1234"></a><span class="sd">    transformer for all series (single object), or different transformers per series</span>
-<a id="__codelineno-0-1235" name="__codelineno-0-1235"></a><span class="sd">    (dictionary). Clones transformer objects to avoid overwriting.</span>
-<a id="__codelineno-0-1236" name="__codelineno-0-1236"></a>
-<a id="__codelineno-0-1237" name="__codelineno-0-1237"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1238" name="__codelineno-0-1238"></a><span class="sd">        forecaster_name: Name of the forecaster using this function. Special handling</span>
-<a id="__codelineno-0-1239" name="__codelineno-0-1239"></a><span class="sd">            is applied for &#39;ForecasterRecursiveMultiSeries&#39;.</span>
-<a id="__codelineno-0-1240" name="__codelineno-0-1240"></a><span class="sd">        series_names_in_: Names of the time series (levels) used during training.</span>
-<a id="__codelineno-0-1241" name="__codelineno-0-1241"></a><span class="sd">            These will be the keys in the returned transformer dictionary.</span>
-<a id="__codelineno-0-1242" name="__codelineno-0-1242"></a><span class="sd">        encoding: Encoding used to identify different series. Only used for</span>
-<a id="__codelineno-0-1243" name="__codelineno-0-1243"></a><span class="sd">            ForecasterRecursiveMultiSeries. If None, creates a single &#39;_unknown_level&#39;</span>
-<a id="__codelineno-0-1244" name="__codelineno-0-1244"></a><span class="sd">            entry. Defaults to None.</span>
-<a id="__codelineno-0-1245" name="__codelineno-0-1245"></a><span class="sd">        transformer_series: Transformer(s) to apply to series. Can be:</span>
-<a id="__codelineno-0-1246" name="__codelineno-0-1246"></a><span class="sd">            - None: No transformation applied</span>
-<a id="__codelineno-0-1247" name="__codelineno-0-1247"></a><span class="sd">            - Single transformer object: Same transformer cloned for all series</span>
-<a id="__codelineno-0-1248" name="__codelineno-0-1248"></a><span class="sd">            - Dict mapping series names to transformers: Different transformer per series</span>
-<a id="__codelineno-0-1249" name="__codelineno-0-1249"></a><span class="sd">            Defaults to None.</span>
-<a id="__codelineno-0-1250" name="__codelineno-0-1250"></a>
-<a id="__codelineno-0-1251" name="__codelineno-0-1251"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1252" name="__codelineno-0-1252"></a><span class="sd">        dict: Dictionary with series names as keys and transformer objects (or None)</span>
-<a id="__codelineno-0-1253" name="__codelineno-0-1253"></a><span class="sd">            as values. Transformers are cloned to prevent overwriting.</span>
-<a id="__codelineno-0-1254" name="__codelineno-0-1254"></a>
-<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">    Warnings:</span>
-<a id="__codelineno-0-1256" name="__codelineno-0-1256"></a><span class="sd">        IgnoredArgumentWarning: If transformer_series is a dict and some series_names_in_</span>
-<a id="__codelineno-0-1257" name="__codelineno-0-1257"></a><span class="sd">            are not present in the dict keys (those series get no transformation).</span>
-<a id="__codelineno-0-1258" name="__codelineno-0-1258"></a>
-<a id="__codelineno-0-1259" name="__codelineno-0-1259"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1260" name="__codelineno-0-1260"></a><span class="sd">        No transformation:</span>
-<a id="__codelineno-0-1261" name="__codelineno-0-1261"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.forecaster.utils import initialize_transformer_series</span>
-<a id="__codelineno-0-1262" name="__codelineno-0-1262"></a><span class="sd">        &gt;&gt;&gt; series = [&#39;series1&#39;, &#39;series2&#39;, &#39;series3&#39;]</span>
-<a id="__codelineno-0-1263" name="__codelineno-0-1263"></a><span class="sd">        &gt;&gt;&gt; result = initialize_transformer_series(</span>
-<a id="__codelineno-0-1264" name="__codelineno-0-1264"></a><span class="sd">        ...     forecaster_name=&#39;ForecasterDirectMultiVariate&#39;,</span>
-<a id="__codelineno-0-1265" name="__codelineno-0-1265"></a><span class="sd">        ...     series_names_in_=series,</span>
-<a id="__codelineno-0-1266" name="__codelineno-0-1266"></a><span class="sd">        ...     transformer_series=None</span>
-<a id="__codelineno-0-1267" name="__codelineno-0-1267"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-1268" name="__codelineno-0-1268"></a><span class="sd">        &gt;&gt;&gt; print(result)</span>
-<a id="__codelineno-0-1269" name="__codelineno-0-1269"></a><span class="sd">        {&#39;series1&#39;: None, &#39;series2&#39;: None, &#39;series3&#39;: None}</span>
-<a id="__codelineno-0-1270" name="__codelineno-0-1270"></a>
-<a id="__codelineno-0-1271" name="__codelineno-0-1271"></a><span class="sd">        Same transformer for all series:</span>
-<a id="__codelineno-0-1272" name="__codelineno-0-1272"></a><span class="sd">        &gt;&gt;&gt; from sklearn.preprocessing import StandardScaler</span>
-<a id="__codelineno-0-1273" name="__codelineno-0-1273"></a><span class="sd">        &gt;&gt;&gt; scaler = StandardScaler()</span>
-<a id="__codelineno-0-1274" name="__codelineno-0-1274"></a><span class="sd">        &gt;&gt;&gt; result = initialize_transformer_series(</span>
-<a id="__codelineno-0-1275" name="__codelineno-0-1275"></a><span class="sd">        ...     forecaster_name=&#39;ForecasterDirectMultiVariate&#39;,</span>
-<a id="__codelineno-0-1276" name="__codelineno-0-1276"></a><span class="sd">        ...     series_names_in_=[&#39;series1&#39;, &#39;series2&#39;],</span>
-<a id="__codelineno-0-1277" name="__codelineno-0-1277"></a><span class="sd">        ...     transformer_series=scaler</span>
-<a id="__codelineno-0-1278" name="__codelineno-0-1278"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">        &gt;&gt;&gt; len(result)</span>
-<a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">        2</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">        &gt;&gt;&gt; all(isinstance(v, StandardScaler) for v in result.values())</span>
-<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="sd">        True</span>
-<a id="__codelineno-0-1283" name="__codelineno-0-1283"></a><span class="sd">        &gt;&gt;&gt; result[&#39;series1&#39;] is result[&#39;series2&#39;]  # Different clones</span>
-<a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">        False</span>
-<a id="__codelineno-0-1285" name="__codelineno-0-1285"></a>
-<a id="__codelineno-0-1286" name="__codelineno-0-1286"></a><span class="sd">        Different transformer per series:</span>
-<a id="__codelineno-0-1287" name="__codelineno-0-1287"></a><span class="sd">        &gt;&gt;&gt; from sklearn.preprocessing import MinMaxScaler</span>
-<a id="__codelineno-0-1288" name="__codelineno-0-1288"></a><span class="sd">        &gt;&gt;&gt; transformers = {</span>
-<a id="__codelineno-0-1289" name="__codelineno-0-1289"></a><span class="sd">        ...     &#39;series1&#39;: StandardScaler(),</span>
-<a id="__codelineno-0-1290" name="__codelineno-0-1290"></a><span class="sd">        ...     &#39;series2&#39;: MinMaxScaler()</span>
-<a id="__codelineno-0-1291" name="__codelineno-0-1291"></a><span class="sd">        ... }</span>
-<a id="__codelineno-0-1292" name="__codelineno-0-1292"></a><span class="sd">        &gt;&gt;&gt; result = initialize_transformer_series(</span>
-<a id="__codelineno-0-1293" name="__codelineno-0-1293"></a><span class="sd">        ...     forecaster_name=&#39;ForecasterDirectMultiVariate&#39;,</span>
-<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">        ...     series_names_in_=[&#39;series1&#39;, &#39;series2&#39;],</span>
-<a id="__codelineno-0-1295" name="__codelineno-0-1295"></a><span class="sd">        ...     transformer_series=transformers</span>
-<a id="__codelineno-0-1296" name="__codelineno-0-1296"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-1297" name="__codelineno-0-1297"></a><span class="sd">        &gt;&gt;&gt; isinstance(result[&#39;series1&#39;], StandardScaler)</span>
-<a id="__codelineno-0-1298" name="__codelineno-0-1298"></a><span class="sd">        True</span>
-<a id="__codelineno-0-1299" name="__codelineno-0-1299"></a><span class="sd">        &gt;&gt;&gt; isinstance(result[&#39;series2&#39;], MinMaxScaler)</span>
-<a id="__codelineno-0-1300" name="__codelineno-0-1300"></a><span class="sd">        True</span>
-<a id="__codelineno-0-1301" name="__codelineno-0-1301"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1302" name="__codelineno-0-1302"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
-<a id="__codelineno-0-1303" name="__codelineno-0-1303"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone</span>
-<a id="__codelineno-0-1304" name="__codelineno-0-1304"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IgnoredArgumentWarning</span>
-<a id="__codelineno-0-1305" name="__codelineno-0-1305"></a>
-<a id="__codelineno-0-1306" name="__codelineno-0-1306"></a>    <span class="k">if</span> <span class="n">forecaster_name</span> <span class="o">==</span> <span class="s2">&quot;ForecasterRecursiveMultiSeries&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-1307" name="__codelineno-0-1307"></a>        <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1308" name="__codelineno-0-1308"></a>            <span class="n">series_names_in_</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_unknown_level&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-1309" name="__codelineno-0-1309"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1310" name="__codelineno-0-1310"></a>            <span class="n">series_names_in_</span> <span class="o">=</span> <span class="n">series_names_in_</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;_unknown_level&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-1311" name="__codelineno-0-1311"></a>
-<a id="__codelineno-0-1312" name="__codelineno-0-1312"></a>    <span class="k">if</span> <span class="n">transformer_series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1313" name="__codelineno-0-1313"></a>        <span class="n">transformer_series_</span> <span class="o">=</span> <span class="p">{</span><span class="n">serie</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">series_names_in_</span><span class="p">}</span>
-<a id="__codelineno-0-1314" name="__codelineno-0-1314"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer_series</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-<a id="__codelineno-0-1315" name="__codelineno-0-1315"></a>        <span class="n">transformer_series_</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-1316" name="__codelineno-0-1316"></a>            <span class="n">serie</span><span class="p">:</span> <span class="n">clone</span><span class="p">(</span><span class="n">transformer_series</span><span class="p">)</span> <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">series_names_in_</span>
-<a id="__codelineno-0-1317" name="__codelineno-0-1317"></a>        <span class="p">}</span>
-<a id="__codelineno-0-1318" name="__codelineno-0-1318"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1319" name="__codelineno-0-1319"></a>        <span class="n">transformer_series_</span> <span class="o">=</span> <span class="p">{</span><span class="n">serie</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">series_names_in_</span><span class="p">}</span>
-<a id="__codelineno-0-1320" name="__codelineno-0-1320"></a>        <span class="c1"># Only elements already present in transformer_series_ are updated</span>
-<a id="__codelineno-0-1321" name="__codelineno-0-1321"></a>        <span class="n">transformer_series_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-<a id="__codelineno-0-1322" name="__codelineno-0-1322"></a>            <span class="p">{</span>
-<a id="__codelineno-0-1323" name="__codelineno-0-1323"></a>                <span class="n">k</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-<a id="__codelineno-0-1324" name="__codelineno-0-1324"></a>                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">transformer_series</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<a id="__codelineno-0-1325" name="__codelineno-0-1325"></a>                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">transformer_series_</span>
-<a id="__codelineno-0-1326" name="__codelineno-0-1326"></a>            <span class="p">}</span>
-<a id="__codelineno-0-1327" name="__codelineno-0-1327"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1328" name="__codelineno-0-1328"></a>
-<a id="__codelineno-0-1329" name="__codelineno-0-1329"></a>        <span class="n">series_not_in_transformer_series</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-1330" name="__codelineno-0-1330"></a>            <span class="nb">set</span><span class="p">(</span><span class="n">series_names_in_</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">transformer_series</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-0-1331" name="__codelineno-0-1331"></a>        <span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;_unknown_level&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-1332" name="__codelineno-0-1332"></a>        <span class="k">if</span> <span class="n">series_not_in_transformer_series</span><span class="p">:</span>
-<a id="__codelineno-0-1333" name="__codelineno-0-1333"></a>            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-1334" name="__codelineno-0-1334"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_not_in_transformer_series</span><span class="si">}</span><span class="s2"> not present in `transformer_series`.&quot;</span>
-<a id="__codelineno-0-1335" name="__codelineno-0-1335"></a>                <span class="sa">f</span><span class="s2">&quot; No transformation is applied to these series.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1336" name="__codelineno-0-1336"></a>                <span class="n">IgnoredArgumentWarning</span><span class="p">,</span>
-<a id="__codelineno-0-1337" name="__codelineno-0-1337"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1338" name="__codelineno-0-1338"></a>
-<a id="__codelineno-0-1339" name="__codelineno-0-1339"></a>    <span class="k">return</span> <span class="n">transformer_series_</span>
+<span class="normal"><a href="#__codelineno-0-1339">1339</a></span>
+<span class="normal"><a href="#__codelineno-0-1340">1340</a></span>
+<span class="normal"><a href="#__codelineno-0-1341">1341</a></span>
+<span class="normal"><a href="#__codelineno-0-1342">1342</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="k">def</span><span class="w"> </span><span class="nf">initialize_transformer_series</span><span class="p">(</span>
+<a id="__codelineno-0-1228" name="__codelineno-0-1228"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-1229" name="__codelineno-0-1229"></a>    <span class="n">series_names_in_</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-1230" name="__codelineno-0-1230"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1231" name="__codelineno-0-1231"></a>    <span class="n">transformer_series</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1232" name="__codelineno-0-1232"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<a id="__codelineno-0-1233" name="__codelineno-0-1233"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize transformer_series_ attribute for multivariate/multiseries forecasters.</span>
+<a id="__codelineno-0-1234" name="__codelineno-0-1234"></a>
+<a id="__codelineno-0-1235" name="__codelineno-0-1235"></a><span class="sd">    Creates a dictionary of transformers for each time series in multivariate or</span>
+<a id="__codelineno-0-1236" name="__codelineno-0-1236"></a><span class="sd">    multiseries forecasting. Handles three cases: no transformation (None), same</span>
+<a id="__codelineno-0-1237" name="__codelineno-0-1237"></a><span class="sd">    transformer for all series (single object), or different transformers per series</span>
+<a id="__codelineno-0-1238" name="__codelineno-0-1238"></a><span class="sd">    (dictionary). Clones transformer objects to avoid overwriting.</span>
+<a id="__codelineno-0-1239" name="__codelineno-0-1239"></a>
+<a id="__codelineno-0-1240" name="__codelineno-0-1240"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1241" name="__codelineno-0-1241"></a><span class="sd">        forecaster_name: Name of the forecaster using this function. Special handling</span>
+<a id="__codelineno-0-1242" name="__codelineno-0-1242"></a><span class="sd">            is applied for &#39;ForecasterRecursiveMultiSeries&#39;.</span>
+<a id="__codelineno-0-1243" name="__codelineno-0-1243"></a><span class="sd">        series_names_in_: Names of the time series (levels) used during training.</span>
+<a id="__codelineno-0-1244" name="__codelineno-0-1244"></a><span class="sd">            These will be the keys in the returned transformer dictionary.</span>
+<a id="__codelineno-0-1245" name="__codelineno-0-1245"></a><span class="sd">        encoding: Encoding used to identify different series. Only used for</span>
+<a id="__codelineno-0-1246" name="__codelineno-0-1246"></a><span class="sd">            ForecasterRecursiveMultiSeries. If None, creates a single &#39;_unknown_level&#39;</span>
+<a id="__codelineno-0-1247" name="__codelineno-0-1247"></a><span class="sd">            entry. Defaults to None.</span>
+<a id="__codelineno-0-1248" name="__codelineno-0-1248"></a><span class="sd">        transformer_series: Transformer(s) to apply to series. Can be:</span>
+<a id="__codelineno-0-1249" name="__codelineno-0-1249"></a><span class="sd">            - None: No transformation applied</span>
+<a id="__codelineno-0-1250" name="__codelineno-0-1250"></a><span class="sd">            - Single transformer object: Same transformer cloned for all series</span>
+<a id="__codelineno-0-1251" name="__codelineno-0-1251"></a><span class="sd">            - Dict mapping series names to transformers: Different transformer per series</span>
+<a id="__codelineno-0-1252" name="__codelineno-0-1252"></a><span class="sd">            Defaults to None.</span>
+<a id="__codelineno-0-1253" name="__codelineno-0-1253"></a>
+<a id="__codelineno-0-1254" name="__codelineno-0-1254"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">        dict: Dictionary with series names as keys and transformer objects (or None)</span>
+<a id="__codelineno-0-1256" name="__codelineno-0-1256"></a><span class="sd">            as values. Transformers are cloned to prevent overwriting.</span>
+<a id="__codelineno-0-1257" name="__codelineno-0-1257"></a>
+<a id="__codelineno-0-1258" name="__codelineno-0-1258"></a><span class="sd">    Warnings:</span>
+<a id="__codelineno-0-1259" name="__codelineno-0-1259"></a><span class="sd">        IgnoredArgumentWarning: If transformer_series is a dict and some series_names_in_</span>
+<a id="__codelineno-0-1260" name="__codelineno-0-1260"></a><span class="sd">            are not present in the dict keys (those series get no transformation).</span>
+<a id="__codelineno-0-1261" name="__codelineno-0-1261"></a>
+<a id="__codelineno-0-1262" name="__codelineno-0-1262"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1263" name="__codelineno-0-1263"></a><span class="sd">        No transformation:</span>
+<a id="__codelineno-0-1264" name="__codelineno-0-1264"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.forecaster.utils import initialize_transformer_series</span>
+<a id="__codelineno-0-1265" name="__codelineno-0-1265"></a><span class="sd">        &gt;&gt;&gt; series = [&#39;series1&#39;, &#39;series2&#39;, &#39;series3&#39;]</span>
+<a id="__codelineno-0-1266" name="__codelineno-0-1266"></a><span class="sd">        &gt;&gt;&gt; result = initialize_transformer_series(</span>
+<a id="__codelineno-0-1267" name="__codelineno-0-1267"></a><span class="sd">        ...     forecaster_name=&#39;ForecasterDirectMultiVariate&#39;,</span>
+<a id="__codelineno-0-1268" name="__codelineno-0-1268"></a><span class="sd">        ...     series_names_in_=series,</span>
+<a id="__codelineno-0-1269" name="__codelineno-0-1269"></a><span class="sd">        ...     transformer_series=None</span>
+<a id="__codelineno-0-1270" name="__codelineno-0-1270"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-1271" name="__codelineno-0-1271"></a><span class="sd">        &gt;&gt;&gt; print(result)</span>
+<a id="__codelineno-0-1272" name="__codelineno-0-1272"></a><span class="sd">        {&#39;series1&#39;: None, &#39;series2&#39;: None, &#39;series3&#39;: None}</span>
+<a id="__codelineno-0-1273" name="__codelineno-0-1273"></a>
+<a id="__codelineno-0-1274" name="__codelineno-0-1274"></a><span class="sd">        Same transformer for all series:</span>
+<a id="__codelineno-0-1275" name="__codelineno-0-1275"></a><span class="sd">        &gt;&gt;&gt; from sklearn.preprocessing import StandardScaler</span>
+<a id="__codelineno-0-1276" name="__codelineno-0-1276"></a><span class="sd">        &gt;&gt;&gt; scaler = StandardScaler()</span>
+<a id="__codelineno-0-1277" name="__codelineno-0-1277"></a><span class="sd">        &gt;&gt;&gt; result = initialize_transformer_series(</span>
+<a id="__codelineno-0-1278" name="__codelineno-0-1278"></a><span class="sd">        ...     forecaster_name=&#39;ForecasterDirectMultiVariate&#39;,</span>
+<a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">        ...     series_names_in_=[&#39;series1&#39;, &#39;series2&#39;],</span>
+<a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">        ...     transformer_series=scaler</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="sd">        &gt;&gt;&gt; len(result)</span>
+<a id="__codelineno-0-1283" name="__codelineno-0-1283"></a><span class="sd">        2</span>
+<a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">        &gt;&gt;&gt; all(isinstance(v, StandardScaler) for v in result.values())</span>
+<a id="__codelineno-0-1285" name="__codelineno-0-1285"></a><span class="sd">        True</span>
+<a id="__codelineno-0-1286" name="__codelineno-0-1286"></a><span class="sd">        &gt;&gt;&gt; result[&#39;series1&#39;] is result[&#39;series2&#39;]  # Different clones</span>
+<a id="__codelineno-0-1287" name="__codelineno-0-1287"></a><span class="sd">        False</span>
+<a id="__codelineno-0-1288" name="__codelineno-0-1288"></a>
+<a id="__codelineno-0-1289" name="__codelineno-0-1289"></a><span class="sd">        Different transformer per series:</span>
+<a id="__codelineno-0-1290" name="__codelineno-0-1290"></a><span class="sd">        &gt;&gt;&gt; from sklearn.preprocessing import MinMaxScaler</span>
+<a id="__codelineno-0-1291" name="__codelineno-0-1291"></a><span class="sd">        &gt;&gt;&gt; transformers = {</span>
+<a id="__codelineno-0-1292" name="__codelineno-0-1292"></a><span class="sd">        ...     &#39;series1&#39;: StandardScaler(),</span>
+<a id="__codelineno-0-1293" name="__codelineno-0-1293"></a><span class="sd">        ...     &#39;series2&#39;: MinMaxScaler()</span>
+<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">        ... }</span>
+<a id="__codelineno-0-1295" name="__codelineno-0-1295"></a><span class="sd">        &gt;&gt;&gt; result = initialize_transformer_series(</span>
+<a id="__codelineno-0-1296" name="__codelineno-0-1296"></a><span class="sd">        ...     forecaster_name=&#39;ForecasterDirectMultiVariate&#39;,</span>
+<a id="__codelineno-0-1297" name="__codelineno-0-1297"></a><span class="sd">        ...     series_names_in_=[&#39;series1&#39;, &#39;series2&#39;],</span>
+<a id="__codelineno-0-1298" name="__codelineno-0-1298"></a><span class="sd">        ...     transformer_series=transformers</span>
+<a id="__codelineno-0-1299" name="__codelineno-0-1299"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-1300" name="__codelineno-0-1300"></a><span class="sd">        &gt;&gt;&gt; isinstance(result[&#39;series1&#39;], StandardScaler)</span>
+<a id="__codelineno-0-1301" name="__codelineno-0-1301"></a><span class="sd">        True</span>
+<a id="__codelineno-0-1302" name="__codelineno-0-1302"></a><span class="sd">        &gt;&gt;&gt; isinstance(result[&#39;series2&#39;], MinMaxScaler)</span>
+<a id="__codelineno-0-1303" name="__codelineno-0-1303"></a><span class="sd">        True</span>
+<a id="__codelineno-0-1304" name="__codelineno-0-1304"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1305" name="__codelineno-0-1305"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<a id="__codelineno-0-1306" name="__codelineno-0-1306"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone</span>
+<a id="__codelineno-0-1307" name="__codelineno-0-1307"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IgnoredArgumentWarning</span>
+<a id="__codelineno-0-1308" name="__codelineno-0-1308"></a>
+<a id="__codelineno-0-1309" name="__codelineno-0-1309"></a>    <span class="k">if</span> <span class="n">forecaster_name</span> <span class="o">==</span> <span class="s2">&quot;ForecasterRecursiveMultiSeries&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-1310" name="__codelineno-0-1310"></a>        <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1311" name="__codelineno-0-1311"></a>            <span class="n">series_names_in_</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_unknown_level&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-1312" name="__codelineno-0-1312"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1313" name="__codelineno-0-1313"></a>            <span class="n">series_names_in_</span> <span class="o">=</span> <span class="n">series_names_in_</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;_unknown_level&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-1314" name="__codelineno-0-1314"></a>
+<a id="__codelineno-0-1315" name="__codelineno-0-1315"></a>    <span class="k">if</span> <span class="n">transformer_series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1316" name="__codelineno-0-1316"></a>        <span class="n">transformer_series_</span> <span class="o">=</span> <span class="p">{</span><span class="n">serie</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">series_names_in_</span><span class="p">}</span>
+<a id="__codelineno-0-1317" name="__codelineno-0-1317"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer_series</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<a id="__codelineno-0-1318" name="__codelineno-0-1318"></a>        <span class="n">transformer_series_</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-1319" name="__codelineno-0-1319"></a>            <span class="n">serie</span><span class="p">:</span> <span class="n">clone</span><span class="p">(</span><span class="n">transformer_series</span><span class="p">)</span> <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">series_names_in_</span>
+<a id="__codelineno-0-1320" name="__codelineno-0-1320"></a>        <span class="p">}</span>
+<a id="__codelineno-0-1321" name="__codelineno-0-1321"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1322" name="__codelineno-0-1322"></a>        <span class="n">transformer_series_</span> <span class="o">=</span> <span class="p">{</span><span class="n">serie</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">series_names_in_</span><span class="p">}</span>
+<a id="__codelineno-0-1323" name="__codelineno-0-1323"></a>        <span class="c1"># Only elements already present in transformer_series_ are updated</span>
+<a id="__codelineno-0-1324" name="__codelineno-0-1324"></a>        <span class="n">transformer_series_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+<a id="__codelineno-0-1325" name="__codelineno-0-1325"></a>            <span class="p">{</span>
+<a id="__codelineno-0-1326" name="__codelineno-0-1326"></a>                <span class="n">k</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<a id="__codelineno-0-1327" name="__codelineno-0-1327"></a>                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">transformer_series</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<a id="__codelineno-0-1328" name="__codelineno-0-1328"></a>                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">transformer_series_</span>
+<a id="__codelineno-0-1329" name="__codelineno-0-1329"></a>            <span class="p">}</span>
+<a id="__codelineno-0-1330" name="__codelineno-0-1330"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1331" name="__codelineno-0-1331"></a>
+<a id="__codelineno-0-1332" name="__codelineno-0-1332"></a>        <span class="n">series_not_in_transformer_series</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-1333" name="__codelineno-0-1333"></a>            <span class="nb">set</span><span class="p">(</span><span class="n">series_names_in_</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">transformer_series</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-1334" name="__codelineno-0-1334"></a>        <span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;_unknown_level&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-1335" name="__codelineno-0-1335"></a>        <span class="k">if</span> <span class="n">series_not_in_transformer_series</span><span class="p">:</span>
+<a id="__codelineno-0-1336" name="__codelineno-0-1336"></a>            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-1337" name="__codelineno-0-1337"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_not_in_transformer_series</span><span class="si">}</span><span class="s2"> not present in `transformer_series`.&quot;</span>
+<a id="__codelineno-0-1338" name="__codelineno-0-1338"></a>                <span class="sa">f</span><span class="s2">&quot; No transformation is applied to these series.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1339" name="__codelineno-0-1339"></a>                <span class="n">IgnoredArgumentWarning</span><span class="p">,</span>
+<a id="__codelineno-0-1340" name="__codelineno-0-1340"></a>            <span class="p">)</span>
+<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a>
+<a id="__codelineno-0-1342" name="__codelineno-0-1342"></a>    <span class="k">return</span> <span class="n">transformer_series_</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -39178,10 +39184,7 @@ per target forecaster. Default: False.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/forecaster/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1158">1158</a></span>
-<span class="normal"><a href="#__codelineno-0-1159">1159</a></span>
-<span class="normal"><a href="#__codelineno-0-1160">1160</a></span>
-<span class="normal"><a href="#__codelineno-0-1161">1161</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1161">1161</a></span>
 <span class="normal"><a href="#__codelineno-0-1162">1162</a></span>
 <span class="normal"><a href="#__codelineno-0-1163">1163</a></span>
 <span class="normal"><a href="#__codelineno-0-1164">1164</a></span>
@@ -39241,70 +39244,73 @@ per target forecaster. Default: False.</p>
 <span class="normal"><a href="#__codelineno-0-1218">1218</a></span>
 <span class="normal"><a href="#__codelineno-0-1219">1219</a></span>
 <span class="normal"><a href="#__codelineno-0-1220">1220</a></span>
-<span class="normal"><a href="#__codelineno-0-1221">1221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1158" name="__codelineno-0-1158"></a><span class="k">def</span><span class="w"> </span><span class="nf">predict_multivariate</span><span class="p">(</span>
-<a id="__codelineno-0-1159" name="__codelineno-0-1159"></a>    <span class="n">forecasters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-<a id="__codelineno-0-1160" name="__codelineno-0-1160"></a>    <span class="n">steps_ahead</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-1161" name="__codelineno-0-1161"></a>    <span class="n">exog</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1162" name="__codelineno-0-1162"></a>    <span class="n">show_progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-1163" name="__codelineno-0-1163"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-1164" name="__codelineno-0-1164"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-1165" name="__codelineno-0-1165"></a><span class="sd">    Generate multi-output predictions using multiple baseline forecasters.</span>
-<a id="__codelineno-0-1166" name="__codelineno-0-1166"></a>
-<a id="__codelineno-0-1167" name="__codelineno-0-1167"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1168" name="__codelineno-0-1168"></a><span class="sd">        forecasters (dict): Dictionary of fitted forecaster instances (one per target).</span>
-<a id="__codelineno-0-1169" name="__codelineno-0-1169"></a><span class="sd">            Keys are target names, values are the fitted forecasters (e.g.,</span>
-<a id="__codelineno-0-1170" name="__codelineno-0-1170"></a><span class="sd">            ForecasterRecursive, ForecasterEquivalentDate).</span>
-<a id="__codelineno-0-1171" name="__codelineno-0-1171"></a><span class="sd">        steps_ahead (int): Number of steps to forecast.</span>
-<a id="__codelineno-0-1172" name="__codelineno-0-1172"></a><span class="sd">        exog (pd.DataFrame, optional): Exogenous variables for prediction.</span>
-<a id="__codelineno-0-1173" name="__codelineno-0-1173"></a><span class="sd">            If provided, will be passed to each forecaster&#39;s predict method.</span>
-<a id="__codelineno-0-1174" name="__codelineno-0-1174"></a><span class="sd">        show_progress (bool, optional): Show progress bar while predicting</span>
-<a id="__codelineno-0-1175" name="__codelineno-0-1175"></a><span class="sd">            per target forecaster. Default: False.</span>
-<a id="__codelineno-0-1176" name="__codelineno-0-1176"></a>
-<a id="__codelineno-0-1177" name="__codelineno-0-1177"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1178" name="__codelineno-0-1178"></a><span class="sd">        pd.DataFrame: DataFrame with predictions for all targets.</span>
+<span class="normal"><a href="#__codelineno-0-1221">1221</a></span>
+<span class="normal"><a href="#__codelineno-0-1222">1222</a></span>
+<span class="normal"><a href="#__codelineno-0-1223">1223</a></span>
+<span class="normal"><a href="#__codelineno-0-1224">1224</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1161" name="__codelineno-0-1161"></a><span class="k">def</span><span class="w"> </span><span class="nf">predict_multivariate</span><span class="p">(</span>
+<a id="__codelineno-0-1162" name="__codelineno-0-1162"></a>    <span class="n">forecasters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-0-1163" name="__codelineno-0-1163"></a>    <span class="n">steps_ahead</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-1164" name="__codelineno-0-1164"></a>    <span class="n">exog</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1165" name="__codelineno-0-1165"></a>    <span class="n">show_progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-1166" name="__codelineno-0-1166"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-1167" name="__codelineno-0-1167"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1168" name="__codelineno-0-1168"></a><span class="sd">    Generate multi-output predictions using multiple baseline forecasters.</span>
+<a id="__codelineno-0-1169" name="__codelineno-0-1169"></a>
+<a id="__codelineno-0-1170" name="__codelineno-0-1170"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1171" name="__codelineno-0-1171"></a><span class="sd">        forecasters (dict): Dictionary of fitted forecaster instances (one per target).</span>
+<a id="__codelineno-0-1172" name="__codelineno-0-1172"></a><span class="sd">            Keys are target names, values are the fitted forecasters (e.g.,</span>
+<a id="__codelineno-0-1173" name="__codelineno-0-1173"></a><span class="sd">            ForecasterRecursive, ForecasterEquivalentDate).</span>
+<a id="__codelineno-0-1174" name="__codelineno-0-1174"></a><span class="sd">        steps_ahead (int): Number of steps to forecast.</span>
+<a id="__codelineno-0-1175" name="__codelineno-0-1175"></a><span class="sd">        exog (pd.DataFrame, optional): Exogenous variables for prediction.</span>
+<a id="__codelineno-0-1176" name="__codelineno-0-1176"></a><span class="sd">            If provided, will be passed to each forecaster&#39;s predict method.</span>
+<a id="__codelineno-0-1177" name="__codelineno-0-1177"></a><span class="sd">        show_progress (bool, optional): Show progress bar while predicting</span>
+<a id="__codelineno-0-1178" name="__codelineno-0-1178"></a><span class="sd">            per target forecaster. Default: False.</span>
 <a id="__codelineno-0-1179" name="__codelineno-0-1179"></a>
-<a id="__codelineno-0-1180" name="__codelineno-0-1180"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1181" name="__codelineno-0-1181"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-<a id="__codelineno-0-1182" name="__codelineno-0-1182"></a><span class="sd">        &gt;&gt;&gt; from sklearn.linear_model import LinearRegression</span>
-<a id="__codelineno-0-1183" name="__codelineno-0-1183"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.forecaster.recursive import ForecasterRecursive</span>
-<a id="__codelineno-0-1184" name="__codelineno-0-1184"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.forecaster.utils import predict_multivariate</span>
-<a id="__codelineno-0-1185" name="__codelineno-0-1185"></a><span class="sd">        &gt;&gt;&gt; y1 = pd.Series([1, 2, 3, 4, 5])</span>
-<a id="__codelineno-0-1186" name="__codelineno-0-1186"></a><span class="sd">        &gt;&gt;&gt; y2 = pd.Series([2, 4, 6, 8, 10])</span>
-<a id="__codelineno-0-1187" name="__codelineno-0-1187"></a><span class="sd">        &gt;&gt;&gt; f1 = ForecasterRecursive(estimator=LinearRegression(), lags=2)</span>
-<a id="__codelineno-0-1188" name="__codelineno-0-1188"></a><span class="sd">        &gt;&gt;&gt; f2 = ForecasterRecursive(estimator=LinearRegression(), lags=2)</span>
-<a id="__codelineno-0-1189" name="__codelineno-0-1189"></a><span class="sd">        &gt;&gt;&gt; f1.fit(y=y1)</span>
-<a id="__codelineno-0-1190" name="__codelineno-0-1190"></a><span class="sd">        &gt;&gt;&gt; f2.fit(y=y2)</span>
-<a id="__codelineno-0-1191" name="__codelineno-0-1191"></a><span class="sd">        &gt;&gt;&gt; forecasters = {&#39;target1&#39;: f1, &#39;target2&#39;: f2}</span>
-<a id="__codelineno-0-1192" name="__codelineno-0-1192"></a><span class="sd">        &gt;&gt;&gt; predictions = predict_multivariate(forecasters, steps_ahead=2)</span>
-<a id="__codelineno-0-1193" name="__codelineno-0-1193"></a><span class="sd">        &gt;&gt;&gt; predictions</span>
-<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a><span class="sd">           target1  target2</span>
-<a id="__codelineno-0-1195" name="__codelineno-0-1195"></a><span class="sd">        5      6.0     12.0</span>
-<a id="__codelineno-0-1196" name="__codelineno-0-1196"></a><span class="sd">        6      7.0     14.0</span>
-<a id="__codelineno-0-1197" name="__codelineno-0-1197"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1198" name="__codelineno-0-1198"></a>
-<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">forecasters</span><span class="p">:</span>
-<a id="__codelineno-0-1200" name="__codelineno-0-1200"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-1180" name="__codelineno-0-1180"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1181" name="__codelineno-0-1181"></a><span class="sd">        pd.DataFrame: DataFrame with predictions for all targets.</span>
+<a id="__codelineno-0-1182" name="__codelineno-0-1182"></a>
+<a id="__codelineno-0-1183" name="__codelineno-0-1183"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1184" name="__codelineno-0-1184"></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<a id="__codelineno-0-1185" name="__codelineno-0-1185"></a><span class="sd">        &gt;&gt;&gt; from sklearn.linear_model import LinearRegression</span>
+<a id="__codelineno-0-1186" name="__codelineno-0-1186"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.forecaster.recursive import ForecasterRecursive</span>
+<a id="__codelineno-0-1187" name="__codelineno-0-1187"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.forecaster.utils import predict_multivariate</span>
+<a id="__codelineno-0-1188" name="__codelineno-0-1188"></a><span class="sd">        &gt;&gt;&gt; y1 = pd.Series([1, 2, 3, 4, 5])</span>
+<a id="__codelineno-0-1189" name="__codelineno-0-1189"></a><span class="sd">        &gt;&gt;&gt; y2 = pd.Series([2, 4, 6, 8, 10])</span>
+<a id="__codelineno-0-1190" name="__codelineno-0-1190"></a><span class="sd">        &gt;&gt;&gt; f1 = ForecasterRecursive(estimator=LinearRegression(), lags=2)</span>
+<a id="__codelineno-0-1191" name="__codelineno-0-1191"></a><span class="sd">        &gt;&gt;&gt; f2 = ForecasterRecursive(estimator=LinearRegression(), lags=2)</span>
+<a id="__codelineno-0-1192" name="__codelineno-0-1192"></a><span class="sd">        &gt;&gt;&gt; f1.fit(y=y1)</span>
+<a id="__codelineno-0-1193" name="__codelineno-0-1193"></a><span class="sd">        &gt;&gt;&gt; f2.fit(y=y2)</span>
+<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a><span class="sd">        &gt;&gt;&gt; forecasters = {&#39;target1&#39;: f1, &#39;target2&#39;: f2}</span>
+<a id="__codelineno-0-1195" name="__codelineno-0-1195"></a><span class="sd">        &gt;&gt;&gt; predictions = predict_multivariate(forecasters, steps_ahead=2)</span>
+<a id="__codelineno-0-1196" name="__codelineno-0-1196"></a><span class="sd">        &gt;&gt;&gt; predictions</span>
+<a id="__codelineno-0-1197" name="__codelineno-0-1197"></a><span class="sd">           target1  target2</span>
+<a id="__codelineno-0-1198" name="__codelineno-0-1198"></a><span class="sd">        5      6.0     12.0</span>
+<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">        6      7.0     14.0</span>
+<a id="__codelineno-0-1200" name="__codelineno-0-1200"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1201" name="__codelineno-0-1201"></a>
-<a id="__codelineno-0-1202" name="__codelineno-0-1202"></a>    <span class="n">predictions</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-1203" name="__codelineno-0-1203"></a>
-<a id="__codelineno-0-1204" name="__codelineno-0-1204"></a>    <span class="n">target_iter</span> <span class="o">=</span> <span class="n">forecasters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<a id="__codelineno-0-1205" name="__codelineno-0-1205"></a>    <span class="k">if</span> <span class="n">show_progress</span> <span class="ow">and</span> <span class="n">tqdm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1206" name="__codelineno-0-1206"></a>        <span class="n">target_iter</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-1207" name="__codelineno-0-1207"></a>            <span class="n">forecasters</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-<a id="__codelineno-0-1208" name="__codelineno-0-1208"></a>            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Predicting targets&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1209" name="__codelineno-0-1209"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1210" name="__codelineno-0-1210"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1211" name="__codelineno-0-1211"></a>
-<a id="__codelineno-0-1212" name="__codelineno-0-1212"></a>    <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">forecaster</span> <span class="ow">in</span> <span class="n">target_iter</span><span class="p">:</span>
-<a id="__codelineno-0-1213" name="__codelineno-0-1213"></a>        <span class="c1"># Generate predictions for this target</span>
-<a id="__codelineno-0-1214" name="__codelineno-0-1214"></a>        <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1215" name="__codelineno-0-1215"></a>            <span class="n">pred</span> <span class="o">=</span> <span class="n">forecaster</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps_ahead</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">)</span>
-<a id="__codelineno-0-1216" name="__codelineno-0-1216"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1217" name="__codelineno-0-1217"></a>            <span class="n">pred</span> <span class="o">=</span> <span class="n">forecaster</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps_ahead</span><span class="p">)</span>
-<a id="__codelineno-0-1218" name="__codelineno-0-1218"></a>        <span class="n">predictions</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred</span>
-<a id="__codelineno-0-1219" name="__codelineno-0-1219"></a>
-<a id="__codelineno-0-1220" name="__codelineno-0-1220"></a>    <span class="c1"># Combine into a single DataFrame</span>
-<a id="__codelineno-0-1221" name="__codelineno-0-1221"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-1202" name="__codelineno-0-1202"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">forecasters</span><span class="p">:</span>
+<a id="__codelineno-0-1203" name="__codelineno-0-1203"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-1204" name="__codelineno-0-1204"></a>
+<a id="__codelineno-0-1205" name="__codelineno-0-1205"></a>    <span class="n">predictions</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-1206" name="__codelineno-0-1206"></a>
+<a id="__codelineno-0-1207" name="__codelineno-0-1207"></a>    <span class="n">target_iter</span> <span class="o">=</span> <span class="n">forecasters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<a id="__codelineno-0-1208" name="__codelineno-0-1208"></a>    <span class="k">if</span> <span class="n">show_progress</span> <span class="ow">and</span> <span class="n">tqdm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1209" name="__codelineno-0-1209"></a>        <span class="n">target_iter</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-1210" name="__codelineno-0-1210"></a>            <span class="n">forecasters</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+<a id="__codelineno-0-1211" name="__codelineno-0-1211"></a>            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Predicting targets&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1212" name="__codelineno-0-1212"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1213" name="__codelineno-0-1213"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1214" name="__codelineno-0-1214"></a>
+<a id="__codelineno-0-1215" name="__codelineno-0-1215"></a>    <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">forecaster</span> <span class="ow">in</span> <span class="n">target_iter</span><span class="p">:</span>
+<a id="__codelineno-0-1216" name="__codelineno-0-1216"></a>        <span class="c1"># Generate predictions for this target</span>
+<a id="__codelineno-0-1217" name="__codelineno-0-1217"></a>        <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1218" name="__codelineno-0-1218"></a>            <span class="n">pred</span> <span class="o">=</span> <span class="n">forecaster</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps_ahead</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">)</span>
+<a id="__codelineno-0-1219" name="__codelineno-0-1219"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1220" name="__codelineno-0-1220"></a>            <span class="n">pred</span> <span class="o">=</span> <span class="n">forecaster</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps_ahead</span><span class="p">)</span>
+<a id="__codelineno-0-1221" name="__codelineno-0-1221"></a>        <span class="n">predictions</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred</span>
+<a id="__codelineno-0-1222" name="__codelineno-0-1222"></a>
+<a id="__codelineno-0-1223" name="__codelineno-0-1223"></a>    <span class="c1"># Combine into a single DataFrame</span>
+<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
