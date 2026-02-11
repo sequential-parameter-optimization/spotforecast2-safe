@@ -1,3 +1,10 @@
+## [0.4.15](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.14...v0.4.15) (2026-02-11)
+
+
+### Bug Fixes
+
+* Refactor Data Fetching Defaults, no default filename in fetch_data() ([a36d232](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a36d232726f46653b26d1c4cd26d570772af07b3))
+
 ## [0.4.14](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.13...v0.4.14) (2026-02-11)
 
 
