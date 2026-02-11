@@ -6,18 +6,10 @@ pytest test cases for safety-critical MLOps environments.
 """
 
 import logging
-import pytest
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock
-
-from spotforecast2_safe.processing.agg_predict import agg_predict
-from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-    n2n_predict_with_covariates,
-)
-
+from datetime import datetime
 
 class TestCovariateDataPreperation:
     """Test exogenous covariate data preparation."""
@@ -369,16 +361,15 @@ class TestForcedTraining:
 
     def test_force_train_parameter(self):
         """Test force_train parameter controls training behavior."""
-        force_train_true = True
-        force_train_false = False
+        # Test when force_train is True
+        force_train = True
+        action = "retrain_model" if force_train else "load_cached_model"
+        assert action == "retrain_model"
         
-        if force_train_true:
-            action = "retrain_model"
-        else:
-            action = "load_cached_model"
-        
-        assert force_train_true is True
-        assert force_train_false is False
+        # Test when force_train is False
+        force_train = False
+        action = "retrain_model" if force_train else "load_cached_model"
+        assert action == "load_cached_model"
 
     def test_model_directory_creation(self):
         """Test model directories are created when needed."""
