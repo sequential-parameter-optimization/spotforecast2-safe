@@ -1,3 +1,15 @@
+## [0.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.9...v0.4.0) (2026-02-11)
+
+
+### Features
+
+* **security:** Improve OpenSSF Scorecard compliance to 8-9/10 ([#1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/1)) ([5c028e2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5c028e203c1936f7c03ee9a6092c4a171306feb8))
+
+
+### Documentation
+
+* badges updated ([a180f3a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a180f3a89ee07447171642d9967f8ca75411f320))
+
 ## [0.3.9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.8...v0.3.9) (2026-02-09)
 
 
