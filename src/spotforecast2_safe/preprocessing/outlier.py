@@ -38,7 +38,7 @@ def mark_outliers(
     for col in data.columns:
         iso = IsolationForest(contamination=contamination, random_state=random_state)
         # Fit and predict (-1 for outliers, 1 for inliers)
-        outliers = iso.fit_predict(data[[col]].values)
+        outliers = iso.fit_predict(data[col].values.reshape(-1, 1))
 
         # Mark outliers as NaN
         data.loc[outliers == -1, col] = np.nan
@@ -176,7 +176,7 @@ def get_outliers(
     for col in data.columns:
         iso = IsolationForest(contamination=contamination, random_state=random_state)
         # Fit and predict (-1 for outliers, 1 for inliers)
-        predictions = iso.fit_predict(data[[col]].values)
+        predictions = iso.fit_predict(data[col].values.reshape(-1, 1))
 
         # Get outlier values
         if data_original is not None:

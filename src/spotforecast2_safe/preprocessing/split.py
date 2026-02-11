@@ -121,7 +121,6 @@ def split_rel_train_val_test(
     n_test = n_total - n_train - n_val
 
     if n_test < 0:
-        n_test = 0
         n_val = n_total - n_train
     if n_val < 0:
         n_val = 0
