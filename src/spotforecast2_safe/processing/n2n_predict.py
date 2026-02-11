@@ -187,7 +187,7 @@ def n2n_predict(
     else:
         if verbose:
             print("Fetching data from CSV...")
-        data = fetch_data(columns=TARGET)
+        data = fetch_data(filename="data_in.csv", columns=TARGET)
 
     _, _, _, _ = get_start_end(
         data=data,

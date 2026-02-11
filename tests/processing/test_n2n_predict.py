@@ -66,7 +66,7 @@ def test_n2n_predict_flow(
     # --- Assertions ---
 
     # Verify fetch_data called with correct columns
-    mock_fetch_data.assert_called_once_with(columns=columns)
+    mock_fetch_data.assert_called_once_with(filename="data_in.csv", columns=columns)
 
     # Verify preprocessing steps called
     mock_start_end.assert_called_once()

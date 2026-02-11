@@ -115,7 +115,7 @@ def fetch_data(
     Args:
         filename (str, optional):
             Filename of the CSV file containing the dataset. Must be located in the
-            data home directory. If both filename and dataframe are None, defaults to "data_in.csv".
+            data home directory. This is required if dataframe is None.
         dataframe (pd.DataFrame, optional):
             A pandas DataFrame to process. If provided, it will be processed with
             proper timezone handling. Mutually exclusive with filename.
@@ -136,7 +136,8 @@ def fetch_data(
         pd.DataFrame: The integrated raw dataset with UTC timezone.
 
     Raises:
-        ValueError: If columns is an empty list or if both filename and dataframe are provided.
+        ValueError: If columns is an empty list, if both filename and dataframe are provided,
+            or if neither filename nor dataframe is provided.
         FileNotFoundError: If CSV file does not exist.
 
     Examples:
@@ -175,7 +176,10 @@ def fetch_data(
     else:
         # Load from CSV file
         if filename is None:
-            filename = "data_in.csv"
+            raise ValueError(
+                "filename must be specified when dataframe is None. "
+                "Explicitly provide a filename (e.g., 'data_in.csv') or a DataFrame."
+            )
         csv_path = get_data_home() / filename
         if not Path(csv_path).is_file():
             raise FileNotFoundError(f"The file {csv_path} does not exist.")

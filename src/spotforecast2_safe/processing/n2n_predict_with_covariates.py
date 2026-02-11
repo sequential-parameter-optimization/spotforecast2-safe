@@ -771,7 +771,7 @@ def n2n_predict_with_covariates(
     if data is None:
         if verbose:
             print("  Fetching data from CSV...")
-        data = fetch_data(timezone=timezone)
+        data = fetch_data(filename="data_in.csv", timezone=timezone)
     else:
         if verbose:
             print("  Using provided dataframe...")

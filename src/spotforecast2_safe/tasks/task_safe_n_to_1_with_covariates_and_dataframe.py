@@ -65,17 +65,17 @@ from spotforecast2_safe.manager.tools import _parse_bool
 # - They are defined as a named constant (rather than inline) to make it clear
 #   what is being tuned and to avoid unexplained "magic numbers" in the code.
 DEFAULT_WEIGHTS: List[float] = [
-    1.0,   # Index 0 – weight for forecast component 0
-    1.0,   # Index 1 – weight for forecast component 1
+    1.0,  # Index 0 – weight for forecast component 0
+    1.0,  # Index 1 – weight for forecast component 1
     -1.0,  # Index 2 – weight for forecast component 2
     -1.0,  # Index 3 – weight for forecast component 3
-    1.0,   # Index 4 – weight for forecast component 4
+    1.0,  # Index 4 – weight for forecast component 4
     -1.0,  # Index 5 – weight for forecast component 5
-    1.0,   # Index 6 – weight for forecast component 6
-    1.0,   # Index 7 – weight for forecast component 7
-    1.0,   # Index 8 – weight for forecast component 8
+    1.0,  # Index 6 – weight for forecast component 6
+    1.0,  # Index 7 – weight for forecast component 7
+    1.0,  # Index 8 – weight for forecast component 8
     -1.0,  # Index 9 – weight for forecast component 9
-    1.0,   # Index 10 – weight for forecast component 10
+    1.0,  # Index 10 – weight for forecast component 10
 ]
 
 warnings.simplefilter("ignore", category=FutureWarning)
@@ -520,7 +520,7 @@ def main(
         # Use a copy to avoid accidental mutation of the module-level default.
         weights = DEFAULT_WEIGHTS.copy()
 
-    data = fetch_data()
+    data = fetch_data(filename="data_in.csv")
 
     logger.info("--- Starting n_to_1_with_covariates using modular functions ---")
 
