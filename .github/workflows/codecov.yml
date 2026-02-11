@@ -36,12 +36,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv pip install --upgrade pip
-          uv pip install -e ".[dev]"
+          uv pip install --system --upgrade pip
+          uv pip install --system -e ".[dev]"
 
       - name: Run tests
         run: |
-          uv run pytest tests/ -v --tb=short --cov=src/spotforecast2_safe --cov-branch --cov-report=xml --cov-report=term
+          pytest tests/ -v --tb=short --cov=src/spotforecast2_safe --cov-branch --cov-report=xml --cov-report=term
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@5c47607acb93fed5485fdbf7232e8a31425f672a  # v5.0.2
