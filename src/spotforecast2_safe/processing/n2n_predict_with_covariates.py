@@ -900,7 +900,7 @@ def n2n_predict_with_covariates(
         axis=1,
     )
 
-    missing_count = int(exogenous_features.isnull().sum().sum())
+    missing_count = exogenous_features.isnull().sum().sum()
     if missing_count != 0:
         raise ValueError(
             f"Missing values in exogenous features: {missing_count} missing entries"
