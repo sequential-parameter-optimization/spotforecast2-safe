@@ -139,6 +139,47 @@ class BaseFold:
     ) -> None:
         """
         Validate all input parameters to ensure correctness.
+
+        Args:
+            cv_name (str):
+            steps (int | None):
+            initial_train_size (int | str | pd.Timestamp | None):
+            fold_stride (int | None):
+            window_size (int | None):
+            differentiation (int | None):
+            refit (bool | int):
+            fixed_train_size (bool):
+            gap (int):
+            skip_folds (int | list[int] | None):
+            allow_incomplete_fold (bool):
+            return_all_indexes (bool):
+            verbose (bool):
+            **kwargs:
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If any of the input parameters are invalid.
+
+        Examples:
+            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
+            >>> cv = TimeSeriesFold(steps=1)
+            >>> cv._validate_params(
+            ...     cv_name="TimeSeriesFold",
+            ...     steps=1,
+            ...     initial_train_size=1,
+            ...     fold_stride=1,
+            ...     window_size=1,
+            ...     differentiation=1,
+            ...     refit=False,
+            ...     fixed_train_size=True,
+            ...     gap=0,
+            ...     skip_folds=None,
+            ...     allow_incomplete_fold=True,
+            ...     return_all_indexes=False,
+            ...     verbose=True,
+            ... )
         """
 
         if cv_name == "TimeSeriesFold":
