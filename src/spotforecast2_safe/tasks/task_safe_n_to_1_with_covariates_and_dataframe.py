@@ -65,20 +65,21 @@ from spotforecast2_safe.manager.tools import _parse_bool
 # - They are defined as a named constant (rather than inline) to make it clear
 #   what is being tuned and to avoid unexplained "magic numbers" in the code.
 DEFAULT_WEIGHTS: List[float] = [
-    1.0,
-    1.0,
-    -1.0,
-    -1.0,
-    1.0,
-    -1.0,
-    1.0,
-    1.0,
-    1.0,
-    -1.0,
-    1.0,
+    1.0,   # Index 0 – weight for forecast component 0
+    1.0,   # Index 1 – weight for forecast component 1
+    -1.0,  # Index 2 – weight for forecast component 2
+    -1.0,  # Index 3 – weight for forecast component 3
+    1.0,   # Index 4 – weight for forecast component 4
+    -1.0,  # Index 5 – weight for forecast component 5
+    1.0,   # Index 6 – weight for forecast component 6
+    1.0,   # Index 7 – weight for forecast component 7
+    1.0,   # Index 8 – weight for forecast component 8
+    -1.0,  # Index 9 – weight for forecast component 9
+    1.0,   # Index 10 – weight for forecast component 10
 ]
 
-warnings.simplefilter("ignore")
+warnings.simplefilter("ignore", category=FutureWarning)
+warnings.simplefilter("ignore", category=UserWarning)
 
 
 def _mask_latitude(lat: float) -> str:
@@ -342,7 +343,7 @@ def n_to_1_with_covariates(
         >>> print(f"Model Metrics: {metrics}")
         >>> print(f"Feature Info: {features}")
     """
-    logger = logging.getLogger("task_safe_n_to_1")
+    logger = logging.getLogger(__name__)
 
     # Security: Mask sensitive coordinates immediately (CWE-532, CWE-312)
     # This prevents raw latitude/longitude from being accessed in logging contexts
@@ -428,8 +429,8 @@ def n_to_1_with_covariates(
         # SECURITY: Do not log any location data (even masked) to avoid CWE-532/CWE-312
         # Include only non-sensitive context information in the error message.
         logger.error(
-            "Forecasting failed: %s. Estimator: %s",
-            str(e),
+            "Forecasting failed during N-to-1 forecasting. Exception type: %s. Estimator: %s",
+            type(e).__name__,
             masked_estimator,
         )
         raise
@@ -512,7 +513,7 @@ def main(
             level=logging.INFO if verbose else logging.WARNING, log_dir=log_dir
         )
     else:
-        logger = logging.getLogger("task_safe_n_to_1")
+        logger = logging.getLogger(__name__)
         logger.addHandler(logging.NullHandler())
 
     if weights is None:
