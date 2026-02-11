@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 bartzbeielstein
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 # OpenSSF Scorecard Improvement Guide
 ## Steps 2-3: Branch Protection & GPG Signing
 
