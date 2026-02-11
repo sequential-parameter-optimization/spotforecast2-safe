@@ -2707,12 +2707,44 @@ matrix generates missing values. Most machine learning models do not accept
 missing values, so the Forecaster's <code>fit' and</code>predict' methods may fail.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>message</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The message to display.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">... </span>    <span class="s2">&quot;Missing values detected in input data.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">... </span>    <span class="n">MissingValuesWarning</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">... </span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotforecast2_safe.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingValuesWarning</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">... </span>    <span class="s2">&quot;Missing values detected in input data.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">... </span>    <span class="n">MissingValuesWarning</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -2748,7 +2780,11 @@ missing values, so the Forecaster's <code>fit' and</code>predict' methods may fa
 <span class="normal"><a href="#__codelineno-0-369">369</a></span>
 <span class="normal"><a href="#__codelineno-0-370">370</a></span>
 <span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="k">class</span><span class="w"> </span><span class="nc">MissingValuesWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+<span class="normal"><a href="#__codelineno-0-376">376</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="k">class</span><span class="w"> </span><span class="nc">MissingValuesWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Warning for missing values in data.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Used to indicate that there are missing values in the data. This</span>
@@ -2756,23 +2792,27 @@ missing values, so the Forecaster's <code>fit' and</code>predict' methods may fa
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    matrix generates missing values. Most machine learning models do not accept</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    missing values, so the Forecaster&#39;s `fit&#39; and `predict&#39; methods may fail.</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        &gt;&gt;&gt; import warnings</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        &gt;&gt;&gt; warnings.warn(</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        ...     &quot;Missing values detected in input data.&quot;,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        ...     MissingValuesWarning</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        ... )  # doctest: +SKIP</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">extra_message</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="s2">&quot;You can suppress this warning using: &quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="s2">&quot;warnings.simplefilter(&#39;ignore&#39;, category=MissingValuesWarning)&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="p">)</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span> <span class="o">+</span> <span class="n">extra_message</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        message (str): The message to display.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        &gt;&gt;&gt; import warnings</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.exceptions import MissingValuesWarning</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        &gt;&gt;&gt; warnings.warn(</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        ...     &quot;Missing values detected in input data.&quot;,</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        ...     MissingValuesWarning</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        ... )  # doctest: +SKIP</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="n">extra_message</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="s2">&quot;You can suppress this warning using: &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;warnings.simplefilter(&#39;ignore&#39;, category=MissingValuesWarning)&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span> <span class="o">+</span> <span class="n">extra_message</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
