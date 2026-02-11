@@ -51,6 +51,33 @@ from spotforecast2_safe.processing.n2n_predict_with_covariates import (
 from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.tools import _parse_bool
 
+# Default aggregation weights for the N-to-1 forecasting task.
+# 
+# The position of each value corresponds to a specific forecast component or
+# aggregation term used by `agg_predict`. Positive values increase the influence
+# of the corresponding component in the final aggregated forecast, whereas
+# negative values down-weight or invert the contribution of that component.
+# 
+# NOTE:
+# - These defaults are domain-specific and should be updated together with any
+#   changes to the aggregation logic or the ordering of components in
+#   `agg_predict`.
+# - They are defined as a named constant (rather than inline) to make it clear
+#   what is being tuned and to avoid unexplained "magic numbers" in the code.
+DEFAULT_WEIGHTS: List[float] = [
+    1.0,
+    1.0,
+    -1.0,
+    -1.0,
+    1.0,
+    -1.0,
+    1.0,
+    1.0,
+    1.0,
+    -1.0,
+    1.0,
+]
+
 warnings.simplefilter("ignore")
 
 
@@ -210,11 +237,11 @@ def n_to_1_with_covariates(
         weights (Optional[Union[Dict[str, float], List[float], np.ndarray]]):
             Weights for combining multi-output predictions.
             Can be:
-            - None: Default weights [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+            - None: Uses DEFAULT_WEIGHTS (see module-level constant for values)
             - Dict: {"col_name": weight, ...} for specific columns
             - List: [w1, w2, ...] in column order
             - np.ndarray: Same as list
-            Default: None (uses default weights).
+            Default: None (uses DEFAULT_WEIGHTS).
 
         verbose (bool): Enable progress logging.
             Prints intermediate results and timestamps.
@@ -324,7 +351,8 @@ def n_to_1_with_covariates(
 
     # Default weights if not provided
     if weights is None:
-        weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+        # Use documented default aggregation weights instead of inline magic numbers.
+        weights = DEFAULT_WEIGHTS
 
     if verbose:
         logger.info("=" * 80)
@@ -336,7 +364,8 @@ def n_to_1_with_covariates(
         logger.info(f"  Window Size: {window_size}")
         logger.info(f"  Lags: {lags}")
         logger.info(f"  Train Ratio: {train_ratio}")
-        # SECURITY: Do not log latitude/longitude (even masked) to avoid PII in logs (CWE-312, CWE-532)
+        # SECURITY: Never log latitude/longitude at all to avoid PII in logs (CWE-312, CWE-532).
+        #           Only a fixed redacted placeholder is written to the logs; no masking functions are used.
         logger.info("  Location: [REDACTED]")
         # Log timezone region only, not full timezone (security: CWE-532)
         logger.info(f"  Region: {country_code}-{state}")
@@ -467,7 +496,7 @@ def main(
         include_poly_features (bool): Toggle polynomial features. Default: False.
         verbose (bool): Toggle detailed logging. Default: False.
         weights (Optional[List[float]]): List of weights for prediction aggregation.
-            Default: [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0].
+            Default: DEFAULT_WEIGHTS.
         log_dir (Optional[Path]): Directory to save log files. If None, uses default path.
         logging_enabled (bool): Toggle overall logging (console and file). Default: False.
     """
@@ -486,7 +515,8 @@ def main(
         logger.addHandler(logging.NullHandler())
 
     if weights is None:
-        weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+        # Use a copy to avoid accidental mutation of the module-level default.
+        weights = DEFAULT_WEIGHTS.copy()
 
     data = fetch_data()
 
@@ -626,7 +656,7 @@ if __name__ == "__main__":
         "--weights",
         type=float,
         nargs="+",
-        default=[1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0],
+        default=DEFAULT_WEIGHTS,
         help="Space-separated list of weights for prediction aggregation.",
     )
     parser.add_argument(
