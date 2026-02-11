@@ -338,9 +338,7 @@ def n_to_1_with_covariates(
         logger.info(f"  Lags: {lags}")
         logger.info(f"  Train Ratio: {train_ratio}")
         # Log masked location data (pre-masked to exclude raw values from logging context)
-        logger.info(
-            f"  Location: {masked_latitude}, {masked_longitude}"
-        )
+        logger.info(f"  Location: {masked_latitude}, {masked_longitude}")
         # Log timezone region only, not full timezone (security: CWE-532)
         logger.info(f"  Region: {country_code}-{state}")
         # Log estimator type only, not configuration (security: CWE-532)
