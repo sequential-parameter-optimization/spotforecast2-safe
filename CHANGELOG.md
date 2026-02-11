@@ -1,3 +1,10 @@
+## [0.4.6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.5...v0.4.6) (2026-02-11)
+
+
+### Bug Fixes
+
+* reuse compliance ([ee91478](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ee9147811ab20671bd4be6dae165f4fadcada227))
+
 ## [0.4.5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.4...v0.4.5) (2026-02-11)
 
 
