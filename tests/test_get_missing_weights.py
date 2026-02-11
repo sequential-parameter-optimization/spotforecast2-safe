@@ -127,7 +127,7 @@ class TestGetMissingWeights:
         dates = pd.date_range("2020-01-01", periods=100, freq="D")
         data = create_test_data_with_gaps(dates, [10, 20])
 
-        imputed_data, missing_mask = get_missing_weights(
+        _,_ = get_missing_weights(
             data, window_size=72, verbose=True
         )
 

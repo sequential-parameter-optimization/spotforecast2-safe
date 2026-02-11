@@ -317,6 +317,12 @@ def n_to_1_with_covariates(
     """
     logger = logging.getLogger("task_safe_n_to_1")
 
+    # Security: Mask sensitive coordinates immediately (CWE-532, CWE-312)
+    # This prevents raw latitude/longitude from being accessed in logging contexts
+    masked_latitude = _mask_latitude(latitude)
+    masked_longitude = _mask_longitude(longitude)
+    masked_estimator = _mask_estimator(estimator)
+
     # Default weights if not provided
     if weights is None:
         weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
@@ -331,14 +337,14 @@ def n_to_1_with_covariates(
         logger.info(f"  Window Size: {window_size}")
         logger.info(f"  Lags: {lags}")
         logger.info(f"  Train Ratio: {train_ratio}")
-        # Log masked location data for INFO level (security: CWE-532, CWE-312)
+        # Log masked location data (pre-masked to exclude raw values from logging context)
         logger.info(
-            f"  Location: {_mask_latitude(latitude)}, {_mask_longitude(longitude)}"
+            f"  Location: {masked_latitude}, {masked_longitude}"
         )
         # Log timezone region only, not full timezone (security: CWE-532)
         logger.info(f"  Region: {country_code}-{state}")
         # Log estimator type only, not configuration (security: CWE-532)
-        logger.info(f"  Estimator: {_mask_estimator(estimator)}")
+        logger.info(f"  Estimator: {masked_estimator}")
         logger.info("  Feature Engineering:")
         logger.info(f"    - Weather Windows: {include_weather_windows}")
         logger.info(f"    - Holiday Features: {include_holiday_features}")
@@ -392,12 +398,12 @@ def n_to_1_with_covariates(
             **forecast_kwargs
         )
     except Exception as e:
-        # Log error without exposing sensitive parameters (CWE-532, CWE-312)
+        # Log error using pre-masked location data to exclude raw values from logging context
         logger.error(
             "Forecasting failed: %s. Location: %s, %s",
             str(e),
-            _mask_latitude(latitude),
-            _mask_longitude(longitude),
+            masked_latitude,
+            masked_longitude,
         )
         raise
 

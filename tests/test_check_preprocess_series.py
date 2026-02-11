@@ -375,7 +375,7 @@ class TestCheckPreprocessSeriesDataFrameLongFormat:
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            result_dict, result_indexes = check_preprocess_series(df)
+            _, _ = check_preprocess_series(df)
 
             # Should have two warnings: IgnoredArgumentWarning and InputTypeWarning
             assert len(w) == 2
