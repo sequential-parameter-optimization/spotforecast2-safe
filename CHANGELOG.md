@@ -1,3 +1,10 @@
+## [0.4.13](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.12...v0.4.13) (2026-02-11)
+
+
+### Bug Fixes
+
+* copilot ai  improvements ([d875319](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d875319c6250af7cd7bd849ed6ea942b6603ea97))
+
 ## [0.4.12](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.11...v0.4.12) (2026-02-11)
 
 
