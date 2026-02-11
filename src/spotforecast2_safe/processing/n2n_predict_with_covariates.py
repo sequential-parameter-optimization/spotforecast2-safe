@@ -738,6 +738,7 @@ def n2n_predict_with_covariates(
     # Set default model_dir if not provided
     if model_dir is None:
         from spotforecast2_safe.data.fetch_data import get_cache_home
+
         model_dir = get_cache_home() / "forecasters"
 
     # Input Validation

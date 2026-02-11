@@ -52,12 +52,12 @@ from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.tools import _parse_bool
 
 # Default aggregation weights for the N-to-1 forecasting task.
-# 
+#
 # The position of each value corresponds to a specific forecast component or
 # aggregation term used by `agg_predict`. Positive values increase the influence
 # of the corresponding component in the final aggregated forecast, whereas
 # negative values down-weight or invert the contribution of that component.
-# 
+#
 # NOTE:
 # - These defaults are domain-specific and should be updated together with any
 #   changes to the aggregation logic or the ordering of components in
