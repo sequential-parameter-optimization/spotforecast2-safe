@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.1...v0.4.2) (2026-02-11)
+
+
+### Bug Fixes
+
+* explicitly convert DataFrames to numpy arrays in fit_predict calls (CodeQL py/hash-unhashable-value) ([a9dc588](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a9dc588ce62684aaf8aa2aa11a563b0d8c7a74f2))
+
 ## [0.4.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.0...v0.4.1) (2026-02-11)
 
 
