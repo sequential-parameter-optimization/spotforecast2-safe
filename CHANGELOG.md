@@ -1,3 +1,10 @@
+## [0.5.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.5.0-rc.1...v0.5.0-rc.2) (2026-02-11)
+
+
+### Features
+
+* split_ts ([189d5ef](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/189d5ef9d54dadeaa8765127af124cab1bf4f420))
+
 ## [0.5.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.15...v0.5.0-rc.1) (2026-02-11)
 
 
