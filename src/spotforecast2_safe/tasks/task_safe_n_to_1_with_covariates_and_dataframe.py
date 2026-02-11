@@ -339,10 +339,10 @@ def n_to_1_with_covariates(
         logger.info(f"  Weights Type: {type(weights).__name__}")
         logger.info(f"{'=' * 80}")
 
-        # DEBUG level: detailed location data for troubleshooting (requires explicit DEBUG logging)
-        logger.debug(f"  [DETAILED] Timezone: {timezone}")
-        logger.debug(f"  [DETAILED] Precise Location: Lat={latitude}, Lon={longitude}")
-        logger.debug(f"  [DETAILED] Estimator object: {estimator}")
+        # SECURITY NOTE: Detailed location/timezone/estimator data intentionally NOT logged
+        # even at DEBUG level per CWE-312, CWE-532 to prevent PII exposure in log aggregation,
+        # crash dumps, or if DEBUG logs are accidentally enabled in production.
+        # Developers can inspect variables directly in code if needed.
 
     # --- Step 1: Multi-Output Recursive Forecasting with Covariates ---
     if verbose:
