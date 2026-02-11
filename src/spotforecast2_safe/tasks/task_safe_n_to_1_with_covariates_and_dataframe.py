@@ -657,7 +657,7 @@ if __name__ == "__main__":
         "--weights",
         type=float,
         nargs="+",
-        default=DEFAULT_WEIGHTS,
+        default=None,
         help="Space-separated list of weights for prediction aggregation.",
     )
     parser.add_argument(
