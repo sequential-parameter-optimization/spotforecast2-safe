@@ -352,7 +352,8 @@ def n_to_1_with_covariates(
     # Default weights if not provided
     if weights is None:
         # Use documented default aggregation weights instead of inline magic numbers.
-        weights = DEFAULT_WEIGHTS
+        # Use a copy to avoid accidental mutation of the module-level default.
+        weights = DEFAULT_WEIGHTS.copy()
 
     if verbose:
         logger.info("=" * 80)
