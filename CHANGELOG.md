@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.0...v0.4.1) (2026-02-11)
+
+
+### Bug Fixes
+
+* mask sensitive data in logging (CodeQL CWE-312, CWE-532, CWE-359) ([bc8238d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/bc8238df5f2105fefee7c865a676c8b4f006a07d))
+
 ## [0.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.9...v0.4.0) (2026-02-11)
 
 
