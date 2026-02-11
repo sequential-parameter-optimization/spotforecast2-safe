@@ -2422,7 +2422,7 @@ Default: True.</p>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fetching data from CSV...&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">TARGET</span><span class="p">)</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;data_in.csv&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">TARGET</span><span class="p">)</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_start_end</span><span class="p">(</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
@@ -3835,7 +3835,7 @@ SPOTFORECAST2_CACHE environment variable). Default: None.</p>
 <a id="__codelineno-0-771" name="__codelineno-0-771"></a>    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Fetching data from CSV...&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">)</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;data_in.csv&quot;</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">)</span>
 <a id="__codelineno-0-775" name="__codelineno-0-775"></a>    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-776" name="__codelineno-0-776"></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 <a id="__codelineno-0-777" name="__codelineno-0-777"></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Using provided dataframe...&quot;</span><span class="p">)</span>
