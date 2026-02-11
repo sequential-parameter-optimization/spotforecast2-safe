@@ -19,7 +19,6 @@ from spotforecast2_safe.manager.persistence import (
     _save_forecasters,
 )
 
-
 # ============================================================================
 # Fixtures
 # ============================================================================
@@ -158,7 +157,9 @@ class TestSaveForecasters:
         mock_dump.assert_called_once()
 
     @patch("spotforecast2_safe.manager.persistence.dump")
-    def test_save_multiple_forecasters(self, mock_dump, temp_model_dir, sample_forecasters):
+    def test_save_multiple_forecasters(
+        self, mock_dump, temp_model_dir, sample_forecasters
+    ):
         """Test saving multiple forecasters."""
         paths = _save_forecasters(sample_forecasters, temp_model_dir, verbose=False)
 
@@ -177,7 +178,9 @@ class TestSaveForecasters:
         assert new_dir.exists()
 
     @patch("spotforecast2_safe.manager.persistence.dump")
-    def test_save_returns_valid_paths(self, mock_dump, temp_model_dir, sample_forecasters):
+    def test_save_returns_valid_paths(
+        self, mock_dump, temp_model_dir, sample_forecasters
+    ):
         """Test that returned paths are valid."""
         paths = _save_forecasters(sample_forecasters, temp_model_dir, verbose=False)
 
@@ -186,7 +189,9 @@ class TestSaveForecasters:
             assert target in path.name
 
     @patch("spotforecast2_safe.manager.persistence.dump")
-    def test_overwrite_existing_models(self, mock_dump, temp_model_dir, mock_forecaster):
+    def test_overwrite_existing_models(
+        self, mock_dump, temp_model_dir, mock_forecaster
+    ):
         """Test that existing models can be overwritten."""
         forecasters = {"power": mock_forecaster}
 
@@ -194,12 +199,14 @@ class TestSaveForecasters:
         _save_forecasters(forecasters, temp_model_dir, verbose=False)
 
         # Save again
-        paths = _save_forecasters(forecasters, temp_model_dir, verbose=False)
+        _ = _save_forecasters(forecasters, temp_model_dir, verbose=False)
 
         assert mock_dump.call_count == 2
 
     @patch("spotforecast2_safe.manager.persistence.dump")
-    def test_verbose_output(self, mock_dump, temp_model_dir, sample_forecasters, capsys):
+    def test_verbose_output(
+        self, mock_dump, temp_model_dir, sample_forecasters, capsys
+    ):
         """Test verbose output during save."""
         _save_forecasters(sample_forecasters, temp_model_dir, verbose=True)
 
@@ -236,7 +243,9 @@ class TestLoadForecasters:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_load_single_forecaster(self, mock_load, mock_dump, temp_model_dir, mock_forecaster):
+    def test_load_single_forecaster(
+        self, mock_load, mock_dump, temp_model_dir, mock_forecaster
+    ):
         """Test loading a single forecaster."""
         # First save a model
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
@@ -254,7 +263,9 @@ class TestLoadForecasters:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_load_multiple_forecasters(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
+    def test_load_multiple_forecasters(
+        self, mock_load, mock_dump, temp_model_dir, sample_forecasters
+    ):
         """Test loading multiple forecasters."""
         # Save all models
         _save_forecasters(sample_forecasters, temp_model_dir, verbose=False)
@@ -284,7 +295,9 @@ class TestLoadForecasters:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_load_partial_models(self, mock_load, mock_dump, temp_model_dir, mock_forecaster):
+    def test_load_partial_models(
+        self, mock_load, mock_dump, temp_model_dir, mock_forecaster
+    ):
         """Test loading when only some models exist."""
         # Save only 'power' model
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
@@ -312,7 +325,9 @@ class TestLoadForecasters:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_verbose_output(self, mock_load, mock_dump, temp_model_dir, mock_forecaster, capsys):
+    def test_verbose_output(
+        self, mock_load, mock_dump, temp_model_dir, mock_forecaster, capsys
+    ):
         """Test verbose output during load."""
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
 
@@ -336,7 +351,9 @@ class TestLoadForecasters:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_string_path_input(self, mock_load, mock_dump, temp_model_dir, mock_forecaster):
+    def test_string_path_input(
+        self, mock_load, mock_dump, temp_model_dir, mock_forecaster
+    ):
         """Test that function accepts string paths."""
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
 
@@ -378,7 +395,10 @@ class TestModelDirectoryExists:
         # Note: Path.exists() returns True for files too, but we only care
         # that the function works. In actual use, _model_directory_exists
         # is checked before attempting to load/save, so this is fine.
-        assert _model_directory_exists(file_path) is True or _model_directory_exists(file_path) is False
+        assert (
+            _model_directory_exists(file_path) is True
+            or _model_directory_exists(file_path) is False
+        )
 
 
 # ============================================================================
@@ -391,7 +411,9 @@ class TestModelPersistenceIntegration:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_save_and_load_cycle(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
+    def test_save_and_load_cycle(
+        self, mock_load, mock_dump, temp_model_dir, sample_forecasters
+    ):
         """Test complete save and load cycle."""
         # Save models
         saved_paths = _save_forecasters(
@@ -415,7 +437,9 @@ class TestModelPersistenceIntegration:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_selective_model_training(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
+    def test_selective_model_training(
+        self, mock_load, mock_dump, temp_model_dir, sample_forecasters
+    ):
         """Test selective retraining of missing models."""
         # Save only some models
         partial_models = {"power": sample_forecasters["power"]}
@@ -434,7 +458,9 @@ class TestModelPersistenceIntegration:
 
     @patch("spotforecast2_safe.manager.persistence.dump")
     @patch("spotforecast2_safe.manager.persistence.load")
-    def test_concurrent_model_access(self, mock_load, mock_dump, temp_model_dir, sample_forecasters):
+    def test_concurrent_model_access(
+        self, mock_load, mock_dump, temp_model_dir, sample_forecasters
+    ):
         """Test that saved models can be accessed concurrently."""
         # Save models
         _save_forecasters(sample_forecasters, temp_model_dir, verbose=False)
@@ -475,7 +501,7 @@ class TestEdgeCases:
     def test_very_long_target_name(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test with very long target names."""
         long_name = "a" * 100
-        paths = _save_forecasters({long_name: mock_forecaster}, temp_model_dir)
+        _ = _save_forecasters({long_name: mock_forecaster}, temp_model_dir)
         assert mock_dump.called
 
     @patch("spotforecast2_safe.manager.persistence.dump")
@@ -502,5 +528,5 @@ class TestEdgeCases:
     def test_unicode_target_names(self, mock_dump, temp_model_dir, mock_forecaster):
         """Test with unicode characters in target names."""
         forecasters = {"energie": mock_forecaster}
-        paths = _save_forecasters(forecasters, temp_model_dir, verbose=False)
+        _ = _save_forecasters(forecasters, temp_model_dir, verbose=False)
         assert mock_dump.called

@@ -3,7 +3,10 @@ from unittest.mock import patch, MagicMock
 from spotforecast2_safe.processing.n2n_predict import n2n_predict
 
 
-@patch("spotforecast2_safe.processing.n2n_predict._model_directory_exists", return_value=False)
+@patch(
+    "spotforecast2_safe.processing.n2n_predict._model_directory_exists",
+    return_value=False,
+)
 @patch("spotforecast2_safe.manager.persistence.dump")
 @patch("spotforecast2_safe.manager.persistence.load")
 @patch("spotforecast2_safe.processing.n2n_predict.fetch_data")
@@ -86,7 +89,10 @@ def test_n2n_predict_flow(
     assert len(forecasters) == 2  # Should have forecasters for both columns
 
 
-@patch("spotforecast2_safe.processing.n2n_predict._model_directory_exists", return_value=False)
+@patch(
+    "spotforecast2_safe.processing.n2n_predict._model_directory_exists",
+    return_value=False,
+)
 @patch("spotforecast2_safe.manager.persistence.dump")
 @patch("spotforecast2_safe.manager.persistence.load")
 @patch("spotforecast2_safe.processing.n2n_predict.fetch_data")

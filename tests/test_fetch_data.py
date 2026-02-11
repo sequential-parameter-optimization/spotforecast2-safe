@@ -151,7 +151,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -178,7 +180,9 @@ class TestFetchData:
             mock_home.return_value = sample_csv.parent
 
             # Mock the Data.from_csv to return sample data
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame(
                     {
@@ -201,7 +205,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -218,7 +224,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -233,7 +241,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -248,7 +258,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -263,7 +275,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -280,7 +294,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -300,7 +316,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -326,7 +344,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 expected_df = pd.DataFrame({"col1": [1, 2, 3]})
                 mock_data.data = expected_df
@@ -342,7 +362,9 @@ class TestFetchData:
         with patch("spotforecast2_safe.data.fetch_data.get_data_home") as mock_home:
             mock_home.return_value = sample_csv.parent
 
-            with patch("spotforecast2_safe.data.fetch_data.Data.from_csv") as mock_from_csv:
+            with patch(
+                "spotforecast2_safe.data.fetch_data.Data.from_csv"
+            ) as mock_from_csv:
                 mock_data = MagicMock()
                 mock_data.data = pd.DataFrame()
                 mock_from_csv.return_value = mock_data
@@ -392,7 +414,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_returns_dataframe(self):
         """Test that fetch_holiday_data returns a pandas DataFrame."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_df = pd.DataFrame({"is_holiday": [0, 1, 0]})
             mock_create.return_value = mock_df
 
@@ -405,7 +429,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_default_parameters(self):
         """Test fetch_holiday_data with default parameters."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(start="2023-01-01T00:00", end="2023-01-10T00:00")
@@ -421,7 +447,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_custom_timezone(self):
         """Test fetch_holiday_data with custom timezone."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(
@@ -433,7 +461,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_custom_frequency(self):
         """Test fetch_holiday_data with custom frequency."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(
@@ -445,7 +475,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_custom_country_code(self):
         """Test fetch_holiday_data with custom country code."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(
@@ -457,7 +489,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_custom_state(self):
         """Test fetch_holiday_data with custom state."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(
@@ -469,7 +503,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_all_custom_parameters(self):
         """Test fetch_holiday_data with all custom parameters."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(
@@ -492,7 +528,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_with_timestamp_objects(self):
         """Test fetch_holiday_data with pd.Timestamp objects."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             start_ts = pd.Timestamp("2023-01-01")
@@ -506,7 +544,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_with_string_dates(self):
         """Test fetch_holiday_data with string dates."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             mock_create.return_value = pd.DataFrame()
 
             fetch_holiday_data(start="2023-01-01T00:00", end="2023-01-10T00:00")
@@ -517,7 +557,9 @@ class TestFetchHolidayData:
 
     def test_fetch_holiday_data_returns_correct_structure(self):
         """Test that fetch_holiday_data returns correctly structured data."""
-        with patch("spotforecast2_safe.data.fetch_data.create_holiday_df") as mock_create:
+        with patch(
+            "spotforecast2_safe.data.fetch_data.create_holiday_df"
+        ) as mock_create:
             expected_df = pd.DataFrame({"is_holiday": [0, 1, 0, 1, 0]})
             mock_create.return_value = expected_df
 

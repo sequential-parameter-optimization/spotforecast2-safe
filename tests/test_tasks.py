@@ -4,8 +4,7 @@
 """Tests for spotforecast2_safe task scripts."""
 
 import unittest
-from unittest.mock import MagicMock, patch
-import sys
+from unittest.mock import patch
 import tempfile
 from pathlib import Path
 
@@ -17,7 +16,7 @@ class TestTaskSafeDemo(unittest.TestCase):
 
     def test_main_returns_zero_on_success(self):
         """Test that main() returns 0 on successful execution."""
-        from spotforecast2_safe.tasks.task_safe_demo import main, DemoConfig
+        from spotforecast2_safe.tasks.task_safe_demo import main
 
         # Create temporary test data file
         with tempfile.TemporaryDirectory() as tmpdir:

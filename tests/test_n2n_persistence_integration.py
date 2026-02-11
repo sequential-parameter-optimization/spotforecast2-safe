@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ============================================================================
 # Fixtures
 # ============================================================================
@@ -109,7 +108,6 @@ class TestModelCachingBehavior:
         """Test basic load/save functionality."""
         from spotforecast2_safe.processing.n2n_predict_with_covariates import (
             _load_forecasters,
-            _save_forecasters,
         )
 
         # Try loading from empty dir
@@ -148,7 +146,6 @@ class TestPersistenceFunctions:
     def test_save_forecasters_with_patch(self, mock_dump, temp_model_dir):
         """Test _save_forecasters with mocked dump."""
         from spotforecast2_safe.manager.persistence import (
-            _load_forecasters,
             _save_forecasters,
         )
 
@@ -231,4 +228,3 @@ class TestFunctionDocumentation:
 
         for func in functions:
             assert func.__doc__ is not None, f"{func.__name__} has no docstring"
-

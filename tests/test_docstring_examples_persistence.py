@@ -9,14 +9,13 @@ and self-contained with all required imports.
 """
 
 import doctest
-import pytest
 
 from spotforecast2_safe.manager import persistence
 
 
 def test_ensure_model_dir_docstring_examples():
     """Test that _ensure_model_dir docstring examples are valid."""
-    results = doctest.testmod(
+    _ = doctest.testmod(
         persistence,
         verbose=False,
         optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
@@ -59,7 +58,6 @@ def test_get_model_filepath_example():
 def test_save_forecasters_example():
     """Validate _save_forecasters example is runnable."""
     import tempfile
-    from pathlib import Path
 
     from sklearn.linear_model import LinearRegression
 
@@ -81,7 +79,6 @@ def test_save_forecasters_example():
 def test_load_forecasters_example():
     """Validate _load_forecasters example is runnable."""
     import tempfile
-    from pathlib import Path
 
     from sklearn.linear_model import LinearRegression
 
@@ -111,7 +108,6 @@ def test_load_forecasters_example():
 def test_model_directory_exists_example():
     """Validate _model_directory_exists example is runnable."""
     import tempfile
-    from pathlib import Path
 
     from spotforecast2_safe.manager.persistence import _model_directory_exists
 

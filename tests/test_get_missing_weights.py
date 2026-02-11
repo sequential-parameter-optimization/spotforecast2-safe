@@ -8,7 +8,10 @@ recursive forecasting with sample weighting to penalize observations near gaps.
 import numpy as np
 import pandas as pd
 import pytest
-from spotforecast2_safe.preprocessing.imputation import get_missing_weights, custom_weights
+from spotforecast2_safe.preprocessing.imputation import (
+    get_missing_weights,
+    custom_weights,
+)
 
 
 def create_test_data_with_gaps(dates, gap_indices):
@@ -66,8 +69,7 @@ class TestGetMissingWeights:
         dates = pd.date_range("2020-01-01", periods=20, freq="D")
         data = pd.DataFrame(
             {
-                "value": [1, 2, np.nan, 4, 5, np.nan, np.nan, 8, 9, 10]
-                + [np.nan] * 10,
+                "value": [1, 2, np.nan, 4, 5, np.nan, np.nan, 8, 9, 10] + [np.nan] * 10,
                 "other": list(range(10)) + [np.nan] * 10,
             },
             index=dates,

@@ -139,7 +139,9 @@ def test_doc_example_create_train_X_y():
 
     assert isinstance(X_train, pd.DataFrame)
     assert isinstance(y_train, pd.Series)
-    assert feature_names == forecaster.lags_names + window_features_names + exog_names_out
+    assert (
+        feature_names == forecaster.lags_names + window_features_names + exog_names_out
+    )
     assert exog_names_in_ == exog_names_out
     assert exog_dtypes_in_ is not None
     assert exog_dtypes_out_ is not None
@@ -166,7 +168,9 @@ def test_doc_example_create_train_X_y_public():
 
     assert isinstance(X_train, pd.DataFrame)
     assert isinstance(y_train, pd.Series)
-    assert feature_names == forecaster.lags_names + window_features_names + exog_names_out
+    assert (
+        feature_names == forecaster.lags_names + window_features_names + exog_names_out
+    )
     assert exog_names_in_ == exog_names_out
     assert exog_dtypes_in_ is not None
     assert exog_dtypes_out_ is not None

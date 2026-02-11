@@ -1,7 +1,6 @@
-import os
-import pytest
 from unittest.mock import patch
 from spotforecast2_safe.forecaster.utils import select_n_jobs_fit_forecaster
+
 
 def test_select_n_jobs_fit_forecaster_returns_int():
     """
@@ -10,6 +9,7 @@ def test_select_n_jobs_fit_forecaster_returns_int():
     n_jobs = select_n_jobs_fit_forecaster("test_forecaster", None)
     assert isinstance(n_jobs, int)
     assert n_jobs >= 1
+
 
 @patch("os.cpu_count")
 def test_select_n_jobs_fit_forecaster_with_mocked_cpu_count(mock_cpu_count):
@@ -27,6 +27,7 @@ def test_select_n_jobs_fit_forecaster_with_mocked_cpu_count(mock_cpu_count):
     # Case: cpu_count returns 0 (edge case, fallback to 1)
     mock_cpu_count.return_value = 0
     assert select_n_jobs_fit_forecaster("test_forecaster", None) == 1
+
 
 def test_select_n_jobs_fit_forecaster_arguments_ignored():
     """

@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ============================================================================
 # Fixtures
 # ============================================================================
@@ -218,7 +217,10 @@ class TestSaveForecasters:
         assert "power" in captured.out
         assert "Saved" in captured.out
 
-    @patch("spotforecast2_safe.manager.persistence.dump", side_effect=OSError("Permission denied"))
+    @patch(
+        "spotforecast2_safe.manager.persistence.dump",
+        side_effect=OSError("Permission denied"),
+    )
     def test_save_failure_handling(self, mock_dump, temp_model_dir):
         """Test error handling for save failures."""
         from spotforecast2_safe.manager.persistence import _save_forecasters
@@ -266,7 +268,7 @@ class TestLoadForecasters:
         _save_forecasters({"power": mock_forecaster}, temp_model_dir, verbose=False)
 
         mock_load.return_value = mock_forecaster
-        forecasters, missing = _load_forecasters(["power"], temp_model_dir, verbose=False)
+        _, _ = _load_forecasters(["power"], temp_model_dir, verbose=False)
 
         # dump should have been called to save
         assert mock_dump.called
@@ -287,7 +289,7 @@ class TestLoadForecasters:
         _save_forecasters(forecasters_dict, temp_model_dir, verbose=False)
 
         mock_load.return_value = MagicMock()
-        forecasters, missing = _load_forecasters(
+        _, _ = _load_forecasters(
             ["power", "energy"],
             temp_model_dir,
             verbose=False,
@@ -452,7 +454,7 @@ class TestModelPersistenceIntegration:
         _save_forecasters(forecasters, temp_model_dir, verbose=False)
 
         mock_load.return_value = MagicMock()
-        loaded, missing = _load_forecasters(
+        _, _ = _load_forecasters(
             ["power", "energy"],
             temp_model_dir,
             verbose=False,
@@ -488,7 +490,6 @@ class TestModelPersistenceIntegration:
     def test_concurrent_model_access(self, mock_dump, mock_load, temp_model_dir):
         """Test handling multiple models simultaneously."""
         from spotforecast2_safe.manager.persistence import (
-            _load_forecasters,
             _save_forecasters,
         )
 

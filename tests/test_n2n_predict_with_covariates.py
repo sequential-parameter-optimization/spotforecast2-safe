@@ -7,20 +7,16 @@ Tests cover the main forecasting pipeline, helper functions, and edge cases.
 import numpy as np
 import pandas as pd
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     _apply_cyclical_encoding,
     _create_interaction_features,
     _get_calendar_features,
     _get_day_night_features,
-    _get_holiday_features,
-    _get_weather_features,
     _merge_data_and_covariates,
     _select_exogenous_features,
-    n2n_predict_with_covariates,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -33,8 +29,12 @@ def sample_time_series():
     dates = pd.date_range("2023-01-01", periods=500, freq="h", tz="UTC")
     data = pd.DataFrame(
         {
-            "power": np.sin(np.arange(500) * 0.1) * 100 + np.random.randn(500) * 5 + 200,
-            "demand": np.cos(np.arange(500) * 0.08) * 50 + np.random.randn(500) * 3 + 150,
+            "power": np.sin(np.arange(500) * 0.1) * 100
+            + np.random.randn(500) * 5
+            + 200,
+            "demand": np.cos(np.arange(500) * 0.08) * 50
+            + np.random.randn(500) * 3
+            + 150,
         },
         index=dates,
     )
@@ -216,7 +216,9 @@ class TestMainFunction:
     def test_parameter_validation(self):
         """Test that function accepts various parameter combinations."""
         # Test with various valid parameter combinations
-        with patch("spotforecast2_safe.processing.n2n_predict_with_covariates.fetch_data"):
+        with patch(
+            "spotforecast2_safe.processing.n2n_predict_with_covariates.fetch_data"
+        ):
             with patch(
                 "spotforecast2_safe.processing.n2n_predict_with_covariates.get_start_end"
             ):
@@ -349,7 +351,10 @@ class TestIntegration:
         formats = [
             ("2023-01-01", "2023-01-10"),
             (pd.Timestamp("2023-01-01"), pd.Timestamp("2023-01-10")),
-            (pd.Timestamp("2023-01-01", tz="UTC"), pd.Timestamp("2023-01-10", tz="UTC")),
+            (
+                pd.Timestamp("2023-01-01", tz="UTC"),
+                pd.Timestamp("2023-01-10", tz="UTC"),
+            ),
         ]
 
         for start, cov_end in formats:
