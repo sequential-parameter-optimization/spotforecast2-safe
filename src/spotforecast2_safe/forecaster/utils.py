@@ -1058,6 +1058,9 @@ def date_to_index_position(
     if method not in ["prediction", "validation"]:
         raise ValueError("`method` must be 'prediction' or 'validation'.")
 
+    # Initialize output to satisfy type checking; all code paths below must set it
+    output: int
+
     if isinstance(date_input, (str, pd.Timestamp)):
         if not isinstance(index, pd.DatetimeIndex):
             raise TypeError(
