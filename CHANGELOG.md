@@ -1,3 +1,10 @@
+## [0.4.9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.8...v0.4.9) (2026-02-11)
+
+
+### Bug Fixes
+
+* test with CodeQL ([1ce036e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1ce036e0c70097e31d4d29cf0712368d6f080155))
+
 ## [0.4.8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.7...v0.4.8) (2026-02-11)
 
 
