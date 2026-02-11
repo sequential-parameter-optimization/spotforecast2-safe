@@ -2424,7 +2424,7 @@ Default: True.</p>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fetching data from CSV...&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">fetch_data</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">TARGET</span><span class="p">)</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">START</span><span class="p">,</span> <span class="n">END</span><span class="p">,</span> <span class="n">COV_START</span><span class="p">,</span> <span class="n">COV_END</span> <span class="o">=</span> <span class="n">get_start_end</span><span class="p">(</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_start_end</span><span class="p">(</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="n">forecast_horizon</span><span class="o">=</span><span class="n">forecast_horizon</span><span class="p">,</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
@@ -3650,10 +3650,7 @@ SPOTFORECAST2_CACHE environment variable). Default: None.</p>
 <span class="normal"><a href="#__codelineno-0-1082">1082</a></span>
 <span class="normal"><a href="#__codelineno-0-1083">1083</a></span>
 <span class="normal"><a href="#__codelineno-0-1084">1084</a></span>
-<span class="normal"><a href="#__codelineno-0-1085">1085</a></span>
-<span class="normal"><a href="#__codelineno-0-1086">1086</a></span>
-<span class="normal"><a href="#__codelineno-0-1087">1087</a></span>
-<span class="normal"><a href="#__codelineno-0-1088">1088</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="k">def</span><span class="w"> </span><span class="nf">n2n_predict_with_covariates</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-1085">1085</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="k">def</span><span class="w"> </span><span class="nf">n2n_predict_with_covariates</span><span class="p">(</span>
 <a id="__codelineno-0-593" name="__codelineno-0-593"></a>    <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="n">forecast_horizon</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span><span class="p">,</span>
 <a id="__codelineno-0-595" name="__codelineno-0-595"></a>    <span class="n">contamination</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
@@ -4095,61 +4092,58 @@ SPOTFORECAST2_CACHE environment variable). Default: None.</p>
 <a id="__codelineno-0-1031" name="__codelineno-0-1031"></a>                <span class="n">model_dir</span><span class="o">=</span><span class="n">model_dir</span><span class="p">,</span>
 <a id="__codelineno-0-1032" name="__codelineno-0-1032"></a>                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
 <a id="__codelineno-0-1033" name="__codelineno-0-1033"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1034" name="__codelineno-0-1034"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1035" name="__codelineno-0-1035"></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-1036" name="__codelineno-0-1036"></a>                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ⚠ Model persistence disabled (weight_func cannot be pickled)&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1034" name="__codelineno-0-1034"></a>
+<a id="__codelineno-0-1035" name="__codelineno-0-1035"></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+<a id="__codelineno-0-1036" name="__codelineno-0-1036"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Total forecasters available: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">recursive_forecasters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-1037" name="__codelineno-0-1037"></a>
-<a id="__codelineno-0-1038" name="__codelineno-0-1038"></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-1039" name="__codelineno-0-1039"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Total forecasters available: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">recursive_forecasters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1040" name="__codelineno-0-1040"></a>
-<a id="__codelineno-0-1041" name="__codelineno-0-1041"></a>    <span class="c1"># ========================================================================</span>
-<a id="__codelineno-0-1042" name="__codelineno-0-1042"></a>    <span class="c1"># 10. PREDICTION</span>
-<a id="__codelineno-0-1043" name="__codelineno-0-1043"></a>    <span class="c1"># ========================================================================</span>
+<a id="__codelineno-0-1038" name="__codelineno-0-1038"></a>    <span class="c1"># ========================================================================</span>
+<a id="__codelineno-0-1039" name="__codelineno-0-1039"></a>    <span class="c1"># 10. PREDICTION</span>
+<a id="__codelineno-0-1040" name="__codelineno-0-1040"></a>    <span class="c1"># ========================================================================</span>
+<a id="__codelineno-0-1041" name="__codelineno-0-1041"></a>
+<a id="__codelineno-0-1042" name="__codelineno-0-1042"></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+<a id="__codelineno-0-1043" name="__codelineno-0-1043"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[9/9] Generating predictions...&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-1044" name="__codelineno-0-1044"></a>
-<a id="__codelineno-0-1045" name="__codelineno-0-1045"></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-1046" name="__codelineno-0-1046"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[9/9] Generating predictions...&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1047" name="__codelineno-0-1047"></a>
-<a id="__codelineno-0-1048" name="__codelineno-0-1048"></a>    <span class="n">exo_pred_subset</span> <span class="o">=</span> <span class="n">exo_pred</span><span class="p">[</span><span class="n">exog_features</span><span class="p">]</span>
-<a id="__codelineno-0-1049" name="__codelineno-0-1049"></a>
-<a id="__codelineno-0-1050" name="__codelineno-0-1050"></a>    <span class="n">predictions</span> <span class="o">=</span> <span class="n">predict_multivariate</span><span class="p">(</span>
-<a id="__codelineno-0-1051" name="__codelineno-0-1051"></a>        <span class="n">recursive_forecasters</span><span class="p">,</span>
-<a id="__codelineno-0-1052" name="__codelineno-0-1052"></a>        <span class="n">steps_ahead</span><span class="o">=</span><span class="n">forecast_horizon</span><span class="p">,</span>
-<a id="__codelineno-0-1053" name="__codelineno-0-1053"></a>        <span class="n">exog</span><span class="o">=</span><span class="n">exo_pred_subset</span><span class="p">,</span>
-<a id="__codelineno-0-1054" name="__codelineno-0-1054"></a>        <span class="n">show_progress</span><span class="o">=</span><span class="n">show_progress</span><span class="p">,</span>
-<a id="__codelineno-0-1055" name="__codelineno-0-1055"></a>    <span class="p">)</span>
-<a id="__codelineno-0-1056" name="__codelineno-0-1056"></a>
-<a id="__codelineno-0-1057" name="__codelineno-0-1057"></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-<a id="__codelineno-0-1058" name="__codelineno-0-1058"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Predictions shape: </span><span class="si">{</span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1059" name="__codelineno-0-1059"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
-<a id="__codelineno-0-1060" name="__codelineno-0-1060"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Forecasting completed successfully!&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
-<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a>
-<a id="__codelineno-0-1063" name="__codelineno-0-1063"></a>    <span class="c1"># ========================================================================</span>
-<a id="__codelineno-0-1064" name="__codelineno-0-1064"></a>    <span class="c1"># COMPILE METADATA</span>
-<a id="__codelineno-0-1065" name="__codelineno-0-1065"></a>    <span class="c1"># ========================================================================</span>
-<a id="__codelineno-0-1066" name="__codelineno-0-1066"></a>
-<a id="__codelineno-0-1067" name="__codelineno-0-1067"></a>    <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-1068" name="__codelineno-0-1068"></a>        <span class="s2">&quot;forecast_horizon&quot;</span><span class="p">:</span> <span class="n">forecast_horizon</span><span class="p">,</span>
-<a id="__codelineno-0-1069" name="__codelineno-0-1069"></a>        <span class="s2">&quot;target_columns&quot;</span><span class="p">:</span> <span class="n">target_columns</span><span class="p">,</span>
-<a id="__codelineno-0-1070" name="__codelineno-0-1070"></a>        <span class="s2">&quot;exog_features&quot;</span><span class="p">:</span> <span class="n">exog_features</span><span class="p">,</span>
-<a id="__codelineno-0-1071" name="__codelineno-0-1071"></a>        <span class="s2">&quot;n_exog_features&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">exog_features</span><span class="p">),</span>
-<a id="__codelineno-0-1072" name="__codelineno-0-1072"></a>        <span class="s2">&quot;train_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_train</span><span class="p">),</span>
-<a id="__codelineno-0-1073" name="__codelineno-0-1073"></a>        <span class="s2">&quot;val_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_val</span><span class="p">),</span>
-<a id="__codelineno-0-1074" name="__codelineno-0-1074"></a>        <span class="s2">&quot;test_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_test</span><span class="p">),</span>
-<a id="__codelineno-0-1075" name="__codelineno-0-1075"></a>        <span class="s2">&quot;data_shape_original&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-<a id="__codelineno-0-1076" name="__codelineno-0-1076"></a>        <span class="s2">&quot;data_shape_merged&quot;</span><span class="p">:</span> <span class="n">data_with_exog</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-<a id="__codelineno-0-1077" name="__codelineno-0-1077"></a>        <span class="s2">&quot;training_end&quot;</span><span class="p">:</span> <span class="n">end_validation</span><span class="p">,</span>
-<a id="__codelineno-0-1078" name="__codelineno-0-1078"></a>        <span class="s2">&quot;prediction_start&quot;</span><span class="p">:</span> <span class="n">exo_pred</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-1079" name="__codelineno-0-1079"></a>        <span class="s2">&quot;prediction_end&quot;</span><span class="p">:</span> <span class="n">exo_pred</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-<a id="__codelineno-0-1080" name="__codelineno-0-1080"></a>        <span class="s2">&quot;lags&quot;</span><span class="p">:</span> <span class="n">lags</span><span class="p">,</span>
-<a id="__codelineno-0-1081" name="__codelineno-0-1081"></a>        <span class="s2">&quot;window_size&quot;</span><span class="p">:</span> <span class="n">window_size</span><span class="p">,</span>
-<a id="__codelineno-0-1082" name="__codelineno-0-1082"></a>        <span class="s2">&quot;contamination&quot;</span><span class="p">:</span> <span class="n">contamination</span><span class="p">,</span>
-<a id="__codelineno-0-1083" name="__codelineno-0-1083"></a>        <span class="s2">&quot;n_outliers&quot;</span><span class="p">:</span> <span class="p">(</span>
-<a id="__codelineno-0-1084" name="__codelineno-0-1084"></a>            <span class="n">outliers</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outliers</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span>
-<a id="__codelineno-0-1085" name="__codelineno-0-1085"></a>        <span class="p">),</span>
-<a id="__codelineno-0-1086" name="__codelineno-0-1086"></a>    <span class="p">}</span>
-<a id="__codelineno-0-1087" name="__codelineno-0-1087"></a>
-<a id="__codelineno-0-1088" name="__codelineno-0-1088"></a>    <span class="k">return</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">recursive_forecasters</span>
+<a id="__codelineno-0-1045" name="__codelineno-0-1045"></a>    <span class="n">exo_pred_subset</span> <span class="o">=</span> <span class="n">exo_pred</span><span class="p">[</span><span class="n">exog_features</span><span class="p">]</span>
+<a id="__codelineno-0-1046" name="__codelineno-0-1046"></a>
+<a id="__codelineno-0-1047" name="__codelineno-0-1047"></a>    <span class="n">predictions</span> <span class="o">=</span> <span class="n">predict_multivariate</span><span class="p">(</span>
+<a id="__codelineno-0-1048" name="__codelineno-0-1048"></a>        <span class="n">recursive_forecasters</span><span class="p">,</span>
+<a id="__codelineno-0-1049" name="__codelineno-0-1049"></a>        <span class="n">steps_ahead</span><span class="o">=</span><span class="n">forecast_horizon</span><span class="p">,</span>
+<a id="__codelineno-0-1050" name="__codelineno-0-1050"></a>        <span class="n">exog</span><span class="o">=</span><span class="n">exo_pred_subset</span><span class="p">,</span>
+<a id="__codelineno-0-1051" name="__codelineno-0-1051"></a>        <span class="n">show_progress</span><span class="o">=</span><span class="n">show_progress</span><span class="p">,</span>
+<a id="__codelineno-0-1052" name="__codelineno-0-1052"></a>    <span class="p">)</span>
+<a id="__codelineno-0-1053" name="__codelineno-0-1053"></a>
+<a id="__codelineno-0-1054" name="__codelineno-0-1054"></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+<a id="__codelineno-0-1055" name="__codelineno-0-1055"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Predictions shape: </span><span class="si">{</span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1056" name="__codelineno-0-1056"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+<a id="__codelineno-0-1057" name="__codelineno-0-1057"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Forecasting completed successfully!&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1058" name="__codelineno-0-1058"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+<a id="__codelineno-0-1059" name="__codelineno-0-1059"></a>
+<a id="__codelineno-0-1060" name="__codelineno-0-1060"></a>    <span class="c1"># ========================================================================</span>
+<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>    <span class="c1"># COMPILE METADATA</span>
+<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a>    <span class="c1"># ========================================================================</span>
+<a id="__codelineno-0-1063" name="__codelineno-0-1063"></a>
+<a id="__codelineno-0-1064" name="__codelineno-0-1064"></a>    <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-1065" name="__codelineno-0-1065"></a>        <span class="s2">&quot;forecast_horizon&quot;</span><span class="p">:</span> <span class="n">forecast_horizon</span><span class="p">,</span>
+<a id="__codelineno-0-1066" name="__codelineno-0-1066"></a>        <span class="s2">&quot;target_columns&quot;</span><span class="p">:</span> <span class="n">target_columns</span><span class="p">,</span>
+<a id="__codelineno-0-1067" name="__codelineno-0-1067"></a>        <span class="s2">&quot;exog_features&quot;</span><span class="p">:</span> <span class="n">exog_features</span><span class="p">,</span>
+<a id="__codelineno-0-1068" name="__codelineno-0-1068"></a>        <span class="s2">&quot;n_exog_features&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">exog_features</span><span class="p">),</span>
+<a id="__codelineno-0-1069" name="__codelineno-0-1069"></a>        <span class="s2">&quot;train_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_train</span><span class="p">),</span>
+<a id="__codelineno-0-1070" name="__codelineno-0-1070"></a>        <span class="s2">&quot;val_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_val</span><span class="p">),</span>
+<a id="__codelineno-0-1071" name="__codelineno-0-1071"></a>        <span class="s2">&quot;test_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_test</span><span class="p">),</span>
+<a id="__codelineno-0-1072" name="__codelineno-0-1072"></a>        <span class="s2">&quot;data_shape_original&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+<a id="__codelineno-0-1073" name="__codelineno-0-1073"></a>        <span class="s2">&quot;data_shape_merged&quot;</span><span class="p">:</span> <span class="n">data_with_exog</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+<a id="__codelineno-0-1074" name="__codelineno-0-1074"></a>        <span class="s2">&quot;training_end&quot;</span><span class="p">:</span> <span class="n">end_validation</span><span class="p">,</span>
+<a id="__codelineno-0-1075" name="__codelineno-0-1075"></a>        <span class="s2">&quot;prediction_start&quot;</span><span class="p">:</span> <span class="n">exo_pred</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-1076" name="__codelineno-0-1076"></a>        <span class="s2">&quot;prediction_end&quot;</span><span class="p">:</span> <span class="n">exo_pred</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-0-1077" name="__codelineno-0-1077"></a>        <span class="s2">&quot;lags&quot;</span><span class="p">:</span> <span class="n">lags</span><span class="p">,</span>
+<a id="__codelineno-0-1078" name="__codelineno-0-1078"></a>        <span class="s2">&quot;window_size&quot;</span><span class="p">:</span> <span class="n">window_size</span><span class="p">,</span>
+<a id="__codelineno-0-1079" name="__codelineno-0-1079"></a>        <span class="s2">&quot;contamination&quot;</span><span class="p">:</span> <span class="n">contamination</span><span class="p">,</span>
+<a id="__codelineno-0-1080" name="__codelineno-0-1080"></a>        <span class="s2">&quot;n_outliers&quot;</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-1081" name="__codelineno-0-1081"></a>            <span class="n">outliers</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outliers</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span>
+<a id="__codelineno-0-1082" name="__codelineno-0-1082"></a>        <span class="p">),</span>
+<a id="__codelineno-0-1083" name="__codelineno-0-1083"></a>    <span class="p">}</span>
+<a id="__codelineno-0-1084" name="__codelineno-0-1084"></a>
+<a id="__codelineno-0-1085" name="__codelineno-0-1085"></a>    <span class="k">return</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">recursive_forecasters</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
