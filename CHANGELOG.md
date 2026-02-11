@@ -1,3 +1,10 @@
+## [0.4.14](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.13...v0.4.14) (2026-02-11)
+
+
+### Bug Fixes
+
+* correct codecov action parameter from file to files ([df427e7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/df427e71b6ddb4a58631eb9b9dd695bc28e9c7ca))
+
 ## [0.4.13](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.12...v0.4.13) (2026-02-11)
 
 
