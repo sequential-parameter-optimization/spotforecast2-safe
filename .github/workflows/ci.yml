@@ -103,8 +103,10 @@ jobs:
       
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.13'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: sequential-parameter-optimization/spotforecast2-safe
           file: ./coverage.xml
           fail_ci_if_error: false
 

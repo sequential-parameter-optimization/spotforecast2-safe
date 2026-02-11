@@ -20,8 +20,8 @@
 [![Documentation](https://img.shields.io/badge/docs-passing-brightgreen)](https://sequential-parameter-optimization.github.io/spotforecast2-safe/)
 [![GitHub Release](https://img.shields.io/github/v/release/sequential-parameter-optimization/spotforecast2-safe)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/releases)
 [![Reliability](https://img.shields.io/badge/robustness-fail--safe-orange)](MODEL_CARD.md)
-[![codecov](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe/branch/main/graph/badge.svg)](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe)
 [![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/sequential-parameter-optimization/spotforecast2-safe)](https://scorecard.dev/viewer/?uri=github.com/sequential-parameter-optimization/spotforecast2-safe)
+[![codecov](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe/branch/main/graph/badge.svg)](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe)
 
 
 **Status**
