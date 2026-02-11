@@ -1,3 +1,16 @@
+## [0.4.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.3...v0.4.4) (2026-02-11)
+
+
+### Bug Fixes
+
+* test_ ([55a2ce3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/55a2ce340b90e400dfb6087d0e91b833cc2cc226))
+
+
+### Documentation
+
+* Add local CodeQL analysis guide for VS Code ([3cb4c7b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3cb4c7b6cec326481f8063d8bdc5498af69699fb))
+* cleanup ([9b00e9e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9b00e9e40dfb2337a2968b7dd5c1e00d5888fd09))
+
 ## [0.4.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.2...v0.4.3) (2026-02-11)
 
 
