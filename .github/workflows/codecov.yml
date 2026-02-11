@@ -10,15 +10,16 @@ on:
       - main
       - develop
 
-# Principle of Least Privilege
-permissions:
-  contents: read
-  id-token: write
+# Principle of Least Privilege: Base permissions are read-only
+permissions: read-all
 
 jobs:
   test:
     name: Run tests and collect coverage
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -11,8 +11,7 @@ on:
       - develop
 
 # Principle of Least Privilege: Base permissions are read-only
-permissions:
-  contents: read
+permissions: read-all
 
 jobs:
   codeql:
@@ -58,6 +57,8 @@ jobs:
   reuse:
     name: REUSE Compliance
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code

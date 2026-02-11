@@ -10,13 +10,15 @@ on:
       - 'src/spotforecast2_safe/**'
   workflow_dispatch:
 
-permissions:
-  contents: write
+# Principle of Least Privilege: Base permissions are read-only
+permissions: read-all
 
 jobs:
   deploy-docs:
     name: Deploy Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout code
