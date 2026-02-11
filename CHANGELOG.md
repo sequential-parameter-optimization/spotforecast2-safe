@@ -1,3 +1,40 @@
+## [0.3.9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.8...v0.3.9) (2026-02-09)
+
+
+### Bug Fixes
+
+* data path for entsoe ([4dc3a1d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4dc3a1df4fb223e16a087f187635fa5811c96d2a))
+
+## [0.3.8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.7...v0.3.8) (2026-02-09)
+
+
+### Bug Fixes
+
+* trainer accepts country info ([1c5aef4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1c5aef4f626c082e1f1090507da65fba297231ed))
+* trainer for entsoe ([029f8d6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/029f8d6388b8c795e112f5770b2e0fb6f78223c0))
+
+## [0.3.7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.6...v0.3.7) (2026-02-09)
+
+
+### Bug Fixes
+
+* predictor.py ([001c953](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/001c95352fcfcad06ce571789185bfda5f1d9d3d))
+
+## [0.3.6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.5...v0.3.6) (2026-02-09)
+
+
+### Bug Fixes
+
+* tests trainer ([7cf52ff](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7cf52ff57f42dfa588038a9c93871601feade361))
+* trainer accepts end_dev arg ([cb8099e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cb8099e707c5e73fa4f1977896f1c23aef342d71))
+
+## [0.3.5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.4...v0.3.5) (2026-02-09)
+
+
+### Code Refactoring
+
+* exog in _safe completed ([a724fa9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a724fa9fb154b3645a7f970652d51fd5acfcc8e7))
+
 ## [0.3.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.3.3...v0.3.4) (2026-02-08)
 
 

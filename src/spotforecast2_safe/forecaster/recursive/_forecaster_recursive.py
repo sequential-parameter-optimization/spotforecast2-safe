@@ -36,7 +36,8 @@ from spotforecast2_safe.forecaster.utils import (
     initialize_estimator,
     transform_numpy,
 )
-from spotforecast2_safe import __version__
+
+# from spotforecast2_safe import __version__  # Removed to avoid circular import
 
 
 class ForecasterRecursive(ForecasterBase):
@@ -221,7 +222,12 @@ class ForecasterRecursive(ForecasterBase):
         self.creation_date = pd.Timestamp.today().strftime("%Y-%m-%d %H:%M:%S")
         self.is_fitted = False
         self.fit_date = None
-        self.spotforecast_version = __version__
+        try:
+            from spotforecast2_safe import __version__
+
+            self.spotforecast_version = __version__
+        except ImportError:
+            self.spotforecast_version = "unknown"
         self.python_version = sys.version.split(" ")[0]
         self.forecaster_id = forecaster_id
         self._probabilistic_mode = "binned"

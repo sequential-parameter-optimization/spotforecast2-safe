@@ -19,6 +19,14 @@ from .split import split_abs_train_val_test, split_rel_train_val_test
 from ._differentiator import TimeSeriesDifferentiator
 from ._binner import QuantileBinner
 from ._rolling import RollingFeatures
+from .repeating_basis_function import RepeatingBasisFunction
+from .exog_builder import ExogBuilder
+from .linearly_interpolate_ts import LinearlyInterpolateTS
+from .forecaster_recursive_model import (
+    ForecasterRecursiveModel,
+    ForecasterRecursiveLGBM,
+    ForecasterRecursiveXGB,
+)
 
 __all__ = [
     "get_start_end",
@@ -37,4 +45,10 @@ __all__ = [
     "TimeSeriesDifferentiator",
     "QuantileBinner",
     "RollingFeatures",
+    "RepeatingBasisFunction",
+    "ExogBuilder",
+    "LinearlyInterpolateTS",
+    "ForecasterRecursiveModel",
+    "ForecasterRecursiveLGBM",
+    "ForecasterRecursiveXGB",
 ]

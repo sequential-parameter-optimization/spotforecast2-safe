@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 def get_model_prediction(
-    model_name: str, model_dir: Optional[Union[str, Path]] = None
+    model_name: str,
+    model_dir: Optional[Union[str, Path]] = None,
+    predict_size: Optional[int] = None,
 ) -> Optional[Dict[str, Any]]:
     """
     Get the prediction package from the latest trained model.
@@ -28,6 +30,7 @@ def get_model_prediction(
         model_name: Name of the model to use (e.g., 'lgbm', 'xgb').
         model_dir: Directory where models are stored. If None, defaults to
             the library's cache home.
+        predict_size: Optional override for the prediction horizon.
 
     Returns:
         A dictionary containing predictions and metrics if a model is found and
@@ -124,12 +127,13 @@ def get_model_prediction(
         return None
 
     try:
-        prediction_package = model.package_prediction()
+        prediction_package = model.package_prediction(predict_size=predict_size)
         return prediction_package
     except Exception as e:
         logger.error(
             "Error occurred while generating prediction package for '%s': %s",
             model_name,
             e,
+            exc_info=True,
         )
         return None

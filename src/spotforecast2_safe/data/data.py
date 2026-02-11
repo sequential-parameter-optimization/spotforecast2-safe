@@ -5,7 +5,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import pandas as pd
 
@@ -58,6 +58,7 @@ class Data:
             ValueError: If the index is timezone-naive and no timezone is provided.
 
         Examples:
+            >>> from spotforecast2_safe.data import Data
             >>> data = Data.from_csv(
             ...     Path("data.csv"),
             ...     timezone="UTC",
@@ -131,3 +132,35 @@ class Data:
                 pass
 
         return cls(data=df)
+
+
+@dataclass
+class Period:
+    """Class abstraction for the information required to encode a period using RBF.
+
+    Attributes:
+        name: Name of the period (e.g., 'hour', 'day').
+        n_periods: Number of periods to encode (e.g., 24 for hours).
+        column: Name of the column in the DataFrame containing the period information.
+        input_range: Tuple of (min, max) values for the period (e.g., (0, 23) for hours).
+
+    Examples:
+        >>> from spotforecast2_safe.data import Period
+        >>> period = Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))
+        >>> period.name
+        'hour'
+    """
+
+    name: str
+    n_periods: int
+    column: str
+    input_range: Tuple[int, int]
+
+    def __post_init__(self):
+        """Validate the period configuration."""
+        if self.n_periods <= 0:
+            raise ValueError(f"n_periods must be positive, got {self.n_periods}")
+        if self.input_range[0] >= self.input_range[1]:
+            raise ValueError(
+                f"input_range[0] must be less than input_range[1], got {self.input_range}"
+            )
