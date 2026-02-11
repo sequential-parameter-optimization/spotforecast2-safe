@@ -54,6 +54,58 @@ from spotforecast2_safe.manager.tools import _parse_bool
 warnings.simplefilter("ignore")
 
 
+def _mask_latitude(lat: float) -> str:
+    """Mask latitude to 1 decimal place for safe logging (security: CWE-532, CWE-312).
+
+    Geographic precision beyond 1 decimal (~11km) is considered sensitive PII.
+    This function rounds coordinates for INFO-level logging.
+
+    Args:
+        lat: Latitude value to mask.
+
+    Returns:
+        Masked latitude string representation (e.g., "51.5°N").
+    """
+    masked = round(lat, 1)
+    direction = "N" if masked >= 0 else "S"
+    return f"{abs(masked)}°{direction}"
+
+
+def _mask_longitude(lon: float) -> str:
+    """Mask longitude to 1 decimal place for safe logging (security: CWE-532, CWE-312).
+
+    Geographic precision beyond 1 decimal (~11km) is considered sensitive PII.
+    This function rounds coordinates for INFO-level logging.
+
+    Args:
+        lon: Longitude value to mask.
+
+    Returns:
+        Masked longitude string representation (e.g., "7.5°E").
+    """
+    masked = round(lon, 1)
+    direction = "E" if masked >= 0 else "W"
+    return f"{abs(masked)}°{direction}"
+
+
+def _mask_estimator(estimator: Any) -> str:
+    """Mask estimator details for safe logging (security: CWE-532).
+
+    Logs estimator type but not configuration to avoid exposing model details.
+
+    Args:
+        estimator: Estimator object or name.
+
+    Returns:
+        Safe string representation of estimator type.
+    """
+    if estimator is None:
+        return "LGBMRegressor (default)"
+    if isinstance(estimator, str):
+        return estimator
+    return type(estimator).__name__
+
+
 def n_to_1_with_covariates(
     data: Optional[pd.DataFrame] = None,
     forecast_horizon: int = 24,
@@ -272,16 +324,25 @@ def n_to_1_with_covariates(
         logger.info(f"  Window Size: {window_size}")
         logger.info(f"  Lags: {lags}")
         logger.info(f"  Train Ratio: {train_ratio}")
-        logger.info(f"  Location: Lat={latitude}, Lon={longitude}")
-        logger.info(f"  Timezone: {timezone}")
-        logger.info(f"  Country Code: {country_code}, State: {state}")
-        logger.info(f"  Estimator: {estimator}")
+        # Log masked location data for INFO level (security: CWE-532, CWE-312)
+        logger.info(
+            f"  Location: {_mask_latitude(latitude)}, {_mask_longitude(longitude)}"
+        )
+        # Log timezone region only, not full timezone (security: CWE-532)
+        logger.info(f"  Region: {country_code}-{state}")
+        # Log estimator type only, not configuration (security: CWE-532)
+        logger.info(f"  Estimator: {_mask_estimator(estimator)}")
         logger.info("  Feature Engineering:")
         logger.info(f"    - Weather Windows: {include_weather_windows}")
         logger.info(f"    - Holiday Features: {include_holiday_features}")
         logger.info(f"    - Polynomial Features: {include_poly_features}")
         logger.info(f"  Weights Type: {type(weights).__name__}")
         logger.info(f"{'=' * 80}")
+
+        # DEBUG level: detailed location data for troubleshooting (requires explicit DEBUG logging)
+        logger.debug(f"  [DETAILED] Timezone: {timezone}")
+        logger.debug(f"  [DETAILED] Precise Location: Lat={latitude}, Lon={longitude}")
+        logger.debug(f"  [DETAILED] Estimator object: {estimator}")
 
     # --- Step 1: Multi-Output Recursive Forecasting with Covariates ---
     if verbose:
