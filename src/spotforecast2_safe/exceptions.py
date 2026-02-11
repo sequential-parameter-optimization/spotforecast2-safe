@@ -353,18 +353,22 @@ class MissingValuesWarning(UserWarning):
     matrix generates missing values. Most machine learning models do not accept
     missing values, so the Forecaster's `fit' and `predict' methods may fail.
 
+    Args:
+        message (str): The message to display.
+
     Examples:
         >>> import warnings
+        >>> from spotforecast2_safe.exceptions import MissingValuesWarning
         >>> warnings.warn(
         ...     "Missing values detected in input data.",
         ...     MissingValuesWarning
         ... )  # doctest: +SKIP
     """
 
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
         extra_message = (
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=MissingValuesWarning)"
