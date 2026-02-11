@@ -219,8 +219,16 @@ class TimeSeriesFold(BaseFold):
     def __repr__(self) -> str:
         """Information displayed when printed.
 
+        Args:
+            None
+
         Returns:
             String representation of the TimeSeriesFold object.
+
+        Examples:
+            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
+            >>> cv = TimeSeriesFold(steps=1)
+            >>> print(cv)
         """
 
         info = (
