@@ -337,14 +337,15 @@ class TestErrorHandling:
 
     def test_invalid_forecast_horizon(self):
         """Test error handling for invalid forecast horizon."""
-        forecast_horizon = -1
+        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+            n2n_predict_with_covariates,
+        )
 
-        assert forecast_horizon < 0  # Invalid
+        with pytest.raises(ValueError):
+            n2n_predict_with_covariates(forecast_horizon=-1)
 
-        valid_horizon = 24
-        assert valid_horizon > 0  # Valid
-
-    def test_corrupted_prediction_shape(self):
+        with pytest.raises(ValueError):
+            n2n_predict_with_covariates(forecast_horizon=0)
         """Test handling of unexpected prediction shapes."""
         expected_shape = (24, 11)
         actual_shape = (24, 10)  # Missing one column
