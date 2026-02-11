@@ -35759,8 +35759,8 @@ print(position)</p>
 <a id="__codelineno-0-1058" name="__codelineno-0-1058"></a>    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">]:</span>
 <a id="__codelineno-0-1059" name="__codelineno-0-1059"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`method` must be &#39;prediction&#39; or &#39;validation&#39;.&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-1060" name="__codelineno-0-1060"></a>
-<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>    <span class="c1"># Initialize output to satisfy type checking; all code paths below must set it</span>
-<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a>    <span class="n">output</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>    <span class="c1"># Initialize output; will be set in all valid code paths below</span>
+<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a>    <span class="n">output</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <a id="__codelineno-0-1063" name="__codelineno-0-1063"></a>
 <a id="__codelineno-0-1064" name="__codelineno-0-1064"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">)):</span>
 <a id="__codelineno-0-1065" name="__codelineno-0-1065"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">):</span>
