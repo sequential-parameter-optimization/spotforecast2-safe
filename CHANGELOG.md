@@ -1,3 +1,10 @@
+## [0.4.11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.10...v0.4.11) (2026-02-11)
+
+
+### Bug Fixes
+
+* task_safe ([df8a316](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/df8a316f88ea27a46b975bf7633846e4b3f33012))
+
 ## [0.4.10](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.9...v0.4.10) (2026-02-11)
 
 
