@@ -398,12 +398,12 @@ def n_to_1_with_covariates(
             **forecast_kwargs
         )
     except Exception as e:
-        # Log error using pre-masked location data to exclude raw values from logging context
+        # SECURITY: Do not log any location data (even masked) to avoid CWE-532/CWE-312
+        # Include only non-sensitive context information in the error message.
         logger.error(
-            "Forecasting failed: %s. Location: %s, %s",
+            "Forecasting failed: %s. Estimator: %s",
             str(e),
-            masked_latitude,
-            masked_longitude,
+            masked_estimator,
         )
         raise
 
