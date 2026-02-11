@@ -1,3 +1,10 @@
+## [0.6.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.5.0...v0.6.0) (2026-02-11)
+
+
+### Features
+
+* split_base ([4d9b494](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4d9b494d28666ddfb1070509ee7f381cbc290caa))
+
 ## [0.5.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.4.15...v0.5.0) (2026-02-11)
 
 
