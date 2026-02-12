@@ -285,6 +285,7 @@ Before reporting a new issue, search the publicly available archives:
 - [Discussions Archive](https://github.com/sequential-parameter-optimization/spotforecast2-safe/discussions): Search community questions and answers for help with common tasks.
 
 If you don't find a solution, see the [Reporting Issues guide](contributing.md#reporting-issues) to submit a new bug report.
+For more help, see the project's [GitHub Issues](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues).
 
 ## See Also
 
