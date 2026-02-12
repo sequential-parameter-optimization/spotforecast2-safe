@@ -34,26 +34,27 @@
 
 ## Safety-Critical Design Goals
 
-`spotforecast2-safe` is a specialized Python library designed to **facilitate** time series forecasting in safety-critical production environments and embedded systems. 
+`spotforecast2-safe` is a specialized Python library designed to facilitate time series forecasting in safety-critical production environments and embedded systems.
 
-Unlike standard machine and dep learning libraries, it follows a strict **"Safety-First"** architecture by design. **However, users must independently verify that these features meet their specific regulatory requirements:**
+Unlike standard machine and deep learning libraries, it follows a strict Safety-First architecture by design. However, users must independently verify that these features meet their specific regulatory requirements:
 
-- **Zero Dead Code**: We aim to minimize the attack surface by excluding visualization and training logic.
-- **Deterministic Logic**: The algorithms are designed to be purely mathematical and deterministic.
-- **Fail-Safe Operation**: The system is designed to favor explicit errors over silent failures when encountering invalid data.
-- **EU AI Act Support**: The architecture supports transparency and data governance, helping users build compliant high-risk AI components.
+Zero Dead Code: We aim to minimize the attack surface by excluding visualization and training logic.
+Deterministic Logic: The algorithms are designed to be purely mathematical and deterministic.
+Fail-Safe Operation: The system is designed to favor explicit errors over silent failures when encountering invalid data.
+EU AI Act Support: The architecture supports transparency and data governance, helping users build compliant high-risk AI components.
+Compliance & Inventory Management: The package includes Common Platform Enumeration (CPE) identifiers for vulnerability tracking, SBOM generation, and supply chain disclosure. See [MODEL_CARD.md](MODEL_CARD.md) for the current CPE identifier.
 
-For a detailed technical overview of our safety mechanisms, see our **[MODEL_CARD.md](MODEL_CARD.md)**.
+For a detailed technical overview of our safety mechanisms, see [MODEL_CARD.md](MODEL_CARD.md).
 
 An extended version of this library with visualization and additional features is available at: [https://sequential-parameter-optimization.github.io/spotforecast2/](https://sequential-parameter-optimization.github.io/spotforecast2/)
 
-## ⚠️ Disclaimer & Liability
+## Disclaimer & Liability
 
-**IMPORTANT**: This software is provided "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. 
+IMPORTANT: This software is provided "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed.
 
 In no event shall the authors, copyright holders, or contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
-**The use of this software in safety-critical systems is at the sole risk of the user.**
+The use of this software in safety-critical systems is at the sole risk of the user.
 
 ## Attributions
 
