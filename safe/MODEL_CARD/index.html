@@ -1626,14 +1626,16 @@
 <h1 id="modelmethod-card-spotforecast2-safe">Model/Method Card: spotforecast2-safe</h1>
 <h2 id="1-system-details">1. System Details</h2>
 <ul>
-<li><strong>Name</strong>: spotforecast2-safe</li>
-<li><strong>Version</strong>: 0.0.6 (Safety Release with Extended Testing)</li>
-<li><strong>Type</strong>: Deterministic library for time series transformation and feature generation (Preprocessing).</li>
-<li><strong>License</strong>: BSD-3-Clause</li>
-<li><strong>Developers</strong>: bartzbeielstein</li>
-<li><strong>Repository</strong>: <a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe">https://github.com/sequential-parameter-optimization/spotforecast2-safe</a></li>
-<li><strong>Core Dependencies</strong>: <code>numpy</code>, <code>pandas</code> (Minimal Dependency Footprint).</li>
-<li><strong>Prohibited Dependencies</strong>: <code>plotly</code>, <code>matplotlib</code>, <code>spotoptim</code>, <code>optuna</code>, <code>torch</code>, <code>tensorflow</code>.</li>
+<li>Name: spotforecast2-safe</li>
+<li>Version: 0.8.0-rc.1</li>
+<li>Type: Deterministic library for time series transformation and feature generation (Preprocessing).</li>
+<li>License: AGPL-3.0-or-later</li>
+<li>Developers: bartzbeielstein</li>
+<li>Repository: https://github.com/sequential-parameter-optimization/spotforecast2-safe</li>
+<li>CPE Identifier (Wildcard): cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:<em>:</em>:<em>:</em>:<em>:</em>:<em>:</em></li>
+<li>CPE Identifier (Current Release): cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:<em>:</em>:<em>:</em>:<em>:</em>:*</li>
+<li>Core Dependencies: numpy, pandas (Minimal Dependency Footprint).</li>
+<li>Prohibited Dependencies: plotly, matplotlib, spotoptim, optuna, torch, tensorflow.</li>
 </ul>
 <h2 id="2-intended-use">2. Intended Use</h2>
 <h3 id="primary-use-cases">Primary Use Cases</h3>
@@ -1686,10 +1688,14 @@
 <li><strong>Memory Requirements</strong>: Creating the Lag matrix (N-to-1) can be memory-intensive for extremely large time series ($T &gt; 10^7$) as data is duplicated.</li>
 </ul>
 <h2 id="7-how-to-audit">7. How to Audit</h2>
-<p>For auditors who need to validate this package:
-1. Check <code>pyproject.toml</code> to confirm the absence of unsafe libraries.
-2. Run <code>pytest tests/</code> to verify the functional correctness of the matrix transformation.
-3. Check the hash values of input and output data to prove determinism.</p>
+<p>For auditors who need to validate this package:</p>
+<ol>
+<li>Check <code>pyproject.toml</code> to confirm the absence of unsafe libraries.</li>
+<li>Run <code>pytest tests/</code> to verify the functional correctness of the matrix transformation.</li>
+<li>Run <code>pytest tests/test_cpe.py</code> to verify CPE identifier generation for compliance and SBOM (Software Bill of Materials) tracking.</li>
+<li>Reference the CPE Identifier from Section 1 to include this package in vulnerability tracking systems and supply chain disclosure documents.</li>
+<li>Consult the get_cpe_identifier function in <code>src/spotforecast2_safe/utils/cpe.py</code> for CPE generation in automated workflows.</li>
+</ol>
 <h2 id="8-disclaimer-liability">8. Disclaimer &amp; Liability</h2>
 <p><strong>LIMITATION OF LIABILITY</strong>: While this library is designed with safety principles and deterministic logic in mind, it is provided "AS IS" without any warranties. The developers and contributors assume <strong>NO LIABILITY</strong> for any direct or indirect damages, system failures, or financial losses resulting from the use of this software. </p>
 <p>It is the sole responsibility of the system integrator to perform a full system-level safety validation (e.g., as per ISO 26262, IEC 61508, or the EU AI Act) before deploying this software in a production or safety-critical environment.</p>
