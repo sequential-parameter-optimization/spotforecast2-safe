@@ -2,14 +2,16 @@
 
 ## 1. System Details
 
-- **Name**: spotforecast2-safe
-- **Version**: 0.0.6 (Safety Release with Extended Testing)
-- **Type**: Deterministic library for time series transformation and feature generation (Preprocessing).
-- **License**: BSD-3-Clause
-- **Developers**: bartzbeielstein
-- **Repository**: [https://github.com/sequential-parameter-optimization/spotforecast2-safe](https://github.com/sequential-parameter-optimization/spotforecast2-safe)
-- **Core Dependencies**: `numpy`, `pandas` (Minimal Dependency Footprint).
-- **Prohibited Dependencies**: `plotly`, `matplotlib`, `spotoptim`, `optuna`, `torch`, `tensorflow`.
+- Name: spotforecast2-safe
+- Version: 0.8.0-rc.1
+- Type: Deterministic library for time series transformation and feature generation (Preprocessing).
+- License: AGPL-3.0-or-later
+- Developers: bartzbeielstein
+- Repository: https://github.com/sequential-parameter-optimization/spotforecast2-safe
+- CPE Identifier (Wildcard): cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*
+- CPE Identifier (Current Release): cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:*:*:*:*:*:*:*
+- Core Dependencies: numpy, pandas (Minimal Dependency Footprint).
+- Prohibited Dependencies: plotly, matplotlib, spotoptim, optuna, torch, tensorflow.
 
 ## 2. Intended Use
 ### Primary Use Cases
@@ -71,9 +73,13 @@ This package is designed to support the development of high-risk AI systems acco
 ## 7. How to Audit
 
 For auditors who need to validate this package:
+
 1. Check `pyproject.toml` to confirm the absence of unsafe libraries.
 2. Run `pytest tests/` to verify the functional correctness of the matrix transformation.
-3. Check the hash values of input and output data to prove determinism.
+3. Run `pytest tests/test_cpe.py` to verify CPE identifier generation for compliance and SBOM (Software Bill of Materials) tracking.
+4. Reference the CPE Identifier from Section 1 to include this package in vulnerability tracking systems and supply chain disclosure documents.
+5. Consult the get_cpe_identifier function in `src/spotforecast2_safe/utils/cpe.py` for CPE generation in automated workflows.
+
 
 ## 8. Disclaimer & Liability
 

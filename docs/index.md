@@ -15,6 +15,18 @@
 - 📊 [Model/Method Card](safe/MODEL_CARD.md)
 - 🚀 Current Version: **{{ version }}**
 
+## Software Identification (CPE)
+
+For vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:
+
+    cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*
+
+Current release identifier:
+
+    cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:{{ version }}:*:*:*:*:*:*:*
+
+See [Model/Method Card](safe/MODEL_CARD.md#1-system-details) for additional compliance details.
+
 ## Installation
 
 ```bash
