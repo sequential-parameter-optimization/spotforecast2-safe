@@ -1,9 +1,15 @@
-## [0.7.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.6.0...v0.7.0) (2026-02-12)
+## [0.8.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.7.0...v0.8.0-rc.1) (2026-02-12)
 
 
 ### Features
 
-* split ([#7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/7)) ([5d5f40b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5d5f40b9cb28c621fe36df00d8ef6465e7a46eca))
+* split_ts ([189d5ef](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/189d5ef9d54dadeaa8765127af124cab1bf4f420))
+* warnings ([7feeeb4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7feeeb4662ecd410afa6c7eee978398a8252f7c6))
+
+
+### Documentation
+
+* README restructured ([791e68e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/791e68e31053f9c4c9dc1a1226924d6a1d8a4ff3))
 
 ## [0.7.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.6.0...v0.7.0-rc.1) (2026-02-11)
 
