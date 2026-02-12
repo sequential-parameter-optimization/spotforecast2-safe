@@ -65,6 +65,16 @@ Many thanks to the [skforecast team](https://skforecast.org/0.20.0/more/about-sk
 
  Documentation (API) is available at: [https://sequential-parameter-optimization.github.io/spotforecast2-safe/](https://sequential-parameter-optimization.github.io/spotforecast2-safe/)
 
+## Contributing
+
+We welcome contributions to spotforecast2-safe! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide for details on:
+
+- Development setup and coding standards
+- Testing and documentation requirements
+- Commit message conventions
+- Pull request process
+- SPDX license header requirements
+
 ## License
 
 `spotforecast2-safe` software: [AGPL-3.0-or-later License](LICENSE)
