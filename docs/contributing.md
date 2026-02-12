@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2026 bartzbeielstein
-# SPDX-License-Identifier: AGPL-3.0-or-later
-
 # Contributing to spotforecast2-safe
 
 Thank you for your interest in contributing to spotforecast2-safe! This document provides guidelines and requirements for contributing to the project.
