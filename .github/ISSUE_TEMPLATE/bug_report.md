@@ -1,38 +1,61 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+about: Create a report to help us improve spotforecast2-safe
+title: '[BUG] '
+labels: 'bug'
 assignees: ''
 
 ---
 
-**Describe the bug**
+Thank you for reporting a bug! Please provide the following information to help us diagnose and fix the issue.
+
+## Describe the Bug
+
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Environment
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+- Python version: (e.g., 3.13.0)
+- spotforecast2-safe version: (e.g., 0.8.0)
+- Operating system: (e.g., macOS, Linux, Windows)
+- Installation method: (e.g., `pip install spotforecast2-safe` or `uv sync`)
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Steps to Reproduce
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+```python
+# Minimal code example that reproduces the issue
+from spotforecast2_safe import ...
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+# Your code here
+```
 
-**Additional context**
-Add any other context about the problem here.
+## Expected Behavior
+
+A clear description of what you expected to happen.
+
+## Actual Behavior
+
+What actually happened instead. Include:
+- Error message or traceback
+- Output or unexpected results
+
+## Error Output
+
+```
+Paste the full error message/traceback here:
+```
+
+## Additional Context
+
+Add any other context about the problem here:
+- Has this worked in a previous version?
+- Does this happen consistently or intermittently?
+- Any modifications to the code?
+
+## Checklist
+
+- [ ] I searched existing issues and discussions
+- [ ] I confirmed the bug persists in the latest version
+- [ ] I included steps to reproduce the issue
+- [ ] I am using Python 3.13 or later
+

@@ -41,6 +41,18 @@ uv sync
 uv run pytest tests/ -v
 ```
 
+### Building the Package
+
+To build the source and binary distributions (wheels):
+
+```bash
+# Using the standard build tool
+uv run python -m build
+
+# The artifacts will be in the dist/ directory
+ls -lah dist/
+```
+
 ## Coding Standards
 
 All contributions must adhere to the following standards:
@@ -223,13 +235,50 @@ Any changes that affect these properties must be clearly documented and justifie
 
 ## Reporting Issues
 
-Before reporting a bug:
+We use GitHub Issues for bug tracking and feature requests. This is the primary channel for reporting problems.
 
-1. Check existing issues to avoid duplicates
+GitHub Issues: https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues
+
+### Before Reporting a Bug
+
+1. Check [existing issues](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues) to avoid duplicates
 2. Run the latest version to confirm the bug persists
-3. Include reproduction steps, expected behavior, and actual behavior
+3. Verify you are using Python 3.13 or later
+4. Prepare a minimal reproducible example
 
-Security issues should not be reported in public issues. Email security concerns directly to bartzbeielstein.
+### What to Include in a Bug Report
+
+- Python version and OS
+- spotforecast2-safe version
+- Minimal code that reproduces the issue
+- Expected vs. actual behavior
+- Full error message/traceback
+
+Use the [Bug Report Template](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new?template=bug_report.md) when creating a new issue.
+
+### Public Issue Archive & Search
+
+All issues, reports, and community responses are maintained in a publicly searchable archive:
+
+- **Issues Archive**: https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues
+  - Browse all reported bugs, feature requests, and their resolutions
+  - Search by keywords, labels, or date
+  - View full discussion history and resolution details
+
+- **Discussions Archive**: https://github.com/sequential-parameter-optimization/spotforecast2-safe/discussions
+  - Community questions and answers
+  - Feature discussions
+  - Search across all past discussions
+
+This archive is maintained indefinitely and is fully searchable, allowing users to:
+- Find solutions to common problems
+- See how previous issues were resolved
+- Learn from community discussions
+- Verify if a bug has been reported before
+
+### Reporting Security Vulnerabilities
+
+Security issues should NOT be reported in public issues. See our [Security Policy](.github/SECURITY.md) for the proper reporting procedure.
 
 ## License
 
