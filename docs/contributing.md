@@ -41,6 +41,18 @@ uv sync
 uv run pytest tests/ -v
 ```
 
+### Building the Package
+
+To build the source and binary distributions (wheels):
+
+```bash
+# Using the standard build tool
+uv run python -m build
+
+# The artifacts will be in the dist/ directory
+ls -lah dist/
+```
+
 ## Coding Standards
 
 All contributions must adhere to the following standards:

@@ -279,11 +279,17 @@ For common issues and solutions:
 - Import errors: Verify the package is installed with `uv sync`
 - Version compatibility: Check you're using Python 3.13 or later
 
-For more help, see the project's [GitHub Issues](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues).
+Before reporting a new issue, search the publicly available archives:
+
+- [Issues Archive](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues): Browse all reported bugs, feature requests, and their resolutions. Use the search feature to find similar problems.
+- [Discussions Archive](https://github.com/sequential-parameter-optimization/spotforecast2-safe/discussions): Search community questions and answers for help with common tasks.
+
+If you don't find a solution, see the [Reporting Issues guide](contributing.md#reporting-issues) to submit a new bug report.
 
 ## See Also
 
 - [Complete API Reference](api/data.md)
 - [Model/Method Card](safe/MODEL_CARD.md)
+- [Security Policy](security.md) - Vulnerability reporting and security best practices
 - [Contributing Guide](contributing.md)
 - [GitHub Repository](https://github.com/sequential-parameter-optimization/spotforecast2-safe)
