@@ -8,13 +8,13 @@
 [![PyPI Version](https://img.shields.io/pypi/v/spotforecast2-safe)](https://pypi.org/project/spotforecast2-safe/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/spotforecast2-safe)](https://pypi.org/project/spotforecast2-safe/)
 [![Total Downloads](https://static.pepy.tech/badge/spotforecast2-safe)](https://pepy.tech/project/spotforecast2-safe)
-[![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Ready-success)](MODEL_CARD.md)
-[![Dependencies](https://img.shields.io/badge/dependencies-minimal-blue)](pyproject.toml)
-[![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](MODEL_CARD.md)
 [![License](https://img.shields.io/github/license/sequential-parameter-optimization/spotforecast2-safe)](LICENSE)
 
 **Testing & Quality**
 
+[![EU AI Act](https://img.shields.io/badge/EU%20AI%20Act-Ready-success)](MODEL_CARD.md)
+[![Dependencies](https://img.shields.io/badge/dependencies-minimal-blue)](pyproject.toml)
+[![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](MODEL_CARD.md)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/sequential-parameter-optimization/spotforecast2-safe/ci.yml?branch=main&label=Tests)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/actions/workflows/ci.yml)
 [![REUSE Compliance](https://img.shields.io/badge/REUSE-Compliant-brightgreen)](https://reuse.software/how-to-comply/)
 [![Documentation](https://img.shields.io/badge/docs-passing-brightgreen)](https://sequential-parameter-optimization.github.io/spotforecast2-safe/)
