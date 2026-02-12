@@ -16,7 +16,7 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-minimal-blue)](pyproject.toml)
 [![Audit](https://img.shields.io/badge/audit-whitebox-brightgreen)](MODEL_CARD.md)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/sequential-parameter-optimization/spotforecast2-safe/ci.yml?branch=main&label=Tests)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe/branch/main/graph/badge.svg)](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe)
+[![codecov](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe/branch/develop/graph/badge.svg)](https://codecov.io/gh/sequential-parameter-optimization/spotforecast2-safe)
 [![REUSE status](https://api.reuse.software/badge/github.com/sequential-parameter-optimization/spotforecast2-safe)](https://api.reuse.software/info/github.com/sequential-parameter-optimization/spotforecast2-safe)
 [![Documentation](https://img.shields.io/badge/docs-passing-brightgreen)](https://sequential-parameter-optimization.github.io/spotforecast2-safe/)
 [![GitHub Release](https://img.shields.io/github/v/release/sequential-parameter-optimization/spotforecast2-safe)](https://github.com/sequential-parameter-optimization/spotforecast2-safe/releases)
