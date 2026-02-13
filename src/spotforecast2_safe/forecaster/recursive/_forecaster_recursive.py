@@ -329,6 +329,40 @@ class ForecasterRecursive(ForecasterBase):
     def __repr__(self) -> str:
         """
         Information displayed when a ForecasterRecursive object is printed.
+
+        Returns:
+            str: String representation of the forecaster with key information about its configuration and state.
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> print(forecaster)  # doctest: +ELLIPSIS
+            =========================
+            ForecasterRecursive
+            =========================
+            Estimator: LinearRegression
+            Lags: [1, 2, 3]
+            Window features: []
+            Window size: 3
+            Series name: None
+            Exogenous included: False
+            Exogenous names: None
+            Transformer for y: None
+            Transformer for exog: None
+            Weight function included: False
+            Differentiation order: None
+            Training range: None
+            Training index type: None
+            Training index frequency: None
+            Estimator parameters: {...}
+            fit_kwargs: {...}
+            Creation date: ...
+            Last fit date: None
+            spotforecast version: ...
+            Python version: ...
+            Forecaster id: None
+
         """
 
         params = (
@@ -358,7 +392,7 @@ class ForecasterRecursive(ForecasterBase):
             f"fit_kwargs: {self.fit_kwargs} \n"
             f"Creation date: {self.creation_date} \n"
             f"Last fit date: {self.fit_date} \n"
-            f"Skforecast version: {self.spotforecast_version} \n"
+            f"spotforecast version: {self.spotforecast_version} \n"
             f"Python version: {self.python_version} \n"
             f"Forecaster id: {self.forecaster_id} \n"
         )

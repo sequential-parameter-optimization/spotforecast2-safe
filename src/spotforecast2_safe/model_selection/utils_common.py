@@ -19,10 +19,34 @@ from spotforecast2_safe.forecaster.utils import check_interval, date_to_index_po
 
 class OneStepAheadValidationWarning(UserWarning):
     """
-    Warning used when validation is performed with one-step-ahead predictions.
+    Warning used to notify that the one-step-ahead validation is being used.
+
+    Args:
+        message (str): The warning message to be displayed when the warning is raised.
+
+    Returns:
+        str: The warning message along with instructions on how to suppress the warning.
+
+    Examples:
+        >>> import warnings
+        >>> from spotforecast2_safe.model_selection.utils_common import OneStepAheadValidationWarning
+        >>> warnings.warn(
+        ...     "This is a one-step-ahead validation warning.",
+        ...     OneStepAheadValidationWarning
+        ... )
+        This is a one-step-ahead validation warning.
+        You can suppress this warning using: warnings.simplefilter('ignore', category=OneStepAheadValidationWarning)
     """
 
-    pass
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        extra_message = (
+            "You can suppress this warning using: "
+            "warnings.simplefilter('ignore', category=OneStepAheadValidationWarning)"
+        )
+        return self.message + "\n" + extra_message
 
 
 def initialize_lags_grid(

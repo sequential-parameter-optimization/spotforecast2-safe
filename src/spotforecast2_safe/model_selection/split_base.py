@@ -80,6 +80,11 @@ class BaseFold:
         return_all_indexes (bool): Whether to return all indexes or only the start
             and end indexes of each fold.
         verbose (bool): Whether to print information about generated folds.
+
+    Methods:
+        _validate_params: Validates the input parameters to ensure correctness.
+        _extract_index: Extracts and returns the index from the input data X.
+        set_params: Set the parameters of the Fold object after validating them.
     """
 
     def __init__(
@@ -311,6 +316,19 @@ class BaseFold:
 
         Returns:
             pd.Index: Index extracted from the input data.
+
+        Raises:
+            TypeError: If the input data is not of the expected type or if the series in
+                a dictionary do not have valid indexes.
+            ValueError: If the series in a dictionary have different frequencies or if any
+                series have no frequency.
+
+        Examples:
+            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
+            >>> cv = TimeSeriesFold(steps=1)
+            >>> idx = cv._extract_index(pd.Series([1, 2, 3], index=pd.date_range("2020-01-01", periods=3)))
+            >>> print(idx)
+            DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03'], dtype='datetime64[ns]', freq='D')
         """
 
         if isinstance(X, (pd.Series, pd.DataFrame)):
@@ -377,6 +395,24 @@ class BaseFold:
 
         Args:
             params (dict): Dictionary with the parameters to set.
+
+        Examples:
+            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
+            >>> cv = TimeSeriesFold(steps=1)
+            >>> cv.set_params({
+            ...     "steps": 2,
+            ...     "initial_train_size": 10,
+            ...     "fold_stride": 2,
+            ...     "window_size": 5,
+            ...     "differentiation": 1,
+            ...     "refit": True,
+            ...     "fixed_train_size": False,
+            ...     "gap": 1,
+            ...     "skip_folds": 2,
+            ...     "allow_incomplete_fold": False,
+            ...     "return_all_indexes": True,
+            ...     "verbose": False,
+            ... })
         """
 
         if not isinstance(params, dict):
