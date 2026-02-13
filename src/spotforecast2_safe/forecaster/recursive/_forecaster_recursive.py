@@ -2619,7 +2619,23 @@ class ForecasterRecursive(ForecasterBase):
             sort_importance: If `True`, sorts the feature importances in descending order.
 
         Returns:
-            Feature importances associated with each predictor.
+            pd.DataFrame: Feature importances associated with each predictor.
+
+        Raises:
+            NotFittedError: If the forecaster is not fitted.
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> forecaster.fit(y=pd.Series(np.arange(20)))
+            >>> forecaster.get_feature_importances()
+              feature  importance
+            0   lag_1         1.0
+            1   lag_2         0.0
+            2   lag_3         0.0
         """
 
         if not self.is_fitted:
@@ -2670,6 +2686,47 @@ class ForecasterRecursive(ForecasterBase):
         """
         Set in-sample residuals in case they were not calculated during the
         training process.
+
+        In-sample residuals are calculated as the difference between the true
+        values and the predictions made by the forecaster using the training
+        data. The following internal attributes are updated:
+
+        + `in_sample_residuals_`: residuals stored in a numpy ndarray.
+        + `binner_intervals_`: intervals used to bin the residuals are calculated
+        using the quantiles of the predicted values.
+        + `in_sample_residuals_by_bin_`: residuals are binned according to the
+        predicted value they are associated with and stored in a dictionary, where
+        the keys are the intervals of the predicted values and the values are
+        the residuals associated with that range.
+
+        A total of 10_000 residuals are stored in the attribute `in_sample_residuals_`.
+        If the number of residuals is greater than 10_000, a random sample of
+        10_000 residuals is stored. The number of residuals stored per bin is
+        limited to `10_000 // self.binner.n_bins_`.
+
+        Args:
+                y: Target time series.
+            exog: Exogenous variables.
+            random_state: Random state for reproducibility.
+
+        Returns:
+            None
+
+        Raises:
+            NotFittedError: If the forecaster is not fitted.
+            IndexError: If the index range of `y` does not match the range
+                used during training.
+            ValueError: If the features generated from the provided data do not
+                match those used during the training process.
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> forecaster.fit(y=pd.Series(np.arange(20)), store_in_sample_residuals=False)
+            >>> forecaster.set_in_sample_residuals(y=pd.Series(np.arange(20)))
+            >>> forecaster.in_sample_residuals_
+            array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
         """
         if not self.is_fitted:
             raise NotFittedError(
@@ -2727,6 +2784,58 @@ class ForecasterRecursive(ForecasterBase):
     ) -> None:
         """
         Set new values to the attribute `out_sample_residuals_`.
+
+        Out of sample residuals are meant to be calculated using observations that
+        did not participate in the training process. `y_true` and `y_pred` are
+        expected to be in the original scale of the time series. Residuals are
+        calculated as `y_true` - `y_pred`, after applying the necessary
+        transformations and differentiations if the forecaster includes them
+        (`self.transformer_y` and `self.differentiation`). Two internal attributes
+        are updated:
+
+        + `out_sample_residuals_`: residuals stored in a numpy ndarray.
+        + `out_sample_residuals_by_bin_`: residuals are binned according to the
+        predicted value they are associated with and stored in a dictionary, where
+        the keys are the intervals of the predicted values and the values are
+        the residuals associated with that range. If a bin is empty, it is filled
+        with a random sample of residuals from other bins. This is done to ensure
+        that all bins have at least one residual and can be used in the prediction
+        process.
+
+        A total of 10_000 residuals are stored in the attribute `out_sample_residuals_`.
+        If the number of residuals is greater than 10_000, a random sample of
+        10_000 residuals is stored. The number of residuals stored per bin is
+        limited to `10_000 // self.binner.n_bins_`.
+
+        Args:
+            y_true: True values of the time series in the original scale.
+            y_pred: Predicted values of the time series in the original scale.
+            append: If `True`, new residuals are added to the once already stored
+                in the forecaster. If after appending the new residuals, the limit
+                of `10_000 // self.binner.n_bins_` values per bin is reached, a
+                random sample of residuals is stored.
+            random_state: Random state for reproducibility.
+
+        Returns:
+            None
+
+        Raises:
+            NotFittedError: If the forecaster is not fitted.
+            TypeError: If `y_true` or `y_pred` are not `numpy ndarray` or `pandas Series`.
+            ValueError: If `y_true` and `y_pred` have different length or index (if Series).
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> forecaster.fit(y=pd.Series(np.arange(20)), store_in_sample_residuals=False)
+            >>> y_true = np.array([20, 21, 22, 23, 24])
+            >>> y_pred = np.array([20.1, 20.9, 22.2, 22.8, 24.0])
+            >>> forecaster.set_out_sample_residuals(y_true=y_true, y_pred=y_pred)
+            >>> forecaster.out_sample_residuals_
+            array([-0.1,  0.1, -0.2,  0.2,  0. ])
         """
         if not self.is_fitted:
             raise NotFittedError(
