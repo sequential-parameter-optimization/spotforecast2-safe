@@ -472,18 +472,14 @@ def transform_numpy(
         >>> from spotforecast2_safe.forecaster.utils import transform_numpy
         >>> from sklearn.preprocessing import StandardScaler
         >>> import numpy as np
-        >>> array = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> array = np.array([1, 2, 3, 4, 5])
         >>> transformer = StandardScaler()
         >>> array_transformed = transform_numpy(array, transformer, fit=True)
         >>> print(array_transformed)
-        [[-1.22474487 -1.22474487]
-         [ 0.          0.        ]
-         [ 1.22474487  1.22474487]]
+        [-1.41421356 -0.70710678  0.          0.70710678  1.41421356]
         >>> array_inversed = transform_numpy(array_transformed, transformer, inverse_transform=True)
         >>> print(array_inversed)
-        [[1. 2.]
-         [3. 4.]
-         [5. 6.]]
+        [1. 2. 3. 4. 5.]
     """
 
     if transformer is None:
@@ -634,8 +630,14 @@ def initialize_window_features(
         Number of features: 4
 
         Multiple window features:
-        >>> wf1 = RollingFeatures(stats=['mean'], window_sizes=7)
-        >>> wf2 = RollingFeatures(stats=['max', 'min'], window_sizes=3)
+        >>> class MockWF:
+        ...     def __init__(self, names, sizes):
+        ...         self.features_names = names
+        ...         self.window_sizes = sizes
+        ...     def transform_batch(self, X): pass
+        ...     def transform(self, X): pass
+        >>> wf1 = MockWF(['f1'], 7)
+        >>> wf2 = MockWF(['f2', 'f3'], 3)
         >>> wf_list, names, max_size = initialize_window_features([wf1, wf2])
         >>> print(f"Max window size: {max_size}")
         Max window size: 7
@@ -1145,8 +1147,8 @@ def check_residuals_input(
         >>> import numpy as np
         >>> forecaster_name = "ForecasterRecursiveMultiSeries"
         >>> use_in_sample_residuals = True
-        >>> in_sample_residuals_ = np.array([0.1, -0.2])
-        >>> out_sample_residuals_ = np.array([0.3, -0.1])
+        >>> in_sample_residuals_ = {'series_1': np.array([0.1, -0.2]), 'series_2': np.array([0.3, -0.1])}
+        >>> out_sample_residuals_ = None
         >>> use_binned_residuals = False
         >>> check_residuals_input(
         ...     forecaster_name,

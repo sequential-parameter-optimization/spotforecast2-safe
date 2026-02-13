@@ -2217,9 +2217,7 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
                 idx_lags = np.arange(-steps, 0)[:, None] - self.lags
                 # Ensure idx_lags is a valid index array for full_predictors_level
                 idx_lags_valid = idx_lags + len(full_predictors_level)
-                X_predict_level.append(
-                    full_predictors_level[idx_lags_valid]
-                )
+                X_predict_level.append(full_predictors_level[idx_lags_valid])
 
             if self.window_features is not None:
                 X_window_features = np.full(
