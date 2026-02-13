@@ -1,3 +1,10 @@
+## [0.9.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.4...v0.9.0-rc.1) (2026-02-13)
+
+
+### Features
+
+* create_predict_X ([85553d6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/85553d6b26ed27b11b237a6416f3206b2186e35c))
+
 ## [0.8.3-rc.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.3...v0.8.3-rc.4) (2026-02-13)
 
 
