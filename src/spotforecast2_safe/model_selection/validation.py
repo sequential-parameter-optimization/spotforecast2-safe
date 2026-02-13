@@ -506,6 +506,48 @@ def backtesting_forecaster_one_step(
         tuple (pd.DataFrame, pd.DataFrame):
             - metric_values: Value(s) of the metric(s).
             - backtest_predictions: Value of predictions.
+
+    Notes:
+        This function is designed for one-step-ahead backtesting,
+        where predictions are made for the next time step using the most recent data. The function handles the fitting and
+        prediction process for each fold defined in the `OneStepAheadFold` object,
+        and calculates the specified metric(s) based on the true and predicted values.
+        Depending on the `interval` and `interval_method` parameters, it can also generate probabilistic predictions.
+
+    Examples:
+        >>> from spotforecast2_safe.forecaster import ForecasterRecursive
+        >>> from spotforecast2_safe.model_selection.split_one_step import OneStepAheadFold
+        >>> from spotforecast2_safe.model_selection.validation import backtesting_forecaster_one_step
+        >>> # Create a forecaster and a one-step-ahead fold
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> from sklearn.linear_model import LinearRegression
+        >>> y = pd.Series(np.random.randn(100), name='y')
+        >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=5)
+        >>> cv = OneStepAheadFold(initial_train_size=20, window_size=5)
+        >>> # Perform backtesting
+        >>> metric_values, backtest_predictions = backtesting_forecaster_one_step(
+        ...     forecaster=forecaster,
+        ...     y=y,
+        ...     cv=cv,
+        ...     metric='mean_squared_error',
+        ...     exog=None,
+        ...     interval=0.95,
+        ...     interval_method='bootstrapping',
+        ...     n_boot=20,
+        ...     use_in_sample_residuals=True,
+        ...     use_binned_residuals=False,
+        ...     random_state=42,
+        ...     return_predictors=False,
+        ...     n_jobs=1,
+        ...     verbose=True,
+        ...     show_progress=True,
+        ...     suppress_warnings=False
+        ... )
+        # Note: For reliable bootstrapping with binned residuals, use a sufficiently large series and value spread.
+        # For random data, use_binned_residuals=False.
+        # TODO: Setting return_predictors=True requires ForecasterRecursive.create_predict_X().
+
     """
 
     set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -791,7 +833,7 @@ def backtesting_forecaster(
         >>> y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         >>> forecaster = ForecasterRecursive(
         ...     estimator=RandomForestRegressor(random_state=123),
-        ...     lags=2
+        ...     lags=5
         ... )
         >>> cv = TimeSeriesFold(
         ...     steps=2,
