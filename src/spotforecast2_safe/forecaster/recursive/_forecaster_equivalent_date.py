@@ -118,6 +118,9 @@ class ForecasterEquivalentDate:
             the forecaster.
         python_version (str): Version of python used to create the forecaster.
         forecaster_id (str, int): Name used as an identifier of the forecaster.
+        estimator (Ignored): Not used, present here for API consistency by convention.
+        differentiation (Ignored): Not used, present here for API consistency by convention.
+        differentiation_max (Ignored): Not used, present here for API consistency by convention.
 
     Examples:
         >>> import pandas as pd
@@ -183,8 +186,7 @@ class ForecasterEquivalentDate:
                 "https://pandas.pydata.org/docs/reference/offset_frequency.html"
             )
 
-        if isinstance(self.offset, int):
-            self.window_size = self.offset * self.n_offsets
+        self.window_size = self.offset * self.n_offsets
 
         self.binner_kwargs = binner_kwargs
         if binner_kwargs is None:
@@ -360,10 +362,11 @@ class ForecasterEquivalentDate:
                     <li><strong>Training index type:</strong> {str(self.index_type_).split('.')[-1][:-2] if self.is_fitted else 'Not fitted'}</li>
                     <li><strong>Training index frequency:</strong> {self.index_freq_ if self.is_fitted else 'Not fitted'}</li>
                 </ul>
+            </details>
         </div>
         """
 
-        return style + content
+        return (style + content).strip()
 
     def fit(
         self,
@@ -477,7 +480,7 @@ class ForecasterEquivalentDate:
         self.training_range_ = y_index[[0, -1]]
         self.index_type_ = type(y_index)
         self.index_freq_ = (
-            y_index.freq if isinstance(y_index, pd.DatetimeIndex) else y_index.step
+            y_index.freqstr if isinstance(y_index, pd.DatetimeIndex) else y_index.step
         )
 
         # NOTE: This is done to save time during fit in functions such as backtesting()
