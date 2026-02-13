@@ -1,3 +1,10 @@
+## [0.8.3-rc.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.3...v0.8.3-rc.4) (2026-02-13)
+
+
+### Bug Fixes
+
+* _recursive_predict_bootstrapping ([59ed543](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/59ed543db4a6489820dba87783f03325585f01f3))
+
 ## [0.8.3-rc.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.2...v0.8.3-rc.3) (2026-02-13)
 
 
