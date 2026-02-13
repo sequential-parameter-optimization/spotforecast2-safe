@@ -8317,7 +8317,11 @@ Defaults to 'cpu'.</p>
 <span class="normal"><a href="#__codelineno-0-763">763</a></span>
 <span class="normal"><a href="#__codelineno-0-764">764</a></span>
 <span class="normal"><a href="#__codelineno-0-765">765</a></span>
-<span class="normal"><a href="#__codelineno-0-766">766</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-766">766</a></span>
+<span class="normal"><a href="#__codelineno-0-767">767</a></span>
+<span class="normal"><a href="#__codelineno-0-768">768</a></span>
+<span class="normal"><a href="#__codelineno-0-769">769</a></span>
+<span class="normal"><a href="#__codelineno-0-770">770</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="sd">    Set the device for the estimator to either &#39;cpu&#39;, &#39;gpu&#39;, &#39;cuda&#39;, or None.</span>
 <a id="__codelineno-0-715" name="__codelineno-0-715"></a>
@@ -8368,10 +8372,14 @@ Defaults to 'cpu'.</p>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a>    <span class="k">if</span> <span class="n">original_device</span> <span class="o">!=</span> <span class="n">new_device</span><span class="p">:</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-762" name="__codelineno-0-762"></a>            <span class="n">estimator</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">param_name</span><span class="p">:</span> <span class="n">new_device</span><span class="p">})</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>            <span class="k">pass</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>    <span class="k">return</span> <span class="n">original_device</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>                <span class="sa">f</span><span class="s2">&quot;Failed to set device parameter &#39;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">new_device</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>                <span class="sa">f</span><span class="s2">&quot;for estimator &#39;</span><span class="si">{</span><span class="n">estimator_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>                <span class="ne">UserWarning</span><span class="p">,</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>            <span class="p">)</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>    <span class="k">return</span> <span class="n">original_device</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -14557,7 +14565,11 @@ Defaults to 'cpu'.</p>
 <span class="normal"><a href="#__codelineno-0-763">763</a></span>
 <span class="normal"><a href="#__codelineno-0-764">764</a></span>
 <span class="normal"><a href="#__codelineno-0-765">765</a></span>
-<span class="normal"><a href="#__codelineno-0-766">766</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-766">766</a></span>
+<span class="normal"><a href="#__codelineno-0-767">767</a></span>
+<span class="normal"><a href="#__codelineno-0-768">768</a></span>
+<span class="normal"><a href="#__codelineno-0-769">769</a></span>
+<span class="normal"><a href="#__codelineno-0-770">770</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="sd">    Set the device for the estimator to either &#39;cpu&#39;, &#39;gpu&#39;, &#39;cuda&#39;, or None.</span>
 <a id="__codelineno-0-715" name="__codelineno-0-715"></a>
@@ -14608,10 +14620,14 @@ Defaults to 'cpu'.</p>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a>    <span class="k">if</span> <span class="n">original_device</span> <span class="o">!=</span> <span class="n">new_device</span><span class="p">:</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-762" name="__codelineno-0-762"></a>            <span class="n">estimator</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">param_name</span><span class="p">:</span> <span class="n">new_device</span><span class="p">})</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>            <span class="k">pass</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>    <span class="k">return</span> <span class="n">original_device</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>                <span class="sa">f</span><span class="s2">&quot;Failed to set device parameter &#39;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">new_device</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>                <span class="sa">f</span><span class="s2">&quot;for estimator &#39;</span><span class="si">{</span><span class="n">estimator_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>                <span class="ne">UserWarning</span><span class="p">,</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>            <span class="p">)</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>    <span class="k">return</span> <span class="n">original_device</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
