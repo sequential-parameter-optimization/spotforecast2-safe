@@ -705,3 +705,62 @@ def check_residuals_input(
                 raise ValueError(
                     f"Residuals for level '{level}' are None. Check `forecaster.{literal}`."
                 )
+
+    return
+
+
+def set_cpu_gpu_device(estimator: object, device: str | None = "cpu") -> str | None:
+    """
+    Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None.
+
+    Args:
+        estimator: Estimator compatible with the scikit-learn API.
+        device: Device to set. Options are 'cpu', 'gpu', 'cuda', or None.
+            Defaults to 'cpu'.
+
+    Returns:
+        The device that was set on the estimator before the function was called.
+    """
+
+    valid_devices = {"gpu", "cpu", "cuda", "GPU", "CPU", None}
+    if device not in valid_devices:
+        raise ValueError("`device` must be 'gpu', 'cpu', 'cuda', or None.")
+
+    estimator_name = type(estimator).__name__
+
+    supported_estimators = {"XGBRegressor", "LGBMRegressor", "CatBoostRegressor"}
+    if estimator_name not in supported_estimators:
+        return None
+
+    device_names = {
+        "XGBRegressor": "device",
+        "LGBMRegressor": "device",
+        "CatBoostRegressor": "task_type",
+    }
+    device_values = {
+        "XGBRegressor": {"gpu": "cuda", "cpu": "cpu", "cuda": "cuda"},
+        "LGBMRegressor": {"gpu": "gpu", "cpu": "cpu", "cuda": "gpu"},
+        "CatBoostRegressor": {
+            "gpu": "GPU",
+            "cpu": "CPU",
+            "cuda": "GPU",
+            "GPU": "GPU",
+            "CPU": "CPU",
+        },
+    }
+
+    param_name = device_names[estimator_name]
+    original_device = getattr(estimator, param_name, None)
+
+    if device is None:
+        return original_device
+
+    new_device = device_values[estimator_name][device]
+
+    if original_device != new_device:
+        try:
+            estimator.set_params(**{param_name: new_device})
+        except Exception:
+            pass
+
+    return original_device
