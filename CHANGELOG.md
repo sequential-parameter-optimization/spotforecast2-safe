@@ -1,3 +1,24 @@
+## [0.8.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.7.0...v0.8.0) (2026-02-13)
+
+
+### Features
+
+* cpe ([#11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/11)) ([26a9bf6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/26a9bf66054beff8622c8a3fdd5298d97621d32d))
+* cpe code ([6b0844d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/6b0844df003e86bfa7026376af7073ef30856680))
+* split_ts ([189d5ef](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/189d5ef9d54dadeaa8765127af124cab1bf4f420))
+* val and test ([#21](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/21)) ([b4a1075](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b4a1075aaa842230e960391602ee9ca2a27bf11d)), closes [#11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/11)
+* validates ([#20](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/20)) ([f828d73](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f828d73aa0ce9a58e432b218cf17007457f58898)), closes [#11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/11)
+* validation ([6255de1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/6255de173d7ec8c94d5e840a404a4e8be1e967de))
+* warnings ([7feeeb4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7feeeb4662ecd410afa6c7eee978398a8252f7c6))
+
+
+### Documentation
+
+* badges ([d4db607](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d4db607747dfc8685d09ad8653e5c809432dcc1d))
+* contribute ([de263f3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/de263f3a012aec6c3d2d9fba886f24fe664d8289))
+* features ([#17](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/17)) ([4ff00c8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4ff00c826f19a138bb5dc9503714f7a67fee326d)), closes [#11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/11)
+* README restructured ([791e68e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/791e68e31053f9c4c9dc1a1226924d6a1d8a4ff3))
+
 ## [0.8.0-rc.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.0-rc.3...v0.8.0-rc.4) (2026-02-13)
 
 
