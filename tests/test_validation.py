@@ -511,7 +511,7 @@ class TestCheckPredictInput:
     def test_check_predict_input_invalid_exog_columns(self):
         """Test check_predict_input raises ValueError for mismatched exog columns."""
         exog = pd.DataFrame({"col2": [1, 2, 3, 4, 5]})  # Different column name
-        with pytest.raises(ValueError, match="Exogenous variables must be"):
+        with pytest.raises(ValueError, match="Missing columns in `exog`"):
             check_predict_input(
                 forecaster_name="forecaster",
                 steps=5,

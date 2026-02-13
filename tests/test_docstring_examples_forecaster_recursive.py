@@ -221,7 +221,7 @@ def test_doc_example_create_predict_inputs():
     last_window = y.iloc[-3:]
     exog_future = _make_exog(5, index=pd.RangeIndex(start=30, stop=35), seed=12)
 
-    last_window_values, exog_values, prediction_index, exog_index = (
+    last_window_values, exog_values, prediction_index, steps = (
         forecaster._create_predict_inputs(
             steps=5, last_window=last_window, exog=exog_future, check_inputs=True
         )
@@ -230,7 +230,7 @@ def test_doc_example_create_predict_inputs():
     assert isinstance(last_window_values, np.ndarray)
     assert isinstance(exog_values, np.ndarray)
     assert isinstance(prediction_index, pd.Index)
-    assert isinstance(exog_index, pd.Index)
+    assert isinstance(steps, int)
     pd.testing.assert_index_equal(prediction_index, exog_future.index)
 
 
