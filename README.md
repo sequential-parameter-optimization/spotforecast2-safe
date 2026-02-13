@@ -109,3 +109,9 @@ The "full" version of `spotforecast2-safe`, which is named `spotforecast`, is av
 ## spotoptim
 
 * [spotoptim documentation](https://sequential-parameter-optimization.github.io/spotoptim/)
+
+## Quality
+
+* [OpenSSF Best Practices Badge Program](https://www.bestpractices.dev/en)
+* [National Vulnarability Database: Common Platform Enumeration (CPE)](https://nvd.nist.gov/products/cpe)
+* [Code Coverage (codecov)](https://about.codecov.io)
