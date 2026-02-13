@@ -2202,8 +2202,6 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
                 exog_values_dict=exog_values_dict,
             )
 
-        if self.lags is not None:
-            idx_lags = np.arange(-steps, 0)[:, None] - self.lags
         len_X_train_series_names_in_ = len(self.X_train_series_names_in_)
         exog_shape = len(self.X_train_exog_names_out_) if exog is not None else 0
 
@@ -2216,8 +2214,11 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
             )
 
             if self.lags is not None:
+                idx_lags = np.arange(-steps, 0)[:, None] - self.lags
+                # Ensure idx_lags is a valid index array for full_predictors_level
+                idx_lags_valid = idx_lags + len(full_predictors_level)
                 X_predict_level.append(
-                    full_predictors_level[idx_lags + len(full_predictors_level)]
+                    full_predictors_level[idx_lags_valid]
                 )
 
             if self.window_features is not None:
