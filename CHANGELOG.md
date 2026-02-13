@@ -1,8 +1,17 @@
+## [0.8.3-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.2...v0.8.3-rc.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* ForecasterRecursive ([4f524b7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4f524b715f5916b529028b7b8729908ac19f1fb5))
+
+## [0.8.2-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.2-rc.1...v0.8.2-rc.2) (2026-02-13)
 ## [0.8.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.1...v0.8.2) (2026-02-13)
 
 
 ### Bug Fixes
 
+* ForecasterRecursive ([4f524b7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4f524b715f5916b529028b7b8729908ac19f1fb5))
 * _rolling.py ([4ab63ed](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4ab63ed149ccd788bd80d761cc63d546d3bbbfa5))
 * rolling ([#25](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/25)) ([c90705c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c90705cb75f897c92c981ec44853660c0cccd10b)), closes [#11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/11)
 * rolling features ([#24](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/24)) ([39afa62](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/39afa62885e2ac8c1a4a2c77d491c60040b5d02e)), closes [#11](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/11)

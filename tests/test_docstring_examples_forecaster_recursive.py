@@ -155,25 +155,10 @@ def test_doc_example_create_train_X_y_public():
         lags=3,
         window_features=[RollingFeatures(stats="mean", window_sizes=3)],
     )
-    (
-        X_train,
-        y_train,
-        exog_names_in_,
-        window_features_names,
-        exog_names_out,
-        feature_names,
-        exog_dtypes_in_,
-        exog_dtypes_out_,
-    ) = forecaster.create_train_X_y(y=y, exog=exog)
+    X_train, y_train = forecaster.create_train_X_y(y=y, exog=exog)
 
     assert isinstance(X_train, pd.DataFrame)
     assert isinstance(y_train, pd.Series)
-    assert (
-        feature_names == forecaster.lags_names + window_features_names + exog_names_out
-    )
-    assert exog_names_in_ == exog_names_out
-    assert exog_dtypes_in_ is not None
-    assert exog_dtypes_out_ is not None
 
 
 def test_doc_example_train_test_split_one_step_ahead():

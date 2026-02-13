@@ -54,6 +54,13 @@ class TimeSeriesDifferentiator(BaseEstimator, TransformerMixin):
         return self
 
     @_check_X_numpy_ndarray_1d(ensure_1d=True)
+    def fit_transform(self, X: np.ndarray, y: object = None) -> np.ndarray:
+        """
+        Fit and transform.
+        """
+        return self.fit(X).transform(X)
+
+    @_check_X_numpy_ndarray_1d(ensure_1d=True)
     def transform(self, X: np.ndarray, y: object = None) -> np.ndarray:
         """
         Compute the differences.

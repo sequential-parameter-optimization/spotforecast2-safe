@@ -771,11 +771,10 @@ class ForecasterRecursive(ForecasterBase):
 
         if self.differentiation is not None:
             if not self.is_fitted:
-                self.differentiator.fit(y_values)  # Differentiator requires fit first
-                y_values = self.differentiator.transform(y_values)
+                y_values = self.differentiator.fit_transform(y_values)
             else:
                 differentiator = copy(self.differentiator)
-                y_values = differentiator.transform(y_values)
+                y_values = differentiator.fit_transform(y_values)
 
         exog_names_in_ = None
         exog_dtypes_in_ = None
@@ -789,17 +788,10 @@ class ForecasterRecursive(ForecasterBase):
             )
 
             len_y_original = len(y)
-            len_exog = len(exog)
             len_train = len(train_index)
+            len_exog = len(exog)
 
-            # Safety-critical validation: exog must be either full-length or pre-aligned
-            if len_exog == len_y_original:
-                # Standard case: exog covers full y range, trim by window_size
-                exog = exog.iloc[self.window_size :, :]
-            elif len_exog == len_train:
-                # Alternative case: exog already aligned to training index
-                pass
-            else:
+            if not len_exog == len_y_original and not len_exog == len_train:
                 raise ValueError(
                     f"Length mismatch for exogenous variables. Expected either:\n"
                     f"  - Full length matching `y`: {len_y_original} observations, OR\n"
@@ -807,6 +799,23 @@ class ForecasterRecursive(ForecasterBase):
                     f"Got: {len_exog} observations.\n"
                     f"Window size: {self.window_size}"
                 )
+
+            if len_exog == len_y_original:
+                if not (exog_index == y_index).all():
+                    raise ValueError(
+                        "When `exog` has the same length as `y`, the index of "
+                        "`exog` must be aligned with the index of `y` "
+                        "to ensure the correct alignment of values."
+                    )
+                # Standard case: exog covers full y range, trim by window_size
+                exog = exog.iloc[self.window_size :, :]
+            else:
+                if not (exog_index == train_index).all():
+                    raise ValueError(
+                        "When `exog` already starts after the first `window_size` "
+                        "observations, its index must be aligned with the index "
+                        "of `y` starting from `window_size`."
+                    )
 
             exog_names_in_ = exog.columns.to_list()
             exog_dtypes_in_ = get_exog_dtypes(exog=exog)
@@ -898,16 +907,7 @@ class ForecasterRecursive(ForecasterBase):
 
     def create_train_X_y(
         self, y: pd.Series, exog: Union[pd.Series, pd.DataFrame, None] = None
-    ) -> Tuple[
-        pd.DataFrame,
-        pd.Series,
-        List[str],
-        List[str],
-        List[str],
-        List[str],
-        Dict[str, type],
-        Dict[str, type],
-    ]:
+    ) -> Tuple[pd.DataFrame, pd.Series]:
         """Public method to create training predictors and target values.
 
         This method is a public wrapper around the internal method `_create_train_X_y`,
@@ -922,12 +922,6 @@ class ForecasterRecursive(ForecasterBase):
             Tuple containing:
                 - X_train: DataFrame of training predictors including lags, window features, and exogenous variables (if provided).
                 - y_train: Series of target values aligned with the predictors.
-                - X_train_features_names_out_: List of all predictor feature names.
-                - lags_names: List of lag feature names.
-                - window_features_names: List of window feature names.
-                - exog_names_in_: List of exogenous variable names (if exogenous variables are used).
-                - exog_dtypes_in_: Dictionary of input data types for exogenous variables.
-                - exog_dtypes_out_: Dictionary of output data types for exogenous variables after transformation (if exogenous variables are used).
 
         Examples:
             >>> import numpy as np
@@ -942,18 +936,16 @@ class ForecasterRecursive(ForecasterBase):
             ...     lags=3,
             ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
             ... )
-            >>> (X_train, y_train, exog_names_in_, window_features_names,
-            ...  exog_names_out, feature_names, exog_dtypes_in_,
-            ...  exog_dtypes_out_) = forecaster.create_train_X_y(y=y, exog=exog)
+            >>> X_train, y_train = forecaster.create_train_X_y(y=y, exog=exog)
             >>> isinstance(X_train, pd.DataFrame)
             True
             >>> isinstance(y_train, pd.Series)
             True
-            >>> feature_names == forecaster.lags_names + window_features_names + exog_names_out
-            True
 
         """
-        return self._create_train_X_y(y=y, exog=exog)
+        output = self._create_train_X_y(y=y, exog=exog)
+
+        return output[0], output[1]
 
     def _train_test_split_one_step_ahead(
         self,
@@ -977,11 +969,9 @@ class ForecasterRecursive(ForecasterBase):
         Returns:
             Tuple containing:
                 - X_train: Predictor values used to train the model as pandas DataFrame.
-                - y_train: Values of the time series related to each row of X_train for
-                    each step in the form {step: y_step_[i]} as dict.
+                - y_train: Target values related to each row of X_train as pandas Series.
                 - X_test: Predictor values used to test the model as pandas DataFrame.
-                - y_test: Values of the time series related to each row of X_test for
-                    each step in the form {step: y_step_[i]} as dict.
+                - y_test: Target values related to each row of X_test as pandas Series.
 
         Examples:
             >>> import numpy as np
