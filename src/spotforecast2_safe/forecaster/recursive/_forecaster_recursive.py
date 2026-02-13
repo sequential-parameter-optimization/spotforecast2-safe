@@ -12,7 +12,11 @@ from sklearn.linear_model._base import LinearModel
 import warnings
 
 from spotforecast2_safe.forecaster.base import ForecasterBase
-from spotforecast2_safe.exceptions import NotFittedError
+from spotforecast2_safe.exceptions import (
+    NotFittedError,
+    DataTransformationWarning,
+    ResidualsUsageWarning,
+)
 from spotforecast2_safe.preprocessing import TimeSeriesDifferentiator, QuantileBinner
 from spotforecast2_safe.utils import (
     check_y,
@@ -562,6 +566,19 @@ class ForecasterRecursive(ForecasterBase):
             >>> y_data.shape
             (7,)
         """
+        if X_as_pandas and train_index is None:
+            raise ValueError(
+                "If `X_as_pandas` is True, `train_index` must be provided."
+            )
+
+        if len(y) <= self.window_size:
+            raise ValueError(
+                f"Length of `y` must be greater than the maximum window size "
+                f"needed by the forecaster.\n"
+                f"    Length `y`: {len(y)}.\n"
+                f"    Max window size: {self.window_size}."
+            )
+
         X_data = None
         if self.lags is not None:
             # y = y.ravel() # Assuming y is already raveled
@@ -1372,6 +1389,17 @@ class ForecasterRecursive(ForecasterBase):
 
             exog_values = (
                 exog_values if isinstance(exog, pd.Series) else exog.to_numpy()
+            )
+
+        if self.transformer_y is not None or self.differentiation is not None:
+            warnings.warn(
+                "The output matrix is in the transformed scale due to the "
+                "inclusion of transformations or differentiation in the Forecaster. "
+                "As a result, any predictions generated using this matrix will also "
+                "be in the transformed scale. Please refer to the documentation "
+                "for more details: "
+                "https://skforecast.org/latest/user_guides/training-and-prediction-matrices.html",
+                DataTransformationWarning,
             )
 
         return last_window_values, exog_values, prediction_index, exog_index
@@ -2347,6 +2375,7 @@ class ForecasterRecursive(ForecasterBase):
         if self.binner is not None:
             max_samples = 10_000 // self.binner.n_bins
             rng = np.random.default_rng(seed=random_state)
+
             for k, v in out_sample_residuals_by_bin.items():
                 if len(v) > max_samples:
                     out_sample_residuals_by_bin[k] = rng.choice(
@@ -2356,9 +2385,26 @@ class ForecasterRecursive(ForecasterBase):
             bin_keys = (
                 [] if self.binner_intervals_ is None else self.binner_intervals_.keys()
             )
-            for k in bin_keys:
-                if k not in out_sample_residuals_by_bin:
-                    out_sample_residuals_by_bin[k] = np.array([])
+            empty_bins = [
+                k
+                for k in bin_keys
+                if k not in out_sample_residuals_by_bin
+                or len(out_sample_residuals_by_bin[k]) == 0
+            ]
+
+            if empty_bins:
+                warnings.warn(
+                    f"The following bins have no out of sample residuals: {empty_bins}. "
+                    f"No predicted values fall in the interval "
+                    f"{[self.binner_intervals_[bin] for bin in empty_bins]}. "
+                    f"Empty bins will be filled with a random sample of residuals.",
+                    ResidualsUsageWarning,
+                )
+                empty_bin_size = min(max_samples, len(out_sample_residuals))
+                for k in empty_bins:
+                    out_sample_residuals_by_bin[k] = rng.choice(
+                        a=out_sample_residuals, size=empty_bin_size, replace=False
+                    )
 
         self.out_sample_residuals_ = out_sample_residuals
         self.out_sample_residuals_by_bin_ = out_sample_residuals_by_bin
