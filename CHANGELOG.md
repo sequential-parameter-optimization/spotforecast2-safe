@@ -1,13 +1,37 @@
-## [0.8.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.2...v0.8.3) (2026-02-13)
+## [0.9.0-rc.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0-rc.2...v0.9.0-rc.3) (2026-02-13)
 
 
 ### Bug Fixes
 
-* Develop ([#27](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/27)) ([7c86921](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7c869217b49f422fff382489014fcb9e87e130e0))
-* Develop ([#28](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/28)) ([cf63a97](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cf63a9710f14ebbd02f7bb6e4a782756b0f9f912))
-* ForecasterRecursive ([4f524b7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4f524b715f5916b529028b7b8729908ac19f1fb5))
-* ForecasterRecursive ([#26](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/26)) ([d5c4d36](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d5c4d369cfe649f476e6ffc36c6aeefacd3f05e5))
 * ForecasterRecursive ([#29](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/29)) ([179f40b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/179f40b3153260944e331e2970599b4c48bb4476)), closes [#27](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/27) [#28](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/28) [#26](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/26)
+
+## [0.9.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0-rc.1...v0.9.0-rc.2) (2026-02-13)
+
+
+### Bug Fixes
+
+* predict ([26fbdc8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/26fbdc845d9cb1256649274c0a03be21efe193c9))
+
+## [0.9.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.4...v0.9.0-rc.1) (2026-02-13)
+
+
+### Features
+
+* create_predict_X ([85553d6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/85553d6b26ed27b11b237a6416f3206b2186e35c))
+
+## [0.8.3-rc.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.3...v0.8.3-rc.4) (2026-02-13)
+
+
+### Bug Fixes
+
+* _recursive_predict_bootstrapping ([59ed543](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/59ed543db4a6489820dba87783f03325585f01f3))
+
+## [0.8.3-rc.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.2...v0.8.3-rc.3) (2026-02-13)
+
+
+### Bug Fixes
+
+* _recursive_predict ([ba54a2e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ba54a2e8973e95b415c1b24aad7880507e60f8b2))
 
 ## [0.8.3-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3-rc.1...v0.8.3-rc.2) (2026-02-13)
 

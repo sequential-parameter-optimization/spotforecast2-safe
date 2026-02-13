@@ -34,6 +34,7 @@ from spotforecast2_safe.utils import (
     check_interval,
     check_residuals_input,
     date_to_index_position,
+    set_cpu_gpu_device,
 )
 from spotforecast2_safe.forecaster.utils import (
     initialize_window_features,
@@ -1434,85 +1435,87 @@ class ForecasterRecursive(ForecasterBase):
         self,
         steps: int,
         last_window_values: np.ndarray,
-        exog_values: Union[np.ndarray, None] = None,
+        exog_values: np.ndarray | None = None,
     ) -> np.ndarray:
         """
-        Create predictions recursively for the specified number of steps.
+        Predict n steps ahead. It is an iterative process in which, each prediction,
+        is used as a predictor for the next step.
 
         Args:
             steps:
-                Number of future steps to predict.
+                Number of steps to predict.
             last_window_values:
-                Numpy array of the last window values to use for prediction, transformed and ready for input into the prediction method.
+                Series values used to create the predictors needed in the first
+                iteration of the prediction (t + 1).
             exog_values:
-                Numpy array of exogenous variable values for prediction, transformed and ready for input into the prediction method.
+                Exogenous variable/s included as predictor/s.
 
         Returns:
-            Numpy array of predicted values for the specified number of steps.
-
-        Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> y = pd.Series(np.arange(30), name='y')
-            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
-            >>> forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(),
-            ...     lags=3,
-            ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-            ... )
-            >>> forecaster.fit(y=y, exog=exog)
-            >>> last_window = y.iloc[-3:]
-            >>> exog_future = pd.DataFrame({'temp': np.random.randn(5)}, index=pd.RangeIndex(start=30, stop=35))
-            >>> last_window_values, exog_values, prediction_index, exog_index = forecaster._create_predict_inputs(
-            ...     steps=5, last_window=last_window, exog=exog_future, check_inputs=True
-            ... )
-            >>> predictions = forecaster._recursive_predict(
-            ...     steps=5, last_window_values=last_window_values, exog_values=exog_values
-            ... )
-            >>> isinstance(predictions, np.ndarray)
-            True
+            Predicted values.
         """
 
-        predictions = np.full(shape=steps, fill_value=np.nan)
+        original_device = set_cpu_gpu_device(estimator=self.estimator, device="cpu")
 
-        for step in range(steps):
+        n_lags = len(self.lags) if self.lags is not None else 0
+        n_window_features = (
+            len(self.X_train_window_features_names_out_)
+            if self.window_features is not None
+            else 0
+        )
+        n_exog = exog_values.shape[1] if exog_values is not None else 0
 
-            X_gen = []
+        X = np.full(
+            shape=(n_lags + n_window_features + n_exog), fill_value=np.nan, dtype=float
+        )
+        predictions = np.full(shape=steps, fill_value=np.nan, dtype=float)
+        last_window = np.concatenate((last_window_values, predictions))
 
-            if self.lags is not None:
-                X_lags = last_window_values[-self.lags]
-                if X_lags.ndim == 1:
-                    X_lags = X_lags.reshape(1, -1)
-                X_gen.append(X_lags)
+        estimator_name = type(self.estimator).__name__
+        is_linear = isinstance(self.estimator, LinearModel)
+        is_lightgbm = estimator_name == "LGBMRegressor"
+        is_xgboost = estimator_name == "XGBRegressor"
 
-            if self.window_features is not None:
-                X_window_features = []
-                for wf in self.window_features:
-                    wf_values = wf.transform(last_window_values)
-                    X_window_features.append(wf_values[-1:])
+        if is_linear:
+            coef = self.estimator.coef_
+            intercept = self.estimator.intercept_
+        elif is_lightgbm:
+            booster = self.estimator.booster_
+        elif is_xgboost:
+            booster = self.estimator.get_booster()
 
-                X_window_features = np.concatenate(X_window_features, axis=1)
-                X_gen.append(X_window_features)
+        has_lags = self.lags is not None
+        has_window_features = self.window_features is not None
+        has_exog = exog_values is not None
 
-            if self.exog_in_:
-                X_exog = exog_values[step]
-                if X_exog.ndim < 2:
-                    X_exog = X_exog.reshape(1, -1)
-                X_gen.append(X_exog)
+        for i in range(steps):
 
-            X_gen = np.concatenate(X_gen, axis=1)
+            if has_lags:
+                X[:n_lags] = last_window[-self.lags - (steps - i)]
+            if has_window_features:
+                window_data = last_window[i : -(steps - i)]
+                X[n_lags : n_lags + n_window_features] = np.concatenate(
+                    [wf.transform(window_data) for wf in self.window_features]
+                )
+            if has_exog:
+                X[n_lags + n_window_features :] = exog_values[i]
 
-            # Convert to DataFrame with feature names to avoid sklearn warning
-            if self.X_train_features_names_out_ is not None:
-                X_gen = pd.DataFrame(X_gen, columns=self.X_train_features_names_out_)
+            if is_linear:
+                pred = np.dot(X, coef) + intercept
+            elif is_lightgbm:
+                pred = booster.predict(X.reshape(1, -1))
+            elif is_xgboost:
+                pred = booster.inplace_predict(X.reshape(1, -1))
+            else:
+                pred = self.estimator.predict(X.reshape(1, -1)).ravel()
 
-            pred = self.estimator.predict(X_gen)
-            predictions[step] = pred[0]
+            pred = pred.item()
+            predictions[i] = pred
 
-            last_window_values = np.append(last_window_values, pred)
+            # Update `last_window` values. The first position is discarded and
+            # the new prediction is added at the end.
+            last_window[-(steps - i)] = pred
+
+        set_cpu_gpu_device(estimator=self.estimator, device=original_device)
 
         return predictions
 
@@ -1575,6 +1578,8 @@ class ForecasterRecursive(ForecasterBase):
             >>> preds.shape
             (3, 5)
         """
+
+        original_device = set_cpu_gpu_device(estimator=self.estimator, device="cpu")
 
         n_lags = len(self.lags) if self.lags is not None else 0
         n_window_features = (
@@ -1650,7 +1655,124 @@ class ForecasterRecursive(ForecasterBase):
             predictions[i, :] = pred
             last_window[-(steps - i), :] = pred
 
+        set_cpu_gpu_device(estimator=self.estimator, device=original_device)
+
         return predictions
+
+    def create_predict_X(
+        self,
+        steps: int,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        check_inputs: bool = True,
+    ) -> pd.DataFrame:
+        """
+        Create the predictors needed to predict `steps` ahead. As it is a recursive
+        process, the predictors are created at each iteration of the prediction
+        process.
+
+        Args:
+            steps:
+                Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            last_window:
+                Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in `self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data. Defaults to None.
+            exog:
+                Exogenous variable/s included as predictor/s. Defaults to None.
+            check_inputs:
+                If `True`, the input is checked for possible warnings and errors
+                with the `check_predict_input` function. This argument is created
+                for internal use and is not recommended to be changed.
+                Defaults to True.
+
+        Returns:
+            Pandas DataFrame with the predictors for each step. The index
+            is the same as the prediction index.
+        """
+
+        (
+            last_window_values,
+            exog_values,
+            prediction_index,
+            steps,
+        ) = self._create_predict_inputs(
+            steps=steps,
+            last_window=last_window,
+            exog=exog,
+            check_inputs=check_inputs,
+        )
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            predictions = self._recursive_predict(
+                steps=steps,
+                last_window_values=last_window_values,
+                exog_values=exog_values,
+            )
+
+        X_predict = []
+        full_predictors = np.concatenate((last_window_values, predictions))
+
+        if self.lags is not None:
+            idx = np.arange(-steps, 0)[:, None] - self.lags
+            X_lags = full_predictors[idx + len(full_predictors)]
+            X_predict.append(X_lags)
+
+        if self.window_features is not None:
+            X_window_features = np.full(
+                shape=(steps, len(self.X_train_window_features_names_out_)),
+                fill_value=np.nan,
+                order="C",
+                dtype=float,
+            )
+            for i in range(steps):
+                X_window_features[i, :] = np.concatenate(
+                    [
+                        wf.transform(full_predictors[i : -(steps - i)])
+                        for wf in self.window_features
+                    ]
+                )
+            X_predict.append(X_window_features)
+
+        if exog is not None:
+            X_predict.append(exog_values)
+
+        X_predict = pd.DataFrame(
+            data=np.concatenate(X_predict, axis=1),
+            columns=self.X_train_features_names_out_,
+            index=prediction_index,
+        )
+
+        if self.exog_in_:
+            categorical_features = any(
+                not pd.api.types.is_numeric_dtype(dtype)
+                or pd.api.types.is_bool_dtype(dtype)
+                for dtype in set(self.exog_dtypes_out_.values())
+            )
+            if categorical_features:
+                X_predict = X_predict.astype(self.exog_dtypes_out_)
+
+        if self.transformer_y is not None or self.differentiation is not None:
+            warnings.warn(
+                "The output matrix is in the transformed scale due to the "
+                "inclusion of transformations or differentiation in the Forecaster. "
+                "As a result, any predictions generated using this matrix will also "
+                "be in the transformed scale. Please refer to the documentation "
+                "for more details: "
+                "https://skforecast.org/latest/user_guides/training-and-prediction-matrices.html",
+                DataTransformationWarning,
+            )
+
+        return X_predict
 
     def predict(
         self,
@@ -1710,22 +1832,29 @@ class ForecasterRecursive(ForecasterBase):
             )
         )
 
-        predictions = self._recursive_predict(
-            steps=steps, last_window_values=last_window_values, exog_values=exog_values
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            predictions = self._recursive_predict(
+                steps=steps,
+                last_window_values=last_window_values,
+                exog_values=exog_values,
+            )
 
         if self.differentiation is not None:
             predictions = self.differentiator.inverse_transform_next_window(predictions)
 
-        predictions = transform_dataframe(
-            df=pd.Series(predictions, name="pred").to_frame(),
+        predictions = transform_numpy(
+            array=predictions,
             transformer=self.transformer_y,
             fit=False,
             inverse_transform=True,
         )
 
-        predictions = predictions.iloc[:, 0]
-        predictions.index = prediction_index
+        predictions = pd.Series(data=predictions, index=prediction_index, name="pred")
 
         return predictions
 

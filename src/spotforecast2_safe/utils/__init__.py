@@ -13,6 +13,7 @@ from spotforecast2_safe.utils.validation import (
     check_exog_dtypes,
     check_predict_input,
     check_residuals_input,
+    set_cpu_gpu_device,
 )
 from spotforecast2_safe.utils.data_transform import (
     input_to_frame,
@@ -45,4 +46,5 @@ __all__ = [
     "create_holiday_df",
     "check_residuals_input",
     "date_to_index_position",
+    "set_cpu_gpu_device",
 ]
