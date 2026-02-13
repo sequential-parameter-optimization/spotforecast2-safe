@@ -4728,7 +4728,10 @@ Encoding used to identify the different series (<code>ForecasterRecursiveMultiSe
 <span class="normal"><a href="#__codelineno-0-574">574</a></span>
 <span class="normal"><a href="#__codelineno-0-575">575</a></span>
 <span class="normal"><a href="#__codelineno-0-576">576</a></span>
-<span class="normal"><a href="#__codelineno-0-577">577</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_predict_input</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-577">577</a></span>
+<span class="normal"><a href="#__codelineno-0-578">578</a></span>
+<span class="normal"><a href="#__codelineno-0-579">579</a></span>
+<span class="normal"><a href="#__codelineno-0-580">580</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_predict_input</span><span class="p">(</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">steps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="n">is_fitted</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -4886,36 +4889,39 @@ Encoding used to identify the different series (<code>ForecasterRecursiveMultiSe
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>                    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a>                        <span class="n">exog_names</span> <span class="o">=</span> <span class="n">exog</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                            <span class="sa">f</span><span class="s2">&quot;Exogenous variables must be: </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. &quot;</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>                            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2"> for series &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="n">check_exog</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>            <span class="n">check_exog_dtypes</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">call_check_exog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="c1"># Check that exogenous variables are the same as used in training</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>            <span class="c1"># Get the name of columns</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="n">exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>                    <span class="sa">f</span><span class="s2">&quot;Exogenous variables must be: </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>                <span class="p">)</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="c1"># Check last_window</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="k">if</span> <span class="n">last_window</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="k">if</span> <span class="n">last_window</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`last_window` has missing values.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="n">check_y</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">series_id</span><span class="o">=</span><span class="s2">&quot;`last_window`&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>    <span class="k">return</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>                    <span class="n">col_missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>                    <span class="k">if</span> <span class="n">col_missing</span><span class="p">:</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>                            <span class="sa">f</span><span class="s2">&quot;Missing columns for series &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; in `exog`. &quot;</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>                            <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>            <span class="n">check_exog</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>            <span class="n">check_exog_dtypes</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">call_check_exog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>            <span class="c1"># Check that exogenous variables are the same as used in training</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>            <span class="c1"># Get the name of columns</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="n">exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="n">col_missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>            <span class="k">if</span> <span class="n">col_missing</span><span class="p">:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>                    <span class="sa">f</span><span class="s2">&quot;Missing columns in `exog`. Expected </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>                    <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>                <span class="p">)</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="c1"># Check last_window</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>    <span class="k">if</span> <span class="n">last_window</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="k">if</span> <span class="n">last_window</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`last_window` has missing values.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="n">check_y</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">series_id</span><span class="o">=</span><span class="s2">&quot;`last_window`&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>    <span class="k">return</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4961,10 +4967,7 @@ encoding : str, default None
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/utils/validation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-580">580</a></span>
-<span class="normal"><a href="#__codelineno-0-581">581</a></span>
-<span class="normal"><a href="#__codelineno-0-582">582</a></span>
-<span class="normal"><a href="#__codelineno-0-583">583</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-583">583</a></span>
 <span class="normal"><a href="#__codelineno-0-584">584</a></span>
 <span class="normal"><a href="#__codelineno-0-585">585</a></span>
 <span class="normal"><a href="#__codelineno-0-586">586</a></span>
@@ -5085,131 +5088,134 @@ encoding : str, default None
 <span class="normal"><a href="#__codelineno-0-701">701</a></span>
 <span class="normal"><a href="#__codelineno-0-702">702</a></span>
 <span class="normal"><a href="#__codelineno-0-703">703</a></span>
-<span class="normal"><a href="#__codelineno-0-704">704</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>    <span class="n">use_in_sample_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>    <span class="n">in_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">out_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">use_binned_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">in_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="p">),</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="n">out_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-704">704</a></span>
+<span class="normal"><a href="#__codelineno-0-705">705</a></span>
+<span class="normal"><a href="#__codelineno-0-706">706</a></span>
+<span class="normal"><a href="#__codelineno-0-707">707</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">use_in_sample_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">in_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>    <span class="n">out_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="n">use_binned_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="n">in_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
 <a id="__codelineno-0-591" name="__codelineno-0-591"></a>    <span class="p">),</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>    <span class="n">levels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">    Check residuals input arguments in Forecasters.</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">    forecaster_name : str</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">        Forecaster name.</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">    use_in_sample_residuals : bool</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">        Indicates if in sample or out sample residuals are used.</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">    in_sample_residuals_ : numpy ndarray, dict</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">        Residuals of the model when predicting training data.</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">    out_sample_residuals_ : numpy ndarray, dict</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        Residuals of the model when predicting non training data.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">    use_binned_residuals : bool</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        Indicates if residuals are binned.</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    in_sample_residuals_by_bin_ : dict</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">        In sample residuals binned according to the predicted value each residual</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        is associated with.</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    out_sample_residuals_by_bin_ : dict</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        Out of sample residuals binned according to the predicted value each residual</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>    <span class="n">out_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="p">),</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>    <span class="n">levels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    Check residuals input arguments in Forecasters.</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">    forecaster_name : str</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">        Forecaster name.</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">    use_in_sample_residuals : bool</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        Indicates if in sample or out sample residuals are used.</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">    in_sample_residuals_ : numpy ndarray, dict</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">        Residuals of the model when predicting training data.</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">    out_sample_residuals_ : numpy ndarray, dict</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        Residuals of the model when predicting non training data.</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">    use_binned_residuals : bool</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        Indicates if residuals are binned.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    in_sample_residuals_by_bin_ : dict</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        In sample residuals binned according to the predicted value each residual</span>
 <a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        is associated with.</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    levels : list, default None</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        Names of the series (levels) to be predicted (Forecasters multiseries).</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    encoding : str, default None</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">        Encoding used to identify the different series (ForecasterRecursiveMultiSeries).</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">    None</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="n">forecasters_multiseries</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="s2">&quot;ForecasterRecursiveMultiSeries&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="s2">&quot;ForecasterDirectMultiVariate&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>        <span class="s2">&quot;ForecasterRnn&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a>    <span class="p">)</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a>    <span class="k">if</span> <span class="n">use_in_sample_residuals</span><span class="p">:</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_by_bin_</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_by_bin_&quot;</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_&quot;</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>        <span class="c1"># Check if residuals are empty or None</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>                <span class="sa">f</span><span class="s2">&quot;`store_in_sample_residuals = True` when fitting the forecaster &quot;</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>                <span class="sa">f</span><span class="s2">&quot;or use the `set_in_sample_residuals()` method before predicting.&quot;</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>            <span class="p">)</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`, &quot;</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                        <span class="sa">f</span><span class="s2">&quot;most likely because they were not present in the training data. &quot;</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_by_bin_</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_by_bin_&quot;</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_&quot;</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>        <span class="p">)</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>                <span class="sa">f</span><span class="s2">&quot;`use_in_sample_residuals = True` or the &quot;</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                <span class="sa">f</span><span class="s2">&quot;`set_out_sample_residuals()` method before predicting.&quot;</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>            <span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`. &quot;</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels. &quot;</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                        <span class="sa">f</span><span class="s2">&quot;Otherwise, Use the `set_out_sample_residuals()` method before &quot;</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                        <span class="sa">f</span><span class="s2">&quot;predicting to set the residuals for these levels.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">level_residuals</span> <span class="o">=</span> <span class="n">residuals</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="k">if</span> <span class="n">level_residuals</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">level_residuals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                    <span class="sa">f</span><span class="s2">&quot;Residuals for level &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; are None. Check `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`.&quot;</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                <span class="p">)</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    out_sample_residuals_by_bin_ : dict</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        Out of sample residuals binned according to the predicted value each residual</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        is associated with.</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">    levels : list, default None</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        Names of the series (levels) to be predicted (Forecasters multiseries).</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">    encoding : str, default None</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">        Encoding used to identify the different series (ForecasterRecursiveMultiSeries).</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">    None</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>    <span class="n">forecasters_multiseries</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="s2">&quot;ForecasterRecursiveMultiSeries&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>        <span class="s2">&quot;ForecasterDirectMultiVariate&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="s2">&quot;ForecasterRnn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>    <span class="p">)</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="k">if</span> <span class="n">use_in_sample_residuals</span><span class="p">:</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_by_bin_</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_by_bin_&quot;</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_&quot;</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>        <span class="c1"># Check if residuals are empty or None</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="p">)</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>                <span class="sa">f</span><span class="s2">&quot;`store_in_sample_residuals = True` when fitting the forecaster &quot;</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>                <span class="sa">f</span><span class="s2">&quot;or use the `set_in_sample_residuals()` method before predicting.&quot;</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="p">)</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`, &quot;</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                        <span class="sa">f</span><span class="s2">&quot;most likely because they were not present in the training data. &quot;</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_by_bin_</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_by_bin_&quot;</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_&quot;</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>        <span class="p">)</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>                <span class="sa">f</span><span class="s2">&quot;`use_in_sample_residuals = True` or the &quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>                <span class="sa">f</span><span class="s2">&quot;`set_out_sample_residuals()` method before predicting.&quot;</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="p">)</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`. &quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels. &quot;</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                        <span class="sa">f</span><span class="s2">&quot;Otherwise, Use the `set_out_sample_residuals()` method before &quot;</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                        <span class="sa">f</span><span class="s2">&quot;predicting to set the residuals for these levels.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>    <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="n">level_residuals</span> <span class="o">=</span> <span class="n">residuals</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="k">if</span> <span class="n">level_residuals</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">level_residuals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="sa">f</span><span class="s2">&quot;Residuals for level &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; are None. Check `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`.&quot;</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -13249,7 +13255,10 @@ Encoding used to identify the different series (<code>ForecasterRecursiveMultiSe
 <span class="normal"><a href="#__codelineno-0-574">574</a></span>
 <span class="normal"><a href="#__codelineno-0-575">575</a></span>
 <span class="normal"><a href="#__codelineno-0-576">576</a></span>
-<span class="normal"><a href="#__codelineno-0-577">577</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_predict_input</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-577">577</a></span>
+<span class="normal"><a href="#__codelineno-0-578">578</a></span>
+<span class="normal"><a href="#__codelineno-0-579">579</a></span>
+<span class="normal"><a href="#__codelineno-0-580">580</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_predict_input</span><span class="p">(</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">steps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="n">is_fitted</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -13407,36 +13416,39 @@ Encoding used to identify the different series (<code>ForecasterRecursiveMultiSe
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>                    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a>                        <span class="n">exog_names</span> <span class="o">=</span> <span class="n">exog</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                            <span class="sa">f</span><span class="s2">&quot;Exogenous variables must be: </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. &quot;</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>                            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2"> for series &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="n">check_exog</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>            <span class="n">check_exog_dtypes</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">call_check_exog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="c1"># Check that exogenous variables are the same as used in training</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>            <span class="c1"># Get the name of columns</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="n">exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>                    <span class="sa">f</span><span class="s2">&quot;Exogenous variables must be: </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>                <span class="p">)</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="c1"># Check last_window</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="k">if</span> <span class="n">last_window</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="k">if</span> <span class="n">last_window</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`last_window` has missing values.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="n">check_y</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">series_id</span><span class="o">=</span><span class="s2">&quot;`last_window`&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>    <span class="k">return</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>                    <span class="n">col_missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>                    <span class="k">if</span> <span class="n">col_missing</span><span class="p">:</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>                            <span class="sa">f</span><span class="s2">&quot;Missing columns for series &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; in `exog`. &quot;</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>                            <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>            <span class="n">check_exog</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>            <span class="n">check_exog_dtypes</span><span class="p">(</span><span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">call_check_exog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>            <span class="c1"># Check that exogenous variables are the same as used in training</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>            <span class="c1"># Get the name of columns</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>                <span class="n">exog_names</span> <span class="o">=</span> <span class="n">exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="n">col_missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names_in_</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exog_names</span><span class="p">)</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>            <span class="k">if</span> <span class="n">col_missing</span><span class="p">:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>                    <span class="sa">f</span><span class="s2">&quot;Missing columns in `exog`. Expected </span><span class="si">{</span><span class="n">exog_names_in_</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>                    <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">exog_names</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>                <span class="p">)</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="c1"># Check last_window</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>    <span class="k">if</span> <span class="n">last_window</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="k">if</span> <span class="n">last_window</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`last_window` has missing values.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="n">check_y</span><span class="p">(</span><span class="n">last_window</span><span class="p">,</span> <span class="n">series_id</span><span class="o">=</span><span class="s2">&quot;`last_window`&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>    <span class="k">return</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -13482,10 +13494,7 @@ encoding : str, default None
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/utils/validation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-580">580</a></span>
-<span class="normal"><a href="#__codelineno-0-581">581</a></span>
-<span class="normal"><a href="#__codelineno-0-582">582</a></span>
-<span class="normal"><a href="#__codelineno-0-583">583</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-583">583</a></span>
 <span class="normal"><a href="#__codelineno-0-584">584</a></span>
 <span class="normal"><a href="#__codelineno-0-585">585</a></span>
 <span class="normal"><a href="#__codelineno-0-586">586</a></span>
@@ -13606,131 +13615,134 @@ encoding : str, default None
 <span class="normal"><a href="#__codelineno-0-701">701</a></span>
 <span class="normal"><a href="#__codelineno-0-702">702</a></span>
 <span class="normal"><a href="#__codelineno-0-703">703</a></span>
-<span class="normal"><a href="#__codelineno-0-704">704</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>    <span class="n">use_in_sample_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>    <span class="n">in_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">out_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">use_binned_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">in_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="p">),</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="n">out_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-704">704</a></span>
+<span class="normal"><a href="#__codelineno-0-705">705</a></span>
+<span class="normal"><a href="#__codelineno-0-706">706</a></span>
+<span class="normal"><a href="#__codelineno-0-707">707</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">use_in_sample_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">in_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>    <span class="n">out_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="n">use_binned_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="n">in_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
 <a id="__codelineno-0-591" name="__codelineno-0-591"></a>    <span class="p">),</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>    <span class="n">levels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">    Check residuals input arguments in Forecasters.</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">    forecaster_name : str</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">        Forecaster name.</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">    use_in_sample_residuals : bool</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">        Indicates if in sample or out sample residuals are used.</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">    in_sample_residuals_ : numpy ndarray, dict</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">        Residuals of the model when predicting training data.</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">    out_sample_residuals_ : numpy ndarray, dict</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        Residuals of the model when predicting non training data.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">    use_binned_residuals : bool</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        Indicates if residuals are binned.</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    in_sample_residuals_by_bin_ : dict</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">        In sample residuals binned according to the predicted value each residual</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        is associated with.</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    out_sample_residuals_by_bin_ : dict</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        Out of sample residuals binned according to the predicted value each residual</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>    <span class="n">out_sample_residuals_by_bin_</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>        <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="p">),</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>    <span class="n">levels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    Check residuals input arguments in Forecasters.</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">    forecaster_name : str</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">        Forecaster name.</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">    use_in_sample_residuals : bool</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        Indicates if in sample or out sample residuals are used.</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">    in_sample_residuals_ : numpy ndarray, dict</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">        Residuals of the model when predicting training data.</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">    out_sample_residuals_ : numpy ndarray, dict</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        Residuals of the model when predicting non training data.</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">    use_binned_residuals : bool</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        Indicates if residuals are binned.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    in_sample_residuals_by_bin_ : dict</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        In sample residuals binned according to the predicted value each residual</span>
 <a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        is associated with.</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    levels : list, default None</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        Names of the series (levels) to be predicted (Forecasters multiseries).</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    encoding : str, default None</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">        Encoding used to identify the different series (ForecasterRecursiveMultiSeries).</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">    None</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="n">forecasters_multiseries</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="s2">&quot;ForecasterRecursiveMultiSeries&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="s2">&quot;ForecasterDirectMultiVariate&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>        <span class="s2">&quot;ForecasterRnn&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a>    <span class="p">)</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a>    <span class="k">if</span> <span class="n">use_in_sample_residuals</span><span class="p">:</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_by_bin_</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_by_bin_&quot;</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_&quot;</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>        <span class="c1"># Check if residuals are empty or None</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="p">)</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>                <span class="sa">f</span><span class="s2">&quot;`store_in_sample_residuals = True` when fitting the forecaster &quot;</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>                <span class="sa">f</span><span class="s2">&quot;or use the `set_in_sample_residuals()` method before predicting.&quot;</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>            <span class="p">)</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`, &quot;</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                        <span class="sa">f</span><span class="s2">&quot;most likely because they were not present in the training data. &quot;</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_by_bin_</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_by_bin_&quot;</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_&quot;</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>        <span class="p">)</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>                <span class="sa">f</span><span class="s2">&quot;`use_in_sample_residuals = True` or the &quot;</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                <span class="sa">f</span><span class="s2">&quot;`set_out_sample_residuals()` method before predicting.&quot;</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>            <span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`. &quot;</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels. &quot;</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                        <span class="sa">f</span><span class="s2">&quot;Otherwise, Use the `set_out_sample_residuals()` method before &quot;</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                        <span class="sa">f</span><span class="s2">&quot;predicting to set the residuals for these levels.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">level_residuals</span> <span class="o">=</span> <span class="n">residuals</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="k">if</span> <span class="n">level_residuals</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">level_residuals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                    <span class="sa">f</span><span class="s2">&quot;Residuals for level &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; are None. Check `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`.&quot;</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                <span class="p">)</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    out_sample_residuals_by_bin_ : dict</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">        Out of sample residuals binned according to the predicted value each residual</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        is associated with.</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">    levels : list, default None</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        Names of the series (levels) to be predicted (Forecasters multiseries).</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">    encoding : str, default None</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">        Encoding used to identify the different series (ForecasterRecursiveMultiSeries).</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">    None</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>    <span class="n">forecasters_multiseries</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="s2">&quot;ForecasterRecursiveMultiSeries&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>        <span class="s2">&quot;ForecasterDirectMultiVariate&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="s2">&quot;ForecasterRnn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>    <span class="p">)</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="k">if</span> <span class="n">use_in_sample_residuals</span><span class="p">:</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_by_bin_</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_by_bin_&quot;</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">in_sample_residuals_</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;in_sample_residuals_&quot;</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>        <span class="c1"># Check if residuals are empty or None</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="p">)</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>                <span class="sa">f</span><span class="s2">&quot;`store_in_sample_residuals = True` when fitting the forecaster &quot;</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>                <span class="sa">f</span><span class="s2">&quot;or use the `set_in_sample_residuals()` method before predicting.&quot;</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="p">)</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`, &quot;</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                        <span class="sa">f</span><span class="s2">&quot;most likely because they were not present in the training data. &quot;</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="k">if</span> <span class="n">use_binned_residuals</span><span class="p">:</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_by_bin_</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_by_bin_&quot;</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>            <span class="n">residuals</span> <span class="o">=</span> <span class="n">out_sample_residuals_</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="n">literal</span> <span class="o">=</span> <span class="s2">&quot;out_sample_residuals_&quot;</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="n">is_empty</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>            <span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">residuals</span><span class="p">)</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">residuals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>        <span class="p">)</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="k">if</span> <span class="n">is_empty</span><span class="p">:</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>                <span class="sa">f</span><span class="s2">&quot;`forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">` is either None or empty. Use &quot;</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>                <span class="sa">f</span><span class="s2">&quot;`use_in_sample_residuals = True` or the &quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>                <span class="sa">f</span><span class="s2">&quot;`set_out_sample_residuals()` method before predicting.&quot;</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="p">)</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                <span class="n">unknown_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                <span class="k">if</span> <span class="n">unknown_levels</span><span class="p">:</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                        <span class="sa">f</span><span class="s2">&quot;`levels` </span><span class="si">{</span><span class="n">unknown_levels</span><span class="si">}</span><span class="s2"> are not present in `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`. &quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                        <span class="sa">f</span><span class="s2">&quot;A random sample of the residuals from other levels will be used. &quot;</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                        <span class="sa">f</span><span class="s2">&quot;This can lead to inaccurate intervals for the unknown levels. &quot;</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                        <span class="sa">f</span><span class="s2">&quot;Otherwise, Use the `set_out_sample_residuals()` method before &quot;</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                        <span class="sa">f</span><span class="s2">&quot;predicting to set the residuals for these levels.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                        <span class="n">UnknownLevelWarning</span><span class="p">,</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>    <span class="k">if</span> <span class="n">forecaster_name</span> <span class="ow">in</span> <span class="n">forecasters_multiseries</span><span class="p">:</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">residuals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="n">level_residuals</span> <span class="o">=</span> <span class="n">residuals</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="k">if</span> <span class="n">level_residuals</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">level_residuals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="sa">f</span><span class="s2">&quot;Residuals for level &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; are None. Check `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`.&quot;</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
