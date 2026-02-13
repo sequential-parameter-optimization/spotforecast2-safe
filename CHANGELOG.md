@@ -1,9 +1,11 @@
 ## [0.9.1-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.1-rc.1...v0.9.1-rc.2) (2026-02-13)
+## [0.9.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0...v0.9.1) (2026-02-13)
 
 
 ### Bug Fixes
 
 * ForecasterEquivalentDate verified ([69e8f62](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/69e8f62fdd217483a5879ae6fd9e0b6a8071af92))
+* predict_bootstrapping ([5fb5ce0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5fb5ce0fdfb43b0c17833ef56a987ca65505cdda))
 
 ## [0.9.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0...v0.9.1-rc.1) (2026-02-13)
 
