@@ -760,7 +760,11 @@ def set_cpu_gpu_device(estimator: object, device: str | None = "cpu") -> str | N
     if original_device != new_device:
         try:
             estimator.set_params(**{param_name: new_device})
-        except Exception:
-            pass
+        except Exception as exc:
+            warnings.warn(
+                f"Failed to set device parameter '{param_name}' to '{new_device}' "
+                f"for estimator '{estimator_name}': {exc}",
+                UserWarning,
+            )
 
     return original_device
