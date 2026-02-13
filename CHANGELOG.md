@@ -1,13 +1,16 @@
-## [0.9.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.3...v0.9.0) (2026-02-13)
-
-
-### Features
-
-* create_predict_X ([85553d6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/85553d6b26ed27b11b237a6416f3206b2186e35c))
+## [0.9.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0...v0.9.1-rc.1) (2026-02-13)
 
 
 ### Bug Fixes
 
+* predict_bootstrapping ([5fb5ce0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5fb5ce0fdfb43b0c17833ef56a987ca65505cdda))
+
+## [0.9.0-rc.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0-rc.3...v0.9.0-rc.4) (2026-02-13)
+
+
+### Bug Fixes
+
+* predict_bootstrapping ([5fb5ce0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5fb5ce0fdfb43b0c17833ef56a987ca65505cdda))
 * _recursive_predict ([ba54a2e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ba54a2e8973e95b415c1b24aad7880507e60f8b2))
 * _recursive_predict_bootstrapping ([59ed543](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/59ed543db4a6489820dba87783f03325585f01f3))
 * predict ([26fbdc8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/26fbdc845d9cb1256649274c0a03be21efe193c9))
