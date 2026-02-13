@@ -6,12 +6,12 @@ This page provides a high-level introduction to spotforecast2-safe's public API 
 
 The spotforecast2-safe library organizes functionality into six major modules:
 
-- **Data**: Fetching and managing time series, weather, and holiday data
-- **Preprocessing**: Feature engineering, data curation, and transformation
-- **Processing**: Utilities for handling timestamps and temporal conversions
-- **Forecaster**: Recursive forecasting models (ForecasterRecursive, ForecasterEquivalentDate)
-- **Utils**: CPE generation, configuration, validation, and helper functions
-- **Weather**: Climate data integration
+- Data: Fetching and managing time series, weather, and holiday data
+- Preprocessing: Feature engineering, data curation, and transformation
+- Processing: Utilities for handling timestamps and temporal conversions
+- Forecaster: Recursive forecasting models (ForecasterRecursive, ForecasterEquivalentDate)
+- Utils: CPE generation, configuration, validation, and helper functions
+- Weather: Climate data integration
 
 ## Quick Start
 
@@ -248,28 +248,28 @@ print(f"30-day forecast: {forecast}")
 
 The complete documentation is organized as follows:
 
-- **Home** (this page): High-level overview
-- **API Reference**: Detailed API documentation by module
+- Home (this page): High-level overview
+- API Reference: Detailed API documentation by module
   - [Data Module](api/data.md): Data fetching and Period management
   - [Preprocessing Module](api/preprocessing.md): Feature engineering and forecasters
   - [Processing Module](api/processing.md): Utilities for timestamps and conversions
   - [Utils Module](api/utils.md): Helper functions and CPE generation
   - [Weather Module](api/weather.md): Climate data integration
   - [Exceptions](api/exceptions.md): Error types and documentation
-- **Guides**: Practical examples and workflows
+- Guides: Practical examples and workflows
   - [ForecasterRecursive Guide](recursive/ForecasterRecursive.md): Advanced forecasting techniques
   - [Model Persistence](processing/model_persistence.md): Production deployment
-- **Safety & Compliance**: Documentation for auditors and compliance
+- Safety & Compliance: Documentation for auditors and compliance
   - [Model/Method Card](safe/MODEL_CARD.md): Compliance and safety design
   - [Contributing Guide](contributing.md): How to contribute to the project
 
 ## Next Steps
 
-1. **Quick Start**: Follow the [Quick Start](#quick-start) example above
-2. **Learn Core Concepts**: Read about [Period Management](#period-management) and [Recursive Forecasting](#recursive-forecasting)
-3. **Explore Examples**: Check out [ForecasterRecursive Guide](recursive/ForecasterRecursive.md)
-4. **API Reference**: Dive into specific modules in [API Documentation](api/data.md)
-5. **Contribute**: See [Contributing Guide](contributing.md) to contribute improvements
+1. Quick Start: Follow the [Quick Start](#quick-start) example above
+2. Learn Core Concepts: Read about [Period Management](#period-management) and [Recursive Forecasting](#recursive-forecasting)
+3. Explore Examples: Check out [ForecasterRecursive Guide](recursive/ForecasterRecursive.md)
+4. API Reference: Dive into specific modules in [API Documentation](api/data.md)
+5. Contribute: See [Contributing Guide](contributing.md) to contribute improvements
 
 ## Troubleshooting
 
