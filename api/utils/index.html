@@ -999,6 +999,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotforecast2_safe.utils.set_cpu_gpu_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_cpu_gpu_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotforecast2_safe.utils.transform_dataframe" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1432,6 +1443,17 @@
     <span class="md-ellipsis">
       
         get_exog_dtypes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spotforecast2_safe.utils.validation.set_cpu_gpu_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_cpu_gpu_device
       
     </span>
   </a>
@@ -2343,6 +2365,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotforecast2_safe.utils.set_cpu_gpu_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_cpu_gpu_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotforecast2_safe.utils.transform_dataframe" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2776,6 +2809,17 @@
     <span class="md-ellipsis">
       
         get_exog_dtypes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spotforecast2_safe.utils.validation.set_cpu_gpu_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_cpu_gpu_device
       
     </span>
   </a>
@@ -5091,7 +5135,9 @@ encoding : str, default None
 <span class="normal"><a href="#__codelineno-0-704">704</a></span>
 <span class="normal"><a href="#__codelineno-0-705">705</a></span>
 <span class="normal"><a href="#__codelineno-0-706">706</a></span>
-<span class="normal"><a href="#__codelineno-0-707">707</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-707">707</a></span>
+<span class="normal"><a href="#__codelineno-0-708">708</a></span>
+<span class="normal"><a href="#__codelineno-0-709">709</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">use_in_sample_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">in_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -5216,6 +5262,8 @@ encoding : str, default None
 <a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="sa">f</span><span class="s2">&quot;Residuals for level &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; are None. Check `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`.&quot;</span>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="p">)</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>    <span class="k">return</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8122,6 +8170,208 @@ it's converted to a single-column DataFrame.</p>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a>        <span class="p">)</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a>    <span class="k">return</span> <span class="n">data</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="spotforecast2_safe.utils.set_cpu_gpu_device" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>estimator</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Estimator compatible with the scikit-learn API.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>device</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Device to set. Options are 'cpu', 'gpu', 'cuda', or None.
+Defaults to 'cpu'.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;cpu&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The device that was set on the estimator before the function was called.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/spotforecast2_safe/utils/validation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-712">712</a></span>
+<span class="normal"><a href="#__codelineno-0-713">713</a></span>
+<span class="normal"><a href="#__codelineno-0-714">714</a></span>
+<span class="normal"><a href="#__codelineno-0-715">715</a></span>
+<span class="normal"><a href="#__codelineno-0-716">716</a></span>
+<span class="normal"><a href="#__codelineno-0-717">717</a></span>
+<span class="normal"><a href="#__codelineno-0-718">718</a></span>
+<span class="normal"><a href="#__codelineno-0-719">719</a></span>
+<span class="normal"><a href="#__codelineno-0-720">720</a></span>
+<span class="normal"><a href="#__codelineno-0-721">721</a></span>
+<span class="normal"><a href="#__codelineno-0-722">722</a></span>
+<span class="normal"><a href="#__codelineno-0-723">723</a></span>
+<span class="normal"><a href="#__codelineno-0-724">724</a></span>
+<span class="normal"><a href="#__codelineno-0-725">725</a></span>
+<span class="normal"><a href="#__codelineno-0-726">726</a></span>
+<span class="normal"><a href="#__codelineno-0-727">727</a></span>
+<span class="normal"><a href="#__codelineno-0-728">728</a></span>
+<span class="normal"><a href="#__codelineno-0-729">729</a></span>
+<span class="normal"><a href="#__codelineno-0-730">730</a></span>
+<span class="normal"><a href="#__codelineno-0-731">731</a></span>
+<span class="normal"><a href="#__codelineno-0-732">732</a></span>
+<span class="normal"><a href="#__codelineno-0-733">733</a></span>
+<span class="normal"><a href="#__codelineno-0-734">734</a></span>
+<span class="normal"><a href="#__codelineno-0-735">735</a></span>
+<span class="normal"><a href="#__codelineno-0-736">736</a></span>
+<span class="normal"><a href="#__codelineno-0-737">737</a></span>
+<span class="normal"><a href="#__codelineno-0-738">738</a></span>
+<span class="normal"><a href="#__codelineno-0-739">739</a></span>
+<span class="normal"><a href="#__codelineno-0-740">740</a></span>
+<span class="normal"><a href="#__codelineno-0-741">741</a></span>
+<span class="normal"><a href="#__codelineno-0-742">742</a></span>
+<span class="normal"><a href="#__codelineno-0-743">743</a></span>
+<span class="normal"><a href="#__codelineno-0-744">744</a></span>
+<span class="normal"><a href="#__codelineno-0-745">745</a></span>
+<span class="normal"><a href="#__codelineno-0-746">746</a></span>
+<span class="normal"><a href="#__codelineno-0-747">747</a></span>
+<span class="normal"><a href="#__codelineno-0-748">748</a></span>
+<span class="normal"><a href="#__codelineno-0-749">749</a></span>
+<span class="normal"><a href="#__codelineno-0-750">750</a></span>
+<span class="normal"><a href="#__codelineno-0-751">751</a></span>
+<span class="normal"><a href="#__codelineno-0-752">752</a></span>
+<span class="normal"><a href="#__codelineno-0-753">753</a></span>
+<span class="normal"><a href="#__codelineno-0-754">754</a></span>
+<span class="normal"><a href="#__codelineno-0-755">755</a></span>
+<span class="normal"><a href="#__codelineno-0-756">756</a></span>
+<span class="normal"><a href="#__codelineno-0-757">757</a></span>
+<span class="normal"><a href="#__codelineno-0-758">758</a></span>
+<span class="normal"><a href="#__codelineno-0-759">759</a></span>
+<span class="normal"><a href="#__codelineno-0-760">760</a></span>
+<span class="normal"><a href="#__codelineno-0-761">761</a></span>
+<span class="normal"><a href="#__codelineno-0-762">762</a></span>
+<span class="normal"><a href="#__codelineno-0-763">763</a></span>
+<span class="normal"><a href="#__codelineno-0-764">764</a></span>
+<span class="normal"><a href="#__codelineno-0-765">765</a></span>
+<span class="normal"><a href="#__codelineno-0-766">766</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="sd">    Set the device for the estimator to either &#39;cpu&#39;, &#39;gpu&#39;, &#39;cuda&#39;, or None.</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="sd">        estimator: Estimator compatible with the scikit-learn API.</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a><span class="sd">        device: Device to set. Options are &#39;cpu&#39;, &#39;gpu&#39;, &#39;cuda&#39;, or None.</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">            Defaults to &#39;cpu&#39;.</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        The device that was set on the estimator before the function was called.</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>    <span class="n">valid_devices</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">}</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>    <span class="k">if</span> <span class="n">device</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_devices</span><span class="p">:</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`device` must be &#39;gpu&#39;, &#39;cpu&#39;, &#39;cuda&#39;, or None.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>    <span class="n">estimator_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>    <span class="n">supported_estimators</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;XGBRegressor&quot;</span><span class="p">,</span> <span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">,</span> <span class="s2">&quot;CatBoostRegressor&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>    <span class="k">if</span> <span class="n">estimator_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_estimators</span><span class="p">:</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>    <span class="n">device_names</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="s2">&quot;XGBRegressor&quot;</span><span class="p">:</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">:</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="s2">&quot;CatBoostRegressor&quot;</span><span class="p">:</span> <span class="s2">&quot;task_type&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>    <span class="p">}</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>    <span class="n">device_values</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="s2">&quot;XGBRegressor&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="s2">&quot;gpu&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="s2">&quot;CatBoostRegressor&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="s2">&quot;GPU&quot;</span><span class="p">:</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="s2">&quot;CPU&quot;</span><span class="p">:</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>        <span class="p">},</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="p">}</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>    <span class="n">param_name</span> <span class="o">=</span> <span class="n">device_names</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">]</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>    <span class="n">original_device</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>        <span class="k">return</span> <span class="n">original_device</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>    <span class="n">new_device</span> <span class="o">=</span> <span class="n">device_values</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">][</span><span class="n">device</span><span class="p">]</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>    <span class="k">if</span> <span class="n">original_device</span> <span class="o">!=</span> <span class="n">new_device</span><span class="p">:</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>            <span class="n">estimator</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">param_name</span><span class="p">:</span> <span class="n">new_device</span><span class="p">})</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>            <span class="k">pass</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>    <span class="k">return</span> <span class="n">original_device</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -13618,7 +13868,9 @@ encoding : str, default None
 <span class="normal"><a href="#__codelineno-0-704">704</a></span>
 <span class="normal"><a href="#__codelineno-0-705">705</a></span>
 <span class="normal"><a href="#__codelineno-0-706">706</a></span>
-<span class="normal"><a href="#__codelineno-0-707">707</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-707">707</a></span>
+<span class="normal"><a href="#__codelineno-0-708">708</a></span>
+<span class="normal"><a href="#__codelineno-0-709">709</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_residuals_input</span><span class="p">(</span>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">forecaster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">use_in_sample_residuals</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">in_sample_residuals_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -13743,6 +13995,8 @@ encoding : str, default None
 <a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="sa">f</span><span class="s2">&quot;Residuals for level &#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; are None. Check `forecaster.</span><span class="si">{</span><span class="n">literal</span><span class="si">}</span><span class="s2">`.&quot;</span>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="p">)</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>    <span class="k">return</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -14156,6 +14410,208 @@ For Series, uses the series name as the key. For DataFrames, uses all column nam
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">exog_dtypes</span> <span class="o">=</span> <span class="n">exog</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="k">return</span> <span class="n">exog_dtypes</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="spotforecast2_safe.utils.validation.set_cpu_gpu_device" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>estimator</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Estimator compatible with the scikit-learn API.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>device</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Device to set. Options are 'cpu', 'gpu', 'cuda', or None.
+Defaults to 'cpu'.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;cpu&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The device that was set on the estimator before the function was called.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/spotforecast2_safe/utils/validation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-712">712</a></span>
+<span class="normal"><a href="#__codelineno-0-713">713</a></span>
+<span class="normal"><a href="#__codelineno-0-714">714</a></span>
+<span class="normal"><a href="#__codelineno-0-715">715</a></span>
+<span class="normal"><a href="#__codelineno-0-716">716</a></span>
+<span class="normal"><a href="#__codelineno-0-717">717</a></span>
+<span class="normal"><a href="#__codelineno-0-718">718</a></span>
+<span class="normal"><a href="#__codelineno-0-719">719</a></span>
+<span class="normal"><a href="#__codelineno-0-720">720</a></span>
+<span class="normal"><a href="#__codelineno-0-721">721</a></span>
+<span class="normal"><a href="#__codelineno-0-722">722</a></span>
+<span class="normal"><a href="#__codelineno-0-723">723</a></span>
+<span class="normal"><a href="#__codelineno-0-724">724</a></span>
+<span class="normal"><a href="#__codelineno-0-725">725</a></span>
+<span class="normal"><a href="#__codelineno-0-726">726</a></span>
+<span class="normal"><a href="#__codelineno-0-727">727</a></span>
+<span class="normal"><a href="#__codelineno-0-728">728</a></span>
+<span class="normal"><a href="#__codelineno-0-729">729</a></span>
+<span class="normal"><a href="#__codelineno-0-730">730</a></span>
+<span class="normal"><a href="#__codelineno-0-731">731</a></span>
+<span class="normal"><a href="#__codelineno-0-732">732</a></span>
+<span class="normal"><a href="#__codelineno-0-733">733</a></span>
+<span class="normal"><a href="#__codelineno-0-734">734</a></span>
+<span class="normal"><a href="#__codelineno-0-735">735</a></span>
+<span class="normal"><a href="#__codelineno-0-736">736</a></span>
+<span class="normal"><a href="#__codelineno-0-737">737</a></span>
+<span class="normal"><a href="#__codelineno-0-738">738</a></span>
+<span class="normal"><a href="#__codelineno-0-739">739</a></span>
+<span class="normal"><a href="#__codelineno-0-740">740</a></span>
+<span class="normal"><a href="#__codelineno-0-741">741</a></span>
+<span class="normal"><a href="#__codelineno-0-742">742</a></span>
+<span class="normal"><a href="#__codelineno-0-743">743</a></span>
+<span class="normal"><a href="#__codelineno-0-744">744</a></span>
+<span class="normal"><a href="#__codelineno-0-745">745</a></span>
+<span class="normal"><a href="#__codelineno-0-746">746</a></span>
+<span class="normal"><a href="#__codelineno-0-747">747</a></span>
+<span class="normal"><a href="#__codelineno-0-748">748</a></span>
+<span class="normal"><a href="#__codelineno-0-749">749</a></span>
+<span class="normal"><a href="#__codelineno-0-750">750</a></span>
+<span class="normal"><a href="#__codelineno-0-751">751</a></span>
+<span class="normal"><a href="#__codelineno-0-752">752</a></span>
+<span class="normal"><a href="#__codelineno-0-753">753</a></span>
+<span class="normal"><a href="#__codelineno-0-754">754</a></span>
+<span class="normal"><a href="#__codelineno-0-755">755</a></span>
+<span class="normal"><a href="#__codelineno-0-756">756</a></span>
+<span class="normal"><a href="#__codelineno-0-757">757</a></span>
+<span class="normal"><a href="#__codelineno-0-758">758</a></span>
+<span class="normal"><a href="#__codelineno-0-759">759</a></span>
+<span class="normal"><a href="#__codelineno-0-760">760</a></span>
+<span class="normal"><a href="#__codelineno-0-761">761</a></span>
+<span class="normal"><a href="#__codelineno-0-762">762</a></span>
+<span class="normal"><a href="#__codelineno-0-763">763</a></span>
+<span class="normal"><a href="#__codelineno-0-764">764</a></span>
+<span class="normal"><a href="#__codelineno-0-765">765</a></span>
+<span class="normal"><a href="#__codelineno-0-766">766</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_cpu_gpu_device</span><span class="p">(</span><span class="n">estimator</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="sd">    Set the device for the estimator to either &#39;cpu&#39;, &#39;gpu&#39;, &#39;cuda&#39;, or None.</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="sd">        estimator: Estimator compatible with the scikit-learn API.</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a><span class="sd">        device: Device to set. Options are &#39;cpu&#39;, &#39;gpu&#39;, &#39;cuda&#39;, or None.</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">            Defaults to &#39;cpu&#39;.</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        The device that was set on the estimator before the function was called.</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>    <span class="n">valid_devices</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">}</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>    <span class="k">if</span> <span class="n">device</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_devices</span><span class="p">:</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`device` must be &#39;gpu&#39;, &#39;cpu&#39;, &#39;cuda&#39;, or None.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>    <span class="n">estimator_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>    <span class="n">supported_estimators</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;XGBRegressor&quot;</span><span class="p">,</span> <span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">,</span> <span class="s2">&quot;CatBoostRegressor&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>    <span class="k">if</span> <span class="n">estimator_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_estimators</span><span class="p">:</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>    <span class="n">device_names</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="s2">&quot;XGBRegressor&quot;</span><span class="p">:</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">:</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="s2">&quot;CatBoostRegressor&quot;</span><span class="p">:</span> <span class="s2">&quot;task_type&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>    <span class="p">}</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>    <span class="n">device_values</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="s2">&quot;XGBRegressor&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="s2">&quot;LGBMRegressor&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="s2">&quot;gpu&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="s2">&quot;CatBoostRegressor&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="s2">&quot;cuda&quot;</span><span class="p">:</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="s2">&quot;GPU&quot;</span><span class="p">:</span> <span class="s2">&quot;GPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="s2">&quot;CPU&quot;</span><span class="p">:</span> <span class="s2">&quot;CPU&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>        <span class="p">},</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="p">}</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>    <span class="n">param_name</span> <span class="o">=</span> <span class="n">device_names</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">]</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>    <span class="n">original_device</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>        <span class="k">return</span> <span class="n">original_device</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>    <span class="n">new_device</span> <span class="o">=</span> <span class="n">device_values</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">][</span><span class="n">device</span><span class="p">]</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>    <span class="k">if</span> <span class="n">original_device</span> <span class="o">!=</span> <span class="n">new_device</span><span class="p">:</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>            <span class="n">estimator</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">param_name</span><span class="p">:</span> <span class="n">new_device</span><span class="p">})</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>            <span class="k">pass</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>    <span class="k">return</span> <span class="n">original_device</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
