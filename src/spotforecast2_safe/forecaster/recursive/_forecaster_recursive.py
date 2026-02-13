@@ -1659,6 +1659,121 @@ class ForecasterRecursive(ForecasterBase):
 
         return predictions
 
+    def create_predict_X(
+        self,
+        steps: int,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        check_inputs: bool = True,
+    ) -> pd.DataFrame:
+        """
+        Create the predictors needed to predict `steps` ahead. As it is a recursive
+        process, the predictors are created at each iteration of the prediction
+        process.
+
+        Args:
+            steps:
+                Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            last_window:
+                Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in `self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data. Defaults to None.
+            exog:
+                Exogenous variable/s included as predictor/s. Defaults to None.
+            check_inputs:
+                If `True`, the input is checked for possible warnings and errors
+                with the `check_predict_input` function. This argument is created
+                for internal use and is not recommended to be changed.
+                Defaults to True.
+
+        Returns:
+            Pandas DataFrame with the predictors for each step. The index
+            is the same as the prediction index.
+        """
+
+        (
+            last_window_values,
+            exog_values,
+            prediction_index,
+            steps,
+        ) = self._create_predict_inputs(
+            steps=steps,
+            last_window=last_window,
+            exog=exog,
+            check_inputs=check_inputs,
+        )
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            predictions = self._recursive_predict(
+                steps=steps,
+                last_window_values=last_window_values,
+                exog_values=exog_values,
+            )
+
+        X_predict = []
+        full_predictors = np.concatenate((last_window_values, predictions))
+
+        if self.lags is not None:
+            idx = np.arange(-steps, 0)[:, None] - self.lags
+            X_lags = full_predictors[idx + len(full_predictors)]
+            X_predict.append(X_lags)
+
+        if self.window_features is not None:
+            X_window_features = np.full(
+                shape=(steps, len(self.X_train_window_features_names_out_)),
+                fill_value=np.nan,
+                order="C",
+                dtype=float,
+            )
+            for i in range(steps):
+                X_window_features[i, :] = np.concatenate(
+                    [
+                        wf.transform(full_predictors[i : -(steps - i)])
+                        for wf in self.window_features
+                    ]
+                )
+            X_predict.append(X_window_features)
+
+        if exog is not None:
+            X_predict.append(exog_values)
+
+        X_predict = pd.DataFrame(
+            data=np.concatenate(X_predict, axis=1),
+            columns=self.X_train_features_names_out_,
+            index=prediction_index,
+        )
+
+        if self.exog_in_:
+            categorical_features = any(
+                not pd.api.types.is_numeric_dtype(dtype)
+                or pd.api.types.is_bool_dtype(dtype)
+                for dtype in set(self.exog_dtypes_out_.values())
+            )
+            if categorical_features:
+                X_predict = X_predict.astype(self.exog_dtypes_out_)
+
+        if self.transformer_y is not None or self.differentiation is not None:
+            warnings.warn(
+                "The output matrix is in the transformed scale due to the "
+                "inclusion of transformations or differentiation in the Forecaster. "
+                "As a result, any predictions generated using this matrix will also "
+                "be in the transformed scale. Please refer to the documentation "
+                "for more details: "
+                "https://skforecast.org/latest/user_guides/training-and-prediction-matrices.html",
+                DataTransformationWarning,
+            )
+
+        return X_predict
+
     def predict(
         self,
         steps: int | str | pd.Timestamp,
