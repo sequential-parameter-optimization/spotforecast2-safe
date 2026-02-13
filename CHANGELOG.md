@@ -1,3 +1,10 @@
+## [0.9.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0...v0.9.1-rc.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* predict_bootstrapping ([5fb5ce0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5fb5ce0fdfb43b0c17833ef56a987ca65505cdda))
+
 ## [0.9.0-rc.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.9.0-rc.3...v0.9.0-rc.4) (2026-02-13)
 
 
