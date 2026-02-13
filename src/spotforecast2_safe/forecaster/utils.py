@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import warnings
 import uuid
+from copy import copy, deepcopy
 from sklearn.compose import ColumnTransformer
 from spotforecast2_safe.utils import (
     initialize_lags,
@@ -27,6 +28,7 @@ from spotforecast2_safe.exceptions import (
     UnknownLevelWarning,
     IgnoredArgumentWarning,
     InputTypeWarning,
+    MissingValuesWarning,
 )
 
 try:
@@ -57,12 +59,15 @@ def check_preprocess_series(
     the same index as the original DataFrame.
 
     Args:
-        series: pandas DataFrame or dictionary of pandas Series/DataFrames
+        series (pd.DataFrame, dict): pandas DataFrame or dictionary of pandas
+            Series/DataFrames.
 
     Returns:
-        tuple[dict[str, pd.Series], dict[str, pd.Index]]:
-            - series_dict: Dictionary where keys are series IDs and values are pandas Series.
-            - series_indexes: Dictionary where keys are series IDs and values are the index of each series.
+        tuple: A tuple containing:
+            - series_dict (dict): Dictionary where keys are series IDs and values
+              are pandas Series.
+            - series_indexes (dict): Dictionary where keys are series IDs and values
+              are the index of each series.
     Raises:
         TypeError:
             If `series` is not a pandas DataFrame or a dictionary of pandas Series/DataFrames.
@@ -285,18 +290,13 @@ def exog_to_direct(
     forecasting.
 
     Args:
-        exog: pandas Series, pandas DataFrame
-            Exogenous variables.
-        steps: int
-            Number of steps that will be predicted using exog.
+        exog (pd.Series, pd.DataFrame): Exogenous variables.
+        steps (int): Number of steps that will be predicted using exog.
 
     Returns:
-        tuple[pd.DataFrame, list[str]]:
-            exog_direct: pandas DataFrame
-                Exogenous variables transformed.
-            exog_direct_names: list
-                Names of the columns of the exogenous variables transformed. Only
-                created if `exog` is a pandas Series or DataFrame.
+        tuple: A tuple containing:
+            - exog_direct (pd.DataFrame): Exogenous variables transformed.
+            - exog_direct_names (list): Names of the columns of the exogenous variables transformed.
     """
 
     if not isinstance(exog, (pd.Series, pd.DataFrame)):
@@ -333,31 +333,28 @@ def exog_to_direct_numpy(
     forecasting.
 
     Args:
-        exog: numpy ndarray, pandas Series, pandas DataFrame
-            Exogenous variables, shape(samples,). If exog is a pandas format, the
-            direct exog names are created.
-        steps: int
-            Number of steps that will be predicted using exog.
+        exog (np.ndarray, pd.Series, pd.DataFrame): Exogenous variables,
+            shape(samples,). If exog is a pandas format, the direct exog names
+            are created.
+        steps (int): Number of steps that will be predicted using exog.
 
     Returns:
-        tuple[np.ndarray, list[str] | None]:
-            exog_direct: numpy ndarray
-                Exogenous variables transformed.
-            exog_direct_names: list, None
-                Names of the columns of the exogenous variables transformed. Only
-                created if `exog` is a pandas Series or DataFrame.
+        tuple: A tuple containing:
+            - exog_direct (np.ndarray): Exogenous variables transformed.
+            - exog_direct_names (list, None): Names of the columns of the exogenous
+              variables transformed. Only created if `exog` is a pandas format.
 
     Examples:
-        from spotforecast2_safe.forecaster.utils import exog_to_direct_numpy
-        import numpy as np
-        exog = np.array([10, 20, 30, 40, 50])
-        steps = 3
-        exog_direct, exog_direct_names = exog_to_direct_numpy(exog, steps)
-        print(exog_direct)
-            [[10 20 30]
-            [20 30 40]
-            [30 40 50]]
-        print(exog_direct_names)
+        >>> from spotforecast2_safe.forecaster.utils import exog_to_direct_numpy
+        >>> import numpy as np
+        >>> exog = np.array([10, 20, 30, 40, 50])
+        >>> steps = 3
+        >>> exog_direct, exog_direct_names = exog_to_direct_numpy(exog, steps)
+        >>> print(exog_direct)
+        [[10 20 30]
+         [20 30 40]
+         [30 40 50]]
+        >>> print(exog_direct_names)
         None
     """
 
@@ -392,41 +389,30 @@ def prepare_steps_direct(
     Prepare list of steps to be predicted in Direct Forecasters.
 
     Args:
-        max_step: int, list, numpy ndarray
-            Maximum number of future steps the forecaster will predict
-            when using predict methods.
-        steps: int, list, None, default None
-            Predict n steps. The value of `steps` must be less than or equal to the
-            value of steps defined when initializing the forecaster. Starts at 1.
-
-            - If `int`: Only steps within the range of 1 to int are predicted.
-            - If `list`: List of ints. Only the steps contained in the list
-              are predicted.
-            - If `None`: As many steps are predicted as were defined at
-              initialization.
+        max_step (int, list, np.ndarray): Maximum number of future steps the
+            forecaster will predict.
+        steps (int, list, None): Predict n steps. The value of `steps` must be
+            less than or equal to the value of steps defined when initializing
+            the forecaster. Starts at 1. Defaults to `None`.
 
     Returns:
-        list[int]:
-            Steps to be predicted.
+        list: Steps to be predicted.
 
     Examples:
-        from spotforecast2_safe.forecaster.utils import prepare_steps_direct
-        max_step = 5
-        steps = 3
-        steps_direct = prepare_steps_direct(max_step, steps)
-        print(steps_direct)
+        >>> from spotforecast2_safe.forecaster.utils import prepare_steps_direct
+        >>> max_step = 5
+        >>> steps = 3
+        >>> prepare_steps_direct(max_step, steps)
         [1, 2, 3]
 
-        max_step = 5
-        steps = [1, 3, 5]
-        steps_direct = prepare_steps_direct(max_step, steps)
-        print(steps_direct)
+        >>> max_step = 5
+        >>> steps = [1, 3, 5]
+        >>> prepare_steps_direct(max_step, steps)
         [1, 3, 5]
 
-        max_step = 5
-        steps = None
-        steps_direct = prepare_steps_direct(max_step, steps)
-        print(steps_direct)
+        >>> max_step = 5
+        >>> steps = None
+        >>> prepare_steps_direct(max_step, steps)
         [1, 2, 3, 4, 5]
     """
 
@@ -464,41 +450,40 @@ def transform_numpy(
     have inverse_transform method.
 
     Args:
-        array: numpy ndarray
-            Array to be transformed.
-        transformer: scikit-learn alike transformer, preprocessor, or ColumnTransformer.
-            Scikit-learn alike transformer (preprocessor) with methods: fit, transform,
-            fit_transform and inverse_transform.
-    fit: bool, default False
-        Train the transformer before applying it.
-    inverse_transform: bool, default False
-        Transform back the data to the original representation. This is not available
-        when using transformers of class scikit-learn ColumnTransformers.
+        array (np.ndarray): Array to be transformed.
+        transformer (object, None): Scikit-learn alike transformer, preprocessor,
+            or ColumnTransformer with methods: fit, transform, fit_transform
+            and inverse_transform.
+        fit (bool): Train the transformer before applying it. Defaults to `False`.
+        inverse_transform (bool): Transform back the data to the original
+            representation. This is not available when using transformers of
+            class scikit-learn ColumnTransformers. Defaults to `False`.
 
     Returns:
-        numpy ndarray: Transformed array.
+        np.ndarray: Transformed array.
 
     Raises:
         TypeError: If `array` is not a numpy ndarray.
-        TypeError: If `transformer` is not a scikit-learn alike transformer, preprocessor, or ColumnTransformer.
-        ValueError: If `inverse_transform` is True and `transformer` is a ColumnTransformer.
+        TypeError: If `transformer` is not a scikit-learn alike transformer.
+        ValueError: If `inverse_transform` is True and `transformer` is a
+            ColumnTransformer.
 
     Examples:
-        ffrom spotforecast2_safe.forecaster.utils import transform_numpy
-        from sklearn.preprocessing import StandardScaler
-        import numpy as np
-        array = np.array([[1, 2], [3, 4], [5, 6]])
-        transformer = StandardScaler()
-        array_transformed = transform_numpy(array, transformer, fit=True)
-        print(array_transformed)
+        >>> from spotforecast2_safe.forecaster.utils import transform_numpy
+        >>> from sklearn.preprocessing import StandardScaler
+        >>> import numpy as np
+        >>> array = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> transformer = StandardScaler()
+        >>> array_transformed = transform_numpy(array, transformer, fit=True)
+        >>> print(array_transformed)
         [[-1.22474487 -1.22474487]
          [ 0.          0.        ]
          [ 1.22474487  1.22474487]]
-         array_inversed = transform_numpy(array_transformed, transformer, inverse_transform=True)
-         print(array_inversed)
-         [[1. 2.]
-          [3. 4.]
-          [5. 6.]]
+        >>> array_inversed = transform_numpy(array_transformed, transformer, inverse_transform=True)
+        >>> print(array_inversed)
+        [[1. 2.]
+         [3. 4.]
+         [5. 6.]]
     """
 
     if transformer is None:
@@ -565,16 +550,11 @@ def select_n_jobs_fit_forecaster(forecaster_name: str, estimator: object) -> int
     predictability.
 
     Args:
-        forecaster_name: Name of the forecaster being fitted. Currently unused but
-            reserved for granular resource allocation based on model complexity.
-        estimator: The estimator object being used by the forecaster. Currently
-            unused but reserved for checking if the estimator itself supports
-            internal parallelism.
+        forecaster_name (str): Name of the forecaster being fitted.
+        estimator (object): The estimator object being used by the forecaster.
 
     Returns:
-        The number of jobs (CPUs) to use for parallel processing. Defaults to
-        the system CPU count, with a fallback to 1 if the count cannot be
-        determined.
+        int: The number of jobs (CPUs) to use for parallel processing.
     """
     import os
 
@@ -597,6 +577,7 @@ __all__ = [
     "check_preprocess_series",
     "check_preprocess_exog_multiseries",
     "set_skforecast_warnings",
+    "set_cpu_gpu_device",
     "initialize_window_features",
     "initialize_transformer_series",
     "check_extract_values_and_index",
@@ -609,7 +590,12 @@ __all__ = [
     "exog_to_direct_numpy",
     "transform_numpy",
     "select_n_jobs_fit_forecaster",
+    "select_n_jobs_fit_forecaster",
     "predict_multivariate",
+    "align_series_and_exog_multiseries",
+    "prepare_levels_multiseries",
+    "preprocess_levels_self_last_window_multiseries",
+    "initialize_differentiator_multiseries",
 ]
 
 
@@ -856,6 +842,261 @@ def get_style_repr_html(is_fitted: bool = False) -> Tuple[str, str]:
     return style, unique_id
 
 
+def align_series_and_exog_multiseries(
+    series_dict: dict[str, pd.Series],
+    exog_dict: dict[str, pd.DataFrame] | None = None,
+) -> tuple[dict[str, pd.Series], dict[str, pd.DataFrame | None]]:
+    """
+    Align series and exog according to their index.
+
+    Heading and trailing NaNs are removed from all series in `series_dict`.
+    If needed, reindexing is applied to `exog_dict`.
+
+    Args:
+        series_dict (dict): Dictionary with the series used during training.
+        exog_dict (dict, None): Dictionary with the exogenous variable/s used
+            during training. Defaults to `None`.
+
+    Returns:
+        tuple: A tuple containing:
+            - series_dict (dict): Dictionary with the aligned series.
+            - exog_dict (dict): Dictionary with the aligned exogenous variables.
+    """
+
+    for k in series_dict.keys():
+        if np.isnan(series_dict[k].iat[0]) or np.isnan(series_dict[k].iat[-1]):
+            first_valid_index = series_dict[k].first_valid_index()
+            last_valid_index = series_dict[k].last_valid_index()
+            series_dict[k] = series_dict[k].loc[first_valid_index:last_valid_index]
+        else:
+            first_valid_index = series_dict[k].index[0]
+            last_valid_index = series_dict[k].index[-1]
+
+        if exog_dict is not None and exog_dict[k] is not None:
+            if not series_dict[k].index.equals(exog_dict[k].index):
+                exog_dict[k] = exog_dict[k].loc[first_valid_index:last_valid_index]
+                if exog_dict[k].empty:
+                    warnings.warn(
+                        f"`exog` for series '{k}' is empty after aligning "
+                        f"with the series index. Exog values will be NaN.",
+                        MissingValuesWarning,
+                    )
+                    exog_dict[k] = None
+                elif len(exog_dict[k]) != len(series_dict[k]):
+                    warnings.warn(
+                        f"`exog` for series '{k}' doesn't have values for "
+                        f"all the dates in the series. Missing values will be "
+                        f"filled with NaN.",
+                        MissingValuesWarning,
+                    )
+                    exog_dict[k] = exog_dict[k].reindex(
+                        series_dict[k].index, fill_value=np.nan
+                    )
+
+    return series_dict, exog_dict
+
+
+def prepare_levels_multiseries(
+    X_train_series_names_in_: list[str], levels: str | list[str] | None = None
+) -> tuple[list[str], bool]:
+    """
+    Prepare list of levels to be predicted in multiseries Forecasters.
+
+    Args:
+        X_train_series_names_in_ (list): Names of the series (levels) included
+            in the matrix `X_train`.
+        levels (str, list, None): Names of the series (levels) to be predicted.
+            Defaults to `None`.
+
+    Returns:
+        tuple: A tuple containing:
+            - levels (list): Names of the series (levels) to be predicted.
+            - input_levels_is_list (bool): Indicates if input levels argument is a list.
+    """
+
+    input_levels_is_list = False
+    if levels is None:
+        levels = X_train_series_names_in_
+    elif isinstance(levels, str):
+        levels = [levels]
+    else:
+        input_levels_is_list = True
+
+    return levels, input_levels_is_list
+
+
+def preprocess_levels_self_last_window_multiseries(
+    levels: list[str],
+    input_levels_is_list: bool,
+    last_window_: dict[str, pd.Series],
+) -> tuple[list[str], pd.DataFrame]:
+    """
+    Preprocess `levels` and `last_window` arguments for prediction.
+
+    Only levels whose last window ends at the same datetime index will be
+    predicted together.
+
+    Args:
+        levels (list): Names of the series (levels) to be predicted.
+        input_levels_is_list (bool): Indicates if input levels argument is a list.
+        last_window_ (dict): Dictionary with the last window of each series.
+
+    Returns:
+        tuple: A tuple containing:
+            - levels (list): Names of the series (levels) to be predicted.
+            - last_window (pd.DataFrame): Series values used to create predictors.
+    """
+
+    available_last_windows = set() if last_window_ is None else set(last_window_.keys())
+    not_available_last_window = set(levels) - available_last_windows
+    if not_available_last_window:
+        levels = [level for level in levels if level not in not_available_last_window]
+        if not levels:
+            raise ValueError(
+                f"No series to predict. None of the series {not_available_last_window} "
+                f"are present in `last_window_` attribute. Provide `last_window` "
+                f"as argument in predict method."
+            )
+        else:
+            warnings.warn(
+                f"Levels {not_available_last_window} are excluded from "
+                f"prediction since they were not stored in `last_window_` "
+                f"attribute during training. If you don't want to retrain "
+                f"the Forecaster, provide `last_window` as argument.",
+                IgnoredArgumentWarning,
+            )
+
+    last_index_levels = [v.index[-1] for k, v in last_window_.items() if k in levels]
+    if len(set(last_index_levels)) > 1:
+        max_index_levels = max(last_index_levels)
+        selected_levels = [
+            k
+            for k, v in last_window_.items()
+            if k in levels and v.index[-1] == max_index_levels
+        ]
+
+        series_excluded_from_last_window = set(levels) - set(selected_levels)
+        levels = selected_levels
+
+        if input_levels_is_list and series_excluded_from_last_window:
+            warnings.warn(
+                f"Only series whose last window ends at the same index "
+                f"can be predicted together. Series that do not reach "
+                f"the maximum index, '{max_index_levels}', are excluded "
+                f"from prediction: {series_excluded_from_last_window}.",
+                IgnoredArgumentWarning,
+            )
+
+    last_window = pd.DataFrame({k: v for k, v in last_window_.items() if k in levels})
+
+    return levels, last_window
+
+
+def initialize_differentiator_multiseries(
+    series_names_in_: list[str],
+    differentiator: object | dict[str, object | None] | None = None,
+) -> dict[str, object | None]:
+    """
+    Initialize `differentiator_` attribute for multiseries forecasters.
+
+    Args:
+        series_names_in_ (list): Names of the series (levels) used during training.
+        differentiator (object, dict, None): Skforecast object (or dict of objects)
+            used to differentiate the time series. Defaults to `None`.
+
+    Returns:
+        dict: Dictionary with the `differentiator` for each series.
+    """
+
+    series_names_in_ = series_names_in_ + ["_unknown_level"]
+    if differentiator is None:
+        differentiator_ = {serie: None for serie in series_names_in_}
+    elif not isinstance(differentiator, dict):
+        differentiator_ = {serie: copy(differentiator) for serie in series_names_in_}
+    else:
+        differentiator_ = {serie: None for serie in series_names_in_}
+        # Only elements already present in differentiator_ are updated
+        differentiator_.update(
+            {k: deepcopy(v) for k, v in differentiator.items() if k in differentiator_}
+        )
+
+        series_not_in_differentiator = set(series_names_in_) - set(
+            differentiator.keys()
+        )
+        if series_not_in_differentiator:
+            warnings.warn(
+                f"{series_not_in_differentiator} not present in `differentiation`."
+                f" No differentiation is applied to these series.",
+                IgnoredArgumentWarning,
+            )
+
+    return differentiator_
+
+
+def set_cpu_gpu_device(
+    estimator: object,
+    device: str | None = "cpu",
+) -> str | None:
+    """
+    Set the device for the estimator.
+
+    Args:
+        estimator (object): Estimator object.
+        device (str, None): Device to use. One of 'cpu', 'gpu', 'cuda', or None.
+            Defaults to 'cpu'.
+
+    Returns:
+        str, None: The original device of the estimator.
+    """
+
+    valid_devices = {"gpu", "cpu", "cuda", "GPU", "CPU", None}
+    if device not in valid_devices:
+        raise ValueError("`device` must be 'gpu', 'cpu', 'cuda', or None.")
+
+    estimator_name = type(estimator).__name__
+
+    supported_estimators = {"XGBRegressor", "LGBMRegressor", "CatBoostRegressor"}
+    if estimator_name not in supported_estimators:
+        return None
+
+    device_names = {
+        "XGBRegressor": "device",
+        "LGBMRegressor": "device",
+        "CatBoostRegressor": "task_type",
+    }
+    device_values = {
+        "XGBRegressor": {"gpu": "cuda", "cpu": "cpu", "cuda": "cuda"},
+        "LGBMRegressor": {"gpu": "gpu", "cpu": "cpu", "cuda": "gpu"},
+        "CatBoostRegressor": {
+            "gpu": "GPU",
+            "cpu": "CPU",
+            "cuda": "GPU",
+            "GPU": "GPU",
+            "CPU": "CPU",
+        },
+    }
+
+    param_name = device_names[estimator_name]
+    original_device = getattr(estimator, param_name, None)
+
+    if device is None:
+        return original_device
+
+    try:
+        new_device = device_values[estimator_name][device]
+    except KeyError:
+        # Fallback if device mapping fails or model updated
+        return original_device
+
+    if original_device != new_device:
+        try:
+            estimator.set_params(**{param_name: new_device})
+        except Exception:
+            pass
+
+    return original_device
+
+
 def check_residuals_input(
     forecaster_name: str,
     use_in_sample_residuals: bool,
@@ -875,49 +1116,45 @@ def check_residuals_input(
     Check residuals input arguments in Forecasters.
 
     Args:
-        forecaster_name: str
-            Forecaster name.
-        use_in_sample_residuals: bool
-            Indicates if in sample or out sample residuals are used.
-        in_sample_residuals_: numpy ndarray, dict
-            Residuals of the model when predicting training data.
-        out_sample_residuals_: numpy ndarray, dict
-            Residuals of the model when predicting non training data.
-        use_binned_residuals: bool
-            Indicates if residuals are binned.
-        in_sample_residuals_by_bin_: dict
-            In sample residuals binned according to the predicted value each residual
-            is associated with.
-        out_sample_residuals_by_bin_: dict
-            Out of sample residuals binned according to the predicted value each residual
-            is associated with.
-        levels: list, default None
-            Names of the series (levels) to be predicted (Forecasters multiseries).
-        encoding: str, default None
-            Encoding used to identify the different series (ForecasterRecursiveMultiSeries).
+        forecaster_name (str): Forecaster name.
+        use_in_sample_residuals (bool): Indicates if in sample or out sample
+            residuals are used.
+        in_sample_residuals_ (np.ndarray, dict, None): Residuals of the model
+            when predicting training data.
+        out_sample_residuals_ (np.ndarray, dict, None): Residuals of the model
+            when predicting non training data.
+        use_binned_residuals (bool): Indicates if residuals are binned.
+        in_sample_residuals_by_bin_ (dict, None): In sample residuals binned
+            according to the predicted value.
+        out_sample_residuals_by_bin_ (dict, None): Out of sample residuals
+            binned according to the predicted value.
+        levels (list, None): Names of the series (levels) to be predicted.
+            Defaults to `None`.
+        encoding (str, None): Encoding used to identify the different series.
+            Defaults to `None`.
 
     Returns:
         None
 
     Examples:
-        from spotforecast2_safe.forecaster.utils import check_residuals_input
-        import numpy as np
-        forecaster_name = "ForecasterRecursiveMultiSeries"
-        use_in_sample_residuals = True
-        in_sample_residuals_ = np.array([0.1, -0.2
-        out_sample_residuals_ = np.array([0.3, -0.1])
-        use_binned_residuals = False
-        check_residuals_input(
-            forecaster_name,
-            use_in_sample_residuals,
-            in_sample_residuals_,
-            out_sample_residuals_,
-            use_binned_residuals,
-            in_sample_residuals_by_bin_=None,
-            out_sample_residuals_by_bin_=None,
-            levels=['series_1', 'series_2'],
-            encoding='onehot'
-        )
+        >>> from spotforecast2_safe.forecaster.utils import check_residuals_input
+        >>> import numpy as np
+        >>> forecaster_name = "ForecasterRecursiveMultiSeries"
+        >>> use_in_sample_residuals = True
+        >>> in_sample_residuals_ = np.array([0.1, -0.2])
+        >>> out_sample_residuals_ = np.array([0.3, -0.1])
+        >>> use_binned_residuals = False
+        >>> check_residuals_input(
+        ...     forecaster_name,
+        ...     use_in_sample_residuals,
+        ...     in_sample_residuals_,
+        ...     out_sample_residuals_,
+        ...     use_binned_residuals,
+        ...     in_sample_residuals_by_bin_=None,
+        ...     out_sample_residuals_by_bin_=None,
+        ...     levels=['series_1', 'series_2'],
+        ...     encoding='onehot'
+        ... )
     """
 
     forecasters_multiseries = (
@@ -998,61 +1235,42 @@ def date_to_index_position(
     kwargs_pd_to_datetime: dict = {},
 ) -> int:
     """
-    Transform a datetime string or pandas Timestamp to an integer. The integer
-    represents the position of the datetime in the index.
+    Transform a datetime string or pandas Timestamp to an integer position.
+
+    The integer represents the position of the datetime in the index.
 
     Args:
-        index: pandas Index
-            Original datetime index (must be a pandas DatetimeIndex if `date_input`
-            is not an int).
-        date_input: int, str, pandas Timestamp
-            Datetime to transform to integer.
-
-            - If int, returns the same integer.
-            - If str or pandas Timestamp, it is converted and expanded into the index.
-        method: str, default 'prediction'
-            Can be 'prediction' or 'validation'.
-
-            - If 'prediction', the date must be later than the last date in the index.
-            - If 'validation', the date must be within the index range.
-        date_literal: str, default 'steps'
-            Variable name used in error messages.
-        kwargs_pd_to_datetime: dict, default {}
-            Additional keyword arguments to pass to `pd.to_datetime()`.
+        index (pd.Index): Original datetime index.
+        date_input (int, str, pd.Timestamp): Datetime to transform.
+        method (str): Strategy to use. Options: 'prediction', 'validation'.
+            Defaults to `'prediction'`.
+        date_literal (str): Variable name used in error messages.
+            Defaults to `'steps'`.
+        kwargs_pd_to_datetime (dict): Keyword arguments for `pd.to_datetime()`.
+            Defaults to `{}`.
 
     Returns:
-        int:
-            `date_input` transformed to integer position in the `index`.
-
-        + If `date_input` is an integer, it returns the same integer.
-        + If method is 'prediction', number of steps to predict from the last
-        date in the index.
-        + If method is 'validation', position plus one of the date in the index,
-        this is done to include the target date in the training set when using
-        pandas iloc with slices.
+        int: `date_input` transformed to integer position in the `index`.
 
     Raises:
         ValueError: If `method` is not 'prediction' or 'validation'.
         TypeError: If `date_input` is not an int, str, or pandas Timestamp.
         TypeError: If `index` is not a pandas DatetimeIndex when `date_input` is not an int.
-        ValueError: If `date_input` is a date and does not meet the requirements based on the `method` argument.
+        ValueError: If `date_input` is a date and does not meet requirement.
 
     Examples:
-        from spotforecast2_safe.forecaster.utils import date_to_index_position
-        import pandas as pd
-        index = pd.date_range(start='2020-01-01', periods=10, freq='D')
-        # Using an integer input
-        position = date_to_index_position(index, 5)
-        print(position)
-        # Output: 5
-        # Using a date input for prediction
-        position = date_to_index_position(index, '2020-01-15', method='prediction')
-        print(position)
-        # Output: 5 (number of steps from the last date in the index to the target date)
-        # Using a date input for validation
-        position = date_to_index_position(index, '2020-01-05', method='validation')
-        print(position)
-        # Output: 5 (position plus one of the target date in the index)
+        >>> from spotforecast2_safe.forecaster.utils import date_to_index_position
+        >>> import pandas as pd
+        >>> index = pd.date_range(start='2020-01-01', periods=10, freq='D')
+        >>> # Using an integer input
+        >>> date_to_index_position(index, 5)
+        5
+        >>> # Using a date input for prediction
+        >>> date_to_index_position(index, '2020-01-15', method='prediction')
+        5
+        >>> # Using a date input for validation
+        >>> date_to_index_position(index, '2020-01-05', method='validation')
+        5
     """
 
     if method not in ["prediction", "validation"]:
@@ -1108,36 +1326,30 @@ def initialize_estimator(
     estimator: object | None = None, regressor: object | None = None
 ) -> None:
     """
-    Helper to handle the deprecation of 'regressor' in favor of 'estimator'.
-    Returns the valid estimator object.
+    Handle the deprecation of 'regressor' in favor of 'estimator'.
 
     Args:
-        estimator: estimator or pipeline compatible with the scikit-learn API, default None
-            An instance of a estimator or pipeline compatible with the scikit-learn API.
-        regressor: estimator or pipeline compatible with the scikit-learn API, default None
-            Deprecated. An instance of a estimator or pipeline compatible with the
-            scikit-learn API.
+        estimator (object, None): Estimator or pipeline compatible with the
+            scikit-learn API. Defaults to `None`.
+        regressor (object, None): Deprecated. Alias for `estimator`.
+            Defaults to `None`.
 
     Returns:
-        estimator or pipeline compatible with the scikit-learn API
-            The valid estimator object.
+        object: The valid estimator object.
 
     Raises:
-        ValueError: If both `estimator` and `regressor` are provided. Use only `estimator`.
-        Warning: If `regressor` is provided, a FutureWarning is raised indicating that it is deprecated and will be removed in a future version.
+        ValueError: If both `estimator` and `regressor` are provided.
 
     Examples:
-        from spotforecast2_safe.forecaster.utils import initialize_estimator
-        from sklearn.linear_model import LinearRegression
-        # Using the `estimator` argument
-        estimator = LinearRegression()
-        result = initialize_estimator(estimator=estimator)
-        print(result)
+        >>> from spotforecast2_safe.forecaster.utils import initialize_estimator
+        >>> from sklearn.linear_model import LinearRegression
+        >>> # Using the `estimator` argument
+        >>> estimator = LinearRegression()
+        >>> initialize_estimator(estimator=estimator)
         LinearRegression()
-        # Using the deprecated `regressor` argument
-        regressor = LinearRegression()
-        result = initialize_estimator(regressor=regressor)
-        print(result)
+        >>> # Using the deprecated `regressor` argument
+        >>> regressor = LinearRegression()
+        >>> initialize_estimator(regressor=regressor)
         LinearRegression()
 
     """

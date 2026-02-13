@@ -5,7 +5,7 @@
 """Common validation and initialization utilities for model selection."""
 
 from __future__ import annotations
-from typing import Callable
+from typing import Callable, Generator
 import warnings
 import numpy as np
 import pandas as pd
@@ -17,15 +17,158 @@ from sklearn.pipeline import Pipeline
 from spotforecast2_safe.forecaster.utils import check_interval, date_to_index_position
 
 
+def _extract_data_folds_multiseries(
+    series: pd.DataFrame | dict[str, pd.Series | pd.DataFrame],
+    folds: list,
+    span_index: pd.DatetimeIndex | pd.RangeIndex,
+    window_size: int,
+    exog: pd.Series | pd.DataFrame | dict[str, pd.Series | pd.DataFrame] | None = None,
+    dropna_last_window: bool = False,
+    externally_fitted: bool = False,
+) -> Generator[
+    tuple[
+        pd.DataFrame | dict[str, pd.Series | pd.DataFrame],
+        pd.DataFrame,
+        list[str],
+        pd.Series | pd.DataFrame | dict[str, pd.Series | pd.DataFrame] | None,
+        pd.Series | pd.DataFrame | dict[str, pd.Series | pd.DataFrame] | None,
+        list[list[int]],
+    ],
+    None,
+    None,
+]:
+    """
+    Select the data from series and exog that corresponds to each fold.
+
+    Args:
+        series (pd.DataFrame, dict): Time series.
+        folds (list): Folds created using the split method of the OneStepAheadFold or
+            TimeSeriesFold objects.
+        span_index (pd.DatetimeIndex, pd.RangeIndex): Full index from the minimum
+            to the maximum index among all series.
+        window_size (int): Size of the window needed to create the predictors.
+        exog (pd.Series, pd.DataFrame, dict, None): Exogenous variables. Defaults to `None`.
+        dropna_last_window (bool): If `True`, drop the columns of the last window
+            that have NaN values. Defaults to `False`.
+        externally_fitted (bool): Flag indicating whether the forecaster is already
+            trained. Only used when `initial_train_size` is None and `refit` is False.
+            Defaults to `False`.
+
+    Yields:
+        tuple: A tuple containing:
+            - series_train (pd.DataFrame, dict): Time series corresponding to the
+              training set of the fold.
+            - series_last_window (pd.DataFrame): Time series corresponding to the
+              last window of the fold.
+            - levels_last_window (list): Levels of the time series present in the
+              last window of the fold.
+            - exog_train (pd.Series, pd.DataFrame, dict, None): Exogenous variable
+              corresponding to the training set of the fold.
+            - exog_test (pd.Series, pd.DataFrame, dict, None): Exogenous variable
+              corresponding to the test set of the fold.
+            - fold (list): List containing the indexes of that fold.
+    """
+
+    is_series_dict = isinstance(series, dict)
+    is_exog_dict = isinstance(exog, dict)
+
+    for fold in folds:
+        train_iloc_start = fold[1][0]
+        train_iloc_end = fold[1][1]
+        last_window_iloc_start = fold[2][0]
+        last_window_iloc_end = fold[2][1]
+        test_iloc_start = fold[3][0]
+        test_iloc_end = fold[3][1]
+
+        if is_series_dict or is_exog_dict:
+            # Subtract 1 to the iloc indexes to get the loc indexes
+            train_loc_start = span_index[train_iloc_start]
+            train_loc_end = span_index[train_iloc_end - 1]
+            last_window_loc_start = span_index[last_window_iloc_start]
+            last_window_loc_end = span_index[last_window_iloc_end - 1]
+            test_loc_start = span_index[test_iloc_start]
+            test_loc_end = span_index[test_iloc_end - 1]
+
+        if not is_series_dict:
+            series_train = series.iloc[train_iloc_start:train_iloc_end,]
+
+            series_to_drop = []
+            for col in series_train.columns:
+                if series_train[col].isna().to_numpy().all():
+                    series_to_drop.append(col)
+                else:
+                    first_valid_index = series_train[col].first_valid_index()
+                    last_valid_index = series_train[col].last_valid_index()
+                    if (
+                        len(series_train[col].loc[first_valid_index:last_valid_index])
+                        < window_size
+                    ):
+                        series_to_drop.append(col)
+
+            series_last_window = series.iloc[
+                last_window_iloc_start:last_window_iloc_end,
+            ]
+
+            series_train = series_train.drop(columns=series_to_drop)
+            if not externally_fitted:
+                series_last_window = series_last_window.drop(columns=series_to_drop)
+        else:
+            series_train = {}
+            series_last_window = {}
+            for k, v in series.items():
+                v_train = v.loc[train_loc_start:train_loc_end]
+                if not v_train.isna().to_numpy().all():
+                    first_valid_index = v_train.first_valid_index()
+                    last_valid_index = v_train.last_valid_index()
+                    if first_valid_index is not None and last_valid_index is not None:
+                        v_train = v_train.loc[first_valid_index:last_valid_index]
+                        if len(v_train) >= window_size:
+                            series_train[k] = v_train
+
+            for k, v in series.items():
+                v_last_window = v.loc[last_window_loc_start:last_window_loc_end]
+                if not v_last_window.isna().to_numpy().all():
+                    first_valid_index = v_last_window.first_valid_index()
+                    last_valid_index = v_last_window.last_valid_index()
+                    if first_valid_index is not None and last_valid_index is not None:
+                        v_last_window = v_last_window.loc[
+                            first_valid_index:last_valid_index
+                        ]
+                        if len(v_last_window) >= window_size:
+                            series_last_window[k] = v_last_window
+
+        if is_series_dict:
+            levels_last_window = list(series_last_window.keys())
+        else:
+            levels_last_window = series_last_window.columns.to_list()
+
+        if exog is not None:
+            if is_exog_dict:
+                exog_train = {}
+                exog_test = {}
+                for k, v in exog.items():
+                    if v is not None:
+                        exog_train[k] = v.loc[train_loc_start:train_loc_end]
+                        exog_test[k] = v.loc[test_loc_start:test_loc_end]
+                    else:
+                        exog_train[k] = None
+                        exog_test[k] = None
+            else:
+                exog_train = exog.iloc[train_iloc_start:train_iloc_end,]
+                exog_test = exog.iloc[test_iloc_start:test_iloc_end,]
+        else:
+            exog_train = None
+            exog_test = None
+
+        yield series_train, series_last_window, levels_last_window, exog_train, exog_test, fold
+
+
 class OneStepAheadValidationWarning(UserWarning):
     """
     Warning used to notify that the one-step-ahead validation is being used.
 
     Args:
-        message (str): The warning message to be displayed when the warning is raised.
-
-    Returns:
-        str: The warning message along with instructions on how to suppress the warning.
+        message (str): The warning message to be displayed.
 
     Examples:
         >>> import warnings
@@ -61,14 +204,14 @@ def initialize_lags_grid(
     Initialize lags grid and lags label for model selection.
 
     Args:
-        forecaster: Forecaster model. ForecasterRecursive, ForecasterDirect,
-            ForecasterRecursiveMultiSeries, ForecasterDirectMultiVariate.
-        lags_grid: Lists of lags to try, containing int, lists, numpy ndarray, or range
-            objects. If `dict`, the keys are used as labels in the `results`
-            DataFrame, and the values are used as the lists of lags to try.
+        forecaster (object): Forecaster model.
+        lags_grid (list, dict, None): Lists of lags to try. If `list`, each element
+            must be an int, list, np.ndarray, or range. If `dict`, the keys are
+            used as labels in the `results` DataFrame, and the values are the
+            lags to try. Defaults to `None`.
 
     Returns:
-        tuple: (lags_grid, lags_label)
+        tuple: A tuple containing:
             - lags_grid (dict): Dictionary with lags configuration for each iteration.
             - lags_label (str): Label for lags representation in the results object.
 
@@ -129,61 +272,40 @@ def check_backtesting_input(
     modules `model_selection`.
 
     Args:
-        forecaster: Forecaster model.
-        cv: TimeSeriesFold object with the information needed to split the data into folds.
-        metric: Metric used to quantify the goodness of fit of the model.
-        add_aggregated_metric: If `True`, the aggregated metrics (average, weighted average and pooling)
-            over all levels are also returned (only multiseries).
-        y: Training time series for uni-series forecasters.
-        series: Training time series for multi-series forecasters.
-        exog: Exogenous variables.
-        interval: Specifies whether probabilistic predictions should be estimated and the
-            method to use. The following options are supported:
-
-            - If `float`, represents the nominal (expected) coverage (between 0 and 1).
-            For instance, `interval=0.95` corresponds to `[2.5, 97.5]` percentiles.
-            - If `list` or `tuple`: Sequence of percentiles to compute, each value must
-            be between 0 and 100 inclusive. For example, a 95% confidence interval can
-            be specified as `interval = [2.5, 97.5]` or multiple percentiles (e.g. 10,
-            50 and 90) as `interval = [10, 50, 90]`.
-            - If 'bootstrapping' (str): `n_boot` bootstrapping predictions will be generated.
-            - If scipy.stats distribution object, the distribution parameters will
-            be estimated for each prediction.
-            - If None, no probabilistic predictions are estimated.
-        interval_method: Technique used to estimate prediction intervals. Available options:
-
-            - 'bootstrapping': Bootstrapping is used to generate prediction
-            intervals.
-            - 'conformal': Employs the conformal prediction split method for
-            interval estimation.
-        alpha: The confidence intervals used in ForecasterStats are (1 - alpha) %.
-        n_boot: Number of bootstrapping iterations to perform when estimating prediction
-            intervals.
-        use_in_sample_residuals: If `True`, residuals from the training data are used as proxy of prediction
-            error to create prediction intervals.  If `False`, out_sample_residuals
-            are used if they are already stored inside the forecaster.
-        use_binned_residuals: If `True`, residuals are selected based on the predicted values
-            (binned selection).
-            If `False`, residuals are selected randomly.
-        random_state: Seed for the random number generator to ensure reproducibility.
-        return_predictors: If `True`, the predictors used to make the predictions are also returned.
-        n_jobs: The number of jobs to run in parallel. If `-1`, then the number of jobs is
-            set to the number of cores. If 'auto', `n_jobs` is set using the function
-            select_n_jobs_fit_forecaster.
-        freeze_params: Determines whether to freeze the model parameters after the first fit
-            for estimators that perform automatic model selection.
-
-            - If `True`, the model parameters found during the first fit (e.g., order
-            and seasonal_order for Arima, or smoothing parameters for Ets) are reused
-            in all subsequent refits. This avoids re-running the automatic selection
-            procedure in each fold and reduces runtime.
-            - If `False`, automatic model selection is performed independently in each
-            refit, allowing parameters to adapt across folds. This increases runtime
-            and adds a `params` column to the output with the parameters selected per
-            fold.
-        show_progress: Whether to show a progress bar.
-        suppress_warnings: If `True`, spotforecast warnings will be suppressed during the backtesting
-            process.
+        forecaster (object): Forecaster model.
+        cv (object): TimeSeriesFold object with the information needed to split the
+            data into folds.
+        metric (str, Callable, list): Metric used to quantify the goodness of fit
+            of the model.
+        add_aggregated_metric (bool): If `True`, the aggregated metrics (average,
+            weighted average and pooling) over all levels are also returned
+            (only multiseries). Defaults to `True`.
+        y (pd.Series, None): Training time series for uni-series forecasters.
+            Defaults to `None`.
+        series (pd.DataFrame, dict, None): Training time series for multi-series
+            forecasters. Defaults to `None`.
+        exog (pd.Series, pd.DataFrame, dict, None): Exogenous variables.
+            Defaults to `None`.
+        interval (float, list, tuple, str, object, None): Specifies whether
+            probabilistic predictions should be estimated and the method to use.
+            Defaults to `None`.
+        interval_method (str): Technique used to estimate prediction intervals.
+            Options: 'bootstrapping', 'conformal'. Defaults to `'bootstrapping'`.
+        alpha (float, None): The confidence intervals used in ForecasterStats.
+            Defaults to `None`.
+        n_boot (int): Number of bootstrapping iterations. Defaults to `250`.
+        use_in_sample_residuals (bool): If `True`, use residuals from training data.
+            Defaults to `True`.
+        use_binned_residuals (bool): If `True`, residuals are selected based on
+            predicted values. Defaults to `True`.
+        random_state (int): Seed for reproducibility. Defaults to `123`.
+        return_predictors (bool): If `True`, return predictors used for predictions.
+            Defaults to `False`.
+        freeze_params (bool): If `True`, freeze model parameters after first fit.
+            Defaults to `True`.
+        n_jobs (int, str): Number of jobs to run in parallel. Defaults to `'auto'`.
+        show_progress (bool): Whether to show a progress bar. Defaults to `True`.
+        suppress_warnings (bool): If `True`, suppress warnings. Defaults to `False`.
 
     Returns:
         None
@@ -512,15 +634,19 @@ def check_one_step_ahead_input(
     functions in modules `model_selection` when using a `OneStepAheadFold`.
 
     Args:
-        forecaster: Forecaster model.
-        cv: OneStepAheadFold object with the information needed to split the data into folds.
-        metric: Metric used to quantify the goodness of fit of the model.
-        y: Training time series for uni-series forecasters.
-        series: Training time series for multi-series forecasters.
-        exog: Exogenous variables.
-        show_progress: Whether to show a progress bar.
-        suppress_warnings: If `True`, spotforecast warnings will be suppressed during the hyperparameter
-            search.
+        forecaster (object): Forecaster model.
+        cv (object): OneStepAheadFold object with the information needed to split
+            the data into folds.
+        metric (str, Callable, list): Metric used to quantify the goodness of fit
+            of the model.
+        y (pd.Series, None): Training time series for uni-series forecasters.
+            Defaults to `None`.
+        series (pd.DataFrame, dict, None): Training time series for multi-series
+            forecasters. Defaults to `None`.
+        exog (pd.Series, pd.DataFrame, dict, None): Exogenous variables.
+            Defaults to `None`.
+        show_progress (bool): Whether to show a progress bar. Defaults to `True`.
+        suppress_warnings (bool): If `True`, suppress warnings. Defaults to `False`.
 
     Returns:
         None
@@ -701,8 +827,8 @@ def select_n_jobs_backtesting(forecaster: object, refit: bool | int) -> int:
     parallelization unnecessary and potentially harmful due to resource contention.
 
     Args:
-        forecaster: Forecaster model.
-        refit: If the forecaster is refitted during the backtesting process.
+        forecaster (object): Forecaster model.
+        refit (bool, int): If the forecaster is refitted during the backtesting process.
 
     Returns:
         int: The number of jobs to run in parallel.
