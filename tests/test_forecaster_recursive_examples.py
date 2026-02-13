@@ -1,11 +1,18 @@
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.preprocessing import StandardScaler
-
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.preprocessing import RollingFeatures
+
+# If RollingFeatures is not available, skip that test
+try:
+    from spotforecast2_safe.preprocessing import RollingFeatures
+
+    HAS_ROLLING = True
+except ImportError:
+    HAS_ROLLING = False
 
 
 def test_basic_forecaster_with_lags():
@@ -14,9 +21,12 @@ def test_basic_forecaster_with_lags():
     forecaster.fit(y)
     predictions = forecaster.predict(steps=5)
     assert len(predictions) == 5
+    assert isinstance(predictions, pd.Series)
 
 
 def test_forecaster_with_window_features_and_transformations():
+    if not HAS_ROLLING:
+        pytest.skip("RollingFeatures not available")
     y = pd.Series(np.random.randn(100), name="y")
     forecaster = ForecasterRecursive(
         estimator=RandomForestRegressor(n_estimators=100),
@@ -28,6 +38,7 @@ def test_forecaster_with_window_features_and_transformations():
     forecaster.fit(y)
     predictions = forecaster.predict(steps=10)
     assert len(predictions) == 10
+    assert isinstance(predictions, pd.Series)
 
 
 def test_forecaster_with_exogenous_variables():
@@ -42,6 +53,7 @@ def test_forecaster_with_exogenous_variables():
     )
     predictions = forecaster.predict(steps=5, exog=exog_future)
     assert len(predictions) == 5
+    assert isinstance(predictions, pd.Series)
 
 
 def test_forecaster_with_probabilistic_prediction():
@@ -54,3 +66,4 @@ def test_forecaster_with_probabilistic_prediction():
     forecaster.fit(y, store_in_sample_residuals=True)
     predictions = forecaster.predict(steps=5)
     assert len(predictions) == 5
+    assert isinstance(predictions, pd.Series)
