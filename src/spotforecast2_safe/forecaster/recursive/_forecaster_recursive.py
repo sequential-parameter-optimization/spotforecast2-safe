@@ -5,9 +5,11 @@
 from __future__ import annotations
 from typing import Callable, Union, List, Optional, Tuple, Dict
 import sys
+import inspect
 import numpy as np
 import pandas as pd
 from copy import copy
+from sklearn.pipeline import Pipeline
 from sklearn.linear_model._base import LinearModel
 import warnings
 
@@ -2013,6 +2015,140 @@ class ForecasterRecursive(ForecasterBase):
 
         return boot_predictions
 
+    def predict_quantiles(
+        self,
+        steps: int | str | pd.Timestamp,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        quantiles: list[float] | tuple[float] = [0.05, 0.5, 0.95],
+        n_boot: int = 250,
+        use_in_sample_residuals: bool = True,
+        use_binned_residuals: bool = True,
+        random_state: int = 123,
+    ) -> pd.DataFrame:
+        """
+        Calculate the specified quantiles for each step. After generating
+        multiple forecasting predictions through a bootstrapping process, each
+        quantile is calculated for each step.
+
+        Args:
+            steps: Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            last_window: Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in` self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data.
+            exog: Exogenous variable/s included as predictor/s.
+            quantiles: Sequence of quantiles to compute, which must be between 0 and 1
+                inclusive. For example, quantiles of 0.05, 0.5 and 0.95 should be as
+                `quantiles = [0.05, 0.5, 0.95]`.
+            n_boot: Number of bootstrapping iterations to perform when estimating quantiles.
+            use_in_sample_residuals: If `True`, residuals from the training data are used as proxy of
+                prediction error to create predictions.
+                If `False`, out of sample residuals (calibration) are used.
+                Out-of-sample residuals must be precomputed using Forecaster's
+                `set_out_sample_residuals()` method.
+            use_binned_residuals: If `True`, residuals are selected based on the predicted values
+                (binned selection).
+                If `False`, residuals are selected randomly.
+            random_state: Seed for the random number generator to ensure reproducibility.
+
+        Returns:
+            Quantiles predicted by the forecaster.
+        """
+
+        check_interval(quantiles=quantiles)
+
+        boot_predictions = self.predict_bootstrapping(
+            steps=steps,
+            last_window=last_window,
+            exog=exog,
+            n_boot=n_boot,
+            random_state=random_state,
+            use_in_sample_residuals=use_in_sample_residuals,
+            use_binned_residuals=use_binned_residuals,
+        )
+
+        predictions = boot_predictions.quantile(q=quantiles, axis=1).transpose()
+        predictions.columns = [f"q_{q}" for q in quantiles]
+
+        return predictions
+
+    def predict_dist(
+        self,
+        steps: int | str | pd.Timestamp,
+        distribution: object,
+        last_window: pd.Series | pd.DataFrame | None = None,
+        exog: pd.Series | pd.DataFrame | None = None,
+        n_boot: int = 250,
+        use_in_sample_residuals: bool = True,
+        use_binned_residuals: bool = True,
+        random_state: int = 123,
+    ) -> pd.DataFrame:
+        """
+        Fit a given probability distribution for each step. After generating
+        multiple forecasting predictions through a bootstrapping process, each
+        step is fitted to the given distribution.
+
+        Args:
+            steps: Number of steps to predict.
+                - If steps is int, number of steps to predict.
+                - If str or pandas Datetime, the prediction will be up to that date.
+            distribution: A distribution object from scipy.stats with methods `_pdf` and `fit`.
+                For example scipy.stats.norm.
+            last_window: Series values used to create the predictors (lags) needed in the
+                first iteration of the prediction (t + 1).
+                If `last_window = None`, the values stored in` self.last_window_` are
+                used to calculate the initial predictors, and the predictions start
+                right after training data.
+            exog: Exogenous variable/s included as predictor/s.
+            n_boot: Number of bootstrapping iterations to perform when estimating prediction
+                intervals.
+            use_in_sample_residuals: If `True`, residuals from the training data are used as proxy of
+                prediction error to create predictions.
+                If `False`, out of sample residuals (calibration) are used.
+                Out-of-sample residuals must be precomputed using Forecaster's
+                `set_out_sample_residuals()` method.
+            use_binned_residuals: If `True`, residuals are selected based on the predicted values
+                (binned selection).
+                If `False`, residuals are selected randomly.
+            random_state: Seed for the random number generator to ensure reproducibility.
+
+        Returns:
+            Distribution parameters estimated for each step.
+        """
+
+        if not hasattr(distribution, "_pdf") or not callable(
+            getattr(distribution, "fit", None)
+        ):
+            raise TypeError(
+                "`distribution` must be a valid probability distribution object "
+                "from scipy.stats, with methods `_pdf` and `fit`."
+            )
+
+        predictions = self.predict_bootstrapping(
+            steps=steps,
+            last_window=last_window,
+            exog=exog,
+            n_boot=n_boot,
+            random_state=random_state,
+            use_in_sample_residuals=use_in_sample_residuals,
+            use_binned_residuals=use_binned_residuals,
+        )
+
+        param_names = [
+            p for p in inspect.signature(distribution._pdf).parameters if not p == "x"
+        ] + ["loc", "scale"]
+
+        predictions[param_names] = predictions.apply(
+            lambda x: distribution.fit(x), axis=1, result_type="expand"
+        )
+        predictions = predictions[param_names]
+
+        return predictions
+
     def _predict_interval_conformal(
         self,
         steps: int | str | pd.Timestamp,
@@ -2383,6 +2519,147 @@ class ForecasterRecursive(ForecasterBase):
                 ]
 
             self.in_sample_residuals_ = residuals
+
+    def set_fit_kwargs(self, fit_kwargs: dict[str, object]) -> None:
+        """
+        Set new values for the additional keyword arguments passed to the `fit`
+        method of the estimator.
+
+        Args:
+            fit_kwargs: Dict of the form {"argument": new_value}.
+        """
+
+        self.fit_kwargs = check_select_fit_kwargs(self.estimator, fit_kwargs=fit_kwargs)
+
+    def set_lags(
+        self, lags: Union[int, List[int], np.ndarray, range, None] = None
+    ) -> None:
+        """
+        Set new value to the attribute `lags`. Attributes `lags_names`,
+        `max_lag` and `window_size` are also updated.
+
+        Args:
+            lags: Lags used as predictors. Index starts at 1, so lag 1 is equal to t-1.
+                - `int`: include lags from 1 to `lags` (included).
+                - `list`, `1d numpy ndarray` or `range`: include only lags present in
+                `lags`, all elements must be int.
+                - `None`: no lags are included as predictors.
+        """
+
+        if self.window_features is None and lags is None:
+            raise ValueError(
+                "At least one of the arguments `lags` or `window_features` "
+                "must be different from None. This is required to create the "
+                "predictors used in training the forecaster."
+            )
+
+        self.lags, self.lags_names, self.max_lag = initialize_lags(
+            type(self).__name__, lags
+        )
+        self.window_size = max(
+            [
+                ws
+                for ws in [self.max_lag, self.max_size_window_features]
+                if ws is not None
+            ]
+        )
+        if self.differentiation is not None:
+            self.window_size += self.differentiation
+            self.differentiator.set_params(window_size=self.window_size)
+
+    def set_window_features(
+        self, window_features: object | list[object] | None = None
+    ) -> None:
+        """
+        Set new value to the attribute `window_features`. Attributes
+        `max_size_window_features`, `window_features_names`,
+        `window_features_class_names` and `window_size` are also updated.
+
+        Args:
+            window_features: Instance or list of instances used to create window features.
+                Window features are created from the original time series and are
+                included as predictors.
+        """
+
+        if window_features is None and self.lags is None:
+            raise ValueError(
+                "At least one of the arguments `lags` or `window_features` "
+                "must be different from None. This is required to create the "
+                "predictors used in training the forecaster."
+            )
+
+        (
+            self.window_features,
+            self.window_features_names,
+            self.max_size_window_features,
+        ) = initialize_window_features(window_features)
+        self.window_features_class_names = None
+        if window_features is not None:
+            self.window_features_class_names = [
+                type(wf).__name__ for wf in self.window_features
+            ]
+        self.window_size = max(
+            [
+                ws
+                for ws in [self.max_lag, self.max_size_window_features]
+                if ws is not None
+            ]
+        )
+        if self.differentiation is not None:
+            self.window_size += self.differentiation
+            self.differentiator.set_params(window_size=self.window_size)
+
+    def get_feature_importances(self, sort_importance: bool = True) -> pd.DataFrame:
+        """
+        Return feature importances of the estimator stored in the forecaster.
+        Only valid when estimator stores internally the feature importances in the
+        attribute `feature_importances_` or `coef_`. Otherwise, returns `None`.
+
+        Args:
+            sort_importance: If `True`, sorts the feature importances in descending order.
+
+        Returns:
+            Feature importances associated with each predictor.
+        """
+
+        if not self.is_fitted:
+            raise NotFittedError(
+                "This forecaster is not fitted yet. Call `fit` with appropriate "
+                "arguments before using `get_feature_importances()`."
+            )
+
+        if isinstance(self.estimator, Pipeline):
+            estimator = self.estimator[-1]
+        else:
+            estimator = self.estimator
+
+        if hasattr(estimator, "feature_importances_"):
+            feature_importances = estimator.feature_importances_
+        elif hasattr(estimator, "coef_"):
+            feature_importances = estimator.coef_
+        else:
+            warnings.warn(
+                f"Impossible to access feature importances for estimator of type "
+                f"{type(estimator)}. This method is only valid when the "
+                f"estimator stores internally the feature importances in the "
+                f"attribute `feature_importances_` or `coef_`.",
+                UserWarning,
+            )
+            feature_importances = None
+
+        if feature_importances is not None:
+            feature_importances = pd.DataFrame(
+                {
+                    "feature": self.X_train_features_names_out_,
+                    "importance": feature_importances,
+                }
+            )
+            if sort_importance:
+                feature_importances = feature_importances.sort_values(
+                    by="importance", ascending=False
+                )
+
+        return feature_importances
 
     def set_in_sample_residuals(
         self,
