@@ -2571,14 +2571,32 @@ class ForecasterRecursive(ForecasterBase):
         self, window_features: object | list[object] | None = None
     ) -> None:
         """
-        Set new value to the attribute `window_features`. Attributes
-        `max_size_window_features`, `window_features_names`,
+        Set new value to the attribute `window_features`.
+
+        Attributes `max_size_window_features`, `window_features_names`,
         `window_features_class_names` and `window_size` are also updated.
 
         Args:
             window_features: Instance or list of instances used to create window features.
                 Window features are created from the original time series and are
                 included as predictors.
+
+        Returns:
+            None
+
+        Examples:
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> from spotforecast2_safe.preprocessing import RollingFeatures
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> rolling = RollingFeatures(stats=['mean', 'std'], window_sizes=[3, 5])
+            >>> forecaster.set_window_features(window_features=rolling)
+            >>> forecaster.window_features_names
+            ['roll_mean_3', 'roll_std_3', 'roll_mean_5', 'roll_std_5']
+            >>> forecaster.window_size
+            5
         """
 
         if window_features is None and self.lags is None:
