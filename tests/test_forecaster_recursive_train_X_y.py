@@ -123,7 +123,6 @@ def test_create_train_X_y_differentiation():
     # and not handled properly (shifted).
     # But skforecast usually expects cleaned data or handles NaNs.
     # our TimeSeriesDifferentiator pads with NaNs.
-    pass
 
 
 def test_create_train_X_y_public_api():
