@@ -32,6 +32,7 @@ from spotforecast2_safe.utils import (
     transform_dataframe,
     check_interval,
     check_residuals_input,
+    date_to_index_position,
 )
 from spotforecast2_safe.forecaster.utils import (
     initialize_window_features,
@@ -1245,7 +1246,7 @@ class ForecasterRecursive(ForecasterBase):
 
     def _create_predict_inputs(
         self,
-        steps: int,
+        steps: int | str | pd.Timestamp,
         last_window: Union[pd.Series, pd.DataFrame, None] = None,
         exog: Union[pd.Series, pd.DataFrame, None] = None,
         predict_probabilistic: bool = False,
@@ -1258,7 +1259,7 @@ class ForecasterRecursive(ForecasterBase):
 
         Args:
             steps:
-                Number of future steps to predict.
+                Number of future steps to predict. Can be an integer or a date (str/pd.Timestamp).
             last_window:
                 Optional last window of observed values to use for prediction.
                 If None, uses the last window from training.
@@ -1318,6 +1319,12 @@ class ForecasterRecursive(ForecasterBase):
 
         if last_window is None:
             last_window = self.last_window_
+
+        # Transform steps to integer if it is a date
+        if not isinstance(steps, (int, np.integer)):
+            steps = date_to_index_position(
+                index=last_window.index, date_input=steps, method="prediction"
+            )
 
         if check_inputs:
             check_predict_input(
@@ -1628,7 +1635,7 @@ class ForecasterRecursive(ForecasterBase):
 
     def predict(
         self,
-        steps: int,
+        steps: int | str | pd.Timestamp,
         last_window: Union[pd.Series, pd.DataFrame, None] = None,
         exog: Union[pd.Series, pd.DataFrame, None] = None,
         check_inputs: bool = True,
