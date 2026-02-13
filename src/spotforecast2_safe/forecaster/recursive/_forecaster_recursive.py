@@ -1832,22 +1832,29 @@ class ForecasterRecursive(ForecasterBase):
             )
         )
 
-        predictions = self._recursive_predict(
-            steps=steps, last_window_values=last_window_values, exog_values=exog_values
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            predictions = self._recursive_predict(
+                steps=steps,
+                last_window_values=last_window_values,
+                exog_values=exog_values,
+            )
 
         if self.differentiation is not None:
             predictions = self.differentiator.inverse_transform_next_window(predictions)
 
-        predictions = transform_dataframe(
-            df=pd.Series(predictions, name="pred").to_frame(),
+        predictions = transform_numpy(
+            array=predictions,
             transformer=self.transformer_y,
             fit=False,
             inverse_transform=True,
         )
 
-        predictions = predictions.iloc[:, 0]
-        predictions.index = prediction_index
+        predictions = pd.Series(data=predictions, index=prediction_index, name="pred")
 
         return predictions
 
