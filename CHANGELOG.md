@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.0...v0.8.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* unpinned tag ([#23](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/23)) ([3dabf19](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3dabf19724970fb0360a443d0c41cb85e7e65191))
+
 ## [0.8.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.7.0...v0.8.0) (2026-02-13)
 
 
