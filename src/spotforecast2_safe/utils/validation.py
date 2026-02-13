@@ -545,10 +545,11 @@ def check_predict_input(
                     else:
                         exog_names = exog[level].columns.tolist()
 
-                    if len(set(exog_names) - set(exog_names_in_)) > 0:
+                    col_missing = set(exog_names_in_) - set(exog_names)
+                    if col_missing:
                         raise ValueError(
-                            f"Exogenous variables must be: {exog_names_in_}. "
-                            f"Got {exog_names} for series '{level}'."
+                            f"Missing columns for series '{level}' in `exog`. "
+                            f"Expected {exog_names_in_}. Got {exog_names}."
                         )
         else:
             check_exog(exog=exog, allow_nan=False)
@@ -561,9 +562,11 @@ def check_predict_input(
             else:
                 exog_names = exog.columns.tolist()
 
-            if len(set(exog_names) - set(exog_names_in_)) > 0:
+            col_missing = set(exog_names_in_) - set(exog_names)
+            if col_missing:
                 raise ValueError(
-                    f"Exogenous variables must be: {exog_names_in_}. Got {exog_names}."
+                    f"Missing columns in `exog`. Expected {exog_names_in_}. "
+                    f"Got {exog_names}."
                 )
 
     # Check last_window
