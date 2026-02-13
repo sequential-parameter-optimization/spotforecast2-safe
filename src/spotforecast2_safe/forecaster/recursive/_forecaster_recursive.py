@@ -1579,6 +1579,8 @@ class ForecasterRecursive(ForecasterBase):
             (3, 5)
         """
 
+        original_device = set_cpu_gpu_device(estimator=self.estimator, device="cpu")
+
         n_lags = len(self.lags) if self.lags is not None else 0
         n_window_features = (
             len(self.X_train_window_features_names_out_)
@@ -1652,6 +1654,8 @@ class ForecasterRecursive(ForecasterBase):
 
             predictions[i, :] = pred
             last_window[-(steps - i), :] = pred
+
+        set_cpu_gpu_device(estimator=self.estimator, device=original_device)
 
         return predictions
 
