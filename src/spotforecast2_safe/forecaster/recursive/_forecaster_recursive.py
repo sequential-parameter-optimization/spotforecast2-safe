@@ -482,31 +482,12 @@ class ForecasterRecursive(ForecasterBase):
         return style + content
 
     def __setstate__(self, state: dict) -> None:
-        """Custom __setstate__ to ensure backward compatibility when unpickling.
-        This method ensures that when unpickling an object, if the attribute `__spotforecast_tags__` is missing
-        (which would be the case for objects pickled with versions of the code before this attribute was added),
-        it will be initialized with the correct tags.
-        This maintains compatibility with older pickled objects while ensuring that all forecaster instances
-        have the necessary metadata for integration within the spotforecast ecosystem.
-
-        Args:
-            state: State dictionary from the pickled object.
-
-        Returns:
-            None
-
-        Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> import pickle
-            >>> pickled = pickle.dumps(forecaster)
-            >>> unpickled_forecaster = pickle.loads(pickled)
-            >>> hasattr(unpickled_forecaster, "__spotforecast_tags__")
-            True
+        """
+        Custom __setstate__ to ensure backward compatibility when unpickling.
+        Only sets __spotforecast_tags__ if not present, preserving custom tags.
         """
         super().__setstate__(state)
-        if not hasattr(self, "_ForecasterRecursive__spotforecast_tags__"):
+        if not hasattr(self, "__spotforecast_tags__"):
             self.__spotforecast_tags__ = {
                 "library": "spotforecast",
                 "forecaster_name": "ForecasterRecursive",

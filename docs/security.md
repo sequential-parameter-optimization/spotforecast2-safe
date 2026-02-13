@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2026 bartzbeielstein
-# SPDX-License-Identifier: AGPL-3.0-or-later
-
 # Security Policy & Vulnerability Reporting
 
 This page documents the security measures and vulnerability reporting process for spotforecast2-safe.
@@ -11,10 +8,10 @@ If you discover a security vulnerability, DO NOT create a public GitHub issue. T
 
 ### Primary: Private Security Advisory
 
-Use GitHub's **Private Security Advisory** feature:
+Use GitHub's Private Security Advisory feature:
 
 1. Go to: https://github.com/sequential-parameter-optimization/spotforecast2-safe/security/advisories
-2. Click **"Report a vulnerability"**
+2. Click "Report a vulnerability"
 3. Provide details about the vulnerability
 
 ### Alternative: Email Reporting
@@ -41,10 +38,10 @@ Provide as much detail as possible:
 
 We aim to respond to all vulnerability reports promptly:
 
-- **Acknowledgment**: Within 24 hours
-- **Initial assessment**: Within 3 business days
-- **Fix and patch**: Varies based on severity (critical issues prioritized)
-- **Public disclosure**: Coordinated after patch is available
+- Acknowledgment: Within 24 hours
+- Initial assessment: Within 3 business days
+- Fix and patch: Varies based on severity (critical issues prioritized)
+- Public disclosure: Coordinated after patch is available
 
 ## Security Advisories
 
@@ -68,23 +65,23 @@ We recommend using the latest version. Check [PyPI](https://pypi.org/project/spo
 
 spotforecast2-safe is designed with security in mind:
 
-**Zero Dead Code**
+Zero Dead Code
 - No GUI components, plotting libraries, or AutoML frameworks
 - Minimal external dependencies (see below)
 - Reduced attack surface for supply chain security
 
-**Deterministic Operations**
+Deterministic Operations
 - All transformations are bit-level reproducible
 - Predictable behavior enables auditing
 - No hidden randomness or stochastic operations
 
-**Fail-Safe Processing**
+Fail-Safe Processing
 - All transformations validate input data
 - Invalid data raises explicit errors
 - No silent failures or data imputation
 - NaNs and Infs are rejected immediately
 
-**Minimal Dependencies**
+Minimal Dependencies
 
 Core dependencies are carefully selected to minimize the CVE surface:
 
@@ -100,7 +97,7 @@ Core dependencies are carefully selected to minimize the CVE surface:
 - scikit-learn - ML utilities
 - tqdm - Progress bars
 
-**Supply Chain Security Measures**
+Supply Chain Security Measures
 
 - ✅ Dependencies pinned with compatible release specifiers
 - ✅ Dependabot enabled for automated dependency updates
@@ -149,9 +146,9 @@ safety check
 ```
 
 This project uses:
-- **Dependabot**: Automated checks for outdated and vulnerable dependencies
-- **bandit**: Code security analysis
-- **Safety**: Dependency vulnerability scanning
+- Dependabot: Automated checks for outdated and vulnerable dependencies
+- bandit: Code security analysis
+- Safety: Dependency vulnerability scanning
 
 ### Pinned Versions
 
@@ -170,31 +167,31 @@ This approach ensures:
 
 All commits to main and develop branches undergo automated security checks:
 
-1. **REUSE Compliance**: License header verification for all files
-2. **Code Quality**: Black, isort, ruff, mypy formatting and linting
-3. **Security Scanning**: bandit for code vulnerabilities, Safety for dependencies
-4. **Test Coverage**: pytest with minimum coverage thresholds
-5. **Dependency Analysis**: Dependabot for outdated packages
-6. **Build Artifacts**: Verified and scanned before deployment
+1. REUSE Compliance: License header verification for all files
+2. Code Quality: Black, isort, ruff, mypy formatting and linting
+3. Security Scanning: bandit for code vulnerabilities, Safety for dependencies
+4. Test Coverage: pytest with minimum coverage thresholds
+5. Dependency Analysis: Dependabot for outdated packages
+6. Build Artifacts: Verified and scanned before deployment
 
 ## Compliance Standards
 
 spotforecast2-safe follows these compliance standards:
 
-- **REUSE Compliant**: All files have SPDX license identifiers
-- **SPDX**: Standards-based license tracking
-- **EU AI Act Ready**: Support for compliance via [MODEL_CARD.md](safe/MODEL_CARD.md)
-- **OpenSSF Scorecard**: Monitored for security practices
-- **Python 3.13+**: Requires latest Python version for security patches
+- REUSE Compliant: All files have SPDX license identifiers
+- SPDX: Standards-based license tracking
+- EU AI Act Ready: Support for compliance via [MODEL_CARD.md](safe/MODEL_CARD.md)
+- OpenSSF Scorecard: Monitored for security practices
+- Python 3.13+: Requires latest Python version for security patches
 
 ## Contact
 
 For security inquiries:
 
-- **Vulnerability Reports**: Use [Private Security Advisory](https://github.com/sequential-parameter-optimization/spotforecast2-safe/security/advisories)
-- **Alternative Email**: bartzbeielstein@users.noreply.github.com
-- **General Inquiries**: https://github.com/sequential-parameter-optimization
-- **Security Advisories**: https://github.com/sequential-parameter-optimization/spotforecast2-safe/security/advisories
+- Vulnerability Reports: Use [Private Security Advisory](https://github.com/sequential-parameter-optimization/spotforecast2-safe/security/advisories)
+- Alternative Email: bartzbeielstein@users.noreply.github.com
+- General Inquiries: https://github.com/sequential-parameter-optimization
+- Security Advisories: https://github.com/sequential-parameter-optimization/spotforecast2-safe/security/advisories
 
 ## See Also
 
