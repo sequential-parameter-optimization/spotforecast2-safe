@@ -1,3 +1,10 @@
+## [0.8.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.1...v0.8.2-rc.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* _rolling.py ([4ab63ed](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4ab63ed149ccd788bd80d761cc63d546d3bbbfa5))
+
 ## [0.8.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.8.0...v0.8.1) (2026-02-13)
 
 

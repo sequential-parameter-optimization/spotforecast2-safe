@@ -95,6 +95,65 @@ def _np_median_jit(x: np.ndarray) -> float:
     return np.nanmedian(x)
 
 
+@njit(cache=True)
+def _np_min_max_ratio_jit(x: np.ndarray) -> float:
+    """
+    NumPy min-max ratio function implemented with Numba JIT.
+    """
+    return np.nanmin(x) / np.nanmax(x)
+
+
+@njit(cache=True)
+def _np_cv_jit(x: np.ndarray) -> float:
+    """
+    Coefficient of variation function implemented with Numba JIT.
+    If the array has only one element, the function returns 0.
+    """
+    if len(x) == 1:
+        return 0.0
+
+    a_a, b_b = 0.0, 0.0
+    for i in x:
+        if not np.isnan(i):
+            a_a = a_a + i
+            b_b = b_b + i * i
+
+    n = np.sum(~np.isnan(x))
+    if n <= 1:
+        return 0.0
+
+    var = b_b / n - ((a_a / n) ** 2)
+    var = var * (n / (n - 1))
+    std = np.sqrt(var)
+
+    return std / (a_a / n)
+
+
+@njit(cache=True)
+def _ewm_jit(x: np.ndarray, alpha: float = 0.3) -> float:
+    """
+    Calculate the exponentially weighted mean of an array.
+    """
+    if not (0 < alpha <= 1):
+        # Numba njit doesn't support f-strings or complex error messages easily in all versions
+        # so we keep it simple.
+        return np.nan
+
+    n = len(x)
+    weights = 0.0
+    sum_weights = 0.0
+    for i in range(n):
+        if not np.isnan(x[i]):
+            weight = (1 - alpha) ** (n - 1 - i)
+            weights += x[i] * weight
+            sum_weights += weight
+
+    if sum_weights == 0:
+        return np.nan
+
+    return weights / sum_weights
+
+
 def check_valid_quantile(quantile: float | list[float] | tuple[float]) -> None:
     """
     Check if quantile is valid (0 <= quantile <= 1).

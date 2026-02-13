@@ -8,9 +8,100 @@ Data transformation utilities for time series forecasting.
 This module provides functions for normalizing and transforming data formats.
 """
 
-from typing import Union
+from typing import Union, Optional
 import numpy as np
 import pandas as pd
+
+
+def date_to_index_position(
+    index: pd.Index,
+    date_input: Union[int, str, pd.Timestamp],
+    method: str = "prediction",
+    date_literal: str = "steps",
+    kwargs_pd_to_datetime: Optional[dict] = None,
+) -> int:
+    """
+    Transform a datetime string or pandas Timestamp to an integer. The integer
+    represents the position of the datetime in the index.
+
+    Args:
+        index:
+            Original datetime index (must be a pandas DatetimeIndex if `date_input` is not an int).
+        date_input:
+            Datetime to transform to integer.
+            - If int, returns the same integer.
+            - If str or pandas Timestamp, it is converted and expanded into the index.
+        method:
+            Can be 'prediction' or 'validation'.
+            - If 'prediction', the date must be later than the last date in the index.
+            - If 'validation', the date must be within the index range.
+        date_literal:
+            Variable name used in error messages. Defaults to 'steps'.
+        kwargs_pd_to_datetime:
+            Additional keyword arguments to pass to `pd.to_datetime()`. Defaults to None.
+
+    Returns:
+        int:
+            `date_input` transformed to integer position in the `index`.
+            - If `date_input` is an integer, it returns the same integer.
+            - If method is 'prediction', number of steps to predict from the last date in the index.
+            - If method is 'validation', position plus one of the date in the index.
+
+    Raises:
+        ValueError: If `method` is not 'prediction' or 'validation'.
+        TypeError: If `index` is not a DatetimeIndex when `date_input` is not an integer.
+        ValueError: If `date_input` (as date) does not meet the method's constraints.
+        TypeError: If `date_input` is not an integer, string, or pandas Timestamp.
+    """
+    # Initialize output to satisfy static analyzers; it will be overwritten
+    # on all valid execution paths before being returned.
+    output: int = 0
+
+    if kwargs_pd_to_datetime is None:
+        kwargs_pd_to_datetime = {}
+
+    if method not in ["prediction", "validation"]:
+        raise ValueError("`method` must be 'prediction' or 'validation'.")
+
+    if isinstance(date_input, (str, pd.Timestamp)):
+        if not isinstance(index, pd.DatetimeIndex):
+            raise TypeError(
+                f"Index must be a pandas DatetimeIndex when `{date_literal}` is "
+                f"not an integer. Check input series or last window."
+            )
+
+        target_date = pd.to_datetime(date_input, **kwargs_pd_to_datetime)
+        last_date = pd.to_datetime(index[-1])
+
+        if method == "prediction":
+            if target_date <= last_date:
+                raise ValueError(
+                    "If `steps` is a date, it must be greater than the last date "
+                    "in the index."
+                )
+            span_index = pd.date_range(
+                start=last_date, end=target_date, freq=index.freq
+            )
+            output = len(span_index) - 1
+        elif method == "validation":
+            first_date = pd.to_datetime(index[0])
+            if target_date < first_date or target_date > last_date:
+                raise ValueError(
+                    "If `initial_train_size` is a date, it must be greater than "
+                    "the first date in the index and less than the last date."
+                )
+            span_index = pd.date_range(
+                start=first_date, end=target_date, freq=index.freq
+            )
+            output = len(span_index)
+    elif isinstance(date_input, (int, np.integer)):
+        output = int(date_input)
+    else:
+        raise TypeError(
+            f"`{date_literal}` must be an integer, string, or pandas Timestamp."
+        )
+
+    return output
 
 
 def input_to_frame(
