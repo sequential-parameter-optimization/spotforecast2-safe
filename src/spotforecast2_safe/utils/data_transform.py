@@ -53,6 +53,10 @@ def date_to_index_position(
         ValueError: If `date_input` (as date) does not meet the method's constraints.
         TypeError: If `date_input` is not an integer, string, or pandas Timestamp.
     """
+    # Initialize output to satisfy static analyzers; it will be overwritten
+    # on all valid execution paths before being returned.
+    output: int = 0
+
     if kwargs_pd_to_datetime is None:
         kwargs_pd_to_datetime = {}
 
