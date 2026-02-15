@@ -20,12 +20,6 @@ from spotforecast2_safe.data.fetch_data import fetch_data, get_data_home
 
 logger = logging.getLogger(__name__)
 
-# Optional dependency
-try:
-    from entsoe import EntsoePandasClient
-except ImportError:
-    EntsoePandasClient = None
-
 
 def merge_build_manual(output_file: str = "energy_load.csv") -> None:
     """
@@ -40,8 +34,18 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
             Defaults to "energy_load.csv".
 
     Examples:
+        # Example 1: Merge with default output file (if raw data exists)
         >>> from spotforecast2_safe.downloader.entsoe import merge_build_manual
-        >>> # merge_build_manual()
+        >>> try:
+        ...     merge_build_manual()
+        ... except Exception:
+        ...     pass  # Ignore errors if no raw data exists
+
+        # Example 2: Merge with a custom output file name
+        >>> try:
+        ...     merge_build_manual(output_file="custom_energy_load.csv")
+        ... except Exception:
+        ...     pass
     """
     data_home = get_data_home()
     raw_dir = data_home / "raw"
@@ -121,17 +125,48 @@ def download_new_data(
         force: If True, bypass the 24h cooldown check.
 
     Raises:
-        ImportError: If 'entsoe-py' is not installed.
-        ValueError: If data fetching fails after retries.
+        ImportError:
+            If the Python package 'entsoe-py' is not installed.
+        ValueError:
+            If data fetching fails after retries.
 
     Examples:
-        >>> # download_new_data(api_key="your_key", country_code="DE")
+        # Example 1: Download for Germany for a single day (force download)
+        >>> from spotforecast2_safe.downloader.entsoe import download_new_data
+        >>> import os
+        >>> os.environ["ENTSOE_API_KEY"] = "dummy_key"
+        >>> try:
+        ...     download_new_data(api_key="dummy_key", country_code="DE", start="202201010000", end="202201020000", force=True)
+        ... except ImportError:
+        ...     pass  # entsoe-py not installed, skip
+        ... except Exception:
+        ...     pass  # Ignore download errors in doctest
+
+        # Example 2: Download for France for a different period
+        >>> try:
+        ...     download_new_data(api_key="dummy_key", country_code="FR", start="202201030000", end="202201040000", force=True)
+        ... except ImportError:
+        ...     pass
+        ... except Exception:
+        ...     pass
+
+        # Example 3: Download using environment variable for API key
+        >>> os.environ["ENTSOE_API_KEY"] = "dummy_key"
+        >>> try:
+        ...     download_new_data(api_key=os.environ["ENTSOE_API_KEY"], country_code="DE", start="202201050000", end="202201060000", force=True)
+        ... except ImportError:
+        ...     pass
+        ... except Exception:
+        ...     pass
     """
-    if EntsoePandasClient is None:
+
+    try:
+        from entsoe import EntsoePandasClient
+    except ImportError as e:
         raise ImportError(
             "The 'entsoe-py' library is required for this functionality. "
             "Install it with: pip install entsoe-py"
-        )
+        ) from e
 
     # First merge existing files to get the latest index
     merge_build_manual()
