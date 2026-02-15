@@ -1,3 +1,15 @@
+## [0.11.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.10.1...v0.11.0) (2026-02-15)
+
+
+### Features
+
+* ForecasterRecursive manager class ([d5ee4dd](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d5ee4ddd46b9cd92ae62979c63a0151f5eeeaf85))
+
+
+### Documentation
+
+* entsoe ([107cee3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/107cee3ee28aa37d518f67818528481bd289d8d5))
+
 ## [0.11.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.10.1-rc.1...v0.11.0-rc.1) (2026-02-15)
 
 
