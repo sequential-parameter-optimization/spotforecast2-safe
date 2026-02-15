@@ -145,7 +145,7 @@ class Data:
         return cls(data=df)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Period:
     """Class abstraction for the information required to encode a period using RBF.
 
