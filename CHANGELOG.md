@@ -1,3 +1,15 @@
+## [0.12.1-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.12.1-rc.1...v0.12.1-rc.2) (2026-02-15)
+
+
+### Bug Fixes
+
+* remove unused import ([f46f664](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f46f66425369635d45e9a56a5797f826455c8fcf))
+
+
+### Documentation
+
+* Period Configuration Rationale ([449c84b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/449c84b2c9cbbc04cbad81325d8e8cc1fc87867d))
+
 ## [0.12.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.12.0...v0.12.1-rc.1) (2026-02-15)
 
 
