@@ -7,9 +7,11 @@ from spotforecast2_safe.preprocessing import (
     RepeatingBasisFunction,
     ExogBuilder,
     LinearlyInterpolateTS,
-    ForecasterRecursiveModel,
-    ForecasterRecursiveLGBM,
+)
+from spotforecast2_safe.manager.models import (
     ForecasterRecursiveXGB,
+    ForecasterRecursiveLGBM,
+    ForecasterRecursiveModel,
 )
 
 """spotforecast2-safe: Safety-critical time series forecasting library.

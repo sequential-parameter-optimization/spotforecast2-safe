@@ -1,13 +1,14 @@
+import pytest
 import pandas as pd
 
 from lightgbm import LGBMRegressor
 from sklearn.linear_model import LinearRegression
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.preprocessing.forecaster_recursive_model import (
+from spotforecast2_safe.manager.models import (
     ForecasterRecursiveModel,
-    ForecasterRecursiveLGBM,
     ForecasterRecursiveXGB,
+    ForecasterRecursiveLGBM,
 )
 
 
@@ -65,16 +66,37 @@ def test_forecaster_recursive_xgb_init():
         assert model.forecaster is None
 
 
-def test_docstring_examples():
-    """Verify the examples provided in the docstrings."""
-    # Base model example
+def test_forecaster_recursive_model_fit_uninitialized():
+    """Test fitting without a forecaster raises ValueError."""
+    model = ForecasterRecursiveModel(iteration=0)
+    y = pd.Series([1, 2, 3])
+    with pytest.raises(ValueError, match="Forecaster not initialized"):
+        model.fit(y=y)
+
+
+def test_package_prediction_no_forecaster():
+    """Test package_prediction returns empty dict if forecaster is None."""
+    model = ForecasterRecursiveModel(iteration=0)
+    assert model.package_prediction() == {}
+
+
+def test_package_prediction_missing_file(tmp_path, monkeypatch):
+    """Test package_prediction handling of missing data file."""
     model = ForecasterRecursiveModel(iteration=0)
     model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
-    model.name = "linear"
-    model.tune()
-    assert model.is_tuned is True
 
-    # LGBM example
-    lgbm_model = ForecasterRecursiveLGBM(iteration=0)
-    assert lgbm_model.name == "lgbm"
-    assert lgbm_model.forecaster is not None
+    # Mock get_data_home to point to an empty temp dir
+    import sys
+
+    fd_mod = sys.modules["spotforecast2_safe.data.fetch_data"]
+    monkeypatch.setattr(fd_mod, "get_data_home", lambda: tmp_path)
+
+    result = model.package_prediction()
+    assert result == {}
+
+
+def test_forecaster_recursive_model_repr():
+    """Verify that the representation contains the name."""
+    model = ForecasterRecursiveModel(iteration=0, name="custom")
+    # We didn't explicitly define __repr__, but check basics
+    assert "ForecasterRecursiveModel" in str(model)

@@ -37,6 +37,22 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
         FileNotFoundError: If the raw directory does not exist.
         ValueError: If no valid CSV files are found for merging.
 
+    Notes:
+        Logging information can be selected by setting the log level for the
+        `spotforecast2_safe.downloader.entsoe` logger. Common levels are
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`.
+
+        Examples:
+            # Show only warnings and errors (default)
+            >>> import logging
+            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
+
+            # Show informative messages about the merging process
+            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
+
+            # Show detailed debug information
+            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+
     Examples:
         # Example 1: Merge with default output file (if raw data exists)
         >>> from spotforecast2_safe.downloader.entsoe import merge_build_manual
@@ -133,6 +149,22 @@ def download_new_data(
             If the Python package 'entsoe-py' is not installed.
         ValueError:
             If data fetching fails after retries.
+
+    Notes:
+        Logging information can be selected by setting the log level for the
+        `spotforecast2_safe.downloader.entsoe` logger. Common levels are
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`.
+
+        Examples:
+            # Show only warnings and errors (default)
+            >>> import logging
+            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
+
+            # Show informative messages about the merging process
+            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
+
+            # Show detailed debug information
+            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
 
     Examples:
         # Example 1: Download for Germany for a single day (2022-01-01 to 2022-01-02)   with force download
