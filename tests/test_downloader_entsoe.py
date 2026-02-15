@@ -62,10 +62,7 @@ class TestEntsoeDownloader(unittest.TestCase):
 
     @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
     @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
-    @patch("spotforecast2_safe.downloader.entsoe.EntsoePandasClient")
-    def test_download_new_data_success(
-        self, mock_client_class, mock_fetch, mock_get_home
-    ):
+    def test_download_new_data_success(self, mock_fetch, mock_get_home):
         """Test successful data download."""
         mock_get_home.return_value = self.test_dir
 
@@ -73,12 +70,19 @@ class TestEntsoeDownloader(unittest.TestCase):
         dates = pd.date_range("2026-01-01", periods=5, freq="h", tz="UTC")
         mock_fetch.return_value = pd.DataFrame(index=dates)
 
-        # Setup mock client
+        # Patch sys.modules to inject a mock entsoe module
+        import sys
+        from unittest.mock import MagicMock
+
+        mock_entsoe_mod = MagicMock()
+        mock_client_class = mock_entsoe_mod.EntsoePandasClient
         mock_client = mock_client_class.return_value
         mock_df = pd.DataFrame(
             {"Actual": [123]}, index=[dates[-1] + pd.Timedelta(hours=1)]
         )
         mock_client.query_load_and_forecast.return_value = mock_df
+        sys.modules["entsoe"] = mock_entsoe_mod
+
         download_new_data(api_key="fake_key", force=True)
 
         # Verify client call
@@ -90,16 +94,20 @@ class TestEntsoeDownloader(unittest.TestCase):
 
     @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
     @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
-    @patch("spotforecast2_safe.downloader.entsoe.EntsoePandasClient")
-    def test_download_new_data_cooldown(
-        self, mock_client_class, mock_fetch, mock_get_home
-    ):
+    def test_download_new_data_cooldown(self, mock_fetch, mock_get_home):
         """Test that download is skipped if too recent."""
         mock_get_home.return_value = self.test_dir
 
         # Last index is very recent
         now = pd.Timestamp.now(tz="UTC")
         mock_fetch.return_value = pd.DataFrame(index=[now - pd.Timedelta(hours=2)])
+
+        import sys
+        from unittest.mock import MagicMock
+
+        mock_entsoe_mod = MagicMock()
+        mock_client_class = mock_entsoe_mod.EntsoePandasClient
+        sys.modules["entsoe"] = mock_entsoe_mod
 
         download_new_data(api_key="fake_key", force=False)
 
