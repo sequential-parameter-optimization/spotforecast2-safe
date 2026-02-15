@@ -9,6 +9,12 @@
 ### Documentation
 
 * entsoe ([107cee3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/107cee3ee28aa37d518f67818528481bd289d8d5))
+## [0.10.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.10.0...v0.10.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* doctests ([8b67e1a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8b67e1a3d029cd92adbe8aa68c417f850986b8af))
 
 ## [0.10.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.10.0...v0.10.1-rc.1) (2026-02-13)
 
