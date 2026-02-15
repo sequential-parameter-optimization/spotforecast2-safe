@@ -18,29 +18,37 @@ class ConfigEntsoe:
     initialization or used with sensible defaults.
 
     Args:
-        api_country_code: ISO country code for ENTSO-E API queries.
-        periods: List of Period objects defining cyclical feature encodings.
-        lags_consider: List of lag values to consider for feature selection.
-        train_size: Time window for training data.
-        end_train_default: Default end date for training period (ISO format with timezone).
-        delta_val: Validation window size.
-        predict_size: Number of hours to predict ahead.
-        refit_size: Number of days between model refits.
-        random_state: Random seed for reproducibility.
-        n_hyperparameters_trials: Number of trials for hyperparameter optimization.
-        data_filename: Path to the interim merged data file.
+        api_country_code (str): ISO country code for ENTSO-E API queries.
+        periods (Optional[List[Period]]): List of Period objects defining cyclical feature encodings.
+        lags_consider (Optional[List[int]]): List of lag values to consider for feature selection.
+        train_size (Optional[pd.Timedelta]): Time window for training data.
+        end_train_default (str): Default end date for training period (ISO format with timezone).
+        delta_val (Optional[pd.Timedelta]): Validation window size.
+        predict_size (int): Number of hours to predict ahead.
+        refit_size (int): Number of days between model refits.
+        random_state (int): Random seed for reproducibility.
+        n_hyperparameters_trials (int): Number of trials for hyperparameter optimization.
+        data_filename (str): Path to the interim merged data file.
 
     Attributes:
-        API_COUNTRY_CODE: ISO country code for API queries.
-        periods: Cyclical feature encoding specifications.
-        lags_consider: Lag values for autoregressive features.
-        train_size: Training data window.
-        end_train_default: Default training end date.
-        delta_val: Validation window.
-        predict_size: Prediction horizon in hours.
-        refit_size: Refit interval in days.
-        random_state: Random seed.
-        n_hyperparameters_trials: Hyperparameter tuning trials.
+        API_COUNTRY_CODE (str): ISO country code for API queries.
+        periods (List[Period]): Cyclical feature encoding specifications.
+        lags_consider (List[int]): Lag values for autoregressive features.
+        train_size (pd.Timedelta): Training data window.
+        end_train_default (str): Default training end date.
+        delta_val (pd.Timedelta): Validation window.
+        predict_size (int): Prediction horizon in hours.
+        refit_size (int): Refit interval in days.
+        random_state (int): Random seed.
+        n_hyperparameters_trials (int): Hyperparameter tuning trials.
+
+    Notes:
+        The default period configurations use specific `n_periods` to balance resolution and smoothing:
+        - **Daily**: `n_periods=12` (24h) provides ~2h resolution, smoothing hourly noise and halving dimensionality.
+        - **Weekly**: `n_periods` typically matches range (1:1) to distinguish day-of-week patterns.
+        - **Yearly**: `n_periods=12` (365d) provides ~1 month resolution, capturing broad seasonal trends without overfitting.
+
+        See `docs/PERIOD_CONFIGURATION_RATIONALE.md` for a detailed analysis.
 
     Examples:
         >>> from spotforecast2_safe import Config
