@@ -1,3 +1,10 @@
+## [0.12.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.11.0...v0.12.0-rc.1) (2026-02-15)
+
+
+### Features
+
+* Config (moved from spotforecast2) ([aafaaf3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/aafaaf3eadb958ca8d23e29f023343ae37c71236))
+
 ## [0.11.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.11.0-rc.1...v0.11.0-rc.2) (2026-02-15)
 ## [0.11.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.10.1...v0.11.0) (2026-02-15)
 
