@@ -4,6 +4,12 @@
 ### Bug Fixes
 
 * Period dataclass frozen ([06d2c9e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/06d2c9e5eff745cf461fee3fbb9ffe949ea353fa))
+## [0.12.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.11.0...v0.12.0) (2026-02-15)
+
+
+### Features
+
+* Config (moved from spotforecast2) ([aafaaf3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/aafaaf3eadb958ca8d23e29f023343ae37c71236))
 
 ## [0.12.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.11.0...v0.12.0-rc.1) (2026-02-15)
 
