@@ -2179,7 +2179,7 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
 
-        (last_window, exog_values_dict, levels, prediction_index) = (
+        last_window, exog_values_dict, levels, prediction_index = (
             self._create_predict_inputs(
                 steps=steps,
                 levels=levels,
@@ -2332,7 +2332,7 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
 
-        (last_window, exog_values_dict, levels, prediction_index) = (
+        last_window, exog_values_dict, levels, prediction_index = (
             self._create_predict_inputs(
                 steps=steps,
                 levels=levels,
@@ -2425,7 +2425,7 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
 
-        (last_window, exog_values_dict, levels, prediction_index) = (
+        last_window, exog_values_dict, levels, prediction_index = (
             self._create_predict_inputs(
                 steps=steps,
                 levels=levels,
@@ -2558,7 +2558,7 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
             pd.DataFrame: Values predicted by the forecaster and their estimated interval.
         """
 
-        (last_window, exog_values_dict, levels, prediction_index) = (
+        last_window, exog_values_dict, levels, prediction_index = (
             self._create_predict_inputs(
                 steps=steps,
                 levels=levels,
@@ -3049,7 +3049,7 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
                 "arguments before using `set_in_sample_residuals()`."
             )
 
-        (X_train, y_train, series_indexes, _, X_train_series_names_in_, *_) = (
+        X_train, y_train, series_indexes, _, X_train_series_names_in_, *_ = (
             self._create_train_X_y(series=series, exog=exog, store_last_window=False)
         )
 

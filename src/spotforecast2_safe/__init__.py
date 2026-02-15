@@ -13,6 +13,9 @@ from spotforecast2_safe.manager.models import (
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
 )
+from spotforecast2_safe.manager.configurator import ConfigEntsoe
+
+Config = ConfigEntsoe
 
 """spotforecast2-safe: Safety-critical time series forecasting library.
 
@@ -44,4 +47,6 @@ __all__ = [
     "ForecasterRecursiveModel",
     "ForecasterRecursiveLGBM",
     "ForecasterRecursiveXGB",
+    "ConfigEntsoe",
+    "Config",
 ]
