@@ -22,11 +22,8 @@ from ._rolling import RollingFeatures
 from .repeating_basis_function import RepeatingBasisFunction
 from .exog_builder import ExogBuilder
 from .linearly_interpolate_ts import LinearlyInterpolateTS
-from .forecaster_recursive_model import (
-    ForecasterRecursiveModel,
-    ForecasterRecursiveLGBM,
-    ForecasterRecursiveXGB,
-)
+
+# No recursive models here anymore
 
 __all__ = [
     "get_start_end",
@@ -48,7 +45,4 @@ __all__ = [
     "RepeatingBasisFunction",
     "ExogBuilder",
     "LinearlyInterpolateTS",
-    "ForecasterRecursiveModel",
-    "ForecasterRecursiveLGBM",
-    "ForecasterRecursiveXGB",
 ]

@@ -20,11 +20,15 @@ The spotforecast2-safe library organizes functionality into six major modules:
 ```python
 from spotforecast2_safe.data import Period
 from spotforecast2_safe.preprocessing import (
-    ForecasterRecursive,
-    ForecasterRecursiveLGBM,
     ExogBuilder,
     RollingFeatures,
 )
+from spotforecast2_safe.manager.models import (
+    ForecasterRecursiveXGB,
+    ForecasterRecursiveLGBM,
+    ForecasterRecursiveModel,
+)
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.utils import generate_holiday
 ```
 

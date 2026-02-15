@@ -7,7 +7,6 @@ import logging
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
-from lightgbm import LGBMRegressor
 
 from spotforecast2_safe.data.data import Period
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
@@ -43,7 +42,7 @@ class ForecasterRecursiveModel:
 
     Examples:
         >>> import pandas as pd
-        >>> from spotforecast2_safe.preprocessing.forecaster_recursive_model import ForecasterRecursiveModel
+        >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
         >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
         >>> from sklearn.linear_model import LinearRegression
         >>>
@@ -58,11 +57,11 @@ class ForecasterRecursiveModel:
     def __init__(
         self,
         iteration: int,
-        end_dev: Optional[Union[str, pd.Timestamp]] = None,
+        end_dev: Union[str, pd.Timestamp] = "2025-12-31 00:00+00:00",
         train_size: Optional[pd.Timedelta] = None,
         periods: Optional[List[Period]] = None,
         country_code: str = "DE",
-        random_state: int = 314159,
+        random_state: int = 123456789,
         predict_size: int = 24,
         refit_size: int = 7,
         name: str = "base",
@@ -72,21 +71,55 @@ class ForecasterRecursiveModel:
         Initialize the Recursive Forecaster Model.
 
         Args:
-            iteration: Current iteration index.
-            end_dev: Cutoff date for training. Defaults to a reasonable date if None.
-            train_size: Time window for training data lookback.
-            periods: List of Period objects for cyclical encoding.
-            country_code: ISO country code for holidays.
-            random_state: Random seed.
-            predict_size: Forecast horizon in hours.
-            refit_size: Retraining frequency in days.
-            name: Model name identifier. Defaults to "base".
-            **kwargs: Additional parameters for forward compatibility.
+            iteration:
+                Current iteration index.
+            end_dev:
+                Cutoff date for training. Defaults to "2025-12-31 00:00+00:00".
+            train_size:
+                Time window for training data lookback.
+            periods:
+                List of Period objects for cyclical encoding.
+            country_code:
+                ISO country code for holidays. Defaults to "DE".
+            random_state:
+                Random seed. Defaults to 123456789.
+            predict_size:
+                Forecast horizon in hours. Defaults to 24.
+            refit_size:
+                Retraining frequency in days. Defaults to 7.
+            name:
+                Model name identifier. Defaults to "base".
+            **kwargs:
+                Additional parameters for forward compatibility.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the forecaster has not been initialized.
+
+        Examples:
+            >>> import pandas as pd
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+            >>> model = ForecasterRecursiveModel(iteration=0)
+            >>> model.name
+            'base'
+            >>> model.end_dev
+            Timestamp('2025-12-31 00:00:00+0000', tz='UTC')
+            >>> model.train_size
+            >>> model.random_state
+            123456789
+            >>> model.predict_size
+            24
+            >>> model.refit_size
+            7
+            >>> model.preprocessor # doctest: +ELLIPSIS
+            <spotforecast2_safe.preprocessing.exog_builder.ExogBuilder object at 0x...>
+            >>> model.is_tuned
+            False
         """
         self.iteration = iteration
-        # Default end date if not provided (safety fallback)
-        default_end = "2025-12-31 00:00+00:00"
-        self.end_dev = pd.to_datetime(end_dev if end_dev else default_end, utc=True)
+        self.end_dev = pd.to_datetime(end_dev, utc=True)
         self.train_size = train_size
         self.random_state = random_state
         self.predict_size = predict_size
@@ -246,70 +279,3 @@ class ForecasterRecursiveModel:
         except Exception as e:
             logger.error("Error generating prediction package: %s", e, exc_info=True)
             return {}
-
-
-class ForecasterRecursiveLGBM(ForecasterRecursiveModel):
-    """
-    ForecasterRecursive specialization using LightGBM.
-
-    Examples:
-        >>> from spotforecast2_safe.preprocessing.forecaster_recursive_model import ForecasterRecursiveLGBM
-        >>> model = ForecasterRecursiveLGBM(iteration=0)
-        >>> model.name
-        'lgbm'
-        >>> model.forecaster is not None
-        True
-    """
-
-    def __init__(self, iteration: int, lags: int = 12, **kwargs: Any):
-        """
-        Initialize the LGBM Recursive Forecaster.
-
-        Args:
-            iteration: Current iteration index.
-            lags: Number of autoregressive lags.
-            **kwargs: Passed to ForecasterRecursiveModel.
-        """
-        super().__init__(iteration, name="lgbm", **kwargs)
-        self.forecaster = ForecasterRecursive(
-            estimator=LGBMRegressor(
-                n_jobs=-1, verbose=-1, random_state=self.random_state
-            ),
-            lags=lags,
-        )
-
-
-class ForecasterRecursiveXGB(ForecasterRecursiveModel):
-    """
-    ForecasterRecursive specialization using XGBoost.
-
-    Examples:
-        >>> from spotforecast2_safe.preprocessing.forecaster_recursive_model import ForecasterRecursiveXGB
-        >>> # Only works if xgboost is installed
-        >>> try:
-        ...     model = ForecasterRecursiveXGB(iteration=0)
-        ...     print(model.name)
-        ... except Exception:
-        ...     print("xgb")
-        xgb
-    """
-
-    def __init__(self, iteration: int, lags: int = 12, **kwargs: Any):
-        """
-        Initialize the XGBoost Recursive Forecaster.
-
-        Args:
-            iteration: Current iteration index.
-            lags: Number of autoregressive lags.
-            **kwargs: Passed to ForecasterRecursiveModel.
-        """
-        super().__init__(iteration, name="xgb", **kwargs)
-        if XGBRegressor is not None:
-            self.forecaster = ForecasterRecursive(
-                estimator=XGBRegressor(n_jobs=-1, random_state=self.random_state),
-                lags=lags,
-            )
-        else:
-            logger.warning(
-                "XGBoost not installed. This model will fail during fit/predict."
-            )
