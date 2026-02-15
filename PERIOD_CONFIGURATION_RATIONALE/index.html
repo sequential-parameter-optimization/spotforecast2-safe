@@ -12,31 +12,31 @@
         <meta name="author" content="bartzbeielstein">
       
       
-        <link rel="canonical" href="https://sequential-parameter-optimization.github.io/spotforecast2-safe/safe/spotforecast2-safe/">
+        <link rel="canonical" href="https://sequential-parameter-optimization.github.io/spotforecast2-safe/PERIOD_CONFIGURATION_RATIONALE/">
       
       
-        <link rel="prev" href="../../recursive/ForecasterEquivalentDate/">
+        <link rel="prev" href="../preprocessing/outliers/">
       
       
-        <link rel="next" href="../MODEL_CARD/">
+        <link rel="next" href="../recursive/ForecasterRecursive/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>Streamlining Process - spotforecast2-safe</title>
+        <title>Period Configuration Rationale - spotforecast2-safe</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,9 +55,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spotforecast2-safe-safety-critical-streamlining" class="md-skip">
+        <a href="#period-configuration-and-feature-engineering-rationale" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="spotforecast2-safe" class="md-header__button md-logo" aria-label="spotforecast2-safe" data-md-component="logo">
+    <a href=".." title="spotforecast2-safe" class="md-header__button md-logo" aria-label="spotforecast2-safe" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Streamlining Process
+              Period Configuration Rationale
             
           </span>
         </div>
@@ -231,7 +231,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -252,7 +252,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../api_overview/" class="md-tabs__link">
+        <a href="../api_overview/" class="md-tabs__link">
           
   
   
@@ -272,7 +272,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../api/data/" class="md-tabs__link">
+        <a href="../api/data/" class="md-tabs__link">
           
   
   
@@ -292,7 +292,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../processing/model_persistence/" class="md-tabs__link">
+        <a href="../processing/model_persistence/" class="md-tabs__link">
           
   
   
@@ -308,11 +308,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../preprocessing/outliers/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../preprocessing/outliers/" class="md-tabs__link">
           
   
   
@@ -332,7 +334,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../recursive/ForecasterRecursive/" class="md-tabs__link">
+        <a href="../recursive/ForecasterRecursive/" class="md-tabs__link">
           
   
   
@@ -348,13 +350,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../safe/spotforecast2-safe/" class="md-tabs__link">
           
   
   
@@ -374,7 +374,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../contributing/" class="md-tabs__link">
+        <a href="../contributing/" class="md-tabs__link">
           
   
   
@@ -408,7 +408,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="spotforecast2-safe" class="md-nav__button md-logo" aria-label="spotforecast2-safe" data-md-component="logo">
+    <a href=".." title="spotforecast2-safe" class="md-nav__button md-logo" aria-label="spotforecast2-safe" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -438,7 +438,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -519,7 +519,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api_overview/" class="md-nav__link">
+      <a href="../api_overview/" class="md-nav__link">
         
   
   
@@ -608,7 +608,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/data/" class="md-nav__link">
+      <a href="../api/data/" class="md-nav__link">
         
   
   
@@ -636,7 +636,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/preprocessing/" class="md-nav__link">
+      <a href="../api/preprocessing/" class="md-nav__link">
         
   
   
@@ -664,7 +664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/processing/" class="md-nav__link">
+      <a href="../api/processing/" class="md-nav__link">
         
   
   
@@ -692,7 +692,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/forecaster/" class="md-nav__link">
+      <a href="../api/forecaster/" class="md-nav__link">
         
   
   
@@ -720,7 +720,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/utils/" class="md-nav__link">
+      <a href="../api/utils/" class="md-nav__link">
         
   
   
@@ -748,7 +748,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/weather/" class="md-nav__link">
+      <a href="../api/weather/" class="md-nav__link">
         
   
   
@@ -776,7 +776,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/exceptions/" class="md-nav__link">
+      <a href="../api/exceptions/" class="md-nav__link">
         
   
   
@@ -865,7 +865,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../processing/model_persistence/" class="md-nav__link">
+      <a href="../processing/model_persistence/" class="md-nav__link">
         
   
   
@@ -897,28 +897,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -936,7 +939,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -954,7 +957,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../preprocessing/outliers/" class="md-nav__link">
+      <a href="../preprocessing/outliers/" class="md-nav__link">
         
   
   
@@ -979,10 +982,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../PERIOD_CONFIGURATION_RATIONALE/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Period Configuration Rationale
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -998,6 +1028,98 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#background-cyclical-feature-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Background: Cyclical Feature Encoding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-rationale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Rationale
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Rationale">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-daily-cycle-24-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Daily Cycle (24 Hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-weekly-cycle-168-hours-7-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Weekly Cycle (168 Hours / 7 Days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-yearly-cycle-365-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Yearly Cycle (365 Days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1071,7 +1193,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../recursive/ForecasterRecursive/" class="md-nav__link">
+      <a href="../recursive/ForecasterRecursive/" class="md-nav__link">
         
   
   
@@ -1099,7 +1221,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../recursive/ForecasterEquivalentDate/" class="md-nav__link">
+      <a href="../recursive/ForecasterEquivalentDate/" class="md-nav__link">
         
   
   
@@ -1131,31 +1253,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
             
   
   
@@ -1173,7 +1292,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1188,37 +1307,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Streamlining Process
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../safe/spotforecast2-safe/" class="md-nav__link">
         
   
   
@@ -1234,281 +1326,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rationale" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rationale
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#positive-list-retained-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Positive List (Retained Components)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Positive List (Retained Components)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#orchestration-pipelines" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Orchestration &amp; Pipelines
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-environmental-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data &amp; Environmental Services
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#forecaster-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Forecaster Engine
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing-signal-cleaning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Preprocessing &amp; Signal Cleaning
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#core-utilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Core Utilities
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#negative-list-removed-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Negative List (Removed Components)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Negative List (Removed Components)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#removed-modules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Removed Modules
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#associated-test-deletions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Associated Test Deletions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conclusion
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#essential-classes-and-functions-positive-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Essential Classes and Functions (Positive List)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Essential Classes and Functions (Positive List)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#orchestration-processing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Orchestration &amp; Processing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-environmental-services_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data &amp; Environmental Services
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#forecasting-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Forecasting Engine
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing-validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Preprocessing &amp; Validation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#feature-engineering" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feature Engineering
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#unused-classes-and-functions-negative-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Unused Classes and Functions (Negative List)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Unused Classes and Functions (Negative List)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#utilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Utilities
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Preprocessing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#internal-details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Internal Details
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1521,7 +1338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../MODEL_CARD/" class="md-nav__link">
+      <a href="../safe/MODEL_CARD/" class="md-nav__link">
         
   
   
@@ -1549,7 +1366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../VERSION_MANAGEMENT/" class="md-nav__link">
+      <a href="../safe/VERSION_MANAGEMENT/" class="md-nav__link">
         
   
   
@@ -1577,7 +1394,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/" class="md-nav__link">
+      <a href="../security/" class="md-nav__link">
         
   
   
@@ -1666,7 +1483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/" class="md-nav__link">
+      <a href="../contributing/" class="md-nav__link">
         
   
   
@@ -1694,7 +1511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tasks/" class="md-nav__link">
+      <a href="../tasks/" class="md-nav__link">
         
   
   
@@ -1749,10 +1566,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rationale" class="md-nav__link">
+  <a href="#background-cyclical-feature-encoding" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rationale
+        Background: Cyclical Feature Encoding
       
     </span>
   </a>
@@ -1760,22 +1577,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#positive-list-retained-components" class="md-nav__link">
+  <a href="#configuration-rationale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Positive List (Retained Components)
+        Configuration Rationale
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Positive List (Retained Components)">
+    <nav class="md-nav" aria-label="Configuration Rationale">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#orchestration-pipelines" class="md-nav__link">
+  <a href="#1-daily-cycle-24-hours" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Orchestration &amp; Pipelines
+        1. Daily Cycle (24 Hours)
       
     </span>
   </a>
@@ -1783,10 +1600,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#data-environmental-services" class="md-nav__link">
+  <a href="#2-weekly-cycle-168-hours-7-days" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data &amp; Environmental Services
+        2. Weekly Cycle (168 Hours / 7 Days)
       
     </span>
   </a>
@@ -1794,32 +1611,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#forecaster-engine" class="md-nav__link">
+  <a href="#3-yearly-cycle-365-days" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Forecaster Engine
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing-signal-cleaning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Preprocessing &amp; Signal Cleaning
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#core-utilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Core Utilities
+        3. Yearly Cycle (365 Days)
       
     </span>
   </a>
@@ -1832,174 +1627,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#negative-list-removed-components" class="md-nav__link">
+  <a href="#summary-table" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Negative List (Removed Components)
+        Summary Table
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Negative List (Removed Components)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#removed-modules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Removed Modules
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#associated-test-deletions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Associated Test Deletions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conclusion
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#essential-classes-and-functions-positive-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Essential Classes and Functions (Positive List)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Essential Classes and Functions (Positive List)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#orchestration-processing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Orchestration &amp; Processing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-environmental-services_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data &amp; Environmental Services
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#forecasting-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Forecasting Engine
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing-validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Preprocessing &amp; Validation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#feature-engineering" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feature Engineering
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#unused-classes-and-functions-negative-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Unused Classes and Functions (Negative List)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Unused Classes and Functions (Negative List)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#utilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Utilities
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Preprocessing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#internal-details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Internal Details
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -2023,166 +1657,90 @@
   
 
 
-<h1 id="spotforecast2-safe-safety-critical-streamlining">spotforecast2-safe: Safety-Critical Streamlining</h1>
-<p>As part of the MLOps engineering for safety-critical systems, the <code>spotforecast2_safe</code> package has been meticulously streamlined. This document outlines the rationale and the specific changes made to ensure the package contains only the necessary components for the defined forecasting tasks.</p>
-<h2 id="rationale">Rationale</h2>
-<p>In safety-critical environments, reducing the "dead code" and unnecessary dependencies is paramount. By removing unreachable or unused modules, we:
-1. <strong>Minimize Attack Surface</strong>: Fewer lines of code mean fewer potential vulnerabilities.
-2. <strong>Improve Predictability</strong>: Removing complex model search and statistical heuristics ensures the system behaves exactly as expected for its primary workload.
-3. <strong>Streamline Compliance</strong>: Auditing and validating a smaller codebase is more efficient and reliable.</p>
-<hr />
-<h2 id="positive-list-retained-components">Positive List (Retained Components)</h2>
-<p>The following files are essential for the execution of the primary workflows: <code>task_n_to_1.py</code> and <code>task_n_to_1_with_covariates_and_dataframe.py</code>.</p>
-<h3 id="orchestration-pipelines">Orchestration &amp; Pipelines</h3>
+<h1 id="period-configuration-and-feature-engineering-rationale">Period Configuration and Feature Engineering Rationale</h1>
+<p>This document explains the rationale behind the selected period configurations and feature engineering choices in <code>spotforecast2-safe</code>, specifically regarding the encoding of cyclical time features using Radial Basis Functions (RBF).</p>
+<h2 id="background-cyclical-feature-encoding">Background: Cyclical Feature Encoding</h2>
+<p>For time series forecasting, encoding cyclical features like "hour of day" or "day of week" is crucial. Standard methods like one-hot encoding or integer encoding have limitations:</p>
 <ul>
-<li><code>src/spotforecast2_safe/processing/n2n_predict_with_covariates.py</code></li>
-<li><code>src/spotforecast2_safe/processing/n2n_predict.py</code></li>
-<li><code>src/spotforecast2_safe/processing/agg_predict.py</code></li>
+<li>One-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).</li>
+<li>Integer Encoding: Creates artificial ordinal relationships (e.g., hour 23 is "far" from hour 0).</li>
+<li>Sine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.</li>
 </ul>
-<h3 id="data-environmental-services">Data &amp; Environmental Services</h3>
+<p>We use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (<code>n_periods</code>).</p>
+<h2 id="configuration-rationale">Configuration Rationale</h2>
+<p>The <code>ConfigEntsoe</code> class provides default configurations optimized for energy demand forecasting. The choice of <code>n_periods</code> relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.</p>
+<h3 id="1-daily-cycle-24-hours">1. Daily Cycle (24 Hours)</h3>
 <ul>
-<li><code>src/spotforecast2_safe/data/data.py</code></li>
-<li><code>src/spotforecast2_safe/data/fetch_data.py</code></li>
-<li><code>src/spotforecast2_safe/weather/weather_client.py</code></li>
-<li><code>src/spotforecast2_safe/utils/generate_holiday.py</code></li>
-</ul>
-<h3 id="forecaster-engine">Forecaster Engine</h3>
-<ul>
-<li><code>src/spotforecast2_safe/forecaster/base.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/recursive/_forecaster_recursive.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/recursive/_forecaster_equivalent_date.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/recursive/_warnings.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/utils.py</code></li>
-</ul>
-<h3 id="preprocessing-signal-cleaning">Preprocessing &amp; Signal Cleaning</h3>
-<ul>
-<li><code>src/spotforecast2_safe/preprocessing/curate_data.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/imputation.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/outlier.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/split.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_rolling.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_differentiator.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_binner.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_common.py</code></li>
-</ul>
-<h3 id="core-utilities">Core Utilities</h3>
-<ul>
-<li><code>src/spotforecast2_safe/utils/validation.py</code></li>
-<li><code>src/spotforecast2_safe/utils/data_transform.py</code></li>
-<li><code>src/spotforecast2_safe/utils/forecaster_config.py</code></li>
-<li><code>src/spotforecast2_safe/utils/convert_to_utc.py</code></li>
-<li><code>src/spotforecast2_safe/exceptions.py</code></li>
-</ul>
-<hr />
-<h2 id="negative-list-removed-components">Negative List (Removed Components)</h2>
-<p>The following directories and files were present in the original <code>spotforecast2</code> package but have been removed from <code>spotforecast2_safe</code> as they are not required for the target safety-critical tasks.</p>
-<h3 id="removed-modules">Removed Modules</h3>
-<ul>
-<li><strong><code>src/spotforecast2_safe/model_selection/</code></strong> (Entire directory)<ul>
-<li><em>Reason</em>: Bayesian, Grid, and Random search are too complex and non-deterministic for these specific safety-critical deployment targets.</li>
-</ul>
+<li>Configuration: <code>n_periods=12</code></li>
+<li>Ratio: 2:1 (24 hours / 12 functions)</li>
+<li>Resolution: ~2 hours</li>
+<li>
+<p>Rationale: </p>
 </li>
-<li><strong><code>src/spotforecast2_safe/stats/</code></strong> (Entire directory)<ul>
-<li><em>Reason</em>: Contains autocorrelation and secondary statistical tools not used in the automated pipeline.</li>
-</ul>
+<li>
+<p>Hourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.</p>
 </li>
-<li><strong><code>src/spotforecast2_safe/forecaster/metrics.py</code></strong><ul>
-<li><em>Reason</em>: Specialized custom metrics that were not invoked by the core pipelines.</li>
+<li>Reducing <code>n_periods</code> to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.</li>
+<li>This also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.</li>
 </ul>
-</li>
-<li><strong><code>src/spotforecast2_safe/preprocessing/time_series_visualization.py</code></strong><ul>
-<li><em>Reason</em>: Headless production environments do not require Plotly or Matplotlib-based visualizations.</li>
-</ul>
-</li>
-</ul>
-<h3 id="associated-test-deletions">Associated Test Deletions</h3>
-<p>To maintain a green build and avoid import errors, the following non-essential tests were also removed:
-- <code>tests/test_model_selection_utils.py</code>
-- <code>tests/test_time_series_fold.py</code>
-- <code>tests/test_ts_visualization.py</code></p>
-<h2 id="conclusion">Conclusion</h2>
-<p>The resulting <code>spotforecast2_safe</code> project is a hardened version of the original, with $0$ unreachable code paths for the specified tasks and $100\%$ test coverage on the remaining logic.</p>
-<h2 id="essential-classes-and-functions-positive-list">Essential Classes and Functions (Positive List)</h2>
-<p>The following classes and functions (including internal helpers) are strictly required for the execution of <code>task_safe_demo.py</code> and <code>task_safe_n_to_1_with_covariates_and_dataframe.py</code>:</p>
-<h3 id="orchestration-processing">Orchestration &amp; Processing</h3>
+<h3 id="2-weekly-cycle-168-hours-7-days">2. Weekly Cycle (168 Hours / 7 Days)</h3>
 <ul>
-<li><code>agg_predict</code> (Function)</li>
-<li><code>n2n_predict</code> (Function)</li>
-<li><code>n2n_predict_with_covariates</code> (Function)</li>
+<li>Configuration: Typically <code>n_periods=7</code> (or similar for weekly patterns)</li>
+<li>Ratio: 1:1 on a daily scale</li>
+<li>Rationale: </li>
+<li>Daily patterns vary significantly between weekdays and weekends.</li>
+<li>A resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.</li>
 </ul>
-<h3 id="data-environmental-services_1">Data &amp; Environmental Services</h3>
+<h3 id="3-yearly-cycle-365-days">3. Yearly Cycle (365 Days)</h3>
 <ul>
-<li><code>fetch_data</code> (Function)</li>
-<li><code>fetch_holiday_data</code> (Function)</li>
-<li><code>fetch_weather_data</code> (Function)</li>
-<li><code>WeatherClient</code> (Class)</li>
-<li><code>create_holiday_df</code> (Function)</li>
-<li><code>convert_to_utc</code> (Function)</li>
+<li>Configuration: <code>n_periods=12</code></li>
+<li>Ratio: ~30:1 (365 days / 12 functions)</li>
+<li>Resolution: ~1 month</li>
+<li>Rationale: </li>
+<li>The yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.</li>
+<li>We do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.</li>
+<li>Using <code>n_periods=12</code> mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).</li>
 </ul>
-<h3 id="forecasting-engine">Forecasting Engine</h3>
-<ul>
-<li><code>ForecasterRecursive</code> (Class)</li>
-<li><code>ForecasterEquivalentDate</code> (Class)</li>
-<li><code>ForecasterBase</code> (Class)</li>
-<li><code>predict_multivariate</code> (Function)</li>
-<li><code>initialize_lags</code> (Function)</li>
-<li><code>initialize_weights</code> (Function)</li>
-<li><code>initialize_estimator</code> (Function)</li>
-<li><code>initialize_window_features</code> (Function)</li>
-</ul>
-<h3 id="preprocessing-validation">Preprocessing &amp; Validation</h3>
-<ul>
-<li><code>agg_and_resample_data</code> (Function)</li>
-<li><code>basic_ts_checks</code> (Function)</li>
-<li><code>curate_holidays</code> (Function)</li>
-<li><code>curate_weather</code> (Function)</li>
-<li><code>get_start_end</code> (Function)</li>
-<li><code>mark_outliers</code> (Function)</li>
-<li><code>get_missing_weights</code> (Function)</li>
-<li><code>split_rel_train_val_test</code> (Function)</li>
-<li><code>check_y</code> (Function)</li>
-<li><code>check_exog</code> (Function)</li>
-<li><code>check_predict_input</code> (Function)</li>
-<li><code>check_interval</code> (Function)</li>
-<li><code>input_to_frame</code> (Function)</li>
-<li><code>expand_index</code> (Function)</li>
-<li><code>transform_dataframe</code> (Function)</li>
-<li><code>check_extract_values_and_index</code> (Function)</li>
-</ul>
-<h3 id="feature-engineering">Feature Engineering</h3>
-<ul>
-<li><code>RollingFeatures</code> (Class)</li>
-<li><code>TimeSeriesDifferentiator</code> (Class)</li>
-<li><code>QuantileBinner</code> (Class)</li>
-</ul>
-<h2 id="unused-classes-and-functions-negative-list">Unused Classes and Functions (Negative List)</h2>
-<p>The following components are present in the <code>spotforecast2_safe</code> codebase but are <strong>not invoked</strong> by the primary safety-critical tasks mentioned above.</p>
-<h3 id="utilities">Utilities</h3>
-<ul>
-<li><code>check_preprocess_series</code> (Function)</li>
-<li><code>check_preprocess_exog_multiseries</code> (Function)</li>
-<li><code>set_skforecast_warnings</code> (Function)</li>
-<li><code>initialize_transformer_series</code> (Function)</li>
-<li><code>date_to_index_position</code> (Function)</li>
-<li><code>prepare_steps_direct</code> (Function)</li>
-<li><code>exog_to_direct</code> (Function)</li>
-<li><code>exog_to_direct_numpy</code> (Function)</li>
-<li><code>transform_numpy</code> (Function)</li>
-<li><code>select_n_jobs_fit_forecaster</code> (Function)</li>
-<li><code>get_style_repr_html</code> (Function)</li>
-</ul>
-<h3 id="preprocessing">Preprocessing</h3>
-<ul>
-<li><code>manual_outlier_removal</code> (Function)</li>
-<li><code>get_outliers</code> (Function)</li>
-<li><code>custom_weights</code> (Function)</li>
-<li><code>WeightFunction</code> (Class)</li>
-<li><code>split_abs_train_val_test</code> (Function)</li>
-</ul>
-<h3 id="internal-details">Internal Details</h3>
-<ul>
-<li><code>check_residuals_input</code> (Function)</li>
-</ul>
+<h2 id="summary-table">Summary Table</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Period</th>
+<th style="text-align: left;">N Periods</th>
+<th style="text-align: left;">Range Size</th>
+<th style="text-align: left;">Ratio</th>
+<th style="text-align: left;">Resolution</th>
+<th style="text-align: left;">Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Daily</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">24</td>
+<td style="text-align: left;">1:2</td>
+<td style="text-align: left;">2 Hours</td>
+<td style="text-align: left;">Smoothing hourly noise, reducing dimensionality.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Weekly</td>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">1:1</td>
+<td style="text-align: left;">1 Day</td>
+<td style="text-align: left;">Distinguishing day-of-week patterns.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Yearly</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">365</td>
+<td style="text-align: left;">1:30</td>
+<td style="text-align: left;">1 Month</td>
+<td style="text-align: left;">Capturing broad seasonal trends.</td>
+</tr>
+</tbody>
+</table>
+<p>This configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.</p>
 
 
 
@@ -2218,7 +1776,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../recursive/ForecasterEquivalentDate/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ForecasterEquivalentDate">
+          <a href="../preprocessing/outliers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Outlier Detection">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2228,20 +1786,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                ForecasterEquivalentDate
+                Outlier Detection
               </div>
             </div>
           </a>
         
         
           
-          <a href="../MODEL_CARD/" class="md-footer__link md-footer__link--next" aria-label="Next: Model/Method Card">
+          <a href="../recursive/ForecasterRecursive/" class="md-footer__link md-footer__link--next" aria-label="Next: ForecasterRecursive">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Model/Method Card
+                ForecasterRecursive
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2298,10 +1856,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "navigation.top", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "navigation.top", "navigation.footer"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
