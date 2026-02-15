@@ -12,12 +12,6 @@ from spotforecast2_safe.data.data import Period
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 
-# Try to import XGBoost
-try:
-    from xgboost import XGBRegressor
-except ImportError:
-    XGBRegressor = None
-
 logger = logging.getLogger(__name__)
 
 
