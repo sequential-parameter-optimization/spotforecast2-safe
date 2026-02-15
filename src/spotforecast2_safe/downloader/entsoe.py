@@ -33,6 +33,10 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
         output_file: The name of the combined output file.
             Defaults to "energy_load.csv".
 
+    Raises:
+        FileNotFoundError: If the raw directory does not exist.
+        ValueError: If no valid CSV files are found for merging.
+
     Examples:
         # Example 1: Merge with default output file (if raw data exists)
         >>> from spotforecast2_safe.downloader.entsoe import merge_build_manual
@@ -131,7 +135,7 @@ def download_new_data(
             If data fetching fails after retries.
 
     Examples:
-        # Example 1: Download for Germany for a single day (force download)
+        # Example 1: Download for Germany for a single day (2022-01-01 to 2022-01-02)   with force download
         >>> from spotforecast2_safe.downloader.entsoe import download_new_data
         >>> import os
         >>> os.environ["ENTSOE_API_KEY"] = "dummy_key"
@@ -142,7 +146,7 @@ def download_new_data(
         ... except Exception:
         ...     pass  # Ignore download errors in doctest
 
-        # Example 2: Download for France for a different period
+        # Example 2: Download for France for the period 2022-01-03 to 2022-01-04
         >>> try:
         ...     download_new_data(api_key="dummy_key", country_code="FR", start="202201030000", end="202201040000", force=True)
         ... except ImportError:
@@ -150,7 +154,7 @@ def download_new_data(
         ... except Exception:
         ...     pass
 
-        # Example 3: Download using environment variable for API key
+        # Example 3: Download using environment variable for API key for Germany, with start date 2022-01-05 and end date 2022-01-06 (also force download)
         >>> os.environ["ENTSOE_API_KEY"] = "dummy_key"
         >>> try:
         ...     download_new_data(api_key=os.environ["ENTSOE_API_KEY"], country_code="DE", start="202201050000", end="202201060000", force=True)
@@ -178,17 +182,26 @@ def download_new_data(
         try:
             current_data = fetch_data()  # This might look at interim or a specific file
             start_date = current_data.index[-1] + pd.Timedelta(hours=1)
+            logger.info(
+                "No start date provided. Resuming from last data point: %s", start_date
+            )
         except Exception:
             # Fallback if no data is present
             start_date = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=7)
+            logger.info(
+                "No previous data found. Starting from default date: %s", start_date
+            )
     else:
         start_date = pd.to_datetime(start, utc=True)
+        logger.info("Using provided start date: %s", start_date)
 
     # Determine end date
     if end is None:
         end_date = pd.Timestamp.now(tz="UTC").floor("D")
+        logger.info("No end date provided. Using current date: %s", end_date)
     else:
         end_date = pd.to_datetime(end, utc=True)
+        logger.info("Using provided end date: %s", end_date)
 
     # Safety check: avoid redundant small downloads
     hours_diff = (end_date - start_date).total_seconds() / 3600
