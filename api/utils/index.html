@@ -6074,7 +6074,9 @@ for forecasting: it must be a pandas Series and must not contain any NaN values.
 <span class="normal"><a href="#__codelineno-0-74">74</a></span>
 <span class="normal"><a href="#__codelineno-0-75">75</a></span>
 <span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_holiday_df</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#__codelineno-0-78">78</a></span>
+<span class="normal"><a href="#__codelineno-0-79">79</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_holiday_df</span><span class="p">(</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12"></a>    <span class="n">start</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">],</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13"></a>    <span class="n">end</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">],</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14"></a>    <span class="n">tz</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;UTC&quot;</span><span class="p">,</span>
@@ -6138,9 +6140,11 @@ for forecasting: it must be a pandas Series and must not contain any NaN values.
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="c1"># Broadcast holiday status from unique dates to the full index</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="c1"># We use mapping to avoid reindex issues with different timezone objects</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">df_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">full_index</span><span class="p">)</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">df_full</span><span class="p">[</span><span class="s2">&quot;is_holiday&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_index</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_holiday_series</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="k">return</span> <span class="n">df_full</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">df_full</span><span class="p">[</span><span class="s2">&quot;is_holiday&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>        <span class="n">full_index</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_holiday_series</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="p">)</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="k">return</span> <span class="n">df_full</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -11821,7 +11825,9 @@ or if series_weights is not a dict.</p>
 <span class="normal"><a href="#__codelineno-0-74">74</a></span>
 <span class="normal"><a href="#__codelineno-0-75">75</a></span>
 <span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_holiday_df</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#__codelineno-0-78">78</a></span>
+<span class="normal"><a href="#__codelineno-0-79">79</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_holiday_df</span><span class="p">(</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12"></a>    <span class="n">start</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">],</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13"></a>    <span class="n">end</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">],</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14"></a>    <span class="n">tz</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;UTC&quot;</span><span class="p">,</span>
@@ -11885,9 +11891,11 @@ or if series_weights is not a dict.</p>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="c1"># Broadcast holiday status from unique dates to the full index</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="c1"># We use mapping to avoid reindex issues with different timezone objects</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">df_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">full_index</span><span class="p">)</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">df_full</span><span class="p">[</span><span class="s2">&quot;is_holiday&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_index</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_holiday_series</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="k">return</span> <span class="n">df_full</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">df_full</span><span class="p">[</span><span class="s2">&quot;is_holiday&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>        <span class="n">full_index</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_holiday_series</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="p">)</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="k">return</span> <span class="n">df_full</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
