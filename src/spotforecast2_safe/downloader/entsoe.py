@@ -153,46 +153,46 @@ def download_new_data(
     Notes:
         Logging information can be selected by setting the log level for the
         `spotforecast2_safe.downloader.entsoe` logger. Common levels are
-        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`.
-
-        Examples:
-            # Show only warnings and errors (default)
-            >>> import logging
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
-
-            # Show informative messages about the merging process
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-
-            # Show detailed debug information
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. For example, to
+        show only warnings and errors (default):
+        import logging;
+        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
+        to show informative messages about the merging process
+        import logging;
+        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
+        to show detailed debug information:
+        import logging;
+        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
 
     Examples:
-        # Example 1: Download for Germany for a single day (2022-01-01 to 2022-01-02)   with force download
+        # Example 1: Basic download for Germany with specific start/end dates
         >>> from spotforecast2_safe.downloader.entsoe import download_new_data
-        >>> import os
-        >>> os.environ["ENTSOE_API_KEY"] = "dummy_key"
         >>> try:
-        ...     download_new_data(api_key="dummy_key", country_code="DE", start="202201010000", end="202201020000", force=True)
-        ... except ImportError:
-        ...     pass  # entsoe-py not installed, skip
-        ... except Exception:
-        ...     pass  # Ignore download errors in doctest
-
-        # Example 2: Download for France for the period 2022-01-03 to 2022-01-04
-        >>> try:
-        ...     download_new_data(api_key="dummy_key", country_code="FR", start="202201030000", end="202201040000", force=True)
-        ... except ImportError:
-        ...     pass
-        ... except Exception:
+        ...     download_new_data(
+        ...         api_key="YOUR_API_KEY",
+        ...         country_code="DE",
+        ...         start="202301010000",
+        ...         end="202301020000",
+        ...         force=True
+        ...     )
+        ... except (ImportError, ValueError, Exception):
+        ...     # In a real scenario, handle errors appropriately
         ...     pass
 
-        # Example 3: Download using environment variable for API key for Germany, with start date 2022-01-05 and end date 2022-01-06 (also force download)
-        >>> os.environ["ENTSOE_API_KEY"] = "dummy_key"
+        # Example 2: Incremental download (automatically resumes from last data point)
         >>> try:
-        ...     download_new_data(api_key=os.environ["ENTSOE_API_KEY"], country_code="DE", start="202201050000", end="202201060000", force=True)
-        ... except ImportError:
+        ...     download_new_data(api_key="YOUR_API_KEY", country_code="FR")
+        ... except (ImportError, Exception):
         ...     pass
-        ... except Exception:
+
+        # Example 3: Forced download bypassing the 24h cooldown check
+        >>> try:
+        ...     download_new_data(
+        ...         api_key="YOUR_API_KEY",
+        ...         country_code="DE",
+        ...         force=True
+        ...     )
+        ... except (ImportError, Exception):
         ...     pass
     """
 

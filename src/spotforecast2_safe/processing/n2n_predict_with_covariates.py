@@ -426,7 +426,7 @@ def _create_interaction_features(
     base_cols: Optional[List[str]] = None,
     weather_window_pattern: str = "_window_",
     include_weather_funcs: Optional[List[str]] = None,
-    holiday_col: str = "holiday",
+    holiday_col: str = "is_holiday",
     degree: int = 1,
 ) -> pd.DataFrame:
     """Create interaction features from exogenous features.

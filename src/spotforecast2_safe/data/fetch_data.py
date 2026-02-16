@@ -139,13 +139,13 @@ def fetch_data(
             proper timezone handling. Mutually exclusive with filename.
         columns (list, optional):
             List of columns to be included in the dataset. If None, all columns are included.
-            If an empty list is provided, a ValueError is raised.
+            If an empty list is provided, a ValueError is raised. Default: None.
         index_col (int):
-            Column index to be used as the index (only used when loading from CSV).
+            Column index to be used as the index (only used when loading from CSV). Default: 0.
         parse_dates (bool):
-            Whether to parse dates in the index column (only used when loading from CSV).
+            Whether to parse dates in the index column (only used when loading from CSV). Default: True.
         dayfirst (bool):
-            Whether the day comes first in date parsing (only used when loading from CSV).
+            Whether the day comes first in date parsing (only used when loading from CSV). Default: False.
         timezone (str):
             Timezone to set for the datetime index. If a DataFrame with naive index is provided,
             it will be localized to this timezone then converted to UTC. Default: "UTC".
@@ -286,6 +286,8 @@ def fetch_weather_data(
             Frequency of the weather data.
         fallback_on_failure (bool):
             Whether to use fallback data in case of failure.
+        cached (bool):
+            Whether to use cached data.
 
     Returns:
         pd.DataFrame: DataFrame containing weather information.
