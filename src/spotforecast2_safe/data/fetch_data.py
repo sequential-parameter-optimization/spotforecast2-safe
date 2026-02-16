@@ -46,6 +46,24 @@ def get_data_home(data_home: Optional[Union[str, Path]] = None) -> Path:
     return data_home
 
 
+def get_package_data_home() -> Path:
+    """Return the location of the internal package datasets.
+
+    Returns:
+        pathlib.Path:
+            The path to the spotforecast package data directory.
+
+    Examples:
+        >>> from spotforecast2_safe.data.fetch_data import get_package_data_home
+        >>> package_data_dir = get_package_data_home()
+        >>> package_data_dir.name
+        'csv'
+        >>> package_data_dir.parent.name
+        'datasets'
+    """
+    return Path(__file__).parent.parent / "datasets" / "csv"
+
+
 def get_cache_home(cache_home: Optional[Union[str, Path]] = None) -> Path:
     """Return the location where persistent models are to be cached.
 
@@ -141,22 +159,15 @@ def fetch_data(
         FileNotFoundError: If CSV file does not exist.
 
     Examples:
-        Load from CSV (default):
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> data = fetch_data(columns=["col1", "col2"])
-        >>> data.head()
-                        Header1  Header2  Header3
-
-        Load from specific CSV:
-        >>> data = fetch_data(filename="custom_data.csv")
-
-        Process a DataFrame:
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({"value": [1, 2, 3]},
-        ...                   index=pd.date_range("2024-01-01", periods=3, freq="h"))
-        >>> data = fetch_data(dataframe=df, timezone="Europe/Berlin")
-        >>> data.index.tz
-        <UTC>
+        >>> from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+        >>> # demo01.csv is included in the package datasets
+        >>> path_demo = get_package_data_home() / "demo01.csv"
+        >>> df = fetch_data(filename=path_demo)
+        >>> df.head()
+                                  Forecast    Actual
+        Time
+        2022-01-01 00:00:00+00:00  306.73  317.27
+        2022-01-01 00:15:00+00:00  306.73  317.27
     """
     if columns is not None and len(columns) == 0:
         raise ValueError("columns must be specified and cannot be empty.")
@@ -180,8 +191,13 @@ def fetch_data(
                 "filename must be specified when dataframe is None. "
                 "Explicitly provide a filename (e.g., 'data_in.csv') or a DataFrame."
             )
-        csv_path = get_data_home() / filename
-        if not Path(csv_path).is_file():
+
+        # Check if the filename is an absolute path
+        csv_path = Path(filename)
+        if not csv_path.is_absolute():
+            csv_path = get_data_home() / filename
+
+        if not csv_path.is_file():
             raise FileNotFoundError(f"The file {csv_path} does not exist.")
 
         dataset = Data.from_csv(
