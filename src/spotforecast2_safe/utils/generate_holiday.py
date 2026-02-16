@@ -53,21 +53,25 @@ def create_holiday_df(
     # to avoid conflicts - pandas will infer it from the Timestamps
     if inferred_tz is not None:
         full_index = pd.date_range(start=start, end=end, freq=freq)
-        daily_index = pd.date_range(start=start, end=end, freq="D")
     else:
         full_index = pd.date_range(start=start, end=end, freq=freq, tz=effective_tz)
-        daily_index = pd.date_range(start=start, end=end, freq="D", tz=effective_tz)
+
+    # Generate the range of unique days covered by start/end to check for holidays
+    # We normalize to midnight to ensure we cover every day involved
+    unique_dates = pd.Series(full_index.normalize().unique())
 
     # Get holidays for the country/state
     country_holidays = holidays.country_holidays(country_code, subdiv=state)
 
     # Check each day if it is a holiday
-    # We use the date part for lookup
-    is_holiday = [1 if date.date() in country_holidays else 0 for date in daily_index]
+    is_holiday_series = pd.Series(
+        [1 if d.date() in country_holidays else 0 for d in unique_dates],
+        index=unique_dates,
+    )
 
-    df_holiday = pd.DataFrame({"holiday": is_holiday}, index=daily_index)
-
-    # Reindex to full frequency and forward fill
-    df_full = df_holiday.reindex(full_index, method="ffill").fillna(0).astype(int)
+    # Broadcast holiday status from unique dates to the full index
+    # We use mapping to avoid reindex issues with different timezone objects
+    df_full = pd.DataFrame(index=full_index)
+    df_full["is_holiday"] = full_index.normalize().map(is_holiday_series).fillna(0).astype(int)
 
     return df_full

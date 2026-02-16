@@ -15,13 +15,13 @@ def test_create_holiday_df_christmas():
     # 25th (1st Xmas Day) -> 1
     # 26th (2nd Xmas Day) -> 1
 
-    assert df.loc["2023-12-25", "holiday"] == 1
-    assert df.loc["2023-12-26", "holiday"] == 1
+    assert df.loc["2023-12-25", "is_holiday"] == 1
+    assert df.loc["2023-12-26", "is_holiday"] == 1
     # Note: Depending on holidays version, 24th might be treated differently,
     # but typically it's 0 or 0.5 if handled as half-day.
     # Assuming 0 based on original test.
     if "2023-12-24" in df.index:
-        assert df.loc["2023-12-24", "holiday"] == 0
+        assert df.loc["2023-12-24", "is_holiday"] == 0
 
 
 def test_hourly_frequency():
@@ -31,7 +31,7 @@ def test_hourly_frequency():
     df = create_holiday_df(start, end, freq="h", country_code="DE", state="NW")
 
     assert len(df) == 24
-    assert df["holiday"].sum() == 24  # All hours should be holidays
+    assert df["is_holiday"].sum() == 24  # All hours should be holidays
 
 
 def test_timezone_handling():
@@ -41,7 +41,7 @@ def test_timezone_handling():
     df = create_holiday_df(start, end, freq="D", tz="Europe/Berlin", country_code="DE")
 
     assert str(df.index.tz) == "Europe/Berlin"
-    assert df.iloc[0]["holiday"] == 1
+    assert df.iloc[0]["is_holiday"] == 1
 
 
 def test_inferred_timezone():
@@ -51,7 +51,7 @@ def test_inferred_timezone():
     df = create_holiday_df(start, end, freq="D", country_code="US", state="CA")
 
     assert str(df.index.tz) == "US/Pacific"
-    assert df.iloc[0]["holiday"] == 1  # Xmas
+    assert df.iloc[0]["is_holiday"] == 1  # Xmas
 
 
 def test_empty_range():
@@ -60,4 +60,4 @@ def test_empty_range():
     end = "2023-01-01"
     df = create_holiday_df(start, end, freq="D", country_code="DE")  # New Year
     assert len(df) == 1
-    assert df.iloc[0]["holiday"] == 1
+    assert df.iloc[0]["is_holiday"] == 1

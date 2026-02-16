@@ -286,6 +286,8 @@ def fetch_weather_data(
             Frequency of the weather data.
         fallback_on_failure (bool):
             Whether to use fallback data in case of failure.
+        cached (bool):
+            Whether to use cached data.
 
     Returns:
         pd.DataFrame: DataFrame containing weather information.
