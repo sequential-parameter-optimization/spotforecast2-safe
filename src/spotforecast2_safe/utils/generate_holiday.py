@@ -72,6 +72,8 @@ def create_holiday_df(
     # Broadcast holiday status from unique dates to the full index
     # We use mapping to avoid reindex issues with different timezone objects
     df_full = pd.DataFrame(index=full_index)
-    df_full["is_holiday"] = full_index.normalize().map(is_holiday_series).fillna(0).astype(int)
+    df_full["is_holiday"] = (
+        full_index.normalize().map(is_holiday_series).fillna(0).astype(int)
+    )
 
     return df_full
