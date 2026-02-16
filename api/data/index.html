@@ -3700,7 +3700,9 @@ Args:
     freq (str):
         Frequency of the weather data.
     fallback_on_failure (bool):
-        Whether to use fallback data in case of failure.</p>
+        Whether to use fallback data in case of failure.
+    cached (bool):
+        Whether to use cached data.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3805,7 +3807,9 @@ Args:
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_weather_data</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_weather_data</span><span class="p">(</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">cov_start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">cov_end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">51.5136</span><span class="p">,</span>
@@ -3832,41 +3836,43 @@ Args:
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            Frequency of the weather data.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        fallback_on_failure (bool):</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            Whether to use fallback data in case of failure.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        pd.DataFrame: DataFrame containing weather information.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        &gt;&gt;&gt; weather_df = fetch_weather_data(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ...     cov_start=&#39;2023-01-01T00:00&#39;,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        ...     cov_end=&#39;2023-01-11T00:00&#39;,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ...     latitude=51.5136,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        ...     longitude=7.4653,</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        ...     timezone=&#39;UTC&#39;,</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ...     freq=&#39;h&#39;,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ...     fallback_on_failure=True,</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ...     cached=True</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        &gt;&gt;&gt; weather_df.head()</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_data_home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;weather_cache.parquet&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">service</span> <span class="o">=</span> <span class="n">WeatherService</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">(</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">start</span><span class="o">=</span><span class="n">cov_start</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">end</span><span class="o">=</span><span class="n">cov_end</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">fallback_on_failure</span><span class="o">=</span><span class="n">fallback_on_failure</span><span class="p">,</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">return</span> <span class="n">weather_df</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        cached (bool):</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            Whether to use cached data.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        pd.DataFrame: DataFrame containing weather information.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &gt;&gt;&gt; weather_df = fetch_weather_data(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ...     cov_start=&#39;2023-01-01T00:00&#39;,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        ...     cov_end=&#39;2023-01-11T00:00&#39;,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        ...     latitude=51.5136,</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ...     longitude=7.4653,</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ...     timezone=&#39;UTC&#39;,</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ...     freq=&#39;h&#39;,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        ...     fallback_on_failure=True,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ...     cached=True</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        &gt;&gt;&gt; weather_df.head()</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_data_home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;weather_cache.parquet&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="n">service</span> <span class="o">=</span> <span class="n">WeatherService</span><span class="p">(</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">(</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">start</span><span class="o">=</span><span class="n">cov_start</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">end</span><span class="o">=</span><span class="n">cov_end</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">fallback_on_failure</span><span class="o">=</span><span class="n">fallback_on_failure</span><span class="p">,</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">weather_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4994,7 +5000,9 @@ Args:
     freq (str):
         Frequency of the weather data.
     fallback_on_failure (bool):
-        Whether to use fallback data in case of failure.</p>
+        Whether to use fallback data in case of failure.
+    cached (bool):
+        Whether to use cached data.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -5099,7 +5107,9 @@ Args:
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_weather_data</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_weather_data</span><span class="p">(</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">cov_start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">cov_end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">51.5136</span><span class="p">,</span>
@@ -5126,41 +5136,43 @@ Args:
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            Frequency of the weather data.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        fallback_on_failure (bool):</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            Whether to use fallback data in case of failure.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        pd.DataFrame: DataFrame containing weather information.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        &gt;&gt;&gt; weather_df = fetch_weather_data(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ...     cov_start=&#39;2023-01-01T00:00&#39;,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        ...     cov_end=&#39;2023-01-11T00:00&#39;,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ...     latitude=51.5136,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        ...     longitude=7.4653,</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        ...     timezone=&#39;UTC&#39;,</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ...     freq=&#39;h&#39;,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ...     fallback_on_failure=True,</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ...     cached=True</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        &gt;&gt;&gt; weather_df.head()</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_data_home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;weather_cache.parquet&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">service</span> <span class="o">=</span> <span class="n">WeatherService</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">(</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">start</span><span class="o">=</span><span class="n">cov_start</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">end</span><span class="o">=</span><span class="n">cov_end</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">fallback_on_failure</span><span class="o">=</span><span class="n">fallback_on_failure</span><span class="p">,</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">return</span> <span class="n">weather_df</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        cached (bool):</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            Whether to use cached data.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        pd.DataFrame: DataFrame containing weather information.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &gt;&gt;&gt; weather_df = fetch_weather_data(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ...     cov_start=&#39;2023-01-01T00:00&#39;,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        ...     cov_end=&#39;2023-01-11T00:00&#39;,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        ...     latitude=51.5136,</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ...     longitude=7.4653,</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ...     timezone=&#39;UTC&#39;,</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ...     freq=&#39;h&#39;,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        ...     fallback_on_failure=True,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ...     cached=True</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        &gt;&gt;&gt; weather_df.head()</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_data_home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;weather_cache.parquet&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="n">service</span> <span class="o">=</span> <span class="n">WeatherService</span><span class="p">(</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">(</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">start</span><span class="o">=</span><span class="n">cov_start</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">end</span><span class="o">=</span><span class="n">cov_end</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">fallback_on_failure</span><span class="o">=</span><span class="n">fallback_on_failure</span><span class="p">,</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">weather_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5939,7 +5951,9 @@ Args:
     freq (str):
         Frequency of the weather data.
     fallback_on_failure (bool):
-        Whether to use fallback data in case of failure.</p>
+        Whether to use fallback data in case of failure.
+    cached (bool):
+        Whether to use cached data.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -6044,7 +6058,9 @@ Args:
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_weather_data</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_weather_data</span><span class="p">(</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">cov_start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">cov_end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">51.5136</span><span class="p">,</span>
@@ -6071,41 +6087,43 @@ Args:
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            Frequency of the weather data.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        fallback_on_failure (bool):</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            Whether to use fallback data in case of failure.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        pd.DataFrame: DataFrame containing weather information.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        &gt;&gt;&gt; weather_df = fetch_weather_data(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ...     cov_start=&#39;2023-01-01T00:00&#39;,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        ...     cov_end=&#39;2023-01-11T00:00&#39;,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ...     latitude=51.5136,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        ...     longitude=7.4653,</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        ...     timezone=&#39;UTC&#39;,</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ...     freq=&#39;h&#39;,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ...     fallback_on_failure=True,</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ...     cached=True</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        ... )</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        &gt;&gt;&gt; weather_df.head()</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_data_home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;weather_cache.parquet&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">service</span> <span class="o">=</span> <span class="n">WeatherService</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">(</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">start</span><span class="o">=</span><span class="n">cov_start</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">end</span><span class="o">=</span><span class="n">cov_end</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">fallback_on_failure</span><span class="o">=</span><span class="n">fallback_on_failure</span><span class="p">,</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">return</span> <span class="n">weather_df</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        cached (bool):</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            Whether to use cached data.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        pd.DataFrame: DataFrame containing weather information.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &gt;&gt;&gt; weather_df = fetch_weather_data(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ...     cov_start=&#39;2023-01-01T00:00&#39;,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        ...     cov_end=&#39;2023-01-11T00:00&#39;,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        ...     latitude=51.5136,</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ...     longitude=7.4653,</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ...     timezone=&#39;UTC&#39;,</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ...     freq=&#39;h&#39;,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        ...     fallback_on_failure=True,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ...     cached=True</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ... )</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        &gt;&gt;&gt; weather_df.head()</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_data_home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;weather_cache.parquet&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">cache_path</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="n">service</span> <span class="o">=</span> <span class="n">WeatherService</span><span class="p">(</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_dataframe</span><span class="p">(</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">start</span><span class="o">=</span><span class="n">cov_start</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">end</span><span class="o">=</span><span class="n">cov_end</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">timezone</span><span class="o">=</span><span class="n">timezone</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">fallback_on_failure</span><span class="o">=</span><span class="n">fallback_on_failure</span><span class="p">,</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">weather_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
