@@ -146,6 +146,36 @@ class ForecasterRecursiveModel:
 
         Raises:
             ValueError: If the forecaster has not been initialized.
+
+        Examples:
+            >>> import pandas as pd
+            >>> import numpy as np
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> from sklearn.linear_model import LinearRegression
+            >>>
+            >>> # Example 1: Basic usage with pd.Series
+            >>> model = ForecasterRecursiveModel(iteration=0)
+            >>> model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> y = pd.Series(
+            ...     np.random.rand(10),
+            ...     index=pd.date_range("2023-01-01", periods=10, freq="h")
+            ... )
+            >>> model.fit(y=y)
+            >>> model.forecaster.is_fitted
+            True
+            >>>
+            >>> # Example 2: Usage with exogenous variables
+            >>> model_exog = ForecasterRecursiveModel(iteration=0)
+            >>> model_exog.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            >>> exog = pd.DataFrame(
+            ...     np.random.rand(10, 2),
+            ...     index=y.index,
+            ...     columns=["exog_1", "exog_2"]
+            ... )
+            >>> model_exog.fit(y=y, exog=exog)
+            >>> model_exog.forecaster.is_fitted
+            True
         """
         if self.forecaster is None:
             raise ValueError("Forecaster not initialized")
@@ -165,6 +195,43 @@ class ForecasterRecursiveModel:
         Returns:
             Dict[str, Any]: A result package containing actual values,
                 predictions, and calculated metrics (MAE, MAPE).
+
+        Examples:
+            >>> import os
+            >>> import tempfile
+            >>> import pandas as pd
+            >>> from pathlib import Path
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_lgbm import ForecasterRecursiveLGBM
+            >>> from spotforecast2_safe.data.fetch_data import get_package_data_home
+            >>>
+            >>> # Setup temporary data environment
+            >>> tmp_dir = tempfile.mkdtemp()
+            >>> os.environ["SPOTFORECAST2_DATA"] = tmp_dir
+            >>> data_path = Path(tmp_dir) / "interim"
+            >>> data_path.mkdir(parents=True)
+            >>>
+            >>> # Load demo data and rename columns to match expectations
+            >>> demo_path = get_package_data_home() / "demo01.csv"
+            >>> df = pd.read_csv(demo_path)
+            >>> df = df.rename(columns={
+            ...     "Time": "Time (UTC)",
+            ...     "Actual": "Actual Load",
+            ...     "Forecast": "Forecasted Load"
+            ... })
+            >>> df.to_csv(data_path / "energy_load.csv", index=False)
+            >>>
+            >>> # Initialize and run prediction package
+            >>> model = ForecasterRecursiveLGBM(iteration=0, end_dev="2022-01-05 00:00+00:00")
+            >>> result = model.package_prediction(predict_size=24)
+            >>>
+            >>> # Validate output
+            >>> "train_actual" in result and "future_pred" in result
+            True
+            >>>
+            >>> # Cleanup
+            >>> import shutil
+            >>> shutil.rmtree(tmp_dir)
+            >>> del os.environ["SPOTFORECAST2_DATA"]
         """
         from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
