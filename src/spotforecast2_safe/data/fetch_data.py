@@ -164,10 +164,10 @@ def fetch_data(
         >>> path_demo = get_package_data_home() / "demo01.csv"
         >>> df = fetch_data(filename=path_demo)
         >>> df.head()
-                                  Forecast    Actual
-        Time
-        2022-01-01 00:00:00+00:00  306.73  317.27
-        2022-01-01 00:15:00+00:00  306.73  317.27
+                                  Forecasted Load  Actual Load
+        Time (UTC)
+        2022-01-01 00:00:00+00:00  306.73           317.27
+        2022-01-01 00:15:00+00:00  306.73           317.27
     """
     if columns is not None and len(columns) == 0:
         raise ValueError("columns must be specified and cannot be empty.")
