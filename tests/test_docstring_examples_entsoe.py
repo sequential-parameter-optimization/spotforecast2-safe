@@ -15,9 +15,15 @@ def mock_entsoe_data():
         Path(__file__).parents[1] / "src/spotforecast2_safe/datasets/csv/demo01.csv"
     )
     df = pd.read_csv(demo_path)
-    df["Time"] = pd.to_datetime(df["Time"], utc=True)
-    df.set_index("Time", inplace=True)
-    df.index.name = "Time (UTC)"
+    # The new demo01.csv already has "Time (UTC)"
+    if "Time (UTC)" in df.columns:
+        df["Time (UTC)"] = pd.to_datetime(df["Time (UTC)"], utc=True)
+        df.set_index("Time (UTC)", inplace=True)
+    elif "Time" in df.columns:
+        df["Time"] = pd.to_datetime(df["Time"], utc=True)
+        df.set_index("Time", inplace=True)
+        df.index.name = "Time (UTC)"
+
     # Standard ENTSO-E load/forecast columns are usually 'Actual Load' and 'Day-ahead Forecast'
     # or similar. For our mock, we just need it to be a valid DataFrame.
     return df.head(100)
@@ -67,7 +73,7 @@ def test_download_new_data_example_logic(
             assert len(csv_files) == 1
             saved_df = pd.read_csv(csv_files[0], index_col=0)
             assert len(saved_df) == 100
-            assert "Actual" in saved_df.columns
+            assert "Actual Load" in saved_df.columns
 
 
 def test_download_new_data_no_entsoe_py():

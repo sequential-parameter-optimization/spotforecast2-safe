@@ -1,8 +1,19 @@
+## [0.13.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.1...v0.13.2-rc.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* colnames in datasets demo01.csv ([cedbd8d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cedbd8d6fbf9562b4906b7ba8ceaa1fbf9a2b352))
+* demo01.csv corrected header ([1d51ec2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1d51ec234e98d60625074dd80ca511623b1e59d6))
+
+## [0.13.1-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.1-rc.1...v0.13.1-rc.2) (2026-02-17)
 ## [0.13.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.0...v0.13.1) (2026-02-17)
 
 
 ### Bug Fixes
 
+* colnames in datasets demo01.csv ([cedbd8d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cedbd8d6fbf9562b4906b7ba8ceaa1fbf9a2b352))
+* demo01.csv corrected header ([1d51ec2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1d51ec234e98d60625074dd80ca511623b1e59d6))
 * tests with Actual ([7c532c2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7c532c26071174ce98ab2fdee82a95b0754e0c7d))
 
 ## [0.13.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.0...v0.13.1-rc.1) (2026-02-17)

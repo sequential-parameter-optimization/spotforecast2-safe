@@ -14,8 +14,8 @@ def test_fetch_demo01_data():
     assert isinstance(df, pd.DataFrame)
 
     # Check for expected columns
-    assert "Forecast" in df.columns
-    assert "Actual" in df.columns
+    assert "Forecasted Load" in df.columns
+    assert "Actual Load" in df.columns
 
     # Check index is datetime with timezone
     assert isinstance(df.index, pd.DatetimeIndex)
