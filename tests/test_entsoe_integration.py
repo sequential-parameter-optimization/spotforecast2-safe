@@ -13,10 +13,10 @@ def test_merge_build_manual_creates_merged_file(tmp_path):
     interim_dir = tmp_path / "interim"
     interim_dir.mkdir()
     df1 = pd.DataFrame(
-        {"Time (UTC)": ["2026-01-01 00:00", "2026-01-01 01:00"], "Actual": [1, 2]}
+        {"Time (UTC)": ["2026-01-01 00:00", "2026-01-01 01:00"], "Actual Load": [1, 2]}
     )
     df2 = pd.DataFrame(
-        {"Time (UTC)": ["2026-01-01 01:00", "2026-01-01 02:00"], "Actual": [2, 3]}
+        {"Time (UTC)": ["2026-01-01 01:00", "2026-01-01 02:00"], "Actual Load": [2, 3]}
     )
     df1.to_csv(raw_dir / "a.csv", index=False)
     df2.to_csv(raw_dir / "b.csv", index=False)
@@ -26,7 +26,7 @@ def test_merge_build_manual_creates_merged_file(tmp_path):
         merge_build_manual(output_file="merged.csv")
     merged = pd.read_csv(interim_dir / "merged.csv", index_col=0, parse_dates=True)
     assert len(merged) == 3
-    assert "Actual" in merged.columns
+    assert "Actual Load" in merged.columns
 
 
 def test_merge_build_manual_no_raw_dir(tmp_path, caplog):
@@ -60,7 +60,7 @@ def test_download_new_data_success(tmp_path):
         mock_client_class = mock_entsoe_mod.EntsoePandasClient
         mock_client = mock_client_class.return_value
         mock_df = pd.DataFrame(
-            {"Actual": [123]}, index=[dates[-1] + pd.Timedelta(hours=1)]
+            {"Actual Load": [123]}, index=[dates[-1] + pd.Timedelta(hours=1)]
         )
         mock_client.query_load_and_forecast.return_value = mock_df
         sys.modules["entsoe"] = mock_entsoe_mod
@@ -70,7 +70,7 @@ def test_download_new_data_success(tmp_path):
         assert len(files) == 1
         # Check merged file exists
         merged = pd.read_csv(interim_dir / "energy_load.csv")
-        assert "Actual" in merged.columns
+        assert "Actual Load" in merged.columns
 
 
 def test_download_new_data_cooldown_skips(tmp_path):
