@@ -280,8 +280,19 @@ class ForecasterRecursiveModel:
 
             # Limit test to prediction window
             predict_hours = predict_size * self.refit_size
+            logger.info(
+                "Prediction window: predict_size=%d, refit_size=%d, "
+                "predict_hours=%d, available_test_hours=%d",
+                predict_size,
+                self.refit_size,
+                predict_hours,
+                len(y_test),
+            )
             if len(y_test) > predict_hours:
                 y_test = y_test.iloc[:predict_hours]
+                logger.info("Limited test data to %d hours", predict_hours)
+            else:
+                logger.info("Using all %d available test hours", len(y_test))
 
             # Fit on training data
             self.forecaster.fit(y=y_train)
@@ -313,6 +324,26 @@ class ForecasterRecursiveModel:
                 "mae": mean_absolute_error(f_24h_actual, f_24h_pred),
                 "mape": mean_absolute_percentage_error(f_24h_actual, f_24h_pred),
             }
+
+            # Debug logging for metric computation
+            logger.info(
+                "Metric computation windows: "
+                "future_pred=%d hours, future_actual=%d hours, "
+                "24h_pred=%d hours, 24h_actual=%d hours",
+                len(future_pred),
+                len(y_test_aligned),
+                len(f_24h_pred),
+                len(f_24h_actual),
+            )
+            logger.info(
+                "Metrics computed: "
+                "Full horizon (MAE=%.2f, MAPE=%.4f), "
+                "24h window (MAE=%.2f, MAPE=%.4f)",
+                metrics_future["mae"],
+                metrics_future["mape"],
+                metrics_future_24h["mae"],
+                metrics_future_24h["mape"],
+            )
 
             result = {
                 "train_actual": y_train_aligned,
