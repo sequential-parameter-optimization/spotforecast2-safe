@@ -1,3 +1,10 @@
+## [0.15.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.0-rc.1...v0.15.0-rc.2) (2026-02-18)
+
+
+### Bug Fixes
+
+* shape error (_rolling.py) ([e088c8b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e088c8b78fc8812c80d1ad04524ef7e085a01e23))
+
 ## [0.15.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.14.0...v0.15.0-rc.1) (2026-02-18)
 
 
