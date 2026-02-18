@@ -21,12 +21,6 @@ def tmp_data_extra(monkeypatch):
     tmp_dir = tempfile.mkdtemp()
     monkeypatch.setenv("SPOTFORECAST2_DATA", tmp_dir)
 
-    # Mock get_data_home by explicitly importing the module
-    import importlib
-
-    fetch_data_mod = importlib.import_module("spotforecast2_safe.data.fetch_data")
-    monkeypatch.setattr(fetch_data_mod, "get_data_home", lambda: Path(tmp_dir))
-
     interim_dir = Path(tmp_dir) / "interim"
     interim_dir.mkdir(parents=True)
 
@@ -36,7 +30,10 @@ def tmp_data_extra(monkeypatch):
 
 
 def create_mock_data(path: Path, columns=None):
-    """Create a mock energy_load.csv file."""
+    """Create a mock energy_load.csv file.
+
+    Uses column names expected by ``load_timeseries`` / ``load_timeseries_forecast``.
+    """
     if columns is None:
         columns = ["Actual Load", "Forecasted Load"]
 
@@ -93,7 +90,8 @@ def test_package_prediction_missing_actual_load(tmp_data_extra, caplog):
         result = model.package_prediction()
 
     assert result == {}
-    assert "'Actual Load' column missing" in caplog.text
+    # load_timeseries raises KeyError which is caught by package_prediction's except
+    assert "Error generating prediction package" in caplog.text
 
 
 def test_package_prediction_custom_predict_size(tmp_data_extra):
@@ -109,6 +107,7 @@ def test_package_prediction_custom_predict_size(tmp_data_extra):
     # Override with predict_size=1 -> 7 hours
     result = model.package_prediction(predict_size=1)
 
+    assert "future_actual" in result
     assert len(result["future_actual"]) == 7
     assert len(result["future_pred"]) == 7
 
@@ -120,10 +119,10 @@ def test_package_prediction_exception_handling(tmp_data_extra, monkeypatch, capl
     model = ForecasterRecursiveModel(iteration=0)
     model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
 
-    # Force an exception during pandas read_csv
-    import pandas as pd
+    # Force an exception during load_timeseries by removing the data file
+    import os
 
-    monkeypatch.setattr(pd, "read_csv", lambda *args, **kwargs: 1 / 0)
+    os.remove(tmp_data_extra / "energy_load.csv")
 
     with caplog.at_level("ERROR"):
         result = model.package_prediction()

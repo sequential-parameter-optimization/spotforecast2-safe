@@ -9,6 +9,7 @@ from typing import Optional, Union
 from spotforecast2_safe.utils.generate_holiday import create_holiday_df
 from pandas import Timestamp
 from spotforecast2_safe.weather.weather_client import WeatherService
+import logging
 
 
 def get_data_home(data_home: Optional[Union[str, Path]] = None) -> Path:
@@ -117,6 +118,140 @@ def get_cache_home(cache_home: Optional[Union[str, Path]] = None) -> Path:
     # Create cache directory if it does not exist
     cache_home.mkdir(parents=True, exist_ok=True)
     return cache_home
+
+
+_logger = logging.getLogger(__name__)
+
+
+def load_timeseries(
+    data_home: Optional[Union[str, Path]] = None,
+) -> pd.Series:
+    """Load the actual-load time series from ``interim/energy_load.csv``.
+
+    Reads the ``Actual Load`` column, converts the index to a UTC
+    ``DatetimeIndex`` with hourly frequency, and fills any missing
+    values with forward/backward fill.
+
+    Args:
+        data_home: Root data directory.  If *None*, resolved via
+            :func:`get_data_home`.
+
+    Returns:
+        pd.Series: Hourly actual-load series indexed by UTC timestamps.
+
+    Raises:
+        FileNotFoundError: If ``interim/energy_load.csv`` does not exist.
+
+    Examples:
+        >>> import os, tempfile, shutil
+        >>> import pandas as pd
+        >>> from spotforecast2_safe.data.fetch_data import (
+        ...     load_timeseries, get_package_data_home,
+        ... )
+        >>> tmp = tempfile.mkdtemp()
+        >>> os.environ["SPOTFORECAST2_DATA"] = tmp
+        >>> interim = os.path.join(tmp, "interim")
+        >>> os.makedirs(interim, exist_ok=True)
+        >>> demo = get_package_data_home() / "demo01.csv"
+        >>> df = pd.read_csv(demo)
+        >>> df = df.rename(columns={
+        ...     "Time": "Time (UTC)",
+        ...     "Actual": "Actual Load",
+        ...     "Forecast": "Forecasted Load",
+        ... })
+        >>> df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
+        >>> y = load_timeseries()
+        >>> isinstance(y, pd.Series)
+        True
+        >>> y.index.tz is not None
+        True
+        >>> shutil.rmtree(tmp)
+        >>> del os.environ["SPOTFORECAST2_DATA"]
+    """
+    data_dir = get_data_home(data_home)
+    csv_path = data_dir / "interim" / "energy_load.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(
+            f"Data file not found: {csv_path}. "
+            "Run the downloader first or place energy_load.csv "
+            "in the 'interim' sub-directory."
+        )
+
+    df = pd.read_csv(csv_path, parse_dates=["Time (UTC)"])
+    df = df.set_index("Time (UTC)")
+    df.index = pd.to_datetime(df.index, utc=True)
+    df.index.name = "datetime"
+    df = df.asfreq("h")
+
+    y = df["Actual Load"]
+    if y.isna().any():
+        y = y.ffill().bfill()
+    return y
+
+
+def load_timeseries_forecast(
+    data_home: Optional[Union[str, Path]] = None,
+) -> pd.Series:
+    """Load the day-ahead forecast time series from ``interim/energy_load.csv``.
+
+    Reads the ``Forecasted Load`` column, converts the index to a UTC
+    ``DatetimeIndex`` with hourly frequency, and fills any missing
+    values with forward/backward fill.
+
+    Args:
+        data_home: Root data directory.  If *None*, resolved via
+            :func:`get_data_home`.
+
+    Returns:
+        pd.Series: Hourly forecasted-load series indexed by UTC timestamps.
+
+    Raises:
+        FileNotFoundError: If ``interim/energy_load.csv`` does not exist.
+        KeyError: If ``Forecasted Load`` column is not present.
+
+    Examples:
+        >>> import os, tempfile, shutil
+        >>> import pandas as pd
+        >>> from spotforecast2_safe.data.fetch_data import (
+        ...     load_timeseries_forecast, get_package_data_home,
+        ... )
+        >>> tmp = tempfile.mkdtemp()
+        >>> os.environ["SPOTFORECAST2_DATA"] = tmp
+        >>> interim = os.path.join(tmp, "interim")
+        >>> os.makedirs(interim, exist_ok=True)
+        >>> demo = get_package_data_home() / "demo01.csv"
+        >>> df = pd.read_csv(demo)
+        >>> df = df.rename(columns={
+        ...     "Time": "Time (UTC)",
+        ...     "Actual": "Actual Load",
+        ...     "Forecast": "Forecasted Load",
+        ... })
+        >>> df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
+        >>> y_f = load_timeseries_forecast()
+        >>> isinstance(y_f, pd.Series)
+        True
+        >>> shutil.rmtree(tmp)
+        >>> del os.environ["SPOTFORECAST2_DATA"]
+    """
+    data_dir = get_data_home(data_home)
+    csv_path = data_dir / "interim" / "energy_load.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(
+            f"Data file not found: {csv_path}. "
+            "Run the downloader first or place energy_load.csv "
+            "in the 'interim' sub-directory."
+        )
+
+    df = pd.read_csv(csv_path, parse_dates=["Time (UTC)"])
+    df = df.set_index("Time (UTC)")
+    df.index = pd.to_datetime(df.index, utc=True)
+    df.index.name = "datetime"
+    df = df.asfreq("h")
+
+    y = df["Forecasted Load"]
+    if y.isna().any():
+        y = y.ffill().bfill()
+    return y
 
 
 def fetch_data(
