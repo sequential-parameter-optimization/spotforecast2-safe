@@ -124,6 +124,155 @@ class ForecasterRecursiveModel:
         self.forecaster: Optional[ForecasterRecursive] = None
         self.is_tuned = False
 
+    def get_params(self, deep: bool = True) -> Dict[str, object]:
+        """
+        Get parameters for this forecaster model.
+
+        Collects wrapper-level parameters (``iteration``, ``end_dev``,
+        ``train_size``, ``random_state``, ``predict_size``, ``refit_size``,
+        ``name``) and, when a forecaster is attached, delegates to
+        :meth:`ForecasterRecursive.get_params` for forecaster-level
+        parameters (``estimator``, ``lags``, ``window_features``, etc.).
+
+        Args:
+            deep: If True, will return the parameters for this forecaster model and
+                contained sub-objects that are estimators.
+
+        Returns:
+            params: Dictionary of parameter names mapped to their values.
+
+        Examples:
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            ...     ForecasterRecursiveModel,
+            ... )
+            >>> model = ForecasterRecursiveModel(iteration=0)
+            >>> p = model.get_params(deep=False)
+            >>> p["iteration"]
+            0
+            >>> p["name"]
+            'base'
+            >>> p["predict_size"]
+            24
+            >>> "forecaster" not in p  # forecaster is None
+            True
+
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> model2 = ForecasterRecursiveModel(iteration=1)
+            >>> model2.forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(), lags=3
+            ... )
+            >>> p2 = model2.get_params(deep=False)
+            >>> len(p2["forecaster__lags"])
+            3
+            >>> isinstance(p2["forecaster__estimator"], LinearRegression)
+            True
+
+            >>> p3 = model2.get_params(deep=True)
+            >>> "forecaster__estimator__fit_intercept" in p3
+            True
+        """
+        # Wrapper-level parameters
+        params: Dict[str, object] = {}
+        for key in [
+            "iteration",
+            "end_dev",
+            "train_size",
+            "random_state",
+            "predict_size",
+            "refit_size",
+            "name",
+        ]:
+            if hasattr(self, key):
+                params[key] = getattr(self, key)
+
+        # Delegate to ForecasterRecursive.get_params when available
+        if self.forecaster is not None:
+            forecaster_params = self.forecaster.get_params(deep=deep)
+            for key, value in forecaster_params.items():
+                params[f"forecaster__{key}"] = value
+
+        return params
+
+    def set_params(
+        self, params: Dict[str, object] = None, **kwargs: object
+    ) -> "ForecasterRecursiveModel":
+        """
+        Set the parameters of this forecaster model.
+
+        Wrapper-level keys (``iteration``, ``name``, ``predict_size``, …)
+        are set directly on the model.  Keys prefixed with ``forecaster__``
+        are forwarded to :meth:`ForecasterRecursive.set_params`.
+
+        Args:
+            params: Optional dictionary of parameter names mapped to their
+                new values.  If provided, these parameters are set first.
+            **kwargs: Additional parameter names mapped to their new values.
+                Parameters can target the wrapper (e.g. ``name="new"``),
+                the forecaster (e.g. ``forecaster__lags=5``), or the
+                estimator inside the forecaster
+                (e.g. ``forecaster__estimator__fit_intercept=False``).
+
+        Returns:
+            ForecasterRecursiveModel: The model instance with updated
+                parameters (supports method chaining).
+
+        Examples:
+            Setting wrapper-level parameters:
+
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            ...     ForecasterRecursiveModel,
+            ... )
+            >>> model = ForecasterRecursiveModel(iteration=0)
+            >>> _ = model.set_params(name="updated", predict_size=48)
+            >>> model.name
+            'updated'
+            >>> model.predict_size
+            48
+
+            Setting forecaster-level parameters on an attached forecaster:
+
+            >>> from sklearn.linear_model import LinearRegression
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> model2 = ForecasterRecursiveModel(iteration=1)
+            >>> model2.forecaster = ForecasterRecursive(
+            ...     estimator=LinearRegression(), lags=3
+            ... )
+            >>> _ = model2.set_params(
+            ...     params={"forecaster__estimator__fit_intercept": False}
+            ... )
+            >>> model2.forecaster.estimator.fit_intercept
+            False
+        """
+        # Merge params dict and kwargs
+        all_params: Dict[str, object] = {}
+        if params is not None:
+            all_params.update(params)
+        all_params.update(kwargs)
+
+        if not all_params:
+            return self
+
+        # Separate forecaster-level from wrapper-level params
+        forecaster_params: Dict[str, object] = {}
+        for key, value in all_params.items():
+            if key.startswith("forecaster__"):
+                # Strip the 'forecaster__' prefix before forwarding
+                sub_key = key[len("forecaster__") :]
+                forecaster_params[sub_key] = value
+            else:
+                setattr(self, key, value)
+
+        # Delegate forecaster-level params
+        if forecaster_params and self.forecaster is not None:
+            if hasattr(self.forecaster, "set_params"):
+                self.forecaster.set_params(**forecaster_params)
+            else:
+                for param_name, value in forecaster_params.items():
+                    setattr(self.forecaster, param_name, value)
+
+        return self
+
     def tune(self) -> None:
         """
         Simulate hyperparameter tuning.
