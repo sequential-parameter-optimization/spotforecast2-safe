@@ -120,7 +120,7 @@ def get_cache_home(cache_home: Optional[Union[str, Path]] = None) -> Path:
     return cache_home
 
 
-_logger = logging.getLogger(__name__)
+unused_logger = logging.getLogger(__name__)
 
 
 def load_timeseries(
