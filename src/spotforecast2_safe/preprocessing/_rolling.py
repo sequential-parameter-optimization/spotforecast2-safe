@@ -252,21 +252,7 @@ class RollingFeatures:
                             )
 
         if array_ndim == 1:
-            # For 1D input, we want (n_samples, n_features)
-            # This logic is slightly different from skforecast because skforecast's
-            # transform() seems optimized for the bootstrap case (returning 1 row per sample)
-            # whereas our original transform() was a batch transform.
-            # Let's align with skforecast's RollingFeatures.transform which returns
-            # (n_samples, n_features) if n_samples == 1? No, skforecast returns (n_boot, n_stats).
-
-            # Re-evaluating: spotforecast2-safe's ForecasterRecursive._create_window_features
-            # calls wf.transform_batch(y) which calls wf.transform(y.to_numpy()).
-            # ForecasterRecursive._recursive_predict calls wf.transform(window_data).
-
-            # In _recursive_predict, window_data is (window_size, n_boot).
-            # The result should be (n_boot, n_features).
-
-            return rolling_features
+            return rolling_features.ravel()
         else:
             return rolling_features
 
