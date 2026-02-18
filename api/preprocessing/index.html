@@ -8588,21 +8588,7 @@ auto-generated from statistic names and window sizes (e.g.,
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="k">class</span><span class="w"> </span><span class="nc">RollingFeatures</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="k">class</span><span class="w"> </span><span class="nc">RollingFeatures</span><span class="p">:</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">    Compute rolling window statistics over time series data.</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25"></a>
@@ -8835,99 +8821,85 @@ auto-generated from statistic names and window sizes (e.g.,
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>                            <span class="p">)</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">if</span> <span class="n">array_ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="c1"># For 1D input, we want (n_samples, n_features)</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>            <span class="c1"># This logic is slightly different from skforecast because skforecast&#39;s</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>            <span class="c1"># transform() seems optimized for the bootstrap case (returning 1 row per sample)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>            <span class="c1"># whereas our original transform() was a batch transform.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>            <span class="c1"># Let&#39;s align with skforecast&#39;s RollingFeatures.transform which returns</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>            <span class="c1"># (n_samples, n_features) if n_samples == 1? No, skforecast returns (n_boot, n_stats).</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>            <span class="c1"># Re-evaluating: spotforecast2-safe&#39;s ForecasterRecursive._create_window_features</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>            <span class="c1"># calls wf.transform_batch(y) which calls wf.transform(y.to_numpy()).</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="c1"># ForecasterRecursive._recursive_predict calls wf.transform(window_data).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="c1"># In _recursive_predict, window_data is (window_size, n_boot).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="c1"># The result should be (n_boot, n_features).</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="k">return</span> <span class="n">rolling_features</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="k">return</span> <span class="n">rolling_features</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_vectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rolling_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Vectorized transform for bootstrap predictions.</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        X: (window_length, n_samples)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        rolling_features: (n_samples, n_features) - modified in place</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">vectorizable_stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="k">if</span> <span class="n">stat_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vectorizable_stats</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>                <span class="n">window</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">-</span><span class="n">ws</span><span class="p">:,</span> <span class="p">:]</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Mean of empty slice&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Degrees of freedom &lt;= 0 for slice&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;All-NaN slice encountered&quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                    <span class="k">if</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                        <span class="n">n_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">n_valid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                        <span class="n">all_nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">all_nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Compute rolling features from a pandas Series with index preservation.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="k">return</span> <span class="n">rolling_features</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>            <span class="k">return</span> <span class="n">rolling_features</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_vectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rolling_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Vectorized transform for bootstrap predictions.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        X: (window_length, n_samples)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        rolling_features: (n_samples, n_features) - modified in place</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">vectorizable_stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>                <span class="k">if</span> <span class="n">stat_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vectorizable_stats</span><span class="p">:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="n">window</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">-</span><span class="n">ws</span><span class="p">:,</span> <span class="p">:]</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Mean of empty slice&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Degrees of freedom &lt;= 0 for slice&quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;All-NaN slice encountered&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                    <span class="k">if</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>                        <span class="n">n_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">n_valid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                        <span class="n">all_nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">all_nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Compute rolling features from a pandas Series with index preservation.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="c1"># Use pandas rolling for batch transformation</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>                <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>                <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>                <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="c1"># Use pandas rolling for batch transformation</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>                <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>                <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -9329,21 +9301,7 @@ Method exists for scikit-learn compatibility.</p>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
-<span class="normal"><a href="#__codelineno-0-257">257</a></span>
-<span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    Compute rolling window statistics from time series data.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
@@ -9401,23 +9359,9 @@ Method exists for scikit-learn compatibility.</p>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>                        <span class="p">)</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">if</span> <span class="n">array_ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="c1"># For 1D input, we want (n_samples, n_features)</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="c1"># This logic is slightly different from skforecast because skforecast&#39;s</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="c1"># transform() seems optimized for the bootstrap case (returning 1 row per sample)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="c1"># whereas our original transform() was a batch transform.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="c1"># Let&#39;s align with skforecast&#39;s RollingFeatures.transform which returns</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="c1"># (n_samples, n_features) if n_samples == 1? No, skforecast returns (n_boot, n_stats).</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="c1"># Re-evaluating: spotforecast2-safe&#39;s ForecasterRecursive._create_window_features</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="c1"># calls wf.transform_batch(y) which calls wf.transform(y.to_numpy()).</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="c1"># ForecasterRecursive._recursive_predict calls wf.transform(window_data).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="c1"># In _recursive_predict, window_data is (window_size, n_boot).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="c1"># The result should be (n_boot, n_features).</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">return</span> <span class="n">rolling_features</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">return</span> <span class="n">rolling_features</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">rolling_features</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="k">return</span> <span class="n">rolling_features</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9440,7 +9384,21 @@ Method exists for scikit-learn compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/preprocessing/_rolling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-317">317</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
@@ -9456,51 +9414,37 @@ Method exists for scikit-learn compatibility.</p>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Compute rolling features from a pandas Series with index preservation.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Compute rolling features from a pandas Series with index preservation.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="c1"># Use pandas rolling for batch transformation</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="c1"># Use pandas rolling for batch transformation</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17715,21 +17659,7 @@ auto-generated from statistic names and window sizes (e.g.,
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="k">class</span><span class="w"> </span><span class="nc">RollingFeatures</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="k">class</span><span class="w"> </span><span class="nc">RollingFeatures</span><span class="p">:</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="sd">    Compute rolling window statistics over time series data.</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25"></a>
@@ -17962,99 +17892,85 @@ auto-generated from statistic names and window sizes (e.g.,
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>                            <span class="p">)</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">if</span> <span class="n">array_ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="c1"># For 1D input, we want (n_samples, n_features)</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>            <span class="c1"># This logic is slightly different from skforecast because skforecast&#39;s</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>            <span class="c1"># transform() seems optimized for the bootstrap case (returning 1 row per sample)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>            <span class="c1"># whereas our original transform() was a batch transform.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>            <span class="c1"># Let&#39;s align with skforecast&#39;s RollingFeatures.transform which returns</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>            <span class="c1"># (n_samples, n_features) if n_samples == 1? No, skforecast returns (n_boot, n_stats).</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>            <span class="c1"># Re-evaluating: spotforecast2-safe&#39;s ForecasterRecursive._create_window_features</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>            <span class="c1"># calls wf.transform_batch(y) which calls wf.transform(y.to_numpy()).</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="c1"># ForecasterRecursive._recursive_predict calls wf.transform(window_data).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="c1"># In _recursive_predict, window_data is (window_size, n_boot).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="c1"># The result should be (n_boot, n_features).</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="k">return</span> <span class="n">rolling_features</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="k">return</span> <span class="n">rolling_features</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_vectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rolling_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Vectorized transform for bootstrap predictions.</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        X: (window_length, n_samples)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        rolling_features: (n_samples, n_features) - modified in place</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">vectorizable_stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="k">if</span> <span class="n">stat_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vectorizable_stats</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>                <span class="n">window</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">-</span><span class="n">ws</span><span class="p">:,</span> <span class="p">:]</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Mean of empty slice&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Degrees of freedom &lt;= 0 for slice&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;All-NaN slice encountered&quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                    <span class="k">if</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                        <span class="n">n_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">n_valid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                        <span class="n">all_nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">all_nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Compute rolling features from a pandas Series with index preservation.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="k">return</span> <span class="n">rolling_features</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>            <span class="k">return</span> <span class="n">rolling_features</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_vectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rolling_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Vectorized transform for bootstrap predictions.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        X: (window_length, n_samples)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        rolling_features: (n_samples, n_features) - modified in place</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">vectorizable_stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>                <span class="k">if</span> <span class="n">stat_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vectorizable_stats</span><span class="p">:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="n">window</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">-</span><span class="n">ws</span><span class="p">:,</span> <span class="p">:]</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Mean of empty slice&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Degrees of freedom &lt;= 0 for slice&quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>                        <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;All-NaN slice encountered&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                    <span class="k">if</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>                        <span class="n">n_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">n_valid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                        <span class="n">all_nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                        <span class="n">result</span><span class="p">[</span><span class="n">all_nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                    <span class="k">elif</span> <span class="n">stat_name</span> <span class="o">==</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                        <span class="n">rolling_features</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Compute rolling features from a pandas Series with index preservation.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="c1"># Use pandas rolling for batch transformation</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>                <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>                <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>                <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="c1"># Use pandas rolling for batch transformation</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>                <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>                <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -18456,21 +18372,7 @@ Method exists for scikit-learn compatibility.</p>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
-<span class="normal"><a href="#__codelineno-0-257">257</a></span>
-<span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    Compute rolling window statistics from time series data.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
@@ -18528,23 +18430,9 @@ Method exists for scikit-learn compatibility.</p>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>                        <span class="p">)</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">if</span> <span class="n">array_ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="c1"># For 1D input, we want (n_samples, n_features)</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="c1"># This logic is slightly different from skforecast because skforecast&#39;s</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="c1"># transform() seems optimized for the bootstrap case (returning 1 row per sample)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="c1"># whereas our original transform() was a batch transform.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="c1"># Let&#39;s align with skforecast&#39;s RollingFeatures.transform which returns</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="c1"># (n_samples, n_features) if n_samples == 1? No, skforecast returns (n_boot, n_stats).</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="c1"># Re-evaluating: spotforecast2-safe&#39;s ForecasterRecursive._create_window_features</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="c1"># calls wf.transform_batch(y) which calls wf.transform(y.to_numpy()).</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="c1"># ForecasterRecursive._recursive_predict calls wf.transform(window_data).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="c1"># In _recursive_predict, window_data is (window_size, n_boot).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="c1"># The result should be (n_boot, n_features).</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">return</span> <span class="n">rolling_features</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">return</span> <span class="n">rolling_features</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">rolling_features</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="k">return</span> <span class="n">rolling_features</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -18567,7 +18455,21 @@ Method exists for scikit-learn compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/spotforecast2_safe/preprocessing/_rolling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-317">317</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
@@ -18583,51 +18485,37 @@ Method exists for scikit-learn compatibility.</p>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Compute rolling features from a pandas Series with index preservation.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Compute rolling features from a pandas Series with index preservation.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="n">values</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="c1"># Use pandas rolling for batch transformation</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ws</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_sizes</span><span class="p">):</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="n">idx_feature</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_funcs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="c1"># Use pandas rolling for batch transformation</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="c1"># Note: skforecast uses closed=&#39;left&#39; for RollingFeatures by default to avoid leakage.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="c1"># However, RollingFeatures in spotforecast2-safe&#39;s original implementation</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="c1"># seemed to be a simple rolling. Let&#39;s check skforecast&#39;s default again.</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="c1"># skforecast: self.unique_rolling_windows[key][&#39;params&#39;] = {&#39;window&#39;: params[0], &#39;min_periods&#39;: params[1], &#39;center&#39;: False, &#39;closed&#39;: &#39;left&#39;}</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="c1"># Wait, if closed=&#39;left&#39;, then the current value is NOT included.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="c1"># Let&#39;s align with skforecast&#39;s behavior if it&#39;s ported.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="c1"># Original spotforecast2-safe implementation used standard rolling (closed=&#39;right&#39;)</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="c1"># but if we want to be exactly like skforecast, we should use closed=&#39;left&#39;.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="c1"># Actually, ForecasterRecursive handles the lags manually, so if window features are</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="c1"># calculated on the same &#39;y&#39; as lags, they should probably be shifted too.</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">rolled</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">output</span><span class="p">[:,</span> <span class="n">idx_feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolled</span><span class="o">.</span><span class="n">values</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">features_names</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
