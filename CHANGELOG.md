@@ -1,3 +1,9 @@
+## [0.14.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.2-rc.1...v0.14.0-rc.1) (2026-02-18)
+
+
+### Features
+
+* get and set_params for Forecaster Models ([ba5d85e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ba5d85e16f78470b045c95a30c6e499108e4b8f5))
 ## [0.13.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.1...v0.13.2) (2026-02-17)
 
 
