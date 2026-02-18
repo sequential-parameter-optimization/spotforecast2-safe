@@ -35,9 +35,9 @@ def test_rolling_features_transform_1d():
 
     features = rf.transform(X)
 
-    # transform() on 1D input returns (1, n_features) - the stats of the last window
-    assert features.shape == (1, 1)
-    np.testing.assert_almost_equal(features[0, 0], (7.0 + 8.0 + 9.0) / 3.0)
+    # transform() on 1D input returns (n_features,) - the stats of the last window
+    assert features.shape == (1,)
+    np.testing.assert_almost_equal(features[0], (7.0 + 8.0 + 9.0) / 3.0)
 
 
 def test_rolling_features_new_stats():
@@ -50,8 +50,8 @@ def test_rolling_features_new_stats():
     X = np.array([10.0, 20.0, 30.0, 40.0])
 
     features = rf.transform(X)
-    # 1D input -> (1, 3)
-    assert features.shape == (1, 3)
+    # 1D input -> (3,)
+    assert features.shape == (3,)
 
     # Window=3 -> [20, 30, 40]
     # ratio_min_max: 20/40 = 0.5
@@ -60,7 +60,7 @@ def test_rolling_features_new_stats():
     expected_ratio = np.min(window) / np.max(window)
     expected_cv = np.std(window, ddof=1) / np.mean(window)
 
-    np.testing.assert_almost_equal(features[0, 0], expected_ratio)
-    np.testing.assert_almost_equal(features[0, 1], expected_cv)
+    np.testing.assert_almost_equal(features[0], expected_ratio)
+    np.testing.assert_almost_equal(features[1], expected_cv)
     # ewm is more complex, but let's check it's not NaN
-    assert not np.isnan(features[0, 2])
+    assert not np.isnan(features[2])
