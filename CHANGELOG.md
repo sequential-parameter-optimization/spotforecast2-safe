@@ -1,9 +1,11 @@
 ## [0.14.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.14.0-rc.1...v0.14.0-rc.2) (2026-02-18)
+## [0.14.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.2...v0.14.0) (2026-02-18)
 
 
 ### Features
 
 * ForecasterRecursiveModel fully functional ([17f39da](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/17f39dabbdb81cd7602be99af2b481cd0c34a754))
+* get and set_params for Forecaster Models ([ba5d85e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ba5d85e16f78470b045c95a30c6e499108e4b8f5))
 
 ## [0.14.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.13.2-rc.1...v0.14.0-rc.1) (2026-02-18)
 
