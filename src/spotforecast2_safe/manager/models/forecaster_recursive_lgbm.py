@@ -6,6 +6,7 @@ from typing import Any
 
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.manager.trainer import window_features
 from .forecaster_recursive_model import ForecasterRecursiveModel
 from lightgbm import LGBMRegressor
 
@@ -43,4 +44,5 @@ class ForecasterRecursiveLGBM(ForecasterRecursiveModel):
                 n_jobs=-1, verbose=-1, random_state=self.random_state
             ),
             lags=lags,
+            window_features=window_features,
         )

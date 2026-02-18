@@ -19,6 +19,9 @@ class MockModel:
     def tune(self):
         self.is_tuned = True
 
+    def get_params(self, deep=True):
+        return {"iteration": self.iteration, "name": self.name}
+
 
 @patch("spotforecast2_safe.manager.trainer.fetch_data")
 def test_handle_training_with_custom_name(mock_fetch):

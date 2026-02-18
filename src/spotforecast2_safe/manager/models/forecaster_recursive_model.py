@@ -4,12 +4,22 @@
 """Recursive forecaster model wrappers for different estimators."""
 
 import logging
-from typing import Any, Dict, List, Optional, Union
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 
 import pandas as pd
+from joblib import dump
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
 from spotforecast2_safe.data.data import Period
+from spotforecast2_safe.data.fetch_data import (
+    load_timeseries,
+    load_timeseries_forecast,
+)
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.model_selection import TimeSeriesFold, backtesting_forecaster
+from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 
 logger = logging.getLogger(__name__)
@@ -123,6 +133,11 @@ class ForecasterRecursiveModel:
         self.name = name
         self.forecaster: Optional[ForecasterRecursive] = None
         self.is_tuned = False
+        self.save_model_to_file = kwargs.pop("save_model_to_file", True)
+        self.results_tuning: Optional[pd.DataFrame] = None
+        self.best_params: Optional[dict] = None
+        self.best_lags: Optional[List[int]] = None
+        self.metrics = ["mean_absolute_error", "mean_absolute_percentage_error"]
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
@@ -274,16 +289,122 @@ class ForecasterRecursiveModel:
         return self
 
     def tune(self) -> None:
-        """
-        Simulate hyperparameter tuning.
+        """Simulate hyperparameter tuning.
 
-        In a production environment, this would implement Bayesian search or
-        similar optimization. For safety-critical stability, we currently
-        default to robust parameters.
-        #TODO: Implement hyperparameter tuning in spotforecast2
+        In ``spotforecast2-safe`` this is a simulated stub that marks the
+        model as tuned without performing an actual Bayesian search.  A
+        full implementation using ``bayesian_search_forecaster`` will be
+        provided in the ``spotforecast2`` package.
+
+        #TODO: Implement real Bayesian search in spotforecast2
         """
         logger.info("Tuning %s model (simulated)...", self.name)
         self.is_tuned = True
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save_to_file(
+        self,
+        model_dir: Optional[Union[str, Path]] = None,
+    ) -> None:
+        """Serialize the model to disk via :func:`joblib.dump`.
+
+        Args:
+            model_dir: Directory for the model file.  If *None*,
+                defaults to :func:`get_cache_home`.
+
+        Examples:
+            >>> import tempfile
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            ...     ForecasterRecursiveModel,
+            ... )
+            >>> model = ForecasterRecursiveModel(iteration=0, name="test")
+            >>> with tempfile.TemporaryDirectory() as tmpdir:
+            ...     model.save_to_file(model_dir=tmpdir)
+            ...     import os; any("test_forecaster_0" in f for f in os.listdir(tmpdir))
+            True
+        """
+        from spotforecast2_safe.manager.trainer import get_path_model
+
+        path_to_save = get_path_model(self.name, self.iteration, model_dir=model_dir)
+        path_to_save.parent.mkdir(parents=True, exist_ok=True)
+        logger.info(
+            "Saving %s Forecaster %d to %s.",
+            self.name.upper(),
+            self.iteration,
+            path_to_save,
+        )
+        dump(self, path_to_save, compress=3)
+
+    # ------------------------------------------------------------------
+    # Cross-validation helpers
+    # ------------------------------------------------------------------
+
+    def _build_cv(
+        self,
+        train_size: int,
+        fixed_train_size: bool = False,
+        refit: Union[int, bool] = False,
+    ) -> TimeSeriesFold:
+        """Build cross-validation time folds for tuning and backtesting.
+
+        Args:
+            train_size: Number of observations in the initial training set.
+            fixed_train_size: Whether to keep the training window fixed.
+            refit: Refit frequency (``False`` = no refit).
+
+        Returns:
+            TimeSeriesFold: Configured fold object.
+        """
+        return TimeSeriesFold(
+            steps=self.predict_size,
+            refit=refit,
+            initial_train_size=train_size,
+            fixed_train_size=fixed_train_size,
+            gap=0,
+            skip_folds=None,
+            allow_incomplete_fold=True,
+        )
+
+    def _get_init_train(
+        self, min_val: pd.Timestamp, end_val: pd.Timestamp
+    ) -> pd.Timestamp:
+        """Return the start of the training period.
+
+        If ``train_size`` is *None*, uses the earliest available timestamp.
+        Otherwise computes ``end_val - train_size`` and caps at ``min_val``.
+
+        Args:
+            min_val: Earliest timestamp in the dataset.
+            end_val: End of the training/dev period.
+
+        Returns:
+            pd.Timestamp: Start of the training window.
+
+        Examples:
+            >>> import pandas as pd
+            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            ...     ForecasterRecursiveModel,
+            ... )
+            >>> model = ForecasterRecursiveModel(iteration=0)
+            >>> start = pd.Timestamp("2020-01-01", tz="UTC")
+            >>> end = pd.Timestamp("2025-12-31", tz="UTC")
+            >>> model._get_init_train(start, end) == start
+            True
+            >>> model.train_size = pd.Timedelta(days=365)
+            >>> model._get_init_train(start, end)
+            Timestamp('2024-12-31 00:00:00+0000', tz='UTC')
+        """
+        if self.train_size is None:
+            return min_val
+        init_train = end_val - self.train_size
+        return max(min_val, init_train)
+
+    # ------------------------------------------------------------------
+    # Training helpers
+    # ------------------------------------------------------------------
 
     def fit(self, y: pd.Series, exog: Optional[pd.DataFrame] = None) -> None:
         """
@@ -331,12 +452,333 @@ class ForecasterRecursiveModel:
 
         self.forecaster.fit(y=y, exog=exog)
 
-    def package_prediction(self, predict_size: Optional[int] = None) -> Dict[str, Any]:
-        """
-        Generate predictions and package them with metrics for the UI.
+    def fit_with_best(self) -> None:
+        """Fit the forecaster using the recorded best hyperparameters.
 
-        This method handles data loading (from interim), alignment,
-        scoring, and benchmark comparison.
+        After tuning (or manually setting ``best_params`` and ``best_lags``),
+        this method loads the data, sets the optimal parameters/lags, and
+        fits the forecaster on the full training + dev set up to
+        ``end_dev``.
+
+        Raises:
+            ValueError: If the forecaster has not been initialized.
+        """
+        logger.info(
+            "Fitting %s Forecaster %d for predictions",
+            self.name.upper(),
+            self.iteration,
+        )
+
+        if self.best_params is None or self.best_lags is None:
+            logger.warning("Model is not tuned! Starting tuning first...")
+            self.tune()
+
+        if self.forecaster is None:
+            raise ValueError("Forecaster not initialized")
+
+        # Load data
+        y = load_timeseries()
+        y = LinearlyInterpolateTS().fit_transform(y)
+        X = self.preprocessor.build(start_date=y.index.min(), end_date=self.end_dev)
+
+        # Apply best params and lags
+        logger.info("Setting parameters...")
+        if self.best_params is not None:
+            self.forecaster.set_params(**self.best_params)
+        logger.info("Setting lags...")
+        if self.best_lags is not None and hasattr(self.forecaster, "set_lags"):
+            self.forecaster.set_lags(self.best_lags)
+
+        # Determine training window
+        start_train = self._get_init_train(y.index.min(), self.end_dev)
+
+        # Fit
+        logger.info(
+            "Fitting over %s to %s ...",
+            start_train,
+            self.end_dev,
+        )
+        self.forecaster.fit(
+            y.loc[start_train : self.end_dev],
+            exog=X.loc[start_train : self.end_dev],
+        )
+        logger.info("Training done!")
+
+    # ------------------------------------------------------------------
+    # Training data access
+    # ------------------------------------------------------------------
+
+    def _get_training_data(
+        self,
+    ) -> Tuple[pd.DataFrame, pd.Series]:
+        """Create lag/window training matrices via the forecaster.
+
+        Returns:
+            Tuple[pd.DataFrame, pd.Series]: ``(X_train, y_train)``.
+
+        Raises:
+            ValueError: If the forecaster has not been initialized.
+        """
+        if self.forecaster is None:
+            raise ValueError("Forecaster not initialized")
+
+        y = load_timeseries()
+        y = LinearlyInterpolateTS().fit_transform(y)
+        X = self.preprocessor.build(start_date=y.index.min(), end_date=self.end_dev)
+
+        start_train = self._get_init_train(y.index.min(), self.end_dev)
+
+        X_train, y_train = self.forecaster.create_train_X_y(
+            y=y.loc[start_train : self.end_dev],
+            exog=X.loc[start_train : self.end_dev],
+        )
+        return X_train, y_train
+
+    # ------------------------------------------------------------------
+    # Backtesting
+    # ------------------------------------------------------------------
+
+    def backtest(self) -> pd.DataFrame:
+        """Back-test the forecaster on the test data.
+
+        Returns:
+            pd.DataFrame: Backtesting metric values.
+
+        Raises:
+            ValueError: If the forecaster has not been initialized.
+        """
+        logger.info(
+            "Backtesting %s Forecaster %d",
+            self.name.upper(),
+            self.iteration,
+        )
+
+        if self.forecaster is None:
+            raise ValueError("Forecaster not initialized")
+
+        y = load_timeseries()
+        y = LinearlyInterpolateTS().fit_transform(y)
+        X = self.preprocessor.build(start_date=y.index.min(), end_date=y.index.max())
+
+        self.fit_with_best()
+
+        start_train = self._get_init_train(y.index.min(), self.end_dev)
+        fixed_train_size = self.train_size is not None
+        end_train = self.end_dev - pd.Timedelta(
+            hours=self.predict_size * self.refit_size
+        )
+        length_training = len(y.loc[start_train:end_train])
+
+        metrics, _ = backtesting_forecaster(
+            self.forecaster,
+            y,
+            cv=self._build_cv(
+                train_size=length_training,
+                fixed_train_size=fixed_train_size,
+                refit=False,
+            ),
+            metric=self.metrics,
+            exog=X,
+        )
+        logger.info("Backtesting results: %s.", metrics.to_dict())
+        return metrics
+
+    # ------------------------------------------------------------------
+    # Prediction & error methods
+    # ------------------------------------------------------------------
+
+    def predict(
+        self,
+        delta_predict: Optional[pd.Timedelta] = None,
+    ) -> Tuple[dict, Tuple[pd.Series, pd.Series]]:
+        """Generate predictions and compute error metrics.
+
+        Args:
+            delta_predict: Optional time horizon to predict.  If *None*
+                or if it exceeds the available data, predicts to the end
+                of the dataset.
+
+        Returns:
+            Tuple[dict, Tuple[pd.Series, pd.Series]]:
+                ``(metrics, (y_actual, y_predicted))``.
+
+        Raises:
+            ValueError: If the forecaster has not been initialized.
+        """
+        logger.info(
+            "Making predictions with %s Forecaster %d",
+            self.name.upper(),
+            self.iteration,
+        )
+
+        if not self.is_tuned:
+            self.tune()
+
+        if self.forecaster is None:
+            raise ValueError("Forecaster not initialized")
+
+        y = load_timeseries()
+        y = LinearlyInterpolateTS().fit_transform(y)
+        X = self.preprocessor.build(start_date=y.index.min(), end_date=y.index.max())
+
+        start_future = self.end_dev + pd.Timedelta(hours=1)
+
+        if delta_predict is None or delta_predict > y.index.max() - start_future:
+            end_predict = y.index.max()
+        else:
+            end_predict = start_future + delta_predict
+
+        idx_future = pd.date_range(start=start_future, end=end_predict, freq="h")
+
+        n_steps = len(idx_future)
+        if n_steps > self.refit_size * self.predict_size:
+            logger.info(
+                "Predicting %d hours (about %d days), retraining might be necessary!",
+                n_steps,
+                n_steps // 24,
+            )
+
+        y_predicted = self.forecaster.predict(steps=n_steps, exog=X.loc[idx_future])
+
+        metrics_out: dict = {}
+        metrics_out["mape"] = mean_absolute_percentage_error(
+            y.loc[idx_future], y_predicted
+        )
+        metrics_out["mae"] = mean_absolute_error(y.loc[idx_future], y_predicted)
+        logger.info(
+            "MAPE: %.2f, MAE: %.2f",
+            metrics_out["mape"],
+            metrics_out["mae"],
+        )
+        return metrics_out, (y.loc[idx_future], y_predicted)
+
+    def get_error_training(
+        self,
+    ) -> Tuple[dict, Tuple[pd.Series, pd.Series]]:
+        """Compute in-sample error on the training data.
+
+        Returns:
+            Tuple[dict, Tuple[pd.Series, pd.Series]]:
+                ``(metrics, (y_train, y_train_pred))``.
+        """
+        logger.info(
+            "Obtaining training estimation with Forecaster %d",
+            self.iteration,
+        )
+
+        if not self.is_tuned:
+            self.tune()
+
+        if self.forecaster is None:
+            raise ValueError("Forecaster not initialized")
+
+        X_train, y_train = self._get_training_data()
+        y_train_pred = pd.Series(
+            self.forecaster.regressor.predict(X_train),
+            index=y_train.index,
+        )
+
+        metrics_out: dict = {}
+        metrics_out["mape"] = mean_absolute_percentage_error(y_train, y_train_pred)
+        metrics_out["mae"] = mean_absolute_error(y_train, y_train_pred)
+        logger.info(
+            "Train MAPE: %.2f, MAE: %.2f",
+            metrics_out["mape"],
+            metrics_out["mae"],
+        )
+        return metrics_out, (y_train, y_train_pred)
+
+    def get_error_forecast(
+        self,
+        delta_predict: Optional[pd.Timedelta] = None,
+    ) -> Tuple[dict, Tuple[pd.Series, pd.Series]]:
+        """Compute the error of the ENTSO-E benchmark forecast.
+
+        Args:
+            delta_predict: Optional prediction horizon.
+
+        Returns:
+            Tuple[dict, Tuple[pd.Series, pd.Series]]:
+                ``(metrics, (y_actual, y_forecast))``.
+        """
+        y = load_timeseries()
+        y = LinearlyInterpolateTS().fit_transform(y)
+
+        y_forecast = load_timeseries_forecast()
+        y_forecast = LinearlyInterpolateTS().fit_transform(y_forecast)
+
+        start_future = self.end_dev + pd.Timedelta(hours=1)
+
+        if delta_predict is None or delta_predict > y.index.max() - start_future:
+            end_predict = y.index.max()
+        else:
+            end_predict = start_future + delta_predict
+
+        idx_future = pd.date_range(start=start_future, end=end_predict, freq="h")
+
+        metrics_out: dict = {}
+        metrics_out["mape"] = mean_absolute_percentage_error(
+            y.loc[idx_future], y_forecast.loc[idx_future]
+        )
+        metrics_out["mae"] = mean_absolute_error(
+            y.loc[idx_future], y_forecast.loc[idx_future]
+        )
+        return metrics_out, (y.loc[idx_future], y_forecast.loc[idx_future])
+
+    # ------------------------------------------------------------------
+    # Feature importance
+    # ------------------------------------------------------------------
+
+    def get_feature_importance(self) -> Optional[pd.DataFrame]:
+        """Return feature importances from the underlying estimator.
+
+        Only supported for tree-based models (``xgb``, ``lgbm``).
+
+        Returns:
+            pd.DataFrame or None: Feature importances, or *None* if the
+                model does not support this operation.
+        """
+        if self.name not in ["xgb", "lgbm"]:
+            logger.error("Regressor does not support feature importance!")
+            return None
+        if self.forecaster is None:
+            raise ValueError("Forecaster not initialized")
+        return self.forecaster.get_feature_importances()
+
+    def get_global_shap_feature_importance(self, frac: float = 0.1) -> pd.Series:
+        """Return global SHAP-based feature importances.
+
+        .. note::
+
+            This is a stub.  The full implementation using
+            ``shap.TreeExplainer`` will be provided in the
+            ``spotforecast2`` package.
+
+        #TODO: Implement shap feature importance in spotforecast2
+
+        Args:
+            frac: Fraction of training data to use for SHAP values.
+
+        Returns:
+            pd.Series: Empty series (stub).
+        """
+        logger.warning(
+            "get_global_shap_feature_importance is a stub in "
+            "spotforecast2-safe. Use spotforecast2 for the full "
+            "implementation."
+        )
+        return pd.Series(dtype=float)
+
+    # ------------------------------------------------------------------
+    # Prediction packaging (delegates to predict / get_error_*)
+    # ------------------------------------------------------------------
+
+    def package_prediction(self, predict_size: Optional[int] = None) -> Dict[str, Any]:
+        """Package predictions, training errors, and benchmarks for the UI.
+
+        This is the main entry-point used by the application layer.
+        It delegates to :meth:`predict`, :meth:`get_error_training`,
+        and :meth:`get_error_forecast`.
 
         Args:
             predict_size: Optional override for the prediction horizon.
@@ -369,8 +811,14 @@ class ForecasterRecursiveModel:
             ... })
             >>> df.to_csv(data_path / "energy_load.csv", index=False)
             >>>
-            >>> # Initialize and run prediction package
+            >>> # Initialize model — override forecaster for small demo data
+            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            >>> from lightgbm import LGBMRegressor
             >>> model = ForecasterRecursiveLGBM(iteration=0, end_dev="2022-01-05 00:00+00:00")
+            >>> model.forecaster = ForecasterRecursive(
+            ...     estimator=LGBMRegressor(n_jobs=-1, verbose=-1, random_state=123456789),
+            ...     lags=12,
+            ... )
             >>> result = model.package_prediction(predict_size=24)
             >>>
             >>> # Validate output
@@ -382,52 +830,30 @@ class ForecasterRecursiveModel:
             >>> shutil.rmtree(tmp_dir)
             >>> del os.environ["SPOTFORECAST2_DATA"]
         """
-        from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
-
-        from spotforecast2_safe.data.fetch_data import get_data_home
-
         if self.forecaster is None:
             logger.error("Forecaster not initialized")
             return {}
 
         try:
-            # Load data from interim directory
-            data_home = get_data_home()
-            data_path = data_home / "interim" / "energy_load.csv"
-
-            if not data_path.exists():
-                logger.error("Data file not found: %s", data_path)
-                return {}
-
-            # Read and prepare data
-            df = pd.read_csv(data_path, parse_dates=["Time (UTC)"])
-            df = df.set_index("Time (UTC)")
-            df.index = pd.to_datetime(df.index, utc=True)
-            df.index.name = "datetime"
-            df = df.asfreq("h")
-
-            if "Actual Load" not in df.columns:
-                logger.error("'Actual Load' column missing in %s", data_path)
-                return {}
-
-            y = df["Actual Load"]
-            # Basic imputation
-            if y.isna().any():
-                y = y.ffill().bfill()
+            y = load_timeseries()
+            y = LinearlyInterpolateTS().fit_transform(y)
 
             # Benchmark
-            future_forecast = df.get("Forecasted Load", None)
-            if future_forecast is not None and future_forecast.isna().any():
-                future_forecast = future_forecast.ffill().bfill()
+            try:
+                future_forecast_series = load_timeseries_forecast()
+                future_forecast_series = LinearlyInterpolateTS().fit_transform(
+                    future_forecast_series
+                )
+            except (FileNotFoundError, KeyError):
+                future_forecast_series = None
 
-            # Train/test split using end_dev
+            # Train / test split
             y_train = y.loc[: self.end_dev]
             y_test = y.loc[self.end_dev :]
 
             if predict_size is None:
                 predict_size = self.predict_size
 
-            # Limit test to prediction window
             predict_hours = predict_size * self.refit_size
             logger.info(
                 "Prediction window: predict_size=%d, refit_size=%d, "
@@ -446,12 +872,12 @@ class ForecasterRecursiveModel:
             # Fit on training data
             self.forecaster.fit(y=y_train)
 
-            # In-sample (train) predictions
+            # In-sample predictions
             train_pred = self.forecaster.predict(steps=len(y_train))
             train_pred.index = y_train.index[-len(train_pred) :]
             y_train_aligned = y_train.loc[train_pred.index]
 
-            # Out-of-sample (future) predictions
+            # Out-of-sample predictions
             future_pred = self.forecaster.predict(steps=len(y_test))
             future_pred.index = y_test.index[: len(future_pred)]
             y_test_aligned = y_test.loc[future_pred.index]
@@ -474,19 +900,8 @@ class ForecasterRecursiveModel:
                 "mape": mean_absolute_percentage_error(f_24h_actual, f_24h_pred),
             }
 
-            # Debug logging for metric computation
             logger.info(
-                "Metric computation windows: "
-                "future_pred=%d hours, future_actual=%d hours, "
-                "24h_pred=%d hours, 24h_actual=%d hours",
-                len(future_pred),
-                len(y_test_aligned),
-                len(f_24h_pred),
-                len(f_24h_actual),
-            )
-            logger.info(
-                "Metrics computed: "
-                "Full horizon (MAE=%.2f, MAPE=%.4f), "
+                "Metrics computed: Full horizon (MAE=%.2f, MAPE=%.4f), "
                 "24h window (MAE=%.2f, MAPE=%.4f)",
                 metrics_future["mae"],
                 metrics_future["mape"],
@@ -494,7 +909,7 @@ class ForecasterRecursiveModel:
                 metrics_future_24h["mape"],
             )
 
-            result = {
+            result: Dict[str, Any] = {
                 "train_actual": y_train_aligned,
                 "future_actual": y_test_aligned,
                 "train_pred": train_pred,
@@ -505,8 +920,8 @@ class ForecasterRecursiveModel:
             }
 
             # Add benchmark if available
-            if future_forecast is not None:
-                forecast_test = future_forecast.loc[y_test_aligned.index]
+            if future_forecast_series is not None:
+                forecast_test = future_forecast_series.loc[y_test_aligned.index]
                 result["future_forecast"] = forecast_test
                 result["metrics_forecast"] = {
                     "mae": mean_absolute_error(y_test_aligned, forecast_test),

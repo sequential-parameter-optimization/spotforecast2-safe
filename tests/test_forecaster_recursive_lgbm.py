@@ -53,6 +53,13 @@ def sample_ts_data():
 def test_forecaster_recursive_lgbm_fit_predict_interface(sample_ts_data):
     """Test the fit/predict interface."""
     model = ForecasterRecursiveLGBM(iteration=0, lags=3)
+    # Override forecaster without window_features for small test data
+    from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+    model.forecaster = ForecasterRecursive(
+        estimator=LGBMRegressor(n_jobs=-1, verbose=-1, random_state=123456789),
+        lags=3,
+    )
     model.fit(sample_ts_data)
     predictions = model.forecaster.predict(steps=5)
     assert len(predictions) == 5
