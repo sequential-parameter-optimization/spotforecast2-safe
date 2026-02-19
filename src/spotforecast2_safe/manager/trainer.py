@@ -19,9 +19,7 @@ from spotforecast2_safe.preprocessing import RollingFeatures
 
 logger = logging.getLogger(__name__)
 
-# ============================================================================
-# Module-level objects ported from chag25a models.py
-# ============================================================================
+
 
 #: Candidate lag values for hyperparameter search.
 LAGS_CONSIDER: list[int] = list(range(1, 24))
