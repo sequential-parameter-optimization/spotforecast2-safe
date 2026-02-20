@@ -1,9 +1,12 @@
 ## [0.15.2-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.2-rc.1...v0.15.2-rc.2) (2026-02-20)
+## [0.15.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.1...v0.15.2) (2026-02-20)
 
 
 ### Bug Fixes
 
 * cleaup trainer ([f192a22](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f192a222ccc382e0702e2306f238b8c4c01cddb1))
+* default values ([8c7d15e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8c7d15ec90ab5de6dbd41a25cbd3c6e46b87ad30))
+* forecaster_recursive_model does not use a default end_dev ([f1ddde2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f1ddde2a9558967f0f945787b0a3507d884ebf11))
 
 ## [0.15.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.1...v0.15.2-rc.1) (2026-02-20)
 
