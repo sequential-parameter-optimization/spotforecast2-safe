@@ -61,7 +61,7 @@ class ForecasterRecursiveModel:
     def __init__(
         self,
         iteration: int,
-        end_dev: Union[str, pd.Timestamp] = "2025-12-31 00:00+00:00",
+        end_dev: Union[str, pd.Timestamp] = None,
         train_size: Optional[pd.Timedelta] = None,
         periods: Optional[List[Period]] = None,
         country_code: str = "DE",
@@ -78,9 +78,12 @@ class ForecasterRecursiveModel:
             iteration:
                 Current iteration index.
             end_dev:
-                Cutoff date for training. Defaults to "2025-12-31 00:00+00:00".
+                Cutoff date for training, e.g., "2025-12-31 00:00+00:00".
+                If None, it is calculated automatically to be one day
+                before the latest available index in the data.
+                Defaults to None.
             train_size:
-                Time window for training data lookback.
+                Time window for training data lookback.                
             periods:
                 List of Period objects for cyclical encoding.
             country_code:
@@ -469,6 +472,7 @@ class ForecasterRecursiveModel:
             self.iteration,
         )
 
+        # Check if model is tuned
         if self.best_params is None or self.best_lags is None:
             logger.warning("Model is not tuned! Starting tuning first...")
             self.tune()

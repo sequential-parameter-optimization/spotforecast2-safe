@@ -3,7 +3,8 @@
 
 """Configuration for ENTSO-E task pipeline."""
 
-from typing import List, Optional
+from dataclasses import replace
+from typing import Dict, List, Optional
 
 import pandas as pd
 from spotforecast2_safe.data import Period
@@ -145,3 +146,142 @@ class ConfigEntsoe:
         self.random_state = random_state
         self.n_hyperparameters_trials = n_hyperparameters_trials
         self.data_filename = data_filename
+
+    def get_params(self, deep: bool = True) -> Dict[str, object]:
+        """
+        Get parameters for this configuration object.
+
+        Args:
+            deep: If True, will return the parameters for this configuration and
+                contained sub-objects that are estimators.
+
+        Returns:
+            params: Dictionary of parameter names mapped to their values.
+
+        Examples:
+            >>> from spotforecast2_safe.manager.configurator.config_entsoe import ConfigEntsoe
+            >>> config = ConfigEntsoe(api_country_code="FR")
+            >>> p = config.get_params()
+            >>> p["api_country_code"]
+            'FR'
+            >>> p["predict_size"]
+            24
+        """
+        params = {
+            "api_country_code": self.API_COUNTRY_CODE,
+            "periods": self.periods,
+            "lags_consider": self.lags_consider,
+            "train_size": self.train_size,
+            "end_train_default": self.end_train_default,
+            "delta_val": self.delta_val,
+            "predict_size": self.predict_size,
+            "refit_size": self.refit_size,
+            "random_state": self.random_state,
+            "n_hyperparameters_trials": self.n_hyperparameters_trials,
+            "data_filename": self.data_filename,
+        }
+
+        # Expose period sub-objects via the '__' notation if deep=True
+        if deep and self.periods is not None:
+            for period in self.periods:
+                prefix = f"periods__{period.name}"
+                params[f"{prefix}__n_periods"] = period.n_periods
+                params[f"{prefix}__column"] = period.column
+                params[f"{prefix}__input_range"] = period.input_range
+
+        return params
+
+    def set_params(
+        self, params: Dict[str, object] = None, **kwargs: object
+    ) -> "ConfigEntsoe":
+        """
+        Set the parameters of this configuration object.
+
+        Args:
+            params: Optional dictionary of parameter names mapped to their
+                new values.
+            **kwargs: Additional parameter names mapped to their new values.
+                It supports configuring nested 'Period' objects using the
+                `periods__<name>__<param>` notation.
+
+        Returns:
+            ConfigEntsoe: The configuration instance with updated
+                parameters (supports method chaining).
+
+        Examples:
+            >>> from spotforecast2_safe.manager.configurator.config_entsoe import ConfigEntsoe
+            >>> config = ConfigEntsoe()
+            >>> _ = config.set_params(api_country_code="FR", predict_size=48)
+            >>> config.API_COUNTRY_CODE
+            'FR'
+            >>> config.predict_size
+            48
+
+            >>> # Deep parameter setting
+            >>> _ = config.set_params(periods__daily__n_periods=24)
+            >>> next(p.n_periods for p in config.periods if p.name == "daily")
+            24
+        """
+        # Merge params dict and kwargs
+        all_params: Dict[str, object] = {}
+        if params is not None:
+            all_params.update(params)
+        all_params.update(kwargs)
+
+        if not all_params:
+            return self
+
+        nested_period_params = {}
+        flat_params = {}
+
+        for key, value in all_params.items():
+            if key.startswith("periods__"):
+                parts = key.split("__")
+                if len(parts) == 3:
+                    _, p_name, p_param = parts
+                    if p_name not in nested_period_params:
+                        nested_period_params[p_name] = {}
+                    nested_period_params[p_name][p_param] = value
+                else:
+                    raise ValueError(
+                        f"Invalid deep parameter format: {key}. "
+                        "Expected format: periods__<name>__<param>"
+                    )
+            else:
+                flat_params[key] = value
+
+        # Set standard parameters first
+        for key, value in flat_params.items():
+            if key == "api_country_code":
+                self.API_COUNTRY_CODE = value
+            elif hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                raise ValueError(
+                    f"Invalid parameter {key} for {self.__class__.__name__}. "
+                    "Check the list of available parameters with `get_params()`."
+                )
+
+        # Apply nested parameters to frozen Period dataclasses
+        if nested_period_params and self.periods is not None:
+            existing_names = {p.name for p in self.periods}
+            for p_name in nested_period_params:
+                if p_name not in existing_names:
+                    raise ValueError(
+                        f"Period with name '{p_name}' not found in configuration."
+                    )
+
+            new_periods = []
+            for period in self.periods:
+                if period.name in nested_period_params:
+                    # Period is a frozen dataclass, so we utilize replace() to replicate
+                    # an updated version.
+                    updated_period = replace(
+                        period, **nested_period_params[period.name]
+                    )
+                    new_periods.append(updated_period)
+                else:
+                    new_periods.append(period)
+            self.periods = new_periods
+
+        return self

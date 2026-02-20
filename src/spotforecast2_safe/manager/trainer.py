@@ -20,7 +20,6 @@ from spotforecast2_safe.preprocessing import RollingFeatures
 logger = logging.getLogger(__name__)
 
 
-
 #: Candidate lag values for hyperparameter search.
 LAGS_CONSIDER: list[int] = list(range(1, 24))
 
@@ -188,18 +187,63 @@ def train_new_model(
     `{model_name}_forecaster_{n_iteration}.joblib`.
 
     Args:
-        model_class: The class of the forecaster model to train.
+        model_class (type):
+            The class of the forecaster model to train.
             The class should accept `iteration`, `end_dev`, and `train_size`
             in its constructor and provide a `tune()` method.
-        n_iteration: The iteration number for this training run.
-        train_size: Optional size of the training set as a pandas Timedelta.
+        n_iteration (int):
+            The iteration number for this training run.
+            This acts as an incrementing version number for the model. 
+            When using `handle_training`, the first model starts at iteration 0. 
+            Upon subsequent forced or scheduled retrainings, it is incremented 
+            by 1 (`get_last_model_iteration + 1`). It is primarily used to 
+            determine the filename when saving the model to disk 
+            (e.g., `lgbm_forecaster_0.joblib`, `lgbm_forecaster_1.joblib`).
+        model_name (Optional[str]):
+            Optional name of the model to train.
+            If None, the name is inferred from the model class.
             Defaults to None.
-        save_to_file: If True, saves the model to disk after training.
+        train_size (Optional[pd.Timedelta]):
+            Optional size of the training set as a pandas Timedelta.
+            Determines the lookback window length from `end_dev`. If provided, the training data
+            will start at `end_dev - train_size`. If None, all available data up to `end_dev` is used.
+            Defaults to None.
+        save_to_file (bool):
+            If True, saves the model to disk after training.
             Defaults to True.
-        model_dir: Directory where the model should be saved. If None, defaults to
+        model_dir (Optional[Union[str, Path]]):
+            Directory where the model should be saved. If None, defaults to
             the library's cache home.
-        end_dev: Optional cutoff date for training. If None, it is calculated
-            from the latest available data.
+        end_dev (Optional[Union[str, pd.Timestamp]]):
+            Optional cutoff date for training.
+            This represents the absolute point in time separating training/development data
+            from unseen future data. If None, it is calculated automatically to be one day
+            before the latest available index in the data.
+        data_filename (Optional[str]):
+            Optional filename for the data to be used for training, e.g., 'interim/energy_load.csv'.
+            If None, the default data file is used. Defaults to None.
+        **kwargs (Any):
+            Additional keyword arguments to be passed to the model constructor.
+
+    Notes:
+        Relationship between ``train_size`` and ``end_dev``:
+        The actual training data spans from ``max(dataset_start, end_dev - train_size)`` to ``end_dev``.
+        - If ``train_size`` is larger than the available history before ``end_dev``, the framework
+          gracefully clips the start date to the beginning of the dataset without throwing an error.
+        - If ``end_dev`` is set to a time before the start of the dataset, the training subset will
+          be empty and the forecaster will fail to fit.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from spotforecast2_safe.manager.trainer import train_new_model
+        >>> # Train using all available history up to the end of 2025:
+        >>> # train_new_model(..., train_size=None, end_dev="2025-12-31 00:00+00:00")
+        >>>
+        >>> # Train using exactly 3 years of data leading up to the end of 2025:
+        >>> # train_new_model(..., train_size=pd.Timedelta(days=3*365), end_dev="2025-12-31 00:00+00:00")
+        >>>
+        >>> # Train using the latest available data minus 1 day (default behavior):
+        >>> # train_new_model(..., train_size=pd.Timedelta(days=3*365), end_dev=None)
 
     Returns:
         The trained model instance.
