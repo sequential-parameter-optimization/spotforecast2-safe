@@ -60,7 +60,7 @@ class TestGetParams:
         assert p["refit_size"] == 14
         assert p["random_state"] == 123456789
         assert p["train_size"] is None
-        assert isinstance(p["end_dev"], pd.Timestamp)
+        assert pd.isna(p["end_dev"])
 
 
 # ---------------------------------------------------------------------------

@@ -83,7 +83,7 @@ class ForecasterRecursiveModel:
                 before the latest available index in the data.
                 Defaults to None.
             train_size:
-                Time window for training data lookback.                
+                Time window for training data lookback.
             periods:
                 List of Period objects for cyclical encoding.
             country_code:
@@ -112,7 +112,7 @@ class ForecasterRecursiveModel:
             >>> model.name
             'base'
             >>> model.end_dev
-            Timestamp('2025-12-31 00:00:00+0000', tz='UTC')
+            NaT
             >>> model.train_size
             >>> model.random_state
             123456789

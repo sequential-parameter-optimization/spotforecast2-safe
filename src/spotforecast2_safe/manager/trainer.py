@@ -193,11 +193,11 @@ def train_new_model(
             in its constructor and provide a `tune()` method.
         n_iteration (int):
             The iteration number for this training run.
-            This acts as an incrementing version number for the model. 
-            When using `handle_training`, the first model starts at iteration 0. 
-            Upon subsequent forced or scheduled retrainings, it is incremented 
-            by 1 (`get_last_model_iteration + 1`). It is primarily used to 
-            determine the filename when saving the model to disk 
+            This acts as an incrementing version number for the model.
+            When using `handle_training`, the first model starts at iteration 0.
+            Upon subsequent forced or scheduled retrainings, it is incremented
+            by 1 (`get_last_model_iteration + 1`). It is primarily used to
+            determine the filename when saving the model to disk
             (e.g., `lgbm_forecaster_0.joblib`, `lgbm_forecaster_1.joblib`).
         model_name (Optional[str]):
             Optional name of the model to train.
