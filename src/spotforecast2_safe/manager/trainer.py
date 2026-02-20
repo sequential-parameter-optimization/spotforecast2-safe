@@ -15,24 +15,8 @@ import pandas as pd
 from joblib import dump, load
 
 from spotforecast2_safe.data.fetch_data import fetch_data, get_cache_home
-from spotforecast2_safe.preprocessing import RollingFeatures
 
 logger = logging.getLogger(__name__)
-
-
-#: Candidate lag values for hyperparameter search.
-LAGS_CONSIDER: list[int] = list(range(1, 24))
-
-#: Default rolling window features matching the original chag25a configuration.
-#: Each entry is a separate RollingFeatures instance to avoid duplicate-name
-#: collisions in spotforecast2-safe's ``initialize_window_features``.
-window_features = [
-    RollingFeatures(stats="mean", window_sizes=24),
-    RollingFeatures(stats="mean", window_sizes=24 * 7),
-    RollingFeatures(stats="mean", window_sizes=24 * 30),
-    RollingFeatures(stats="min", window_sizes=24),
-    RollingFeatures(stats="max", window_sizes=24),
-]
 
 
 def get_path_model(
@@ -101,70 +85,6 @@ def load_iteration(
     except Exception as e:
         logger.error("Failed to load model from %s: %s", path_file, e)
         return None
-
-
-def search_space_lgbm(trial: Any) -> dict:
-    """Optuna search space for LightGBM hyperparameters.
-
-    Args:
-        trial: An :class:`optuna.trial.Trial` instance.
-
-    Returns:
-        dict: Suggested hyperparameters for the current trial.
-
-    Examples:
-        >>> from spotforecast2_safe.manager.trainer import search_space_lgbm
-        >>> # Without Optuna, verify the function signature exists
-        >>> callable(search_space_lgbm)
-        True
-    """
-    search_space = {
-        "num_leaves": trial.suggest_int("num_leaves", 8, 256),
-        "max_depth": trial.suggest_int("max_depth", 3, 16),
-        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.2, log=True),
-        "n_estimators": trial.suggest_int("n_estimators", 50, 1000, log=True),
-        "bagging_fraction": trial.suggest_float("bagging_fraction", 0.5, 1),
-        "feature_fraction": trial.suggest_float("feature_fraction", 0.5, 1),
-        "reg_alpha": trial.suggest_float("reg_alpha", 0.01, 100),
-        "reg_lambda": trial.suggest_float("reg_lambda", 0.01, 100),
-        "lags": trial.suggest_categorical("lags", LAGS_CONSIDER),
-    }
-    return search_space
-
-
-def search_space_xgb(trial: Any) -> dict:
-    """Optuna search space for XGBoost hyperparameters.
-
-    Args:
-        trial: An :class:`optuna.trial.Trial` instance.
-
-    Returns:
-        dict: Suggested hyperparameters for the current trial.
-
-    Examples:
-        >>> from spotforecast2_safe.manager.trainer import search_space_xgb
-        >>> callable(search_space_xgb)
-        True
-    """
-    search_space = {
-        "max_depth": trial.suggest_int("max_depth", 2, 10),
-        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.2, log=True),
-        "subsample": trial.suggest_float("subsample", 0.6, 1),
-        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1),
-        "min_child_weight": trial.suggest_int("min_child_weight", 1, 8),
-        "n_estimators": trial.suggest_int("n_estimators", 50, 600, step=50),
-        "alpha": trial.suggest_float("alpha", 0.0, 0.5),
-        "lambda": trial.suggest_float("lambda", 0.0, 0.5),
-        "lags": trial.suggest_categorical("lags", LAGS_CONSIDER),
-    }
-    return search_space
-
-
-#: Registry mapping model names to their search space functions.
-SEARCH_SPACES: dict[str, Any] = {
-    "lgbm": search_space_lgbm,
-    "xgb": search_space_xgb,
-}
 
 
 def train_new_model(

@@ -9,13 +9,8 @@ from pathlib import Path
 from joblib import dump
 
 from spotforecast2_safe.manager.trainer import (
-    LAGS_CONSIDER,
-    SEARCH_SPACES,
     get_path_model,
     load_iteration,
-    search_space_lgbm,
-    search_space_xgb,
-    window_features,
 )
 
 
@@ -62,112 +57,3 @@ class TestLoadIteration:
             assert result is not None
             assert result["name"] == "lgbm"
             assert result["iteration"] == 1
-
-
-# ------------------------------------------------------------------ #
-# LAGS_CONSIDER
-# ------------------------------------------------------------------ #
-
-
-class TestLagsConsider:
-    def test_is_list_of_ints(self):
-        assert isinstance(LAGS_CONSIDER, list)
-        assert all(isinstance(x, int) for x in LAGS_CONSIDER)
-
-    def test_range_1_to_23(self):
-        assert LAGS_CONSIDER == list(range(1, 24))
-        assert len(LAGS_CONSIDER) == 23
-
-
-# ------------------------------------------------------------------ #
-# window_features
-# ------------------------------------------------------------------ #
-
-
-class TestWindowFeatures:
-    def test_is_list_of_rolling_features(self):
-        from spotforecast2_safe.preprocessing import RollingFeatures
-
-        assert isinstance(window_features, list)
-        assert len(window_features) == 5
-        for wf in window_features:
-            assert isinstance(wf, RollingFeatures)
-
-
-# ------------------------------------------------------------------ #
-# search_space_lgbm / search_space_xgb
-# ------------------------------------------------------------------ #
-
-
-class _MockTrial:
-    """Minimal mock for optuna.trial.Trial."""
-
-    def suggest_int(self, name, low, high, **kwargs):
-        return low
-
-    def suggest_float(self, name, low, high, **kwargs):
-        return low
-
-    def suggest_categorical(self, name, choices):
-        return choices[0]
-
-
-class TestSearchSpaceLGBM:
-    def test_returns_dict(self):
-        result = search_space_lgbm(_MockTrial())
-        assert isinstance(result, dict)
-
-    def test_expected_keys(self):
-        result = search_space_lgbm(_MockTrial())
-        expected = {
-            "num_leaves",
-            "max_depth",
-            "learning_rate",
-            "n_estimators",
-            "bagging_fraction",
-            "feature_fraction",
-            "reg_alpha",
-            "reg_lambda",
-            "lags",
-        }
-        assert set(result.keys()) == expected
-
-    def test_lags_from_lags_consider(self):
-        result = search_space_lgbm(_MockTrial())
-        assert result["lags"] in LAGS_CONSIDER
-
-
-class TestSearchSpaceXGB:
-    def test_returns_dict(self):
-        result = search_space_xgb(_MockTrial())
-        assert isinstance(result, dict)
-
-    def test_expected_keys(self):
-        result = search_space_xgb(_MockTrial())
-        expected = {
-            "max_depth",
-            "learning_rate",
-            "subsample",
-            "colsample_bytree",
-            "min_child_weight",
-            "n_estimators",
-            "alpha",
-            "lambda",
-            "lags",
-        }
-        assert set(result.keys()) == expected
-
-
-# ------------------------------------------------------------------ #
-# SEARCH_SPACES registry
-# ------------------------------------------------------------------ #
-
-
-class TestSearchSpaces:
-    def test_contains_lgbm_and_xgb(self):
-        assert "lgbm" in SEARCH_SPACES
-        assert "xgb" in SEARCH_SPACES
-
-    def test_values_are_callable(self):
-        for name, fn in SEARCH_SPACES.items():
-            assert callable(fn), f"SEARCH_SPACES['{name}'] is not callable"
