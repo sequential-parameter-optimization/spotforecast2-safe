@@ -25,11 +25,7 @@ from spotforecast2_safe.manager.persistence import (
 )
 from spotforecast2_safe.manager.predictor import get_model_prediction
 from spotforecast2_safe.manager.tools import _parse_bool
-from spotforecast2_safe.manager.trainer import (
-    get_last_model,
-    handle_training,
-    train_new_model,
-)
+from spotforecast2_safe.manager.trainer import get_last_model
 
 __all__ = [
     # Logger
@@ -45,9 +41,7 @@ __all__ = [
     # Predictor
     "get_model_prediction",
     # Trainer
-    "train_new_model",
     "get_last_model",
-    "handle_training",
     # Tools
     "_parse_bool",
 ]
