@@ -1,3 +1,10 @@
+## [0.15.2-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.2-rc.1...v0.15.2-rc.2) (2026-02-20)
+
+
+### Bug Fixes
+
+* cleaup trainer ([f192a22](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f192a222ccc382e0702e2306f238b8c4c01cddb1))
+
 ## [0.15.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.1...v0.15.2-rc.1) (2026-02-20)
 
 
