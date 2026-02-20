@@ -1,10 +1,12 @@
 ## [0.15.1-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.1-rc.1...v0.15.1-rc.2) (2026-02-20)
+## [0.15.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.0...v0.15.1) (2026-02-18)
 
 
 ### Bug Fixes
 
 * default values ([8c7d15e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8c7d15ec90ab5de6dbd41a25cbd3c6e46b87ad30))
 * forecaster_recursive_model does not use a default end_dev ([f1ddde2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f1ddde2a9558967f0f945787b0a3507d884ebf11))
+* shape error (_rolling.py) ([e088c8b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e088c8b78fc8812c80d1ad04524ef7e085a01e23))
 
 ## [0.15.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.0...v0.15.1-rc.1) (2026-02-18)
 
