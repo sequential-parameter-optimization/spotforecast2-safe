@@ -1,3 +1,10 @@
+## [0.16.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.3-rc.1...v0.16.0-rc.1) (2026-02-20)
+
+
+### Features
+
+* hardened trainer ([42cd768](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/42cd768b195467f8db32fdd8e63423b18e0357d2))
+
 ## [0.15.3-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v0.15.2...v0.15.3-rc.1) (2026-02-20)
 
 
