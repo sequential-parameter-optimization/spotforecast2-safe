@@ -729,97 +729,97 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>forecaster</td>
-<td>(<a href="`ForecasterRecursive`">ForecasterRecursive</a>, <a href="`ForecasterDirect`">ForecasterDirect</a>, <a href="`ForecasterEquivalentDate`">ForecasterEquivalentDate</a>)</td>
+<td>(<code>ForecasterRecursive</code>, <code>ForecasterDirect</code>, <code>ForecasterEquivalentDate</code>)</td>
 <td>Forecaster model.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>y</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Training time series.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>cv</td>
-<td><a href="`spotforecast2_safe.model_selection.split_ts_cv.TimeSeriesFold`">TimeSeriesFold</a></td>
+<td><code>TimeSeriesFold</code></td>
 <td>TimeSeriesFold object with the information needed to split the data into folds.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>metric</td>
-<td><a href="`str`">str</a> | <a href="`typing.Callable`">Callable</a> | <a href="`list`">list</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a> | <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
 <td>Metric used to quantify the goodness of fit of the model. - If <code>str</code>: {‘mean_squared_error’, ‘mean_absolute_error’, ‘mean_absolute_percentage_error’, ‘mean_squared_log_error’, ‘mean_absolute_scaled_error’, ‘root_mean_squared_scaled_error’} - If <code>Callable</code>: Function with arguments <code>y_true</code>, <code>y_pred</code> and <code>y_train</code> (Optional) that returns a float. - If <code>list</code>: List containing multiple strings and/or Callables.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Exogenous variable/s included as predictor/s. Must have the same number of observations as <code>y</code> and should be aligned so that y[i] is regressed on exog[i]. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>interval</td>
-<td><a href="`float`">float</a> | <a href="`list`">list</a> | <a href="`tuple`">tuple</a> | <a href="`str`">str</a> | <a href="`object`">object</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a> | <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a> | <a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3/library/functions.html#object">object</a></td>
 <td>Specifies whether probabilistic predictions should be estimated and the method to use. The following options are supported: - If <code>float</code>, represents the nominal (expected) coverage (between 0 and 1). For instance, <code>interval=0.95</code> corresponds to <code>[2.5, 97.5]</code> percentiles. - If <code>list</code> or <code>tuple</code>: Sequence of percentiles to compute, each value must be between 0 and 100 inclusive. For example, a 95% confidence interval can be specified as <code>interval = [2.5, 97.5]</code> or multiple percentiles (e.g.&nbsp;10, 50 and 90) as <code>interval = [10, 50, 90]</code>. - If ‘bootstrapping’ (str): <code>n_boot</code> bootstrapping predictions will be generated. - If scipy.stats distribution object, the distribution parameters will be estimated for each prediction. - If None, no probabilistic predictions are estimated. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>interval_method</td>
-<td><a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Technique used to estimate prediction intervals. Available options: - ‘bootstrapping’: Bootstrapping is used to generate prediction intervals. - ‘conformal’: Employs the conformal prediction split method for interval estimation. Defaults to ‘bootstrapping’.</td>
 <td><code>'bootstrapping'</code></td>
 </tr>
 <tr class="even">
 <td>n_boot</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of bootstrapping iterations to perform when estimating prediction intervals. Defaults to 250.</td>
 <td><code>250</code></td>
 </tr>
 <tr class="odd">
 <td>use_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>use_binned_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Seed for the random number generator to ensure reproducibility. Defaults to 123.</td>
 <td><code>123</code></td>
 </tr>
 <tr class="even">
 <td>return_predictors</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, the predictors used to make the predictions are also returned. Defaults to False.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td>n_jobs</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>The number of jobs to run in parallel. If <code>-1</code>, then the number of jobs is set to the number of cores. If ‘auto’, <code>n_jobs</code> is set using the function <code>skforecast.utils.select_n_jobs_backtesting</code>. Defaults to ‘auto’.</td>
 <td><code>'auto'</code></td>
 </tr>
 <tr class="even">
 <td>verbose</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Print number of folds and index of training and validation sets used for backtesting. Defaults to False.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td>show_progress</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to show a progress bar. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>suppress_warnings</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, spotforecast warnings will be suppressed during the backtesting process. See <code>spotforecast.exceptions.warn_skforecast_categories</code> for more information. Defaults to False.</td>
 <td><code>False</code></td>
 </tr>
@@ -839,7 +839,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>tuple</td>
-<td>(<a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>)</td>
+<td>(<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>)</td>
 <td>- metric_values: Value(s) of the metric(s). - backtest_predictions: Value of predictions. The DataFrame includes the following columns: - fold: Indicates the fold number where the prediction was made. - pred: Predicted values for the corresponding series and time steps. If <code>interval</code> is not <code>None</code>, additional columns are included depending on the method: - For <code>float</code>: Columns <code>lower_bound</code> and <code>upper_bound</code>. - For <code>list</code> or <code>tuple</code> of 2 elements: Columns <code>lower_bound</code> and <code>upper_bound</code>. - For <code>list</code> or <code>tuple</code> with multiple percentiles: One column per percentile (e.g., <code>p_10</code>, <code>p_50</code>, <code>p_90</code>). - For <code>'bootstrapping'</code>: One column per bootstrapping iteration (e.g., <code>pred_boot_0</code>, <code>pred_boot_1</code>, …, <code>pred_boot_n</code>). - For <code>scipy.stats</code> distribution objects: One column for each estimated parameter of the distribution (e.g., <code>loc</code>, <code>scale</code>). If <code>return_predictors</code> is <code>True</code>, one column per predictor is created. Depending on the relation between <code>steps</code> and <code>fold_stride</code>, the output may include repeated indexes (if <code>fold_stride &lt; steps</code>) or gaps (if <code>fold_stride &gt; steps</code>). See Notes below for more details.</td>
 </tr>
 </tbody>

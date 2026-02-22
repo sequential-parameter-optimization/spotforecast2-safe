@@ -727,97 +727,97 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>forecaster</td>
-<td>(<a href="`ForecasterRecursive`">ForecasterRecursive</a>, <a href="`ForecasterDirect`">ForecasterDirect</a>, <a href="`ForecasterEquivalentDate`">ForecasterEquivalentDate</a>)</td>
+<td>(<code>ForecasterRecursive</code>, <code>ForecasterDirect</code>, <code>ForecasterEquivalentDate</code>)</td>
 <td>Forecaster model.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>y</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Training time series.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>cv</td>
-<td><a href="`spotforecast2_safe.model_selection.split_one_step.OneStepAheadFold`">OneStepAheadFold</a></td>
+<td><code>OneStepAheadFold</code></td>
 <td>OneStepAheadFold object with the information needed to split the data into folds.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>metric</td>
-<td><a href="`str`">str</a> | <a href="`typing.Callable`">Callable</a> | <a href="`list`">list</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a> | <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
 <td>Metric used to quantify the goodness of fit of the model.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>interval</td>
-<td><a href="`float`">float</a> | <a href="`list`">list</a> | <a href="`tuple`">tuple</a> | <a href="`str`">str</a> | <a href="`object`">object</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a> | <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a> | <a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3/library/functions.html#object">object</a></td>
 <td>Specifies whether probabilistic predictions should be estimated.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>interval_method</td>
-<td><a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Technique used to estimate prediction intervals.</td>
 <td><code>'bootstrapping'</code></td>
 </tr>
 <tr class="even">
 <td>n_boot</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of bootstrapping iterations.</td>
 <td><code>250</code></td>
 </tr>
 <tr class="odd">
 <td>use_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Use residuals from training data.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>use_binned_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Use binned residuals for intervals.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Seed for reproducibility.</td>
 <td><code>123</code></td>
 </tr>
 <tr class="even">
 <td>return_predictors</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Return predictors used for each prediction.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td>n_jobs</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Number of jobs to run in parallel.</td>
 <td><code>'auto'</code></td>
 </tr>
 <tr class="even">
 <td>verbose</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Print information about the process.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td>show_progress</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to show a progress bar.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>suppress_warnings</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Suppress spotforecast warnings.</td>
 <td><code>False</code></td>
 </tr>
@@ -837,7 +837,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>tuple</td>
-<td>(<a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>)</td>
+<td>(<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>)</td>
 <td>- metric_values: Value(s) of the metric(s). - backtest_predictions: Value of predictions.</td>
 </tr>
 </tbody>

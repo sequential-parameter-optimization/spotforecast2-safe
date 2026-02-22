@@ -743,67 +743,67 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>estimator</td>
-<td><a href="`object`">object</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#object">object</a></td>
 <td>Scikit-learn compatible estimator for regression. If None, a default estimator will be initialized. Can also be passed via regressor parameter.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>lags</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`int`">int</a>, <a href="`typing.List`">List</a>[<a href="`int`">int</a>], <a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a>, <a href="`range`">range</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>, <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>], <a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a>, <a href="https://docs.python.org/3/library/stdtypes.html#range">range</a>, None]</td>
 <td>Lagged values of the target variable to use as predictors. Can be an integer (uses lags from 1 to lags), list of integers, numpy array, or range. At least one of lags or window_features must be provided. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>window_features</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`object`">object</a>, <a href="`typing.List`">List</a>[<a href="`object`">object</a>], None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/functions.html#object">object</a>, <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#object">object</a>], None]</td>
 <td>List of window feature objects to compute features from the target variable. Each object must implement transform_batch() method. At least one of lags or window_features must be provided. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>transformer_y</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`object`">object</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#object">object</a>]</td>
 <td>Transformer object for the target variable. Must implement fit() and transform() methods. Applied before training and predictions. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>transformer_exog</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`object`">object</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#object">object</a>]</td>
 <td>Transformer object for exogenous variables. Must implement fit() and transform() methods. Applied before training and predictions. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>weight_func</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Callable`">Callable</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>]</td>
 <td>Function to compute sample weights for training. Must accept an index and return an array of weights. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>differentiation</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`int`">int</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]</td>
 <td>Order of differencing to apply to the target variable. Must be a positive integer. Differencing is applied before creating lags. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>fit_kwargs</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#object">object</a>]]</td>
 <td>Dictionary of additional keyword arguments to pass to the estimator’s fit() method. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>binner_kwargs</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#object">object</a>]]</td>
 <td>Dictionary of keyword arguments for QuantileBinner used in probabilistic predictions. Defaults to {‘n_bins’: 10, ‘method’: ‘linear’}.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>forecaster_id</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`str`">str</a>, <a href="`int`">int</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#int">int</a>, None]</td>
 <td>Identifier for the forecaster instance. Can be a string or integer. Used for tracking and logging purposes. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>regressor</td>
-<td><a href="`object`">object</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#object">object</a></td>
 <td>Alternative parameter name for estimator. If provided, used instead of estimator. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
@@ -1123,25 +1123,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>steps</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>last_window</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in <code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>check_inputs</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, the input is checked for possible warnings and errors with the <code>check_predict_input</code> function. This argument is created for internal use and is not recommended to be changed. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
@@ -1161,12 +1161,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Pandas DataFrame with the predictors for each step. The index</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>is the same as the prediction index.</td>
 </tr>
 </tbody>
@@ -1193,7 +1193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>X_train</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Dataframe created with the <code>create_train_X_y</code> method, first return.</td>
 <td><em>required</em></td>
 </tr>
@@ -1213,7 +1213,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a></td>
+<td><a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></td>
 <td>Weights to use in <code>fit</code> method.</td>
 </tr>
 </tbody>
@@ -1242,13 +1242,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>y</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Target series for training. Must be a pandas Series.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>exog</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, None]</td>
 <td>Optional exogenous variables for training. Can be a pandas Series or DataFrame. Must have the same index as <code>y</code> and cover the same time range. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
@@ -1268,7 +1268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`typing.Tuple`">Tuple</a>[<a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, <a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>]</td>
 <td>Tuple containing: - X_train: DataFrame of training predictors including lags, window features, and exogenous variables (if provided). - y_train: Series of target values aligned with the predictors.</td>
 </tr>
 </tbody>
@@ -1320,37 +1320,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>y</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Target series for training. Must be a pandas Series.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>exog</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, None]</td>
 <td>Optional exogenous variables for training. Can be a pandas Series or DataFrame.Must have the same index as <code>y</code> and cover the same time range. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>store_last_window</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to store the last window of the training series for use in prediction. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>store_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to store in-sample residuals after fitting, which can be used for certain probabilistic prediction methods. Defaults to False.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Random seed for reproducibility when sampling residuals if <code>store_in_sample_residuals</code> is True. Defaults to 123.</td>
 <td><code>123</code></td>
 </tr>
 <tr class="even">
 <td>suppress_warnings</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to suppress warnings during fitting, such as those related to insufficient data length for lags or window features. Defaults to False.</td>
 <td><code>False</code></td>
 </tr>
@@ -1413,7 +1413,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>sort_importance</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, sorts the feature importances in descending order.</td>
 <td><code>True</code></td>
 </tr>
@@ -1433,7 +1433,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>pd.DataFrame: Feature importances associated with each predictor.</td>
 </tr>
 </tbody>
@@ -1452,7 +1452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`spotforecast2_safe.exceptions.NotFittedError`">NotFittedError</a></td>
+<td><a href="../../docs/reference/exceptions.html#spotforecast2_safe.exceptions.NotFittedError">NotFittedError</a></td>
 <td>If the forecaster is not fitted.</td>
 </tr>
 </tbody>
@@ -1493,7 +1493,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>deep</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If True, will return the parameters for this forecaster and contained sub-objects that are estimators.</td>
 <td><code>True</code></td>
 </tr>
@@ -1513,7 +1513,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>params</td>
-<td><a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#object">object</a>]</td>
 <td>Dictionary of parameter names mapped to their values.</td>
 </tr>
 </tbody>
@@ -1554,25 +1554,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>steps</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Number of future steps to predict.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>last_window</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, None]</td>
 <td>Optional last window of observed values to use for prediction. If None, uses the last window from training. Must be a pandas Series or DataFrame with the same structure as the training target series. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, None]</td>
 <td>Optional exogenous variables for prediction. Can be a pandas Series or DataFrame. Must have the same structure as the exogenous variables used in training. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>check_inputs</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to perform input validation checks. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
@@ -1592,12 +1592,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Pandas Series of predicted values for the specified number of steps,</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>indexed according to the prediction index constructed from the last window and the number of steps.</td>
 </tr>
 </tbody>
@@ -1653,43 +1653,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>steps</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>last_window</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in <code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>n_boot</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of bootstrapping iterations to perform when estimating prediction intervals. Defaults to 250.</td>
 <td><code>250</code></td>
 </tr>
 <tr class="odd">
 <td>use_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>use_binned_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Seed for the random number generator to ensure reproducibility. Defaults to 123.</td>
 <td><code>123</code></td>
 </tr>
@@ -1709,7 +1709,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Pandas DataFrame with predictions generated by bootstrapping. Shape: (steps, n_boot).</td>
 </tr>
 </tbody>
@@ -1728,27 +1728,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>steps</code> is not an integer or a valid date.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>exog</code> is missing or has invalid shape.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>n_boot</code> is not a positive integer.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>use_in_sample_residuals=True</code> and <code>in_sample_residuals_</code> are not available.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>use_in_sample_residuals=False</code> and <code>out_sample_residuals_</code> are not available.</td>
 </tr>
 </tbody>
@@ -1800,49 +1800,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>steps</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>distribution</td>
-<td><a href="`object`">object</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#object">object</a></td>
 <td>A distribution object from scipy.stats with methods <code>_pdf</code> and <code>fit</code>. For example scipy.stats.norm.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>last_window</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in<code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Exogenous variable/s included as predictor/s.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>n_boot</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of bootstrapping iterations to perform when estimating prediction intervals.</td>
 <td><code>250</code></td>
 </tr>
 <tr class="even">
 <td>use_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
 <td>use_binned_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Seed for the random number generator to ensure reproducibility.</td>
 <td><code>123</code></td>
 </tr>
@@ -1862,7 +1862,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Distribution parameters estimated for each step.</td>
 </tr>
 </tbody>
@@ -1897,55 +1897,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>steps</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>last_window</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in <code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>method</td>
-<td><a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Technique used to estimate prediction intervals. Available options: - ‘bootstrapping’: Bootstrapping is used to generate prediction intervals [1]<em>. - ‘conformal’: Employs the conformal prediction split method for interval estimation [2]</em>. Defaults to ‘bootstrapping’.</td>
 <td><code>'bootstrapping'</code></td>
 </tr>
 <tr class="odd">
 <td>interval</td>
-<td><a href="`float`">float</a> | <a href="`list`">list</a>[<a href="`float`">float</a>] | <a href="`tuple`">tuple</a>[<a href="`float`">float</a>]</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a> | <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>] | <a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]</td>
 <td>Confidence level of the prediction interval. Interpretation depends on the method used: - If <code>float</code>, represents the nominal (expected) coverage (between 0 and 1). For instance, <code>interval=0.95</code> corresponds to <code>[2.5, 97.5]</code> percentiles. - If <code>list</code> or <code>tuple</code>, defines the exact percentiles to compute, which must be between 0 and 100 inclusive. For example, interval of 95% should be as <code>interval = [2.5, 97.5]</code>. - When using <code>method='conformal'</code>, the interval must be a float or a list/tuple defining a symmetric interval. Defaults to [5, 95].</td>
 <td><code>[5, 95]</code></td>
 </tr>
 <tr class="even">
 <td>n_boot</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of bootstrapping iterations to perform when estimating prediction intervals. Defaults to 250.</td>
 <td><code>250</code></td>
 </tr>
 <tr class="odd">
 <td>use_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>use_binned_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly. Defaults to True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Seed for the random number generator to ensure reproducibility. Defaults to 123.</td>
 <td><code>123</code></td>
 </tr>
@@ -1965,22 +1965,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Pandas DataFrame with values predicted by the forecaster and their estimated interval.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>- pred: predictions.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>- lower_bound: lower bound of the interval.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>- upper_bound: upper bound of the interval.</td>
 </tr>
 </tbody>
@@ -1999,17 +1999,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>method</code> is not ‘bootstrapping’ or ‘conformal’.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>interval</code> is invalid or not compatible with the chosen method.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If inputs (<code>steps</code>, <code>exog</code>, etc.) are invalid.</td>
 </tr>
 </tbody>
@@ -2070,49 +2070,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>steps</td>
-<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>last_window</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in<code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>exog</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a> | None</td>
 <td>Exogenous variable/s included as predictor/s.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>quantiles</td>
-<td><a href="`list`">list</a>[<a href="`float`">float</a>] | <a href="`tuple`">tuple</a>[<a href="`float`">float</a>]</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>] | <a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]</td>
 <td>Sequence of quantiles to compute, which must be between 0 and 1 inclusive. For example, quantiles of 0.05, 0.5 and 0.95 should be as <code>quantiles = [0.05, 0.5, 0.95]</code>.</td>
 <td><code>[0.05, 0.5, 0.95]</code></td>
 </tr>
 <tr class="odd">
 <td>n_boot</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of bootstrapping iterations to perform when estimating quantiles.</td>
 <td><code>250</code></td>
 </tr>
 <tr class="even">
 <td>use_in_sample_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
 <td>use_binned_residuals</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Seed for the random number generator to ensure reproducibility.</td>
 <td><code>123</code></td>
 </tr>
@@ -2132,7 +2132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>Quantiles predicted by the forecaster.</td>
 </tr>
 </tbody>
@@ -2159,7 +2159,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>fit_kwargs</td>
-<td><a href="`dict`">dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#object">object</a>]</td>
 <td>Dict of the form {“argument”: new_value}.</td>
 <td><em>required</em></td>
 </tr>
@@ -2196,7 +2196,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>y</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Target time series.</td>
 <td><em>required</em></td>
 </tr>
@@ -2237,17 +2237,17 @@ random_state: Random state for reproducibility.</code></pre>
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`spotforecast2_safe.exceptions.NotFittedError`">NotFittedError</a></td>
+<td><a href="../../docs/reference/exceptions.html#spotforecast2_safe.exceptions.NotFittedError">NotFittedError</a></td>
 <td>If the forecaster is not fitted.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`IndexError`">IndexError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#IndexError">IndexError</a></td>
 <td>If the index range of <code>y</code> does not match the range used during training.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If the features generated from the provided data do not match those used during the training process.</td>
 </tr>
 </tbody>
@@ -2284,7 +2284,7 @@ random_state: Random state for reproducibility.</code></pre>
 <tbody>
 <tr class="odd">
 <td>lags</td>
-<td><a href="`typing.Union`">Union</a>[<a href="`int`">int</a>, <a href="`typing.List`">List</a>[<a href="`int`">int</a>], <a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a>, <a href="`range`">range</a>, None]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>, <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>], <a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a>, <a href="https://docs.python.org/3/library/stdtypes.html#range">range</a>, None]</td>
 <td>Lags used as predictors. Index starts at 1, so lag 1 is equal to t-1. - <code>int</code>: include lags from 1 to <code>lags</code> (included). - <code>list</code>, <code>1d numpy ndarray</code> or <code>range</code>: include only lags present in <code>lags</code>, all elements must be int. - <code>None</code>: no lags are included as predictors.</td>
 <td><code>None</code></td>
 </tr>
@@ -2321,25 +2321,25 @@ random_state: Random state for reproducibility.</code></pre>
 <tbody>
 <tr class="odd">
 <td>y_true</td>
-<td><a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>True values of the time series in the original scale.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>y_pred</td>
-<td><a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>Predicted values of the time series in the original scale.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>append</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, new residuals are added to the once already stored in the forecaster. If after appending the new residuals, the limit of <code>10_000 // self.binner.n_bins_</code> values per bin is reached, a random sample of residuals is stored.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
 <td>random_state</td>
-<td><a href="`int`">int</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Random state for reproducibility.</td>
 <td><code>123</code></td>
 </tr>
@@ -2378,17 +2378,17 @@ random_state: Random state for reproducibility.</code></pre>
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`spotforecast2_safe.exceptions.NotFittedError`">NotFittedError</a></td>
+<td><a href="../../docs/reference/exceptions.html#spotforecast2_safe.exceptions.NotFittedError">NotFittedError</a></td>
 <td>If the forecaster is not fitted.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`TypeError`">TypeError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#TypeError">TypeError</a></td>
 <td>If <code>y_true</code> or <code>y_pred</code> are not <code>numpy ndarray</code> or <code>pandas Series</code>.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If <code>y_true</code> and <code>y_pred</code> have different length or index (if Series).</td>
 </tr>
 </tbody>
@@ -2430,13 +2430,13 @@ random_state: Random state for reproducibility.</code></pre>
 <tbody>
 <tr class="odd">
 <td>params</td>
-<td><a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#object">object</a>]</td>
 <td>Optional dictionary of parameter names mapped to their new values. If provided, these parameters are set first.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>**kwargs</td>
-<td><a href="`object`">object</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#object">object</a></td>
 <td>Dictionary of parameter names mapped to their new values. Parameters can be for the forecaster itself or for the contained estimator (using the <code>estimator__</code> prefix).</td>
 <td><code>{}</code></td>
 </tr>
@@ -2498,7 +2498,7 @@ random_state: Random state for reproducibility.</code></pre>
 <tbody>
 <tr class="odd">
 <td>window_features</td>
-<td><a href="`object`">object</a> | <a href="`list`">list</a>[<a href="`object`">object</a>] | None</td>
+<td><a href="https://docs.python.org/3/library/functions.html#object">object</a> | <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3/library/functions.html#object">object</a>] | None</td>
 <td>Instance or list of instances used to create window features. Window features are created from the original time series and are included as predictors.</td>
 <td><code>None</code></td>
 </tr>

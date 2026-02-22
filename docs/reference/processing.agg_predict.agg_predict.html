@@ -711,13 +711,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>predictions</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>DataFrame containing the prediction columns.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>weights</td>
-<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Union`">Union</a>[<a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`float`">float</a>], <a href="`typing.List`">List</a>[<a href="`float`">float</a>], <a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a>]]</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/functions.html#float">float</a>], <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>], <a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a>]]</td>
 <td>Dictionary mapping column names to their weights, or a list/array of weights corresponding to the order of columns in <code>predictions</code>. If None, defaults to summing all columns (weight=1.0 for each column).</td>
 <td><code>None</code></td>
 </tr>
@@ -737,7 +737,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
 <td>pd.Series: A Series containing the aggregated values.</td>
 </tr>
 </tbody>
@@ -756,12 +756,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If a column specified in weights (or default weights) is missing from predictions.</td>
 </tr>
 <tr class="even">
 <td></td>
-<td><a href="`ValueError`">ValueError</a></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
 <td>If weights is a list/array and its length does not match the number of columns in predictions.</td>
 </tr>
 </tbody>

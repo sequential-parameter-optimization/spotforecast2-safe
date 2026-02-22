@@ -716,37 +716,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>data</td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>The dataset with a datetime index.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>rule</td>
-<td><a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>The resample rule (e.g., ‘h’ for hourly, ‘D’ for daily). Default is ‘h’ which creates an hourly grid.</td>
 <td><code>'h'</code></td>
 </tr>
 <tr class="odd">
 <td>closed</td>
-<td><a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Which side of bin interval is closed. Default is ‘left’. Using <code>closed="left", label="left"</code> specifies that a time interval (e.g., 10:00 to 11:00) is labeled with the start timestamp (10:00). For consumption data, a different representation is usually more common: <code>closed="left", label="right"</code>, so the interval is labeled with the end timestamp (11:00), since consumption is typically reported after one hour.</td>
 <td><code>'left'</code></td>
 </tr>
 <tr class="even">
 <td>label</td>
-<td><a href="`str`">str</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Which bin edge label to use. Default is ‘left’. See ‘closed’ parameter for details on labeling behavior.</td>
 <td><code>'left'</code></td>
 </tr>
 <tr class="odd">
 <td>by</td>
-<td><a href="`str`">str</a> or <a href="`callable`">callable</a></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a href="https://docs.python.org/3/library/functions.html#callable">callable</a></td>
 <td>Aggregation method to apply (e.g., ‘mean’, ‘sum’, ‘median’). Default is ‘mean’. The aggregation serves robustness: if the data were more finely resolved (e.g., quarter-hourly), asfreq would only pick one value (sampling), while .agg(“mean”) forms the correct average over the hour. If the data is already hourly, .agg doesn’t change anything but ensures that no duplicates exist.</td>
 <td><code>'mean'</code></td>
 </tr>
 <tr class="even">
 <td>verbose</td>
-<td><a href="`bool`">bool</a></td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to print additional information.</td>
 <td><code>False</code></td>
 </tr>
@@ -766,7 +766,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
 <td>pd.DataFrame: Resampled and aggregated dataframe.</td>
 </tr>
 </tbody>
