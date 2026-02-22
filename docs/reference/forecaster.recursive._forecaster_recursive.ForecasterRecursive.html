@@ -1,0 +1,2987 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.29">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>forecaster.recursive._forecaster_recursive.forecasterrecursive – spotforecast2-safe</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4e7a6ecc11b04d2331dcee725084a9de.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-dae36b7b209a5a9f0102814064d699d0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-090e59de8c83bcb5ac477581d78b478d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-dae36b7b209a5a9f0102814064d699d0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">spotforecast2-safe</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sequential-parameter-optimization/spotforecast2-safe"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html">ForecasterRecursive</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/api_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Getting Started</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">API Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/data.fetch_data.fetch_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fetch_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/data.fetch_data.fetch_holiday_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fetch_holiday_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/data.fetch_data.fetch_weather_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fetch_weather_data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Preprocessing</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.exog_builder.ExogBuilder.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ExogBuilder</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.curate_data.agg_and_resample_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">curate_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.outlier.mark_outliers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">outlier detection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.split.split_abs_train_val_test.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">split</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Forecaster</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/forecaster.base.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">base</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">ForecasterRecursive</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ForecasterEquivalentDate</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/forecaster.metrics.add_y_train_argument.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">metrics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/forecaster.utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">utils</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Model Selection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/model_selection.validation.backtesting_forecaster.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">backtesting_forecaster</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Manager</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.metrics.calculate_metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">metrics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.trainer.get_last_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">trainer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.predictor.get_model_prediction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">predictor</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Utils</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/utils.cpe.get_cpe_identifier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">cpe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/utils.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">generate_holiday</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/utils.validation.check_y.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/weather.weather_client.WeatherClient.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weather</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Downloader</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/exceptions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exceptions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Processing Guides</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/processing/model_persistence.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model Persistence</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Preprocessing Guides</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/preprocessing/outliers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Outlier Detection</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Period Configuration Rationale</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Forecaster Guides</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/recursive/ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ForecasterRecursive</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/recursive/ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ForecasterEquivalentDate</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Safety &amp; Security</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Streamlining Process</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/safe/MODEL_CARD.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model/Method Card</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/safe/VERSION_MANAGEMENT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Version Management</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/security.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Security Policy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Development &amp; Community</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/contributing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contributing Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/tasks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tasks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive" class="nav-link active" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive">forecaster.recursive._forecaster_recursive.ForecasterRecursive</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#note" id="toc-note" class="nav-link" data-scroll-target="#note">Note</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X">create_predict_X</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights">create_sample_weights</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y">create_train_X_y</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit">fit</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances">get_feature_importances</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params">get_params</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict">predict</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping">predict_bootstrapping</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist">predict_dist</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval">predict_interval</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles">predict_quantiles</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs">set_fit_kwargs</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals">set_in_sample_residuals</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags">set_lags</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals">set_out_sample_residuals</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params">set_params</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features" id="toc-spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features">set_window_features</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html">ForecasterRecursive</a></li></ol></nav></header>
+
+
+
+
+
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive" class="level1">
+<h1>forecaster.recursive._forecaster_recursive.ForecasterRecursive</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    window_features<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    transformer_y<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    transformer_exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    weight_func<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    differentiation<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    fit_kwargs<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    binner_kwargs<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    forecaster_id<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    regressor<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Recursive autoregressive forecaster for scikit-learn compatible estimators.</p>
+<p>This class turns any estimator compatible with the scikit-learn API into a recursive autoregressive (multi-step) forecaster. The forecaster learns to predict future values by using lagged values of the target variable and optional exogenous features. Predictions are made iteratively, where each step uses previous predictions as input for the next step (recursive strategy).</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>estimator</td>
+<td><a href="`object`">object</a></td>
+<td>Scikit-learn compatible estimator for regression. If None, a default estimator will be initialized. Can also be passed via regressor parameter.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>lags</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`int`">int</a>, <a href="`typing.List`">List</a>[<a href="`int`">int</a>], <a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a>, <a href="`range`">range</a>, None]</td>
+<td>Lagged values of the target variable to use as predictors. Can be an integer (uses lags from 1 to lags), list of integers, numpy array, or range. At least one of lags or window_features must be provided. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>window_features</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`object`">object</a>, <a href="`typing.List`">List</a>[<a href="`object`">object</a>], None]</td>
+<td>List of window feature objects to compute features from the target variable. Each object must implement transform_batch() method. At least one of lags or window_features must be provided. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>transformer_y</td>
+<td><a href="`typing.Optional`">Optional</a>[<a href="`object`">object</a>]</td>
+<td>Transformer object for the target variable. Must implement fit() and transform() methods. Applied before training and predictions. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>transformer_exog</td>
+<td><a href="`typing.Optional`">Optional</a>[<a href="`object`">object</a>]</td>
+<td>Transformer object for exogenous variables. Must implement fit() and transform() methods. Applied before training and predictions. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>weight_func</td>
+<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Callable`">Callable</a>]</td>
+<td>Function to compute sample weights for training. Must accept an index and return an array of weights. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>differentiation</td>
+<td><a href="`typing.Optional`">Optional</a>[<a href="`int`">int</a>]</td>
+<td>Order of differencing to apply to the target variable. Must be a positive integer. Differencing is applied before creating lags. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>fit_kwargs</td>
+<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]]</td>
+<td>Dictionary of additional keyword arguments to pass to the estimator’s fit() method. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>binner_kwargs</td>
+<td><a href="`typing.Optional`">Optional</a>[<a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]]</td>
+<td>Dictionary of keyword arguments for QuantileBinner used in probabilistic predictions. Defaults to {‘n_bins’: 10, ‘method’: ‘linear’}.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>forecaster_id</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`str`">str</a>, <a href="`int`">int</a>, None]</td>
+<td>Identifier for the forecaster instance. Can be a string or integer. Used for tracking and logging purposes. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>regressor</td>
+<td><a href="`object`">object</a></td>
+<td>Alternative parameter name for estimator. If provided, used instead of estimator. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes" class="level2 doc-section doc-section-attributes">
+<h2 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 7%">
+<col style="width: 64%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>estimator</td>
+<td></td>
+<td>Fitted scikit-learn estimator.</td>
+</tr>
+<tr class="even">
+<td>lags</td>
+<td></td>
+<td>Lag indices used in the model.</td>
+</tr>
+<tr class="odd">
+<td>lags_names</td>
+<td></td>
+<td>Names of lag features (e.g., [‘lag_1’, ‘lag_2’]).</td>
+</tr>
+<tr class="even">
+<td>window_features</td>
+<td></td>
+<td>List of window feature transformers.</td>
+</tr>
+<tr class="odd">
+<td>window_features_names</td>
+<td></td>
+<td>Names of window features.</td>
+</tr>
+<tr class="even">
+<td>window_size</td>
+<td></td>
+<td>Maximum window size needed (max of lags and window features).</td>
+</tr>
+<tr class="odd">
+<td>transformer_y</td>
+<td></td>
+<td>Transformer for target variable.</td>
+</tr>
+<tr class="even">
+<td>transformer_exog</td>
+<td></td>
+<td>Transformer for exogenous variables.</td>
+</tr>
+<tr class="odd">
+<td>weight_func</td>
+<td></td>
+<td>Function for sample weighting.</td>
+</tr>
+<tr class="even">
+<td>differentiation</td>
+<td></td>
+<td>Order of differencing applied.</td>
+</tr>
+<tr class="odd">
+<td>differentiator</td>
+<td></td>
+<td>TimeSeriesDifferentiator instance if differencing is used.</td>
+</tr>
+<tr class="even">
+<td>is_fitted</td>
+<td></td>
+<td>Boolean indicating if forecaster has been fitted.</td>
+</tr>
+<tr class="odd">
+<td>fit_date</td>
+<td></td>
+<td>Timestamp of the last fit operation.</td>
+</tr>
+<tr class="even">
+<td>last_window_</td>
+<td></td>
+<td>Last window_size observations from training data.</td>
+</tr>
+<tr class="odd">
+<td>index_type_</td>
+<td></td>
+<td>Type of index in training data (RangeIndex or DatetimeIndex).</td>
+</tr>
+<tr class="even">
+<td>index_freq_</td>
+<td></td>
+<td>Frequency of DatetimeIndex if applicable.</td>
+</tr>
+<tr class="odd">
+<td>training_range_</td>
+<td></td>
+<td>First and last index values of training data.</td>
+</tr>
+<tr class="even">
+<td>series_name_in_</td>
+<td></td>
+<td>Name of the target series.</td>
+</tr>
+<tr class="odd">
+<td>exog_in_</td>
+<td></td>
+<td>Boolean indicating if exogenous variables were used in training.</td>
+</tr>
+<tr class="even">
+<td>exog_names_in_</td>
+<td></td>
+<td>Names of exogenous variables.</td>
+</tr>
+<tr class="odd">
+<td>exog_type_in_</td>
+<td></td>
+<td>Type of exogenous input (Series or DataFrame).</td>
+</tr>
+<tr class="even">
+<td>X_train_features_names_out_</td>
+<td></td>
+<td>Names of all training features.</td>
+</tr>
+<tr class="odd">
+<td>in_sample_residuals_</td>
+<td></td>
+<td>Residuals from training set.</td>
+</tr>
+<tr class="even">
+<td>in_sample_residuals_by_bin_</td>
+<td></td>
+<td>Residuals grouped by bins for probabilistic pred.</td>
+</tr>
+<tr class="odd">
+<td>forecaster_id</td>
+<td></td>
+<td>Identifier for the forecaster instance.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="note" class="level2 doc-section doc-section-note">
+<h2 class="doc-section doc-section-note anchored" data-anchor-id="note">Note</h2>
+<ul>
+<li>Either lags or window_features (or both) must be provided during initialization.</li>
+<li>The forecaster uses a recursive strategy where each multi-step prediction depends on previous predictions within the same forecast horizon.</li>
+<li>Exogenous variables must have the same index as the target variable and must be available for the entire prediction horizon.</li>
+<li>The forecaster supports point predictions, prediction intervals, bootstrapping, quantile predictions, and probabilistic forecasts via conformal methods.</li>
+</ul>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Create a basic forecaster with lags:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.random.randn(<span class="dv">100</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>LinearRegression(),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span><span class="dv">10</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create a forecaster with window features and transformations:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.random.randn(<span class="dv">100</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">100</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">30</span>],</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>...     window_features<span class="op">=</span>[RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">7</span>)],</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>...     transformer_y<span class="op">=</span>StandardScaler(),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>...     differentiation<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create a forecaster with exogenous variables:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.random.randn(<span class="dv">100</span>), name<span class="op">=</span><span class="st">'target'</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog <span class="op">=</span> pd.DataFrame({<span class="st">'temp'</span>: np.random.randn(<span class="dv">100</span>)}, index<span class="op">=</span>y.index)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>Ridge(),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span><span class="dv">7</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>...     forecaster_id<span class="op">=</span><span class="st">'my_forecaster'</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y, exog)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog_future <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>...     {<span class="st">'temp'</span>: np.random.randn(<span class="dv">5</span>)},</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>...     index<span class="op">=</span>pd.RangeIndex(start<span class="op">=</span><span class="dv">100</span>, stop<span class="op">=</span><span class="dv">105</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">5</span>, exog<span class="op">=</span>exog_future)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create a forecaster with probabilistic prediction configuration:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.ensemble <span class="im">import</span> GradientBoostingRegressor</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.random.randn(<span class="dv">100</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>GradientBoostingRegressor(),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>...     binner_kwargs<span class="op">=</span>{<span class="st">'n_bins'</span>: <span class="dv">15</span>, <span class="st">'method'</span>: <span class="st">'linear'</span>}</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y, store_in_sample_residuals<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X">create_predict_X</a></td>
+<td>Create the predictors needed to predict <code>steps</code> ahead. As it is a recursive</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights">create_sample_weights</a></td>
+<td>Create weights for each observation according to the forecaster’s attribute</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y">create_train_X_y</a></td>
+<td>Public method to create training predictors and target values.</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit">fit</a></td>
+<td>Fit the forecaster to the training data.</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances">get_feature_importances</a></td>
+<td>Return feature importances of the estimator stored in the forecaster.</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params">get_params</a></td>
+<td>Get parameters for this forecaster.</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict">predict</a></td>
+<td>Predict future values recursively for the specified number of steps.</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping">predict_bootstrapping</a></td>
+<td>Generate multiple forecasting predictions using a bootstrapping process.</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist">predict_dist</a></td>
+<td>Fit a given probability distribution for each step. After generating</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval">predict_interval</a></td>
+<td>Predict n steps ahead and estimate prediction intervals using either</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles">predict_quantiles</a></td>
+<td>Calculate the specified quantiles for each step. After generating</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs">set_fit_kwargs</a></td>
+<td>Set new values for the additional keyword arguments passed to the <code>fit</code></td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals">set_in_sample_residuals</a></td>
+<td>Set in-sample residuals in case they were not calculated during the</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags">set_lags</a></td>
+<td>Set new value to the attribute <code>lags</code>. Attributes <code>lags_names</code>,</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals">set_out_sample_residuals</a></td>
+<td>Set new values to the attribute <code>out_sample_residuals_</code>.</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params">set_params</a></td>
+<td>Set the parameters of this forecaster.</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features">set_window_features</a></td>
+<td>Set new value to the attribute <code>window_features</code>.</td>
+</tr>
+</tbody>
+</table>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X">create_predict_X</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    steps,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    last_window<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    check_inputs<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create the predictors needed to predict <code>steps</code> ahead. As it is a recursive process, the predictors are created at each iteration of the prediction process.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>steps</td>
+<td><a href="`int`">int</a></td>
+<td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>last_window</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in <code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>exog</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>check_inputs</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, the input is checked for possible warnings and errors with the <code>check_predict_input</code> function. This argument is created for internal use and is not recommended to be changed. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>Pandas DataFrame with the predictors for each step. The index</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>is the same as the prediction index.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights">create_sample_weights</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_sample_weights(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    X_train,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create weights for each observation according to the forecaster’s attribute <code>weight_func</code>.</p>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X_train</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>Dataframe created with the <code>create_train_X_y</code> method, first return.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a></td>
+<td>Weights to use in <code>fit</code> method.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y">create_train_X_y</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_train_X_y(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    y,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Public method to create training predictors and target values.</p>
+<p>This method is a public wrapper around the internal method <code>_create_train_X_y</code>, which generates the training predictors and target values based on the provided time series and exogenous variables. It ensures that the necessary transformations and feature engineering steps are applied to prepare the data for training the forecaster.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>y</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>Target series for training. Must be a pandas Series.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>exog</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td>Optional exogenous variables for training. Can be a pandas Series or DataFrame. Must have the same index as <code>y</code> and cover the same time range. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`typing.Tuple`">Tuple</a>[<a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, <a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>]</td>
+<td>Tuple containing: - X_train: DataFrame of training predictors including lags, window features, and exogenous variables (if provided). - y_train: Series of target values aligned with the predictors.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.arange(<span class="dv">30</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog <span class="op">=</span> pd.DataFrame({<span class="st">'temp'</span>: np.random.randn(<span class="dv">30</span>)}, index<span class="op">=</span>y.index)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>LinearRegression(),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>...     window_features<span class="op">=</span>[RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">3</span>)]</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> X_train, y_train <span class="op">=</span> forecaster.create_train_X_y(y<span class="op">=</span>y, exog<span class="op">=</span>exog)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">isinstance</span>(X_train, pd.DataFrame)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">isinstance</span>(y_train, pd.Series)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit">fit</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    y,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    store_last_window<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    store_in_sample_residuals<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    suppress_warnings<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Fit the forecaster to the training data.</p>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>y</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>Target series for training. Must be a pandas Series.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>exog</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td>Optional exogenous variables for training. Can be a pandas Series or DataFrame.Must have the same index as <code>y</code> and cover the same time range. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>store_last_window</td>
+<td><a href="`bool`">bool</a></td>
+<td>Whether to store the last window of the training series for use in prediction. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>store_in_sample_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>Whether to store in-sample residuals after fitting, which can be used for certain probabilistic prediction methods. Defaults to False.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>random_state</td>
+<td><a href="`int`">int</a></td>
+<td>Random seed for reproducibility when sampling residuals if <code>store_in_sample_residuals</code> is True. Defaults to 123.</td>
+<td><code>123</code></td>
+</tr>
+<tr class="even">
+<td>suppress_warnings</td>
+<td><a href="`bool`">bool</a></td>
+<td>Whether to suppress warnings during fitting, such as those related to insufficient data length for lags or window features. Defaults to False.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>None</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-2" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.arange(<span class="dv">30</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog <span class="op">=</span> pd.DataFrame({<span class="st">'temp'</span>: np.random.randn(<span class="dv">30</span>)}, index<span class="op">=</span>y.index)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>LinearRegression(),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>...     window_features<span class="op">=</span>[RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">3</span>)]</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y<span class="op">=</span>y, exog<span class="op">=</span>exog, store_in_sample_residuals<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances">get_feature_importances</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    sort_importance<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return feature importances of the estimator stored in the forecaster. Only valid when estimator stores internally the feature importances in the attribute <code>feature_importances_</code> or <code>coef_</code>. Otherwise, returns <code>None</code>.</p>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sort_importance</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, sorts the feature importances in descending order.</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-4" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>pd.DataFrame: Feature importances associated with each predictor.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`spotforecast2_safe.exceptions.NotFittedError`">NotFittedError</a></td>
+<td>If the forecaster is not fitted.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-3" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y<span class="op">=</span>pd.Series(np.arange(<span class="dv">20</span>)))</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.get_feature_importances()</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  feature  importance</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span>   lag_1         <span class="fl">1.0</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   lag_2         <span class="fl">0.0</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   lag_3         <span class="fl">0.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params">get_params</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    deep<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Get parameters for this forecaster.</p>
+<section id="parameters-6" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>deep</td>
+<td><a href="`bool`">bool</a></td>
+<td>If True, will return the parameters for this forecaster and contained sub-objects that are estimators.</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-5" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-5">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>params</td>
+<td><a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]</td>
+<td>Dictionary of parameter names mapped to their values.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-4" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-4">Examples</h4>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.get_params()</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'estimator'</span>: LinearRegression(), <span class="st">'lags'</span>: <span class="dv">3</span>, <span class="st">'window_features'</span>: <span class="va">None</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'transformer_y'</span>: <span class="va">None</span>, <span class="st">'transformer_exog'</span>: <span class="va">None</span>, <span class="st">'weight_func'</span>: <span class="va">None</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'differentiation'</span>: <span class="va">None</span>, <span class="st">'fit_kwargs'</span>: {}, <span class="st">'binner_kwargs'</span>: <span class="va">None</span>, <span class="st">'forecaster_id'</span>: <span class="st">'...'</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict">predict</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    steps,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    last_window<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    check_inputs<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Predict future values recursively for the specified number of steps.</p>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>steps</td>
+<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td>Number of future steps to predict.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>last_window</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td>Optional last window of observed values to use for prediction. If None, uses the last window from training. Must be a pandas Series or DataFrame with the same structure as the training target series. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>exog</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a>, <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a>, None]</td>
+<td>Optional exogenous variables for prediction. Can be a pandas Series or DataFrame. Must have the same structure as the exogenous variables used in training. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>check_inputs</td>
+<td><a href="`bool`">bool</a></td>
+<td>Whether to perform input validation checks. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-6" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-6">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>Pandas Series of predicted values for the specified number of steps,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>indexed according to the prediction index constructed from the last window and the number of steps.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-5" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-5">Examples</h4>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(np.arange(<span class="dv">30</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog <span class="op">=</span> pd.DataFrame({<span class="st">'temp'</span>: np.random.randn(<span class="dv">30</span>)}, index<span class="op">=</span>y.index)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>...     estimator<span class="op">=</span>LinearRegression(),</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>...     lags<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>...     window_features<span class="op">=</span>[RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">3</span>)]</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y<span class="op">=</span>y, exog<span class="op">=</span>exog)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> last_window <span class="op">=</span> y.iloc[<span class="op">-</span><span class="dv">3</span>:]</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog_future <span class="op">=</span> pd.DataFrame({<span class="st">'temp'</span>: np.random.randn(<span class="dv">5</span>)}, index<span class="op">=</span>pd.RangeIndex(start<span class="op">=</span><span class="dv">30</span>, stop<span class="op">=</span><span class="dv">35</span>))</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> predictions <span class="op">=</span> forecaster.predict(</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>...     steps<span class="op">=</span><span class="dv">5</span>, last_window<span class="op">=</span>last_window, exog<span class="op">=</span>exog_future, check_inputs<span class="op">=</span><span class="va">True</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">isinstance</span>(predictions, pd.Series)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping">predict_bootstrapping</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    steps,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    last_window<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    n_boot<span class="op">=</span><span class="dv">250</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    use_in_sample_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    use_binned_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Generate multiple forecasting predictions using a bootstrapping process. By sampling from a collection of past observed errors (the residuals), each iteration of bootstrapping generates a different set of predictions. See the References section for more information.</p>
+<section id="parameters-8" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>steps</td>
+<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>last_window</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in <code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>exog</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>n_boot</td>
+<td><a href="`int`">int</a></td>
+<td>Number of bootstrapping iterations to perform when estimating prediction intervals. Defaults to 250.</td>
+<td><code>250</code></td>
+</tr>
+<tr class="odd">
+<td>use_in_sample_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>use_binned_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td>random_state</td>
+<td><a href="`int`">int</a></td>
+<td>Seed for the random number generator to ensure reproducibility. Defaults to 123.</td>
+<td><code>123</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-7" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-7">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>Pandas DataFrame with predictions generated by bootstrapping. Shape: (steps, n_boot).</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-1" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-1">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>steps</code> is not an integer or a valid date.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>exog</code> is missing or has invalid shape.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>n_boot</code> is not a positive integer.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>use_in_sample_residuals=True</code> and <code>in_sample_residuals_</code> are not available.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>use_in_sample_residuals=False</code> and <code>out_sample_residuals_</code> are not available.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-6" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-6">Examples</h4>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> rng <span class="op">=</span> np.random.default_rng(<span class="dv">123</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(rng.normal(size<span class="op">=</span><span class="dv">100</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> _ <span class="op">=</span> forecaster.fit(y<span class="op">=</span>y)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> boot_preds <span class="op">=</span> forecaster.predict_bootstrapping(steps<span class="op">=</span><span class="dv">3</span>, n_boot<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> boot_preds.shape</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>(<span class="dv">3</span>, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="references" class="level4 doc-section doc-section-references">
+<h4 class="doc-section doc-section-references anchored" data-anchor-id="references">References</h4>
+<p>.. [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos. https://otexts.com/fpp3/prediction-intervals.html</p>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist">predict_dist</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    steps,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    distribution,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    last_window<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    n_boot<span class="op">=</span><span class="dv">250</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    use_in_sample_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    use_binned_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Fit a given probability distribution for each step. After generating multiple forecasting predictions through a bootstrapping process, each step is fitted to the given distribution.</p>
+<section id="parameters-9" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-9">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>steps</td>
+<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>distribution</td>
+<td><a href="`object`">object</a></td>
+<td>A distribution object from scipy.stats with methods <code>_pdf</code> and <code>fit</code>. For example scipy.stats.norm.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>last_window</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in<code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>exog</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Exogenous variable/s included as predictor/s.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>n_boot</td>
+<td><a href="`int`">int</a></td>
+<td>Number of bootstrapping iterations to perform when estimating prediction intervals.</td>
+<td><code>250</code></td>
+</tr>
+<tr class="even">
+<td>use_in_sample_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td>use_binned_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>random_state</td>
+<td><a href="`int`">int</a></td>
+<td>Seed for the random number generator to ensure reproducibility.</td>
+<td><code>123</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-8" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-8">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>Distribution parameters estimated for each step.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval">predict_interval</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_interval(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    steps,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    last_window<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">'bootstrapping'</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    interval<span class="op">=</span>[<span class="dv">5</span>, <span class="dv">95</span>],</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    n_boot<span class="op">=</span><span class="dv">250</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    use_in_sample_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    use_binned_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Predict n steps ahead and estimate prediction intervals using either bootstrapping or conformal prediction methods. Refer to the References section for additional details on these methods.</p>
+<section id="parameters-10" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-10">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>steps</td>
+<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>last_window</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in <code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>exog</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Exogenous variable/s included as predictor/s. Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>method</td>
+<td><a href="`str`">str</a></td>
+<td>Technique used to estimate prediction intervals. Available options: - ‘bootstrapping’: Bootstrapping is used to generate prediction intervals [1]<em>. - ‘conformal’: Employs the conformal prediction split method for interval estimation [2]</em>. Defaults to ‘bootstrapping’.</td>
+<td><code>'bootstrapping'</code></td>
+</tr>
+<tr class="odd">
+<td>interval</td>
+<td><a href="`float`">float</a> | <a href="`list`">list</a>[<a href="`float`">float</a>] | <a href="`tuple`">tuple</a>[<a href="`float`">float</a>]</td>
+<td>Confidence level of the prediction interval. Interpretation depends on the method used: - If <code>float</code>, represents the nominal (expected) coverage (between 0 and 1). For instance, <code>interval=0.95</code> corresponds to <code>[2.5, 97.5]</code> percentiles. - If <code>list</code> or <code>tuple</code>, defines the exact percentiles to compute, which must be between 0 and 100 inclusive. For example, interval of 95% should be as <code>interval = [2.5, 97.5]</code>. - When using <code>method='conformal'</code>, the interval must be a float or a list/tuple defining a symmetric interval. Defaults to [5, 95].</td>
+<td><code>[5, 95]</code></td>
+</tr>
+<tr class="even">
+<td>n_boot</td>
+<td><a href="`int`">int</a></td>
+<td>Number of bootstrapping iterations to perform when estimating prediction intervals. Defaults to 250.</td>
+<td><code>250</code></td>
+</tr>
+<tr class="odd">
+<td>use_in_sample_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>use_binned_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly. Defaults to True.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td>random_state</td>
+<td><a href="`int`">int</a></td>
+<td>Seed for the random number generator to ensure reproducibility. Defaults to 123.</td>
+<td><code>123</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-9" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-9">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>Pandas DataFrame with values predicted by the forecaster and their estimated interval.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>- pred: predictions.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>- lower_bound: lower bound of the interval.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>- upper_bound: upper bound of the interval.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-2" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-2">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>method</code> is not ‘bootstrapping’ or ‘conformal’.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>interval</code> is invalid or not compatible with the chosen method.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If inputs (<code>steps</code>, <code>exog</code>, etc.) are invalid.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-7" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-7">Examples</h4>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> rng <span class="op">=</span> np.random.default_rng(<span class="dv">123</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> pd.Series(rng.normal(size<span class="op">=</span><span class="dv">100</span>), name<span class="op">=</span><span class="st">'y'</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> _ <span class="op">=</span> forecaster.fit(y<span class="op">=</span>y)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Bootstrapping method</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> intervals_boot <span class="op">=</span> forecaster.predict_interval(</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>...     steps<span class="op">=</span><span class="dv">3</span>, method<span class="op">=</span><span class="st">'bootstrapping'</span>, interval<span class="op">=</span>[<span class="dv">5</span>, <span class="dv">95</span>]</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> intervals_boot.columns.tolist()</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>[<span class="st">'pred'</span>, <span class="st">'lower_bound'</span>, <span class="st">'upper_bound'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Conformal method</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> intervals_conf <span class="op">=</span> forecaster.predict_interval(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>...     steps<span class="op">=</span><span class="dv">3</span>, method<span class="op">=</span><span class="st">'conformal'</span>, interval<span class="op">=</span><span class="fl">0.95</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> intervals_conf.columns.tolist()</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>[<span class="st">'pred'</span>, <span class="st">'lower_bound'</span>, <span class="st">'upper_bound'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="references-1" class="level4 doc-section doc-section-references">
+<h4 class="doc-section doc-section-references anchored" data-anchor-id="references-1">References</h4>
+<p>.. [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos. https://otexts.com/fpp3/prediction-intervals.html .. [2] MAPIE - Model Agnostic Prediction Interval Estimator. https://mapie.readthedocs.io/en/stable/theoretical_description_regression.html#the-split-method</p>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles">predict_quantiles</h3>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_quantiles(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    steps,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    last_window<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    quantiles<span class="op">=</span>[<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>],</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    n_boot<span class="op">=</span><span class="dv">250</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    use_in_sample_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    use_binned_residuals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Calculate the specified quantiles for each step. After generating multiple forecasting predictions through a bootstrapping process, each quantile is calculated for each step.</p>
+<section id="parameters-11" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-11">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>steps</td>
+<td><a href="`int`">int</a> | <a href="`str`">str</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Timestamp`">Timestamp</a></td>
+<td>Number of steps to predict. - If steps is int, number of steps to predict. - If str or pandas Datetime, the prediction will be up to that date.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>last_window</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Series values used to create the predictors (lags) needed in the first iteration of the prediction (t + 1). If <code>last_window = None</code>, the values stored in<code>self.last_window_</code> are used to calculate the initial predictors, and the predictions start right after training data.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>exog</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a> | <a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a> | None</td>
+<td>Exogenous variable/s included as predictor/s.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>quantiles</td>
+<td><a href="`list`">list</a>[<a href="`float`">float</a>] | <a href="`tuple`">tuple</a>[<a href="`float`">float</a>]</td>
+<td>Sequence of quantiles to compute, which must be between 0 and 1 inclusive. For example, quantiles of 0.05, 0.5 and 0.95 should be as <code>quantiles = [0.05, 0.5, 0.95]</code>.</td>
+<td><code>[0.05, 0.5, 0.95]</code></td>
+</tr>
+<tr class="odd">
+<td>n_boot</td>
+<td><a href="`int`">int</a></td>
+<td>Number of bootstrapping iterations to perform when estimating quantiles.</td>
+<td><code>250</code></td>
+</tr>
+<tr class="even">
+<td>use_in_sample_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals from the training data are used as proxy of prediction error to create predictions. If <code>False</code>, out of sample residuals (calibration) are used. Out-of-sample residuals must be precomputed using Forecaster’s <code>set_out_sample_residuals()</code> method.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td>use_binned_residuals</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, residuals are selected based on the predicted values (binned selection). If <code>False</code>, residuals are selected randomly.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>random_state</td>
+<td><a href="`int`">int</a></td>
+<td>Seed for the random number generator to ensure reproducibility.</td>
+<td><code>123</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-10" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-10">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.DataFrame`">DataFrame</a></td>
+<td>Quantiles predicted by the forecaster.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs">set_fit_kwargs</h3>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_fit_kwargs(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    fit_kwargs,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set new values for the additional keyword arguments passed to the <code>fit</code> method of the estimator.</p>
+<section id="parameters-12" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-12">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fit_kwargs</td>
+<td><a href="`dict`">dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]</td>
+<td>Dict of the form {“argument”: new_value}.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals">set_in_sample_residuals</h3>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_in_sample_residuals(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    y,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set in-sample residuals in case they were not calculated during the training process.</p>
+<p>In-sample residuals are calculated as the difference between the true values and the predictions made by the forecaster using the training data. The following internal attributes are updated:</p>
+<ul>
+<li><code>in_sample_residuals_</code>: residuals stored in a numpy ndarray.</li>
+<li><code>binner_intervals_</code>: intervals used to bin the residuals are calculated using the quantiles of the predicted values.</li>
+<li><code>in_sample_residuals_by_bin_</code>: residuals are binned according to the predicted value they are associated with and stored in a dictionary, where the keys are the intervals of the predicted values and the values are the residuals associated with that range.</li>
+</ul>
+<p>A total of 10_000 residuals are stored in the attribute <code>in_sample_residuals_</code>. If the number of residuals is greater than 10_000, a random sample of 10_000 residuals is stored. The number of residuals stored per bin is limited to <code>10_000 // self.binner.n_bins_</code>.</p>
+<section id="parameters-13" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-13">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>y</td>
+<td><a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>Target time series.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<pre><code>exog: Exogenous variables.
+random_state: Random state for reproducibility.</code></pre>
+</section>
+<section id="returns-11" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-11">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>None</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-3" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-3">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`spotforecast2_safe.exceptions.NotFittedError`">NotFittedError</a></td>
+<td>If the forecaster is not fitted.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`IndexError`">IndexError</a></td>
+<td>If the index range of <code>y</code> does not match the range used during training.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If the features generated from the provided data do not match those used during the training process.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-8" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-8">Examples</h4>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y<span class="op">=</span>pd.Series(np.arange(<span class="dv">20</span>)), store_in_sample_residuals<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.set_in_sample_residuals(y<span class="op">=</span>pd.Series(np.arange(<span class="dv">20</span>)))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.in_sample_residuals_</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>array([<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags">set_lags</h3>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_lags(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set new value to the attribute <code>lags</code>. Attributes <code>lags_names</code>, <code>max_lag</code> and <code>window_size</code> are also updated.</p>
+<section id="parameters-14" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-14">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>lags</td>
+<td><a href="`typing.Union`">Union</a>[<a href="`int`">int</a>, <a href="`typing.List`">List</a>[<a href="`int`">int</a>], <a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a>, <a href="`range`">range</a>, None]</td>
+<td>Lags used as predictors. Index starts at 1, so lag 1 is equal to t-1. - <code>int</code>: include lags from 1 to <code>lags</code> (included). - <code>list</code>, <code>1d numpy ndarray</code> or <code>range</code>: include only lags present in <code>lags</code>, all elements must be int. - <code>None</code>: no lags are included as predictors.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals">set_out_sample_residuals</h3>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    y_true,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    y_pred,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    append<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set new values to the attribute <code>out_sample_residuals_</code>.</p>
+<p>Out of sample residuals are meant to be calculated using observations that did not participate in the training process. <code>y_true</code> and <code>y_pred</code> are expected to be in the original scale of the time series. Residuals are calculated as <code>y_true</code> - <code>y_pred</code>, after applying the necessary transformations and differentiations if the forecaster includes them (<code>self.transformer_y</code> and <code>self.differentiation</code>). Two internal attributes are updated:</p>
+<ul>
+<li><code>out_sample_residuals_</code>: residuals stored in a numpy ndarray.</li>
+<li><code>out_sample_residuals_by_bin_</code>: residuals are binned according to the predicted value they are associated with and stored in a dictionary, where the keys are the intervals of the predicted values and the values are the residuals associated with that range. If a bin is empty, it is filled with a random sample of residuals from other bins. This is done to ensure that all bins have at least one residual and can be used in the prediction process.</li>
+</ul>
+<p>A total of 10_000 residuals are stored in the attribute <code>out_sample_residuals_</code>. If the number of residuals is greater than 10_000, a random sample of 10_000 residuals is stored. The number of residuals stored per bin is limited to <code>10_000 // self.binner.n_bins_</code>.</p>
+<section id="parameters-15" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-15">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>y_true</td>
+<td><a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>True values of the time series in the original scale.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>y_pred</td>
+<td><a href="`numpy`">np</a>.<a href="`numpy.ndarray`">ndarray</a> | <a href="`pandas`">pd</a>.<a href="`pandas.Series`">Series</a></td>
+<td>Predicted values of the time series in the original scale.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>append</td>
+<td><a href="`bool`">bool</a></td>
+<td>If <code>True</code>, new residuals are added to the once already stored in the forecaster. If after appending the new residuals, the limit of <code>10_000 // self.binner.n_bins_</code> values per bin is reached, a random sample of residuals is stored.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>random_state</td>
+<td><a href="`int`">int</a></td>
+<td>Random state for reproducibility.</td>
+<td><code>123</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-12" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-12">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>None</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-4" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-4">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="`spotforecast2_safe.exceptions.NotFittedError`">NotFittedError</a></td>
+<td>If the forecaster is not fitted.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="`TypeError`">TypeError</a></td>
+<td>If <code>y_true</code> or <code>y_pred</code> are not <code>numpy ndarray</code> or <code>pandas Series</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="`ValueError`">ValueError</a></td>
+<td>If <code>y_true</code> and <code>y_pred</code> have different length or index (if Series).</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-9" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-9">Examples</h4>
+<div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.fit(y<span class="op">=</span>pd.Series(np.arange(<span class="dv">20</span>)), store_in_sample_residuals<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y_true <span class="op">=</span> np.array([<span class="dv">20</span>, <span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">23</span>, <span class="dv">24</span>])</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y_pred <span class="op">=</span> np.array([<span class="fl">20.1</span>, <span class="fl">20.9</span>, <span class="fl">22.2</span>, <span class="fl">22.8</span>, <span class="fl">24.0</span>])</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.set_out_sample_residuals(y_true<span class="op">=</span>y_true, y_pred<span class="op">=</span>y_pred)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.out_sample_residuals_</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>array([<span class="op">-</span><span class="fl">0.1</span>,  <span class="fl">0.1</span>, <span class="op">-</span><span class="fl">0.2</span>,  <span class="fl">0.2</span>,  <span class="fl">0.</span> ])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params">set_params</h3>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set the parameters of this forecaster.</p>
+<section id="parameters-16" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-16">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>params</td>
+<td><a href="`typing.Dict`">Dict</a>[<a href="`str`">str</a>, <a href="`object`">object</a>]</td>
+<td>Optional dictionary of parameter names mapped to their new values. If provided, these parameters are set first.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>**kwargs</td>
+<td><a href="`object`">object</a></td>
+<td>Dictionary of parameter names mapped to their new values. Parameters can be for the forecaster itself or for the contained estimator (using the <code>estimator__</code> prefix).</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-13" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-13">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 30%">
+<col style="width: 60%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>self</td>
+<td>'ForecasterRecursive'</td>
+<td>The forecaster instance with updated parameters.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-10" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-10">Examples</h4>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.set_params(estimator__fit_intercept<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.estimator.get_params()[<span class="st">"fit_intercept"</span>]</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features">set_window_features</h3>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    window_features<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set new value to the attribute <code>window_features</code>.</p>
+<p>Attributes <code>max_size_window_features</code>, <code>window_features_names</code>, <code>window_features_class_names</code> and <code>window_size</code> are also updated.</p>
+<section id="parameters-17" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-17">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>window_features</td>
+<td><a href="`object`">object</a> | <a href="`list`">list</a>[<a href="`object`">object</a>] | None</td>
+<td>Instance or list of instances used to create window features. Window features are created from the original time series and are included as predictors.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-14" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-14">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>None</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-11" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-11">Examples</h4>
+<div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>LinearRegression(), lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> rolling <span class="op">=</span> RollingFeatures(stats<span class="op">=</span>[<span class="st">'mean'</span>, <span class="st">'std'</span>], window_sizes<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">5</span>])</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.set_window_features(window_features<span class="op">=</span>rolling)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.window_features_names</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>[<span class="st">'roll_mean_3'</span>, <span class="st">'roll_std_3'</span>, <span class="st">'roll_mean_5'</span>, <span class="st">'roll_std_5'</span>]</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> forecaster.window_size</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sequential-parameter-optimization\.github\.io\/spotforecast2-safe\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
