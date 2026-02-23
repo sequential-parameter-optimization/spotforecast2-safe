@@ -578,6 +578,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../docs/preprocessing/imputation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Imputation &amp; Gap Weighting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Period Configuration Rationale</span></a>
   </div>
@@ -746,7 +752,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>]</td>
-<td>Tuple[pd.DataFrame, pd.Series]: A tuple containing the forward and backward filled DataFrame and a boolean series where True indicates missing weights.</td>
+<td>Tuple[pd.DataFrame, pd.Series]: A tuple containing the forward and backward filled DataFrame and a numeric series (0.0 or 1.0) where 0.0 indicates a weight for missing values/gaps.</td>
 </tr>
 </tbody>
 </table>
