@@ -1582,7 +1582,7 @@
     "href": "docs/preprocessing/outliers.html",
     "title": "Outlier Detection and Handling",
     "section": "",
-    "text": "Guide for identifying and handling outliers in time series data.\n\n\nOutlier detection is crucial for time series forecasting as extreme values can distort model training and predictions. This module provides robust outlier detection and marking capabilities.\n\n\n\n\n\n\n\n\n\nAPI Reference\n\n\n\nFull API documentation for mark_outliers and the outlier module is auto-generated in the Preprocessing Reference.\n\n\n\n\nThe mark_outliers function identifies and flags outliers in a time series DataFrame. See Preprocessing Reference for the full signature, parameters, and return values.\n\n\n\n\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.outlier import mark_outliers\n\n# Create sample time series data\ndata = pd.DataFrame({\n    'value': [1, 2, 100, 4, 5, 6, 7, 8, 9, 10],  # 100 is an outlier\n})\n\n# Mark outliers\nresult_data, outlier_mask = mark_outliers(\n    data,\n    contamination=0.1,  # Expect 10% contamination\n    columns=['value']\n)\n\nprint(f\"Outliers marked: {outlier_mask.sum()} records\")\n\n\n\nThis module uses isolation forest and other statistical methods to detect: - Sudden spikes or drops - Seasonal anomalies - Drift in baseline values - Sudden shifts in variance",
+    "text": "Guide for identifying and handling outliers in time series data.",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1592,8 +1592,8 @@
     "objectID": "docs/preprocessing/outliers.html#overview",
     "href": "docs/preprocessing/outliers.html#overview",
     "title": "Outlier Detection and Handling",
-    "section": "",
-    "text": "Outlier detection is crucial for time series forecasting as extreme values can distort model training and predictions. This module provides robust outlier detection and marking capabilities.",
+    "section": "Overview",
+    "text": "Overview\nOutlier detection is crucial for time series forecasting as extreme values can distort model training and predictions. This module provides robust outlier detection and marking capabilities.",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1603,8 +1603,8 @@
     "objectID": "docs/preprocessing/outliers.html#key-functions",
     "href": "docs/preprocessing/outliers.html#key-functions",
     "title": "Outlier Detection and Handling",
-    "section": "",
-    "text": "API Reference\n\n\n\nFull API documentation for mark_outliers and the outlier module is auto-generated in the Preprocessing Reference.\n\n\n\n\nThe mark_outliers function identifies and flags outliers in a time series DataFrame. See Preprocessing Reference for the full signature, parameters, and return values.",
+    "section": "Key Functions",
+    "text": "Key Functions\n\n\n\n\n\n\nAPI Reference\n\n\n\nFull API documentation for mark_outliers and the outlier module is auto-generated in the Preprocessing Reference.\n\n\n\nmark_outliers\nThe mark_outliers function identifies and flags outliers in a time series DataFrame. See Preprocessing Reference for the full signature, parameters, and return values.",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1614,8 +1614,8 @@
     "objectID": "docs/preprocessing/outliers.html#examples",
     "href": "docs/preprocessing/outliers.html#examples",
     "title": "Outlier Detection and Handling",
-    "section": "",
-    "text": "import pandas as pd\nfrom spotforecast2_safe.preprocessing.outlier import mark_outliers\n\n# Create sample time series data\ndata = pd.DataFrame({\n    'value': [1, 2, 100, 4, 5, 6, 7, 8, 9, 10],  # 100 is an outlier\n})\n\n# Mark outliers\nresult_data, outlier_mask = mark_outliers(\n    data,\n    contamination=0.1,  # Expect 10% contamination\n    columns=['value']\n)\n\nprint(f\"Outliers marked: {outlier_mask.sum()} records\")",
+    "section": "Examples",
+    "text": "Examples\n\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.outlier import mark_outliers\n\n# Create sample time series data\ndata = pd.DataFrame({\n    'value': [1, 2, 100, 4, 5, 6, 7, 8, 9, 10],  # 100 is an outlier\n})\n\n# Mark outliers\nresult_data, outlier_labels = mark_outliers(\n    data,\n    contamination=0.1,  # Expect 10% contamination\n)\n\noutlier_count = (outlier_labels == -1).sum()\nprint(f\"Outliers marked: {outlier_count} records\")\n\nOutliers marked: 1 records",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1625,8 +1625,8 @@
     "objectID": "docs/preprocessing/outliers.html#detection-methods",
     "href": "docs/preprocessing/outliers.html#detection-methods",
     "title": "Outlier Detection and Handling",
-    "section": "",
-    "text": "This module uses isolation forest and other statistical methods to detect: - Sudden spikes or drops - Seasonal anomalies - Drift in baseline values - Sudden shifts in variance",
+    "section": "Detection Methods",
+    "text": "Detection Methods\nThis module uses isolation forest and other statistical methods to detect: - Sudden spikes or drops - Seasonal anomalies - Drift in baseline values - Sudden shifts in variance",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1834,7 +1834,7 @@
     "href": "index.html#quick-links",
     "title": "Welcome to spotforecast2-safe (Core)",
     "section": "Quick Links",
-    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.17.0",
+    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.17.0-rc.1",
     "crumbs": [
       "Home"
     ]
@@ -1844,7 +1844,7 @@
     "href": "index.html#software-identification-cpe",
     "title": "Welcome to spotforecast2-safe (Core)",
     "section": "Software Identification (CPE)",
-    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.17.0:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
+    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.17.0-rc.1:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
     "crumbs": [
       "Home"
     ]
