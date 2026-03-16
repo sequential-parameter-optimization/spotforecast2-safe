@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="A step-by-step walkthrough of the N-to-1 covariate forecasting pipeline and its test suite.">
 
-<title>forecasterequivalentdate – spotforecast2-safe</title>
+<title>task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,27 +59,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4e7a6ecc11b04d2331dcee725084a9de.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9869d8b7442de1229a34c2db70b9e7b6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-4e7a6ecc11b04d2331dcee725084a9de.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-9869d8b7442de1229a34c2db70b9e7b6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -106,36 +107,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -307,7 +282,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">spotforecast2-safe</span>
     </a>
   </div>
@@ -334,7 +309,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/recursive/ForecasterRecursive.html">Forecaster Guides</a></li><li class="breadcrumb-item"><a href="../../docs/recursive/ForecasterEquivalentDate.html">ForecasterEquivalentDate</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../docs/task_safe_n21_cov_df.html">Task Safe n-to-1 Explained</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -348,13 +323,13 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Home</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/api_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/api_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
@@ -369,7 +344,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
@@ -384,19 +359,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.fetch_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.fetch_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fetch_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.fetch_holiday_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.fetch_holiday_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fetch_holiday_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.fetch_weather_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.fetch_weather_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fetch_weather_data</span></a>
   </div>
 </li>
@@ -413,25 +388,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.exog_builder.ExogBuilder.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.exog_builder.ExogBuilder.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ExogBuilder</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.curate_data.agg_and_resample_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.curate_data.agg_and_resample_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">curate_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.outlier.mark_outliers.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.outlier.mark_outliers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">outlier detection</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.split.split_abs_train_val_test.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.split.split_abs_train_val_test.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">split</span></a>
   </div>
 </li>
@@ -448,31 +423,31 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.base.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.base.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">base</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursive</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterEquivalentDate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.add_y_train_argument.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.add_y_train_argument.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">metrics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
@@ -489,7 +464,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.validation.backtesting_forecaster.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.validation.backtesting_forecaster.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">backtesting_forecaster</span></a>
   </div>
 </li>
@@ -506,19 +481,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.metrics.calculate_metrics.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.metrics.calculate_metrics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">metrics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.trainer.get_last_model.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.trainer.get_last_model.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">trainer</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.predictor.get_model_prediction.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.predictor.get_model_prediction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">predictor</span></a>
   </div>
 </li>
@@ -535,19 +510,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.cpe.get_cpe_identifier.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.cpe.get_cpe_identifier.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cpe</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">generate_holiday</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_y.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_y.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">validation</span></a>
   </div>
 </li>
@@ -555,19 +530,19 @@ window.Quarto = {
   </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/weather.weather_client.WeatherClient.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/weather.weather_client.WeatherClient.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weather</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Downloader</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/exceptions.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/exceptions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Exceptions</span></a>
   </div>
 </li>
@@ -584,7 +559,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/processing/model_persistence.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/processing/model_persistence.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model Persistence</span></a>
   </div>
 </li>
@@ -601,19 +576,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/preprocessing/outliers.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/preprocessing/outliers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Outlier Detection</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/preprocessing/imputation.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/preprocessing/imputation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Imputation &amp; Gap Weighting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Period Configuration Rationale</span></a>
   </div>
 </li>
@@ -621,22 +596,22 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
  <span class="menu-text">Forecaster Guides</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/recursive/ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/recursive/ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursive</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/recursive/ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link active">
+  <a href="../docs/recursive/ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterEquivalentDate</span></a>
   </div>
 </li>
@@ -653,25 +628,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Streamlining Process</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/MODEL_CARD.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/safe/MODEL_CARD.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model/Method Card</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/VERSION_MANAGEMENT.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/safe/VERSION_MANAGEMENT.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Version Management</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/security.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/security.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Security Policy</span></a>
   </div>
 </li>
@@ -679,28 +654,28 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true">
  <span class="menu-text">Tasks</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tasks.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/tasks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Demo Tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/task_safe_demo_explained.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/task_safe_demo_explained.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Safe Demo Explained</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Task Safe n-to-1 Explained</span></a>
   </div>
 </li>
@@ -717,7 +692,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/contributing.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/contributing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contributing Guide</span></a>
   </div>
 </li>
@@ -733,195 +708,275 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#forecasterequivalentdate" id="toc-forecasterequivalentdate" class="nav-link active" data-scroll-target="#forecasterequivalentdate">ForecasterEquivalentDate</a>
-  <ul class="collapse">
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#core-concepts" id="toc-core-concepts" class="nav-link" data-scroll-target="#core-concepts">Core Concepts</a></li>
-  <li><a href="#safety-critical-fallback-mechanism" id="toc-safety-critical-fallback-mechanism" class="nav-link" data-scroll-target="#safety-critical-fallback-mechanism">Safety-Critical Fallback Mechanism</a></li>
-  <li><a href="#functional-examples" id="toc-functional-examples" class="nav-link" data-scroll-target="#functional-examples">Functional Examples</a>
-  <ul class="collapse">
-  <li><a href="#basic-baseline-daily-seasonality" id="toc-basic-baseline-daily-seasonality" class="nav-link" data-scroll-target="#basic-baseline-daily-seasonality">1. Basic Baseline (Daily Seasonality)</a></li>
-  <li><a href="#aggregated-multi-offset-robust-weekly-pattern" id="toc-aggregated-multi-offset-robust-weekly-pattern" class="nav-link" data-scroll-target="#aggregated-multi-offset-robust-weekly-pattern">2. Aggregated Multi-Offset (Robust Weekly Pattern)</a></li>
-  <li><a href="#using-calendar-offsets-handling-business-logic" id="toc-using-calendar-offsets-handling-business-logic" class="nav-link" data-scroll-target="#using-calendar-offsets-handling-business-logic">3. Using Calendar Offsets (Handling Business Logic)</a></li>
-  <li><a href="#advanced-probabilistic-intervals-with-binned-residuals" id="toc-advanced-probabilistic-intervals-with-binned-residuals" class="nav-link" data-scroll-target="#advanced-probabilistic-intervals-with-binned-residuals">4. Advanced: Probabilistic Intervals with Binned Residuals</a></li>
-  </ul></li>
-  <li><a href="#expert-reference-internal-mechanics" id="toc-expert-reference-internal-mechanics" class="nav-link" data-scroll-target="#expert-reference-internal-mechanics">Expert Reference: Internal Mechanics</a>
-  <ul class="collapse">
-  <li><a href="#residual-binning-and-conformal-prediction" id="toc-residual-binning-and-conformal-prediction" class="nav-link" data-scroll-target="#residual-binning-and-conformal-prediction">Residual Binning and Conformal Prediction</a></li>
-  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#covariate-data-preparation" id="toc-covariate-data-preparation" class="nav-link active" data-scroll-target="#covariate-data-preparation">Covariate Data Preparation</a></li>
+  <li><a href="#exogenous-variable-validation" id="toc-exogenous-variable-validation" class="nav-link" data-scroll-target="#exogenous-variable-validation">Exogenous Variable Validation</a></li>
+  <li><a href="#logging-and-timestamp-format" id="toc-logging-and-timestamp-format" class="nav-link" data-scroll-target="#logging-and-timestamp-format">Logging and Timestamp Format</a></li>
+  <li><a href="#the-n-to-1-forecasting-structure" id="toc-the-n-to-1-forecasting-structure" class="nav-link" data-scroll-target="#the-n-to-1-forecasting-structure">The N-to-1 Forecasting Structure</a></li>
+  <li><a href="#feature-engineering-with-covariates" id="toc-feature-engineering-with-covariates" class="nav-link" data-scroll-target="#feature-engineering-with-covariates">Feature Engineering with Covariates</a></li>
+  <li><a href="#integrating-exogenous-variables-into-the-feature-matrix" id="toc-integrating-exogenous-variables-into-the-feature-matrix" class="nav-link" data-scroll-target="#integrating-exogenous-variables-into-the-feature-matrix">Integrating Exogenous Variables into the Feature Matrix</a></li>
+  <li><a href="#prediction-aggregation" id="toc-prediction-aggregation" class="nav-link" data-scroll-target="#prediction-aggregation">Prediction Aggregation</a></li>
+  <li><a href="#timezone-handling" id="toc-timezone-handling" class="nav-link" data-scroll-target="#timezone-handling">Timezone Handling</a></li>
+  <li><a href="#forced-training-vs.-cached-model-loading" id="toc-forced-training-vs.-cached-model-loading" class="nav-link" data-scroll-target="#forced-training-vs.-cached-model-loading">Forced Training vs.&nbsp;Cached Model Loading</a></li>
+  <li><a href="#error-handling" id="toc-error-handling" class="nav-link" data-scroll-target="#error-handling">Error Handling</a></li>
+  <li><a href="#kwargs-flexibility" id="toc-kwargs-flexibility" class="nav-link" data-scroll-target="#kwargs-flexibility">Kwargs Flexibility</a></li>
+  <li><a href="#integration-the-complete-pipeline" id="toc-integration-the-complete-pipeline" class="nav-link" data-scroll-target="#integration-the-complete-pipeline">Integration: The Complete Pipeline</a></li>
+  <li><a href="#the-complete-execution-flow" id="toc-the-complete-execution-flow" class="nav-link" data-scroll-target="#the-complete-execution-flow">The Complete Execution Flow</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/recursive/ForecasterEquivalentDate.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/task_safe_n21_cov_df.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/recursive/ForecasterRecursive.html">Forecaster Guides</a></li><li class="breadcrumb-item"><a href="../../docs/recursive/ForecasterEquivalentDate.html">ForecasterEquivalentDate</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
 
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../docs/task_safe_n21_cov_df.html">Task Safe n-to-1 Explained</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained</h1>
+</div>
+
+<div>
+  <div class="description">
+    A step-by-step walkthrough of the N-to-1 covariate forecasting pipeline and its test suite.
+  </div>
+</div>
 
 
+<div class="quarto-title-meta">
 
-<section id="forecasterequivalentdate" class="level1">
-<h1>ForecasterEquivalentDate</h1>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In the realm of time series forecasting, especially within safety-critical systems, robustness and interpretability are paramount. While complex machine learning models like Gradient Boosting or Neural Networks often provide superior accuracy, they can be “black boxes” that behave unpredictably when encountering data distributions different from their training set.</p>
-<p><code>ForecasterEquivalentDate</code> is a specialized forecaster designed to provide a highly interpretable, reliable baseline. It operates on a simple yet powerful principle: history repeats itself. By identifying “equivalent dates” in the past (e.g., the same day last week or the same hour yesterday), it generates forecasts that are naturally grounded in observed reality.</p>
-<p>This class is part of the <code>spotforecast2_safe</code> package, emphasizing its role in building resilient forecasting pipelines where a simple, verifiable fallback is often more valuable than a fragile, complex one.</p>
-<hr>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The <code>task_safe_n_to_1_with_covariates_and_dataframe</code> script extends the baseline forecasting pipeline by adding exogenous covariates — weather observations, public holidays, and automatically engineered calendar features. The outcome is a signed weighted aggregation of 11 per-column recursive forecasts into a single combined prediction. Every public parameter is validated, every sensitive value is masked in log output, and every execution path is wrapped in structured error handling.</p>
+<p>The test suite in <code>tests/test_task_safe_n_to_1_with_covariates.py</code> decomposes this pipeline into isolated units so that a failure in any stage surfaces as a specific, attributable assertion error rather than a silent mismatch at evaluation time. The classes below follow the logical execution order of the pipeline.</p>
+<section id="covariate-data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="covariate-data-preparation">Covariate Data Preparation</h2>
+<p>Before any model is trained, the pipeline constructs three categories of exogenous features. The <code>TestCovariateDataPreperation</code> class verifies that each category satisfies its structural contract.</p>
+<p>Weather data arrives as a DataFrame with a <code>DatetimeIndex</code> and columns for temperature, humidity, and wind speed. The test confirms the exact shape <code>(100, 3)</code> and the presence of all three column names. This is not cosmetic: downstream feature-engineering code selects columns by name, so a missing column produces a <code>KeyError</code> rather than a silently degraded feature set.</p>
+<p>Holiday data must be binary — every entry is either <code>0</code> (non-holiday) or <code>1</code> (holiday). The test calls <code>set(holidays.unique()).issubset({0, 1})</code> to confirm that no fractional or multi-valued entries have slipped through. Any departure from binary encoding would distort the model’s ability to isolate the holiday effect.</p>
+<p>Calendar features — day of week, day of month, month, quarter, weekend flag — are derived directly from the <code>DatetimeIndex</code>. The test verifies that <code>day_of_week</code> spans 0–6, that <code>month</code> spans 1–12, and that the total row count equals 365. These bounds are the minimum necessary to confirm that no date arithmetic has produced impossible values.</p>
+<p>Cyclical encoding replaces raw integer months with sine and cosine components so that December and January are numerically close. The test confirms that both components are bounded strictly within <code>[-1, 1]</code>, which is the mathematical guarantee of the unit-circle encoding.</p>
+<div id="0509b9b6" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">365</span>, freq<span class="op">=</span><span class="st">"D"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>month <span class="op">=</span> dates.month</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>month_sin <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>month_cos <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"month"</span>: month[:<span class="dv">6</span>], <span class="st">"sin"</span>: month_sin[:<span class="dv">6</span>].<span class="bu">round</span>(<span class="dv">4</span>), <span class="st">"cos"</span>: month_cos[:<span class="dv">6</span>].<span class="bu">round</span>(<span class="dv">4</span>)},</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>dates[:<span class="dv">6</span>],</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">month</th>
+<th data-quarto-table-cell-role="th">sin</th>
+<th data-quarto-table-cell-role="th">cos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01</td>
+<td>1</td>
+<td>0.5</td>
+<td>0.866</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-02</td>
+<td>1</td>
+<td>0.5</td>
+<td>0.866</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-03</td>
+<td>1</td>
+<td>0.5</td>
+<td>0.866</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-04</td>
+<td>1</td>
+<td>0.5</td>
+<td>0.866</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-05</td>
+<td>1</td>
+<td>0.5</td>
+<td>0.866</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-06</td>
+<td>1</td>
+<td>0.5</td>
+<td>0.866</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
-<section id="core-concepts" class="level2">
-<h2 class="anchored" data-anchor-id="core-concepts">Core Concepts</h2>
-<p>The <code>ForecasterEquivalentDate</code> relies on three primary parameters to define its behavior:</p>
-<ol type="1">
-<li>Offset: Defines how far back in time to look for the “equivalent” data.
-<ul>
-<li>Integer: Represents a fixed number of steps (e.g., <code>offset=24</code> for hourly data to look at the same hour yesterday).</li>
-<li>Pandas DateOffset: Robustly handles calendar logic (e.g., <code>pd.offsets.Week(1)</code> to look at the same day/time last week, even accounting for variable frequencies or business days).</li>
-</ul></li>
-<li>n_offsets: The number of historical equivalent periods to consider. Instead of just looking at <em>one</em> equivalent date, you can look at the last <em>N</em> occurrences (e.g., the last 4 Mondays).</li>
-<li>agg_func: The function used to aggregate values if <code>n_offsets &gt; 1</code>. Common choices include <code>np.mean</code>, <code>np.median</code>, <code>np.max</code>, or <code>np.min</code>.</li>
-</ol>
-<hr>
+<section id="exogenous-variable-validation" class="level2">
+<h2 class="anchored" data-anchor-id="exogenous-variable-validation">Exogenous Variable Validation</h2>
+<p>The <code>TestExogenousVariableValidation</code> class enforces four structural invariants that must hold before the exogenous DataFrame is passed to the forecaster.</p>
+<p>The exogenous matrix must have exactly the same number of rows as the target series and an identical index. The test creates both objects on the same <code>DatetimeIndex</code> and checks <code>exog.index.equals(y.index)</code>. A mismatch here would cause <code>ForecasterRecursive.fit</code> to raise an alignment error, but verifying it before training saves the cost of constructing lag matrices for an incompatible input.</p>
+<p>Missing features are detected by comparing the actual column list against a required set. If a required column is absent, the gap is made explicit rather than letting a downstream <code>KeyError</code> propagate with an opaque stack trace.</p>
+<p>NaN handling is tested by confirming that two missing values survive <code>exog.isna().sum().sum()</code> and that forward-fill removes all of them. The <code>ffill()</code> strategy is appropriate for weather and calendar data because the last observed value is the most conservative assumption in the absence of new information.</p>
+<div id="4190a68f" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>exog <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"feat1"</span>: [<span class="fl">1.0</span>, <span class="fl">2.0</span>, np.nan, <span class="fl">4.0</span>, <span class="fl">5.0</span>],</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"feat2"</span>: [<span class="fl">10.0</span>, np.nan, <span class="fl">30.0</span>, <span class="fl">40.0</span>, <span class="fl">50.0</span>],</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NaNs before ffill: </span><span class="sc">{</span>exog<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>exog_filled <span class="op">=</span> exog.ffill()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NaNs after  ffill: </span><span class="sc">{</span>exog_filled<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NaNs before ffill: 2
+NaNs after  ffill: 0</code></pre>
+</div>
+</div>
 </section>
-<section id="safety-critical-fallback-mechanism" class="level2">
-<h2 class="anchored" data-anchor-id="safety-critical-fallback-mechanism">Safety-Critical Fallback Mechanism</h2>
-<p>In safety-critical environments (such as energy grid management, medical monitoring, or autonomous industrial processes), a failure in the primary forecasting model can have severe consequences. <code>ForecasterEquivalentDate</code> serves as an ideal fallback mechanism due to the following properties:</p>
-<ul>
-<li>Low Complexity: It has virtually no “model risk.” The forecast is a direct reflection of historical data.</li>
-<li>High Interpretability: Every prediction can be traced back to specific historical dates and values. If a prediction looks wrong, a human operator can immediately see which historical dates were used.</li>
-<li>Resilience to Outliers: By using <code>n_offsets &gt; 1</code> with <code>agg_func=np.median</code>, the forecaster becomes extremely robust to historical anomalies.</li>
-<li>No Training Required: Unlike ML models that require a complex <code>fit</code> process on large datasets, this forecaster essentially “remembers” the recent window, making it ready to use almost instantly.</li>
-<li>Probabilistic Confidence: Through its integration with Conformal Prediction, it provides statistically sound uncertainty intervals, allowing the system to quantify the risk of the baseline forecast.</li>
-</ul>
-<hr>
+<section id="logging-and-timestamp-format" class="level2">
+<h2 class="anchored" data-anchor-id="logging-and-timestamp-format">Logging and Timestamp Format</h2>
+<p>The <code>TestLoggingForCovariates</code> class tests two aspects of the dual-handler logging system used throughout the covariate pipeline.</p>
+<p>The first test verifies that attaching a <code>StreamHandler</code> with a standard formatter results in a logger with at least one handler and level <code>INFO</code>. The N-to-1 pipeline sets this level rather than <code>DEBUG</code> because it is the outermost user-facing task: operators need progress updates, not internal variable traces.</p>
+<p>The second test verifies the timestamp format <code>YYYYMMDD_HHMMSS</code>. A 15-character string, an underscore at position 8, and an all-digit date component are the three assertions. This format is used in log file names, so any deviation would produce files that sort incorrectly by creation time in a directory listing — a subtle but consequential problem in audit contexts where log files are reviewed chronologically.</p>
 </section>
-<section id="functional-examples" class="level2">
-<h2 class="anchored" data-anchor-id="functional-examples">Functional Examples</h2>
-<section id="basic-baseline-daily-seasonality" class="level3">
-<h3 class="anchored" data-anchor-id="basic-baseline-daily-seasonality">1. Basic Baseline (Daily Seasonality)</h3>
-<p>This example demonstrates the simplest usage: using the value from exactly one week ago as the forecast for today.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterEquivalentDate</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Prepare a synthetic daily series with a weekly pattern</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">'2023-01-01'</span>, periods<span class="op">=</span><span class="dv">21</span>, freq<span class="op">=</span><span class="st">'D'</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Sine wave with 7-day period + noise</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> <span class="dv">10</span> <span class="op">+</span> <span class="dv">5</span> <span class="op">*</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> np.arange(<span class="dv">21</span>) <span class="op">/</span> <span class="dv">7</span>) <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">21</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(data, index<span class="op">=</span>index, name<span class="op">=</span><span class="st">"energy_consumption"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Define the forecaster: look back 7 days</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterEquivalentDate(offset<span class="op">=</span><span class="dv">7</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. "Fit" the forecaster (stores the necessary history)</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y<span class="op">=</span>y)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Predict the next 3 days</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Predictions for next 3 days:"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(predictions)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the first prediction matches the value from 7 days ago</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>last_known_equivalent <span class="op">=</span> y.iloc[<span class="op">-</span><span class="dv">7</span>]</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Value 7 days ago: </span><span class="sc">{</span>last_known_equivalent<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Prediction for tomorrow: </span><span class="sc">{</span>predictions<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="the-n-to-1-forecasting-structure" class="level2">
+<h2 class="anchored" data-anchor-id="the-n-to-1-forecasting-structure">The N-to-1 Forecasting Structure</h2>
+<p>The <code>TestNto1ForecastingPipeline</code> class establishes the data structure contracts for the recursive forecasting stage.</p>
+<p>The basic structure test creates a Series of length <code>100 + horizon</code> to represent the full available history. The extra <code>horizon</code> rows will become the test set; only the first 100 rows feed the training stage. Constructing the Series with this combined length from the start avoids off-by-one errors when slicing at the train/test boundary.</p>
+<p>The recursive forecaster is initialised with <code>LGBMRegressor(n_estimators=100, learning_rate=0.1, random_state=42, verbose=-1)</code>. The test confirms that the estimator attributes match the provided values, which establishes that the <code>LGBMRegressor</code> constructor accepted the parameters without silently ignoring any of them. This is important because some sklearn-compatible estimators silently clip or ignore out-of-range parameters.</p>
+<p>Multi-output forecasting produces a one-dimensional array of length <code>steps</code>. The test confirms <code>forecast_array.ndim == 1</code> to distinguish the multi-step output from a two-dimensional matrix that would indicate an accidental multi-target configuration.</p>
 </section>
-<section id="aggregated-multi-offset-robust-weekly-pattern" class="level3">
-<h3 class="anchored" data-anchor-id="aggregated-multi-offset-robust-weekly-pattern">2. Aggregated Multi-Offset (Robust Weekly Pattern)</h3>
-<p>For increased safety, we can average the values from the last 3 equivalent dates. This smooths out individual day anomalies.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterEquivalentDate</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">'2023-01-01'</span>, periods<span class="op">=</span><span class="dv">35</span>, freq<span class="op">=</span><span class="st">'D'</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.arange(<span class="dv">35</span>) <span class="op">%</span> <span class="dv">7</span> <span class="co"># Repeating 0-6 pattern</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(data, index<span class="op">=</span>index)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregated forecaster: Mean of the last 3 weeks (offset 7, 14, 21)</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterEquivalentDate(</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    offset<span class="op">=</span><span class="dv">7</span>, </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    n_offsets<span class="op">=</span><span class="dv">3</span>, </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    agg_func<span class="op">=</span>np.mean</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y<span class="op">=</span>y)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Forecasted week (should be 0-6):"</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(predictions.values)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="using-calendar-offsets-handling-business-logic" class="level3">
-<h3 class="anchored" data-anchor-id="using-calendar-offsets-handling-business-logic">3. Using Calendar Offsets (Handling Business Logic)</h3>
-<p>In many systems, “one week ago” isn’t a fixed number of steps but a calendar concept. <code>ForecasterEquivalentDate</code> supports <code>pd.DateOffset</code> for these scenarios.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterEquivalentDate</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Hourly data with Business Day logic</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">'2023-01-01'</span>, periods<span class="op">=</span><span class="dv">100</span>, freq<span class="op">=</span><span class="st">'h'</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(<span class="bu">range</span>(<span class="dv">100</span>), index<span class="op">=</span>index)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Look back exactly one business week</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This is more robust than offset=168 (24*7) if the data has gaps or irregular holidays</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterEquivalentDate(offset<span class="op">=</span>pd.offsets.BusinessDay(<span class="dv">5</span>))</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y<span class="op">=</span>y)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Predictions using BusinessDay offset:"</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(predictions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="advanced-probabilistic-intervals-with-binned-residuals" class="level3">
-<h3 class="anchored" data-anchor-id="advanced-probabilistic-intervals-with-binned-residuals">4. Advanced: Probabilistic Intervals with Binned Residuals</h3>
-<p>In safety-critical systems, point forecasts are rarely enough. We need to know how much to trust the fallback.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterEquivalentDate</span>
+<section id="feature-engineering-with-covariates" class="level2">
+<h2 class="anchored" data-anchor-id="feature-engineering-with-covariates">Feature Engineering with Covariates</h2>
+<p>The <code>TestCovariateFeatureEngineering</code> class validates three feature construction patterns used by the pipeline.</p>
+<p>Polynomial features are computed by stacking <code>x</code>, <code>x**2</code>, and <code>x**3</code> into a matrix. The test confirms the shape <code>(5, 3)</code> and verifies that the first column is identical to the original input and the second column equals its square. This establishes that no column reordering or normalisation has been applied, which matters because the aggregation weights are positionally indexed.</p>
+<p>Lag features are created with <code>y.shift(i)</code> for <code>i</code> in <code>[1, 2, 3]</code>. The test checks that the first row of <code>lag_1</code> is NaN, confirming that the shift operation introduces the expected initial missing values rather than wrapping around or filling with zeros.</p>
+<p>Rolling window features are computed with <code>y.rolling(window=7).mean()</code>. The test confirms that the first six values are NaN — a direct consequence of requiring a full window before computing the first valid mean. Any model trained without respecting this warm-up period would use NaN-contaminated features for the earliest training rows.</p>
+<div id="9fee80b2" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(np.arange(<span class="dv">1</span>, <span class="dv">11</span>, dtype<span class="op">=</span><span class="bu">float</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lags <span class="op">=</span> pd.DataFrame({<span class="ss">f"lag_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>: y.shift(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>)})</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>rolling_mean <span class="op">=</span> y.rolling(window<span class="op">=</span><span class="dv">7</span>).mean()</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate data with increasing noise (heteroscedasticity)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">'2023-01-01'</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">'D'</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>noise <span class="op">=</span> np.random.normal(<span class="dv">0</span>, np.linspace(<span class="fl">0.1</span>, <span class="fl">2.0</span>, n), n)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(<span class="dv">10</span> <span class="op">+</span> noise, index<span class="op">=</span>index)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecaster with Residual Binning</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># This allows the uncertainty intervals to vary depending on the predicted value</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterEquivalentDate(</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    offset<span class="op">=</span><span class="dv">7</span>,</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    n_offsets<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    binner_kwargs<span class="op">=</span>{<span class="st">'n_bins'</span>: <span class="dv">5</span>}</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Store in-sample residuals to calibrate the intervals</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y<span class="op">=</span>y, store_in_sample_residuals<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict intervals (90% confidence)</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>intervals <span class="op">=</span> forecaster.predict_interval(</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span><span class="dv">7</span>, </span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    interval<span class="op">=</span>[<span class="dv">5</span>, <span class="dv">95</span>] </span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Predictions with Confidence Intervals:"</span>)</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(intervals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Lag features (first 5 rows):"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lags.head())</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Rolling mean NaNs in first 6 positions: </span><span class="sc">{</span>rolling_mean<span class="sc">.</span>iloc[:<span class="dv">6</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Lag features (first 5 rows):
+   lag_1  lag_2  lag_3
+0    NaN    NaN    NaN
+1    1.0    NaN    NaN
+2    2.0    1.0    NaN
+3    3.0    2.0    1.0
+4    4.0    3.0    2.0
+
+Rolling mean NaNs in first 6 positions: 6</code></pre>
+</div>
+</div>
 </section>
+<section id="integrating-exogenous-variables-into-the-feature-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="integrating-exogenous-variables-into-the-feature-matrix">Integrating Exogenous Variables into the Feature Matrix</h2>
+<p>The <code>TestExogenousIntegration</code> class tests how exogenous features are merged with lag features to form the complete training matrix.</p>
+<p>The feature matrix expansion test creates a base matrix of 5 columns and an exogenous matrix of 3 columns, then combines them with <code>np.column_stack</code>. The result must have exactly 8 columns. This verifies that column stacking does not drop any features and does not introduce duplicates.</p>
+<p>The lag-and-exog combination test uses <code>pd.concat([y_lags, exog], axis=1)</code> and confirms the combined column count is 4 (two lags plus two exogenous features). The presence of both <code>y_lag_1</code> and <code>temp</code> in the column set confirms that the concatenation preserved column names, which <code>ForecasterRecursive</code> uses when calling <code>estimator.fit</code>.</p>
 </section>
-<section id="expert-reference-internal-mechanics" class="level2">
-<h2 class="anchored" data-anchor-id="expert-reference-internal-mechanics">Expert Reference: Internal Mechanics</h2>
-<section id="residual-binning-and-conformal-prediction" class="level3">
-<h3 class="anchored" data-anchor-id="residual-binning-and-conformal-prediction">Residual Binning and Conformal Prediction</h3>
-<p>The <code>ForecasterEquivalentDate</code> implements a binned approach to conformal prediction. When <code>fit(store_in_sample_residuals=True)</code> is called: 1. The forecaster calculates historical “forecasts” for the training period. 2. Residuals (<span class="math inline">\(y_{true} - y_{pred}\)</span>) are calculated. 3. Predicted values are split into bins (quantiles) using the <code>binner</code>. 4. Residuals are associated with their corresponding bin based on the predicted value. 5. When <code>predict_interval()</code> is called, the forecaster uses the distribution of residuals from the relevant bin to calculate the bounds. This allows for narrower intervals when the model is historically more accurate and wider intervals when it is less certain.</p>
+<section id="prediction-aggregation" class="level2">
+<h2 class="anchored" data-anchor-id="prediction-aggregation">Prediction Aggregation</h2>
+<p>The <code>TestPredictionAggregation</code> class mirrors the <code>TestAggregatePredict</code> class from the demo task but extends it with temporal index preservation.</p>
+<p>The basic aggregation test uses positive fractional weights <code>[0.5, 0.3, 0.2]</code> that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.</p>
+<p>The unequal importance test verifies the ordering <code>high_priority &gt; medium_priority &gt; low_priority</code> directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.</p>
+<p>The temporal index preservation test reconstructs the aggregated Series with the original <code>DatetimeIndex</code> and calls <code>aggregated_series.index.equals(dates)</code>. This confirms that the matrix multiplication idiom <code>predictions.values @ np.array(weights)</code> — which returns a plain <code>np.ndarray</code> — does not silently discard the temporal index when it is re-attached via <code>pd.Series(aggregated, index=dates)</code>.</p>
+<div id="30d93ce3" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">"h"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    np.random.randn(<span class="dv">10</span>, <span class="dv">3</span>), index<span class="op">=</span>dates, columns<span class="op">=</span>[<span class="st">"loc_1"</span>, <span class="st">"loc_2"</span>, <span class="st">"loc_3"</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="fl">0.2</span>])</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>aggregated <span class="op">=</span> pd.Series(predictions.values <span class="op">@</span> weights, index<span class="op">=</span>dates)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(aggregated.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2020-01-01 00:00:00   -0.245844
+2020-01-01 01:00:00    1.397998
+2020-01-01 02:00:00    0.215520
+2020-01-01 03:00:00    0.621243
+2020-01-01 04:00:00    0.912090
+Freq: h, dtype: float64</code></pre>
+</div>
+</div>
 </section>
-<section id="limitations" class="level3">
-<h3 class="anchored" data-anchor-id="limitations">Limitations</h3>
-<p>While excellent as a fallback, this forecaster does not: * Account for exogenous variables (e.g., weather, holidays). * Capture trends (it assumes the future level will be similar to the past level). * Modify its behavior based on recent forecast errors (it’s not adaptive in the short term).</p>
-<p>For these reasons, it should always be used in tandem with more sophisticated models or as a “sanity check” boundary.</p>
+<section id="timezone-handling" class="level2">
+<h2 class="anchored" data-anchor-id="timezone-handling">Timezone Handling</h2>
+<p>The <code>TestCovariateTimezone</code> class addresses a recurring source of alignment failures in time series pipelines: mixed timezone-aware and timezone-naive indices.</p>
+<p>The first test creates a UTC-indexed Series and confirms that <code>y.index.tz is not None</code> and that the timezone string is <code>"UTC"</code>. A <code>None</code> timezone indicates a tz-naive index, which cannot be compared with a tz-aware index without an explicit <code>tz_localize</code> call.</p>
+<p>The conversion test uses <code>tz_convert("US/Eastern")</code> to move from UTC to Eastern time and confirms that the result has a non-<code>None</code> timezone. This is relevant when the pipeline is deployed in a timezone other than UTC: the model’s training data and the forecast period must share a consistent timezone, or the lag indices will misalign by a constant offset equal to the UTC offset.</p>
+<p>The consistency test creates both <code>y</code> and <code>exog</code> on the same UTC index and verifies <code>str(y.index.tz) == str(exog.index.tz)</code>. A mismatch between the target and exogenous timezone would cause <code>ForecasterRecursive.fit</code> to raise an error when it attempts to align the two inputs.</p>
+</section>
+<section id="forced-training-vs.-cached-model-loading" class="level2">
+<h2 class="anchored" data-anchor-id="forced-training-vs.-cached-model-loading">Forced Training vs.&nbsp;Cached Model Loading</h2>
+<p>The <code>TestForcedTraining</code> class tests the persistence decision logic that controls whether the pipeline trains a new model or loads a previously serialised one.</p>
+<p>The <code>force_train</code> flag maps directly to the action string <code>"retrain_model"</code> when <code>True</code> and <code>"load_cached_model"</code> when <code>False</code>. This test formalises the boolean semantics in isolation from the actual file I/O, confirming that the branching logic is correct before it interacts with the filesystem.</p>
+<p>The directory creation test calls <code>Path.mkdir(parents=True, exist_ok=True)</code> on a path under <code>/tmp</code> and verifies that the directory exists afterwards. The <code>exist_ok=True</code> flag prevents a <code>FileExistsError</code> on repeated runs, which is the correct behaviour for a pipeline that may be invoked multiple times with the same model directory.</p>
+</section>
+<section id="error-handling" class="level2">
+<h2 class="anchored" data-anchor-id="error-handling">Error Handling</h2>
+<p>The <code>TestErrorHandlingCovariates</code> class covers three failure modes that are specific to the covariate pipeline.</p>
+<p>The missing exog detection test computes the shortfall when only 20 steps of exogenous data are provided for a 24-step forecast horizon. The result <code>horizon - exog_provided == 4</code> establishes the arithmetic that the validation layer must implement to produce a meaningful error message rather than an implicit out-of-bounds slice.</p>
+<p>The misaligned index test creates <code>y</code> with 100 rows and <code>exog</code> with 95 rows, then computes their index intersection. The intersection contains 95 elements, confirming that the safe strategy is to restrict computation to the common index rather than raising an error. This mirrors the <code>dropna</code>/<code>intersection</code> pattern used in the demo task.</p>
+<p>The invalid horizon test confirms that <code>-24</code> is not a member of the accepted horizons <code>[6, 12, 24, 48, 168]</code> and that it is negative. This validates the guard condition that <code>n2n_predict_with_covariates</code> enforces at its entry point.</p>
+</section>
+<section id="kwargs-flexibility" class="level2">
+<h2 class="anchored" data-anchor-id="kwargs-flexibility">Kwargs Flexibility</h2>
+<p>The <code>TestKwargsFlexibility</code> class verifies that the <code>**kwargs</code> mechanism correctly forwards parameters through the pipeline layers.</p>
+<p>The estimator kwargs test confirms that a dictionary with <code>n_estimators=500</code>, <code>learning_rate=0.05</code>, and <code>num_leaves=100</code> retains all three keys and values. The <code>n_to_1_with_covariates</code> function collects these in a <code>forecast_kwargs</code> dictionary before passing them to <code>n2n_predict_with_covariates</code>, so the forwarding chain must preserve each key without mutation.</p>
+<p>The forecaster kwargs test checks that <code>lags=[1, 7, 24]</code> and <code>window_size=72</code> survive the forwarding. Using a list for <code>lags</code> instead of a scalar activates the skforecast multi-lag construction path, so the type must be preserved exactly.</p>
+<p>The aggregation kwargs test verifies that <code>method</code> and <code>normalize_weights</code> entries are accessible after construction. These parameters control how <code>agg_predict</code> normalises the weight vector, and their presence in the kwargs dictionary is the precondition for the aggregation stage to respect user-specified aggregation semantics.</p>
+</section>
+<section id="integration-the-complete-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="integration-the-complete-pipeline">Integration: The Complete Pipeline</h2>
+<p>The <code>TestIntegrationN2N</code> class tests the properties that only emerge when all components operate together.</p>
+<p>The end-to-end structure test constructs a 100-row hourly Series named <code>load</code> alongside a two-column exogenous DataFrame with <code>temperature</code> and <code>hour</code> columns on the same index. The three assertions — correct Series length, correct exog shape, and identical indices — are the minimum conditions for a successful call to <code>ForecasterRecursive.fit(y, exog=exog)</code>.</p>
+<p>The output consistency test simulates the pipeline’s return value: a <code>(24, 11)</code> predictions DataFrame, a 24-element aggregated Series, and a metrics dictionary with <code>MAE</code> and <code>MSE</code> keys. Verifying the shape of the predictions DataFrame confirms that the multi-output forecasting produced the expected number of timesteps and columns before aggregation.</p>
+<p>The reproducibility test seeds <code>np.random</code> with <code>42</code>, draws 10 values, reseeds, and draws again. Exact equality between the two arrays confirms that the seed resets the PRNG state completely. In the pipeline, <code>random_state=42</code> is passed to <code>LGBMRegressor</code> for the same reason: two runs with identical input must produce identical output, which is a core requirement of the safety-critical design.</p>
+<div id="b4e5c5bd" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>seed <span class="op">=</span> <span class="dv">42</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(seed)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>data_1 <span class="op">=</span> np.random.randn(<span class="dv">10</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(seed)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>data_2 <span class="op">=</span> np.random.randn(<span class="dv">10</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Arrays identical: </span><span class="sc">{</span>(data_1 <span class="op">==</span> data_2)<span class="sc">.</span><span class="bu">all</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"First 5 values:   </span><span class="sc">{</span>data_1[:<span class="dv">5</span>]<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Arrays identical: True
+First 5 values:   [ 0.4967 -0.1383  0.6477  1.523  -0.2342]</code></pre>
+</div>
+</div>
+</section>
+<section id="the-complete-execution-flow" class="level2">
+<h2 class="anchored" data-anchor-id="the-complete-execution-flow">The Complete Execution Flow</h2>
+<p>A single invocation of <code>task_safe_n_to_1_with_covariates_and_dataframe</code> follows this sequence. The optional logging system is activated first if <code>--logging true</code> is passed. The <code>fetch_data</code> call loads the target time series from the configured data file. Feature engineering then constructs the exogenous matrix: calendar features from the <code>DatetimeIndex</code>, optionally extended with weather windows, holiday indicators, and polynomial interaction terms. The <code>n2n_predict_with_covariates</code> function trains one <code>ForecasterRecursive</code> per target column with the assembled exogenous inputs, serialises each model to the model directory, and returns the prediction DataFrame. Geographic coordinates are redacted from all log output at every level per CWE-312 and CWE-532. The 11-column prediction DataFrame is reduced to a single combined forecast by <code>agg_predict</code> using the <code>DEFAULT_WEIGHTS</code> vector. The combined prediction is printed to stdout and logged to the timestamped log file if logging is enabled.</p>
+<p>The test suite mirrors this flow by isolating each stage into a dedicated class, so a regression in any component produces a targeted failure that pinpoints the affected stage without requiring a full pipeline run.</p>
 
 
-</section>
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1352,7 +1407,7 @@ window.Quarto = {
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/recursive/ForecasterEquivalentDate.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/task_safe_n21_cov_df.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
@@ -1362,5 +1417,5 @@ window.Quarto = {
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

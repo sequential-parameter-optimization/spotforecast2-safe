@@ -77,6 +77,149 @@
     ]
   },
   {
+    "objectID": "docs/task_safe_demo_explained.html",
+    "href": "docs/task_safe_demo_explained.html",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "",
+    "text": "The task_safe_demo script is the canonical end-to-end demonstration of the spotforecast2-safe forecasting system. It compares three forecasting pipelines against a common ground truth and logs every execution step in a safety-critical way. The test suite in tests/test_task_safe_demo.py does not invoke the full pipeline directly — instead it decomposes the script’s internal components into isolated, verifiable units. Understanding each test class therefore means understanding what the script does and why each piece must behave in a specific way.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#the-configuration-contract",
+    "href": "docs/task_safe_demo_explained.html#the-configuration-contract",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "The Configuration Contract",
+    "text": "The Configuration Contract\nBefore any computation begins, task_safe_demo constructs a DemoConfig object. DemoConfig is a frozen dataclass, which means its fields cannot be modified after creation. This immutability is intentional: in safety-critical systems a configuration that can be silently overwritten mid-run is a liability, not a convenience.\nThe TestDemoConfig class verifies that the defaults are meaningful. A forecast_horizon of 24 corresponds to a 24-step-ahead prediction, typically one full day of hourly data. A contamination of 0.01 tells the outlier detector to treat roughly 1% of the training set as anomalous. The window_size of 72 defines how many timesteps are used in the rolling feature window, and random_seed=42 pins all stochastic operations to a reproducible state.\nThe 11-element weights list is equally deliberate. The task aggregates predictions from 11 time series columns into a single combined forecast using a signed weighted average. Some weights are negative, which means those columns enter the combination with reversed sign. The test confirms there are exactly 7 positive weights and 4 negative weights — a contract that must hold for the aggregation arithmetic to produce the intended result.\n\nfrom spotforecast2_safe.manager.datasets.demo_data import DemoConfig\n\nconfig = DemoConfig()\nprint(f\"forecast_horizon : {config.forecast_horizon}\")\nprint(f\"contamination    : {config.contamination}\")\nprint(f\"window_size      : {config.window_size}\")\nprint(f\"random_seed      : {config.random_seed}\")\nprint(f\"weights          : {config.weights}\")\n\nforecast_horizon : 24\ncontamination    : 0.01\nwindow_size      : 72\nrandom_seed      : 42\nweights          : [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#metrics-as-the-evaluation-language",
+    "href": "docs/task_safe_demo_explained.html#metrics-as-the-evaluation-language",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Metrics as the Evaluation Language",
+    "text": "Metrics as the Evaluation Language\nOnce predictions exist they must be evaluated. The calculate_metrics function returns a dictionary with two keys, MAE and MSE, computed directly from the difference series actual - predicted. The TestCalculateMetrics class establishes three behavioral guarantees.\nWhen a model’s predictions are identical to the actuals, both metrics must be exactly zero. This sounds obvious but is the anchor point for all threshold-based safety assertions downstream. When predictions are uniformly offset by a constant — say, every prediction is one unit too high — the MAE equals that offset and the MSE equals its square. The third scenario introduces a NaN in the actual series and confirms that pandas’ default mean() skips missing values, so the metric calculation degrades gracefully rather than producing a silent NaN result.\n\nimport pandas as pd\nimport numpy as np\nfrom spotforecast2_safe.manager.metrics import calculate_metrics\n\nactual    = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])\npredicted = pd.Series([2.0, 3.0, 4.0, 5.0, 6.0])\nmetrics   = calculate_metrics(actual, predicted)\nprint(f\"constant offset → MAE={metrics['MAE']:.1f}, MSE={metrics['MSE']:.1f}\")\n\nactual_with_nan = pd.Series([1.0, np.nan, 3.0, 4.0, 5.0])\nmetrics_nan = calculate_metrics(actual_with_nan, predicted)\nprint(f\"with NaN        → MAE={metrics_nan['MAE']:.4f} (no NaN propagation)\")\n\nconstant offset → MAE=1.0, MSE=1.0\nwith NaN        → MAE=1.0000 (no NaN propagation)",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#logging-as-an-audit-trail",
+    "href": "docs/task_safe_demo_explained.html#logging-as-an-audit-trail",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Logging as an Audit Trail",
+    "text": "Logging as an Audit Trail\nThe TestLogging class is not about forecasting — it is about the operational contract. task_safe_demo routes all messages through a dual-handler logger: one handler writes to the terminal for real-time visibility, the other persists a timestamped log file for post-hoc auditing. The test verifies that after calling setup_logging the resulting logger object has at least one handler attached and that its level is set to DEBUG, so nothing is silently suppressed.\nThe second test confirms that the formatter string %(name)s is present in the handler’s format template. This may appear pedantic, but in a safety-critical context the ability to trace a log message back to its originating module is part of the auditability requirement. A formatter without %(name)s would produce ambiguous output that cannot be attributed to a specific component.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#boolean-argument-parsing",
+    "href": "docs/task_safe_demo_explained.html#boolean-argument-parsing",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Boolean Argument Parsing",
+    "text": "Boolean Argument Parsing\nCommand-line scripts receive all arguments as strings. The --force_train and --logging flags therefore need a parser that converts user-supplied tokens like \"true\", \"True\", \"t\", \"yes\", or \"1\" to the Python boolean True. The _parse_bool function handles this by normalising the input to lowercase before matching against known sets.\nThe TestBooleanParsing class checks that all eight canonical true-like strings produce True, all eight false-like strings produce False, and that an unrecognised input like \"maybe\" raises a ValueError rather than silently defaulting. Silent defaulting is precisely the class of failure that safety-critical code must eliminate: if a user miskeys --force_train mabye, the process should stop immediately with an informative error rather than silently choosing a default that may trigger unintended retraining.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#prediction-aggregation",
+    "href": "docs/task_safe_demo_explained.html#prediction-aggregation",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Prediction Aggregation",
+    "text": "Prediction Aggregation\nThe core of task_safe_demo is the comparison of three distinct pipelines. Each pipeline produces one prediction Series per column — 11 columns in the default configuration. The agg_predict function reduces this DataFrame to a single combined forecast by computing a signed weighted average.\nThe TestAggregatePredict class covers two scenarios. The first uses equal positive weights, which is arithmetically a plain mean. The second uses weights [1.0, -1.0], whose sum is zero, so the denominator guard activates and the function returns the raw weighted sum. The test confirms that col1 - col2 yields the expected difference values, verifying both the sign convention and the zero-denominator branch.\nUnderstanding this aggregation is important because the weights vector is what distinguishes the combined forecast from a naive average. A domain expert may specify negative weights to subtract a known systematic bias or a correlated noise source, so the arithmetic must be exact.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#data-validation",
+    "href": "docs/task_safe_demo_explained.html#data-validation",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Data Validation",
+    "text": "Data Validation\nThe TestDataValidation class tests the pre-flight check that task_safe_demo performs before any model training begins. The script calls config.data_path.is_file() and returns exit code 1 immediately if the file is absent. This fail-fast pattern prevents the system from spending minutes training models only to discover at evaluation time that the ground truth does not exist.\nThe second test in this class constructs a DataFrame with columns A and B and checks which columns from a required set are missing. The result is that column C is absent. This mirrors the schema validation that load_actual_combined applies: the function compares the actual file’s column set against the columns produced by the baseline pipeline, and any mismatch raises an error with an explicit message rather than propagating silently into the metric computation.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#forecasting-pipeline-components",
+    "href": "docs/task_safe_demo_explained.html#forecasting-pipeline-components",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Forecasting Pipeline Components",
+    "text": "Forecasting Pipeline Components\nThe TestForecastingPipeline class does not train a model. It verifies that the data structures expected at each stage of the pipeline are correctly formed before computation begins. The baseline forecast requires a pd.Series with a DatetimeIndex. The covariate forecast additionally requires an exogenous DataFrame with the holiday and weather columns at matching timestamps. The custom LightGBM variant requires an LGBMRegressor instantiated with specific hyperparameters that were found through prior optimisation.\nThe hyperparameter test verifies the exact values of n_estimators=1059, learning_rate≈0.04191, and num_leaves=212. These are not arbitrary — they represent an optimised configuration that is part of the reproducible artefact. Changing them without revalidation would silently degrade forecast quality.\n\nfrom lightgbm import LGBMRegressor\nimport pytest\n\ncustom_lgbm = LGBMRegressor(\n    n_estimators=1059,\n    learning_rate=0.04191323446625026,\n    num_leaves=212,\n    min_child_samples=54,\n    subsample=0.5014650987802548,\n    colsample_bytree=0.6080926628683118,\n    random_state=42,\n    verbose=-1,\n)\nprint(f\"n_estimators  : {custom_lgbm.n_estimators}\")\nprint(f\"num_leaves    : {custom_lgbm.num_leaves}\")\nprint(f\"learning_rate : {custom_lgbm.learning_rate:.5f}\")\n\nn_estimators  : 1059\nnum_leaves    : 212\nlearning_rate : 0.04191",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#index-alignment",
+    "href": "docs/task_safe_demo_explained.html#index-alignment",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Index Alignment",
+    "text": "Index Alignment\nThe three pipelines produce predictions on the same time grid. Before metrics can be computed, the index of the ground truth must be aligned to the index of the predictions. The TestIndexAlignment class verifies two aspects of this alignment.\nThe first test creates two Series on an identical DatetimeIndex and checks that all timestamps match element-wise. This is the ideal case: after reindex the indices are congruent and no NaN values are introduced. The second test intentionally creates a longer index and calls reindex on the shorter Series, confirming that positions beyond the original range fill with NaN. The main script responds to such NaN values by calling dropna on the actual series and restricting all four prediction Series to the common index, so that metrics are always computed on a complete, aligned subset.\n\nimport pandas as pd\nimport numpy as np\n\nidx1 = pd.date_range(\"2020-01-01\", periods=5, freq=\"h\")\nidx2 = pd.date_range(\"2020-01-01\", periods=7, freq=\"h\")\ns1   = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=idx1)\n\ns1_reindexed = s1.reindex(idx2)\nprint(s1_reindexed)\n\n2020-01-01 00:00:00    1.0\n2020-01-01 01:00:00    2.0\n2020-01-01 02:00:00    3.0\n2020-01-01 03:00:00    4.0\n2020-01-01 04:00:00    5.0\n2020-01-01 05:00:00    NaN\n2020-01-01 06:00:00    NaN\nFreq: h, dtype: float64",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#error-handling",
+    "href": "docs/task_safe_demo_explained.html#error-handling",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Error Handling",
+    "text": "Error Handling\nThe TestErrorHandling class covers two failure modes. The first confirms that when the ground truth file is absent, a meaningful error message can be constructed — a precondition for the fail-fast exit code 1 path. The second test calls n2n_predict_with_covariates with forecast_horizon=-1 and expects a ValueError. This is the entry-point validation that prevents nonsensical configurations from entering the training loop.\nThe forecast_horizon check is representative of a broader pattern: every public API function in spotforecast2-safe validates its numerical arguments at the boundary and raises an explicit typed exception rather than silently producing a malformed result. A negative horizon would cause downstream array slicing to behave unexpectedly, so the validation is placed at the earliest possible point.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#memory-and-performance-considerations",
+    "href": "docs/task_safe_demo_explained.html#memory-and-performance-considerations",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Memory and Performance Considerations",
+    "text": "Memory and Performance Considerations\nThe TestMemoryAndPerformance class is less about correctness and more about demonstrating that the data structures used in the pipeline scale to realistic sizes. A 100,000-element pd.Series is constructed and verified to have the correct length, confirming that pandas handles large in-memory series without truncation. A 1,000-row by 20-column DataFrame is subsetted to three columns, confirming that column selection produces the expected shape.\nThe most instructive test in this group computes a weighted average by matrix multiplication: df.values @ weights, where weights is a length-10 array of equal values. This is more efficient than constructing a loop over columns and produces a length-100 result array. The test verifies the shape of the output, establishing that this idiom is valid for the aggregation pattern used throughout the pipeline.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#integration-combining-all-components",
+    "href": "docs/task_safe_demo_explained.html#integration-combining-all-components",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "Integration: Combining All Components",
+    "text": "Integration: Combining All Components\nThe TestIntegration class verifies properties that only emerge when components work together. The test_end_to_end_task_structure test checks that a synthetic Series with a DatetimeIndex satisfies is_monotonic_increasing, which is a prerequisite for all skforecast operations. A non-monotonic index causes _create_train_X_y to produce incorrectly ordered lag matrices, so this invariant must hold at the point where the data enters the forecaster.\nThe test_metric_consistency_across_models test constructs three prediction Series against a common actual and computes MAE and MSE for each. Model C predicts exactly the actuals, so its metrics are identically zero. Models A and B have small symmetric errors around the actuals. The test confirms that the metric dictionary structure is consistent across all three models and that the perfect predictor is correctly identified. This mirrors the final reporting step of task_safe_demo, where all three pipelines are evaluated and their metrics are logged for comparison.\n\nimport pandas as pd\n\nactual = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])\npredictions = {\n    \"baseline\":    pd.Series([1.1, 2.1, 3.1, 4.1, 5.1]),\n    \"covariates\":  pd.Series([0.9, 1.9, 2.9, 3.9, 4.9]),\n    \"custom_lgbm\": pd.Series([1.0, 2.0, 3.0, 4.0, 5.0]),\n}\n\nfrom spotforecast2_safe.manager.metrics import calculate_metrics\n\nresults = {\n    name: calculate_metrics(actual, pred)\n    for name, pred in predictions.items()\n}\npd.DataFrame(results).T.round(4)\n\n\n\n\n\n\n\n\nMAE\nMSE\n\n\n\n\nbaseline\n0.1\n0.01\n\n\ncovariates\n0.1\n0.01\n\n\ncustom_lgbm\n0.0\n0.00",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_demo_explained.html#the-complete-execution-flow",
+    "href": "docs/task_safe_demo_explained.html#the-complete-execution-flow",
+    "title": "task_safe_demo: Design and Test Logic Explained",
+    "section": "The Complete Execution Flow",
+    "text": "The Complete Execution Flow\nPutting all pieces together, a single invocation of task_safe_demo follows this sequence. First, DemoConfig is constructed and its fields are used throughout. The ground truth file is validated before any model training begins. The baseline pipeline trains on the raw series without covariates. The covariate pipeline repeats this with weather, holiday, and calendar features included as exogenous inputs. The custom LightGBM pipeline reuses the covariate pipeline but substitutes the default estimator with a specifically tuned regressor. Each pipeline’s 11-column output is collapsed to a single Series by agg_predict using the signed weight vector. Finally, all three combined forecasts are evaluated against the ground truth and their metrics are written to the log.\nThe test suite mirrors this flow by testing each building block independently, ensuring that a failure in any component surfaces as a specific, attributable test failure rather than a cryptic runtime error at the end of a long training run.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe Demo Explained"
+    ]
+  },
+  {
     "objectID": "docs/safe/spotforecast2-safe.html",
     "href": "docs/safe/spotforecast2-safe.html",
     "title": "spotforecast2-safe: Safety-Critical Streamlining",
@@ -2179,7 +2322,7 @@
     "href": "docs/recursive/ForecasterRecursive.html#functional-examples",
     "title": "ForecasterRecursive",
     "section": "Functional Examples",
-    "text": "Functional Examples\n\n1. Standard Autoregressive Forecast\nA basic example using LinearRegression with the last 7 days as predictors.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Create a synthetic daily series with a trend and seasonality\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ndata = np.linspace(10, 20, 100) + 5 * np.sin(2 * np.pi * np.arange(100) / 7)\ny = pd.Series(data, index=index, name=\"target\")\n\n# 2. Initialize with 7 lags\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=7\n)\n\n# 3. Fit and Predict\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=14)\n\nprint(\"Forecast for the next 14 days:\")\nprint(predictions.head())\n\nForecast for the next 14 days:\n2023-04-11    24.975650\n2023-04-12    22.371439\n2023-04-13    18.133612\n2023-04-14    15.529401\n2023-04-15    16.595893\nFreq: D, Name: pred, dtype: float64\n\n\n\n\n2. Multi-Feature Forecasting (Lags + Window Statistics)\nCombining raw lags with rolling means provides the model with both local and global context.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestRegressor\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\n\n# Data preparation\nindex = pd.date_range(start='2023-01-01', periods=200, freq='h')\ny = pd.Series(np.random.normal(50, 5, 200), index=index, name=\"sensor_reading\")\n\n# Forecaster with Lags and Rolling Mean\nforecaster = ForecasterRecursive(\n    estimator=RandomForestRegressor(n_estimators=50, random_state=123),\n    lags=24,\n    window_features=RollingFeatures(stats=['mean', 'std'], window_sizes=24)\n)\n\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=12)\n\nprint(\"Predictions with window features:\")\nprint(predictions)\n\nPredictions with window features:\n2023-01-09 08:00:00    50.580443\n2023-01-09 09:00:00    49.377933\n2023-01-09 10:00:00    51.436107\n2023-01-09 11:00:00    48.985673\n2023-01-09 12:00:00    47.926611\n2023-01-09 13:00:00    50.173479\n2023-01-09 14:00:00    48.058412\n2023-01-09 15:00:00    42.760109\n2023-01-09 16:00:00    49.001720\n2023-01-09 17:00:00    44.342953\n2023-01-09 18:00:00    44.107219\n2023-01-09 19:00:00    51.254603\nFreq: h, Name: pred, dtype: float64\n\n\n\n\n3. Handling Exogenous Variables\nForecasting energy demand using temperature as an external factor.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Target and Exogenous data\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ny = pd.Series(np.random.normal(100, 10, 100), index=index, name=\"demand\")\nexog = pd.DataFrame({'temp': np.random.normal(20, 5, 100)}, index=index)\n\n# Define forecaster\nforecaster = ForecasterRecursive(estimator=Ridge(), lags=7)\n\n# Fit with exog\nforecaster.fit(y=y, exog=exog)\n\n# Future exog values must be known for the prediction horizon\nexog_future = pd.DataFrame(\n    {'temp': [22, 21, 23]}, \n    index=pd.date_range(start='2023-04-11', periods=3, freq='D')\n)\n\npredictions = forecaster.predict(steps=3, exog=exog_future)\nprint(\"Demand forecast with temp as exog:\")\nprint(predictions)\n\nDemand forecast with temp as exog:\n2023-04-11    95.108343\n2023-04-12    97.236340\n2023-04-13    96.490199\nFreq: D, Name: pred, dtype: float64",
+    "text": "Functional Examples\n\n1. Standard Autoregressive Forecast\nA basic example using LinearRegression with the last 7 days as predictors.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Create a synthetic daily series with a trend and seasonality\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ndata = np.linspace(10, 20, 100) + 5 * np.sin(2 * np.pi * np.arange(100) / 7)\ny = pd.Series(data, index=index, name=\"target\")\n\n# 2. Initialize with 7 lags\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=7\n)\n\n# 3. Fit and Predict\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=14)\n\nprint(\"Forecast for the next 14 days:\")\nprint(predictions.head())\n\nForecast for the next 14 days:\n2023-04-11    24.975650\n2023-04-12    22.371439\n2023-04-13    18.133612\n2023-04-14    15.529401\n2023-04-15    16.595893\nFreq: D, Name: pred, dtype: float64\n\n\n\n\n2. Multi-Feature Forecasting (Lags + Window Statistics)\nCombining raw lags with rolling means provides the model with both local and global context.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestRegressor\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\n\n# Data preparation\nindex = pd.date_range(start='2023-01-01', periods=200, freq='h')\ny = pd.Series(np.random.normal(50, 5, 200), index=index, name=\"sensor_reading\")\n\n# Forecaster with Lags and Rolling Mean\nforecaster = ForecasterRecursive(\n    estimator=RandomForestRegressor(n_estimators=50, random_state=123),\n    lags=24,\n    window_features=RollingFeatures(stats=['mean', 'std'], window_sizes=24)\n)\n\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=12)\n\nprint(\"Predictions with window features:\")\nprint(predictions)\n\nPredictions with window features:\n2023-01-09 08:00:00    51.367349\n2023-01-09 09:00:00    49.743639\n2023-01-09 10:00:00    51.190044\n2023-01-09 11:00:00    48.095528\n2023-01-09 12:00:00    50.157688\n2023-01-09 13:00:00    51.060801\n2023-01-09 14:00:00    50.250335\n2023-01-09 15:00:00    50.160478\n2023-01-09 16:00:00    50.385522\n2023-01-09 17:00:00    48.219950\n2023-01-09 18:00:00    51.252680\n2023-01-09 19:00:00    49.793648\nFreq: h, Name: pred, dtype: float64\n\n\n\n\n3. Handling Exogenous Variables\nForecasting energy demand using temperature as an external factor.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Target and Exogenous data\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ny = pd.Series(np.random.normal(100, 10, 100), index=index, name=\"demand\")\nexog = pd.DataFrame({'temp': np.random.normal(20, 5, 100)}, index=index)\n\n# Define forecaster\nforecaster = ForecasterRecursive(estimator=Ridge(), lags=7)\n\n# Fit with exog\nforecaster.fit(y=y, exog=exog)\n\n# Future exog values must be known for the prediction horizon\nexog_future = pd.DataFrame(\n    {'temp': [22, 21, 23]}, \n    index=pd.date_range(start='2023-04-11', periods=3, freq='D')\n)\n\npredictions = forecaster.predict(steps=3, exog=exog_future)\nprint(\"Demand forecast with temp as exog:\")\nprint(predictions)\n\nDemand forecast with temp as exog:\n2023-04-11     98.894809\n2023-04-12     99.472412\n2023-04-13    101.331074\nFreq: D, Name: pred, dtype: float64",
     "crumbs": [
       "Forecaster Guides",
       "ForecasterRecursive"
@@ -2190,7 +2333,7 @@
     "href": "docs/recursive/ForecasterRecursive.html#expert-reference-internal-mechanics",
     "title": "ForecasterRecursive",
     "section": "Expert Reference: Internal Mechanics",
-    "text": "Expert Reference: Internal Mechanics\n\nFeature Matrix Construction\nForecasterRecursive internally transforms the time series into a supervised learning matrix. If lags=[1, 2] is used, the training set \\(X\\) at time \\(t\\) will contain the columns \\([y_{t-1}, y_{t-2}]\\). If exogenous variables are provided, they are concatenated to this matrix.\n\n\nRobustness and Interpretability\nThe ForecasterRecursive transforms time series data into a supervised structure. If lags=[1, 2] is used, the training set X at time t will contain columns [y_t-1, y_t-2]. This explicit feature engineering makes it easy to understand what the model is looking at.\n\n\nDifferentiation and Reconstruction\nWhen differentiation &gt; 0 is set: 1. The training series \\(y\\) is differenced \\(n\\) times. 2. The model is trained to predict the differenced values. 3. During prediction, the model generates differenced forecasts. 4. These forecasts are automatically integrated (undifferenced) using the TimeSeriesDifferentiator and the last_window_ to return predictions in the original scale. This process is seamless to the user but critical for handling trends.\n\n\n4. Probabilistic Forecasting (Prediction Intervals)\nForecasterRecursive supports probabilistic forecasting, allowing you to estimate prediction intervals. This is crucial for safety-critical applications where quantifying uncertainty is as important as the point forecast itself.\nTwo methods are available: * Bootstrapping: Resamples residuals from the training phase to generate a distribution of possible future paths. * Conformal Prediction: Uses a calibration dataset (out-of-sample residuals) to guarantee a statistical coverage rate (e.g., 95%).\n\nBootstrapping Example\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Generate synthetic data with noise\nnp.random.seed(123)\nsteps = 100\nt = np.arange(steps)\ny = pd.Series(\n    data=0.5 * t + 2 * np.sin(2 * np.pi * t / 12) + np.random.normal(0, 1.5, steps),\n    index=pd.date_range(start='2023-01-01', periods=steps, freq='D'),\n    name='y'\n)\n\n# 2. Initialize and Fit\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=12\n)\nforecaster.fit(y=y, store_in_sample_residuals=True)\n\n# 3. Predict with Intervals (Bootstrapping)\n# We predict the next 10 days with a 95% confidence interval (2.5% to 97.5%)\nresults = forecaster.predict_interval(\n    steps=10,\n    method='bootstrapping',\n    interval=[5, 95],\n    n_boot=250,\n    random_state=123\n)\n\nprint(\"Bootstrapping Intervals:\")\nprint(results.head())\n\nBootstrapping Intervals:\n                 pred  lower_bound  upper_bound\n2023-04-11  51.656751    48.204891    52.988346\n2023-04-12  51.107219    47.731417    52.671035\n2023-04-13  50.742081    47.373322    52.290746\n2023-04-14  50.847425    47.599968    52.286160\n2023-04-15  51.001961    47.559106    52.637506\n\n\n\n\nConformal Prediction Example\nConformal prediction often requires out-of-sample residuals for calibration to ensure the coverage guarantee holds.\n\n# ... (Assuming same setup as above)\n\n# 1. Split data into training and calibration sets\n# We use the last 20 points for calibration (out-of-sample residuals)\ny_train = y.iloc[:-20]\ny_calibration = y.iloc[-20:]\n\nforecaster.fit(y=y_train)\n\n# 2. Compute out-of-sample residuals\n# This is a critical step for conformal prediction\ny_pred = forecaster.predict(steps=len(y_calibration))\nforecaster.set_out_sample_residuals(y_true=y_calibration, y_pred=y_pred)\n\n# 3. Predict with Intervals (Conformal)\n# We request a 95% confidence level (nominal coverage)\nresults_conformal = forecaster.predict_interval(\n    steps=10,\n    method='conformal',\n    interval=0.95,  # 0.95 means 95% coverage\n    use_in_sample_residuals=False # Use the calibration residuals we just set\n)\n\nprint(\"\\nConformal Prediction Intervals:\")\nprint(results_conformal.head())\n\n╭─────────────────────────────── ResidualsUsageWarning ────────────────────────────────╮\n│ The following bins have no out of sample residuals: [0, 1, 2, 3, 4, 5, 6, 7, 8]. No  │\n│ predicted values fall in the interval [(6.052564031457739, 9.893132424701392),       │\n│ (9.893132424701392, 13.000477062496834), (13.000477062496834, 15.826590195682913),   │\n│ (15.826590195682913, 19.566264930112933), (19.566264930112933, 21.980999572364706),  │\n│ (21.980999572364706, 26.536277097754322), (26.536277097754322, 29.923637227267832),  │\n│ (29.923637227267832, 33.20658898686161), (33.20658898686161, 35.669050590351496)].   │\n│ Empty bins will be filled with a random sample of residuals.\\n\\nCategory :           │\n│ spotforecast2.exceptions.ResidualsUsageWarning\\nLocation :                           │\n│ /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/forec │\n│ aster/recursive/_forecaster_recursive.py:2969\\nSuppress :                            │\n│ warnings.simplefilter('ignore', category=ResidualsUsageWarning)                      │\n╰──────────────────────────────────────────────────────────────────────────────────────╯\n\n\n\n\nConformal Prediction Intervals:\n                 pred  lower_bound  upper_bound\n2023-03-22  37.802926    33.516797    42.089055\n2023-03-23  38.230948    33.944819    42.517077\n2023-03-24  38.147748    33.861619    42.433877\n2023-03-25  38.889532    34.603403    43.175661\n2023-03-26  40.946247    36.660118    45.232376",
+    "text": "Expert Reference: Internal Mechanics\n\nFeature Matrix Construction\nForecasterRecursive internally transforms the time series into a supervised learning matrix. If lags=[1, 2] is used, the training set \\(X\\) at time \\(t\\) will contain the columns \\([y_{t-1}, y_{t-2}]\\). If exogenous variables are provided, they are concatenated to this matrix.\n\n\nRobustness and Interpretability\nThe ForecasterRecursive transforms time series data into a supervised structure. If lags=[1, 2] is used, the training set X at time t will contain columns [y_t-1, y_t-2]. This explicit feature engineering makes it easy to understand what the model is looking at.\n\n\nDifferentiation and Reconstruction\nWhen differentiation &gt; 0 is set: 1. The training series \\(y\\) is differenced \\(n\\) times. 2. The model is trained to predict the differenced values. 3. During prediction, the model generates differenced forecasts. 4. These forecasts are automatically integrated (undifferenced) using the TimeSeriesDifferentiator and the last_window_ to return predictions in the original scale. This process is seamless to the user but critical for handling trends.\n\n\n4. Probabilistic Forecasting (Prediction Intervals)\nForecasterRecursive supports probabilistic forecasting, allowing you to estimate prediction intervals. This is crucial for safety-critical applications where quantifying uncertainty is as important as the point forecast itself.\nTwo methods are available: * Bootstrapping: Resamples residuals from the training phase to generate a distribution of possible future paths. * Conformal Prediction: Uses a calibration dataset (out-of-sample residuals) to guarantee a statistical coverage rate (e.g., 95%).\n\nBootstrapping Example\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Generate synthetic data with noise\nnp.random.seed(123)\nsteps = 100\nt = np.arange(steps)\ny = pd.Series(\n    data=0.5 * t + 2 * np.sin(2 * np.pi * t / 12) + np.random.normal(0, 1.5, steps),\n    index=pd.date_range(start='2023-01-01', periods=steps, freq='D'),\n    name='y'\n)\n\n# 2. Initialize and Fit\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=12\n)\nforecaster.fit(y=y, store_in_sample_residuals=True)\n\n# 3. Predict with Intervals (Bootstrapping)\n# We predict the next 10 days with a 95% confidence interval (2.5% to 97.5%)\nresults = forecaster.predict_interval(\n    steps=10,\n    method='bootstrapping',\n    interval=[5, 95],\n    n_boot=250,\n    random_state=123\n)\n\nprint(\"Bootstrapping Intervals:\")\nprint(results.head())\n\nBootstrapping Intervals:\n                 pred  lower_bound  upper_bound\n2023-04-11  51.656751    48.204891    52.988346\n2023-04-12  51.107219    47.731417    52.671035\n2023-04-13  50.742081    47.373322    52.290746\n2023-04-14  50.847425    47.599968    52.286160\n2023-04-15  51.001961    47.559106    52.637506\n\n\n\n\nConformal Prediction Example\nConformal prediction often requires out-of-sample residuals for calibration to ensure the coverage guarantee holds.\n\n# ... (Assuming same setup as above)\n\n# 1. Split data into training and calibration sets\n# We use the last 20 points for calibration (out-of-sample residuals)\ny_train = y.iloc[:-20]\ny_calibration = y.iloc[-20:]\n\nforecaster.fit(y=y_train)\n\n# 2. Compute out-of-sample residuals\n# This is a critical step for conformal prediction\ny_pred = forecaster.predict(steps=len(y_calibration))\nforecaster.set_out_sample_residuals(y_true=y_calibration, y_pred=y_pred)\n\n# 3. Predict with Intervals (Conformal)\n# We request a 95% confidence level (nominal coverage)\nresults_conformal = forecaster.predict_interval(\n    steps=10,\n    method='conformal',\n    interval=0.95,  # 0.95 means 95% coverage\n    use_in_sample_residuals=False # Use the calibration residuals we just set\n)\n\nprint(\"\\nConformal Prediction Intervals:\")\nprint(results_conformal.head())\n\n╭─────────────────────────────── ResidualsUsageWarning ────────────────────────────────╮\n│ The following bins have no out of sample residuals: [0, 1, 2, 3, 4, 5, 6, 7, 8]. No  │\n│ predicted values fall in the interval [(6.052564031457741, 9.893132424701395),       │\n│ (9.893132424701395, 13.000477062496836), (13.000477062496836, 15.82659019568292),    │\n│ (15.82659019568292, 19.56626493011294), (19.56626493011294, 21.98099957236471),      │\n│ (21.98099957236471, 26.536277097754333), (26.536277097754333, 29.923637227267832),   │\n│ (29.923637227267832, 33.20658898686162), (33.20658898686162, 35.669050590351496)].   │\n│ Empty bins will be filled with a random sample of residuals.\\n\\nCategory :           │\n│ spotforecast2.exceptions.ResidualsUsageWarning\\nLocation :                           │\n│ /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/forec │\n│ aster/recursive/_forecaster_recursive.py:2969\\nSuppress :                            │\n│ warnings.simplefilter('ignore', category=ResidualsUsageWarning)                      │\n╰──────────────────────────────────────────────────────────────────────────────────────╯\n\n\n\n\nConformal Prediction Intervals:\n                 pred  lower_bound  upper_bound\n2023-03-22  37.802926    33.516797    42.089055\n2023-03-23  38.230948    33.944819    42.517077\n2023-03-24  38.147748    33.861619    42.433877\n2023-03-25  38.889532    34.603403    43.175661\n2023-03-26  40.946247    36.660118    45.232376",
     "crumbs": [
       "Forecaster Guides",
       "ForecasterRecursive"
@@ -2323,7 +2466,7 @@
     "href": "docs/reference/data.fetch_data.get_data_home.html#returns",
     "title": "data.fetch_data.get_data_home",
     "section": "Returns",
-    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#a76dcdb2 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::"
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#de4aeb3e .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::"
   },
   {
     "objectID": "docs/reference/downloader.entsoe.merge_build_manual.html",
@@ -3780,6 +3923,160 @@
     "crumbs": [
       "Safety & Security",
       "Security Policy"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html",
+    "href": "docs/task_safe_n21_cov_df.html",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "",
+    "text": "The task_safe_n_to_1_with_covariates_and_dataframe script extends the baseline forecasting pipeline by adding exogenous covariates — weather observations, public holidays, and automatically engineered calendar features. The outcome is a signed weighted aggregation of 11 per-column recursive forecasts into a single combined prediction. Every public parameter is validated, every sensitive value is masked in log output, and every execution path is wrapped in structured error handling.\nThe test suite in tests/test_task_safe_n_to_1_with_covariates.py decomposes this pipeline into isolated units so that a failure in any stage surfaces as a specific, attributable assertion error rather than a silent mismatch at evaluation time. The classes below follow the logical execution order of the pipeline.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#covariate-data-preparation",
+    "href": "docs/task_safe_n21_cov_df.html#covariate-data-preparation",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Covariate Data Preparation",
+    "text": "Covariate Data Preparation\nBefore any model is trained, the pipeline constructs three categories of exogenous features. The TestCovariateDataPreperation class verifies that each category satisfies its structural contract.\nWeather data arrives as a DataFrame with a DatetimeIndex and columns for temperature, humidity, and wind speed. The test confirms the exact shape (100, 3) and the presence of all three column names. This is not cosmetic: downstream feature-engineering code selects columns by name, so a missing column produces a KeyError rather than a silently degraded feature set.\nHoliday data must be binary — every entry is either 0 (non-holiday) or 1 (holiday). The test calls set(holidays.unique()).issubset({0, 1}) to confirm that no fractional or multi-valued entries have slipped through. Any departure from binary encoding would distort the model’s ability to isolate the holiday effect.\nCalendar features — day of week, day of month, month, quarter, weekend flag — are derived directly from the DatetimeIndex. The test verifies that day_of_week spans 0–6, that month spans 1–12, and that the total row count equals 365. These bounds are the minimum necessary to confirm that no date arithmetic has produced impossible values.\nCyclical encoding replaces raw integer months with sine and cosine components so that December and January are numerically close. The test confirms that both components are bounded strictly within [-1, 1], which is the mathematical guarantee of the unit-circle encoding.\n\nimport numpy as np\nimport pandas as pd\n\ndates = pd.date_range(\"2020-01-01\", periods=365, freq=\"D\")\nmonth = dates.month\n\nmonth_sin = np.sin(2 * np.pi * month / 12)\nmonth_cos = np.cos(2 * np.pi * month / 12)\n\npd.DataFrame(\n    {\"month\": month[:6], \"sin\": month_sin[:6].round(4), \"cos\": month_cos[:6].round(4)},\n    index=dates[:6],\n)\n\n\n\n\n\n\n\n\nmonth\nsin\ncos\n\n\n\n\n2020-01-01\n1\n0.5\n0.866\n\n\n2020-01-02\n1\n0.5\n0.866\n\n\n2020-01-03\n1\n0.5\n0.866\n\n\n2020-01-04\n1\n0.5\n0.866\n\n\n2020-01-05\n1\n0.5\n0.866\n\n\n2020-01-06\n1\n0.5\n0.866",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#exogenous-variable-validation",
+    "href": "docs/task_safe_n21_cov_df.html#exogenous-variable-validation",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Exogenous Variable Validation",
+    "text": "Exogenous Variable Validation\nThe TestExogenousVariableValidation class enforces four structural invariants that must hold before the exogenous DataFrame is passed to the forecaster.\nThe exogenous matrix must have exactly the same number of rows as the target series and an identical index. The test creates both objects on the same DatetimeIndex and checks exog.index.equals(y.index). A mismatch here would cause ForecasterRecursive.fit to raise an alignment error, but verifying it before training saves the cost of constructing lag matrices for an incompatible input.\nMissing features are detected by comparing the actual column list against a required set. If a required column is absent, the gap is made explicit rather than letting a downstream KeyError propagate with an opaque stack trace.\nNaN handling is tested by confirming that two missing values survive exog.isna().sum().sum() and that forward-fill removes all of them. The ffill() strategy is appropriate for weather and calendar data because the last observed value is the most conservative assumption in the absence of new information.\n\nexog = pd.DataFrame({\n    \"feat1\": [1.0, 2.0, np.nan, 4.0, 5.0],\n    \"feat2\": [10.0, np.nan, 30.0, 40.0, 50.0],\n})\nprint(f\"NaNs before ffill: {exog.isna().sum().sum()}\")\nexog_filled = exog.ffill()\nprint(f\"NaNs after  ffill: {exog_filled.isna().sum().sum()}\")\n\nNaNs before ffill: 2\nNaNs after  ffill: 0",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#logging-and-timestamp-format",
+    "href": "docs/task_safe_n21_cov_df.html#logging-and-timestamp-format",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Logging and Timestamp Format",
+    "text": "Logging and Timestamp Format\nThe TestLoggingForCovariates class tests two aspects of the dual-handler logging system used throughout the covariate pipeline.\nThe first test verifies that attaching a StreamHandler with a standard formatter results in a logger with at least one handler and level INFO. The N-to-1 pipeline sets this level rather than DEBUG because it is the outermost user-facing task: operators need progress updates, not internal variable traces.\nThe second test verifies the timestamp format YYYYMMDD_HHMMSS. A 15-character string, an underscore at position 8, and an all-digit date component are the three assertions. This format is used in log file names, so any deviation would produce files that sort incorrectly by creation time in a directory listing — a subtle but consequential problem in audit contexts where log files are reviewed chronologically.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#the-n-to-1-forecasting-structure",
+    "href": "docs/task_safe_n21_cov_df.html#the-n-to-1-forecasting-structure",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "The N-to-1 Forecasting Structure",
+    "text": "The N-to-1 Forecasting Structure\nThe TestNto1ForecastingPipeline class establishes the data structure contracts for the recursive forecasting stage.\nThe basic structure test creates a Series of length 100 + horizon to represent the full available history. The extra horizon rows will become the test set; only the first 100 rows feed the training stage. Constructing the Series with this combined length from the start avoids off-by-one errors when slicing at the train/test boundary.\nThe recursive forecaster is initialised with LGBMRegressor(n_estimators=100, learning_rate=0.1, random_state=42, verbose=-1). The test confirms that the estimator attributes match the provided values, which establishes that the LGBMRegressor constructor accepted the parameters without silently ignoring any of them. This is important because some sklearn-compatible estimators silently clip or ignore out-of-range parameters.\nMulti-output forecasting produces a one-dimensional array of length steps. The test confirms forecast_array.ndim == 1 to distinguish the multi-step output from a two-dimensional matrix that would indicate an accidental multi-target configuration.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#feature-engineering-with-covariates",
+    "href": "docs/task_safe_n21_cov_df.html#feature-engineering-with-covariates",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Feature Engineering with Covariates",
+    "text": "Feature Engineering with Covariates\nThe TestCovariateFeatureEngineering class validates three feature construction patterns used by the pipeline.\nPolynomial features are computed by stacking x, x**2, and x**3 into a matrix. The test confirms the shape (5, 3) and verifies that the first column is identical to the original input and the second column equals its square. This establishes that no column reordering or normalisation has been applied, which matters because the aggregation weights are positionally indexed.\nLag features are created with y.shift(i) for i in [1, 2, 3]. The test checks that the first row of lag_1 is NaN, confirming that the shift operation introduces the expected initial missing values rather than wrapping around or filling with zeros.\nRolling window features are computed with y.rolling(window=7).mean(). The test confirms that the first six values are NaN — a direct consequence of requiring a full window before computing the first valid mean. Any model trained without respecting this warm-up period would use NaN-contaminated features for the earliest training rows.\n\ny = pd.Series(np.arange(1, 11, dtype=float))\nlags = pd.DataFrame({f\"lag_{i}\": y.shift(i) for i in range(1, 4)})\nrolling_mean = y.rolling(window=7).mean()\n\nprint(\"Lag features (first 5 rows):\")\nprint(lags.head())\nprint(f\"\\nRolling mean NaNs in first 6 positions: {rolling_mean.iloc[:6].isna().sum()}\")\n\nLag features (first 5 rows):\n   lag_1  lag_2  lag_3\n0    NaN    NaN    NaN\n1    1.0    NaN    NaN\n2    2.0    1.0    NaN\n3    3.0    2.0    1.0\n4    4.0    3.0    2.0\n\nRolling mean NaNs in first 6 positions: 6",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#integrating-exogenous-variables-into-the-feature-matrix",
+    "href": "docs/task_safe_n21_cov_df.html#integrating-exogenous-variables-into-the-feature-matrix",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Integrating Exogenous Variables into the Feature Matrix",
+    "text": "Integrating Exogenous Variables into the Feature Matrix\nThe TestExogenousIntegration class tests how exogenous features are merged with lag features to form the complete training matrix.\nThe feature matrix expansion test creates a base matrix of 5 columns and an exogenous matrix of 3 columns, then combines them with np.column_stack. The result must have exactly 8 columns. This verifies that column stacking does not drop any features and does not introduce duplicates.\nThe lag-and-exog combination test uses pd.concat([y_lags, exog], axis=1) and confirms the combined column count is 4 (two lags plus two exogenous features). The presence of both y_lag_1 and temp in the column set confirms that the concatenation preserved column names, which ForecasterRecursive uses when calling estimator.fit.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#prediction-aggregation",
+    "href": "docs/task_safe_n21_cov_df.html#prediction-aggregation",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Prediction Aggregation",
+    "text": "Prediction Aggregation\nThe TestPredictionAggregation class mirrors the TestAggregatePredict class from the demo task but extends it with temporal index preservation.\nThe basic aggregation test uses positive fractional weights [0.5, 0.3, 0.2] that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.\nThe unequal importance test verifies the ordering high_priority &gt; medium_priority &gt; low_priority directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.\nThe temporal index preservation test reconstructs the aggregated Series with the original DatetimeIndex and calls aggregated_series.index.equals(dates). This confirms that the matrix multiplication idiom predictions.values @ np.array(weights) — which returns a plain np.ndarray — does not silently discard the temporal index when it is re-attached via pd.Series(aggregated, index=dates).\n\ndates = pd.date_range(\"2020-01-01\", periods=10, freq=\"h\")\npredictions = pd.DataFrame(\n    np.random.randn(10, 3), index=dates, columns=[\"loc_1\", \"loc_2\", \"loc_3\"]\n)\nweights = np.array([0.4, 0.4, 0.2])\naggregated = pd.Series(predictions.values @ weights, index=dates)\nprint(aggregated.head())\n\n2020-01-01 00:00:00   -0.245844\n2020-01-01 01:00:00    1.397998\n2020-01-01 02:00:00    0.215520\n2020-01-01 03:00:00    0.621243\n2020-01-01 04:00:00    0.912090\nFreq: h, dtype: float64",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#timezone-handling",
+    "href": "docs/task_safe_n21_cov_df.html#timezone-handling",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Timezone Handling",
+    "text": "Timezone Handling\nThe TestCovariateTimezone class addresses a recurring source of alignment failures in time series pipelines: mixed timezone-aware and timezone-naive indices.\nThe first test creates a UTC-indexed Series and confirms that y.index.tz is not None and that the timezone string is \"UTC\". A None timezone indicates a tz-naive index, which cannot be compared with a tz-aware index without an explicit tz_localize call.\nThe conversion test uses tz_convert(\"US/Eastern\") to move from UTC to Eastern time and confirms that the result has a non-None timezone. This is relevant when the pipeline is deployed in a timezone other than UTC: the model’s training data and the forecast period must share a consistent timezone, or the lag indices will misalign by a constant offset equal to the UTC offset.\nThe consistency test creates both y and exog on the same UTC index and verifies str(y.index.tz) == str(exog.index.tz). A mismatch between the target and exogenous timezone would cause ForecasterRecursive.fit to raise an error when it attempts to align the two inputs.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#forced-training-vs.-cached-model-loading",
+    "href": "docs/task_safe_n21_cov_df.html#forced-training-vs.-cached-model-loading",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Forced Training vs. Cached Model Loading",
+    "text": "Forced Training vs. Cached Model Loading\nThe TestForcedTraining class tests the persistence decision logic that controls whether the pipeline trains a new model or loads a previously serialised one.\nThe force_train flag maps directly to the action string \"retrain_model\" when True and \"load_cached_model\" when False. This test formalises the boolean semantics in isolation from the actual file I/O, confirming that the branching logic is correct before it interacts with the filesystem.\nThe directory creation test calls Path.mkdir(parents=True, exist_ok=True) on a path under /tmp and verifies that the directory exists afterwards. The exist_ok=True flag prevents a FileExistsError on repeated runs, which is the correct behaviour for a pipeline that may be invoked multiple times with the same model directory.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#error-handling",
+    "href": "docs/task_safe_n21_cov_df.html#error-handling",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Error Handling",
+    "text": "Error Handling\nThe TestErrorHandlingCovariates class covers three failure modes that are specific to the covariate pipeline.\nThe missing exog detection test computes the shortfall when only 20 steps of exogenous data are provided for a 24-step forecast horizon. The result horizon - exog_provided == 4 establishes the arithmetic that the validation layer must implement to produce a meaningful error message rather than an implicit out-of-bounds slice.\nThe misaligned index test creates y with 100 rows and exog with 95 rows, then computes their index intersection. The intersection contains 95 elements, confirming that the safe strategy is to restrict computation to the common index rather than raising an error. This mirrors the dropna/intersection pattern used in the demo task.\nThe invalid horizon test confirms that -24 is not a member of the accepted horizons [6, 12, 24, 48, 168] and that it is negative. This validates the guard condition that n2n_predict_with_covariates enforces at its entry point.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#kwargs-flexibility",
+    "href": "docs/task_safe_n21_cov_df.html#kwargs-flexibility",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Kwargs Flexibility",
+    "text": "Kwargs Flexibility\nThe TestKwargsFlexibility class verifies that the **kwargs mechanism correctly forwards parameters through the pipeline layers.\nThe estimator kwargs test confirms that a dictionary with n_estimators=500, learning_rate=0.05, and num_leaves=100 retains all three keys and values. The n_to_1_with_covariates function collects these in a forecast_kwargs dictionary before passing them to n2n_predict_with_covariates, so the forwarding chain must preserve each key without mutation.\nThe forecaster kwargs test checks that lags=[1, 7, 24] and window_size=72 survive the forwarding. Using a list for lags instead of a scalar activates the skforecast multi-lag construction path, so the type must be preserved exactly.\nThe aggregation kwargs test verifies that method and normalize_weights entries are accessible after construction. These parameters control how agg_predict normalises the weight vector, and their presence in the kwargs dictionary is the precondition for the aggregation stage to respect user-specified aggregation semantics.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#integration-the-complete-pipeline",
+    "href": "docs/task_safe_n21_cov_df.html#integration-the-complete-pipeline",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "Integration: The Complete Pipeline",
+    "text": "Integration: The Complete Pipeline\nThe TestIntegrationN2N class tests the properties that only emerge when all components operate together.\nThe end-to-end structure test constructs a 100-row hourly Series named load alongside a two-column exogenous DataFrame with temperature and hour columns on the same index. The three assertions — correct Series length, correct exog shape, and identical indices — are the minimum conditions for a successful call to ForecasterRecursive.fit(y, exog=exog).\nThe output consistency test simulates the pipeline’s return value: a (24, 11) predictions DataFrame, a 24-element aggregated Series, and a metrics dictionary with MAE and MSE keys. Verifying the shape of the predictions DataFrame confirms that the multi-output forecasting produced the expected number of timesteps and columns before aggregation.\nThe reproducibility test seeds np.random with 42, draws 10 values, reseeds, and draws again. Exact equality between the two arrays confirms that the seed resets the PRNG state completely. In the pipeline, random_state=42 is passed to LGBMRegressor for the same reason: two runs with identical input must produce identical output, which is a core requirement of the safety-critical design.\n\nseed = 42\nnp.random.seed(seed)\ndata_1 = np.random.randn(10)\n\nnp.random.seed(seed)\ndata_2 = np.random.randn(10)\n\nprint(f\"Arrays identical: {(data_1 == data_2).all()}\")\nprint(f\"First 5 values:   {data_1[:5].round(4)}\")\n\nArrays identical: True\nFirst 5 values:   [ 0.4967 -0.1383  0.6477  1.523  -0.2342]",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
+    ]
+  },
+  {
+    "objectID": "docs/task_safe_n21_cov_df.html#the-complete-execution-flow",
+    "href": "docs/task_safe_n21_cov_df.html#the-complete-execution-flow",
+    "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
+    "section": "The Complete Execution Flow",
+    "text": "The Complete Execution Flow\nA single invocation of task_safe_n_to_1_with_covariates_and_dataframe follows this sequence. The optional logging system is activated first if --logging true is passed. The fetch_data call loads the target time series from the configured data file. Feature engineering then constructs the exogenous matrix: calendar features from the DatetimeIndex, optionally extended with weather windows, holiday indicators, and polynomial interaction terms. The n2n_predict_with_covariates function trains one ForecasterRecursive per target column with the assembled exogenous inputs, serialises each model to the model directory, and returns the prediction DataFrame. Geographic coordinates are redacted from all log output at every level per CWE-312 and CWE-532. The 11-column prediction DataFrame is reduced to a single combined forecast by agg_predict using the DEFAULT_WEIGHTS vector. The combined prediction is printed to stdout and logged to the timestamped log file if logging is enabled.\nThe test suite mirrors this flow by isolating each stage into a dedicated class, so a regression in any component produces a targeted failure that pinpoints the affected stage without requiring a full pipeline run.",
+    "crumbs": [
+      "Tasks",
+      "Task Safe n-to-1 Explained"
     ]
   }
 ]
