@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -106,6 +106,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -752,7 +755,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
 <section id="import-core-components" class="level3">
 <h3 class="anchored" data-anchor-id="import-core-components">1. Import Core Components</h3>
-<div id="233276fd" class="cell" data-execution_count="1">
+<div id="3d1e989c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> (</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    ExogBuilder,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    RollingFeatures,</span>
@@ -768,20 +771,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="load-prepare-data" class="level3">
 <h3 class="anchored" data-anchor-id="load-prepare-data">2. Load &amp; Prepare Data</h3>
-<div id="44a3cb21" class="cell" data-execution_count="2">
+<div id="170256c7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample time series data</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span><span class="dv">100</span>, freq<span class="op">=</span><span class="st">'D'</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.random.randn(<span class="dv">100</span>).cumsum()</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'date'</span>: dates, <span class="st">'value'</span>: values})</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>df.set_index(<span class="st">'date'</span>, inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample time series data (index with explicit freq for forecasting)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span><span class="dv">100</span>, freq<span class="op">=</span><span class="st">'D'</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.random.randn(<span class="dv">100</span>).cumsum()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: values}, index<span class="op">=</span>dates)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="define-forecasting-period" class="level3">
 <h3 class="anchored" data-anchor-id="define-forecasting-period">3. Define Forecasting Period</h3>
-<div id="2783271c" class="cell" data-execution_count="3">
+<div id="4957b121" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define train/test split dates for temporal validation</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'2022-12-31'</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>test_start <span class="op">=</span> <span class="st">'2023-01-01'</span></span>
@@ -790,28 +793,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="create-rolling-features" class="level3">
 <h3 class="anchored" data-anchor-id="create-rolling-features">4. Create Rolling Features</h3>
-<div id="7ae7d446" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform time series into lag features for supervised learning</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rolling_features <span class="op">=</span> RollingFeatures(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    stats<span class="op">=</span><span class="st">'mean'</span>,       <span class="co"># Rolling statistic to compute</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    window_sizes<span class="op">=</span><span class="dv">7</span>,     <span class="co"># Use 7-step history</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rolling_features.fit_transform(df[<span class="st">'value'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="ba097589" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Split series; RollingFeatures is passed as a window_feature to the forecaster</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'value'</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> y.iloc[:<span class="dv">80</span>]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>rolling_features <span class="op">=</span> RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RollingFeatures: stats=</span><span class="sc">{</span>rolling_features<span class="sc">.</span>stats<span class="sc">}</span><span class="ss">, window_sizes=</span><span class="sc">{</span>rolling_features<span class="sc">.</span>window_sizes<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RollingFeatures: stats=['mean'], window_sizes=[7]</code></pre>
+</div>
 </div>
 </section>
 <section id="train-recursive-forecaster" class="level3">
 <h3 class="anchored" data-anchor-id="train-recursive-forecaster">5. Train Recursive Forecaster</h3>
-<div id="a2fc984b" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize forecaster with LightGBM backend</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursiveLGBM(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    iteration<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">7</span>,   <span class="co"># Use 7-step lag history</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Train and forecast (see ForecasterRecursiveModel for the full workflow)</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y_train)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> forecaster.predict()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="645567bc" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build forecaster with rolling-mean window features and fit on training data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>Ridge(),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">7</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    window_features<span class="op">=</span>[rolling_features],</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y_train)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y_pred.<span class="bu">round</span>(<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2020-03-21   -1.393
+2020-03-22   -0.756
+2020-03-23   -0.798
+2020-03-24   -1.347
+2020-03-25   -2.012
+2020-03-26   -2.435
+2020-03-27   -2.488
+Freq: D, Name: pred, dtype: float64</code></pre>
+</div>
 </div>
 </section>
 </section>
@@ -820,16 +837,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="period-management" class="level3">
 <h3 class="anchored" data-anchor-id="period-management">Period Management</h3>
 <p>The <code>Period</code> dataclass encodes cyclical temporal features (e.g.&nbsp;hour-of-day, day-of-week):</p>
-<div id="92cb1049" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data <span class="im">import</span> Period</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Encode hour-of-day as a cyclical feature</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>period <span class="op">=</span> Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c25e41f9" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data <span class="im">import</span> Period</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Encode hour-of-day as a cyclical feature</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>period <span class="op">=</span> Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For train/test splits, use plain date strings with pandas boolean indexing:</p>
-<div id="57c2a63b" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'2023-06-30'</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>test_start <span class="op">=</span> <span class="st">'2023-07-01'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c1093d14" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'2023-06-30'</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>test_start <span class="op">=</span> <span class="st">'2023-07-01'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>See <a href="../docs/reference/data.data.html">Period API</a> for details.</p>
 </section>
@@ -841,43 +858,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>ForecasterRecursiveLGBM</code>: LightGBM implementation (recommended for most use cases)</li>
 <li><code>ForecasterRecursiveXGB</code>: XGBoost implementation</li>
 </ul>
-<div id="bff725b0" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.models <span class="im">import</span> ForecasterRecursiveLGBM</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursiveLGBM(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    iteration<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">7</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y_train)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> forecaster.predict()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="5346a814" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>forecaster_lgbm <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>LGBMRegressor(n_jobs<span class="op">=</span><span class="dv">1</span>, verbose<span class="op">=-</span><span class="dv">1</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">7</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>forecaster_lgbm.fit(y_train)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> forecaster_lgbm.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(forecast.<span class="bu">round</span>(<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.\n\nCategory :                                             <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> spotforecast2.exceptions.IgnoredArgumentWarning\nLocation :                          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:231\nSuppress : warnings.simplefilter('ignore',                  <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> category=IgnoredArgumentWarning)                                                     <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2020-03-21   -0.401
+2020-03-22   -0.401
+2020-03-23   -0.401
+2020-03-24   -0.401
+2020-03-25   -0.401
+2020-03-26   -0.401
+2020-03-27   -0.401
+Freq: D, Name: pred, dtype: float64</code></pre>
+</div>
 </div>
 <p>See <a href="../docs/recursive/ForecasterRecursive.html">ForecasterRecursive Guide</a> for detailed examples.</p>
 </section>
 <section id="feature-engineering" class="level3">
 <h3 class="anchored" data-anchor-id="feature-engineering">Feature Engineering</h3>
 <p>The <code>ExogBuilder</code> class constructs exogenous (external) features:</p>
-<div id="907cfaf5" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> ExogBuilder</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>builder <span class="op">=</span> ExogBuilder(</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span>[Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))],</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>X_with_exog <span class="op">=</span> builder.transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="192f883c" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>builder <span class="op">=</span> ExogBuilder(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span>[Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))],</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>exog <span class="op">=</span> builder.build(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    start_date<span class="op">=</span>pd.Timestamp(<span class="st">'2023-01-01'</span>, tz<span class="op">=</span><span class="st">'UTC'</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    end_date<span class="op">=</span>pd.Timestamp(<span class="st">'2023-01-03'</span>, tz<span class="op">=</span><span class="st">'UTC'</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Exogenous features: </span><span class="sc">{</span>exog<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columns, </span><span class="sc">{</span>exog<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> rows"</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(exog.columns[:<span class="dv">5</span>].tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Exogenous features: 26 columns, 49 rows
+['hour_0', 'hour_1', 'hour_2', 'hour_3', 'hour_4']</code></pre>
+</div>
 </div>
 </section>
 <section id="holiday-integration" class="level3">
 <h3 class="anchored" data-anchor-id="holiday-integration">Holiday Integration</h3>
 <p>Generate holiday calendars for demand forecasting:</p>
-<div id="75308a7d" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils <span class="im">import</span> create_holiday_df</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>holidays <span class="op">=</span> create_holiday_df(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span><span class="st">'2023-01-01'</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span><span class="st">'2023-12-31'</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="86de5c76" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils <span class="im">import</span> create_holiday_df</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>holidays <span class="op">=</span> create_holiday_df(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span><span class="st">'2023-01-01'</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span><span class="st">'2023-12-31'</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>See <a href="../docs/reference/utils.html">Holiday Generation API</a> for details.</p>
 </section>
@@ -885,14 +930,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="model-persistence-savingloading" class="level2">
 <h2 class="anchored" data-anchor-id="model-persistence-savingloading">Model Persistence (Saving/Loading)</h2>
 <p>Save trained models for production deployment:</p>
-<div id="ac75a649" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.persistence <span class="im">import</span> save_model, load_model</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Save model and metadata</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>save_model(forecaster, <span class="st">'my_forecaster.pkl'</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Load in production</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> load_model(<span class="st">'my_forecaster.pkl'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bd72b273" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> spotforecast2_safe.manager.persistence <span class="im">as</span> persistence</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.NamedTemporaryFile(suffix<span class="op">=</span><span class="st">'.pkl'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> tmp:</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    model_path <span class="op">=</span> Path(tmp.name)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>persistence.dump(forecaster, model_path)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>loaded_forecaster <span class="op">=</span> persistence.load(model_path)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Saved and loaded: </span><span class="sc">{</span><span class="bu">type</span>(loaded_forecaster)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>model_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Saved and loaded: ForecasterRecursive</code></pre>
+</div>
 </div>
 <p>See <a href="../docs/processing/model_persistence.html">Model Persistence Guide</a> for details.</p>
 </section>
@@ -902,66 +954,175 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="determinism" class="level3">
 <h3 class="anchored" data-anchor-id="determinism">Determinism</h3>
 <p>Same input always produces identical output (bit-level reproducible):</p>
-<div id="a5f8cddd" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> rolling_features.fit_transform(df[<span class="st">'value'</span>])</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> rolling_features.fit_transform(df[<span class="st">'value'</span>])</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (X1 <span class="op">==</span> X2).<span class="bu">all</span>().<span class="bu">all</span>()  <span class="co"># True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="61fdd8ef" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pred1 <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pred2 <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (pred1 <span class="op">==</span> pred2).<span class="bu">all</span>()</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Determinism verified: identical predictions on repeated calls."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Determinism verified: identical predictions on repeated calls.</code></pre>
+</div>
 </div>
 </section>
 <section id="fail-safe-operation" class="level3">
 <h3 class="anchored" data-anchor-id="fail-safe-operation">Fail-Safe Operation</h3>
 <p>Invalid data raises explicit errors instead of silent failures:</p>
-<div id="e3627373" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This raises an error, not NaN propagation</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_with_nans <span class="op">=</span> pd.DataFrame({<span class="st">'value'</span>: [<span class="dv">1</span>, np.nan, <span class="dv">3</span>]})</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> rolling_features.fit_transform(df_with_nans[<span class="st">'value'</span>])</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Data validation error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2919e8ea" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Missing values raise an explicit error — no silent NaN propagation</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y_with_nans <span class="op">=</span> pd.Series([<span class="fl">1.0</span>, np.nan, <span class="fl">3.0</span>, <span class="fl">4.0</span>, <span class="fl">5.0</span>],</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                        index<span class="op">=</span>pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span><span class="dv">5</span>, freq<span class="op">=</span><span class="st">'D'</span>))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    bad_forecaster <span class="op">=</span> ForecasterRecursive(estimator<span class="op">=</span>Ridge(), lags<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    bad_forecaster.fit(y_with_nans)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> e:</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"ValueError: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ValueError: `y` has missing values.</code></pre>
+</div>
 </div>
 </section>
 <section id="auditability" class="level3">
 <h3 class="anchored" data-anchor-id="auditability">Auditability</h3>
-<p>All transformations are traceable with clear, white-box code:</p>
-<div id="fbec12b8" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Source code is visible via:</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Docstrings (in editor)</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Automatic API documentation (mkdocs)</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. GitHub repository</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>All transformations are traceable with clear, white-box code. The source code is visible via:</p>
+<ul>
+<li>Docstrings (in editor)</li>
+<li>Automatic API documentation (quarto)</li>
+<li>GitHub repository</li>
+</ul>
 </section>
 </section>
 <section id="complete-example-end-to-end-forecasting" class="level2">
 <h2 class="anchored" data-anchor-id="complete-example-end-to-end-forecasting">Complete Example: End-to-End Forecasting</h2>
-<div id="d8cacae0" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.models <span class="im">import</span> ForecasterRecursiveLGBM</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils <span class="im">import</span> create_holiday_df</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Prepare data</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span><span class="dv">365</span><span class="op">*</span><span class="dv">3</span>, freq<span class="op">=</span><span class="st">'h'</span>, tz<span class="op">=</span><span class="st">'UTC'</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.sin(np.arange(<span class="bu">len</span>(dates))<span class="op">*</span><span class="dv">2</span><span class="op">*</span>np.pi<span class="op">/</span><span class="dv">8760</span>) <span class="op">+</span> np.random.randn(<span class="bu">len</span>(dates))<span class="op">*</span><span class="fl">0.1</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(values, index<span class="op">=</span>dates)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Define train/test split dates</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'2022-12-31'</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Create rolling features</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>rolling <span class="op">=</span> RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">24</span>)</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rolling.fit_transform(y)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Split data</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> y[y.index <span class="op">&lt;=</span> train_end]</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Train forecaster</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursiveLGBM(iteration<span class="op">=</span><span class="dv">0</span>, lags<span class="op">=</span><span class="dv">24</span>)</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y_train)</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Generate forecast</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> forecaster.predict()</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Forecast: </span><span class="sc">{</span>forecast<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="50f8bc5a" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib.resources <span class="im">import</span> files</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils <span class="im">import</span> create_holiday_df</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Load demo02.csv (column A, 1970–1972, resampled to regular hourly grid)</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> files(<span class="st">'spotforecast2_safe.datasets.csv'</span>).joinpath(<span class="st">'demo02.csv'</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(path, index_col<span class="op">=</span><span class="st">'DateTime'</span>, parse_dates<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.sort_index().loc[<span class="st">'1970-01-01'</span>:<span class="st">'1972-12-31'</span>].resample(<span class="st">'h'</span>).mean()</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'A'</span>].ffill()</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Series: </span><span class="sc">{</span><span class="bu">len</span>(y)<span class="sc">}</span><span class="ss"> hourly obs  (</span><span class="sc">{</span>y<span class="sc">.</span>index[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> – </span><span class="sc">{</span>y<span class="sc">.</span>index[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Holiday calendar as exogenous feature (German public holidays)</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>holidays <span class="op">=</span> create_holiday_df(start<span class="op">=</span><span class="st">'1970-01-01'</span>, end<span class="op">=</span><span class="st">'1972-12-31'</span>, country_code<span class="op">=</span><span class="st">'DE'</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>holidays.index <span class="op">=</span> holidays.index.tz_localize(<span class="va">None</span>)   <span class="co"># align to tz-naive index</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>exog <span class="op">=</span> holidays.reindex(y.index).fillna(<span class="dv">0</span>)          <span class="co"># missing slots → non-holiday</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Train / test split  (2 years train, 1 year test)</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'1971-12-31 23:00'</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>y_train     <span class="op">=</span> y[y.index    <span class="op">&lt;=</span> train_end]</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>y_test      <span class="op">=</span> y[y.index    <span class="op">&gt;</span>  train_end]</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>exog_train  <span class="op">=</span> exog[exog.index <span class="op">&lt;=</span> train_end]</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>exog_test   <span class="op">=</span> exog[exog.index <span class="op">&gt;</span>  train_end]</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Train: </span><span class="sc">{</span><span class="bu">len</span>(y_train)<span class="sc">}</span><span class="ss"> obs — Test: </span><span class="sc">{</span><span class="bu">len</span>(y_test)<span class="sc">}</span><span class="ss"> obs"</span>)</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Build forecaster: lag 1 h / 1 day / 1 week + 24-h rolling mean + holiday exog</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>Ridge(),</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">24</span>, <span class="dv">168</span>],</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>    window_features<span class="op">=</span>[RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">24</span>)],</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y_train, exog<span class="op">=</span>exog_train)</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Forecast the first 24 hours of the test set</span></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>exog_future <span class="op">=</span> exog_test.iloc[:<span class="dv">24</span>]</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">24</span>, exog<span class="op">=</span>exog_future)</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Evaluate: first 10 hours as a comparison table</span></span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">'y_test'</span>:   y_test.iloc[:<span class="dv">10</span>].values,</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'forecast'</span>: forecast.iloc[:<span class="dv">10</span>].values,</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">'mae'</span>:      (y_test.iloc[:<span class="dv">10</span>] <span class="op">-</span> forecast.iloc[:<span class="dv">10</span>]).<span class="bu">abs</span>().values,</span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>}, index<span class="op">=</span>forecast.iloc[:<span class="dv">10</span>].index)</span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>results.<span class="bu">round</span>(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Series: 26304 hourly obs  (1970-01-01 00:00:00 – 1972-12-31 23:00:00)
+Train: 17520 obs — Test: 8784 obs</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y_test</th>
+<th data-quarto-table-cell-role="th">forecast</th>
+<th data-quarto-table-cell-role="th">mae</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1972-01-01 00:00:00</td>
+<td>0.1110</td>
+<td>0.0202</td>
+<td>0.0907</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1972-01-01 01:00:00</td>
+<td>0.1237</td>
+<td>0.0204</td>
+<td>0.1033</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1972-01-01 02:00:00</td>
+<td>0.0782</td>
+<td>0.0236</td>
+<td>0.0546</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1972-01-01 03:00:00</td>
+<td>-0.0859</td>
+<td>0.0198</td>
+<td>0.1057</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1972-01-01 04:00:00</td>
+<td>-0.0826</td>
+<td>0.0152</td>
+<td>0.0977</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1972-01-01 05:00:00</td>
+<td>-0.0982</td>
+<td>0.0108</td>
+<td>0.1090</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1972-01-01 06:00:00</td>
+<td>-0.0891</td>
+<td>0.0087</td>
+<td>0.0978</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1972-01-01 07:00:00</td>
+<td>0.0794</td>
+<td>0.0081</td>
+<td>0.0712</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1972-01-01 08:00:00</td>
+<td>0.1457</td>
+<td>0.0084</td>
+<td>0.1373</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1972-01-01 09:00:00</td>
+<td>-0.1351</td>
+<td>0.0090</td>
+<td>0.1441</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
 </div>
 </section>
 <section id="documentation-organization" class="level2">

@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -107,6 +107,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -689,6 +692,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#implementation-example" id="toc-implementation-example" class="nav-link" data-scroll-target="#implementation-example">Implementation Example</a></li>
   <li><a href="#internal-logic" id="toc-internal-logic" class="nav-link" data-scroll-target="#internal-logic">Internal Logic</a></li>
+  <li><a href="#the-weight-function-explained" id="toc-the-weight-function-explained" class="nav-link" data-scroll-target="#the-weight-function-explained">The Weight Function Explained</a>
+  <ul class="collapse">
+  <li><a href="#step-1-raw-data-with-gaps" id="toc-step-1-raw-data-with-gaps" class="nav-link" data-scroll-target="#step-1-raw-data-with-gaps">Step 1 — Raw data with gaps</a></li>
+  <li><a href="#step-2-imputation-and-weight-propagation" id="toc-step-2-imputation-and-weight-propagation" class="nav-link" data-scroll-target="#step-2-imputation-and-weight-propagation">Step 2 — Imputation and weight propagation</a></li>
+  <li><a href="#step-3-from-weights-to-x_train-and-sample_weight" id="toc-step-3-from-weights-to-x_train-and-sample_weight" class="nav-link" data-scroll-target="#step-3-from-weights-to-x_train-and-sample_weight">Step 3 — From weights to <code>X_train</code> and <code>sample_weight</code></a></li>
+  <li><a href="#step-4-how-the-estimator-uses-sample_weight" id="toc-step-4-how-the-estimator-uses-sample_weight" class="nav-link" data-scroll-target="#step-4-how-the-estimator-uses-sample_weight">Step 4 — How the estimator uses <code>sample_weight</code></a></li>
+  <li><a href="#why-a-callable-not-an-array" id="toc-why-a-callable-not-an-array" class="nav-link" data-scroll-target="#why-a-callable-not-an-array">Why a callable — not an array?</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/preprocessing/imputation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -738,32 +749,175 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="implementation-example" class="level2">
 <h2 class="anchored" data-anchor-id="implementation-example">Implementation Example</h2>
-<p>The following example demonstrates how to prepare data with gaps for safe training.</p>
-<div id="4cad9efe" class="cell" data-execution_count="1">
+<p>The following example demonstrates how to prepare data with gaps for safe training and generate a forecast.</p>
+<div id="fdd312b5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> (</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    get_missing_weights, </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    WeightFunction</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Create dummy data with a gap</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">"y"</span>: <span class="bu">range</span>(<span class="dv">20</span>)}, index<span class="op">=</span>pd.RangeIndex(<span class="dv">0</span>, <span class="dv">20</span>))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>data.loc[<span class="dv">10</span>, <span class="st">"y"</span>] <span class="op">=</span> np.nan</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Get filled data and weights</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># window_size=5 means we mask the gap and the 5 points following it</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>filled_data, weights <span class="op">=</span> get_missing_weights(data, window_size<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> get_missing_weights, WeightFunction</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Synthetic hourly series with two consecutive gaps</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">'h'</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.sin(np.arange(n) <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">/</span> <span class="dv">24</span>) <span class="op">+</span> np.random.randn(n) <span class="op">*</span> <span class="fl">0.1</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">'y'</span>: values}, index<span class="op">=</span>dates)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>data.loc[data.index[<span class="dv">50</span>], <span class="st">'y'</span>] <span class="op">=</span> np.nan</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>data.loc[data.index[<span class="dv">51</span>], <span class="st">'y'</span>] <span class="op">=</span> np.nan</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Create a serializable WeightFunction</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>weight_func <span class="op">=</span> WeightFunction(weights)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Usage in a Forecaster (conceptual)</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># forecaster = ForecasterRecursive(</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#     estimator=LGBMRegressor(),</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">#     lags=12,</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#     weight_func=weight_func</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NaNs before imputation: </span><span class="sc">{</span>data[<span class="st">'y'</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Impute gaps and compute safety weights</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># window_size=12 → the gap itself plus the next 12 observations are down-weighted to 0</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>filled_data, weights <span class="op">=</span> get_missing_weights(data, window_size<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NaNs after imputation:  </span><span class="sc">{</span>filled_data[<span class="st">'y'</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zero-weight samples:    </span><span class="sc">{</span>(weights <span class="op">==</span> <span class="dv">0</span>)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">  "</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"(gap + </span><span class="sc">{</span><span class="dv">12</span><span class="sc">}</span><span class="ss">-step lag window masked out)"</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Wrap weights in a picklable WeightFunction</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>weight_func <span class="op">=</span> WeightFunction(weights)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Build forecaster — weight_func down-weights imputed regions during training</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>LGBMRegressor(n_jobs<span class="op">=</span><span class="dv">1</span>, verbose<span class="op">=-</span><span class="dv">1</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">12</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    weight_func<span class="op">=</span>weight_func,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>forecaster.fit(filled_data[<span class="st">'y'</span>])</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Forecast the next 24 hours</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">24</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Results table</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">'timestamp'</span>: forecast.index,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'forecast'</span>:  forecast.values.<span class="bu">round</span>(<span class="dv">4</span>),</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>results.set_index(<span class="st">'timestamp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NaNs before imputation: 2
+NaNs after imputation:  0
+Zero-weight samples:    14  (gap + 12-step lag window masked out)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">forecast</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">timestamp</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 08:00:00</td>
+<td>0.8213</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 09:00:00</td>
+<td>0.7379</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 10:00:00</td>
+<td>0.5530</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 11:00:00</td>
+<td>0.2825</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 12:00:00</td>
+<td>0.0396</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 13:00:00</td>
+<td>-0.3173</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 14:00:00</td>
+<td>-0.6113</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 15:00:00</td>
+<td>-0.7076</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 16:00:00</td>
+<td>-0.8231</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 17:00:00</td>
+<td>-0.9425</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 18:00:00</td>
+<td>-0.9796</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 19:00:00</td>
+<td>-0.9678</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 20:00:00</td>
+<td>-0.8754</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 21:00:00</td>
+<td>-0.7605</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-09 22:00:00</td>
+<td>-0.4435</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-09 23:00:00</td>
+<td>-0.2832</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-10 00:00:00</td>
+<td>0.0053</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-10 01:00:00</td>
+<td>0.1809</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-10 02:00:00</td>
+<td>0.5853</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-10 03:00:00</td>
+<td>0.6046</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-10 04:00:00</td>
+<td>0.8878</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-10 05:00:00</td>
+<td>1.0020</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-10 06:00:00</td>
+<td>0.9964</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-10 07:00:00</td>
+<td>0.9290</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
 </div>
 </section>
 <section id="internal-logic" class="level2">
@@ -782,8 +936,432 @@ Safety First
 <p>The <code>WeightFunction</code> is designed to be deterministic and picklable. This is crucial for safety-critical systems where models must be serialized and loaded in different environments (e.g., training in a batch environment and predicting in an edge device) without loss of context.</p>
 </div>
 </div>
+</section>
+<section id="the-weight-function-explained" class="level2">
+<h2 class="anchored" data-anchor-id="the-weight-function-explained">The Weight Function Explained</h2>
+<p>To make the mechanism concrete, this section walks through the exact numerical values at each step using a small, readable example: 30 hourly observations, two consecutive gaps at positions 10–11, and <code>window_size=5</code>.</p>
+<section id="step-1-raw-data-with-gaps" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-raw-data-with-gaps">Step 1 — Raw data with gaps</h3>
+<div id="205eeb29" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> get_missing_weights, WeightFunction</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">'h'</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.sin(np.arange(n) <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">/</span> <span class="dv">24</span>) <span class="op">+</span> np.random.randn(n) <span class="op">*</span> <span class="fl">0.1</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">'y'</span>: values.<span class="bu">round</span>(<span class="dv">4</span>)}, index<span class="op">=</span>dates)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Inject two consecutive gaps</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>data.loc[data.index[<span class="dv">10</span>], <span class="st">'y'</span>] <span class="op">=</span> np.nan</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>data.loc[data.index[<span class="dv">11</span>], <span class="st">'y'</span>] <span class="op">=</span> np.nan</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>data.iloc[<span class="dv">7</span>:<span class="dv">18</span>]   <span class="co"># rows around the gap</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
 
 
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 07:00:00</td>
+<td>1.0427</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 08:00:00</td>
+<td>0.8191</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 09:00:00</td>
+<td>0.7614</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 10:00:00</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 11:00:00</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 12:00:00</td>
+<td>0.0242</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 13:00:00</td>
+<td>-0.4501</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 14:00:00</td>
+<td>-0.6725</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 15:00:00</td>
+<td>-0.7633</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 16:00:00</td>
+<td>-0.9673</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 17:00:00</td>
+<td>-0.9345</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The last known good value before the gap is <code>0.7614</code> (row 9, <code>09:00</code>).</p>
+</section>
+<section id="step-2-imputation-and-weight-propagation" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-imputation-and-weight-propagation">Step 2 — Imputation and weight propagation</h3>
+<p><code>get_missing_weights</code> forward-fills the gap with the last known value, then applies a <strong>rolling maximum</strong> of width <code>window_size + 1</code> over a binary “was-NaN” mask. Any row whose rolling window touches an imputed value receives weight <code>0</code>.</p>
+<div id="e55cd740" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>filled_data, weights <span class="op">=</span> get_missing_weights(data, window_size<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> filled_data.copy()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">'weight'</span>] <span class="op">=</span> weights</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>combined.iloc[<span class="dv">7</span>:<span class="dv">20</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y</th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 07:00:00</td>
+<td>1.0427</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 08:00:00</td>
+<td>0.8191</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 09:00:00</td>
+<td>0.7614</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 10:00:00</td>
+<td>0.7614</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 11:00:00</td>
+<td>0.7614</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 12:00:00</td>
+<td>0.0242</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 13:00:00</td>
+<td>-0.4501</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 14:00:00</td>
+<td>-0.6725</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 15:00:00</td>
+<td>-0.7633</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 16:00:00</td>
+<td>-0.9673</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 17:00:00</td>
+<td>-0.9345</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 18:00:00</td>
+<td>-1.0908</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 19:00:00</td>
+<td>-1.1072</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The contaminated zone covers exactly <strong>2 gap rows + 5 lag-window rows = 7 zeros</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Why extend the mask by <code>window_size</code>? A lag-3 model predicting at <code>12:00</code> uses features <code>[lag_1=11:00, lag_2=10:00, lag_3=09:00]</code>. Both <code>10:00</code> and <code>11:00</code> are imputed, so the entire training row for <code>12:00</code> is corrupt. The mask must reach forward by the full lag depth.</p>
+</div>
+</div>
+</section>
+<section id="step-3-from-weights-to-x_train-and-sample_weight" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-from-weights-to-x_train-and-sample_weight">Step 3 — From weights to <code>X_train</code> and <code>sample_weight</code></h3>
+<p><code>ForecasterRecursive._create_train_X_y()</code> converts the series into a lag matrix. With <code>lags=3</code> the training matrix starts at row 3 and the row indices become timestamps:</p>
+<div id="0f36a157" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>forecaster_small <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>LGBMRegressor(n_jobs<span class="op">=</span><span class="dv">1</span>, verbose<span class="op">=-</span><span class="dv">1</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    weight_func<span class="op">=</span>WeightFunction(weights),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>X_train, y_train, <span class="op">*</span>_ <span class="op">=</span> forecaster_small._create_train_X_y(filled_data[<span class="st">'y'</span>])</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>sample_weight <span class="op">=</span> forecaster_small.create_sample_weights(X_train)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine everything for inspection</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>inspection <span class="op">=</span> X_train.copy()</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>inspection[<span class="st">'y_target'</span>]      <span class="op">=</span> y_train</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>inspection[<span class="st">'sample_weight'</span>] <span class="op">=</span> sample_weight</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>inspection.iloc[<span class="dv">7</span>:<span class="dv">18</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">lag_1</th>
+<th data-quarto-table-cell-role="th">lag_2</th>
+<th data-quarto-table-cell-role="th">lag_3</th>
+<th data-quarto-table-cell-role="th">y_target</th>
+<th data-quarto-table-cell-role="th">sample_weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 10:00:00</td>
+<td>0.7614</td>
+<td>0.8191</td>
+<td>1.0427</td>
+<td>0.7614</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 11:00:00</td>
+<td>0.7614</td>
+<td>0.7614</td>
+<td>0.8191</td>
+<td>0.7614</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 12:00:00</td>
+<td>0.7614</td>
+<td>0.7614</td>
+<td>0.7614</td>
+<td>0.0242</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 13:00:00</td>
+<td>0.0242</td>
+<td>0.7614</td>
+<td>0.7614</td>
+<td>-0.4501</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 14:00:00</td>
+<td>-0.4501</td>
+<td>0.0242</td>
+<td>0.7614</td>
+<td>-0.6725</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 15:00:00</td>
+<td>-0.6725</td>
+<td>-0.4501</td>
+<td>0.0242</td>
+<td>-0.7633</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 16:00:00</td>
+<td>-0.7633</td>
+<td>-0.6725</td>
+<td>-0.4501</td>
+<td>-0.9673</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 17:00:00</td>
+<td>-0.9673</td>
+<td>-0.7633</td>
+<td>-0.6725</td>
+<td>-0.9345</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 18:00:00</td>
+<td>-0.9345</td>
+<td>-0.9673</td>
+<td>-0.7633</td>
+<td>-1.0908</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-01-01 19:00:00</td>
+<td>-1.0908</td>
+<td>-0.9345</td>
+<td>-0.9673</td>
+<td>-1.1072</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-01-01 20:00:00</td>
+<td>-1.1072</td>
+<td>-1.0908</td>
+<td>-0.9345</td>
+<td>-0.7195</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>weight_func</code> is called with <code>X_train.index</code> (the timestamps). It looks up each timestamp in the pre-computed weights Series and returns the corresponding <code>0.0</code> or <code>1.0</code>. Rows where <code>sample_weight == 0</code> are present in <code>X_train</code> but have <strong>zero influence</strong> on the fitted model.</p>
+</section>
+<section id="step-4-how-the-estimator-uses-sample_weight" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-how-the-estimator-uses-sample_weight">Step 4 — How the estimator uses <code>sample_weight</code></h3>
+<p>Inside <code>ForecasterRecursive.fit()</code> the call path is:</p>
+<pre><code>fit(y, exog)
+  └─ _create_train_X_y(y)          → X_train, y_train
+  └─ create_sample_weights(X_train) → weight_func(X_train.index)  → array([1,1,...,0,0,...,1])
+  └─ estimator.fit(X_train, y_train, sample_weight=array)</code></pre>
+<p><code>LGBMRegressor</code> (and any sklearn-compatible estimator) interprets <code>sample_weight=0</code> as “skip this observation entirely”. The imputed rows are physically present in the training matrix but contribute zero gradient to the model.</p>
+<div id="cfb1de69" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the weight distribution summary</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sw_series <span class="op">=</span> pd.Series(sample_weight, index<span class="op">=</span>X_train.index, name<span class="op">=</span><span class="st">'sample_weight'</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total training rows : </span><span class="sc">{</span><span class="bu">len</span>(sw_series)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Active   (weight=1) : </span><span class="sc">{</span>(sw_series <span class="op">==</span> <span class="dv">1</span>)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Excluded (weight=0) : </span><span class="sc">{</span>(sw_series <span class="op">==</span> <span class="dv">0</span>)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Excluded timestamps:"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sw_series[sw_series <span class="op">==</span> <span class="dv">0</span>].index.tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total training rows : 27
+Active   (weight=1) : 20
+Excluded (weight=0) : 7
+
+Excluded timestamps:
+[Timestamp('2020-01-01 10:00:00'), Timestamp('2020-01-01 11:00:00'), Timestamp('2020-01-01 12:00:00'), Timestamp('2020-01-01 13:00:00'), Timestamp('2020-01-01 14:00:00'), Timestamp('2020-01-01 15:00:00'), Timestamp('2020-01-01 16:00:00')]</code></pre>
+</div>
+</div>
+</section>
+<section id="why-a-callable-not-an-array" class="level3">
+<h3 class="anchored" data-anchor-id="why-a-callable-not-an-array">Why a callable — not an array?</h3>
+<p>You might wonder: if we already have the <code>weights</code> Series, why not pass it directly to the forecaster instead of wrapping it in a callable? There are three concrete reasons.</p>
+<p><strong>Reason 1 — Length mismatch: the lag matrix is shorter than the original series.</strong></p>
+<p><code>get_missing_weights</code> returns one weight per row of the original series (length <code>n</code>). <code>ForecasterRecursive._create_train_X_y</code> discards the first <code>max(lags)</code> rows because they cannot be fully populated with lag features. The resulting <code>X_train</code> has length <code>n − max(lags)</code>, which changes with every different <code>lags</code> setting.</p>
+<div id="20973b9e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"len(filled_data) = </span><span class="sc">{</span><span class="bu">len</span>(filled_data)<span class="sc">}</span><span class="ss">   ← original series, one weight per row"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"len(weights)     = </span><span class="sc">{</span><span class="bu">len</span>(weights)<span class="sc">}</span><span class="ss">   ← same"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'lags'</span><span class="sc">:&gt;6}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'X_train rows'</span><span class="sc">:&gt;12}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'would need array length'</span><span class="sc">:&gt;22}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'actual weights length'</span><span class="sc">:&gt;20}</span><span class="ss">"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">66</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lags <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">12</span>]:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    f_tmp <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        estimator<span class="op">=</span>LGBMRegressor(verbose<span class="op">=-</span><span class="dv">1</span>),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        lags<span class="op">=</span>lags,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        weight_func<span class="op">=</span>WeightFunction(weights),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    X_tmp, <span class="op">*</span>_ <span class="op">=</span> f_tmp._create_train_X_y(filled_data[<span class="st">'y'</span>])</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>lags<span class="sc">:&gt;6}</span><span class="ss">  </span><span class="sc">{</span><span class="bu">len</span>(X_tmp)<span class="sc">:&gt;12}</span><span class="ss">  </span><span class="sc">{</span><span class="bu">len</span>(X_tmp)<span class="sc">:&gt;22}</span><span class="ss">  </span><span class="sc">{</span><span class="bu">len</span>(weights)<span class="sc">:&gt;20}</span><span class="ss">  </span><span class="sc">{</span><span class="st">'✗ mismatch'</span> <span class="cf">if</span> <span class="bu">len</span>(X_tmp) <span class="op">!=</span> <span class="bu">len</span>(weights) <span class="cf">else</span> <span class="st">'✓'</span><span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>len(filled_data) = 30   ← original series, one weight per row
+len(weights)     = 30   ← same
+
+  lags  X_train rows  would need array length  actual weights length
+------------------------------------------------------------------
+     1            29                      29                    30  ✗ mismatch
+     3            27                      27                    30  ✗ mismatch
+     7            23                      23                    30  ✗ mismatch
+    12            18                      18                    30  ✗ mismatch</code></pre>
+</div>
+</div>
+<p>A plain array passed at construction time has no way to know which rows were dropped. A <strong>callable receives <code>X_train.index</code></strong> — the exact timestamps that survived — and performs a label-based lookup, returning a correctly sized array regardless of <code>lags</code>.</p>
+<p><strong>Reason 2 — Index-based lookup, not positional.</strong></p>
+<p>The forecaster calls <code>weight_func(X_train.index)</code> where <code>X_train.index</code> is a <code>DatetimeIndex</code>. The function maps each timestamp to its pre-computed weight by label:</p>
+<div id="f398aaf6" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wf <span class="op">=</span> WeightFunction(weights)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sample_idx <span class="op">=</span> X_train.index[<span class="dv">7</span>:<span class="dv">10</span>]      <span class="co"># three timestamps from inside X_train</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"queried timestamps:"</span>, sample_idx.tolist())</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"returned weights:  "</span>, wf(sample_idx).tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>queried timestamps: [Timestamp('2020-01-01 10:00:00'), Timestamp('2020-01-01 11:00:00'), Timestamp('2020-01-01 12:00:00')]
+returned weights:   [0.0, 0.0, 0.0]</code></pre>
+</div>
+</div>
+<p>A positional array <code>weights[7:10]</code> would silently return the wrong values because the lag-matrix offset shifts all positions by <code>max(lags)</code>.</p>
+<p><strong>Reason 3 — Picklability for model serialization.</strong></p>
+<p>Trained <code>ForecasterRecursive</code> instances are saved with <code>persistence.dump()</code> (joblib). Any closure or lambda that captures a local variable fails at serialization time:</p>
+<div id="9f1cfd9c" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># A lambda closure over a local variable — NOT serializable</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_closure():</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> weights.copy()</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">lambda</span> index: w.reindex(index).values</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    pickle.dumps(make_closure())</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"lambda closure: picklable"</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AttributeError</span> <span class="im">as</span> e:</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"lambda closure: NOT picklable — </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co"># WeightFunction stores only the Series — fully serializable</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>wf_roundtrip <span class="op">=</span> pickle.loads(pickle.dumps(WeightFunction(weights)))</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"WeightFunction:  picklable — spot-check: </span><span class="sc">{</span>wf_roundtrip(weights.index[:<span class="dv">3</span>])<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lambda closure: NOT picklable — Can't get local object 'make_closure.&lt;locals&gt;.&lt;lambda&gt;'
+WeightFunction:  picklable — spot-check: [1.0, 1.0, 1.0]</code></pre>
+</div>
+</div>
+<p><code>WeightFunction</code> is a plain class with a single <code>__init__</code> attribute (<code>weights_series</code>). Pickle serializes it without any closure or scope dependency, making it safe to store alongside the trained model and reload in a completely separate process.</p>
+
+
+</section>
 </section>
 
 </main> <!-- /main -->
