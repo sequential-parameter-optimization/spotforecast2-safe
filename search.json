@@ -2543,6 +2543,338 @@
     ]
   },
   {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html",
+    "href": "docs/n2n_predict_with_covariates_explained.html",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "",
+    "text": "The n2n_predict_with_covariates function is the central engine of the spotforecast2-safe forecasting system. It accepts a multivariate time series and returns a DataFrame of multi-step ahead predictions for every target column, together with a metadata dictionary and a collection of fitted ForecasterRecursive objects. The function is organised as a strict sequential pipeline of nine numbered stages, each of which transforms the data into a form that the next stage can consume. Understanding each stage in isolation is the clearest path to understanding the function as a whole."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#input-validation",
+    "href": "docs/n2n_predict_with_covariates_explained.html#input-validation",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Input Validation",
+    "text": "Input Validation\nBefore any computation is attempted, n2n_predict_with_covariates validates every numerical argument at the entry point. The forecast_horizon must be strictly positive, contamination must lie in [0, 0.5], window_size and lags must both be positive, and train_ratio must be strictly between zero and one. These checks follow the fail-fast principle: a nonsensical configuration raises a ValueError immediately with an informative message, rather than allowing a malformed value to silently corrupt a lag matrix or an outlier-detection threshold deep inside the pipeline. The guard on forecast_horizon in particular prevents a negative or zero value from causing array slices to wrap around or return empty results, which would be invisible to the caller at training time but catastrophic at evaluation time."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-1-data-preparation",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-1-data-preparation",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 1 — Data Preparation",
+    "text": "Stage 1 — Data Preparation\nThe first stage resolves the source of the target time series. When the caller supplies a data argument, the series is passed directly to fetch_data with the dataframe keyword. When no data is supplied, fetch_data reads from the default data_in.csv file. In either case the function returns a DataFrame with a timezone-aware DatetimeIndex and numeric columns for each target variable. The column names are recorded immediately as target_columns because they govern every downstream operation, from the exogenous feature alignment to the model persistence file names.\nOnce the data is loaded, get_start_end computes four boundary timestamps: start and end bracket the historical portion of the series, while cov_start and cov_end extend the window forward by exactly forecast_horizon steps to cover the prediction period. These timestamps are used consistently across all feature-engineering functions to ensure that the exogenous feature matrix covers both the training window and the prediction window without any gaps at the boundary.\nbasic_ts_checks then asserts that the index is monotonically increasing and that the frequency is consistent, which are prerequisites for the lag-matrix construction in ForecasterRecursive. agg_and_resample_data enforces the target hourly frequency by aggregating sub-hourly data and forward-filling isolated gaps, producing a regular grid before any model sees the series."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-2-outlier-detection-and-removal",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-2-outlier-detection-and-removal",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 2 — Outlier Detection and Removal",
+    "text": "Stage 2 — Outlier Detection and Removal\nThe second stage passes the cleaned series to mark_outliers, which applies an Isolation Forest with the user-specified contamination parameter. The Isolation Forest partitions the feature space by randomly selecting split points; observations that require very few splits to isolate are considered anomalous. With contamination=0.01, approximately one percent of the series is expected to be anomalous. The function replaces the values at detected outlier positions with NaN so that the imputation stage can treat them uniformly with other missing data. The label series outliers is returned separately and stored for the metadata dictionary at the end of the pipeline.\n\nimport numpy as np\nimport pandas as pd\n\nnp.random.seed(42)\nn = 200\ny = pd.Series(np.random.randn(n))\ny.iloc[50] = 15.0   # inject spike\ny.iloc[100] = -12.0  # inject dip\n\ncontamination = 0.01\nexpected_anomalies = int(n * contamination)\nprint(f\"Series length     : {n}\")\nprint(f\"Expected anomalies: {expected_anomalies}\")\nprint(f\"Injected positions: [50, 100]\")\n\nSeries length     : 200\nExpected anomalies: 2\nInjected positions: [50, 100]\n\n\nThe random_state=1234 argument ensures that two runs on identical input produce identical outlier labels, which is a core requirement of the reproducible-artefact design."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-3-missing-value-imputation-with-sample-weighting",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-3-missing-value-imputation-with-sample-weighting",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 3 — Missing Value Imputation with Sample Weighting",
+    "text": "Stage 3 — Missing Value Imputation with Sample Weighting\nAfter outlier removal, every position marked as anomalous or originally missing is imputed by get_missing_weights. The function forward-fills all NaN positions, then propagates a binary contamination mask forward by window_size positions using a rolling maximum. Any training row whose lag window touches an imputed value receives weight zero; all other rows receive weight one. This strategy is more conservative than simply imputing values: the forecaster still sees the forward-filled numbers in its lag matrix, but the corresponding sample weights suppress their gradient contribution during fitting.\nThe resulting weights_series is wrapped in a WeightFunction object rather than passed as a plain array. This indirection solves three problems simultaneously. The training matrix produced by ForecasterRecursive._create_train_X_y is shorter than the original series by max(lags) rows, so a positionally indexed array would silently return the wrong weights. A callable that receives X_train.index and performs a label-based lookup into the weights Series is immune to this offset regardless of the lags setting. Additionally, WeightFunction is a plain class with no closure dependencies, making it fully picklable alongside the trained forecaster — a requirement for model persistence across separate Python processes.\n\nimport pandas as pd\nimport numpy as np\n\nweights = pd.Series([1, 1, 0, 0, 0, 1, 1, 1], dtype=float,\n                     index=pd.date_range(\"2020-01-01\", periods=8, freq=\"h\"))\n\nclass WeightFunction:\n    def __init__(self, weights_series):\n        self.weights_series = weights_series\n    def __call__(self, index):\n        return self.weights_series.reindex(index).fillna(1.0).values\n\nwf = WeightFunction(weights)\nquery_idx = weights.index[1:5]\nprint(\"Queried timestamps :\", query_idx.tolist())\nprint(\"Returned weights   :\", wf(query_idx).tolist())\n\nQueried timestamps : [Timestamp('2020-01-01 01:00:00'), Timestamp('2020-01-01 02:00:00'), Timestamp('2020-01-01 03:00:00'), Timestamp('2020-01-01 04:00:00')]\nReturned weights   : [1.0, 0.0, 0.0, 0.0]"
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-4-exogenous-feature-engineering",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-4-exogenous-feature-engineering",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 4 — Exogenous Feature Engineering",
+    "text": "Stage 4 — Exogenous Feature Engineering\nThe fourth stage constructs four categories of exogenous features, each covering the full extended window from start to cov_end.\nHoliday features are retrieved by _get_holiday_features, which calls fetch_holiday_data for the configured country and state, validates the result with curate_holidays, and reindexes the resulting binary Series to the hourly grid with fill_value=0. The binary encoding — zero for non-holiday, one for holiday — is intentional: the model receives an unambiguous categorical signal that is compatible with gradient boosting without any encoding transformation.\nWeather features are retrieved by _get_weather_features, which calls fetch_weather_data and then applies WindowFeatures from feature_engine to compute rolling mean, maximum, and minimum over one-day and seven-day windows for each numeric weather column. Any residual missing values in the weather matrix are resolved by backward-fill before the window transformation, and a second check after transformation raises a ValueError if any NaN values remain. This double-check ensures that no imputed weather value silently propagates into the feature matrix.\nCalendar features are created by _get_calendar_features, which uses DatetimeFeatures from feature_engine to extract month, week of year, day of week, and hour directly from the DatetimeIndex. Because these features are derived from the index alone, they are always complete and require no imputation.\nDay and night features are computed by _get_day_night_features using the astral library. For each unique calendar date in the extended index, the function computes sunrise and sunset times using the observer’s geographic coordinates, rounds them to the nearest hour, and broadcasts the values across all hourly timestamps in that day. The derived is_daylight column is a binary flag that equals one during the hours between sunrise and sunset. Caching the per-day sunrise and sunset times before broadcasting avoids recomputing the solar position for every timestamp in a multi-year series.\n\nimport pandas as pd\nimport numpy as np\n\ndates = pd.date_range(\"2020-06-01\", periods=24, freq=\"h\", tz=\"UTC\")\nsunrise_hour = 4   # approximate June sunrise at 51°N\nsunset_hour  = 21  # approximate June sunset  at 51°N\n\nis_daylight = np.where(\n    (dates.hour &gt;= sunrise_hour) & (dates.hour &lt; sunset_hour), 1, 0\n)\ndf_sun = pd.DataFrame({\"hour\": dates.hour, \"is_daylight\": is_daylight}, index=dates)\nprint(df_sun.groupby(\"is_daylight\")[\"hour\"].apply(list).to_string())\n\nis_daylight\n0                             [0, 1, 2, 3, 21, 22, 23]\n1    [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,..."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-5-combining-and-encoding-exogenous-features",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-5-combining-and-encoding-exogenous-features",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 5 — Combining and Encoding Exogenous Features",
+    "text": "Stage 5 — Combining and Encoding Exogenous Features\nThe four feature DataFrames are concatenated column-wise into a single exogenous_features matrix. A missing-value check immediately follows; if any NaN value is present the function raises a ValueError that identifies the count of missing entries. This hard stop prevents a silently incomplete feature matrix from entering the cyclical encoder.\nCyclical encoding is applied to month, week, day of week, hour, sunrise hour, and sunset hour by _apply_cyclical_encoding. Each integer-valued column is replaced by its sine and cosine projections onto a unit circle scaled to the column’s natural period. The transformation ensures that the numerically adjacent values at the boundary of each cycle — midnight and the hour before midnight, December and January, Sunday and Monday — are also geometrically adjacent in the encoded space, which prevents gradient boosting from learning a spurious discontinuity at the wrap-around point. The original integer columns are retained alongside the cyclical columns so that the model can use either representation.\n\nimport numpy as np\nimport pandas as pd\n\ndates = pd.date_range(\"2020-01-01\", periods=12, freq=\"ME\")\nmonth = dates.month\nmonth_sin = np.sin(2 * np.pi * month / 12)\nmonth_cos = np.cos(2 * np.pi * month / 12)\n\npd.DataFrame(\n    {\"month\": month, \"sin\": month_sin.round(4), \"cos\": month_cos.round(4)},\n    index=dates,\n)\n\n\n\n\n\n\n\n\nmonth\nsin\ncos\n\n\n\n\n2020-01-31\n1\n0.500\n0.866\n\n\n2020-02-29\n2\n0.866\n0.500\n\n\n2020-03-31\n3\n1.000\n0.000\n\n\n2020-04-30\n4\n0.866\n-0.500\n\n\n2020-05-31\n5\n0.500\n-0.866\n\n\n2020-06-30\n6\n0.000\n-1.000\n\n\n2020-07-31\n7\n-0.500\n-0.866\n\n\n2020-08-31\n8\n-0.866\n-0.500\n\n\n2020-09-30\n9\n-1.000\n-0.000\n\n\n2020-10-31\n10\n-0.866\n0.500\n\n\n2020-11-30\n11\n-0.500\n0.866\n\n\n2020-12-31\n12\n-0.000\n1.000\n\n\n\n\n\n\n\nInteraction features are then created by _create_interaction_features using PolynomialFeatures with interaction_only=True. This produces pairwise products of the four cyclical calendar columns with the weather window features and the raw weather columns. The holiday column is included if it is present. Interaction features capture joint effects such as the combination of a cold morning and a weekday peak that neither feature can represent individually. The resulting columns are prefixed with poly_ to distinguish them from the base features."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-6-feature-selection",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-6-feature-selection",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 6 — Feature Selection",
+    "text": "Stage 6 — Feature Selection\n_select_exogenous_features assembles the final list of exogenous column names from the combined feature matrix. The function always includes cyclical features, identified by a _sin$|_cos$ regular expression, and the raw weather columns. Weather window features, holiday features, and polynomial interaction features are included only if the corresponding boolean flags were set by the caller. The order-preserving deduplication idiom list(dict.fromkeys(exog_features)) ensures that no column name appears twice in the final list even if multiple selection paths produce the same column, which would cause a duplicate-column error inside the forecaster."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-7-merging-target-and-exogenous-data",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-7-merging-target-and-exogenous-data",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 7 — Merging Target and Exogenous Data",
+    "text": "Stage 7 — Merging Target and Exogenous Data\n_merge_data_and_covariates produces three DataFrames from the combined inputs. exo_tmp is the slice of the exogenous feature matrix that covers [start, end], the historical window used for training. exo_pred is the slice that covers (end, cov_end], the future window used for prediction. data_with_exog is an inner join of the target columns with the selected exogenous features over the historical window; the inner join guarantees that only rows where both the target and the exogenous features are present are retained, eliminating any residual index misalignment. All columns of data_with_exog are cast to float32 to reduce memory consumption during lag-matrix construction."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-8-trainvalidationtest-split",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-8-trainvalidationtest-split",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 8 — Train/Validation/Test Split",
+    "text": "Stage 8 — Train/Validation/Test Split\nsplit_rel_train_val_test partitions data_with_exog into three temporally ordered segments using the train_ratio argument. With the default train_ratio=0.8, the training set receives 80 percent of the rows, and the validation and test sets each receive 10 percent. The split is purely temporal — no shuffling is performed — which respects the causal ordering of a time series. The end timestamp of the combined train-validation segment, end_validation, defines the boundary up to which the forecaster is fitted. This boundary is used in the .fit call rather than the end of the full dataset to leave the test set genuinely unseen.\n\nimport pandas as pd\nimport numpy as np\n\nn = 100\nidx = pd.date_range(\"2020-01-01\", periods=n, freq=\"h\")\ny   = pd.Series(np.arange(n, dtype=float), index=idx)\n\ntrain_ratio = 0.8\nn_train = int(n * train_ratio)\nn_val   = int(n * (1 - train_ratio) / 2)\nn_test  = n - n_train - n_val\n\nprint(f\"Total rows : {n}\")\nprint(f\"Train rows : {n_train}  ({train_ratio:.0%})\")\nprint(f\"Val rows   : {n_val}\")\nprint(f\"Test rows  : {n_test}\")\nprint(f\"Train ends : {y.index[n_train - 1]}\")\n\nTotal rows : 100\nTrain rows : 80  (80%)\nVal rows   : 9\nTest rows  : 11\nTrain ends : 2020-01-04 07:00:00"
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-9-model-training-or-loading",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-9-model-training-or-loading",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 9 — Model Training or Loading",
+    "text": "Stage 9 — Model Training or Loading\nThe ninth stage decides whether to train new forecasters or to load previously serialised ones. If force_train=False and the model directory exists, _load_forecasters attempts to deserialise a ForecasterRecursive object for each target column. Targets whose model files are missing from the directory are added to targets_to_train. If all models load successfully, training is skipped entirely and the function proceeds directly to the prediction stage. This caching mechanism makes repeated calls with the same configuration — for example in a daily batch process — significantly faster than retraining from scratch.\nWhen training is required, a ForecasterRecursive is constructed for each target in targets_to_train. The estimator defaults to LGBMRegressor(random_state=1234, verbose=-1) if the caller does not supply one. A RollingFeatures object with stats=[\"mean\"] and window_sizes=window_size is passed as the window_features argument, which instructs the forecaster to include a rolling mean of the target series as an additional feature alongside the lag columns. The weight_func argument wires the WeightFunction created in stage 3 into the training loop.\nEach forecaster is fitted on the target column of data_with_exog up to and including end_validation, with the corresponding exogenous slice passed as the exog argument. After all targets are trained, _save_forecasters serialises each fitted object to the model directory using joblib, one file per target. The WeightFunction instance is serialised together with the forecaster because it is an attribute of the fitted object.\n\nimport numpy as np\nimport pandas as pd\nfrom lightgbm import LGBMRegressor\n\nestimator = LGBMRegressor(random_state=1234, verbose=-1)\nprint(f\"random_state : {estimator.random_state}\")\nprint(f\"verbose      : {estimator.verbose}\")\nprint(f\"n_estimators : {estimator.n_estimators}\")\n\nrandom_state : 1234\nverbose      : -1\nn_estimators : 100"
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#stage-10-prediction",
+    "href": "docs/n2n_predict_with_covariates_explained.html#stage-10-prediction",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Stage 10 — Prediction",
+    "text": "Stage 10 — Prediction\nAfter all forecasters are available — whether trained or loaded — predict_multivariate iterates over the recursive_forecasters dictionary and calls .predict(steps=forecast_horizon, exog=exo_pred_subset) on each forecaster. The exogenous input for the prediction step is exo_pred[exog_features], the future slice of the feature matrix that covers exactly forecast_horizon steps beyond end_validation. The recursive forecaster advances its internal state one step at a time, using each predicted value as the next lag input, which is why the future exogenous features must be available for all forecast_horizon steps before any prediction can begin. The result is assembled into a predictions DataFrame with one column per target and forecast_horizon rows.\n\nimport numpy as np\nimport pandas as pd\n\nforecast_horizon = 24\nn_targets = 11\nnp.random.seed(42)\n\npred_index = pd.date_range(\"2023-01-02\", periods=forecast_horizon, freq=\"h\")\npredictions = pd.DataFrame(\n    np.random.randn(forecast_horizon, n_targets),\n    index=pred_index,\n    columns=[f\"col_{i+1}\" for i in range(n_targets)],\n)\n\nprint(f\"Predictions shape : {predictions.shape}\")\nprint(f\"First timestamp   : {predictions.index[0]}\")\nprint(f\"Last  timestamp   : {predictions.index[-1]}\")\npredictions.head(3).round(4)\n\nPredictions shape : (24, 11)\nFirst timestamp   : 2023-01-02 00:00:00\nLast  timestamp   : 2023-01-02 23:00:00\n\n\n\n\n\n\n\n\n\ncol_1\ncol_2\ncol_3\ncol_4\ncol_5\ncol_6\ncol_7\ncol_8\ncol_9\ncol_10\ncol_11\n\n\n\n\n2023-01-02 00:00:00\n0.4967\n-0.1383\n0.6477\n1.5230\n-0.2342\n-0.2341\n1.5792\n0.7674\n-0.4695\n0.5426\n-0.4634\n\n\n2023-01-02 01:00:00\n-0.4657\n0.2420\n-1.9133\n-1.7249\n-0.5623\n-1.0128\n0.3142\n-0.9080\n-1.4123\n1.4656\n-0.2258\n\n\n2023-01-02 02:00:00\n0.0675\n-1.4247\n-0.5444\n0.1109\n-1.1510\n0.3757\n-0.6006\n-0.2917\n-0.6017\n1.8523\n-0.0135"
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#metadata-and-return-values",
+    "href": "docs/n2n_predict_with_covariates_explained.html#metadata-and-return-values",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "Metadata and Return Values",
+    "text": "Metadata and Return Values\nThe function returns a three-element tuple. The first element is the predictions DataFrame described above. The second element is a metadata dictionary that records every parameter and intermediate shape that characterises the run: forecast_horizon, target_columns, exog_features, the number of selected exogenous features, the sizes of the train, validation, and test segments, the shapes of the original and merged DataFrames, the training end timestamp, the prediction start and end timestamps, lags, window_size, contamination, and the number of detected outliers. This dictionary provides a self-contained audit record of the computation without requiring the caller to reparse the source data or rerun the pipeline.\nThe third element is the recursive_forecasters dictionary keyed by target column name. Returning the fitted objects allows the caller to inspect internal state — feature names, lag matrices, fitted estimator parameters — or to call .predict again with a different horizon without retraining."
+  },
+  {
+    "objectID": "docs/n2n_predict_with_covariates_explained.html#the-complete-execution-flow",
+    "href": "docs/n2n_predict_with_covariates_explained.html#the-complete-execution-flow",
+    "title": "n2n_predict_with_covariates: Design and Pipeline Logic Explained",
+    "section": "The Complete Execution Flow",
+    "text": "The Complete Execution Flow\nA single call to n2n_predict_with_covariates follows this invariant sequence. Input validation runs first. The target data is loaded and cleaned. Outlier positions are replaced with NaN. Missing values are imputed and sample weights are computed. Four categories of exogenous features are constructed over the full extended time window. The features are concatenated, validated for completeness, cyclically encoded, and augmented with interaction terms. A feature selection step reduces the matrix to the columns that are relevant to the configured pipeline variant. The selected features are merged with the target data over the historical window. The merged data is split temporally into train, validation, and test segments. Forecasters are either loaded from disk or trained from scratch and then persisted. Predictions are generated for the forecast_horizon steps beyond the training end. The predictions, metadata, and fitted forecasters are returned to the caller.\nEvery public parameter is validated at entry, every exogenous feature matrix is checked for completeness before it enters the model, and every fitted object is serialised in a form that survives process boundaries. These invariants make the pipeline safe to embed in automated batch jobs where a silent failure would not be discovered until long after the prediction window has closed."
+  },
+  {
+    "objectID": "docs/api_overview.html",
+    "href": "docs/api_overview.html",
+    "title": "API Overview & Getting Started",
+    "section": "",
+    "text": "This page provides a high-level introduction to spotforecast2-safe’s public API and key concepts. For detailed API documentation, see the API Reference.",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#main-entry-points",
+    "href": "docs/api_overview.html#main-entry-points",
+    "title": "API Overview & Getting Started",
+    "section": "Main Entry Points",
+    "text": "Main Entry Points\nThe spotforecast2-safe library organizes functionality into six major modules:\n\nData: Fetching and managing time series, weather, and holiday data\nPreprocessing: Feature engineering, data curation, and transformation\nProcessing: Utilities for handling timestamps and temporal conversions\nForecaster: Recursive forecasting models (ForecasterRecursive, ForecasterEquivalentDate)\nUtils: CPE generation, configuration, validation, and helper functions\nWeather: Climate data integration",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#quick-start",
+    "href": "docs/api_overview.html#quick-start",
+    "title": "API Overview & Getting Started",
+    "section": "Quick Start",
+    "text": "Quick Start\n\n1. Import Core Components\n\nfrom spotforecast2_safe.preprocessing import (\n    ExogBuilder,\n    RollingFeatures,\n)\nfrom spotforecast2_safe.manager.models import (\n    ForecasterRecursiveXGB,\n    ForecasterRecursiveLGBM,\n    ForecasterRecursiveModel,\n)\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.utils import generate_holiday\n\n\n\n2. Load & Prepare Data\n\nimport pandas as pd\nimport numpy as np\n\n# Create sample time series data (index with explicit freq for forecasting)\nnp.random.seed(0)\ndates = pd.date_range('2020-01-01', periods=100, freq='D')\nvalues = np.random.randn(100).cumsum()\ndf = pd.DataFrame({'value': values}, index=dates)\n\n\n\n3. Define Forecasting Period\n\n# Define train/test split dates for temporal validation\ntrain_end = '2022-12-31'\ntest_start = '2023-01-01'\ntest_end = '2023-12-31'\n\n\n\n4. Create Rolling Features\n\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Split series; RollingFeatures is passed as a window_feature to the forecaster\ny = df['value']\ny_train = y.iloc[:80]\nrolling_features = RollingFeatures(stats='mean', window_sizes=7)\nprint(f\"RollingFeatures: stats={rolling_features.stats}, window_sizes={rolling_features.window_sizes}\")\n\nRollingFeatures: stats=['mean'], window_sizes=[7]\n\n\n\n\n5. Train Recursive Forecaster\n\n# Build forecaster with rolling-mean window features and fit on training data\nforecaster = ForecasterRecursive(\n    estimator=Ridge(),\n    lags=7,\n    window_features=[rolling_features],\n)\nforecaster.fit(y_train)\ny_pred = forecaster.predict(steps=7)\nprint(y_pred.round(3))\n\n2020-03-21   -1.393\n2020-03-22   -0.756\n2020-03-23   -0.798\n2020-03-24   -1.347\n2020-03-25   -2.012\n2020-03-26   -2.435\n2020-03-27   -2.488\nFreq: D, Name: pred, dtype: float64",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#key-concepts",
+    "href": "docs/api_overview.html#key-concepts",
+    "title": "API Overview & Getting Started",
+    "section": "Key Concepts",
+    "text": "Key Concepts\n\nPeriod Management\nThe Period dataclass encodes cyclical temporal features (e.g. hour-of-day, day-of-week):\n\nfrom spotforecast2_safe.data import Period\n\n# Encode hour-of-day as a cyclical feature\nperiod = Period(name=\"hour\", n_periods=24, column=\"hour\", input_range=(0, 23))\n\nFor train/test splits, use plain date strings with pandas boolean indexing:\n\ntrain_end = '2023-06-30'\ntest_start = '2023-07-01'\n\nSee Period API for details.\n\n\nRecursive Forecasting\nRecursive forecasting predicts multiple steps ahead by feeding model predictions back as inputs. The main classes are:\n\nForecasterRecursive: Base class for recursive forecasters\nForecasterRecursiveLGBM: LightGBM implementation (recommended for most use cases)\nForecasterRecursiveXGB: XGBoost implementation\n\n\nfrom lightgbm import LGBMRegressor\n\nforecaster_lgbm = ForecasterRecursive(\n    estimator=LGBMRegressor(n_jobs=1, verbose=-1, random_state=42),\n    lags=7,\n)\nforecaster_lgbm.fit(y_train)\nforecast = forecaster_lgbm.predict(steps=7)\nprint(forecast.round(3))\n\n╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮\n│ The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   │\n│ repeated predicted values.\\n\\nCategory :                                             │\n│ spotforecast2.exceptions.IgnoredArgumentWarning\\nLocation :                          │\n│ /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr │\n│ ocessing/_binner.py:231\\nSuppress : warnings.simplefilter('ignore',                  │\n│ category=IgnoredArgumentWarning)                                                     │\n╰──────────────────────────────────────────────────────────────────────────────────────╯\n\n\n\n2020-03-21   -0.401\n2020-03-22   -0.401\n2020-03-23   -0.401\n2020-03-24   -0.401\n2020-03-25   -0.401\n2020-03-26   -0.401\n2020-03-27   -0.401\nFreq: D, Name: pred, dtype: float64\n\n\nSee ForecasterRecursive Guide for detailed examples.\n\n\nFeature Engineering\nThe ExogBuilder class constructs exogenous (external) features:\n\nbuilder = ExogBuilder(\n    periods=[Period(name=\"hour\", n_periods=24, column=\"hour\", input_range=(0, 23))],\n    country_code=\"DE\",\n)\nexog = builder.build(\n    start_date=pd.Timestamp('2023-01-01', tz='UTC'),\n    end_date=pd.Timestamp('2023-01-03', tz='UTC'),\n)\nprint(f\"Exogenous features: {exog.shape[1]} columns, {exog.shape[0]} rows\")\nprint(exog.columns[:5].tolist())\n\nExogenous features: 26 columns, 49 rows\n['hour_0', 'hour_1', 'hour_2', 'hour_3', 'hour_4']\n\n\n\n\nHoliday Integration\nGenerate holiday calendars for demand forecasting:\n\nfrom spotforecast2_safe.utils import create_holiday_df\n\nholidays = create_holiday_df(\n    start='2023-01-01',\n    end='2023-12-31',\n    country_code='DE',\n)\n\nSee Holiday Generation API for details.",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#model-persistence-savingloading",
+    "href": "docs/api_overview.html#model-persistence-savingloading",
+    "title": "API Overview & Getting Started",
+    "section": "Model Persistence (Saving/Loading)",
+    "text": "Model Persistence (Saving/Loading)\nSave trained models for production deployment:\n\nimport tempfile\nfrom pathlib import Path\nimport spotforecast2_safe.manager.persistence as persistence\n\nwith tempfile.NamedTemporaryFile(suffix='.pkl', delete=False) as tmp:\n    model_path = Path(tmp.name)\n\npersistence.dump(forecaster, model_path)\nloaded_forecaster = persistence.load(model_path)\nprint(f\"Saved and loaded: {type(loaded_forecaster).__name__}\")\nmodel_path.unlink()\n\nSaved and loaded: ForecasterRecursive\n\n\nSee Model Persistence Guide for details.",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#safety-critical-properties",
+    "href": "docs/api_overview.html#safety-critical-properties",
+    "title": "API Overview & Getting Started",
+    "section": "Safety-Critical Properties",
+    "text": "Safety-Critical Properties\nAll spotforecast2-safe operations maintain these critical properties:\n\nDeterminism\nSame input always produces identical output (bit-level reproducible):\n\npred1 = forecaster.predict(steps=7)\npred2 = forecaster.predict(steps=7)\nassert (pred1 == pred2).all()\nprint(\"Determinism verified: identical predictions on repeated calls.\")\n\nDeterminism verified: identical predictions on repeated calls.\n\n\n\n\nFail-Safe Operation\nInvalid data raises explicit errors instead of silent failures:\n\n# Missing values raise an explicit error — no silent NaN propagation\ny_with_nans = pd.Series([1.0, np.nan, 3.0, 4.0, 5.0],\n                        index=pd.date_range('2020-01-01', periods=5, freq='D'))\ntry:\n    bad_forecaster = ForecasterRecursive(estimator=Ridge(), lags=2)\n    bad_forecaster.fit(y_with_nans)\nexcept ValueError as e:\n    print(f\"ValueError: {e}\")\n\nValueError: `y` has missing values.\n\n\n\n\nAuditability\nAll transformations are traceable with clear, white-box code. The source code is visible via:\n\nDocstrings (in editor)\nAutomatic API documentation (quarto)\nGitHub repository",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#complete-example-end-to-end-forecasting",
+    "href": "docs/api_overview.html#complete-example-end-to-end-forecasting",
+    "title": "API Overview & Getting Started",
+    "section": "Complete Example: End-to-End Forecasting",
+    "text": "Complete Example: End-to-End Forecasting\n\nimport pandas as pd\nfrom importlib.resources import files\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\nfrom spotforecast2_safe.utils import create_holiday_df\n\n# 1. Load demo02.csv (column A, 1970–1972, resampled to regular hourly grid)\npath = files('spotforecast2_safe.datasets.csv').joinpath('demo02.csv')\ndf = pd.read_csv(path, index_col='DateTime', parse_dates=True)\ndf = df.sort_index().loc['1970-01-01':'1972-12-31'].resample('h').mean()\ny = df['A'].ffill()\nprint(f\"Series: {len(y)} hourly obs  ({y.index[0]} – {y.index[-1]})\")\n\n# 2. Holiday calendar as exogenous feature (German public holidays)\nholidays = create_holiday_df(start='1970-01-01', end='1972-12-31', country_code='DE')\nholidays.index = holidays.index.tz_localize(None)   # align to tz-naive index\nexog = holidays.reindex(y.index).fillna(0)          # missing slots → non-holiday\n\n# 3. Train / test split  (2 years train, 1 year test)\ntrain_end = '1971-12-31 23:00'\ny_train     = y[y.index    &lt;= train_end]\ny_test      = y[y.index    &gt;  train_end]\nexog_train  = exog[exog.index &lt;= train_end]\nexog_test   = exog[exog.index &gt;  train_end]\nprint(f\"Train: {len(y_train)} obs — Test: {len(y_test)} obs\")\n\n# 4. Build forecaster: lag 1 h / 1 day / 1 week + 24-h rolling mean + holiday exog\nforecaster = ForecasterRecursive(\n    estimator=Ridge(),\n    lags=[1, 24, 168],\n    window_features=[RollingFeatures(stats='mean', window_sizes=24)],\n)\nforecaster.fit(y_train, exog=exog_train)\n\n# 5. Forecast the first 24 hours of the test set\nexog_future = exog_test.iloc[:24]\nforecast = forecaster.predict(steps=24, exog=exog_future)\n\n# 6. Evaluate: first 10 hours as a comparison table\nresults = pd.DataFrame({\n    'y_test':   y_test.iloc[:10].values,\n    'forecast': forecast.iloc[:10].values,\n    'mae':      (y_test.iloc[:10] - forecast.iloc[:10]).abs().values,\n}, index=forecast.iloc[:10].index)\nresults.round(4)\n\nSeries: 26304 hourly obs  (1970-01-01 00:00:00 – 1972-12-31 23:00:00)\nTrain: 17520 obs — Test: 8784 obs\n\n\n\n\n\n\n\n\n\ny_test\nforecast\nmae\n\n\n\n\n1972-01-01 00:00:00\n0.1110\n0.0202\n0.0907\n\n\n1972-01-01 01:00:00\n0.1237\n0.0204\n0.1033\n\n\n1972-01-01 02:00:00\n0.0782\n0.0236\n0.0546\n\n\n1972-01-01 03:00:00\n-0.0859\n0.0198\n0.1057\n\n\n1972-01-01 04:00:00\n-0.0826\n0.0152\n0.0977\n\n\n1972-01-01 05:00:00\n-0.0982\n0.0108\n0.1090\n\n\n1972-01-01 06:00:00\n-0.0891\n0.0087\n0.0978\n\n\n1972-01-01 07:00:00\n0.0794\n0.0081\n0.0712\n\n\n1972-01-01 08:00:00\n0.1457\n0.0084\n0.1373\n\n\n1972-01-01 09:00:00\n-0.1351\n0.0090\n0.1441",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#documentation-organization",
+    "href": "docs/api_overview.html#documentation-organization",
+    "title": "API Overview & Getting Started",
+    "section": "Documentation Organization",
+    "text": "Documentation Organization\nThe complete documentation is organized as follows:\n\nHome (this page): High-level overview\nAPI Reference: Detailed API documentation by module\n\nData Module: Data fetching and Period management\nPreprocessing Module: Feature engineering and forecasters\nProcessing Module: Utilities for timestamps and conversions\nUtils Module: Helper functions and CPE generation\nWeather Module: Climate data integration\nExceptions: Error types and documentation\n\nGuides: Practical examples and workflows\n\nForecasterRecursive Guide: Advanced forecasting techniques\nModel Persistence: Production deployment\n\nSafety & Compliance: Documentation for auditors and compliance\n\nModel/Method Card: Compliance and safety design\nContributing Guide: How to contribute to the project",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#next-steps",
+    "href": "docs/api_overview.html#next-steps",
+    "title": "API Overview & Getting Started",
+    "section": "Next Steps",
+    "text": "Next Steps\n\nQuick Start: Follow the Quick Start example above\nLearn Core Concepts: Read about Period Management and Recursive Forecasting\nExplore Examples: Check out ForecasterRecursive Guide\nAPI Reference: Dive into specific modules in API Documentation\nContribute: See Contributing Guide to contribute improvements",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#troubleshooting",
+    "href": "docs/api_overview.html#troubleshooting",
+    "title": "API Overview & Getting Started",
+    "section": "Troubleshooting",
+    "text": "Troubleshooting\nFor common issues and solutions:\n\nData validation errors: Ensure all input data is clean (no NaNs or Infs)\nImport errors: Verify the package is installed with uv sync\nVersion compatibility: Check you’re using Python 3.13 or later\n\nBefore reporting a new issue, search the publicly available archives:\n\nIssues Archive: Browse all reported bugs, feature requests, and their resolutions. Use the search feature to find similar problems.\nDiscussions Archive: Search community questions and answers for help with common tasks.\n\nIf you don’t find a solution, see the Reporting Issues guide to submit a new bug report. For more help, see the project’s GitHub Issues.",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "docs/api_overview.html#see-also",
+    "href": "docs/api_overview.html#see-also",
+    "title": "API Overview & Getting Started",
+    "section": "See Also",
+    "text": "See Also\n\nComplete API Reference\nModel/Method Card\nSecurity Policy - Vulnerability reporting and security best practices\nContributing Guide\nGitHub Repository",
+    "crumbs": [
+      "Getting Started"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "",
+    "text": "spotforecast2-safe is a specialized, hardened Python package for time series forecasting in safety-critical production environments. It provides a minimal, auditable core for feature engineering and recursive forecasting.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#quick-links",
+    "href": "index.html#quick-links",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Quick Links",
+    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.18.0-rc.1",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#software-identification-cpe",
+    "href": "index.html#software-identification-cpe",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Software Identification (CPE)",
+    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.18.0-rc.1:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Installation",
+    "text": "Installation\ngit clone https://github.com/sequential-parameter-optimization/spotforecast2-safe.git\ncd spotforecast2-safe\nuv sync",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#safety-critical-features",
+    "href": "index.html#safety-critical-features",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Safety-Critical Features",
+    "text": "Safety-Critical Features\n\nZero Dead Code — No GUI, plotting, or AutoML dependencies (No Plotly, No Optuna).\nDeterministic Transformations — Mathematical logic that ensures bit-level reproducibility.\nFail-Safe Processing — Explicit failure on dirty or incomplete data (NaNs/Infs) instead of silent imputation.\nMinimal Footprint — Reduced attack surface for high-security deployment targets.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#core-capabilities",
+    "href": "index.html#core-capabilities",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Core Capabilities",
+    "text": "Core Capabilities\n\nData Service — Robust fetching of time series, weather, and holiday data.\nPreprocessing — Hardened tools for data curation, resampling, temporal splitting, and Data Imputation & Gap Weighting.\nForecasting Engine — Simplified recursive forecasting and seasonal baselines.\n\n\n\n\n\n\n\nDisclaimer & Liability\n\n\n\nIMPORTANT: This software is provided “as is” and any express or implied warranties are disclaimed. The use of this software in safety-critical systems is at the sole risk of the user. For full details, see the Disclaimer in the Model Card.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#links",
+    "href": "index.html#links",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Links",
+    "text": "Links\n\nspotforecast2\nspotoptim",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#attributions",
+    "href": "index.html#attributions",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Attributions",
+    "text": "Attributions\nParts of the code are ported from skforecast to reduce external dependencies. Many thanks to the skforecast team for their great work!",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "This document explains the rationale behind the selected period configurations and feature engineering choices in spotforecast2-safe, specifically regarding the encoding of cyclical time features using Radial Basis Functions (RBF).\n\n\nFor time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).\n\n\n\nThe ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPeriod\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "For time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "The ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "Period\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
     "objectID": "docs/contributing.html",
     "href": "docs/contributing.html",
     "title": "Contributing to spotforecast2-safe",
@@ -2694,240 +3026,6 @@
     "crumbs": [
       "Development & Community",
       "Contributing Guide"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "This document explains the rationale behind the selected period configurations and feature engineering choices in spotforecast2-safe, specifically regarding the encoding of cyclical time features using Radial Basis Functions (RBF).\n\n\nFor time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).\n\n\n\nThe ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPeriod\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "For time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "The ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "Period\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "",
-    "text": "spotforecast2-safe is a specialized, hardened Python package for time series forecasting in safety-critical production environments. It provides a minimal, auditable core for feature engineering and recursive forecasting.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#quick-links",
-    "href": "index.html#quick-links",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Quick Links",
-    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.18.0-rc.1",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#software-identification-cpe",
-    "href": "index.html#software-identification-cpe",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Software Identification (CPE)",
-    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.18.0-rc.1:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#installation",
-    "href": "index.html#installation",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Installation",
-    "text": "Installation\ngit clone https://github.com/sequential-parameter-optimization/spotforecast2-safe.git\ncd spotforecast2-safe\nuv sync",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#safety-critical-features",
-    "href": "index.html#safety-critical-features",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Safety-Critical Features",
-    "text": "Safety-Critical Features\n\nZero Dead Code — No GUI, plotting, or AutoML dependencies (No Plotly, No Optuna).\nDeterministic Transformations — Mathematical logic that ensures bit-level reproducibility.\nFail-Safe Processing — Explicit failure on dirty or incomplete data (NaNs/Infs) instead of silent imputation.\nMinimal Footprint — Reduced attack surface for high-security deployment targets.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#core-capabilities",
-    "href": "index.html#core-capabilities",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Core Capabilities",
-    "text": "Core Capabilities\n\nData Service — Robust fetching of time series, weather, and holiday data.\nPreprocessing — Hardened tools for data curation, resampling, temporal splitting, and Data Imputation & Gap Weighting.\nForecasting Engine — Simplified recursive forecasting and seasonal baselines.\n\n\n\n\n\n\n\nDisclaimer & Liability\n\n\n\nIMPORTANT: This software is provided “as is” and any express or implied warranties are disclaimed. The use of this software in safety-critical systems is at the sole risk of the user. For full details, see the Disclaimer in the Model Card.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#links",
-    "href": "index.html#links",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Links",
-    "text": "Links\n\nspotforecast2\nspotoptim",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#attributions",
-    "href": "index.html#attributions",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Attributions",
-    "text": "Attributions\nParts of the code are ported from skforecast to reduce external dependencies. Many thanks to the skforecast team for their great work!",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html",
-    "href": "docs/api_overview.html",
-    "title": "API Overview & Getting Started",
-    "section": "",
-    "text": "This page provides a high-level introduction to spotforecast2-safe’s public API and key concepts. For detailed API documentation, see the API Reference.",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#main-entry-points",
-    "href": "docs/api_overview.html#main-entry-points",
-    "title": "API Overview & Getting Started",
-    "section": "Main Entry Points",
-    "text": "Main Entry Points\nThe spotforecast2-safe library organizes functionality into six major modules:\n\nData: Fetching and managing time series, weather, and holiday data\nPreprocessing: Feature engineering, data curation, and transformation\nProcessing: Utilities for handling timestamps and temporal conversions\nForecaster: Recursive forecasting models (ForecasterRecursive, ForecasterEquivalentDate)\nUtils: CPE generation, configuration, validation, and helper functions\nWeather: Climate data integration",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#quick-start",
-    "href": "docs/api_overview.html#quick-start",
-    "title": "API Overview & Getting Started",
-    "section": "Quick Start",
-    "text": "Quick Start\n\n1. Import Core Components\n\nfrom spotforecast2_safe.preprocessing import (\n    ExogBuilder,\n    RollingFeatures,\n)\nfrom spotforecast2_safe.manager.models import (\n    ForecasterRecursiveXGB,\n    ForecasterRecursiveLGBM,\n    ForecasterRecursiveModel,\n)\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.utils import generate_holiday\n\n\n\n2. Load & Prepare Data\n\nimport pandas as pd\nimport numpy as np\n\n# Create sample time series data (index with explicit freq for forecasting)\nnp.random.seed(0)\ndates = pd.date_range('2020-01-01', periods=100, freq='D')\nvalues = np.random.randn(100).cumsum()\ndf = pd.DataFrame({'value': values}, index=dates)\n\n\n\n3. Define Forecasting Period\n\n# Define train/test split dates for temporal validation\ntrain_end = '2022-12-31'\ntest_start = '2023-01-01'\ntest_end = '2023-12-31'\n\n\n\n4. Create Rolling Features\n\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Split series; RollingFeatures is passed as a window_feature to the forecaster\ny = df['value']\ny_train = y.iloc[:80]\nrolling_features = RollingFeatures(stats='mean', window_sizes=7)\nprint(f\"RollingFeatures: stats={rolling_features.stats}, window_sizes={rolling_features.window_sizes}\")\n\nRollingFeatures: stats=['mean'], window_sizes=[7]\n\n\n\n\n5. Train Recursive Forecaster\n\n# Build forecaster with rolling-mean window features and fit on training data\nforecaster = ForecasterRecursive(\n    estimator=Ridge(),\n    lags=7,\n    window_features=[rolling_features],\n)\nforecaster.fit(y_train)\ny_pred = forecaster.predict(steps=7)\nprint(y_pred.round(3))\n\n2020-03-21   -1.393\n2020-03-22   -0.756\n2020-03-23   -0.798\n2020-03-24   -1.347\n2020-03-25   -2.012\n2020-03-26   -2.435\n2020-03-27   -2.488\nFreq: D, Name: pred, dtype: float64",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#key-concepts",
-    "href": "docs/api_overview.html#key-concepts",
-    "title": "API Overview & Getting Started",
-    "section": "Key Concepts",
-    "text": "Key Concepts\n\nPeriod Management\nThe Period dataclass encodes cyclical temporal features (e.g. hour-of-day, day-of-week):\n\nfrom spotforecast2_safe.data import Period\n\n# Encode hour-of-day as a cyclical feature\nperiod = Period(name=\"hour\", n_periods=24, column=\"hour\", input_range=(0, 23))\n\nFor train/test splits, use plain date strings with pandas boolean indexing:\n\ntrain_end = '2023-06-30'\ntest_start = '2023-07-01'\n\nSee Period API for details.\n\n\nRecursive Forecasting\nRecursive forecasting predicts multiple steps ahead by feeding model predictions back as inputs. The main classes are:\n\nForecasterRecursive: Base class for recursive forecasters\nForecasterRecursiveLGBM: LightGBM implementation (recommended for most use cases)\nForecasterRecursiveXGB: XGBoost implementation\n\n\nfrom lightgbm import LGBMRegressor\n\nforecaster_lgbm = ForecasterRecursive(\n    estimator=LGBMRegressor(n_jobs=1, verbose=-1, random_state=42),\n    lags=7,\n)\nforecaster_lgbm.fit(y_train)\nforecast = forecaster_lgbm.predict(steps=7)\nprint(forecast.round(3))\n\n╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮\n│ The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   │\n│ repeated predicted values.\\n\\nCategory :                                             │\n│ spotforecast2.exceptions.IgnoredArgumentWarning\\nLocation :                          │\n│ /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr │\n│ ocessing/_binner.py:231\\nSuppress : warnings.simplefilter('ignore',                  │\n│ category=IgnoredArgumentWarning)                                                     │\n╰──────────────────────────────────────────────────────────────────────────────────────╯\n\n\n\n2020-03-21   -0.401\n2020-03-22   -0.401\n2020-03-23   -0.401\n2020-03-24   -0.401\n2020-03-25   -0.401\n2020-03-26   -0.401\n2020-03-27   -0.401\nFreq: D, Name: pred, dtype: float64\n\n\nSee ForecasterRecursive Guide for detailed examples.\n\n\nFeature Engineering\nThe ExogBuilder class constructs exogenous (external) features:\n\nbuilder = ExogBuilder(\n    periods=[Period(name=\"hour\", n_periods=24, column=\"hour\", input_range=(0, 23))],\n    country_code=\"DE\",\n)\nexog = builder.build(\n    start_date=pd.Timestamp('2023-01-01', tz='UTC'),\n    end_date=pd.Timestamp('2023-01-03', tz='UTC'),\n)\nprint(f\"Exogenous features: {exog.shape[1]} columns, {exog.shape[0]} rows\")\nprint(exog.columns[:5].tolist())\n\nExogenous features: 26 columns, 49 rows\n['hour_0', 'hour_1', 'hour_2', 'hour_3', 'hour_4']\n\n\n\n\nHoliday Integration\nGenerate holiday calendars for demand forecasting:\n\nfrom spotforecast2_safe.utils import create_holiday_df\n\nholidays = create_holiday_df(\n    start='2023-01-01',\n    end='2023-12-31',\n    country_code='DE',\n)\n\nSee Holiday Generation API for details.",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#model-persistence-savingloading",
-    "href": "docs/api_overview.html#model-persistence-savingloading",
-    "title": "API Overview & Getting Started",
-    "section": "Model Persistence (Saving/Loading)",
-    "text": "Model Persistence (Saving/Loading)\nSave trained models for production deployment:\n\nimport tempfile\nfrom pathlib import Path\nimport spotforecast2_safe.manager.persistence as persistence\n\nwith tempfile.NamedTemporaryFile(suffix='.pkl', delete=False) as tmp:\n    model_path = Path(tmp.name)\n\npersistence.dump(forecaster, model_path)\nloaded_forecaster = persistence.load(model_path)\nprint(f\"Saved and loaded: {type(loaded_forecaster).__name__}\")\nmodel_path.unlink()\n\nSaved and loaded: ForecasterRecursive\n\n\nSee Model Persistence Guide for details.",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#safety-critical-properties",
-    "href": "docs/api_overview.html#safety-critical-properties",
-    "title": "API Overview & Getting Started",
-    "section": "Safety-Critical Properties",
-    "text": "Safety-Critical Properties\nAll spotforecast2-safe operations maintain these critical properties:\n\nDeterminism\nSame input always produces identical output (bit-level reproducible):\n\npred1 = forecaster.predict(steps=7)\npred2 = forecaster.predict(steps=7)\nassert (pred1 == pred2).all()\nprint(\"Determinism verified: identical predictions on repeated calls.\")\n\nDeterminism verified: identical predictions on repeated calls.\n\n\n\n\nFail-Safe Operation\nInvalid data raises explicit errors instead of silent failures:\n\n# Missing values raise an explicit error — no silent NaN propagation\ny_with_nans = pd.Series([1.0, np.nan, 3.0, 4.0, 5.0],\n                        index=pd.date_range('2020-01-01', periods=5, freq='D'))\ntry:\n    bad_forecaster = ForecasterRecursive(estimator=Ridge(), lags=2)\n    bad_forecaster.fit(y_with_nans)\nexcept ValueError as e:\n    print(f\"ValueError: {e}\")\n\nValueError: `y` has missing values.\n\n\n\n\nAuditability\nAll transformations are traceable with clear, white-box code. The source code is visible via:\n\nDocstrings (in editor)\nAutomatic API documentation (quarto)\nGitHub repository",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#complete-example-end-to-end-forecasting",
-    "href": "docs/api_overview.html#complete-example-end-to-end-forecasting",
-    "title": "API Overview & Getting Started",
-    "section": "Complete Example: End-to-End Forecasting",
-    "text": "Complete Example: End-to-End Forecasting\n\nimport pandas as pd\nfrom importlib.resources import files\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\nfrom spotforecast2_safe.utils import create_holiday_df\n\n# 1. Load demo02.csv (column A, 1970–1972, resampled to regular hourly grid)\npath = files('spotforecast2_safe.datasets.csv').joinpath('demo02.csv')\ndf = pd.read_csv(path, index_col='DateTime', parse_dates=True)\ndf = df.sort_index().loc['1970-01-01':'1972-12-31'].resample('h').mean()\ny = df['A'].ffill()\nprint(f\"Series: {len(y)} hourly obs  ({y.index[0]} – {y.index[-1]})\")\n\n# 2. Holiday calendar as exogenous feature (German public holidays)\nholidays = create_holiday_df(start='1970-01-01', end='1972-12-31', country_code='DE')\nholidays.index = holidays.index.tz_localize(None)   # align to tz-naive index\nexog = holidays.reindex(y.index).fillna(0)          # missing slots → non-holiday\n\n# 3. Train / test split  (2 years train, 1 year test)\ntrain_end = '1971-12-31 23:00'\ny_train     = y[y.index    &lt;= train_end]\ny_test      = y[y.index    &gt;  train_end]\nexog_train  = exog[exog.index &lt;= train_end]\nexog_test   = exog[exog.index &gt;  train_end]\nprint(f\"Train: {len(y_train)} obs — Test: {len(y_test)} obs\")\n\n# 4. Build forecaster: lag 1 h / 1 day / 1 week + 24-h rolling mean + holiday exog\nforecaster = ForecasterRecursive(\n    estimator=Ridge(),\n    lags=[1, 24, 168],\n    window_features=[RollingFeatures(stats='mean', window_sizes=24)],\n)\nforecaster.fit(y_train, exog=exog_train)\n\n# 5. Forecast the first 24 hours of the test set\nexog_future = exog_test.iloc[:24]\nforecast = forecaster.predict(steps=24, exog=exog_future)\n\n# 6. Evaluate: first 10 hours as a comparison table\nresults = pd.DataFrame({\n    'y_test':   y_test.iloc[:10].values,\n    'forecast': forecast.iloc[:10].values,\n    'mae':      (y_test.iloc[:10] - forecast.iloc[:10]).abs().values,\n}, index=forecast.iloc[:10].index)\nresults.round(4)\n\nSeries: 26304 hourly obs  (1970-01-01 00:00:00 – 1972-12-31 23:00:00)\nTrain: 17520 obs — Test: 8784 obs\n\n\n\n\n\n\n\n\n\ny_test\nforecast\nmae\n\n\n\n\n1972-01-01 00:00:00\n0.1110\n0.0202\n0.0907\n\n\n1972-01-01 01:00:00\n0.1237\n0.0204\n0.1033\n\n\n1972-01-01 02:00:00\n0.0782\n0.0236\n0.0546\n\n\n1972-01-01 03:00:00\n-0.0859\n0.0198\n0.1057\n\n\n1972-01-01 04:00:00\n-0.0826\n0.0152\n0.0977\n\n\n1972-01-01 05:00:00\n-0.0982\n0.0108\n0.1090\n\n\n1972-01-01 06:00:00\n-0.0891\n0.0087\n0.0978\n\n\n1972-01-01 07:00:00\n0.0794\n0.0081\n0.0712\n\n\n1972-01-01 08:00:00\n0.1457\n0.0084\n0.1373\n\n\n1972-01-01 09:00:00\n-0.1351\n0.0090\n0.1441",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#documentation-organization",
-    "href": "docs/api_overview.html#documentation-organization",
-    "title": "API Overview & Getting Started",
-    "section": "Documentation Organization",
-    "text": "Documentation Organization\nThe complete documentation is organized as follows:\n\nHome (this page): High-level overview\nAPI Reference: Detailed API documentation by module\n\nData Module: Data fetching and Period management\nPreprocessing Module: Feature engineering and forecasters\nProcessing Module: Utilities for timestamps and conversions\nUtils Module: Helper functions and CPE generation\nWeather Module: Climate data integration\nExceptions: Error types and documentation\n\nGuides: Practical examples and workflows\n\nForecasterRecursive Guide: Advanced forecasting techniques\nModel Persistence: Production deployment\n\nSafety & Compliance: Documentation for auditors and compliance\n\nModel/Method Card: Compliance and safety design\nContributing Guide: How to contribute to the project",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#next-steps",
-    "href": "docs/api_overview.html#next-steps",
-    "title": "API Overview & Getting Started",
-    "section": "Next Steps",
-    "text": "Next Steps\n\nQuick Start: Follow the Quick Start example above\nLearn Core Concepts: Read about Period Management and Recursive Forecasting\nExplore Examples: Check out ForecasterRecursive Guide\nAPI Reference: Dive into specific modules in API Documentation\nContribute: See Contributing Guide to contribute improvements",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#troubleshooting",
-    "href": "docs/api_overview.html#troubleshooting",
-    "title": "API Overview & Getting Started",
-    "section": "Troubleshooting",
-    "text": "Troubleshooting\nFor common issues and solutions:\n\nData validation errors: Ensure all input data is clean (no NaNs or Infs)\nImport errors: Verify the package is installed with uv sync\nVersion compatibility: Check you’re using Python 3.13 or later\n\nBefore reporting a new issue, search the publicly available archives:\n\nIssues Archive: Browse all reported bugs, feature requests, and their resolutions. Use the search feature to find similar problems.\nDiscussions Archive: Search community questions and answers for help with common tasks.\n\nIf you don’t find a solution, see the Reporting Issues guide to submit a new bug report. For more help, see the project’s GitHub Issues.",
-    "crumbs": [
-      "Getting Started"
-    ]
-  },
-  {
-    "objectID": "docs/api_overview.html#see-also",
-    "href": "docs/api_overview.html#see-also",
-    "title": "API Overview & Getting Started",
-    "section": "See Also",
-    "text": "See Also\n\nComplete API Reference\nModel/Method Card\nSecurity Policy - Vulnerability reporting and security best practices\nContributing Guide\nGitHub Repository",
-    "crumbs": [
-      "Getting Started"
     ]
   },
   {
@@ -3089,7 +3187,7 @@
     "href": "docs/recursive/ForecasterRecursive.html#functional-examples",
     "title": "ForecasterRecursive",
     "section": "Functional Examples",
-    "text": "Functional Examples\n\n1. Standard Autoregressive Forecast\nA basic example using LinearRegression with the last 7 days as predictors.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Create a synthetic daily series with a trend and seasonality\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ndata = np.linspace(10, 20, 100) + 5 * np.sin(2 * np.pi * np.arange(100) / 7)\ny = pd.Series(data, index=index, name=\"target\")\n\n# 2. Initialize with 7 lags\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=7\n)\n\n# 3. Fit and Predict\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=14)\n\nprint(\"Forecast for the next 14 days:\")\nprint(predictions.head())\n\nForecast for the next 14 days:\n2023-04-11    24.975650\n2023-04-12    22.371439\n2023-04-13    18.133612\n2023-04-14    15.529401\n2023-04-15    16.595893\nFreq: D, Name: pred, dtype: float64\n\n\n\n\n2. Multi-Feature Forecasting (Lags + Window Statistics)\nCombining raw lags with rolling means provides the model with both local and global context.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestRegressor\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\n\n# Data preparation\nindex = pd.date_range(start='2023-01-01', periods=200, freq='h')\ny = pd.Series(np.random.normal(50, 5, 200), index=index, name=\"sensor_reading\")\n\n# Forecaster with Lags and Rolling Mean\nforecaster = ForecasterRecursive(\n    estimator=RandomForestRegressor(n_estimators=50, random_state=123),\n    lags=24,\n    window_features=RollingFeatures(stats=['mean', 'std'], window_sizes=24)\n)\n\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=12)\n\nprint(\"Predictions with window features:\")\nprint(predictions)\n\nPredictions with window features:\n2023-01-09 08:00:00    52.190703\n2023-01-09 09:00:00    49.961429\n2023-01-09 10:00:00    50.864365\n2023-01-09 11:00:00    50.005390\n2023-01-09 12:00:00    50.823442\n2023-01-09 13:00:00    49.939230\n2023-01-09 14:00:00    50.903578\n2023-01-09 15:00:00    49.984977\n2023-01-09 16:00:00    49.506901\n2023-01-09 17:00:00    51.417828\n2023-01-09 18:00:00    48.894156\n2023-01-09 19:00:00    49.146867\nFreq: h, Name: pred, dtype: float64\n\n\n\n\n3. Handling Exogenous Variables\nForecasting energy demand using temperature as an external factor.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Target and Exogenous data\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ny = pd.Series(np.random.normal(100, 10, 100), index=index, name=\"demand\")\nexog = pd.DataFrame({'temp': np.random.normal(20, 5, 100)}, index=index)\n\n# Define forecaster\nforecaster = ForecasterRecursive(estimator=Ridge(), lags=7)\n\n# Fit with exog\nforecaster.fit(y=y, exog=exog)\n\n# Future exog values must be known for the prediction horizon\nexog_future = pd.DataFrame(\n    {'temp': [22, 21, 23]}, \n    index=pd.date_range(start='2023-04-11', periods=3, freq='D')\n)\n\npredictions = forecaster.predict(steps=3, exog=exog_future)\nprint(\"Demand forecast with temp as exog:\")\nprint(predictions)\n\nDemand forecast with temp as exog:\n2023-04-11    106.186905\n2023-04-12    101.900328\n2023-04-13     99.496086\nFreq: D, Name: pred, dtype: float64",
+    "text": "Functional Examples\n\n1. Standard Autoregressive Forecast\nA basic example using LinearRegression with the last 7 days as predictors.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Create a synthetic daily series with a trend and seasonality\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ndata = np.linspace(10, 20, 100) + 5 * np.sin(2 * np.pi * np.arange(100) / 7)\ny = pd.Series(data, index=index, name=\"target\")\n\n# 2. Initialize with 7 lags\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=7\n)\n\n# 3. Fit and Predict\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=14)\n\nprint(\"Forecast for the next 14 days:\")\nprint(predictions.head())\n\nForecast for the next 14 days:\n2023-04-11    24.975650\n2023-04-12    22.371439\n2023-04-13    18.133612\n2023-04-14    15.529401\n2023-04-15    16.595893\nFreq: D, Name: pred, dtype: float64\n\n\n\n\n2. Multi-Feature Forecasting (Lags + Window Statistics)\nCombining raw lags with rolling means provides the model with both local and global context.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestRegressor\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\n\n# Data preparation\nindex = pd.date_range(start='2023-01-01', periods=200, freq='h')\ny = pd.Series(np.random.normal(50, 5, 200), index=index, name=\"sensor_reading\")\n\n# Forecaster with Lags and Rolling Mean\nforecaster = ForecasterRecursive(\n    estimator=RandomForestRegressor(n_estimators=50, random_state=123),\n    lags=24,\n    window_features=RollingFeatures(stats=['mean', 'std'], window_sizes=24)\n)\n\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=12)\n\nprint(\"Predictions with window features:\")\nprint(predictions)\n\nPredictions with window features:\n2023-01-09 08:00:00    49.570021\n2023-01-09 09:00:00    50.618043\n2023-01-09 10:00:00    51.327859\n2023-01-09 11:00:00    51.105626\n2023-01-09 12:00:00    49.420473\n2023-01-09 13:00:00    51.155573\n2023-01-09 14:00:00    49.395979\n2023-01-09 15:00:00    50.351094\n2023-01-09 16:00:00    48.770328\n2023-01-09 17:00:00    49.783642\n2023-01-09 18:00:00    49.440807\n2023-01-09 19:00:00    50.956421\nFreq: h, Name: pred, dtype: float64\n\n\n\n\n3. Handling Exogenous Variables\nForecasting energy demand using temperature as an external factor.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Target and Exogenous data\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ny = pd.Series(np.random.normal(100, 10, 100), index=index, name=\"demand\")\nexog = pd.DataFrame({'temp': np.random.normal(20, 5, 100)}, index=index)\n\n# Define forecaster\nforecaster = ForecasterRecursive(estimator=Ridge(), lags=7)\n\n# Fit with exog\nforecaster.fit(y=y, exog=exog)\n\n# Future exog values must be known for the prediction horizon\nexog_future = pd.DataFrame(\n    {'temp': [22, 21, 23]}, \n    index=pd.date_range(start='2023-04-11', periods=3, freq='D')\n)\n\npredictions = forecaster.predict(steps=3, exog=exog_future)\nprint(\"Demand forecast with temp as exog:\")\nprint(predictions)\n\nDemand forecast with temp as exog:\n2023-04-11     99.996158\n2023-04-12    100.378327\n2023-04-13    100.694417\nFreq: D, Name: pred, dtype: float64",
     "crumbs": [
       "Forecaster Guides",
       "ForecasterRecursive"
@@ -3243,7 +3341,7 @@
     "href": "docs/reference/data.fetch_data.get_data_home.html#returns",
     "title": "data.fetch_data.get_data_home",
     "section": "Returns",
-    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#e8dd907e .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#d87d6c3f .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::",
     "crumbs": [
       "API Reference",
       "Data",
@@ -5319,7 +5417,7 @@
     "href": "docs/task_safe_n21_cov_df.html#prediction-aggregation",
     "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
     "section": "Prediction Aggregation",
-    "text": "Prediction Aggregation\nThe TestPredictionAggregation class mirrors the TestAggregatePredict class from the demo task but extends it with temporal index preservation.\nThe basic aggregation test uses positive fractional weights [0.5, 0.3, 0.2] that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.\nThe unequal importance test verifies the ordering high_priority &gt; medium_priority &gt; low_priority directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.\nThe temporal index preservation test reconstructs the aggregated Series with the original DatetimeIndex and calls aggregated_series.index.equals(dates). This confirms that the matrix multiplication idiom predictions.values @ np.array(weights) — which returns a plain np.ndarray — does not silently discard the temporal index when it is re-attached via pd.Series(aggregated, index=dates).\n\ndates = pd.date_range(\"2020-01-01\", periods=10, freq=\"h\")\npredictions = pd.DataFrame(\n    np.random.randn(10, 3), index=dates, columns=[\"loc_1\", \"loc_2\", \"loc_3\"]\n)\nweights = np.array([0.4, 0.4, 0.2])\naggregated = pd.Series(predictions.values @ weights, index=dates)\nprint(aggregated.head())\n\n2020-01-01 00:00:00   -0.372767\n2020-01-01 01:00:00   -0.619719\n2020-01-01 02:00:00   -0.857069\n2020-01-01 03:00:00    0.050862\n2020-01-01 04:00:00   -0.807762\nFreq: h, dtype: float64",
+    "text": "Prediction Aggregation\nThe TestPredictionAggregation class mirrors the TestAggregatePredict class from the demo task but extends it with temporal index preservation.\nThe basic aggregation test uses positive fractional weights [0.5, 0.3, 0.2] that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.\nThe unequal importance test verifies the ordering high_priority &gt; medium_priority &gt; low_priority directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.\nThe temporal index preservation test reconstructs the aggregated Series with the original DatetimeIndex and calls aggregated_series.index.equals(dates). This confirms that the matrix multiplication idiom predictions.values @ np.array(weights) — which returns a plain np.ndarray — does not silently discard the temporal index when it is re-attached via pd.Series(aggregated, index=dates).\n\ndates = pd.date_range(\"2020-01-01\", periods=10, freq=\"h\")\npredictions = pd.DataFrame(\n    np.random.randn(10, 3), index=dates, columns=[\"loc_1\", \"loc_2\", \"loc_3\"]\n)\nweights = np.array([0.4, 0.4, 0.2])\naggregated = pd.Series(predictions.values @ weights, index=dates)\nprint(aggregated.head())\n\n2020-01-01 00:00:00    0.061695\n2020-01-01 01:00:00    0.587042\n2020-01-01 02:00:00    0.582864\n2020-01-01 03:00:00   -0.417645\n2020-01-01 04:00:00    0.067370\nFreq: h, dtype: float64",
     "crumbs": [
       "Tasks",
       "Task Safe n-to-1 Explained"

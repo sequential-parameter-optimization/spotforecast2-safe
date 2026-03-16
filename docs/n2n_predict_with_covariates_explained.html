@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="A step-by-step walkthrough of the N-to-N covariate forecasting pipeline for beginners.">
 
-<title>data.fetch_data.fetch_weather_data – spotforecast2-safe</title>
+<title>n2n_predict_with_covariates: Design and Pipeline Logic Explained – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,27 +59,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4e7a6ecc11b04d2331dcee725084a9de.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9869d8b7442de1229a34c2db70b9e7b6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-4e7a6ecc11b04d2331dcee725084a9de.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-9869d8b7442de1229a34c2db70b9e7b6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-84acb973695ec2d34aa8fbb1426e6acd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -281,7 +282,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">spotforecast2-safe</span>
     </a>
   </div>
@@ -308,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.fetch_data.fetch_weather_data.html">fetch_weather_data</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">n2n_predict_with_covariates: Design and Pipeline Logic Explained</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -322,91 +323,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Home</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/api_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/api_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">API Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.fetch_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.fetch_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fetch_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.fetch_holiday_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.fetch_holiday_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fetch_holiday_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.fetch_weather_data.html" class="sidebar-item-text sidebar-link active">
+  <a href="../docs/reference/data.fetch_data.fetch_weather_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fetch_weather_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.get_data_home.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.get_data_home.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_data_home</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.get_cache_home.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.get_cache_home.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_cache_home</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.get_package_data_home.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.get_package_data_home.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_package_data_home</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.load_timeseries.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.load_timeseries.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">load_timeseries</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">load_timeseries_forecast</span></a>
   </div>
 </li>
@@ -423,25 +424,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.exog_builder.ExogBuilder.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.exog_builder.ExogBuilder.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ExogBuilder</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.linearly_interpolate_ts.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.linearly_interpolate_ts.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">linearly_interpolate_ts</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.repeating_basis_function.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.repeating_basis_function.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">repeating_basis_function</span></a>
   </div>
 </li>
@@ -456,31 +457,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.curate_data.agg_and_resample_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.curate_data.agg_and_resample_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">agg_and_resample_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.curate_data.basic_ts_checks.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.curate_data.basic_ts_checks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">basic_ts_checks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.curate_data.curate_holidays.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.curate_data.curate_holidays.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">curate_holidays</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.curate_data.curate_weather.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.curate_data.curate_weather.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">curate_weather</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.curate_data.get_start_end.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.curate_data.get_start_end.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_start_end</span></a>
   </div>
 </li>
@@ -497,19 +498,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.imputation.WeightFunction.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.imputation.WeightFunction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">WeightFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.imputation.get_missing_weights.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.imputation.get_missing_weights.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_missing_weights</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.imputation.custom_weights.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.imputation.custom_weights.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">custom_weights</span></a>
   </div>
 </li>
@@ -526,19 +527,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.outlier.mark_outliers.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.outlier.mark_outliers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">mark_outliers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.outlier.manual_outlier_removal.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.outlier.manual_outlier_removal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">manual_outlier_removal</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.outlier.get_outliers.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.outlier.get_outliers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_outliers</span></a>
   </div>
 </li>
@@ -555,13 +556,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.split.split_abs_train_val_test.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.split.split_abs_train_val_test.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">split_abs_train_val_test</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.split.split_rel_train_val_test.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/preprocessing.split.split_rel_train_val_test.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">split_rel_train_val_test</span></a>
   </div>
 </li>
@@ -580,25 +581,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/processing.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/processing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/processing.agg_predict.agg_predict.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/processing.agg_predict.agg_predict.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">agg_predict</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/processing.n2n_predict.n2n_predict.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/processing.n2n_predict.n2n_predict.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">n2n_predict</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/processing.n2n_predict_with_covariates.n2n_predict_with_covariates.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/processing.n2n_predict_with_covariates.n2n_predict_with_covariates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">n2n_predict_with_covariates</span></a>
   </div>
 </li>
@@ -615,31 +616,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.base.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.base.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">base</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursive</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterEquivalentDate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.recursive._forecaster_recursive_multiseries.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.recursive._forecaster_recursive_multiseries.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursiveMultiSeries</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
@@ -654,49 +655,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.add_y_train_argument.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.add_y_train_argument.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">add_y_train_argument</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.calculate_coverage.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.calculate_coverage.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">calculate_coverage</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.create_mean_pinball_loss.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.create_mean_pinball_loss.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_mean_pinball_loss</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.crps_from_predictions.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.crps_from_predictions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">crps_from_predictions</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.crps_from_quantiles.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.crps_from_quantiles.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">crps_from_quantiles</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.mean_absolute_scaled_error.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.mean_absolute_scaled_error.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">mean_absolute_scaled_error</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.root_mean_squared_scaled_error.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.root_mean_squared_scaled_error.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">root_mean_squared_scaled_error</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">symmetric_mean_absolute_percentage_error</span></a>
   </div>
 </li>
@@ -715,43 +716,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.validation.backtesting_forecaster.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.validation.backtesting_forecaster.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">backtesting_forecaster</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.validation.backtesting_forecaster_one_step.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.validation.backtesting_forecaster_one_step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">backtesting_forecaster_one_step</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.validation.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.validation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">validation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.split_base.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.split_base.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">BaseFold</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.split_one_step.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.split_one_step.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">OneStepAheadFold</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.split_ts_cv.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.split_ts_cv.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">TimeSeriesFold</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/model_selection.utils_common.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/model_selection.utils_common.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils_common</span></a>
   </div>
 </li>
@@ -768,37 +769,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.metrics.calculate_metrics.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.metrics.calculate_metrics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">calculate_metrics</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.predictor.get_model_prediction.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.predictor.get_model_prediction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_model_prediction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.configurator.config_entsoe.ConfigEntsoe.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.configurator.config_entsoe.ConfigEntsoe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ConfigEntsoe</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.logger.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.logger.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">logger</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.persistence.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.persistence.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">persistence</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.tools.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.tools.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tools</span></a>
   </div>
 </li>
@@ -813,13 +814,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.datasets.demo_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.datasets.demo_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">demo_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.datasets.demo_loader.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.datasets.demo_loader.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">demo_loader</span></a>
   </div>
 </li>
@@ -836,19 +837,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.models.forecaster_recursive_lgbm.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.models.forecaster_recursive_lgbm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursiveLGBM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.models.forecaster_recursive_model.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.models.forecaster_recursive_model.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursiveModel</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.models.forecaster_recursive_xgb.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.models.forecaster_recursive_xgb.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursiveXGB</span></a>
   </div>
 </li>
@@ -865,19 +866,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.trainer.get_last_model.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.trainer.get_last_model.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_last_model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.trainer.get_path_model.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.trainer.get_path_model.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_path_model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.trainer.load_iteration.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/manager.trainer.load_iteration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">load_iteration</span></a>
   </div>
 </li>
@@ -896,37 +897,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.cpe.get_cpe_identifier.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.cpe.get_cpe_identifier.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_cpe_identifier</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_holiday_df</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.convert_to_utc.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.convert_to_utc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">convert_to_utc</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.data_transform.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.data_transform.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">data_transform</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.forecaster_config.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.forecaster_config.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">forecaster_config</span></a>
   </div>
 </li>
@@ -941,49 +942,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_y.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_y.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">check_y</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_exog.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_exog.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">check_exog</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_exog_dtypes.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_exog_dtypes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">check_exog_dtypes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_interval.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_interval.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">check_interval</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_predict_input.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_predict_input.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">check_predict_input</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.check_residuals_input.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.check_residuals_input.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">check_residuals_input</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.get_exog_dtypes.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.get_exog_dtypes.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_exog_dtypes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/utils.validation.set_cpu_gpu_device.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/utils.validation.set_cpu_gpu_device.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">set_cpu_gpu_device</span></a>
   </div>
 </li>
@@ -1002,19 +1003,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/weather.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/weather.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/weather.weather_client.WeatherClient.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/weather.weather_client.WeatherClient.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">WeatherClient</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/weather.weather_client.WeatherService.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/weather.weather_client.WeatherService.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">WeatherService</span></a>
   </div>
 </li>
@@ -1031,13 +1032,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">download_new_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/downloader.entsoe.merge_build_manual.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/downloader.entsoe.merge_build_manual.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">merge_build_manual</span></a>
   </div>
 </li>
@@ -1045,7 +1046,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/exceptions.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/exceptions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Exceptions</span></a>
   </div>
 </li>
@@ -1060,13 +1061,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-20" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/tasks.task_safe_demo.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/tasks.task_safe_demo.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">task_safe_demo</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">task_safe_n_to_1_with_covariates_and_dataframe</span></a>
   </div>
 </li>
@@ -1085,7 +1086,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-21" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/processing/model_persistence.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/processing/model_persistence.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model Persistence</span></a>
   </div>
 </li>
@@ -1102,19 +1103,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/preprocessing/outliers.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/preprocessing/outliers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Outlier Detection</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/preprocessing/imputation.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/preprocessing/imputation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Imputation &amp; Gap Weighting</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Period Configuration Rationale</span></a>
   </div>
 </li>
@@ -1131,13 +1132,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-23" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/recursive/ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/recursive/ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursive</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/recursive/ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/recursive/ForecasterEquivalentDate.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterEquivalentDate</span></a>
   </div>
 </li>
@@ -1154,25 +1155,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-24" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Streamlining Process</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/MODEL_CARD.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/safe/MODEL_CARD.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model/Method Card</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/VERSION_MANAGEMENT.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/safe/VERSION_MANAGEMENT.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Version Management</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/security.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/security.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Security Policy</span></a>
   </div>
 </li>
@@ -1189,19 +1190,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-25" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tasks.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/tasks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Demo Tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/task_safe_demo_explained.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/task_safe_demo_explained.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Safe Demo Explained</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Safe n-to-1 Explained</span></a>
   </div>
 </li>
@@ -1218,7 +1219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/contributing.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/contributing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contributing Guide</span></a>
   </div>
 </li>
@@ -1234,21 +1235,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#input-validation" id="toc-input-validation" class="nav-link active" data-scroll-target="#input-validation">Input Validation</a></li>
+  <li><a href="#stage-1-data-preparation" id="toc-stage-1-data-preparation" class="nav-link" data-scroll-target="#stage-1-data-preparation">Stage 1 — Data Preparation</a></li>
+  <li><a href="#stage-2-outlier-detection-and-removal" id="toc-stage-2-outlier-detection-and-removal" class="nav-link" data-scroll-target="#stage-2-outlier-detection-and-removal">Stage 2 — Outlier Detection and Removal</a></li>
+  <li><a href="#stage-3-missing-value-imputation-with-sample-weighting" id="toc-stage-3-missing-value-imputation-with-sample-weighting" class="nav-link" data-scroll-target="#stage-3-missing-value-imputation-with-sample-weighting">Stage 3 — Missing Value Imputation with Sample Weighting</a></li>
+  <li><a href="#stage-4-exogenous-feature-engineering" id="toc-stage-4-exogenous-feature-engineering" class="nav-link" data-scroll-target="#stage-4-exogenous-feature-engineering">Stage 4 — Exogenous Feature Engineering</a></li>
+  <li><a href="#stage-5-combining-and-encoding-exogenous-features" id="toc-stage-5-combining-and-encoding-exogenous-features" class="nav-link" data-scroll-target="#stage-5-combining-and-encoding-exogenous-features">Stage 5 — Combining and Encoding Exogenous Features</a></li>
+  <li><a href="#stage-6-feature-selection" id="toc-stage-6-feature-selection" class="nav-link" data-scroll-target="#stage-6-feature-selection">Stage 6 — Feature Selection</a></li>
+  <li><a href="#stage-7-merging-target-and-exogenous-data" id="toc-stage-7-merging-target-and-exogenous-data" class="nav-link" data-scroll-target="#stage-7-merging-target-and-exogenous-data">Stage 7 — Merging Target and Exogenous Data</a></li>
+  <li><a href="#stage-8-trainvalidationtest-split" id="toc-stage-8-trainvalidationtest-split" class="nav-link" data-scroll-target="#stage-8-trainvalidationtest-split">Stage 8 — Train/Validation/Test Split</a></li>
+  <li><a href="#stage-9-model-training-or-loading" id="toc-stage-9-model-training-or-loading" class="nav-link" data-scroll-target="#stage-9-model-training-or-loading">Stage 9 — Model Training or Loading</a></li>
+  <li><a href="#stage-10-prediction" id="toc-stage-10-prediction" class="nav-link" data-scroll-target="#stage-10-prediction">Stage 10 — Prediction</a></li>
+  <li><a href="#metadata-and-return-values" id="toc-metadata-and-return-values" class="nav-link" data-scroll-target="#metadata-and-return-values">Metadata and Return Values</a></li>
+  <li><a href="#the-complete-execution-flow" id="toc-the-complete-execution-flow" class="nav-link" data-scroll-target="#the-complete-execution-flow">The Complete Execution Flow</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.fetch_data.fetch_weather_data.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_explained.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.fetch_data.fetch_weather_data.html">fetch_weather_data</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">data.fetch_data.fetch_weather_data</h1>
+<h1 class="title">n2n_predict_with_covariates: Design and Pipeline Logic Explained</h1>
 </div>
 
+<div>
+  <div class="description">
+    A step-by-step walkthrough of the N-to-N covariate forecasting pipeline for beginners.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -1263,114 +1279,115 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.fetch_weather_data(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    cov_start,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    cov_end,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    cached<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Fetches weather data for the dataset period plus forecast horizon. Create weather dataframe using API with optional caching.</p>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>cov_start</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Start date for covariate data.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td>cov_end</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>End date for covariate data.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="odd">
-<td>latitude</td>
-<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
-<td>Latitude of the location for weather data. Default is 51.5136 (Dortmund).</td>
-<td><code>51.5136</code></td>
-</tr>
-<tr class="even">
-<td>longitude</td>
-<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
-<td>Longitude of the location for weather data. Default is 7.4653 (Dortmund).</td>
-<td><code>7.4653</code></td>
-</tr>
-<tr class="odd">
-<td>timezone</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Timezone for the weather data.</td>
-<td><code>'UTC'</code></td>
-</tr>
-<tr class="even">
-<td>freq</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Frequency of the weather data.</td>
-<td><code>'h'</code></td>
-</tr>
-<tr class="odd">
-<td>fallback_on_failure</td>
-<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>Whether to use fallback data in case of failure.</td>
-<td><code>True</code></td>
-</tr>
-<tr class="even">
-<td>cached</td>
-<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>Whether to use cached data.</td>
-<td><code>True</code></td>
-</tr>
-</tbody>
-</table>
+<p>The <code>n2n_predict_with_covariates</code> function is the central engine of the <code>spotforecast2-safe</code> forecasting system. It accepts a multivariate time series and returns a DataFrame of multi-step ahead predictions for every target column, together with a metadata dictionary and a collection of fitted <code>ForecasterRecursive</code> objects. The function is organised as a strict sequential pipeline of nine numbered stages, each of which transforms the data into a form that the next stage can consume. Understanding each stage in isolation is the clearest path to understanding the function as a whole.</p>
+<section id="input-validation" class="level2">
+<h2 class="anchored" data-anchor-id="input-validation">Input Validation</h2>
+<p>Before any computation is attempted, <code>n2n_predict_with_covariates</code> validates every numerical argument at the entry point. The <code>forecast_horizon</code> must be strictly positive, <code>contamination</code> must lie in <code>[0, 0.5]</code>, <code>window_size</code> and <code>lags</code> must both be positive, and <code>train_ratio</code> must be strictly between zero and one. These checks follow the fail-fast principle: a nonsensical configuration raises a <code>ValueError</code> immediately with an informative message, rather than allowing a malformed value to silently corrupt a lag matrix or an outlier-detection threshold deep inside the pipeline. The guard on <code>forecast_horizon</code> in particular prevents a negative or zero value from causing array slices to wrap around or return empty results, which would be invisible to the caller at training time but catastrophic at evaluation time.</p>
 </section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>pd.DataFrame: DataFrame containing weather information.</td>
-</tr>
-</tbody>
-</table>
+<section id="stage-1-data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="stage-1-data-preparation">Stage 1 — Data Preparation</h2>
+<p>The first stage resolves the source of the target time series. When the caller supplies a <code>data</code> argument, the series is passed directly to <code>fetch_data</code> with the <code>dataframe</code> keyword. When no data is supplied, <code>fetch_data</code> reads from the default <code>data_in.csv</code> file. In either case the function returns a DataFrame with a timezone-aware <code>DatetimeIndex</code> and numeric columns for each target variable. The column names are recorded immediately as <code>target_columns</code> because they govern every downstream operation, from the exogenous feature alignment to the model persistence file names.</p>
+<p>Once the data is loaded, <code>get_start_end</code> computes four boundary timestamps: <code>start</code> and <code>end</code> bracket the historical portion of the series, while <code>cov_start</code> and <code>cov_end</code> extend the window forward by exactly <code>forecast_horizon</code> steps to cover the prediction period. These timestamps are used consistently across all feature-engineering functions to ensure that the exogenous feature matrix covers both the training window and the prediction window without any gaps at the boundary.</p>
+<p><code>basic_ts_checks</code> then asserts that the index is monotonically increasing and that the frequency is consistent, which are prerequisites for the lag-matrix construction in <code>ForecasterRecursive</code>. <code>agg_and_resample_data</code> enforces the target hourly frequency by aggregating sub-hourly data and forward-filling isolated gaps, producing a regular grid before any model sees the series.</p>
 </section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="98e0d21d" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_weather_data</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>weather_df <span class="op">=</span> fetch_weather_data(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="st">'2023-01-01T00:00'</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="st">'2023-01-11T00:00'</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    cached<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>weather_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
+<section id="stage-2-outlier-detection-and-removal" class="level2">
+<h2 class="anchored" data-anchor-id="stage-2-outlier-detection-and-removal">Stage 2 — Outlier Detection and Removal</h2>
+<p>The second stage passes the cleaned series to <code>mark_outliers</code>, which applies an Isolation Forest with the user-specified <code>contamination</code> parameter. The Isolation Forest partitions the feature space by randomly selecting split points; observations that require very few splits to isolate are considered anomalous. With <code>contamination=0.01</code>, approximately one percent of the series is expected to be anomalous. The function replaces the values at detected outlier positions with NaN so that the imputation stage can treat them uniformly with other missing data. The label series <code>outliers</code> is returned separately and stored for the metadata dictionary at the end of the pipeline.</p>
+<div id="cd5d8aee" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(np.random.randn(n))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>y.iloc[<span class="dv">50</span>] <span class="op">=</span> <span class="fl">15.0</span>   <span class="co"># inject spike</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y.iloc[<span class="dv">100</span>] <span class="op">=</span> <span class="op">-</span><span class="fl">12.0</span>  <span class="co"># inject dip</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>contamination <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>expected_anomalies <span class="op">=</span> <span class="bu">int</span>(n <span class="op">*</span> contamination)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Series length     : </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected anomalies: </span><span class="sc">{</span>expected_anomalies<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Injected positions: [50, 100]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Series length     : 200
+Expected anomalies: 2
+Injected positions: [50, 100]</code></pre>
+</div>
+</div>
+<p>The <code>random_state=1234</code> argument ensures that two runs on identical input produce identical outlier labels, which is a core requirement of the reproducible-artefact design.</p>
+</section>
+<section id="stage-3-missing-value-imputation-with-sample-weighting" class="level2">
+<h2 class="anchored" data-anchor-id="stage-3-missing-value-imputation-with-sample-weighting">Stage 3 — Missing Value Imputation with Sample Weighting</h2>
+<p>After outlier removal, every position marked as anomalous or originally missing is imputed by <code>get_missing_weights</code>. The function forward-fills all NaN positions, then propagates a binary contamination mask forward by <code>window_size</code> positions using a rolling maximum. Any training row whose lag window touches an imputed value receives weight zero; all other rows receive weight one. This strategy is more conservative than simply imputing values: the forecaster still sees the forward-filled numbers in its lag matrix, but the corresponding sample weights suppress their gradient contribution during fitting.</p>
+<p>The resulting <code>weights_series</code> is wrapped in a <code>WeightFunction</code> object rather than passed as a plain array. This indirection solves three problems simultaneously. The training matrix produced by <code>ForecasterRecursive._create_train_X_y</code> is shorter than the original series by <code>max(lags)</code> rows, so a positionally indexed array would silently return the wrong weights. A callable that receives <code>X_train.index</code> and performs a label-based lookup into the weights Series is immune to this offset regardless of the <code>lags</code> setting. Additionally, <code>WeightFunction</code> is a plain class with no closure dependencies, making it fully picklable alongside the trained forecaster — a requirement for model persistence across separate Python processes.</p>
+<div id="786c6174" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> pd.Series([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>], dtype<span class="op">=</span><span class="bu">float</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                     index<span class="op">=</span>pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">8</span>, freq<span class="op">=</span><span class="st">"h"</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> WeightFunction:</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, weights_series):</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights_series <span class="op">=</span> weights_series</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, index):</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.weights_series.reindex(index).fillna(<span class="fl">1.0</span>).values</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>wf <span class="op">=</span> WeightFunction(weights)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>query_idx <span class="op">=</span> weights.index[<span class="dv">1</span>:<span class="dv">5</span>]</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Queried timestamps :"</span>, query_idx.tolist())</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Returned weights   :"</span>, wf(query_idx).tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Queried timestamps : [Timestamp('2020-01-01 01:00:00'), Timestamp('2020-01-01 02:00:00'), Timestamp('2020-01-01 03:00:00'), Timestamp('2020-01-01 04:00:00')]
+Returned weights   : [1.0, 0.0, 0.0, 0.0]</code></pre>
+</div>
+</div>
+</section>
+<section id="stage-4-exogenous-feature-engineering" class="level2">
+<h2 class="anchored" data-anchor-id="stage-4-exogenous-feature-engineering">Stage 4 — Exogenous Feature Engineering</h2>
+<p>The fourth stage constructs four categories of exogenous features, each covering the full extended window from <code>start</code> to <code>cov_end</code>.</p>
+<p>Holiday features are retrieved by <code>_get_holiday_features</code>, which calls <code>fetch_holiday_data</code> for the configured country and state, validates the result with <code>curate_holidays</code>, and reindexes the resulting binary Series to the hourly grid with <code>fill_value=0</code>. The binary encoding — zero for non-holiday, one for holiday — is intentional: the model receives an unambiguous categorical signal that is compatible with gradient boosting without any encoding transformation.</p>
+<p>Weather features are retrieved by <code>_get_weather_features</code>, which calls <code>fetch_weather_data</code> and then applies <code>WindowFeatures</code> from <code>feature_engine</code> to compute rolling mean, maximum, and minimum over one-day and seven-day windows for each numeric weather column. Any residual missing values in the weather matrix are resolved by backward-fill before the window transformation, and a second check after transformation raises a <code>ValueError</code> if any NaN values remain. This double-check ensures that no imputed weather value silently propagates into the feature matrix.</p>
+<p>Calendar features are created by <code>_get_calendar_features</code>, which uses <code>DatetimeFeatures</code> from <code>feature_engine</code> to extract month, week of year, day of week, and hour directly from the <code>DatetimeIndex</code>. Because these features are derived from the index alone, they are always complete and require no imputation.</p>
+<p>Day and night features are computed by <code>_get_day_night_features</code> using the <code>astral</code> library. For each unique calendar date in the extended index, the function computes sunrise and sunset times using the observer’s geographic coordinates, rounds them to the nearest hour, and broadcasts the values across all hourly timestamps in that day. The derived <code>is_daylight</code> column is a binary flag that equals one during the hours between sunrise and sunset. Caching the per-day sunrise and sunset times before broadcasting avoids recomputing the solar position for every timestamp in a multi-year series.</p>
+<div id="28fac99a" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-06-01"</span>, periods<span class="op">=</span><span class="dv">24</span>, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>sunrise_hour <span class="op">=</span> <span class="dv">4</span>   <span class="co"># approximate June sunrise at 51°N</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>sunset_hour  <span class="op">=</span> <span class="dv">21</span>  <span class="co"># approximate June sunset  at 51°N</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>is_daylight <span class="op">=</span> np.where(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    (dates.hour <span class="op">&gt;=</span> sunrise_hour) <span class="op">&amp;</span> (dates.hour <span class="op">&lt;</span> sunset_hour), <span class="dv">1</span>, <span class="dv">0</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>df_sun <span class="op">=</span> pd.DataFrame({<span class="st">"hour"</span>: dates.hour, <span class="st">"is_daylight"</span>: is_daylight}, index<span class="op">=</span>dates)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_sun.groupby(<span class="st">"is_daylight"</span>)[<span class="st">"hour"</span>].<span class="bu">apply</span>(<span class="bu">list</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>is_daylight
+0                             [0, 1, 2, 3, 21, 22, 23]
+1    [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,...</code></pre>
+</div>
+</div>
+</section>
+<section id="stage-5-combining-and-encoding-exogenous-features" class="level2">
+<h2 class="anchored" data-anchor-id="stage-5-combining-and-encoding-exogenous-features">Stage 5 — Combining and Encoding Exogenous Features</h2>
+<p>The four feature DataFrames are concatenated column-wise into a single <code>exogenous_features</code> matrix. A missing-value check immediately follows; if any NaN value is present the function raises a <code>ValueError</code> that identifies the count of missing entries. This hard stop prevents a silently incomplete feature matrix from entering the cyclical encoder.</p>
+<p>Cyclical encoding is applied to month, week, day of week, hour, sunrise hour, and sunset hour by <code>_apply_cyclical_encoding</code>. Each integer-valued column is replaced by its sine and cosine projections onto a unit circle scaled to the column’s natural period. The transformation ensures that the numerically adjacent values at the boundary of each cycle — midnight and the hour before midnight, December and January, Sunday and Monday — are also geometrically adjacent in the encoded space, which prevents gradient boosting from learning a spurious discontinuity at the wrap-around point. The original integer columns are retained alongside the cyclical columns so that the model can use either representation.</p>
+<div id="87f4c4ec" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">12</span>, freq<span class="op">=</span><span class="st">"ME"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>month <span class="op">=</span> dates.month</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>month_sin <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>month_cos <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"month"</span>: month, <span class="st">"sin"</span>: month_sin.<span class="bu">round</span>(<span class="dv">4</span>), <span class="st">"cos"</span>: month_cos.<span class="bu">round</span>(<span class="dv">4</span>)},</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>dates,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
 
@@ -1378,131 +1395,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">temperature_2m</th>
-<th data-quarto-table-cell-role="th">relative_humidity_2m</th>
-<th data-quarto-table-cell-role="th">precipitation</th>
-<th data-quarto-table-cell-role="th">rain</th>
-<th data-quarto-table-cell-role="th">snowfall</th>
-<th data-quarto-table-cell-role="th">weather_code</th>
-<th data-quarto-table-cell-role="th">pressure_msl</th>
-<th data-quarto-table-cell-role="th">surface_pressure</th>
-<th data-quarto-table-cell-role="th">cloud_cover</th>
-<th data-quarto-table-cell-role="th">cloud_cover_low</th>
-<th data-quarto-table-cell-role="th">cloud_cover_mid</th>
-<th data-quarto-table-cell-role="th">cloud_cover_high</th>
-<th data-quarto-table-cell-role="th">wind_speed_10m</th>
-<th data-quarto-table-cell-role="th">wind_direction_10m</th>
-<th data-quarto-table-cell-role="th">wind_gusts_10m</th>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">datetime</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">month</th>
+<th data-quarto-table-cell-role="th">sin</th>
+<th data-quarto-table-cell-role="th">cos</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-01 00:00:00+00:00</td>
-<td>16.6</td>
-<td>43</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1010.4</td>
-<td>998.2</td>
-<td>97</td>
-<td>0</td>
-<td>100</td>
-<td>6</td>
-<td>35.2</td>
-<td>228</td>
-<td>63.7</td>
+<td data-quarto-table-cell-role="th">2020-01-31</td>
+<td>1</td>
+<td>0.500</td>
+<td>0.866</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2023-01-01 01:00:00+00:00</td>
-<td>16.6</td>
-<td>42</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1010.3</td>
-<td>998.1</td>
-<td>100</td>
-<td>0</td>
-<td>99</td>
-<td>87</td>
-<td>32.6</td>
-<td>229</td>
-<td>64.8</td>
+<td data-quarto-table-cell-role="th">2020-02-29</td>
+<td>2</td>
+<td>0.866</td>
+<td>0.500</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-01 02:00:00+00:00</td>
-<td>15.9</td>
-<td>43</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
+<td data-quarto-table-cell-role="th">2020-03-31</td>
 <td>3</td>
-<td>1011.0</td>
-<td>998.8</td>
-<td>100</td>
-<td>0</td>
-<td>99</td>
-<td>100</td>
-<td>29.1</td>
-<td>222</td>
-<td>60.1</td>
+<td>1.000</td>
+<td>0.000</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2023-01-01 03:00:00+00:00</td>
-<td>15.1</td>
-<td>46</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1011.3</td>
-<td>999.0</td>
-<td>100</td>
-<td>0</td>
-<td>100</td>
-<td>99</td>
-<td>28.4</td>
-<td>218</td>
-<td>54.0</td>
+<td data-quarto-table-cell-role="th">2020-04-30</td>
+<td>4</td>
+<td>0.866</td>
+<td>-0.500</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-01 04:00:00+00:00</td>
-<td>14.6</td>
-<td>50</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1011.7</td>
-<td>999.4</td>
-<td>100</td>
+<td data-quarto-table-cell-role="th">2020-05-31</td>
 <td>5</td>
-<td>100</td>
-<td>94</td>
-<td>28.4</td>
-<td>219</td>
-<td>55.1</td>
+<td>0.500</td>
+<td>-0.866</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-06-30</td>
+<td>6</td>
+<td>0.000</td>
+<td>-1.000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-07-31</td>
+<td>7</td>
+<td>-0.500</td>
+<td>-0.866</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-08-31</td>
+<td>8</td>
+<td>-0.866</td>
+<td>-0.500</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-09-30</td>
+<td>9</td>
+<td>-1.000</td>
+<td>-0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-10-31</td>
+<td>10</td>
+<td>-0.866</td>
+<td>0.500</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-11-30</td>
+<td>11</td>
+<td>-0.500</td>
+<td>0.866</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-12-31</td>
+<td>12</td>
+<td>-0.000</td>
+<td>1.000</td>
 </tr>
 </tbody>
 </table>
@@ -1510,6 +1479,174 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>Interaction features are then created by <code>_create_interaction_features</code> using <code>PolynomialFeatures</code> with <code>interaction_only=True</code>. This produces pairwise products of the four cyclical calendar columns with the weather window features and the raw weather columns. The holiday column is included if it is present. Interaction features capture joint effects such as the combination of a cold morning and a weekday peak that neither feature can represent individually. The resulting columns are prefixed with <code>poly_</code> to distinguish them from the base features.</p>
+</section>
+<section id="stage-6-feature-selection" class="level2">
+<h2 class="anchored" data-anchor-id="stage-6-feature-selection">Stage 6 — Feature Selection</h2>
+<p><code>_select_exogenous_features</code> assembles the final list of exogenous column names from the combined feature matrix. The function always includes cyclical features, identified by a <code>_sin$|_cos$</code> regular expression, and the raw weather columns. Weather window features, holiday features, and polynomial interaction features are included only if the corresponding boolean flags were set by the caller. The order-preserving deduplication idiom <code>list(dict.fromkeys(exog_features))</code> ensures that no column name appears twice in the final list even if multiple selection paths produce the same column, which would cause a duplicate-column error inside the forecaster.</p>
+</section>
+<section id="stage-7-merging-target-and-exogenous-data" class="level2">
+<h2 class="anchored" data-anchor-id="stage-7-merging-target-and-exogenous-data">Stage 7 — Merging Target and Exogenous Data</h2>
+<p><code>_merge_data_and_covariates</code> produces three DataFrames from the combined inputs. <code>exo_tmp</code> is the slice of the exogenous feature matrix that covers <code>[start, end]</code>, the historical window used for training. <code>exo_pred</code> is the slice that covers <code>(end, cov_end]</code>, the future window used for prediction. <code>data_with_exog</code> is an inner join of the target columns with the selected exogenous features over the historical window; the inner join guarantees that only rows where both the target and the exogenous features are present are retained, eliminating any residual index misalignment. All columns of <code>data_with_exog</code> are cast to <code>float32</code> to reduce memory consumption during lag-matrix construction.</p>
+</section>
+<section id="stage-8-trainvalidationtest-split" class="level2">
+<h2 class="anchored" data-anchor-id="stage-8-trainvalidationtest-split">Stage 8 — Train/Validation/Test Split</h2>
+<p><code>split_rel_train_val_test</code> partitions <code>data_with_exog</code> into three temporally ordered segments using the <code>train_ratio</code> argument. With the default <code>train_ratio=0.8</code>, the training set receives 80 percent of the rows, and the validation and test sets each receive 10 percent. The split is purely temporal — no shuffling is performed — which respects the causal ordering of a time series. The end timestamp of the combined train-validation segment, <code>end_validation</code>, defines the boundary up to which the forecaster is fitted. This boundary is used in the <code>.fit</code> call rather than the end of the full dataset to leave the test set genuinely unseen.</p>
+<div id="bac03e62" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">"h"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>y   <span class="op">=</span> pd.Series(np.arange(n, dtype<span class="op">=</span><span class="bu">float</span>), index<span class="op">=</span>idx)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>train_ratio <span class="op">=</span> <span class="fl">0.8</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>n_train <span class="op">=</span> <span class="bu">int</span>(n <span class="op">*</span> train_ratio)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>n_val   <span class="op">=</span> <span class="bu">int</span>(n <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> train_ratio) <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>n_test  <span class="op">=</span> n <span class="op">-</span> n_train <span class="op">-</span> n_val</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total rows : </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Train rows : </span><span class="sc">{</span>n_train<span class="sc">}</span><span class="ss">  (</span><span class="sc">{</span>train_ratio<span class="sc">:.0%}</span><span class="ss">)"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Val rows   : </span><span class="sc">{</span>n_val<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Test rows  : </span><span class="sc">{</span>n_test<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Train ends : </span><span class="sc">{</span>y<span class="sc">.</span>index[n_train <span class="op">-</span> <span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total rows : 100
+Train rows : 80  (80%)
+Val rows   : 9
+Test rows  : 11
+Train ends : 2020-01-04 07:00:00</code></pre>
+</div>
+</div>
+</section>
+<section id="stage-9-model-training-or-loading" class="level2">
+<h2 class="anchored" data-anchor-id="stage-9-model-training-or-loading">Stage 9 — Model Training or Loading</h2>
+<p>The ninth stage decides whether to train new forecasters or to load previously serialised ones. If <code>force_train=False</code> and the model directory exists, <code>_load_forecasters</code> attempts to deserialise a <code>ForecasterRecursive</code> object for each target column. Targets whose model files are missing from the directory are added to <code>targets_to_train</code>. If all models load successfully, training is skipped entirely and the function proceeds directly to the prediction stage. This caching mechanism makes repeated calls with the same configuration — for example in a daily batch process — significantly faster than retraining from scratch.</p>
+<p>When training is required, a <code>ForecasterRecursive</code> is constructed for each target in <code>targets_to_train</code>. The estimator defaults to <code>LGBMRegressor(random_state=1234, verbose=-1)</code> if the caller does not supply one. A <code>RollingFeatures</code> object with <code>stats=["mean"]</code> and <code>window_sizes=window_size</code> is passed as the <code>window_features</code> argument, which instructs the forecaster to include a rolling mean of the target series as an additional feature alongside the lag columns. The <code>weight_func</code> argument wires the <code>WeightFunction</code> created in stage 3 into the training loop.</p>
+<p>Each forecaster is fitted on the target column of <code>data_with_exog</code> up to and including <code>end_validation</code>, with the corresponding exogenous slice passed as the <code>exog</code> argument. After all targets are trained, <code>_save_forecasters</code> serialises each fitted object to the model directory using joblib, one file per target. The <code>WeightFunction</code> instance is serialised together with the forecaster because it is an attribute of the fitted object.</p>
+<div id="03f840a4" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>estimator <span class="op">=</span> LGBMRegressor(random_state<span class="op">=</span><span class="dv">1234</span>, verbose<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"random_state : </span><span class="sc">{</span>estimator<span class="sc">.</span>random_state<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"verbose      : </span><span class="sc">{</span>estimator<span class="sc">.</span>verbose<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"n_estimators : </span><span class="sc">{</span>estimator<span class="sc">.</span>n_estimators<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>random_state : 1234
+verbose      : -1
+n_estimators : 100</code></pre>
+</div>
+</div>
+</section>
+<section id="stage-10-prediction" class="level2">
+<h2 class="anchored" data-anchor-id="stage-10-prediction">Stage 10 — Prediction</h2>
+<p>After all forecasters are available — whether trained or loaded — <code>predict_multivariate</code> iterates over the <code>recursive_forecasters</code> dictionary and calls <code>.predict(steps=forecast_horizon, exog=exo_pred_subset)</code> on each forecaster. The exogenous input for the prediction step is <code>exo_pred[exog_features]</code>, the future slice of the feature matrix that covers exactly <code>forecast_horizon</code> steps beyond <code>end_validation</code>. The recursive forecaster advances its internal state one step at a time, using each predicted value as the next lag input, which is why the future exogenous features must be available for all <code>forecast_horizon</code> steps before any prediction can begin. The result is assembled into a <code>predictions</code> DataFrame with one column per target and <code>forecast_horizon</code> rows.</p>
+<div id="7d5d6dda" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>forecast_horizon <span class="op">=</span> <span class="dv">24</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>n_targets <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>pred_index <span class="op">=</span> pd.date_range(<span class="st">"2023-01-02"</span>, periods<span class="op">=</span>forecast_horizon, freq<span class="op">=</span><span class="st">"h"</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    np.random.randn(forecast_horizon, n_targets),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>pred_index,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="ss">f"col_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_targets)],</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Predictions shape : </span><span class="sc">{</span>predictions<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"First timestamp   : </span><span class="sc">{</span>predictions<span class="sc">.</span>index[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Last  timestamp   : </span><span class="sc">{</span>predictions<span class="sc">.</span>index[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>predictions.head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predictions shape : (24, 11)
+First timestamp   : 2023-01-02 00:00:00
+Last  timestamp   : 2023-01-02 23:00:00</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">col_1</th>
+<th data-quarto-table-cell-role="th">col_2</th>
+<th data-quarto-table-cell-role="th">col_3</th>
+<th data-quarto-table-cell-role="th">col_4</th>
+<th data-quarto-table-cell-role="th">col_5</th>
+<th data-quarto-table-cell-role="th">col_6</th>
+<th data-quarto-table-cell-role="th">col_7</th>
+<th data-quarto-table-cell-role="th">col_8</th>
+<th data-quarto-table-cell-role="th">col_9</th>
+<th data-quarto-table-cell-role="th">col_10</th>
+<th data-quarto-table-cell-role="th">col_11</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-01-02 00:00:00</td>
+<td>0.4967</td>
+<td>-0.1383</td>
+<td>0.6477</td>
+<td>1.5230</td>
+<td>-0.2342</td>
+<td>-0.2341</td>
+<td>1.5792</td>
+<td>0.7674</td>
+<td>-0.4695</td>
+<td>0.5426</td>
+<td>-0.4634</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-01-02 01:00:00</td>
+<td>-0.4657</td>
+<td>0.2420</td>
+<td>-1.9133</td>
+<td>-1.7249</td>
+<td>-0.5623</td>
+<td>-1.0128</td>
+<td>0.3142</td>
+<td>-0.9080</td>
+<td>-1.4123</td>
+<td>1.4656</td>
+<td>-0.2258</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-01-02 02:00:00</td>
+<td>0.0675</td>
+<td>-1.4247</td>
+<td>-0.5444</td>
+<td>0.1109</td>
+<td>-1.1510</td>
+<td>0.3757</td>
+<td>-0.6006</td>
+<td>-0.2917</td>
+<td>-0.6017</td>
+<td>1.8523</td>
+<td>-0.0135</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="metadata-and-return-values" class="level2">
+<h2 class="anchored" data-anchor-id="metadata-and-return-values">Metadata and Return Values</h2>
+<p>The function returns a three-element tuple. The first element is the <code>predictions</code> DataFrame described above. The second element is a <code>metadata</code> dictionary that records every parameter and intermediate shape that characterises the run: <code>forecast_horizon</code>, <code>target_columns</code>, <code>exog_features</code>, the number of selected exogenous features, the sizes of the train, validation, and test segments, the shapes of the original and merged DataFrames, the training end timestamp, the prediction start and end timestamps, <code>lags</code>, <code>window_size</code>, <code>contamination</code>, and the number of detected outliers. This dictionary provides a self-contained audit record of the computation without requiring the caller to reparse the source data or rerun the pipeline.</p>
+<p>The third element is the <code>recursive_forecasters</code> dictionary keyed by target column name. Returning the fitted objects allows the caller to inspect internal state — feature names, lag matrices, fitted estimator parameters — or to call <code>.predict</code> again with a different horizon without retraining.</p>
+</section>
+<section id="the-complete-execution-flow" class="level2">
+<h2 class="anchored" data-anchor-id="the-complete-execution-flow">The Complete Execution Flow</h2>
+<p>A single call to <code>n2n_predict_with_covariates</code> follows this invariant sequence. Input validation runs first. The target data is loaded and cleaned. Outlier positions are replaced with NaN. Missing values are imputed and sample weights are computed. Four categories of exogenous features are constructed over the full extended time window. The features are concatenated, validated for completeness, cyclically encoded, and augmented with interaction terms. A feature selection step reduces the matrix to the columns that are relevant to the configured pipeline variant. The selected features are merged with the target data over the historical window. The merged data is split temporally into train, validation, and test segments. Forecasters are either loaded from disk or trained from scratch and then persisted. Predictions are generated for the <code>forecast_horizon</code> steps beyond the training end. The predictions, metadata, and fitted forecasters are returned to the caller.</p>
+<p>Every public parameter is validated at entry, every exogenous feature matrix is checked for completeness before it enters the model, and every fitted object is serialised in a form that survives process boundaries. These invariants make the pipeline safe to embed in automated batch jobs where a silent failure would not be discovered until long after the prediction window has closed.</p>
 
 
 </section>
@@ -1942,7 +2079,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.fetch_data.fetch_weather_data.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_explained.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
@@ -1952,5 +2089,5 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
