@@ -1419,42 +1419,42 @@
     "href": "docs/reference/data.fetch_data.get_cache_home.html",
     "title": "data.fetch_data.get_cache_home",
     "section": "",
-    "text": "data.fetch_data.get_cache_home(cache_home=None)\nReturn the location where persistent models are to be cached.\nBy default the cache directory is set to a folder named ‘spotforecast2_cache’ in the user home folder. Alternatively, it can be set by the ‘SPOTFORECAST2_CACHE’ environment variable or programmatically by giving an explicit folder path. The ‘~’ symbol is expanded to the user home folder. If the folder does not already exist, it is automatically created.\nThis directory is used to store pickled trained models for quick reuse across forecasting runs, following scikit-learn model persistence conventions.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ncache_home\nstr or pathlib.Path\nThe path to spotforecast cache directory. If None, the default path is ~/spotforecast2_cache.\nNone\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nPath\npathlib.Path: The path to the spotforecast cache directory.\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nOSError\nIf the directory cannot be created due to permission issues.\n\n\n\n\n\n\n&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import get_cache_home\n&gt;&gt;&gt; cache_dir = get_cache_home()\n&gt;&gt;&gt; cache_dir.name\n'spotforecast2_cache'\n&gt;&gt;&gt; # Custom cache location\n&gt;&gt;&gt; import tempfile\n&gt;&gt;&gt; from pathlib import Path\n&gt;&gt;&gt; custom_cache = get_cache_home(Path('/tmp/my_cache'))\n&gt;&gt;&gt; custom_cache.exists()\nTrue\n&gt;&gt;&gt; # Using environment variable\n&gt;&gt;&gt; import os\n&gt;&gt;&gt; os.environ['SPOTFORECAST2_CACHE'] = '/var/cache/spotforecast2'\n&gt;&gt;&gt; cache_dir = get_cache_home()\n&gt;&gt;&gt; cache_dir.as_posix()\n'/var/cache/spotforecast2'"
+    "text": "data.fetch_data.get_cache_home(cache_home=None)\nReturn the location where persistent models are to be cached. By default the cache directory is set to a folder named ‘spotforecast2_cache’ in the user home folder. Alternatively, it can be set by the ‘SPOTFORECAST2_CACHE’ environment variable or programmatically by giving an explicit folder path. The ‘~’ symbol is expanded to the user home folder. If the folder does not already exist, it is automatically created.\nThis directory is used to store pickled trained models for quick reuse across forecasting runs, following scikit-learn model persistence conventions."
   },
   {
     "objectID": "docs/reference/data.fetch_data.get_cache_home.html#parameters",
     "href": "docs/reference/data.fetch_data.get_cache_home.html#parameters",
     "title": "data.fetch_data.get_cache_home",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ncache_home\nstr or pathlib.Path\nThe path to spotforecast cache directory. If None, the default path is ~/spotforecast2_cache.\nNone"
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ncache_home\nstr or pathlib.Path\nThe path to spotforecast cache directory. If None, the default path is ~/spotforecast2_cache.\nNone"
   },
   {
     "objectID": "docs/reference/data.fetch_data.get_cache_home.html#returns",
     "href": "docs/reference/data.fetch_data.get_cache_home.html#returns",
     "title": "data.fetch_data.get_cache_home",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\nPath\npathlib.Path: The path to the spotforecast cache directory."
+    "section": "Returns",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\n\nPath\npathlib.Path: The path to the spotforecast cache directory."
   },
   {
     "objectID": "docs/reference/data.fetch_data.get_cache_home.html#raises",
     "href": "docs/reference/data.fetch_data.get_cache_home.html#raises",
     "title": "data.fetch_data.get_cache_home",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\nOSError\nIf the directory cannot be created due to permission issues."
+    "section": "Raises",
+    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nOSError\nIf the directory cannot be created due to permission issues."
   },
   {
     "objectID": "docs/reference/data.fetch_data.get_cache_home.html#examples",
     "href": "docs/reference/data.fetch_data.get_cache_home.html#examples",
     "title": "data.fetch_data.get_cache_home",
-    "section": "",
-    "text": "&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import get_cache_home\n&gt;&gt;&gt; cache_dir = get_cache_home()\n&gt;&gt;&gt; cache_dir.name\n'spotforecast2_cache'\n&gt;&gt;&gt; # Custom cache location\n&gt;&gt;&gt; import tempfile\n&gt;&gt;&gt; from pathlib import Path\n&gt;&gt;&gt; custom_cache = get_cache_home(Path('/tmp/my_cache'))\n&gt;&gt;&gt; custom_cache.exists()\nTrue\n&gt;&gt;&gt; # Using environment variable\n&gt;&gt;&gt; import os\n&gt;&gt;&gt; os.environ['SPOTFORECAST2_CACHE'] = '/var/cache/spotforecast2'\n&gt;&gt;&gt; cache_dir = get_cache_home()\n&gt;&gt;&gt; cache_dir.as_posix()\n'/var/cache/spotforecast2'"
+    "section": "Examples",
+    "text": "Examples\n\nfrom spotforecast2_safe.data.fetch_data import get_cache_home\ncache_dir = get_cache_home()\nprint(cache_dir.name)\nprint(cache_dir.parent.name)\n\nspotforecast2_cache\nrunner\n\n\n\n# Using custom path\nfrom spotforecast2_safe.data.fetch_data import get_cache_home\nimport tempfile\nfrom pathlib import Path\ncustom_cache = get_cache_home(Path('/tmp/my_cache'))\ncustom_cache.exists()\n\nTrue\n\n\n\n# Using environment variable\nfrom spotforecast2_safe.data.fetch_data import get_cache_home\nimport os\nos.environ['SPOTFORECAST2_CACHE'] = '/tmp/spotforecast2_cache_env'\ncache_dir = get_cache_home()\ncache_dir.as_posix()\ndel os.environ['SPOTFORECAST2_CACHE']"
   },
   {
     "objectID": "docs/reference/data.fetch_data.fetch_holiday_data.html",
     "href": "docs/reference/data.fetch_data.fetch_holiday_data.html",
     "title": "data.fetch_data.fetch_holiday_data",
     "section": "",
-    "text": "data.fetch_data.fetch_holiday_data(\n    start,\n    end,\n    tz='UTC',\n    freq='h',\n    country_code='DE',\n    state='NW',\n)\nFetches holiday data for the dataset period.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nstart\nstr or pd.Timestamp\nStart date of the dataset period.\nrequired\n\n\nend\nstr or pd.Timestamp\nEnd date of the dataset period.\nrequired\n\n\ntz\nstr\nTimezone for the holiday data.\n'UTC'\n\n\nfreq\nstr\nFrequency of the holiday data.\n'h'\n\n\ncountry_code\nstr\nCountry code for the holidays.\n'DE'\n\n\nstate\nstr\nState code for the holidays.\n'NW'\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: DataFrame containing holiday information.\n\n\n\n\n\n\n&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_holiday_data\n&gt;&gt;&gt; holiday_df = fetch_holiday_data(\n...     start='2023-01-01T00:00',\n...     end='2023-01-10T00:00',\n...     tz='UTC',\n...     freq='h',\n...     country_code='DE',\n...     state='NW'\n... )\n&gt;&gt;&gt; holiday_df.head()\n                is_holiday",
+    "text": "data.fetch_data.fetch_holiday_data(\n    start,\n    end,\n    tz='UTC',\n    freq='h',\n    country_code='DE',\n    state='NW',\n)\nFetches holiday data for the dataset period.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -1465,8 +1465,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_holiday_data.html#parameters",
     "href": "docs/reference/data.fetch_data.fetch_holiday_data.html#parameters",
     "title": "data.fetch_data.fetch_holiday_data",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nstart\nstr or pd.Timestamp\nStart date of the dataset period.\nrequired\n\n\nend\nstr or pd.Timestamp\nEnd date of the dataset period.\nrequired\n\n\ntz\nstr\nTimezone for the holiday data.\n'UTC'\n\n\nfreq\nstr\nFrequency of the holiday data.\n'h'\n\n\ncountry_code\nstr\nCountry code for the holidays.\n'DE'\n\n\nstate\nstr\nState code for the holidays.\n'NW'",
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nstart\nstr or pd.Timestamp\nStart date of the dataset period.\nrequired\n\n\nend\nstr or pd.Timestamp\nEnd date of the dataset period.\nrequired\n\n\ntz\nstr\nTimezone for the holiday data.\n'UTC'\n\n\nfreq\nstr\nFrequency of the holiday data.\n'h'\n\n\ncountry_code\nstr\nCountry code for the holidays.\n'DE'\n\n\nstate\nstr\nState code for the holidays.\n'NW'",
     "crumbs": [
       "API Reference",
       "Data",
@@ -1477,8 +1477,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_holiday_data.html#returns",
     "href": "docs/reference/data.fetch_data.fetch_holiday_data.html#returns",
     "title": "data.fetch_data.fetch_holiday_data",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: DataFrame containing holiday information.",
+    "section": "Returns",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: DataFrame containing holiday information.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -1489,8 +1489,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_holiday_data.html#examples",
     "href": "docs/reference/data.fetch_data.fetch_holiday_data.html#examples",
     "title": "data.fetch_data.fetch_holiday_data",
-    "section": "",
-    "text": "&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_holiday_data\n&gt;&gt;&gt; holiday_df = fetch_holiday_data(\n...     start='2023-01-01T00:00',\n...     end='2023-01-10T00:00',\n...     tz='UTC',\n...     freq='h',\n...     country_code='DE',\n...     state='NW'\n... )\n&gt;&gt;&gt; holiday_df.head()\n                is_holiday",
+    "section": "Examples",
+    "text": "Examples\n\nfrom spotforecast2_safe.data.fetch_data import fetch_holiday_data\nholiday_df = fetch_holiday_data(\n    start='2023-01-01T00:00',\n    end='2023-01-10T00:00',\n    tz='UTC',\n    freq='h',\n    country_code='DE',\n    state='NW'\n)\nholiday_df.head()\n\n\n\n\n\n\n\n\nis_holiday\n\n\n\n\n2023-01-01 00:00:00+00:00\n1\n\n\n2023-01-01 01:00:00+00:00\n1\n\n\n2023-01-01 02:00:00+00:00\n1\n\n\n2023-01-01 03:00:00+00:00\n1\n\n\n2023-01-01 04:00:00+00:00\n1",
     "crumbs": [
       "API Reference",
       "Data",
@@ -1615,7 +1615,7 @@
     "href": "docs/preprocessing/outliers.html#examples",
     "title": "Outlier Detection and Handling",
     "section": "Examples",
-    "text": "Examples\n\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.outlier import mark_outliers\n\n# Create sample time series data\ndata = pd.DataFrame({\n    'value': [1, 2, 100, 4, 5, 6, 7, 8, 9, 10],  # 100 is an outlier\n})\n\n# Mark outliers\nresult_data, outlier_labels = mark_outliers(\n    data,\n    contamination=0.1,  # Expect 10% contamination\n)\n\noutlier_count = (outlier_labels == -1).sum()\nprint(f\"Outliers marked: {outlier_count} records\")\n\nOutliers marked: 1 records",
+    "text": "Examples\n\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.outlier import mark_outliers\n\n# Create sample time series data\ndata = pd.DataFrame({\n    'value': [1, 2, 100, 4, 5, 6, 7, 8, 9, 10],  # 100 is an outlier\n})\n\n# Mark outliers\nresult_data, outlier_labels = mark_outliers(\n    data=data.copy(),  # Use a copy to preserve original data\n    contamination=0.1,  # Expect 10% contamination\n)\n\noutlier_count = (outlier_labels == -1).sum()\nprint(f\"Outliers marked: {outlier_count} records\")\n\npd.DataFrame({\n    'value (before detection)':          data['value'],\n    'value (after detection)':          result_data.squeeze(),\n    'outlier_label':  outlier_labels,\n    'is_outlier':     outlier_labels == -1,\n})\n\nOutliers marked: 1 records\n\n\n\n\n\n\n\n\n\nvalue (before detection)\nvalue (after detection)\noutlier_label\nis_outlier\n\n\n\n\n0\n1\n1.0\n1\nFalse\n\n\n1\n2\n2.0\n1\nFalse\n\n\n2\n100\nNaN\n-1\nTrue\n\n\n3\n4\n4.0\n1\nFalse\n\n\n4\n5\n5.0\n1\nFalse\n\n\n5\n6\n6.0\n1\nFalse\n\n\n6\n7\n7.0\n1\nFalse\n\n\n7\n8\n8.0\n1\nFalse\n\n\n8\n9\n9.0\n1\nFalse\n\n\n9\n10\n10.0\n1\nFalse",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1626,7 +1626,7 @@
     "href": "docs/preprocessing/outliers.html#detection-methods",
     "title": "Outlier Detection and Handling",
     "section": "Detection Methods",
-    "text": "Detection Methods\nThis module uses isolation forest and other statistical methods to detect: - Sudden spikes or drops - Seasonal anomalies - Drift in baseline values - Sudden shifts in variance",
+    "text": "Detection Methods\nThis module uses isolation forest and other statistical methods to detect:\n\nSudden spikes or drops\nSeasonal anomalies\nDrift in baseline values\nSudden shifts in variance",
     "crumbs": [
       "Preprocessing Guides",
       "Outlier Detection"
@@ -1845,7 +1845,7 @@
     "href": "index.html#quick-links",
     "title": "Welcome to spotforecast2-safe (Core)",
     "section": "Quick Links",
-    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.17.1-rc.1",
+    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.17.2-rc.2",
     "crumbs": [
       "Home"
     ]
@@ -1855,7 +1855,7 @@
     "href": "index.html#software-identification-cpe",
     "title": "Welcome to spotforecast2-safe (Core)",
     "section": "Software Identification (CPE)",
-    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.17.1-rc.1:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
+    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.17.2-rc.2:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
     "crumbs": [
       "Home"
     ]
@@ -2201,7 +2201,7 @@
     "href": "docs/reference/data.fetch_data.fetch_data.html",
     "title": "data.fetch_data.fetch_data",
     "section": "",
-    "text": "data.fetch_data.fetch_data(\n    filename=None,\n    dataframe=None,\n    columns=None,\n    index_col=0,\n    parse_dates=True,\n    dayfirst=False,\n    timezone='UTC',\n)\nFetches the integrated raw dataset from a CSV file or processes a DataFrame.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nfilename\nstr\nFilename of the CSV file containing the dataset. Must be located in the data home directory. This is required if dataframe is None.\nNone\n\n\ndataframe\npd.DataFrame\nA pandas DataFrame to process. If provided, it will be processed with proper timezone handling. Mutually exclusive with filename.\nNone\n\n\ncolumns\nlist\nList of columns to be included in the dataset. If None, all columns are included. If an empty list is provided, a ValueError is raised. Default: None.\nNone\n\n\nindex_col\nint\nColumn index to be used as the index (only used when loading from CSV). Default: 0.\n0\n\n\nparse_dates\nbool\nWhether to parse dates in the index column (only used when loading from CSV). Default: True.\nTrue\n\n\ndayfirst\nbool\nWhether the day comes first in date parsing (only used when loading from CSV). Default: False.\nFalse\n\n\ntimezone\nstr\nTimezone to set for the datetime index. If a DataFrame with naive index is provided, it will be localized to this timezone then converted to UTC. Default: “UTC”.\n'UTC'\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: The integrated raw dataset with UTC timezone.\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nValueError\nIf columns is an empty list, if both filename and dataframe are provided, or if neither filename nor dataframe is provided.\n\n\n\nFileNotFoundError\nIf CSV file does not exist.\n\n\n\n\n\n\n&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home\n&gt;&gt;&gt; # demo01.csv is included in the package datasets\n&gt;&gt;&gt; path_demo = get_package_data_home() / \"demo01.csv\"\n&gt;&gt;&gt; df = fetch_data(filename=path_demo)\n&gt;&gt;&gt; df.head()\n                          Forecasted Load  Actual Load\nTime (UTC)\n2022-01-01 00:00:00+00:00  306.73           317.27\n2022-01-01 00:15:00+00:00  306.73           317.27",
+    "text": "data.fetch_data.fetch_data(\n    filename=None,\n    dataframe=None,\n    columns=None,\n    index_col=0,\n    parse_dates=True,\n    dayfirst=False,\n    timezone='UTC',\n)\nFetches the integrated raw dataset from a CSV file or processes a DataFrame.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2212,8 +2212,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_data.html#parameters",
     "href": "docs/reference/data.fetch_data.fetch_data.html#parameters",
     "title": "data.fetch_data.fetch_data",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nfilename\nstr\nFilename of the CSV file containing the dataset. Must be located in the data home directory. This is required if dataframe is None.\nNone\n\n\ndataframe\npd.DataFrame\nA pandas DataFrame to process. If provided, it will be processed with proper timezone handling. Mutually exclusive with filename.\nNone\n\n\ncolumns\nlist\nList of columns to be included in the dataset. If None, all columns are included. If an empty list is provided, a ValueError is raised. Default: None.\nNone\n\n\nindex_col\nint\nColumn index to be used as the index (only used when loading from CSV). Default: 0.\n0\n\n\nparse_dates\nbool\nWhether to parse dates in the index column (only used when loading from CSV). Default: True.\nTrue\n\n\ndayfirst\nbool\nWhether the day comes first in date parsing (only used when loading from CSV). Default: False.\nFalse\n\n\ntimezone\nstr\nTimezone to set for the datetime index. If a DataFrame with naive index is provided, it will be localized to this timezone then converted to UTC. Default: “UTC”.\n'UTC'",
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nfilename\nstr\nFilename of the CSV file containing the dataset. Must be located in the data home directory. This is required if dataframe is None.\nNone\n\n\ndataframe\npd.DataFrame\nA pandas DataFrame to process. If provided, it will be processed with proper timezone handling. Mutually exclusive with filename.\nNone\n\n\ncolumns\nlist\nList of columns to be included in the dataset. If None, all columns are included. If an empty list is provided, a ValueError is raised. Default: None.\nNone\n\n\nindex_col\nint\nColumn index to be used as the index (only used when loading from CSV). Default: 0.\n0\n\n\nparse_dates\nbool\nWhether to parse dates in the index column (only used when loading from CSV). Default: True.\nTrue\n\n\ndayfirst\nbool\nWhether the day comes first in date parsing (only used when loading from CSV). Default: False.\nFalse\n\n\ntimezone\nstr\nTimezone to set for the datetime index. If a DataFrame with naive index is provided, it will be localized to this timezone then converted to UTC. Default: “UTC”.\n'UTC'",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2224,8 +2224,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_data.html#returns",
     "href": "docs/reference/data.fetch_data.fetch_data.html#returns",
     "title": "data.fetch_data.fetch_data",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: The integrated raw dataset with UTC timezone.",
+    "section": "Returns",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: The integrated raw dataset with UTC timezone.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2236,8 +2236,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_data.html#raises",
     "href": "docs/reference/data.fetch_data.fetch_data.html#raises",
     "title": "data.fetch_data.fetch_data",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\nValueError\nIf columns is an empty list, if both filename and dataframe are provided, or if neither filename nor dataframe is provided.\n\n\n\nFileNotFoundError\nIf CSV file does not exist.",
+    "section": "Raises",
+    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nValueError\nIf columns is an empty list, if both filename and dataframe are provided, or if neither filename nor dataframe is provided.\n\n\n\nFileNotFoundError\nIf CSV file does not exist.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2248,8 +2248,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_data.html#examples",
     "href": "docs/reference/data.fetch_data.fetch_data.html#examples",
     "title": "data.fetch_data.fetch_data",
-    "section": "",
-    "text": "&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home\n&gt;&gt;&gt; # demo01.csv is included in the package datasets\n&gt;&gt;&gt; path_demo = get_package_data_home() / \"demo01.csv\"\n&gt;&gt;&gt; df = fetch_data(filename=path_demo)\n&gt;&gt;&gt; df.head()\n                          Forecasted Load  Actual Load\nTime (UTC)\n2022-01-01 00:00:00+00:00  306.73           317.27\n2022-01-01 00:15:00+00:00  306.73           317.27",
+    "section": "Examples",
+    "text": "Examples\n\nfrom spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home\n# demo02.csv is included in the package datasets\npath_demo = get_package_data_home() / \"demo02.csv\"\ndf = fetch_data(filename=path_demo)\ndf.head()\n\n\n\n\n\n\n\n\nA\nB\nC\nD\nE\nF\nG\nH\nI\nJ\nK\n\n\nDateTime\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n1964-08-02 14:00:00+00:00\n0.202969\n8.255128\n334.0\n0\n0.111049\n-0.121741\n1597.0\n0.067896\n0\nNaN\n0.0\n\n\n1964-08-02 15:00:00+00:00\n0.145975\n7.542355\n339.0\n0\n-0.003927\n0.103541\n1609.0\n-0.093175\n0\nNaN\n0.0\n\n\n1964-08-02 16:00:00+00:00\n0.094389\n8.174336\n344.0\n0\n0.043963\n0.041291\n1660.0\n0.047823\n0\nNaN\n0.0\n\n\n1964-08-02 17:00:00+00:00\n-0.202353\n7.387896\n341.0\n0\n0.067118\n0.072999\n1567.0\n-0.051628\n0\nNaN\n0.0\n\n\n1964-08-02 18:00:00+00:00\n-0.013810\n7.581125\n335.0\n0\n-0.138614\n-0.006495\n1467.0\n0.016003\n0\nNaN\n0.0",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2261,7 +2261,7 @@
     "href": "docs/reference/data.fetch_data.fetch_weather_data.html",
     "title": "data.fetch_data.fetch_weather_data",
     "section": "",
-    "text": "data.fetch_data.fetch_weather_data(\n    cov_start,\n    cov_end,\n    latitude=51.5136,\n    longitude=7.4653,\n    timezone='UTC',\n    freq='h',\n    fallback_on_failure=True,\n    cached=True,\n)\nFetches weather data for the dataset period plus forecast horizon. Create weather dataframe using API with optional caching. Args: cov_start (str): Start date for covariate data. cov_end (str): End date for covariate data. latitude (float): Latitude of the location for weather data. Default is 51.5136 (Dortmund). longitude (float): Longitude of the location for weather data. Default is 7.4653 (Dortmund). timezone (str): Timezone for the weather data. freq (str): Frequency of the weather data. fallback_on_failure (bool): Whether to use fallback data in case of failure. cached (bool): Whether to use cached data.\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: DataFrame containing weather information.\n\n\n\n\n\n\n&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data\n&gt;&gt;&gt; weather_df = fetch_weather_data(\n...     cov_start='2023-01-01T00:00',\n...     cov_end='2023-01-11T00:00',\n...     latitude=51.5136,\n...     longitude=7.4653,\n...     timezone='UTC',\n...     freq='h',\n...     fallback_on_failure=True,\n...     cached=True\n... )\n&gt;&gt;&gt; weather_df.head()",
+    "text": "data.fetch_data.fetch_weather_data(\n    cov_start,\n    cov_end,\n    latitude=51.5136,\n    longitude=7.4653,\n    timezone='UTC',\n    freq='h',\n    fallback_on_failure=True,\n    cached=True,\n)\nFetches weather data for the dataset period plus forecast horizon. Create weather dataframe using API with optional caching. Args: cov_start (str): Start date for covariate data. cov_end (str): End date for covariate data. latitude (float): Latitude of the location for weather data. Default is 51.5136 (Dortmund). longitude (float): Longitude of the location for weather data. Default is 7.4653 (Dortmund). timezone (str): Timezone for the weather data. freq (str): Frequency of the weather data. fallback_on_failure (bool): Whether to use fallback data in case of failure. cached (bool): Whether to use cached data.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2272,8 +2272,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_weather_data.html#returns",
     "href": "docs/reference/data.fetch_data.fetch_weather_data.html#returns",
     "title": "data.fetch_data.fetch_weather_data",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: DataFrame containing weather information.",
+    "section": "Returns",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\n\npd.DataFrame\npd.DataFrame: DataFrame containing weather information.",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2284,8 +2284,8 @@
     "objectID": "docs/reference/data.fetch_data.fetch_weather_data.html#examples",
     "href": "docs/reference/data.fetch_data.fetch_weather_data.html#examples",
     "title": "data.fetch_data.fetch_weather_data",
-    "section": "",
-    "text": "&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_weather_data\n&gt;&gt;&gt; weather_df = fetch_weather_data(\n...     cov_start='2023-01-01T00:00',\n...     cov_end='2023-01-11T00:00',\n...     latitude=51.5136,\n...     longitude=7.4653,\n...     timezone='UTC',\n...     freq='h',\n...     fallback_on_failure=True,\n...     cached=True\n... )\n&gt;&gt;&gt; weather_df.head()",
+    "section": "Examples",
+    "text": "Examples\n\nfrom spotforecast2_safe.data.fetch_data import fetch_weather_data\nweather_df = fetch_weather_data(\n    cov_start='2023-01-01T00:00',\n    cov_end='2023-01-11T00:00',\n    latitude=51.5136,\n    longitude=7.4653,\n    timezone='UTC',\n    freq='h',\n    fallback_on_failure=True,\n    cached=True)\nweather_df.head()\n\n\n\n\n\n\n\n\ntemperature_2m\nrelative_humidity_2m\nprecipitation\nrain\nsnowfall\nweather_code\npressure_msl\nsurface_pressure\ncloud_cover\ncloud_cover_low\ncloud_cover_mid\ncloud_cover_high\nwind_speed_10m\nwind_direction_10m\nwind_gusts_10m\n\n\ndatetime\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2023-01-01 00:00:00+00:00\n16.6\n43\n0.0\n0.0\n0.0\n3\n1010.4\n998.2\n97\n0\n100\n6\n35.2\n228\n63.7\n\n\n2023-01-01 01:00:00+00:00\n16.6\n42\n0.0\n0.0\n0.0\n3\n1010.3\n998.1\n100\n0\n99\n87\n32.6\n229\n64.8\n\n\n2023-01-01 02:00:00+00:00\n15.9\n43\n0.0\n0.0\n0.0\n3\n1011.0\n998.8\n100\n0\n99\n100\n29.1\n222\n60.1\n\n\n2023-01-01 03:00:00+00:00\n15.1\n46\n0.0\n0.0\n0.0\n3\n1011.3\n999.0\n100\n0\n100\n99\n28.4\n218\n54.0\n\n\n2023-01-01 04:00:00+00:00\n14.6\n50\n0.0\n0.0\n0.0\n3\n1011.7\n999.4\n100\n5\n100\n94\n28.4\n219\n55.1",
     "crumbs": [
       "API Reference",
       "Data",
@@ -2297,21 +2297,21 @@
     "href": "docs/reference/data.fetch_data.get_data_home.html",
     "title": "data.fetch_data.get_data_home",
     "section": "",
-    "text": "data.fetch_data.get_data_home(data_home=None)\nReturn the location where datasets are to be stored.\nBy default the data directory is set to a folder named ‘spotforecast2_data’ in the user home folder. Alternatively, it can be set by the ‘SPOTFORECAST2_DATA’ environment variable or programmatically by giving an explicit folder path. The ‘~’ symbol is expanded to the user home folder. If the folder does not already exist, it is automatically created.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ndata_home\nstr or pathlib.Path\nThe path to spotforecast data directory. If None, the default path is ~/spotforecast2_data.\nNone\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples: &gt;&gt;&gt; from pathlib import Path &gt;&gt;&gt; get_data_home() PosixPath(‘/home/user/spotforecast2_data’) &gt;&gt;&gt; get_data_home(Path(‘/tmp/spotforecast2_data’)) PosixPath(‘/tmp/spotforecast2_data’)"
+    "text": "data.fetch_data.get_data_home(data_home=None)\nReturn the location where datasets are to be stored. By default the data directory is set to a folder named ‘spotforecast2_data’ in the user home folder. Alternatively, it can be set by the ‘SPOTFORECAST2_DATA’ environment variable or programmatically by giving an explicit folder path. The ‘~’ symbol is expanded to the user home folder. If the folder does not already exist, it is automatically created."
   },
   {
     "objectID": "docs/reference/data.fetch_data.get_data_home.html#parameters",
     "href": "docs/reference/data.fetch_data.get_data_home.html#parameters",
     "title": "data.fetch_data.get_data_home",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ndata_home\nstr or pathlib.Path\nThe path to spotforecast data directory. If None, the default path is ~/spotforecast2_data.\nNone"
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ndata_home\nstr or pathlib.Path\nThe path to spotforecast data directory. If None, the default path is ~/spotforecast2_data.\nNone"
   },
   {
     "objectID": "docs/reference/data.fetch_data.get_data_home.html#returns",
     "href": "docs/reference/data.fetch_data.get_data_home.html#returns",
     "title": "data.fetch_data.get_data_home",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples: &gt;&gt;&gt; from pathlib import Path &gt;&gt;&gt; get_data_home() PosixPath(‘/home/user/spotforecast2_data’) &gt;&gt;&gt; get_data_home(Path(‘/tmp/spotforecast2_data’)) PosixPath(‘/tmp/spotforecast2_data’)"
+    "section": "Returns",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#428d1d08 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::"
   },
   {
     "objectID": "docs/reference/downloader.entsoe.merge_build_manual.html",
@@ -3124,7 +3124,7 @@
     "href": "docs/reference/preprocessing.outlier.mark_outliers.html",
     "title": "preprocessing.outlier.mark_outliers",
     "section": "",
-    "text": "preprocessing.outlier.mark_outliers(\n    data,\n    contamination=0.1,\n    random_state=1234,\n    verbose=False,\n)\nMarks outliers as NaN in the dataset using Isolation Forest.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ndata\npd.DataFrame\nThe input dataset.\nrequired\n\n\ncontamination\nfloat\nThe (estimated) proportion of outliers in the dataset.\n0.1\n\n\nrandom_state\nint\nRandom seed for reproducibility. Default is 1234.\n1234\n\n\nverbose\nbool\nWhether to print additional information.\nFalse\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\ntuple[pd.DataFrame, np.ndarray]\ntuple[pd.DataFrame, np.ndarray]: A tuple containing the modified dataset with outliers marked as NaN and the outlier labels.\n\n\n\n\n\n\n&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_data\n&gt;&gt;&gt; from spotforecast2_safe.preprocessing.outlier import mark_outliers\n&gt;&gt;&gt; data = fetch_data()\n&gt;&gt;&gt; cleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)",
+    "text": "preprocessing.outlier.mark_outliers(\n    data,\n    contamination=0.1,\n    random_state=1234,\n    verbose=False,\n)\nMarks outliers as NaN in the dataset using Isolation Forest.",
     "crumbs": [
       "API Reference",
       "Preprocessing",
@@ -3135,8 +3135,8 @@
     "objectID": "docs/reference/preprocessing.outlier.mark_outliers.html#parameters",
     "href": "docs/reference/preprocessing.outlier.mark_outliers.html#parameters",
     "title": "preprocessing.outlier.mark_outliers",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ndata\npd.DataFrame\nThe input dataset.\nrequired\n\n\ncontamination\nfloat\nThe (estimated) proportion of outliers in the dataset.\n0.1\n\n\nrandom_state\nint\nRandom seed for reproducibility. Default is 1234.\n1234\n\n\nverbose\nbool\nWhether to print additional information.\nFalse",
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ndata\npd.DataFrame\nThe input dataset.\nrequired\n\n\ncontamination\nfloat\nThe (estimated) proportion of outliers in the dataset.\n0.1\n\n\nrandom_state\nint\nRandom seed for reproducibility. Default is 1234.\n1234\n\n\nverbose\nbool\nWhether to print additional information.\nFalse",
     "crumbs": [
       "API Reference",
       "Preprocessing",
@@ -3147,8 +3147,8 @@
     "objectID": "docs/reference/preprocessing.outlier.mark_outliers.html#returns",
     "href": "docs/reference/preprocessing.outlier.mark_outliers.html#returns",
     "title": "preprocessing.outlier.mark_outliers",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\ntuple[pd.DataFrame, np.ndarray]\ntuple[pd.DataFrame, np.ndarray]: A tuple containing the modified dataset with outliers marked as NaN and the outlier labels.",
+    "section": "Returns",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\n\ntuple[pd.DataFrame, np.ndarray]\ntuple[pd.DataFrame, np.ndarray]: A tuple containing the modified dataset with outliers marked as NaN and the outlier labels.",
     "crumbs": [
       "API Reference",
       "Preprocessing",
@@ -3159,8 +3159,8 @@
     "objectID": "docs/reference/preprocessing.outlier.mark_outliers.html#examples",
     "href": "docs/reference/preprocessing.outlier.mark_outliers.html#examples",
     "title": "preprocessing.outlier.mark_outliers",
-    "section": "",
-    "text": "&gt;&gt;&gt; from spotforecast2_safe.data.fetch_data import fetch_data\n&gt;&gt;&gt; from spotforecast2_safe.preprocessing.outlier import mark_outliers\n&gt;&gt;&gt; data = fetch_data()\n&gt;&gt;&gt; cleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)",
+    "section": "Examples",
+    "text": "Examples\n\nfrom spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home\nfrom spotforecast2_safe.preprocessing.outlier import mark_outliers\npath_demo = get_package_data_home() / \"demo02.csv\"\ndata = fetch_data(filename=path_demo)\ncleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)\n\nColumn 'A': Marked 9.9934% of data points as outliers.\nColumn 'B': Marked 9.9997% of data points as outliers.\nColumn 'C': Marked 9.9347% of data points as outliers.\nColumn 'D': Marked 6.5549% of data points as outliers.\nColumn 'E': Marked 9.9577% of data points as outliers.\nColumn 'F': Marked 9.9787% of data points as outliers.\nColumn 'G': Marked 9.9682% of data points as outliers.\nColumn 'H': Marked 9.9840% of data points as outliers.\nColumn 'I': Marked 9.9546% of data points as outliers.\nColumn 'J': Marked 0.0000% of data points as outliers.\nColumn 'K': Marked 9.9074% of data points as outliers.",
     "crumbs": [
       "API Reference",
       "Preprocessing",
