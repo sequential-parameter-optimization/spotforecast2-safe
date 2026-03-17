@@ -2697,6 +2697,130 @@
     ]
   },
   {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "This document explains the rationale behind the selected period configurations and feature engineering choices in spotforecast2-safe, specifically regarding the encoding of cyclical time features using Radial Basis Functions (RBF).\n\n\nFor time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).\n\n\n\nThe ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPeriod\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "For time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "The ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
+    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
+    "title": "Period Configuration and Feature Engineering Rationale",
+    "section": "",
+    "text": "Period\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
+    "crumbs": [
+      "Preprocessing Guides",
+      "Period Configuration Rationale"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "",
+    "text": "spotforecast2-safe is a specialized, hardened Python package for time series forecasting in safety-critical production environments. It provides a minimal, auditable core for feature engineering and recursive forecasting.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#quick-links",
+    "href": "index.html#quick-links",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Quick Links",
+    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.18.0-rc.2",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#software-identification-cpe",
+    "href": "index.html#software-identification-cpe",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Software Identification (CPE)",
+    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.18.0-rc.2:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Installation",
+    "text": "Installation\ngit clone https://github.com/sequential-parameter-optimization/spotforecast2-safe.git\ncd spotforecast2-safe\nuv sync",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#safety-critical-features",
+    "href": "index.html#safety-critical-features",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Safety-Critical Features",
+    "text": "Safety-Critical Features\n\nZero Dead Code — No GUI, plotting, or AutoML dependencies (No Plotly, No Optuna).\nDeterministic Transformations — Mathematical logic that ensures bit-level reproducibility.\nFail-Safe Processing — Explicit failure on dirty or incomplete data (NaNs/Infs) instead of silent imputation.\nMinimal Footprint — Reduced attack surface for high-security deployment targets.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#core-capabilities",
+    "href": "index.html#core-capabilities",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Core Capabilities",
+    "text": "Core Capabilities\n\nData Service — Robust fetching of time series, weather, and holiday data.\nPreprocessing — Hardened tools for data curation, resampling, temporal splitting, and Data Imputation & Gap Weighting.\nForecasting Engine — Simplified recursive forecasting and seasonal baselines.\n\n\n\n\n\n\n\nDisclaimer & Liability\n\n\n\nIMPORTANT: This software is provided “as is” and any express or implied warranties are disclaimed. The use of this software in safety-critical systems is at the sole risk of the user. For full details, see the Disclaimer in the Model Card.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#links",
+    "href": "index.html#links",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Links",
+    "text": "Links\n\nspotforecast2\nspotoptim",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#attributions",
+    "href": "index.html#attributions",
+    "title": "Welcome to spotforecast2-safe (Core)",
+    "section": "Attributions",
+    "text": "Attributions\nParts of the code are ported from skforecast to reduce external dependencies. Many thanks to the skforecast team for their great work!",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
     "objectID": "docs/api_overview.html",
     "href": "docs/api_overview.html",
     "title": "API Overview & Getting Started",
@@ -2805,221 +2929,6 @@
     "crumbs": [
       "Getting Started"
     ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "",
-    "text": "spotforecast2-safe is a specialized, hardened Python package for time series forecasting in safety-critical production environments. It provides a minimal, auditable core for feature engineering and recursive forecasting.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#quick-links",
-    "href": "index.html#quick-links",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Quick Links",
-    "text": "Quick Links\n\n📦 GitHub Repository\n📚 API Reference\n🛡️ Safety & Compliance\n📊 Model/Method Card\n🚀 Current Version: 0.18.0-rc.1",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#software-identification-cpe",
-    "href": "index.html#software-identification-cpe",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Software Identification (CPE)",
-    "text": "Software Identification (CPE)\nFor vulnerability tracking, supply chain management, and SBOM (Software Bill of Materials) generation:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*\nCurrent release identifier:\ncpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.18.0-rc.1:*:*:*:*:*:*:*\nSee Model/Method Card for additional compliance details.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#installation",
-    "href": "index.html#installation",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Installation",
-    "text": "Installation\ngit clone https://github.com/sequential-parameter-optimization/spotforecast2-safe.git\ncd spotforecast2-safe\nuv sync",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#safety-critical-features",
-    "href": "index.html#safety-critical-features",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Safety-Critical Features",
-    "text": "Safety-Critical Features\n\nZero Dead Code — No GUI, plotting, or AutoML dependencies (No Plotly, No Optuna).\nDeterministic Transformations — Mathematical logic that ensures bit-level reproducibility.\nFail-Safe Processing — Explicit failure on dirty or incomplete data (NaNs/Infs) instead of silent imputation.\nMinimal Footprint — Reduced attack surface for high-security deployment targets.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#core-capabilities",
-    "href": "index.html#core-capabilities",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Core Capabilities",
-    "text": "Core Capabilities\n\nData Service — Robust fetching of time series, weather, and holiday data.\nPreprocessing — Hardened tools for data curation, resampling, temporal splitting, and Data Imputation & Gap Weighting.\nForecasting Engine — Simplified recursive forecasting and seasonal baselines.\n\n\n\n\n\n\n\nDisclaimer & Liability\n\n\n\nIMPORTANT: This software is provided “as is” and any express or implied warranties are disclaimed. The use of this software in safety-critical systems is at the sole risk of the user. For full details, see the Disclaimer in the Model Card.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#links",
-    "href": "index.html#links",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Links",
-    "text": "Links\n\nspotforecast2\nspotoptim",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#attributions",
-    "href": "index.html#attributions",
-    "title": "Welcome to spotforecast2-safe (Core)",
-    "section": "Attributions",
-    "text": "Attributions\nParts of the code are ported from skforecast to reduce external dependencies. Many thanks to the skforecast team for their great work!",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "This document explains the rationale behind the selected period configurations and feature engineering choices in spotforecast2-safe, specifically regarding the encoding of cyclical time features using Radial Basis Functions (RBF).\n\n\nFor time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).\n\n\n\nThe ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPeriod\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#background-cyclical-feature-encoding",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "For time series forecasting, encoding cyclical features like “hour of day” or “day of week” is crucial. Standard methods like one-hot encoding or integer encoding have limitations:\n\nOne-Hot Encoding: Explodes dimensionality (e.g., 24 columns for hours, 365 for days of year).\nInteger Encoding: Creates artificial ordinal relationships (e.g., hour 23 is “far” from hour 0).\nSine-Cosine Encoding: Commonly used, but can introduce high-frequency noise and requires two features per cycle.\n\nWe use Repeating Basis Functions (RBF), which effectively project the cyclic feature onto a set of smooth, periodic functions. This allows us to control the resolution (detail) and smoothness of the encoding by adjusting the number of basis functions (n_periods).",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#configuration-rationale",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "The ConfigEntsoe class provides default configurations optimized for energy demand forecasting. The choice of n_periods relative to the cycle length (e.g., 24 hours) determines the resolution of the encoding.\n\n\n\nConfiguration: n_periods=12\nRatio: 2:1 (24 hours / 12 functions)\nResolution: ~2 hours\nRationale:\n\nHourly data often exhibits noise. A 1:1 ratio (24 basis functions) would provide perfect hourly resolution but might overfit to noise.\nReducing n_periods to 12 provides a natural smoothing effect, effectively capturing the broader daily demand curve (morning peak, evening peak) while filtering out high-frequency hourly fluctuations.\nThis also reduces feature dimensionality by 50% compared to one-hot encoding, improving model efficiency.\n\n\n\n\n\n\nConfiguration: Typically n_periods=7 (or similar for weekly patterns)\nRatio: 1:1 on a daily scale\nRationale:\n\nDaily patterns vary significantly between weekdays and weekends.\nA resolution capturing each day of the week is essential to distinguish between Mondays (start of work week), mid-week, and weekends.\n\n\n\n\n\n\nConfiguration: n_periods=12\nRatio: ~30:1 (365 days / 12 functions)\nResolution: ~1 month\nRationale:\n\nThe yearly cycle (seasonality) is a low-frequency pattern driven by temperature and daylight.\nWe do not need daily resolution for seasonality. A monthly resolution is sufficient to capture the broad winter-summer trends.\nUsing n_periods=12 mirrors the months of the year, providing a smooth, continuous representation of seasonality without overfitting to specific day-of-year quirks (which are better handled by holiday features and lag features).",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
-    "href": "docs/PERIOD_CONFIGURATION_RATIONALE.html#summary-table",
-    "title": "Period Configuration and Feature Engineering Rationale",
-    "section": "",
-    "text": "Period\nN Periods\nRange Size\nRatio\nResolution\nGoal\n\n\n\n\nDaily\n12\n24\n1:2\n2 Hours\nSmoothing hourly noise, reducing dimensionality.\n\n\nWeekly\n7\n7\n1:1\n1 Day\nDistinguishing day-of-week patterns.\n\n\nYearly\n12\n365\n1:30\n1 Month\nCapturing broad seasonal trends.\n\n\n\nThis configuration balances the need for detail with the benefits of dimensionality reduction and noise smoothing, leading to more robust forecasting models.",
-    "crumbs": [
-      "Preprocessing Guides",
-      "Period Configuration Rationale"
-    ]
-  },
-  {
-    "objectID": "docs/contributing.html",
-    "href": "docs/contributing.html",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "Thank you for your interest in contributing to spotforecast2-safe! This document provides guidelines and requirements for contributing to the project.\n\n\nWe are committed to providing a welcoming and inclusive environment for all contributors. Please treat all community members with respect.\n\n\n\n\n\n\nPython 3.13 or later\nuv package manager (install with curl -LsSf https://astral.sh/uv/install.sh | sh)\n\n\n\n\n\nClone the repository:\n\ngit clone https://github.com/sequential-parameter-optimization/spotforecast2-safe.git\ncd spotforecast2-safe\n\nCreate and activate the virtual environment:\n\nuv venv\nsource .venv/bin/activate  # On Windows: .venv\\Scripts\\activate\n\nInstall the project with development dependencies:\n\nuv sync\n\nRun the test suite to verify setup:\n\nuv run pytest tests/ -v\n\n\n\nTo build the source and binary distributions (wheels):\n# Using the standard build tool\nuv run python -m build\n\n# The artifacts will be in the dist/ directory\nls -lah dist/\n\n\n\n\nAll contributions must adhere to the following standards:\n\n\n\nCode style: Black (enforced)\nImport sorting: isort\nLinting: flake8\n\nRun formatting tools before committing:\nblack src/ tests/\nisort src/ tests/\nflake8 src/ tests/ --max-line-length=100\n\n\n\n\nDocstrings: Google style format\nAll public functions, classes, and modules must have comprehensive docstrings\nInclude type hints in function signatures\nInclude usage examples in docstrings where applicable\n\nExample:\ndef get_cpe_identifier(version: str = \"*\") -&gt; str:\n    \"\"\"Generates the CPE 2.3 identifier for the spotforecast2-safe project.\n\n    This function constructs a Common Platform Enumeration (CPE) 2.3 formatted\n    string that uniquely identifies the spotforecast2-safe software.\n\n    Args:\n        version: The specific version of the software. Use wildcard \"*\" to match\n            all versions, or provide a semantic version string. Defaults to \"*\".\n\n    Returns:\n        str: The formatted Common Platform Enumeration 2.3 string.\n\n    Raises:\n        TypeError: If version is not a string.\n\n    Examples:\n        Generate a CPE identifier for all versions:\n\n        &gt;&gt;&gt; get_cpe_identifier()\n        'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*'\n\n    See Also:\n        https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-188.pdf\n    \"\"\"\n\n\n\nAll source files (Python, YAML, etc.) must include SPDX headers at the top:\n# SPDX-FileCopyrightText: &lt;year&gt; &lt;your name&gt;\n# SPDX-License-Identifier: AGPL-3.0-or-later\n\n\"\"\"Module docstring.\"\"\"\nThe project uses REUSE compliance for license tracking. Run the REUSE check:\nuv run reuse lint\n\n\n\n\nAll contributions must include tests covering new functionality:\n\nWrite tests in tests/ directory following the existing naming convention: test_*.py\nUse pytest as the testing framework\nAim for high code coverage (minimum 80% for new code)\nRun tests before submitting a pull request:\n\nuv run pytest tests/ -v --cov=src/spotforecast2_safe\nTest files should also include SPDX headers and follow the same style guidelines.\n\n\n\nPython 3.13+ features optional type hints are encouraged for all new code. Use precise types to improve IDE support and catch errors early:\nfrom typing import Optional\n\ndef process_data(values: list[float], threshold: Optional[float] = None) -&gt; dict[str, int]:\n    \"\"\"Process a list of values.\"\"\"\n    pass\n\n\n\nThis project uses Semantic Versioning and Conventional Commits for automatic changelog generation.\nCommit message format:\n&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;\n\n&lt;body&gt;\n\n&lt;footer&gt;\nTypes (required): - feat: A new feature - fix: A bug fix - docs: Documentation changes only - style: Changes that do not affect code meaning (formatting, SPDX headers) - refactor: Code change that neither fixes a bug nor adds a feature - perf: Performance improvements - test: Test additions or changes - chore: Changes to build system, dependencies, or other non-code changes\nExample:\nfeat(cpe): add CPE identifier generation for compliance tracking\n\nImplement get_cpe_identifier() function to generate NIST CPE 2.3\nformatted strings for vulnerability tracking and SBOM management.\n\nCloses #42\n\n\n\n\nCreate a feature branch from develop:\n\ngit checkout -b feat/your-feature-name\n\nMake your changes and commit with conventional commit messages\nEnsure all tests pass and code standards are met\nCreate a Pull Request against the develop branch\nPR description should clearly explain:\n\nWhat problem it solves\nHow the solution works\nAny breaking changes\n\n\nPull Request title should follow the conventional commit format.\n\n\n\nFor larger features, update or create documentation:\n\nAPI documentation is auto-generated from docstrings via quartodoc into docs/reference/\nProcessing guides go in docs/processing/\nPreprocessing guides go in docs/preprocessing/\nUse Google-style docstrings for all public API\n\nBuild documentation locally:\nuv run python docs/quartodoc_build.py  # generate API reference stubs\nquarto preview                          # preview at http://localhost:4786\n\n\n\nThis is a safety-critical library. Contributions must maintain:\n\nDeterministic behavior (same input = same output, bit-level reproducible)\nFail-safe operation (explicit errors, no silent failures)\nAuditability (white-box code, clear logic, comprehensive tests)\nMinimal dependencies (no unnecessary external packages)\n\nAny changes that affect these properties must be clearly documented and justified in the PR.\n\n\n\nWe use GitHub Issues for bug tracking and feature requests. This is the primary channel for reporting problems.\nGitHub Issues: https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues\n\n\n\nCheck existing issues to avoid duplicates\nRun the latest version to confirm the bug persists\nVerify you are using Python 3.13 or later\nPrepare a minimal reproducible example\n\n\n\n\n\nPython version and OS\nspotforecast2-safe version\nMinimal code that reproduces the issue\nExpected vs. actual behavior\nFull error message/traceback\n\nUse the Bug Report Template when creating a new issue.\n\n\n\nAll issues, reports, and community responses are maintained in a publicly searchable archive:\n\nIssues Archive: https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues\n\nBrowse all reported bugs, feature requests, and their resolutions\nSearch by keywords, labels, or date\nView full discussion history and resolution details\n\nDiscussions Archive: https://github.com/sequential-parameter-optimization/spotforecast2-safe/discussions\n\nCommunity questions and answers\nFeature discussions\nSearch across all past discussions\n\n\nThis archive is maintained indefinitely and is fully searchable, allowing users to: - Find solutions to common problems - See how previous issues were resolved - Learn from community discussions - Verify if a bug has been reported before\n\n\n\nSecurity issues should NOT be reported in public issues. See our Security Policy for the proper reporting procedure.\n\n\n\n\nBy contributing to spotforecast2-safe, you agree that your contributions are licensed under AGPL-3.0-or-later. Include the SPDX header in all new files you create.\n\n\n\n\nCheck existing issues and discussions on GitHub\nRead the Model/Method Card for system design details\nReview the Safety Documentation\n\nThank you for contributing to spotforecast2-safe!"
-  },
-  {
-    "objectID": "docs/contributing.html#code-of-conduct",
-    "href": "docs/contributing.html#code-of-conduct",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "We are committed to providing a welcoming and inclusive environment for all contributors. Please treat all community members with respect."
-  },
-  {
-    "objectID": "docs/contributing.html#getting-started",
-    "href": "docs/contributing.html#getting-started",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "Python 3.13 or later\nuv package manager (install with curl -LsSf https://astral.sh/uv/install.sh | sh)\n\n\n\n\n\nClone the repository:\n\ngit clone https://github.com/sequential-parameter-optimization/spotforecast2-safe.git\ncd spotforecast2-safe\n\nCreate and activate the virtual environment:\n\nuv venv\nsource .venv/bin/activate  # On Windows: .venv\\Scripts\\activate\n\nInstall the project with development dependencies:\n\nuv sync\n\nRun the test suite to verify setup:\n\nuv run pytest tests/ -v\n\n\n\nTo build the source and binary distributions (wheels):\n# Using the standard build tool\nuv run python -m build\n\n# The artifacts will be in the dist/ directory\nls -lah dist/"
-  },
-  {
-    "objectID": "docs/contributing.html#coding-standards",
-    "href": "docs/contributing.html#coding-standards",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "All contributions must adhere to the following standards:\n\n\n\nCode style: Black (enforced)\nImport sorting: isort\nLinting: flake8\n\nRun formatting tools before committing:\nblack src/ tests/\nisort src/ tests/\nflake8 src/ tests/ --max-line-length=100\n\n\n\n\nDocstrings: Google style format\nAll public functions, classes, and modules must have comprehensive docstrings\nInclude type hints in function signatures\nInclude usage examples in docstrings where applicable\n\nExample:\ndef get_cpe_identifier(version: str = \"*\") -&gt; str:\n    \"\"\"Generates the CPE 2.3 identifier for the spotforecast2-safe project.\n\n    This function constructs a Common Platform Enumeration (CPE) 2.3 formatted\n    string that uniquely identifies the spotforecast2-safe software.\n\n    Args:\n        version: The specific version of the software. Use wildcard \"*\" to match\n            all versions, or provide a semantic version string. Defaults to \"*\".\n\n    Returns:\n        str: The formatted Common Platform Enumeration 2.3 string.\n\n    Raises:\n        TypeError: If version is not a string.\n\n    Examples:\n        Generate a CPE identifier for all versions:\n\n        &gt;&gt;&gt; get_cpe_identifier()\n        'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*'\n\n    See Also:\n        https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-188.pdf\n    \"\"\"\n\n\n\nAll source files (Python, YAML, etc.) must include SPDX headers at the top:\n# SPDX-FileCopyrightText: &lt;year&gt; &lt;your name&gt;\n# SPDX-License-Identifier: AGPL-3.0-or-later\n\n\"\"\"Module docstring.\"\"\"\nThe project uses REUSE compliance for license tracking. Run the REUSE check:\nuv run reuse lint"
-  },
-  {
-    "objectID": "docs/contributing.html#testing-requirements",
-    "href": "docs/contributing.html#testing-requirements",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "All contributions must include tests covering new functionality:\n\nWrite tests in tests/ directory following the existing naming convention: test_*.py\nUse pytest as the testing framework\nAim for high code coverage (minimum 80% for new code)\nRun tests before submitting a pull request:\n\nuv run pytest tests/ -v --cov=src/spotforecast2_safe\nTest files should also include SPDX headers and follow the same style guidelines."
-  },
-  {
-    "objectID": "docs/contributing.html#type-hints",
-    "href": "docs/contributing.html#type-hints",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "Python 3.13+ features optional type hints are encouraged for all new code. Use precise types to improve IDE support and catch errors early:\nfrom typing import Optional\n\ndef process_data(values: list[float], threshold: Optional[float] = None) -&gt; dict[str, int]:\n    \"\"\"Process a list of values.\"\"\"\n    pass"
-  },
-  {
-    "objectID": "docs/contributing.html#commit-messages",
-    "href": "docs/contributing.html#commit-messages",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "This project uses Semantic Versioning and Conventional Commits for automatic changelog generation.\nCommit message format:\n&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;\n\n&lt;body&gt;\n\n&lt;footer&gt;\nTypes (required): - feat: A new feature - fix: A bug fix - docs: Documentation changes only - style: Changes that do not affect code meaning (formatting, SPDX headers) - refactor: Code change that neither fixes a bug nor adds a feature - perf: Performance improvements - test: Test additions or changes - chore: Changes to build system, dependencies, or other non-code changes\nExample:\nfeat(cpe): add CPE identifier generation for compliance tracking\n\nImplement get_cpe_identifier() function to generate NIST CPE 2.3\nformatted strings for vulnerability tracking and SBOM management.\n\nCloses #42"
-  },
-  {
-    "objectID": "docs/contributing.html#pull-request-process",
-    "href": "docs/contributing.html#pull-request-process",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "Create a feature branch from develop:\n\ngit checkout -b feat/your-feature-name\n\nMake your changes and commit with conventional commit messages\nEnsure all tests pass and code standards are met\nCreate a Pull Request against the develop branch\nPR description should clearly explain:\n\nWhat problem it solves\nHow the solution works\nAny breaking changes\n\n\nPull Request title should follow the conventional commit format."
-  },
-  {
-    "objectID": "docs/contributing.html#documentation",
-    "href": "docs/contributing.html#documentation",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "For larger features, update or create documentation:\n\nAPI documentation is auto-generated from docstrings via quartodoc into docs/reference/\nProcessing guides go in docs/processing/\nPreprocessing guides go in docs/preprocessing/\nUse Google-style docstrings for all public API\n\nBuild documentation locally:\nuv run python docs/quartodoc_build.py  # generate API reference stubs\nquarto preview                          # preview at http://localhost:4786"
-  },
-  {
-    "objectID": "docs/contributing.html#safety-critical-standards",
-    "href": "docs/contributing.html#safety-critical-standards",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "This is a safety-critical library. Contributions must maintain:\n\nDeterministic behavior (same input = same output, bit-level reproducible)\nFail-safe operation (explicit errors, no silent failures)\nAuditability (white-box code, clear logic, comprehensive tests)\nMinimal dependencies (no unnecessary external packages)\n\nAny changes that affect these properties must be clearly documented and justified in the PR."
-  },
-  {
-    "objectID": "docs/contributing.html#reporting-issues",
-    "href": "docs/contributing.html#reporting-issues",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "We use GitHub Issues for bug tracking and feature requests. This is the primary channel for reporting problems.\nGitHub Issues: https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues\n\n\n\nCheck existing issues to avoid duplicates\nRun the latest version to confirm the bug persists\nVerify you are using Python 3.13 or later\nPrepare a minimal reproducible example\n\n\n\n\n\nPython version and OS\nspotforecast2-safe version\nMinimal code that reproduces the issue\nExpected vs. actual behavior\nFull error message/traceback\n\nUse the Bug Report Template when creating a new issue.\n\n\n\nAll issues, reports, and community responses are maintained in a publicly searchable archive:\n\nIssues Archive: https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues\n\nBrowse all reported bugs, feature requests, and their resolutions\nSearch by keywords, labels, or date\nView full discussion history and resolution details\n\nDiscussions Archive: https://github.com/sequential-parameter-optimization/spotforecast2-safe/discussions\n\nCommunity questions and answers\nFeature discussions\nSearch across all past discussions\n\n\nThis archive is maintained indefinitely and is fully searchable, allowing users to: - Find solutions to common problems - See how previous issues were resolved - Learn from community discussions - Verify if a bug has been reported before\n\n\n\nSecurity issues should NOT be reported in public issues. See our Security Policy for the proper reporting procedure."
-  },
-  {
-    "objectID": "docs/contributing.html#license",
-    "href": "docs/contributing.html#license",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "By contributing to spotforecast2-safe, you agree that your contributions are licensed under AGPL-3.0-or-later. Include the SPDX header in all new files you create."
-  },
-  {
-    "objectID": "docs/contributing.html#questions",
-    "href": "docs/contributing.html#questions",
-    "title": "Contributing to spotforecast2-safe",
-    "section": "",
-    "text": "Check existing issues and discussions on GitHub\nRead the Model/Method Card for system design details\nReview the Safety Documentation\n\nThank you for contributing to spotforecast2-safe!"
   },
   {
     "objectID": "docs/preprocessing/imputation.html",
@@ -3180,7 +3089,7 @@
     "href": "docs/recursive/ForecasterRecursive.html#functional-examples",
     "title": "ForecasterRecursive",
     "section": "Functional Examples",
-    "text": "Functional Examples\n\n1. Standard Autoregressive Forecast\nA basic example using LinearRegression with the last 7 days as predictors.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Create a synthetic daily series with a trend and seasonality\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ndata = np.linspace(10, 20, 100) + 5 * np.sin(2 * np.pi * np.arange(100) / 7)\ny = pd.Series(data, index=index, name=\"target\")\n\n# 2. Initialize with 7 lags\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=7\n)\n\n# 3. Fit and Predict\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=14)\n\nprint(\"Forecast for the next 14 days:\")\nprint(predictions.head())\n\nForecast for the next 14 days:\n2023-04-11    24.975650\n2023-04-12    22.371439\n2023-04-13    18.133612\n2023-04-14    15.529401\n2023-04-15    16.595893\nFreq: D, Name: pred, dtype: float64\n\n\n\n\n2. Multi-Feature Forecasting (Lags + Window Statistics)\nCombining raw lags with rolling means provides the model with both local and global context.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestRegressor\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\n\n# Data preparation\nindex = pd.date_range(start='2023-01-01', periods=200, freq='h')\ny = pd.Series(np.random.normal(50, 5, 200), index=index, name=\"sensor_reading\")\n\n# Forecaster with Lags and Rolling Mean\nforecaster = ForecasterRecursive(\n    estimator=RandomForestRegressor(n_estimators=50, random_state=123),\n    lags=24,\n    window_features=RollingFeatures(stats=['mean', 'std'], window_sizes=24)\n)\n\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=12)\n\nprint(\"Predictions with window features:\")\nprint(predictions)\n\nPredictions with window features:\n2023-01-09 08:00:00    53.053419\n2023-01-09 09:00:00    51.162953\n2023-01-09 10:00:00    50.322208\n2023-01-09 11:00:00    51.323975\n2023-01-09 12:00:00    51.851059\n2023-01-09 13:00:00    52.805366\n2023-01-09 14:00:00    50.524076\n2023-01-09 15:00:00    48.753479\n2023-01-09 16:00:00    51.337267\n2023-01-09 17:00:00    51.421367\n2023-01-09 18:00:00    50.790517\n2023-01-09 19:00:00    48.366694\nFreq: h, Name: pred, dtype: float64\n\n\n\n\n3. Handling Exogenous Variables\nForecasting energy demand using temperature as an external factor.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Target and Exogenous data\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ny = pd.Series(np.random.normal(100, 10, 100), index=index, name=\"demand\")\nexog = pd.DataFrame({'temp': np.random.normal(20, 5, 100)}, index=index)\n\n# Define forecaster\nforecaster = ForecasterRecursive(estimator=Ridge(), lags=7)\n\n# Fit with exog\nforecaster.fit(y=y, exog=exog)\n\n# Future exog values must be known for the prediction horizon\nexog_future = pd.DataFrame(\n    {'temp': [22, 21, 23]}, \n    index=pd.date_range(start='2023-04-11', periods=3, freq='D')\n)\n\npredictions = forecaster.predict(steps=3, exog=exog_future)\nprint(\"Demand forecast with temp as exog:\")\nprint(predictions)\n\nDemand forecast with temp as exog:\n2023-04-11    103.538455\n2023-04-12     99.290302\n2023-04-13     98.270542\nFreq: D, Name: pred, dtype: float64",
+    "text": "Functional Examples\n\n1. Standard Autoregressive Forecast\nA basic example using LinearRegression with the last 7 days as predictors.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# 1. Create a synthetic daily series with a trend and seasonality\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ndata = np.linspace(10, 20, 100) + 5 * np.sin(2 * np.pi * np.arange(100) / 7)\ny = pd.Series(data, index=index, name=\"target\")\n\n# 2. Initialize with 7 lags\nforecaster = ForecasterRecursive(\n    estimator=LinearRegression(),\n    lags=7\n)\n\n# 3. Fit and Predict\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=14)\n\nprint(\"Forecast for the next 14 days:\")\nprint(predictions.head())\n\nForecast for the next 14 days:\n2023-04-11    24.975650\n2023-04-12    22.371439\n2023-04-13    18.133612\n2023-04-14    15.529401\n2023-04-15    16.595893\nFreq: D, Name: pred, dtype: float64\n\n\n\n\n2. Multi-Feature Forecasting (Lags + Window Statistics)\nCombining raw lags with rolling means provides the model with both local and global context.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestRegressor\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.preprocessing import RollingFeatures\n\n# Data preparation\nindex = pd.date_range(start='2023-01-01', periods=200, freq='h')\ny = pd.Series(np.random.normal(50, 5, 200), index=index, name=\"sensor_reading\")\n\n# Forecaster with Lags and Rolling Mean\nforecaster = ForecasterRecursive(\n    estimator=RandomForestRegressor(n_estimators=50, random_state=123),\n    lags=24,\n    window_features=RollingFeatures(stats=['mean', 'std'], window_sizes=24)\n)\n\nforecaster.fit(y=y)\npredictions = forecaster.predict(steps=12)\n\nprint(\"Predictions with window features:\")\nprint(predictions)\n\nPredictions with window features:\n2023-01-09 08:00:00    49.660471\n2023-01-09 09:00:00    51.072707\n2023-01-09 10:00:00    46.126009\n2023-01-09 11:00:00    52.592533\n2023-01-09 12:00:00    53.340909\n2023-01-09 13:00:00    48.022762\n2023-01-09 14:00:00    47.437922\n2023-01-09 15:00:00    47.131645\n2023-01-09 16:00:00    47.523875\n2023-01-09 17:00:00    51.532618\n2023-01-09 18:00:00    50.409404\n2023-01-09 19:00:00    48.729809\nFreq: h, Name: pred, dtype: float64\n\n\n\n\n3. Handling Exogenous Variables\nForecasting energy demand using temperature as an external factor.\n\nimport pandas as pd\nimport numpy as np\nfrom sklearn.linear_model import Ridge\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\n\n# Target and Exogenous data\nindex = pd.date_range(start='2023-01-01', periods=100, freq='D')\ny = pd.Series(np.random.normal(100, 10, 100), index=index, name=\"demand\")\nexog = pd.DataFrame({'temp': np.random.normal(20, 5, 100)}, index=index)\n\n# Define forecaster\nforecaster = ForecasterRecursive(estimator=Ridge(), lags=7)\n\n# Fit with exog\nforecaster.fit(y=y, exog=exog)\n\n# Future exog values must be known for the prediction horizon\nexog_future = pd.DataFrame(\n    {'temp': [22, 21, 23]}, \n    index=pd.date_range(start='2023-04-11', periods=3, freq='D')\n)\n\npredictions = forecaster.predict(steps=3, exog=exog_future)\nprint(\"Demand forecast with temp as exog:\")\nprint(predictions)\n\nDemand forecast with temp as exog:\n2023-04-11    103.316436\n2023-04-12    101.353343\n2023-04-13    100.649831\nFreq: D, Name: pred, dtype: float64",
     "crumbs": [
       "Forecaster Guides",
       "ForecasterRecursive"
@@ -3334,7 +3243,7 @@
     "href": "docs/reference/data.fetch_data.get_data_home.html#returns",
     "title": "data.fetch_data.get_data_home",
     "section": "Returns",
-    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#2eff1dc8 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::",
+    "text": "Returns\n\n\n\nName\nType\nDescription\n\n\n\n\ndata_home\npathlib.Path\nThe path to the spotforecast data directory.\n\n\n\nExamples:\n::: {#09ff7258 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.data.fetch_data import get_data_home\nfrom pathlib import Path\nget_data_home()\nget_data_home(Path('/tmp/spotforecast2_data'))\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\nPosixPath('/tmp/spotforecast2_data')\n```\n:::\n:::",
     "crumbs": [
       "API Reference",
       "Data",
@@ -5410,7 +5319,7 @@
     "href": "docs/task_safe_n21_cov_df.html#prediction-aggregation",
     "title": "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained",
     "section": "Prediction Aggregation",
-    "text": "Prediction Aggregation\nThe TestPredictionAggregation class mirrors the TestAggregatePredict class from the demo task but extends it with temporal index preservation.\nThe basic aggregation test uses positive fractional weights [0.5, 0.3, 0.2] that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.\nThe unequal importance test verifies the ordering high_priority &gt; medium_priority &gt; low_priority directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.\nThe temporal index preservation test reconstructs the aggregated Series with the original DatetimeIndex and calls aggregated_series.index.equals(dates). This confirms that the matrix multiplication idiom predictions.values @ np.array(weights) — which returns a plain np.ndarray — does not silently discard the temporal index when it is re-attached via pd.Series(aggregated, index=dates).\n\ndates = pd.date_range(\"2020-01-01\", periods=10, freq=\"h\")\npredictions = pd.DataFrame(\n    np.random.randn(10, 3), index=dates, columns=[\"loc_1\", \"loc_2\", \"loc_3\"]\n)\nweights = np.array([0.4, 0.4, 0.2])\naggregated = pd.Series(predictions.values @ weights, index=dates)\nprint(aggregated.head())\n\n2020-01-01 00:00:00    0.121142\n2020-01-01 01:00:00   -0.140108\n2020-01-01 02:00:00   -0.646970\n2020-01-01 03:00:00   -0.699053\n2020-01-01 04:00:00    0.024362\nFreq: h, dtype: float64",
+    "text": "Prediction Aggregation\nThe TestPredictionAggregation class mirrors the TestAggregatePredict class from the demo task but extends it with temporal index preservation.\nThe basic aggregation test uses positive fractional weights [0.5, 0.3, 0.2] that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.\nThe unequal importance test verifies the ordering high_priority &gt; medium_priority &gt; low_priority directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.\nThe temporal index preservation test reconstructs the aggregated Series with the original DatetimeIndex and calls aggregated_series.index.equals(dates). This confirms that the matrix multiplication idiom predictions.values @ np.array(weights) — which returns a plain np.ndarray — does not silently discard the temporal index when it is re-attached via pd.Series(aggregated, index=dates).\n\ndates = pd.date_range(\"2020-01-01\", periods=10, freq=\"h\")\npredictions = pd.DataFrame(\n    np.random.randn(10, 3), index=dates, columns=[\"loc_1\", \"loc_2\", \"loc_3\"]\n)\nweights = np.array([0.4, 0.4, 0.2])\naggregated = pd.Series(predictions.values @ weights, index=dates)\nprint(aggregated.head())\n\n2020-01-01 00:00:00    0.059974\n2020-01-01 01:00:00   -0.306975\n2020-01-01 02:00:00   -0.412790\n2020-01-01 03:00:00    0.425742\n2020-01-01 04:00:00    1.501154\nFreq: h, dtype: float64",
     "crumbs": [
       "Tasks",
       "Task Safe n-to-1 Explained"
