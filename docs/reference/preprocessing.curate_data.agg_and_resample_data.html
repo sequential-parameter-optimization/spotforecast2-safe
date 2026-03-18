@@ -481,6 +481,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">get_start_end</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.curate_data.remove_duplicate_timestamps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">remove_duplicate_timestamps</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1111,6 +1117,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../docs/preprocessing/duplicate_timestamps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resolve Duplicate Timestamps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../docs/PERIOD_CONFIGURATION_RATIONALE.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Period Configuration Rationale</span></a>
   </div>
@@ -1225,6 +1237,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/preprocessing.curate_data.agg_and_resample_data.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -1324,7 +1337,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>closed/label: Control how time intervals are labeled</li>
 <li>.agg({…: by}): Aggregates values within each time bin</li>
 </ul>
-<p>Examples:: &gt;&gt;&gt; from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data &gt;&gt;&gt; import pandas as pd &gt;&gt;&gt; date_rng = pd.date_range(start=‘2023-01-01’, end=‘2023-01-02’, freq=‘15T’) &gt;&gt;&gt; data = pd.DataFrame(date_rng, columns=[‘date’]) &gt;&gt;&gt; data.set_index(‘date’, inplace=True) &gt;&gt;&gt; data[‘value’] = range(len(data)) &gt;&gt;&gt; resampled_data = agg_and_resample_data(data, rule=‘h’, by=‘mean’) &gt;&gt;&gt; print(resampled_data.head())</p>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> agg_and_resample_data</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> date_rng <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">'2023-01-01'</span>, end<span class="op">=</span><span class="st">'2023-01-02'</span>, freq<span class="op">=</span><span class="st">'15min'</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> data <span class="op">=</span> pd.DataFrame(date_rng, columns<span class="op">=</span>[<span class="st">'date'</span>])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> data.set_index(<span class="st">'date'</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> data[<span class="st">'value'</span>] <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(data))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> resampled_data <span class="op">=</span> agg_and_resample_data(data, rule<span class="op">=</span><span class="st">'h'</span>, by<span class="op">=</span><span class="st">'mean'</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(resampled_data.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
