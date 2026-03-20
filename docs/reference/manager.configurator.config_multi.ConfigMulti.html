@@ -1285,7 +1285,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">314159</span>,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    n_hyperparameters_trials<span class="op">=</span><span class="dv">20</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    data_filename<span class="op">=</span><span class="st">'interim/energy_load.csv'</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    use_outlier_detection<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.01</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    imputation_method<span class="op">=</span><span class="st">'weighted'</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    use_exogenous_features<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">'NW'</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    include_poly_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the multi-input forecasting pipeline.</p>
 <p>This class manages all configuration parameters for the multi-input task, including API settings, training/prediction intervals, and feature engineering specifications. All parameters can be customized during initialization or used with sensible defaults.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1366,6 +1379,84 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Path to the interim merged data file.</td>
 <td><code>'interim/energy_load.csv'</code></td>
 </tr>
+<tr class="even">
+<td>use_outlier_detection</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If True, apply IsolationForest-based outlier removal.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td>contamination</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Proportion of outliers for IsolationForest (0 &lt; contamination &lt; 0.5).</td>
+<td><code>0.01</code></td>
+</tr>
+<tr class="even">
+<td>imputation_method</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Gap-filling strategy — <code>"weighted"</code> (n2n-style rolling weights) or <code>"linear"</code> (linear interpolation).</td>
+<td><code>'weighted'</code></td>
+</tr>
+<tr class="odd">
+<td>window_size</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Rolling window size in hours for gap detection (weighted imputation).</td>
+<td><code>72</code></td>
+</tr>
+<tr class="even">
+<td>use_exogenous_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If True, build weather/calendar/day-night/holiday features.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td>latitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Latitude of the target location in decimal degrees.</td>
+<td><code>51.5136</code></td>
+</tr>
+<tr class="even">
+<td>longitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Longitude of the target location in decimal degrees.</td>
+<td><code>7.4653</code></td>
+</tr>
+<tr class="odd">
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>IANA timezone string for the target location (e.g.&nbsp;<code>"Europe/Berlin"</code>).</td>
+<td><code>'UTC'</code></td>
+</tr>
+<tr class="even">
+<td>country_code</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>ISO 3166-1 alpha-2 country code for holiday generation.</td>
+<td><code>'DE'</code></td>
+</tr>
+<tr class="odd">
+<td>state</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>ISO 3166-2 subdivision code for regional holidays (e.g.&nbsp;<code>"NW"</code>).</td>
+<td><code>'NW'</code></td>
+</tr>
+<tr class="even">
+<td>include_weather_windows</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If True, include rolling weather-window features.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>include_holiday_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If True, include public-holiday indicator features.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>include_poly_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If True, include polynomial interaction features.</td>
+<td><code>False</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1430,6 +1521,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Hyperparameter tuning trials.</td>
 </tr>
+<tr class="odd">
+<td>use_outlier_detection</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>IsolationForest outlier removal toggle.</td>
+</tr>
+<tr class="even">
+<td>contamination</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>IsolationForest contamination fraction.</td>
+</tr>
+<tr class="odd">
+<td>imputation_method</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Gap-filling strategy (<code>"weighted"</code> or <code>"linear"</code>).</td>
+</tr>
+<tr class="even">
+<td>window_size</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Rolling window size for weighted imputation.</td>
+</tr>
+<tr class="odd">
+<td>use_exogenous_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Exogenous feature construction toggle.</td>
+</tr>
+<tr class="even">
+<td>latitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Location latitude.</td>
+</tr>
+<tr class="odd">
+<td>longitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Location longitude.</td>
+</tr>
+<tr class="even">
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>IANA timezone string.</td>
+</tr>
+<tr class="odd">
+<td>country_code</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Country code for holiday generation.</td>
+</tr>
+<tr class="even">
+<td>state</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Subdivision code for regional holidays.</td>
+</tr>
+<tr class="odd">
+<td>include_weather_windows</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Weather-window feature toggle.</td>
+</tr>
+<tr class="even">
+<td>include_holiday_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Holiday feature toggle.</td>
+</tr>
+<tr class="odd">
+<td>include_poly_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Polynomial feature toggle.</td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1440,7 +1596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="042cd486" class="cell" data-execution_count="1">
+<div id="d5f9f2c0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe <span class="im">import</span> Config <span class="co"># for comparison with default values</span></span>
@@ -1553,7 +1709,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="dd262bf7" class="cell" data-execution_count="2">
+<div id="681e72d1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(api_country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -1620,7 +1776,7 @@ Random state: 314159</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="fddf770e" class="cell" data-execution_count="3">
+<div id="af98b5be" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(api_country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
