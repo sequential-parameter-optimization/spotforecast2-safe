@@ -1258,6 +1258,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.imputation.WeightFunction(weights_series)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Callable class for sample weights that can be pickled.</p>
 <p>This class wraps the weights_series and provides a callable interface compatible with ForecasterRecursive’s weight_func parameter. Unlike local functions with closures, instances of this class can be pickled using standard pickle/joblib.</p>
+<p>When all weights for the requested index sum to zero (e.g.&nbsp;the entire training window falls inside gap-penalty zones after outlier detection), <code>__call__</code> returns <code>None</code> instead of an all-zero array. <code>ForecasterRecursive.create_sample_weights</code> treats a <code>None</code> return as “no weighting”, avoiding a <code>ValueError</code> while still applying the weighted imputation for windows that do contain positive weights.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1287,11 +1288,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> weight_func <span class="op">=</span> WeightFunction(weights)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> weight_func(pd.Index([<span class="dv">0</span>, <span class="dv">1</span>]))</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>array([<span class="fl">1.</span> , <span class="fl">0.9</span>])</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Can be pickled</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> pickled <span class="op">=</span> pickle.dumps(weight_func)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> unpickled <span class="op">=</span> pickle.loads(pickled)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> unpickled(pd.Index([<span class="dv">0</span>, <span class="dv">1</span>]))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>array([<span class="fl">1.</span> , <span class="fl">0.9</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Returns None when all weights in the window are zero</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> zero_weights <span class="op">=</span> pd.Series([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>], index<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> wf_zero <span class="op">=</span> WeightFunction(zero_weights)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> wf_zero(pd.Index([<span class="dv">0</span>, <span class="dv">1</span>])) <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Can be pickled</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> pickled <span class="op">=</span> pickle.dumps(weight_func)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> unpickled <span class="op">=</span> pickle.loads(pickled)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> unpickled(pd.Index([<span class="dv">0</span>, <span class="dv">1</span>]))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>array([<span class="fl">1.</span> , <span class="fl">0.9</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
