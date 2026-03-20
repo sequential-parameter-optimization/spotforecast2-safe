@@ -1240,6 +1240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#spotforecast2_safe.preprocessing.outlier.manual_outlier_removal" id="toc-spotforecast2_safe.preprocessing.outlier.manual_outlier_removal" class="nav-link active" data-scroll-target="#spotforecast2_safe.preprocessing.outlier.manual_outlier_removal">preprocessing.outlier.manual_outlier_removal</a>
   <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
@@ -1262,7 +1263,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    upper_threshold<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Manual outlier removal function. Args: data (pd.DataFrame): The input dataset. column (str): The column name in which to perform manual outlier removal. lower_threshold (float | None): The lower threshold below which values are considered outliers. If None, no lower threshold is applied. upper_threshold (float | None): The upper threshold above which values are considered outliers. If None, no upper threshold is applied. verbose (bool): Whether to print additional information.</p>
+<p>Manual outlier removal function.</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
+<td>The input dataset.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>column</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>The column name in which to perform manual outlier removal.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>lower_threshold</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a> | None</td>
+<td>The lower threshold below which values are considered outliers. If None, no lower threshold is applied.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>upper_threshold</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a> | None</td>
+<td>The upper threshold above which values are considered outliers. If None, no upper threshold is applied.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Whether to print additional information.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <table class="caption-top table">
