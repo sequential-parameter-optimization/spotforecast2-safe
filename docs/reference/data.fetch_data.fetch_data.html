@@ -1280,7 +1280,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    dayfirst<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Fetches the integrated raw dataset from a CSV file or processes a DataFrame.</p>
+<p>Fetches a dataset from a CSV file or processes a DataFrame.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1295,8 +1295,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>filename</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Filename of the CSV file containing the dataset. Must be located in the data home directory. This is required if dataframe is None.</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Full absolute path of the CSV file containing the dataset (e.g., <code>'/home/data/my_data.csv'</code>). Required when <em>dataframe</em> is <code>None</code>. Use :func:<code>get_data_home</code> or :func:<code>get_package_data_home</code> to build the path: .. code-block:: python fetch_data(filename=get_data_home() / “my_data.csv”)</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
@@ -1314,19 +1314,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>index_col</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Column index to be used as the index (only used when loading from CSV). Default: 0.</td>
+<td>Column index to be used as the index. Default: 0.</td>
 <td><code>0</code></td>
 </tr>
 <tr class="odd">
 <td>parse_dates</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>Whether to parse dates in the index column (only used when loading from CSV). Default: True.</td>
+<td>Whether to parse dates in the index column. Default: True.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="even">
 <td>dayfirst</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>Whether the day comes first in date parsing (only used when loading from CSV). Default: False.</td>
+<td>Whether the day comes first in date parsing. Default: False.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
@@ -1352,7 +1352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>pd.DataFrame: The integrated raw dataset with UTC timezone.</td>
+<td>pd.DataFrame: The dataset with UTC timezone.</td>
 </tr>
 </tbody>
 </table>
@@ -1371,7 +1371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
-<td>If columns is an empty list, if both filename and dataframe are provided, or if neither filename nor dataframe is provided.</td>
+<td>If columns is an empty list, if both filename and dataframe are provided, if neither filename nor dataframe is provided, or if filename is not an absolute path.</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -1383,7 +1383,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="638fb3d8" class="cell" data-execution_count="1">
+<div id="cbaae19b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_data, get_package_data_home</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># demo02.csv is included in the package datasets</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>path_demo <span class="op">=</span> get_package_data_home() <span class="op">/</span> <span class="st">"demo02.csv"</span></span>
