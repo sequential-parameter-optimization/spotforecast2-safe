@@ -1384,7 +1384,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    cache_data<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    data_home<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the multi-input forecasting pipeline.</p>
 <p>This class manages all configuration parameters for the multi-input task, including training/prediction intervals, data sources, and feature engineering specifications. All parameters can be customized during initialization or used with sensible defaults.</p>
 <p><code>country_code</code> serves as the single ISO country code used for both API queries (exposed via the <code>API_COUNTRY_CODE</code> property for backward compatibility) and holiday feature generation.</p>
@@ -1604,6 +1614,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Per-column outlier bounds as a list of <code>(lower, upper)</code> tuples, one entry per target column. <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
+<tr class="odd">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If <code>True</code>, enable verbose output for pipeline steps. Defaults to <code>False</code>.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>cache_data</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If <code>True</code>, cache intermediate data to disk. Defaults to <code>False</code>.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>cache_home</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Path to the cache directory. <code>None</code> means the library default (<code>~/spotforecast2_cache/</code>) is used.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>data_home</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Path to the data directory. <code>None</code> means the library default (<code>~/spotforecast2_data/</code>) is used.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>end_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>End of the training window. Derived from <code>end_train_default</code> after data loading; <code>None</code> until set.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>start_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Start of the training window. Derived as <code>end_train_ts - train_size</code> after data loading; <code>None</code> until set.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>n_trials_optuna</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of Optuna Bayesian-search trials for hyperparameter optimization (task 3). Defaults to <code>15</code>.</td>
+<td><code>15</code></td>
+</tr>
+<tr class="even">
+<td>n_trials_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of SpotOptim surrogate-search trials (task 4). Defaults to <code>10</code>.</td>
+<td><code>10</code></td>
+</tr>
+<tr class="odd">
+<td>n_initial_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of initial random evaluations for SpotOptim (task 4). Defaults to <code>5</code>.</td>
+<td><code>5</code></td>
+</tr>
+<tr class="even">
+<td>task</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Active prediction task — one of <code>"lazy"</code>, <code>"training"</code>, <code>"optuna"</code>, or <code>"spotoptim"</code>. Defaults to <code>"lazy"</code>.</td>
+<td><code>'lazy'</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1788,6 +1858,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>]]</td>
 <td>Per-column outlier bounds <code>(lower, upper)</code>.</td>
 </tr>
+<tr class="odd">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Verbose output toggle.</td>
+</tr>
+<tr class="even">
+<td>cache_data</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Cache intermediate data toggle.</td>
+</tr>
+<tr class="odd">
+<td>cache_home</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Path to the cache directory.</td>
+</tr>
+<tr class="even">
+<td>data_home</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Path to the data directory.</td>
+</tr>
+<tr class="odd">
+<td>end_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>End of the training window.</td>
+</tr>
+<tr class="even">
+<td>start_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Start of the training window.</td>
+</tr>
+<tr class="odd">
+<td>n_trials_optuna</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of Optuna hyperparameter-search trials.</td>
+</tr>
+<tr class="even">
+<td>n_trials_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of SpotOptim search trials.</td>
+</tr>
+<tr class="odd">
+<td>n_initial_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of initial SpotOptim evaluations.</td>
+</tr>
+<tr class="even">
+<td>task</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Active prediction task (<code>"lazy"</code>, <code>"training"</code>, <code>"optuna"</code>, or <code>"spotoptim"</code>).</td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1798,7 +1918,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="59ae8f0c" class="cell" data-execution_count="1">
+<div id="f98195b7" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
@@ -1951,7 +2071,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="bad94928" class="cell" data-execution_count="2">
+<div id="b37b5a6c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -2034,7 +2154,7 @@ bounds: None</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="8f308fc8" class="cell" data-execution_count="3">
+<div id="ece4c8a5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
