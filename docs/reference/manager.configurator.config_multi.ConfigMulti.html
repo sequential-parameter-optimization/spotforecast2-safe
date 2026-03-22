@@ -783,6 +783,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.predictor.build_prediction_package.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">build_prediction_package</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../docs/reference/manager.predictor.get_model_prediction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_model_prediction</span></a>
   </div>
@@ -964,6 +970,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/manager.features.merge_data_and_covariates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">merge_data_and_covariates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.features.get_target_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_target_data</span></a>
   </div>
 </li>
       </ul>
@@ -1918,7 +1930,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="f98195b7" class="cell" data-execution_count="1">
+<div id="63929ed9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
@@ -2071,7 +2083,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="b37b5a6c" class="cell" data-execution_count="2">
+<div id="95c03812" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -2154,7 +2166,7 @@ bounds: None</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="ece4c8a5" class="cell" data-execution_count="3">
+<div id="62cdbd8e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
