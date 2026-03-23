@@ -1362,8 +1362,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.get_cache_home(cache_home<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Return the location where persistent models are to be cached. By default the cache directory is set to a folder named ‘spotforecast2_cache’ in the user home folder. Alternatively, it can be set by the ‘SPOTFORECAST2_CACHE’ environment variable or programmatically by giving an explicit folder path. The ‘~’ symbol is expanded to the user home folder. If the folder does not already exist, it is automatically created.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.get_cache_home(cache_home<span class="op">=</span><span class="va">None</span>, create_dir<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return the location where persistent models are to be cached.</p>
+<p>By default the cache directory is set to a folder named <code>spotforecast2_cache</code> in the user home folder. Alternatively, it can be set by the <code>SPOTFORECAST2_CACHE</code> environment variable or programmatically by giving an explicit folder path. The <code>~</code> symbol is expanded to the user home folder. When <code>create_dir</code> is <code>True</code> (the default) the directory is created automatically if it does not already exist.</p>
 <p>This directory is used to store pickled trained models for quick reuse across forecasting runs, following scikit-learn model persistence conventions.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1379,9 +1380,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>cache_home</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> or <a href="https://docs.python.org/3/library/pathlib.html#module-pathlib">pathlib</a>.<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></td>
-<td>The path to spotforecast cache directory. If <code>None</code>, the default path is <code>~/spotforecast2_cache</code>.</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]]</td>
+<td>Path to the spotforecast cache directory. If <code>None</code>, the value of the <code>SPOTFORECAST2_CACHE</code> environment variable is used when set, otherwise the default path <code>~/spotforecast2_cache</code> is used.</td>
 <td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>create_dir</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Whether to create the cache directory if it does not exist. When <code>True</code> (the default), the directory and any missing parent directories are created automatically. When <code>False</code>, the resolved path is returned without touching the filesystem.</td>
+<td><code>True</code></td>
 </tr>
 </tbody>
 </table>
@@ -1400,7 +1407,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></td>
-<td>pathlib.Path: The path to the spotforecast cache directory.</td>
+<td>Absolute path to the spotforecast cache directory.</td>
 </tr>
 </tbody>
 </table>
@@ -1419,14 +1426,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/exceptions.html#OSError">OSError</a></td>
-<td>If the directory cannot be created due to permission issues.</td>
+<td>If <code>create_dir</code> is <code>True</code> and the directory cannot be created due to a permissions error or other OS-level failure.</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="c2eb69bf" class="cell" data-execution_count="1">
+<div id="cf586778" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cache_dir <span class="op">=</span> get_cache_home()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cache_dir.name)</span>
@@ -1436,25 +1443,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 runner</code></pre>
 </div>
 </div>
-<div id="1df42c7a" class="cell" data-execution_count="2">
+<div id="6ac89a87" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using custom path</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>custom_cache <span class="op">=</span> get_cache_home(Path(<span class="st">'/tmp/my_cache'</span>))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>custom_cache.exists()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    custom_cache <span class="op">=</span> get_cache_home(Path(tmp) <span class="op">/</span> <span class="st">'my_cache'</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(custom_cache.exists())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>True</code></pre>
 </div>
 </div>
-<div id="5ef52fbf" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using environment variable</span></span>
+<div id="fe0c029c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Resolve path without creating the directory</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">'SPOTFORECAST2_CACHE'</span>] <span class="op">=</span> <span class="st">'/tmp/spotforecast2_cache_env'</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>cache_dir <span class="op">=</span> get_cache_home()</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>cache_dir.as_posix()</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> os.environ[<span class="st">'SPOTFORECAST2_CACHE'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    resolved <span class="op">=</span> get_cache_home(Path(tmp) <span class="op">/</span> <span class="st">'not_yet'</span>, create_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(resolved.exists())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>False</code></pre>
+</div>
+</div>
+<div id="e88a6520" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using environment variable</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">'SPOTFORECAST2_CACHE'</span>] <span class="op">=</span> <span class="st">'/tmp/spotforecast2_cache_env'</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>cache_dir <span class="op">=</span> get_cache_home()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>cache_dir.as_posix()</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> os.environ[<span class="st">'SPOTFORECAST2_CACHE'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
