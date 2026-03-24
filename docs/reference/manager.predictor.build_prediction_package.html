@@ -1370,7 +1370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    df_test<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Build a prediction package compatible with PredictionFigure.</p>
-<p>Computes true in-sample predictions via the fitted regressor and generates a genuine future forecast of <code>predict_size</code> steps. If <code>df_test</code> is supplied, ground-truth test values are injected and future metrics (MAE, MAPE) are computed.</p>
+<p>Computes true in-sample predictions via the fitted estimator and generates a genuine future forecast of <code>predict_size</code> steps. If <code>df_test</code> is supplied, ground-truth test values are injected and future metrics (MAE, MAPE) are computed.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1386,7 +1386,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>forecaster</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></td>
-<td>A fitted skforecast <code>ForecasterRecursive</code> (or compatible) instance with <code>create_train_X_y</code>, <code>regressor</code>, and <code>predict</code> methods.</td>
+<td>A fitted skforecast <code>ForecasterRecursive</code> (or compatible) instance with <code>create_train_X_y</code>, <code>estimator</code>, and <code>predict</code> methods.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
@@ -1452,7 +1452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
-<td>- <strong>train_pred</strong> (<code>pd.Series</code>) — in-sample fitted values from the underlying regressor.</td>
+<td>- <strong>train_pred</strong> (<code>pd.Series</code>) — in-sample fitted values from the underlying estimator.</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -1492,7 +1492,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>Examples:</p>
-<pre><code>::: {#1aaf5fd4 .cell execution_count=1}
+<pre><code>::: {#698c2357 .cell execution_count=1}
 ``` {.python .cell-code}
 import numpy as np
 import pandas as pd
@@ -1525,18 +1525,11 @@ Future predictions: 24 steps
 Validation passed: True
 ```
 :::
-
-::: {.cell-output .cell-output-stderr}
-```
-/home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/forecaster/base.py:447: FutureWarning: The `regressor` attribute is deprecated and will be removed in future versions. Use `estimator` instead.
-  warnings.warn(
-```
-:::
 :::
 
 
 
-::: {#c083edd1 .cell execution_count=2}
+::: {#ddd203ec .cell execution_count=2}
 ``` {.python .cell-code}
 import numpy as np
 import pandas as pd
@@ -1574,13 +1567,6 @@ print(f"MAE on future: {pkg['metrics_future']['mae']:.4f}")
 test_actual present: True
 metrics_future keys: ['mae', 'mape']
 MAE on future: 4.9177
-```
-:::
-
-::: {.cell-output .cell-output-stderr}
-```
-/home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/forecaster/base.py:447: FutureWarning: The `regressor` attribute is deprecated and will be removed in future versions. Use `estimator` instead.
-  warnings.warn(
 ```
 :::
 :::</code></pre>
