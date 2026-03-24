@@ -1441,7 +1441,7 @@ window.Quarto = {
 <section id="standard-autoregressive-forecast" class="level3">
 <h3 class="anchored" data-anchor-id="standard-autoregressive-forecast">1. Standard Autoregressive Forecast</h3>
 <p>A basic example using <code>LinearRegression</code> with the last 7 days as predictors.</p>
-<div id="9dc3ccfc" class="cell" data-execution_count="1">
+<div id="ae0803fc" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
@@ -1478,7 +1478,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="multi-feature-forecasting-lags-window-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="multi-feature-forecasting-lags-window-statistics">2. Multi-Feature Forecasting (Lags + Window Statistics)</h3>
 <p>Combining raw lags with rolling means provides the model with both local and global context.</p>
-<div id="6fab7e26" class="cell" data-execution_count="2">
+<div id="0db06510" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
@@ -1503,18 +1503,18 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(predictions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Predictions with window features:
-2023-01-09 08:00:00    48.238815
-2023-01-09 09:00:00    49.898571
-2023-01-09 10:00:00    49.312120
-2023-01-09 11:00:00    48.518167
-2023-01-09 12:00:00    49.303619
-2023-01-09 13:00:00    50.760326
-2023-01-09 14:00:00    50.405735
-2023-01-09 15:00:00    50.298503
-2023-01-09 16:00:00    52.398634
-2023-01-09 17:00:00    53.168280
-2023-01-09 18:00:00    49.254550
-2023-01-09 19:00:00    51.598700
+2023-01-09 08:00:00    50.634802
+2023-01-09 09:00:00    51.786629
+2023-01-09 10:00:00    52.650698
+2023-01-09 11:00:00    52.327216
+2023-01-09 12:00:00    50.076633
+2023-01-09 13:00:00    51.765910
+2023-01-09 14:00:00    52.505210
+2023-01-09 15:00:00    51.513071
+2023-01-09 16:00:00    51.913947
+2023-01-09 17:00:00    51.435821
+2023-01-09 18:00:00    53.051692
+2023-01-09 19:00:00    51.471086
 Freq: h, Name: pred, dtype: float64</code></pre>
 </div>
 </div>
@@ -1522,7 +1522,7 @@ Freq: h, Name: pred, dtype: float64</code></pre>
 <section id="handling-exogenous-variables" class="level3">
 <h3 class="anchored" data-anchor-id="handling-exogenous-variables">3. Handling Exogenous Variables</h3>
 <p>Forecasting energy demand using temperature as an external factor.</p>
-<div id="36090722" class="cell" data-execution_count="3">
+<div id="46233d0c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
@@ -1550,9 +1550,9 @@ Freq: h, Name: pred, dtype: float64</code></pre>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(predictions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Demand forecast with temp as exog:
-2023-04-11    94.157153
-2023-04-12    99.956452
-2023-04-13    98.513055
+2023-04-11    102.682740
+2023-04-12    103.572278
+2023-04-13    102.994774
 Freq: D, Name: pred, dtype: float64</code></pre>
 </div>
 </div>
@@ -1579,7 +1579,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <p>Two methods are available: * Bootstrapping: Resamples residuals from the training phase to generate a distribution of possible future paths. * Conformal Prediction: Uses a calibration dataset (out-of-sample residuals) to guarantee a statistical coverage rate (e.g., 95%).</p>
 <section id="bootstrapping-example" class="level4">
 <h4 class="anchored" data-anchor-id="bootstrapping-example">Bootstrapping Example</h4>
-<div id="996875a5" class="cell" data-execution_count="4">
+<div id="61a7fdcf" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
@@ -1628,7 +1628,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="conformal-prediction-example" class="level4">
 <h4 class="anchored" data-anchor-id="conformal-prediction-example">Conformal Prediction Example</h4>
 <p>Conformal prediction often requires out-of-sample residuals for calibration to ensure the coverage guarantee holds.</p>
-<div id="cfe5dfc0" class="cell" data-execution_count="5">
+<div id="34258214" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... (Assuming same setup as above)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Split data into training and calibration sets</span></span>
