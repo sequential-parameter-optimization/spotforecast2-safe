@@ -1334,6 +1334,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#spotforecast2_safe.weather.weather_client.WeatherClient" id="toc-spotforecast2_safe.weather.weather_client.WeatherClient" class="nav-link active" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherClient">weather.weather_client.WeatherClient</a>
   <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive" id="toc-spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive" class="nav-link" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive">fetch_archive</a></li>
@@ -1353,8 +1354,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="spotforecast2_safe.weather.weather_client.WeatherClient" class="level1">
 <h1>weather.weather_client.WeatherClient</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient(latitude, longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Client for fetching weather data from Open-Meteo API.</p>
-<p>Handles the low-level API interactions, parameter building, and response parsing.</p>
+<p>Client for fetching weather data from Open-Meteo API. Handles the low-level API interactions, parameter building, and response parsing.</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>latitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Latitude of the location.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>longitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Longitude of the location.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
 <table class="caption-top table">
@@ -1379,13 +1406,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive">fetch_archive</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_archive(start, end, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fetch historical data from Archive API.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>start</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
+<td>Start date for the historical data.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>end</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
+<td>End date for the historical data.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Timezone for the data (default “UTC”).</td>
+<td><code>'UTC'</code></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast">fetch_forecast</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_forecast(days_ahead, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fetch forecast data from Forecast API.</p>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>days_ahead</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Number of days ahead for the forecast.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Timezone for the data (default “UTC”).</td>
+<td><code>'UTC'</code></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 </section>
 </section>

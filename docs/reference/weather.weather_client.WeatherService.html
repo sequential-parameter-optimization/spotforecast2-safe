@@ -1334,6 +1334,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#spotforecast2_safe.weather.weather_client.WeatherService" id="toc-spotforecast2_safe.weather.weather_client.WeatherService" class="nav-link active" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherService">weather.weather_client.WeatherService</a>
   <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.weather.weather_client.WeatherService.get_dataframe" id="toc-spotforecast2_safe.weather.weather_client.WeatherService.get_dataframe" class="nav-link" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherService.get_dataframe">get_dataframe</a></li>
@@ -1359,6 +1360,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>High-level service for weather data generation.</p>
 <p>Extends WeatherClient with caching, hybrid fetching (archive+forecast), and fallback strategies.</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>latitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Latitude of the location.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>longitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Longitude of the location.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>cache_path</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td>Optional path to cache file for storing fetched data.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>use_forecast</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Whether to use forecast data for future dates (default True).</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
 <table class="caption-top table">
@@ -1384,10 +1424,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Get weather DataFrame for a specified range using best available methods.</p>
-<p>Refactored from spotpredict.create_weather_df.</p>
+<p>Get weather DataFrame for a specified range using best available methods. Refactored from spotpredict.create_weather_df.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>start</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Start date for the data.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>end</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>End date for the data.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Timezone for the data (default “UTC”).</td>
+<td><code>'UTC'</code></td>
+</tr>
+<tr class="even">
+<td>freq</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Frequency for the data (default “h”).</td>
+<td><code>'h'</code></td>
+</tr>
+<tr class="odd">
+<td>fallback_on_failure</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Whether to use fallback data on failure (default True).</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 </section>
 </section>

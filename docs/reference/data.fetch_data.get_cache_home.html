@@ -1364,7 +1364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.get_cache_home(cache_home<span class="op">=</span><span class="va">None</span>, create_dir<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return the location where persistent models are to be cached.</p>
-<p>By default the cache directory is set to a folder named <code>spotforecast2_cache</code> in the user home folder. Alternatively, it can be set by the <code>SPOTFORECAST2_CACHE</code> environment variable or programmatically by giving an explicit folder path. The <code>~</code> symbol is expanded to the user home folder. When <code>create_dir</code> is <code>True</code> (the default) the directory is created automatically if it does not already exist.</p>
+<p>By default the cache directory is set to a folder named <code>.spotforecast2_cache</code> in the user home folder. Alternatively, it can be set by the <code>SPOTFORECAST2_CACHE</code> environment variable or programmatically by giving an explicit folder path. The <code>~</code> symbol is expanded to the user home folder. When <code>create_dir</code> is <code>True</code> (the default) the directory is created automatically if it does not already exist.</p>
 <p>This directory is used to store pickled trained models for quick reuse across forecasting runs, following scikit-learn model persistence conventions.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1381,7 +1381,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>cache_home</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]]</td>
-<td>Path to the spotforecast cache directory. If <code>None</code>, the value of the <code>SPOTFORECAST2_CACHE</code> environment variable is used when set, otherwise the default path <code>~/spotforecast2_cache</code> is used.</td>
+<td>Path to the spotforecast cache directory. If <code>None</code>, the value of the <code>SPOTFORECAST2_CACHE</code> environment variable is used when set, otherwise the default path <code>~/.spotforecast2_cache</code> is used.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
@@ -1433,17 +1433,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="d75cf156" class="cell" data-execution_count="1">
+<div id="4a197f99" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cache_dir <span class="op">=</span> get_cache_home()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cache_dir.name)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cache_dir.parent.name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotforecast2_cache
+<pre><code>.spotforecast2_cache
 runner</code></pre>
 </div>
 </div>
-<div id="6e17b6d4" class="cell" data-execution_count="2">
+<div id="6d72decf" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using custom path</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -1455,7 +1455,7 @@ runner</code></pre>
 <pre><code>True</code></pre>
 </div>
 </div>
-<div id="0ccee9f7" class="cell" data-execution_count="3">
+<div id="d8404051" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Resolve path without creating the directory</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -1467,7 +1467,7 @@ runner</code></pre>
 <pre><code>False</code></pre>
 </div>
 </div>
-<div id="8dbfc4b4" class="cell" data-execution_count="4">
+<div id="ec25e50d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using environment variable</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> get_cache_home</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
