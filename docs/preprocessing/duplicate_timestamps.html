@@ -1367,7 +1367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>remove_duplicate_timestamps()</code> collapses duplicate rows that share the same timestamp into a single row by applying an aggregation function across <strong>all</strong> data columns. The default time column is <code>"Time (UTC)"</code> and the default aggregation is <code>"mean"</code>, but both are configurable.</p>
 <section id="basic-usage-multiple-data-columns-mean-aggregation" class="level2">
 <h2 class="anchored" data-anchor-id="basic-usage-multiple-data-columns-mean-aggregation">Basic usage — multiple data columns, mean aggregation</h2>
-<div id="2d3361fa" class="cell" data-execution_count="1">
+<div id="bc88eede" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> remove_duplicate_timestamps</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1422,7 +1422,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="custom-time-column" class="level2">
 <h2 class="anchored" data-anchor-id="custom-time-column">Custom time column</h2>
 <p>Pass <code>time_col</code> when the timestamp column has a different name:</p>
-<div id="8300c81c" class="cell" data-execution_count="2">
+<div id="2ca9bda7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"measurement_time"</span>: [</span>
@@ -1476,7 +1476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="alternative-aggregation-functions" class="level2">
 <h2 class="anchored" data-anchor-id="alternative-aggregation-functions">Alternative aggregation functions</h2>
 <p>Supported string values: <code>"mean"</code> (default), <code>"median"</code>, <code>"min"</code>, <code>"max"</code>, <code>"sum"</code>, <code>"std"</code>, <code>"var"</code>, <code>"first"</code>, <code>"last"</code>, <code>"mode"</code>. Any callable is also accepted.</p>
-<div id="afe23ad3" class="cell" data-execution_count="3">
+<div id="834611c0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Time (UTC)"</span>: [</span>
