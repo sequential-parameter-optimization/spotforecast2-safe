@@ -1373,7 +1373,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    fill_missing<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fetch weather data for the dataset period plus forecast horizon.</p>
 <p>Creates a weather DataFrame using the Open-Meteo API with optional caching. Caching is controlled solely by the cache_home argument: when a path is provided the service reads from / writes to a parquet cache file inside that directory; when None (the default) no caching is performed.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1436,6 +1437,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Optional path to cache directory. When provided, fetched weather data is cached in <code>&lt;cache_home&gt;/weather_cache.parquet</code>. When None (default), no caching is performed.</td>
 <td><code>None</code></td>
 </tr>
+<tr class="odd">
+<td>fill_missing</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Whether to forward- and back-fill remaining NaN gaps (default False). Forwarded to <code>WeatherService.get_dataframe</code>; see its docstring.</td>
+<td><code>False</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1460,7 +1467,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="889f9f89" class="cell" data-execution_count="1">
+<div id="88b2bcaf" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_weather_data</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>weather_df <span class="op">=</span> fetch_weather_data(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="st">'2023-01-01T00:00'</span>,</span>

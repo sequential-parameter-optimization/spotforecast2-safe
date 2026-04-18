@@ -1423,8 +1423,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Get weather DataFrame for a specified range using best available methods. Refactored from spotpredict.create_weather_df.</p>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    fill_missing<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Get weather DataFrame for a specified range using best available methods.</p>
+<p>Refactored from spotpredict.create_weather_df. Since the 1.0 major release, remaining gaps after fetch are <strong>rejected</strong> by default so that synthesised values never reach downstream consumers labelled as measurements. Pass <code>fill_missing=True</code> to opt into the legacy forward/back-fill behavior.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
@@ -1466,6 +1468,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether to use fallback data on failure (default True).</td>
 <td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>fill_missing</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Whether to forward- and back-fill remaining NaN gaps after fetch/resample (default False). When False (the fail-safe default), any remaining NaN raises <code>ValueError</code> with the gap timestamps.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
+<td>If <code>fill_missing=False</code> and the merged frame still contains NaNs after resample.</td>
 </tr>
 </tbody>
 </table>

@@ -1351,8 +1351,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="spotforecast2_safe.data.fetch_data.load_timeseries_forecast" class="level1">
 <h1>data.fetch_data.load_timeseries_forecast</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.load_timeseries_forecast(data_home<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Load the day-ahead forecast time series from <code>interim/energy_load.csv</code>. Reads the <code>Forecasted Load</code> column, converts the index to a UTC <code>DatetimeIndex</code> with hourly frequency, and fills any missing values with forward/backward fill.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.load_timeseries_forecast(data_home<span class="op">=</span><span class="va">None</span>, on_missing<span class="op">=</span><span class="st">'raise'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Load the day-ahead forecast time series from <code>interim/energy_load.csv</code>.</p>
+<p>Reads the <code>Forecasted Load</code> column and converts the index to a UTC <code>DatetimeIndex</code> with hourly frequency. Missing values are <strong>rejected</strong> by default so callers cannot accidentally feed imputed values into downstream safety-critical pipelines. Pass <code>on_missing='ffill_bfill'</code> to opt into the legacy forward/backward fill behavior that was the default before the 1.0 major release.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1370,6 +1371,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]]</td>
 <td>Root data directory. If None, resolved via <code>get_data_home()</code>.</td>
 <td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>on_missing</td>
+<td><code>OnMissing</code></td>
+<td>How to handle NaN rows in <code>Forecasted Load</code>. <code>'raise'</code> (default) fails fast with the gap timestamps; <code>'ffill_bfill'</code> forward- then back-fills.</td>
+<td><code>'raise'</code></td>
 </tr>
 </tbody>
 </table>
@@ -1413,6 +1420,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 <td><a href="https://docs.python.org/3/library/exceptions.html#KeyError">KeyError</a></td>
 <td>If <code>Forecasted Load</code> column is not present.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
+<td>If <code>on_missing='raise'</code> and the series has NaNs.</td>
 </tr>
 </tbody>
 </table>
