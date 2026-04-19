@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>model_card – spotforecast2-safe</title>
+<title>Model/Method Card: spotforecast2-safe – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -1328,142 +1363,269 @@ window.Quarto = {
   <ul>
   <li><a href="#modelmethod-card-spotforecast2-safe" id="toc-modelmethod-card-spotforecast2-safe" class="nav-link active" data-scroll-target="#modelmethod-card-spotforecast2-safe">Model/Method Card: spotforecast2-safe</a>
   <ul class="collapse">
-  <li><a href="#system-details" id="toc-system-details" class="nav-link" data-scroll-target="#system-details">1. System Details</a></li>
-  <li><a href="#intended-use" id="toc-intended-use" class="nav-link" data-scroll-target="#intended-use">2. Intended Use</a>
+  <li><a href="#model-details" id="toc-model-details" class="nav-link" data-scroll-target="#model-details">1. Model Details</a></li>
+  <li><a href="#uses" id="toc-uses" class="nav-link" data-scroll-target="#uses">2. Uses</a>
   <ul class="collapse">
-  <li><a href="#primary-use-cases" id="toc-primary-use-cases" class="nav-link" data-scroll-target="#primary-use-cases">Primary Use Cases</a></li>
-  <li><a href="#out-of-scope" id="toc-out-of-scope" class="nav-link" data-scroll-target="#out-of-scope">Out-of-Scope</a></li>
+  <li><a href="#direct-use" id="toc-direct-use" class="nav-link" data-scroll-target="#direct-use">Direct Use</a></li>
+  <li><a href="#downstream-use" id="toc-downstream-use" class="nav-link" data-scroll-target="#downstream-use">Downstream Use</a></li>
+  <li><a href="#out-of-scope-use" id="toc-out-of-scope-use" class="nav-link" data-scroll-target="#out-of-scope-use">Out-of-Scope Use</a></li>
   </ul></li>
-  <li><a href="#algorithm-logic" id="toc-algorithm-logic" class="nav-link" data-scroll-target="#algorithm-logic">3. Algorithm &amp; Logic</a>
+  <li><a href="#bias-risks-and-limitations" id="toc-bias-risks-and-limitations" class="nav-link" data-scroll-target="#bias-risks-and-limitations">3. Bias, Risks, and Limitations</a>
+  <ul class="collapse">
+  <li><a href="#recommendations" id="toc-recommendations" class="nav-link" data-scroll-target="#recommendations">Recommendations</a></li>
+  </ul></li>
+  <li><a href="#how-to-get-started" id="toc-how-to-get-started" class="nav-link" data-scroll-target="#how-to-get-started">4. How to Get Started</a></li>
+  <li><a href="#technical-specifications" id="toc-technical-specifications" class="nav-link" data-scroll-target="#technical-specifications">5. Technical Specifications</a>
   <ul class="collapse">
   <li><a href="#mathematical-description" id="toc-mathematical-description" class="nav-link" data-scroll-target="#mathematical-description">Mathematical Description</a></li>
   <li><a href="#design-objectives" id="toc-design-objectives" class="nav-link" data-scroll-target="#design-objectives">Design Objectives</a></li>
+  <li><a href="#architecture-layered" id="toc-architecture-layered" class="nav-link" data-scroll-target="#architecture-layered">Architecture (layered)</a></li>
   </ul></li>
-  <li><a href="#performance-robustness-design-goals" id="toc-performance-robustness-design-goals" class="nav-link" data-scroll-target="#performance-robustness-design-goals">4. Performance &amp; Robustness (Design Goals)</a>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">6. Evaluation</a>
   <ul class="collapse">
-  <li><a href="#fail-safe-behavior" id="toc-fail-safe-behavior" class="nav-link" data-scroll-target="#fail-safe-behavior">Fail-Safe Behavior</a></li>
-  <li><a href="#input-validation" id="toc-input-validation" class="nav-link" data-scroll-target="#input-validation">Input Validation</a></li>
-  <li><a href="#cybersecurity-footprint" id="toc-cybersecurity-footprint" class="nav-link" data-scroll-target="#cybersecurity-footprint">Cybersecurity Footprint</a></li>
+  <li><a href="#testing-data" id="toc-testing-data" class="nav-link" data-scroll-target="#testing-data">Testing Data</a></li>
+  <li><a href="#factors" id="toc-factors" class="nav-link" data-scroll-target="#factors">Factors</a></li>
+  <li><a href="#metrics" id="toc-metrics" class="nav-link" data-scroll-target="#metrics">Metrics</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   </ul></li>
-  <li><a href="#compliance-eu-ai-act-support" id="toc-compliance-eu-ai-act-support" class="nav-link" data-scroll-target="#compliance-eu-ai-act-support">5. Compliance &amp; EU AI Act Support</a></li>
-  <li><a href="#caveats-limitations" id="toc-caveats-limitations" class="nav-link" data-scroll-target="#caveats-limitations">6. Caveats &amp; Limitations</a></li>
-  <li><a href="#how-to-audit" id="toc-how-to-audit" class="nav-link" data-scroll-target="#how-to-audit">7. How to Audit</a></li>
-  <li><a href="#disclaimer-liability" id="toc-disclaimer-liability" class="nav-link" data-scroll-target="#disclaimer-liability">8. Disclaimer &amp; Liability</a></li>
+  <li><a href="#environmental-impact" id="toc-environmental-impact" class="nav-link" data-scroll-target="#environmental-impact">7. Environmental Impact</a></li>
+  <li><a href="#compliance-eu-ai-act-support" id="toc-compliance-eu-ai-act-support" class="nav-link" data-scroll-target="#compliance-eu-ai-act-support">8. Compliance &amp; EU AI Act Support</a></li>
+  <li><a href="#glossary" id="toc-glossary" class="nav-link" data-scroll-target="#glossary">9. Glossary</a></li>
+  <li><a href="#citation" id="toc-citation" class="nav-link" data-scroll-target="#citation">10. Citation</a></li>
+  <li><a href="#model-card-authors-contact" id="toc-model-card-authors-contact" class="nav-link" data-scroll-target="#model-card-authors-contact">11. Model Card Authors &amp; Contact</a></li>
+  <li><a href="#how-to-audit" id="toc-how-to-audit" class="nav-link" data-scroll-target="#how-to-audit">12. How to Audit</a></li>
+  <li><a href="#disclaimer-liability" id="toc-disclaimer-liability" class="nav-link" data-scroll-target="#disclaimer-liability">13. Disclaimer &amp; Liability</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/safe/MODEL_CARD.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/safe/spotforecast2-safe.html">Safety &amp; Security</a></li><li class="breadcrumb-item"><a href="../../docs/safe/MODEL_CARD.html">Model/Method Card</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/safe/spotforecast2-safe.html">Safety &amp; Security</a></li><li class="breadcrumb-item"><a href="../../docs/safe/MODEL_CARD.html">Model/Method Card</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Model/Method Card: spotforecast2-safe</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
 
 
 <section id="modelmethod-card-spotforecast2-safe" class="level1">
 <h1>Model/Method Card: spotforecast2-safe</h1>
-<section id="system-details" class="level2">
-<h2 class="anchored" data-anchor-id="system-details">1. System Details</h2>
+<p>This card follows the Hugging Face Model Card Guidebook taxonomy <span class="citation" data-cites="ozon22a">[@ozon22a]</span>.</p>
+<section id="model-details" class="level2">
+<h2 class="anchored" data-anchor-id="model-details">1. Model Details</h2>
 <ul>
-<li>Name: spotforecast2-safe</li>
-<li>Version: 0.8.0-rc.1</li>
-<li>Type: Deterministic library for time series transformation and feature generation (Preprocessing).</li>
-<li>License: AGPL-3.0-or-later</li>
-<li>Developers: bartzbeielstein</li>
-<li>Repository: https://github.com/sequential-parameter-optimization/spotforecast2-safe</li>
-<li>CPE Identifier (Wildcard): cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:<em>:</em>:<em>:</em>:<em>:</em>:<em>:</em></li>
-<li>CPE Identifier (Current Release): cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:<em>:</em>:<em>:</em>:<em>:</em>:*</li>
-<li>Core Dependencies: numpy, pandas (Minimal Dependency Footprint).</li>
-<li>Prohibited Dependencies: plotly, matplotlib, spotoptim, optuna, torch, tensorflow.</li>
+<li><strong>Name</strong>: spotforecast2-safe</li>
+<li><strong>Version</strong>: 1.0.1</li>
+<li><strong>Type</strong>: Deterministic library for time series transformation and feature generation (preprocessing + recursive forecasting wrappers).</li>
+<li><strong>Developed by</strong>: Thomas Bartz-Beielstein. ORCID: <a href="https://orcid.org/0000-0002-5938-5158">0000-0002-5938-5158</a>.</li>
+<li><strong>Shared by</strong>: <code>sequential-parameter-optimization</code> GitHub organization.</li>
+<li><strong>Language</strong>: Python 3.13+.</li>
+<li><strong>License</strong>: AGPL-3.0-or-later.</li>
+<li><strong>Core dependencies</strong>: <code>numpy</code>, <code>pandas</code>, <code>scikit-learn</code>, <code>lightgbm</code>, <code>numba</code>, <code>pyarrow</code>, <code>requests</code>, <code>feature-engine</code>, <code>holidays</code>, <code>astral</code>, <code>tqdm</code> (minimal dependency footprint).</li>
+<li><strong>Prohibited dependencies</strong>: <code>plotly</code>, <code>matplotlib</code>, <code>spotoptim</code>, <code>optuna</code>, <code>torch</code>, <code>tensorflow</code>.</li>
+<li><strong>Repository</strong>: <a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe" class="uri">https://github.com/sequential-parameter-optimization/spotforecast2-safe</a></li>
+<li><strong>Technical report</strong>: <code>bart26h/index.qmd</code> (shipped in-tree).</li>
+<li><strong>CPE Identifier (Wildcard)</strong>: <code>cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*</code></li>
+<li><strong>CPE Identifier (Current Release)</strong>: <code>cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:1.0.1:*:*:*:*:*:*:*</code></li>
 </ul>
 </section>
-<section id="intended-use" class="level2">
-<h2 class="anchored" data-anchor-id="intended-use">2. Intended Use</h2>
-<section id="primary-use-cases" class="level3">
-<h3 class="anchored" data-anchor-id="primary-use-cases">Primary Use Cases</h3>
+<section id="uses" class="level2">
+<h2 class="anchored" data-anchor-id="uses">2. Uses</h2>
+<section id="direct-use" class="level3">
+<h3 class="anchored" data-anchor-id="direct-use">Direct Use</h3>
 <ul>
-<li><strong>Safety-Critical Forecasting Systems</strong>: Preparation of time series data for regression models in environments requiring auditability (e.g., energy supply, finance).</li>
-<li><strong>Embedded Systems / Edge AI</strong>: Use in resource-constrained environments where large ML frameworks cannot be installed.</li>
-<li><strong>Reproducible Research</strong>: Ensuring exact mathematical reproducibility of N-to-1 transformations without hidden stochastics.</li>
+<li><strong>Safety-critical forecasting pipelines</strong>: Preparation of time series data for regression models in auditable environments (energy supply, finance, industrial monitoring).</li>
+<li><strong>Embedded / edge AI</strong>: Runs in resource-constrained environments where heavyweight ML frameworks are not available.</li>
+<li><strong>Reproducible research</strong>: Bit-level reproducible N-to-1 lag transformations, no hidden stochastics.</li>
 </ul>
 </section>
-<section id="out-of-scope" class="level3">
-<h3 class="anchored" data-anchor-id="out-of-scope">Out-of-Scope</h3>
+<section id="downstream-use" class="level3">
+<h3 class="anchored" data-anchor-id="downstream-use">Downstream Use</h3>
 <ul>
-<li><strong>Interactive Visualization</strong>: The package deliberately contains no plotting functions to minimize the attack surface.</li>
-<li><strong>Automated Hyperparameter Tuning</strong>: Optimization (e.g., via spotoptim or Optuna) must take place outside the “Safe Environment”.</li>
-<li><strong>Silent Data Cleaning</strong>: The package does not perform “silent” data imputation. Missing values (NaNs) lead to explicit errors (Fail-Safe), not estimations.</li>
+<li>Feeding the generated feature matrices into <code>scikit-learn</code> regressors, <code>lightgbm</code>, or <code>xgboost</code> via the bundled <code>ForecasterRecursiveLGBM</code> / <code>ForecasterRecursiveXGB</code> wrappers.</li>
+<li>Building custom recursive multi-step forecasters on top of the <code>ForecasterRecursiveModel</code> base class in <code>spotforecast2_safe.manager.models</code>.</li>
+</ul>
+</section>
+<section id="out-of-scope-use" class="level3">
+<h3 class="anchored" data-anchor-id="out-of-scope-use">Out-of-Scope Use</h3>
+<ul>
+<li><strong>Interactive visualization</strong>: Deliberately no plotting code ships in this package — no Plotly, no Matplotlib.</li>
+<li><strong>Automated hyperparameter tuning</strong>: Must run outside the safe environment (e.g., in a separate <code>spotforecast2</code> / <code>spotoptim</code> / Optuna workflow).</li>
+<li><strong>Silent data cleaning</strong>: <code>NaN</code> / <code>Inf</code> values raise <code>ValueError</code>; the package does not silently impute.</li>
 </ul>
 </section>
 </section>
-<section id="algorithm-logic" class="level2">
-<h2 class="anchored" data-anchor-id="algorithm-logic">3. Algorithm &amp; Logic</h2>
+<section id="bias-risks-and-limitations" class="level2">
+<h2 class="anchored" data-anchor-id="bias-risks-and-limitations">3. Bias, Risks, and Limitations</h2>
+<ul>
+<li><strong>Downstream regressor drift</strong>: <code>spotforecast2-safe</code> performs deterministic feature engineering, not forecasting by itself. Accuracy is bounded by the regressor and the training data — concept drift, seasonality shifts, or regime changes in the downstream model will silently degrade forecasts.</li>
+<li><strong>Lag-feature leakage when bypassing <code>ExogBuilder</code></strong>: Users who construct lag or calendar features outside the provided builders risk leaking target values into the feature row for timestamp <em>t</em>. The bundled <code>ExogBuilder</code> / <code>task_n_to_1</code> paths are leakage-free by construction; hand-rolled pipelines are not.</li>
+<li><strong>Multi-threaded inference determinism</strong>: The bit-level reproducibility guarantee assumes single-threaded execution or an explicitly pinned <code>n_jobs=1</code> on the downstream regressor. Thread-pool schedulers (e.g., LightGBM’s default <code>n_jobs=-1</code>) may reorder floating-point reductions.</li>
+<li><strong>Memory for large series</strong>: Creating the lag matrix duplicates the input (T × w). For T &gt; 10⁷ this can exhaust memory; chunking is the caller’s responsibility.</li>
+<li><strong>Living standards</strong>: IEC 61508 / ISO 26262 / EU AI Act references reflect the text as of 2026-04-19. Users must track subsequent amendments themselves.</li>
+</ul>
+<section id="recommendations" class="level3">
+<h3 class="anchored" data-anchor-id="recommendations">Recommendations</h3>
+<ul>
+<li>Validate every new deployment against historical ground truth before switching traffic.</li>
+<li>Always use <code>ExogBuilder</code> or <code>task_n_to_1</code> for feature construction. Do not hand-roll lag matrices.</li>
+<li>Pin <code>n_jobs=1</code> (or equivalent) on the downstream regressor when bit-level reproducibility is required.</li>
+<li>For T &gt; 10⁷, process the series in windowed chunks and re-aggregate downstream.</li>
+</ul>
+</section>
+</section>
+<section id="how-to-get-started" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-get-started">4. How to Get Started</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install spotforecast2-safe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe <span class="im">import</span> ForecasterRecursiveLGBM, ConfigEntsoe</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursiveLGBM(regressor<span class="op">=</span>LGBMRegressor(n_jobs<span class="op">=</span><span class="dv">1</span>), config<span class="op">=</span>config)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>forecaster.fit(y<span class="op">=</span>y_train, exog<span class="op">=</span>exog_train)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> forecaster.predict(steps<span class="op">=</span>config.forecast_horizon, exog<span class="op">=</span>exog_future)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A full end-to-end reference workflow (baseline + covariates + LightGBM vs.&nbsp;ground truth) is registered as a console script:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-demo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The demo source lives in <code>src/spotforecast2_safe/tasks/task_safe_demo.py</code>.</p>
+</section>
+<section id="technical-specifications" class="level2">
+<h2 class="anchored" data-anchor-id="technical-specifications">5. Technical Specifications</h2>
 <p>The core task <code>task_n_to_1</code> implements a deterministic sliding-window transformation.</p>
 <section id="mathematical-description" class="level3">
 <h3 class="anchored" data-anchor-id="mathematical-description">Mathematical Description</h3>
-<p>Given a univariate time series <span class="math inline">\(X = \{x_1, x_2, ..., x_T\}\)</span>, the system transforms this into a feature matrix <span class="math inline">\(X_{feat}\)</span> and a target vector <span class="math inline">\(y\)</span> based on the window size <span class="math inline">\(w\)</span> (lags):</p>
-<p><span class="math display">\[X_{row, t} = [x_{t-w}, x_{t-w+1}, ..., x_{t-1}] \rightarrow y_t = x_t\]</span></p>
+<p>Given a univariate time series <span class="math inline">\(X = \{x_1, x_2, \ldots, x_T\}\)</span> and a window size <span class="math inline">\(w\)</span> (lags), the system produces a feature matrix <span class="math inline">\(X_{feat}\)</span> and target vector <span class="math inline">\(y\)</span> via</p>
+<p><span class="math display">\[X_{row, t} = [x_{t-w}, x_{t-w+1}, \ldots, x_{t-1}] \rightarrow y_t = x_t.\]</span></p>
 </section>
 <section id="design-objectives" class="level3">
 <h3 class="anchored" data-anchor-id="design-objectives">Design Objectives</h3>
 <ul>
-<li><strong>Deterministic</strong>: The implementation strives to ensure that the same input always generates the exact same bit-level output.</li>
-<li><strong>Leakage-Free</strong>: The implementation aims to ensure that the target value <span class="math inline">\(y_t\)</span> is never contained within the input vector <span class="math inline">\(X_{row, t}\)</span>.</li>
+<li><strong>Deterministic</strong>: Same input → same bit-level output.</li>
+<li><strong>Leakage-free</strong>: The target <span class="math inline">\(y_t\)</span> is never contained in the corresponding input vector <span class="math inline">\(X_{row, t}\)</span>.</li>
+<li><strong>Fail-safe</strong>: Invalid input raises an explicit exception; the library never silently repairs bad data.</li>
 </ul>
 </section>
+<section id="architecture-layered" class="level3">
+<h3 class="anchored" data-anchor-id="architecture-layered">Architecture (layered)</h3>
+<p><code>forecaster/</code> (low-level estimator wrappers) → <code>preprocessing/</code> (deterministic transformers: <code>ExogBuilder</code>, <code>RepeatingBasisFunction</code>, <code>QuantileBinner</code>, <code>TimeSeriesDifferentiator</code>) → <code>model_selection/</code> (time-aware CV: <code>TimeSeriesFold</code>, <code>OneStepAheadFold</code>, <code>backtesting_forecaster</code>) → <code>manager/</code> (orchestration: <code>ForecasterRecursiveLGBM</code>, <code>ForecasterRecursiveXGB</code>, <code>ConfigEntsoe</code>) → <code>processing/</code> (high-level pipelines) → <code>tasks/</code> (console-script entry points).</p>
 </section>
-<section id="performance-robustness-design-goals" class="level2">
-<h2 class="anchored" data-anchor-id="performance-robustness-design-goals">4. Performance &amp; Robustness (Design Goals)</h2>
-<p>In the absence of “Accuracy” (as no model is trained), the following software metrics are design goals intended to support compliance with standards like IEC 61508 / EU AI Act. <strong>Users must verify these properties</strong>:</p>
-<section id="fail-safe-behavior" class="level3">
-<h3 class="anchored" data-anchor-id="fail-safe-behavior">Fail-Safe Behavior</h3>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">6. Evaluation</h2>
+<p>No training step runs inside <code>spotforecast2-safe</code> itself, so classical “accuracy” metrics do not apply to the library. The evaluation targets are software-quality metrics that support compliance with IEC 61508 / EU AI Act.</p>
+<section id="testing-data" class="level3">
+<h3 class="anchored" data-anchor-id="testing-data">Testing Data</h3>
 <ul>
-<li><strong>Input</strong>: DataFrame with <code>NaN</code> or <code>Inf</code>.</li>
-<li><strong>Behavior</strong>: Throws an explicit <code>ValueError</code>. No silent processing (Silent Failure).</li>
+<li>Docstring examples in <code>src/</code> (executed via <code>tests/test_docstring_examples_*.py</code>).</li>
+<li>Unit fixtures and integration data in <code>tests/</code> and <code>src/spotforecast2_safe/datasets/csv/</code>.</li>
+<li>The bundled ENTSO-E demo set (<code>DemoConfig.data_path</code>) for end-to-end task tests.</li>
 </ul>
 </section>
-<section id="input-validation" class="level3">
-<h3 class="anchored" data-anchor-id="input-validation">Input Validation</h3>
+<section id="factors" class="level3">
+<h3 class="anchored" data-anchor-id="factors">Factors</h3>
 <ul>
-<li><strong>Strict Checks</strong>: Type hinting and runtime checks for <code>pd.DataFrame</code> and <code>np.ndarray</code>.</li>
+<li>Input dtype (numpy vs.&nbsp;pandas, int vs.&nbsp;float vs.&nbsp;datetime index).</li>
+<li>Presence of <code>NaN</code> / <code>Inf</code> (must fail loudly).</li>
+<li>Series length (smoke-tested up to 10⁶ rows).</li>
+<li>Lag-window size and forecast horizon.</li>
 </ul>
 </section>
-<section id="cybersecurity-footprint" class="level3">
-<h3 class="anchored" data-anchor-id="cybersecurity-footprint">Cybersecurity Footprint</h3>
+<section id="metrics" class="level3">
+<h3 class="anchored" data-anchor-id="metrics">Metrics</h3>
 <ul>
-<li><strong>Minimal CVE Surface</strong>: By avoiding complex dependencies (like PyTorch or web server components), the Common Vulnerabilities and Exposures (CVE) attack surface is minimized.</li>
+<li>Functional correctness of the lag-matrix transformation (unit tests).</li>
+<li>CPE identifier generation (<code>tests/test_cpe.py</code>).</li>
+<li>Determinism: identical input must yield identical output bytes.</li>
+<li>Coverage: ≥ 80 % line coverage on new code (see <code>CONTRIBUTING.md</code>).</li>
 </ul>
 </section>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">Results</h3>
+<ul>
+<li><strong>Fail-safe behavior</strong>: DataFrames containing <code>NaN</code> or <code>Inf</code> raise <code>ValueError</code>. Public loaders (<code>load_timeseries</code>, <code>load_timeseries_forecast</code>, <code>WeatherService.get_dataframe</code>) refuse to return silently-imputed values by default. Callers must opt in to legacy forward/back-fill via <code>on_missing='ffill_bfill'</code> (loaders) or <code>fill_missing=True</code> (weather client) to restore pre-1.0 behavior.</li>
+<li><strong>Input validation</strong>: Strict type hinting plus runtime checks for <code>pd.DataFrame</code> and <code>np.ndarray</code>.</li>
+<li><strong>Cybersecurity footprint</strong>: The prohibited-dependency policy minimizes the Common Vulnerabilities and Exposures (CVE) attack surface. No web server, no deep-learning runtime, no plotting backend.</li>
+</ul>
+</section>
+</section>
+<section id="environmental-impact" class="level2">
+<h2 class="anchored" data-anchor-id="environmental-impact">7. Environmental Impact</h2>
+<p>The library itself performs no training and requires no GPU. Runtime cost is dominated by (a) NumPy/Pandas vector ops during feature engineering and (b) whatever downstream regressor the caller passes in. A typical <code>ForecasterRecursiveLGBM</code> fit on a 10⁵-row series with 168 lags completes in seconds on a single commodity CPU core; the per-inference carbon cost of the safe layer is effectively negligible next to the regressor’s own cost. No pretrained weights are shipped, so there are no embedded-training emissions to report.</p>
 </section>
 <section id="compliance-eu-ai-act-support" class="level2">
-<h2 class="anchored" data-anchor-id="compliance-eu-ai-act-support">5. Compliance &amp; EU AI Act Support</h2>
-<p>This package is designed to support the development of high-risk AI systems according to the EU AI Act. However, <strong>this package itself is not certified</strong>.</p>
+<h2 class="anchored" data-anchor-id="compliance-eu-ai-act-support">8. Compliance &amp; EU AI Act Support</h2>
+<p>This package is designed to support the development of high-risk AI systems according to the EU AI Act. <strong>The package itself is not certified</strong>; the system integrator owns full-system certification.</p>
 <ul>
-<li><strong>Transparency (Art. 13)</strong>: We strive for a fully transparent (“White Box”) code structure.</li>
-<li><strong>Accuracy &amp; Robustness (Art. 15)</strong>: The transformations are designed to be mathematically provable and reproducible, but formal verification is the user’s responsibility.</li>
-<li><strong>Data Governance (Art. 10)</strong>: The package aims to enforce clean data formats by rejecting “dirty” data, assisting in data governance efforts.</li>
+<li><strong>Art. 10 (Data Governance)</strong>: The package rejects dirty data (<code>NaN</code> / <code>Inf</code>) by default, supporting governance requirements for training and inference data quality.</li>
+<li><strong>Art. 11 (Technical Documentation)</strong>: This card plus the <code>bart26h/</code> technical report form the technical-documentation baseline. The CPE identifier in §1 feeds SBOM and vulnerability-tracking pipelines.</li>
+<li><strong>Art. 12 (Automatic Logging)</strong>: <code>spotforecast2_safe.manager.logger</code> provides a dual-handler (console + persistent file) logger; tasks emit timestamped logs under <code>~/spotforecast2_safe_models/logs/</code> for audit retention.</li>
+<li><strong>Art. 13 (Transparency)</strong>: Code is “white-box” — no compiled inference kernels, no opaque model weights.</li>
+<li><strong>Art. 15 (Accuracy &amp; Robustness)</strong>: Transformations are mathematically provable and bit-level reproducible. Formal verification remains the user’s responsibility.</li>
+</ul>
+<p>See the compliance table in the accompanying technical report (<code>bart26h/index.qmd</code>, section <em>Compliance Mapping</em>) for the authoritative mapping to IEC 61508, ISO 26262, ISA/IEC 62443, and the EU AI Act articles.</p>
+</section>
+<section id="glossary" class="level2">
+<h2 class="anchored" data-anchor-id="glossary">9. Glossary</h2>
+<ul>
+<li><strong>AGPL</strong> — Affero General Public License; copyleft license requiring source availability even for network-deployed use.</li>
+<li><strong>ASIL</strong> — Automotive Safety Integrity Level (ISO 26262).</li>
+<li><strong>CPE</strong> — Common Platform Enumeration; standardized identifier for software products in vulnerability-tracking systems.</li>
+<li><strong>CVE</strong> — Common Vulnerabilities and Exposures; public catalogue of known software vulnerabilities.</li>
+<li><strong>EU AI Act</strong> — Regulation (EU) 2024/1689 on artificial intelligence, in force since 2024-08-01.</li>
+<li><strong>IEC 61508</strong> — International Electrotechnical Commission standard for functional safety of electrical / electronic / programmable electronic safety-related systems.</li>
+<li><strong>ISA/IEC 62443</strong> — Industrial automation and control systems security standard series.</li>
+<li><strong>ISO 26262</strong> — Road-vehicle functional-safety standard.</li>
+<li><strong>SBOM</strong> — Software Bill of Materials; machine-readable inventory of a product’s components.</li>
+<li><strong>SDL</strong> — Security Development Lifecycle.</li>
+<li><strong>SIL</strong> — Safety Integrity Level (IEC 61508).</li>
 </ul>
 </section>
-<section id="caveats-limitations" class="level2">
-<h2 class="anchored" data-anchor-id="caveats-limitations">6. Caveats &amp; Limitations</h2>
+<section id="citation" class="level2">
+<h2 class="anchored" data-anchor-id="citation">10. Citation</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">spotforecast2safe</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Bartz-Beielstein, Thomas},</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {{spotforecast2-safe}: Safety-critical Subset of {spotforecast2}},</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {<span class="ch">\url</span>{https://github.com/sequential-parameter-optimization/spotforecast2-safe}},</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">note</span>         = {AGPL-3.0-or-later}</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>APA</strong>: Bartz-Beielstein, T. (2026). <em>spotforecast2-safe: Safety-critical subset of spotforecast2</em> (Version 1.0.1) [Computer software]. https://github.com/sequential-parameter-optimization/spotforecast2-safe</p>
+<p>The accompanying technical report (<code>bart26h/index.qmd</code>) is the long-form reference for design rationale, compliance mapping, and evaluation protocol.</p>
+</section>
+<section id="model-card-authors-contact" class="level2">
+<h2 class="anchored" data-anchor-id="model-card-authors-contact">11. Model Card Authors &amp; Contact</h2>
 <ul>
-<li><strong>No Extrapolation</strong>: The package prepares data; it does not predict by itself. The quality of the forecast depends on the downstream regressor (e.g., <code>scikit-learn</code> LinearRegression).</li>
-<li><strong>Memory Requirements</strong>: Creating the Lag matrix (N-to-1) can be memory-intensive for extremely large time series (<span class="math inline">\(T &gt; 10^7\)</span>) as data is duplicated.</li>
+<li>Thomas Bartz-Beielstein — ORCID <a href="https://orcid.org/0000-0002-5938-5158">0000-0002-5938-5158</a> — <code>bartzbeielstein@gmail.com</code></li>
 </ul>
+<p>This card follows the Hugging Face Model Card Guidebook taxonomy <span class="citation" data-cites="ozon22a">[@ozon22a]</span>.</p>
 </section>
 <section id="how-to-audit" class="level2">
-<h2 class="anchored" data-anchor-id="how-to-audit">7. How to Audit</h2>
+<h2 class="anchored" data-anchor-id="how-to-audit">12. How to Audit</h2>
 <p>For auditors who need to validate this package:</p>
 <ol type="1">
-<li>Check <code>pyproject.toml</code> to confirm the absence of unsafe libraries.</li>
-<li>Run <code>pytest tests/</code> to verify the functional correctness of the matrix transformation.</li>
-<li>Run <code>pytest tests/test_cpe.py</code> to verify CPE identifier generation for compliance and SBOM (Software Bill of Materials) tracking.</li>
-<li>Reference the CPE Identifier from Section 1 to include this package in vulnerability tracking systems and supply chain disclosure documents.</li>
-<li>Consult the get_cpe_identifier function in <code>src/spotforecast2_safe/utils/cpe.py</code> for CPE generation in automated workflows.</li>
+<li>Check <code>pyproject.toml</code> to confirm the absence of prohibited libraries (<code>plotly</code>, <code>matplotlib</code>, <code>spotoptim</code>, <code>optuna</code>, <code>torch</code>, <code>tensorflow</code>).</li>
+<li>Run <code>uv run pytest tests/</code> to verify functional correctness of the matrix transformation and the full test suite.</li>
+<li>Run <code>uv run pytest tests/test_cpe.py</code> to verify CPE identifier generation for compliance and SBOM tracking.</li>
+<li>Reference the CPE identifiers from §1 in vulnerability tracking systems and supply-chain disclosure documents.</li>
+<li>Consult <code>get_cpe_identifier</code> in <code>src/spotforecast2_safe/utils/cpe.py</code> for CPE generation in automated workflows.</li>
+<li>Run <code>uv run reuse lint</code> to confirm SPDX/REUSE licensing compliance.</li>
 </ol>
 </section>
 <section id="disclaimer-liability" class="level2">
-<h2 class="anchored" data-anchor-id="disclaimer-liability">8. Disclaimer &amp; Liability</h2>
+<h2 class="anchored" data-anchor-id="disclaimer-liability">13. Disclaimer &amp; Liability</h2>
 <p><strong>LIMITATION OF LIABILITY</strong>: While this library is designed with safety principles and deterministic logic in mind, it is provided “AS IS” without any warranties. The developers and contributors assume <strong>NO LIABILITY</strong> for any direct or indirect damages, system failures, or financial losses resulting from the use of this software.</p>
 <p>It is the sole responsibility of the system integrator to perform a full system-level safety validation (e.g., as per ISO 26262, IEC 61508, or the EU AI Act) before deploying this software in a production or safety-critical environment.</p>
 
