@@ -1334,6 +1334,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#spotforecast2_safe.manager.logger" id="toc-spotforecast2_safe.manager.logger" class="nav-link active" data-scroll-target="#spotforecast2_safe.manager.logger">manager.logger</a>
   <ul class="collapse">
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul class="collapse">
+  <li><a href="#spotforecast2_safe.manager.logger.JsonAuditFormatter" id="toc-spotforecast2_safe.manager.logger.JsonAuditFormatter" class="nav-link" data-scroll-target="#spotforecast2_safe.manager.logger.JsonAuditFormatter">JsonAuditFormatter</a></li>
+  </ul></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.manager.logger.setup_logging" id="toc-spotforecast2_safe.manager.logger.setup_logging" class="nav-link" data-scroll-target="#spotforecast2_safe.manager.logger.setup_logging">setup_logging</a></li>
@@ -1352,6 +1356,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="spotforecast2_safe.manager.logger" class="level1">
 <h1>manager.logger</h1>
 <p><code>manager.logger</code></p>
+<p>Audit-grade logging for spotforecast2-safe.</p>
+<p>This module sets up a dual-handler logger: a console handler for humans and a file handler that writes one JSON object per line, conforming to the schema at <code>audit_log_schema.json</code> next to this file. The file is the compliance-relevant sink (EU AI Act Article 12, IEC 62443-4-2 SAR 6.1, IEC 61508-3 §7.4.7); the console handler is plaintext for interactive use.</p>
+<p>Schema versioning rule: <code>SCHEMA_VERSION</code> is loaded directly from <code>audit_log_schema.json</code> at import time, so there is exactly one source of truth. Any change to the schema file is guarded by the CI job <code>audit-log-schema-gate</code> (<code>.github/workflows/ci.yml</code>), which rejects a pull request that touches the schema without a Conventional-Commits breaking-change marker (<code>type!:</code>) on at least one commit. That marker cascades to a MAJOR semantic-release bump.</p>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.manager.logger.JsonAuditFormatter">JsonAuditFormatter</a></td>
+<td>Format <code>LogRecord</code> instances as single-line JSON per audit_log_schema.json.</td>
+</tr>
+</tbody>
+</table>
+<section id="spotforecast2_safe.manager.logger.JsonAuditFormatter" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.manager.logger.JsonAuditFormatter">JsonAuditFormatter</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>manager.logger.JsonAuditFormatter()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Format <code>LogRecord</code> instances as single-line JSON per audit_log_schema.json.</p>
+<p>The formatter emits exactly the fields named in the schema’s <code>properties</code> section, never more. Callers pass optional structured context through the standard <code>logging</code> <code>extra=</code> mechanism; recognised extras are <code>event</code>, <code>task</code>, and <code>context</code>.</p>
+</section>
+</section>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="caption-top table">
@@ -1364,15 +1394,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="#spotforecast2_safe.manager.logger.setup_logging">setup_logging</a></td>
-<td>Configure robust logging for safety-critical execution.</td>
+<td>Configure dual-handler logging for safety-critical execution.</td>
 </tr>
 </tbody>
 </table>
 <section id="spotforecast2_safe.manager.logger.setup_logging" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.manager.logger.setup_logging">setup_logging</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>manager.logger.setup_logging(level<span class="op">=</span>logging.INFO, log_dir<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Configure robust logging for safety-critical execution.</p>
-<p>Sets up both a stream (stdout) and an optional informative file handler. Always logs INFO level or higher to the file, regardless of console level.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>manager.logger.setup_logging(level<span class="op">=</span>logging.INFO, log_dir<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Configure dual-handler logging for safety-critical execution.</p>
+<p>Attaches a stream handler (stdout, human-readable plaintext) and, when <code>log_dir</code> is provided, a file handler that writes JSON records per <code>audit_log_schema.json</code>. The console handler honours <code>level</code>; the file handler is always at <code>INFO</code> so the audit trail stays complete even when the operator silences the console.</p>
 <section id="parameters" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
@@ -1388,13 +1418,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>level</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Logging level for console output. Default: logging.INFO</td>
+<td>Logging level for console output. Default: <code>logging.INFO</code>.</td>
 <td><code>logging.INFO</code></td>
 </tr>
 <tr class="even">
 <td>log_dir</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]</td>
-<td>Optional directory for log files. If provided, creates timestamped log files.</td>
+<td>Optional directory for the audit log file. If provided, a timestamped <code>task_safe_n_to_1_YYYYMMDD_HHMMSS.log</code> file is created and receives JSON-formatted records.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>
@@ -1413,77 +1443,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a>[<a href="https://docs.python.org/3/library/logging.html#module-logging">logging</a>.<a href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]]</td>
-<td>Tuple[logging.Logger, Optional[Path]]: Logger instance and optional log file path.</td>
+<td><a href="https://docs.python.org/3/library/logging.html#module-logging">logging</a>.<a href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></td>
+<td>Tuple of the configured logger and the audit log file path (or</td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="raises" class="level4 doc-section doc-section-raises">
-<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 76%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
+<tr class="even">
 <td></td>
-<td>None</td>
-<td>Warnings are logged if file handler creation fails.</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td><code>None</code> if <code>log_dir</code> was omitted).</td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="examples" class="level4 doc-section doc-section-examples">
-<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> logging</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> tempfile</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.manager.logger <span class="im">import</span> setup_logging</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 1: Basic console-only logging</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> logger, log_path <span class="op">=</span> setup_logging(level<span class="op">=</span>logging.INFO)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Logger name: </span><span class="sc">{</span>logger<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>Logger name: task_safe_n_to_1</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Log file path: </span><span class="sc">{</span>log_path<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>Log <span class="bu">file</span> path: <span class="va">None</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 2: File and console logging for audit trail</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmpdir:</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>...     log_dir <span class="op">=</span> Path(tmpdir)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>...     logger, log_path <span class="op">=</span> setup_logging(level<span class="op">=</span>logging.DEBUG, log_dir<span class="op">=</span>log_dir)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>...     logger.info(<span class="st">"Model training started"</span>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>...     logger.debug(<span class="st">"Hyperparameter: learning_rate=0.01"</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="ss">f"Log file created: </span><span class="sc">{</span>log_path<span class="sc">.</span>exists()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="ss">f"Log file suffix: </span><span class="sc">{</span>log_path<span class="sc">.</span>suffix<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>Log <span class="bu">file</span> created: <span class="va">True</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>Log <span class="bu">file</span> suffix: .log</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 3: Verify log levels and file creation</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmpdir:</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>...     logger, log_path <span class="op">=</span> setup_logging(log_dir<span class="op">=</span>Path(tmpdir))</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>...     <span class="co"># Verify logger is configured</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">assert</span> logger.name <span class="op">==</span> <span class="st">"task_safe_n_to_1"</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">assert</span> log_path <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">or</span> <span class="bu">len</span>(logger.handlers) <span class="op">&gt;</span> <span class="dv">0</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">"Logger configured successfully"</span>)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>Logger configured successfully</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 4: Safety-critical scenario - file path verification</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmpdir:</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>...     _, log_path <span class="op">=</span> setup_logging(log_dir<span class="op">=</span>Path(tmpdir))</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>...     <span class="co"># In actual usage, log_path may be None if called multiple times</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>...     <span class="co"># First call creates file, subsequent calls reuse handlers</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">"Logging system ready for audit trail"</span>)</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>Logging system ready <span class="cf">for</span> audit trail</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
