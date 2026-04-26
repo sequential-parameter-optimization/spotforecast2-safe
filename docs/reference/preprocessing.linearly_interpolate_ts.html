@@ -1371,19 +1371,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS">LinearlyInterpolateTS</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS(on_missing<span class="op">=</span><span class="st">'raise'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Transformer that applies linear interpolation to time series data.</p>
-<p>This transformer fills missing values using linear interpolation and forward-fills any remaining gaps (e.g., at the end of the series).</p>
+<p>The transformer always runs <code>y.interpolate(method="linear")</code> first. The <code>on_missing</code> keyword then chooses how to handle any NaN that linear interpolation cannot bridge (typically the leading and trailing endpoints of the series).</p>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 14%">
+<col style="width: 81%">
+<col style="width: 1%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>on_missing</td>
+<td><code>OnMissing</code></td>
+<td>Contract for residual NaN after linear interpolation. - <code>"raise"</code> (default, fail-safe): raise <code>ValueError</code> if any NaN remains. Refuses to silently embed imputed values disguised as measurements. - <code>"ffill_bfill"</code>: explicit opt-in to endpoint forward-then-backward fill, so that leading and trailing NaNs are both bridged. - <code>"passthrough"</code>: return the linearly interpolated series unchanged. The caller promises to handle the residual NaN downstream.</td>
+<td><code>'raise'</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
+<td>If <code>on_missing</code> is not one of the three accepted values, or if <code>on_missing="raise"</code> (the default) and any NaN remains after linear interpolation.</td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing.linearly_interpolate_ts <span class="im">import</span> LinearlyInterpolateTS</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s <span class="op">=</span> pd.Series([<span class="fl">1.0</span>, np.nan, <span class="fl">3.0</span>, np.nan])</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> interpolator <span class="op">=</span> LinearlyInterpolateTS()</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s_filled <span class="op">=</span> interpolator.fit_transform(s)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s_filled.tolist()</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">3.0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing.linearly_interpolate_ts <span class="im">import</span> LinearlyInterpolateTS</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Interior gaps are bridged by linear interpolation under every mode; the default <code>"raise"</code> then succeeds because nothing remains:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s <span class="op">=</span> pd.Series([<span class="fl">1.0</span>, np.nan, <span class="fl">3.0</span>])</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> LinearlyInterpolateTS().fit_transform(s).tolist()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Endpoint NaNs are bridged only when the caller opts in explicitly:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s <span class="op">=</span> pd.Series([<span class="fl">1.0</span>, np.nan, <span class="fl">3.0</span>, np.nan])</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> LinearlyInterpolateTS(on_missing<span class="op">=</span><span class="st">"ffill_bfill"</span>).fit_transform(s).tolist()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">3.0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>"passthrough"</code> lets the residual NaN survive for the caller to handle:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> out <span class="op">=</span> LinearlyInterpolateTS(on_missing<span class="op">=</span><span class="st">"passthrough"</span>).fit_transform(s)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">bool</span>(out.isna().iloc[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="methods" class="level4">
 <h4 class="anchored" data-anchor-id="methods">Methods</h4>
@@ -1397,7 +1450,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="#spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.apply">apply</a></td>
-<td>Apply linear interpolation and forward-fill.</td>
+<td>Apply linear interpolation and dispatch on <code>on_missing</code>.</td>
 </tr>
 <tr class="even">
 <td><a href="#spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.fit">fit</a></td>
@@ -1411,10 +1464,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.apply" class="level5">
 <h5 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.apply">apply</h5>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.<span class="bu">apply</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Apply linear interpolation and forward-fill.</p>
-<section id="parameters" class="level6 doc-section doc-section-parameters">
-<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h6>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.<span class="bu">apply</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Apply linear interpolation and dispatch on <code>on_missing</code>.</p>
+<section id="parameters-1" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1448,7 +1501,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>Union[pd.Series, pd.DataFrame]: Interpolated and ffilled data.</td>
+<td>Union[pd.Series, pd.DataFrame]: The transformed data. For</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
+<td><code>on_missing="ffill_bfill"</code> any residual endpoint NaN has</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
+<td>been forward- and back-filled; for <code>"passthrough"</code> it</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
+<td>survives; for <code>"raise"</code> (the default) the method raises</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
+<td>instead of returning a NaN-bearing result.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-1" class="level6 doc-section doc-section-raises">
+<h6 class="doc-section doc-section-raises anchored" data-anchor-id="raises-1">Raises</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
+<td>If <code>self.on_missing</code> is not a recognized value, or if <code>self.on_missing == "raise"</code> and any NaN remains after linear interpolation.</td>
 </tr>
 </tbody>
 </table>
@@ -1456,10 +1548,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.fit" class="level5">
 <h5 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.fit">fit</h5>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.fit(X, y<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.fit(X, y<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fitted transformer (no-op).</p>
-<section id="parameters-1" class="level6 doc-section doc-section-parameters">
-<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
+<section id="parameters-2" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1507,10 +1599,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.transform" class="level5">
 <h5 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.transform">transform</h5>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.transform(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>preprocessing.linearly_interpolate_ts.LinearlyInterpolateTS.transform(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Transform the input data by applying linear interpolation.</p>
-<section id="parameters-2" class="level6 doc-section doc-section-parameters">
-<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h6>
+<section id="parameters-3" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1544,7 +1636,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>Union[pd.Series, pd.DataFrame]: Interpolated data.</td>
+<td>Union[pd.Series, pd.DataFrame]: Interpolated data, with</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
+<td>residual NaN handled according to <code>self.on_missing</code>.</td>
 </tr>
 </tbody>
 </table>
