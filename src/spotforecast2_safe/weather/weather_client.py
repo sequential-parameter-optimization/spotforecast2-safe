@@ -72,6 +72,18 @@ class WeatherClient:
     Args:
         latitude: Latitude of the location.
         longitude: Longitude of the location.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.weather import WeatherClient
+        client = WeatherClient(latitude=52.52, longitude=13.405)
+        df = client.fetch_archive(
+            start=pd.Timestamp("2023-01-01", tz="UTC"),
+            end=pd.Timestamp("2023-01-02", tz="UTC"),
+        )
+        print(df.head())
+        ```
     """
 
     ARCHIVE_BASE_URL = "https://archive-api.open-meteo.com/v1/archive"
@@ -106,8 +118,7 @@ class WeatherClient:
             ```{python}
             from spotforecast2_safe.weather import WeatherClient
             client = WeatherClient(latitude=52.52, longitude=13.405)
-            df = client.get_dataframe(start="2023-01-01", end="2023-01-07")
-            print(df.head())
+            client.latitude, client.longitude
             ```
         """
         self.latitude = latitude
@@ -184,6 +195,14 @@ class WeatherClient:
         Args:
             days_ahead: Number of days ahead for the forecast.
             timezone: Timezone for the data (default "UTC").
+
+        Examples:
+            ```{python}
+            from spotforecast2_safe.weather import WeatherClient
+            client = WeatherClient(latitude=52.52, longitude=13.405)
+            df = client.fetch_forecast(days_ahead=7)
+            print(df.head())
+            ```
         """
         params = {
             "latitude": self.latitude,
