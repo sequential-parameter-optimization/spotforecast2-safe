@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.0...v3.0.1) (2026-05-13)
+
+
+### Code Refactoring
+
+* **manager:** drop unused _BASE_LOGRECORD_ATTRS in logger ([b29f876](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b29f8760c0ca1e227958f795c367cc0a740742d1))
+
 ## [3.0.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.0...v3.0.1-rc.1) (2026-05-13)
 
 
