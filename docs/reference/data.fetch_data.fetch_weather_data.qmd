@@ -10,6 +10,7 @@ data.fetch_data.fetch_weather_data(
     freq='h',
     fallback_on_failure=True,
     cache_home=None,
+    fill_missing=False,
 )
 ```
 
@@ -33,6 +34,7 @@ is performed.
 | freq                | [str](`str`)                                                                                     | Frequency of the weather data.                                                                                                                                             | `'h'`      |
 | fallback_on_failure | [bool](`bool`)                                                                                   | Whether to use fallback data in case of failure.                                                                                                                           | `True`     |
 | cache_home          | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional path to cache directory.  When provided, fetched weather data is cached in ``<cache_home>/weather_cache.parquet``.  When None (default), no caching is performed. | `None`     |
+| fill_missing        | [bool](`bool`)                                                                                   | Whether to forward- and back-fill remaining NaN gaps (default False).  Forwarded to ``WeatherService.get_dataframe``; see its docstring.                                   | `False`    |
 
 ## Returns {.doc-section .doc-section-returns}
 

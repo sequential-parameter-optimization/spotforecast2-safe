@@ -1,19 +1,25 @@
 # data.fetch_data.load_timeseries_forecast { #spotforecast2_safe.data.fetch_data.load_timeseries_forecast }
 
 ```python
-data.fetch_data.load_timeseries_forecast(data_home=None)
+data.fetch_data.load_timeseries_forecast(data_home=None, on_missing='raise')
 ```
 
 Load the day-ahead forecast time series from ``interim/energy_load.csv``.
-Reads the ``Forecasted Load`` column, converts the index to a UTC
-``DatetimeIndex`` with hourly frequency, and fills any missing
-values with forward/backward fill.
+
+Reads the ``Forecasted Load`` column and converts the index to a
+UTC ``DatetimeIndex`` with hourly frequency.  Missing values are
+**rejected** by default so callers cannot accidentally feed
+imputed values into downstream safety-critical pipelines.  Pass
+``on_missing='ffill_bfill'`` to opt into the legacy
+forward/backward fill behavior that was the default before the
+1.0 major release.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                                                             | Description                                                      | Default   |
-|-----------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------|-----------|
-| data_home | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Root data directory.  If None, resolved via ``get_data_home()``. | `None`    |
+| Name       | Type                                                                                             | Description                                                                                                                                          | Default   |
+|------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| data_home  | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Root data directory.  If None, resolved via ``get_data_home()``.                                                                                     | `None`    |
+| on_missing | [OnMissing](`spotforecast2_safe.data.fetch_data.OnMissing`)                                      | How to handle NaN rows in ``Forecasted Load``. ``'raise'`` (default) fails fast with the gap timestamps; ``'ffill_bfill'`` forward- then back-fills. | `'raise'` |
 
 ## Returns {.doc-section .doc-section-returns}
 
@@ -23,10 +29,11 @@ values with forward/backward fill.
 
 ## Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                                     | Description                                    |
-|--------|------------------------------------------|------------------------------------------------|
-|        | [FileNotFoundError](`FileNotFoundError`) | If ``interim/energy_load.csv`` does not exist. |
-|        | [KeyError](`KeyError`)                   | If ``Forecasted Load`` column is not present.  |
+| Name   | Type                                     | Description                                        |
+|--------|------------------------------------------|----------------------------------------------------|
+|        | [FileNotFoundError](`FileNotFoundError`) | If ``interim/energy_load.csv`` does not exist.     |
+|        | [KeyError](`KeyError`)                   | If ``Forecasted Load`` column is not present.      |
+|        | [ValueError](`ValueError`)               | If ``on_missing='raise'`` and the series has NaNs. |
 
 ## Examples {.doc-section .doc-section-examples}
 
