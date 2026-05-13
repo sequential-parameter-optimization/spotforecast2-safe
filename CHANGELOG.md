@@ -1,3 +1,15 @@
+## [3.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.1...v3.0.2) (2026-05-13)
+
+
+### Bug Fixes
+
+* **weather:** repair broken docstring examples in WeatherClient ([921852a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/921852a79b80d859d1d6a6b08f5683d529c94449))
+
+
+### Documentation
+
+* regenerate stale quartodoc reference pages ([93102f4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/93102f4f3ebdaa833694a85be57a723b6e68215a))
+
 ## [3.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.0...v3.0.1) (2026-05-13)
 
 
