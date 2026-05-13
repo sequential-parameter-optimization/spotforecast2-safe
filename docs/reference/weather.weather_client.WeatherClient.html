@@ -1332,27 +1332,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.weather.weather_client.WeatherClient" id="toc-spotforecast2_safe.weather.weather_client.WeatherClient" class="nav-link active" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherClient">weather.weather_client.WeatherClient</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive" id="toc-spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive" class="nav-link" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive">fetch_archive</a></li>
   <li><a href="#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast" id="toc-spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast" class="nav-link" data-scroll-target="#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast">fetch_forecast</a></li>
   </ul></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/weather.weather_client.WeatherClient.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/weather.html">Weather</a></li><li class="breadcrumb-item"><a href="../../docs/reference/weather.weather_client.WeatherClient.html">WeatherClient</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/weather.html">Weather</a></li><li class="breadcrumb-item"><a href="../../docs/reference/weather.weather_client.WeatherClient.html">WeatherClient</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">weather.weather_client.WeatherClient</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.weather.weather_client.WeatherClient" class="level1">
-<h1>weather.weather_client.WeatherClient</h1>
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient(latitude, longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Client for fetching weather data from Open-Meteo API. Handles the low-level API interactions, parameter building, and response parsing.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1382,6 +1394,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="8d46a2eb" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.fetch_archive(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>pd.Timestamp(<span class="st">"2023-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span>pd.Timestamp(<span class="st">"2023-01-02"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     temperature_2m  relative_humidity_2m  precipitation  \
+datetime                                                                   
+2023-01-01 00:00:00            15.2                    59            0.0   
+2023-01-01 01:00:00            15.6                    55            0.0   
+2023-01-01 02:00:00            15.7                    52            0.0   
+2023-01-01 03:00:00            15.8                    51            0.0   
+2023-01-01 04:00:00            15.8                    49            0.0   
+
+                     rain  snowfall  weather_code  pressure_msl  \
+datetime                                                          
+2023-01-01 00:00:00   0.0       0.0             3        1010.8   
+2023-01-01 01:00:00   0.0       0.0             3        1010.9   
+2023-01-01 02:00:00   0.0       0.0             3        1011.3   
+2023-01-01 03:00:00   0.0       0.0             3        1011.3   
+2023-01-01 04:00:00   0.0       0.0             3        1011.5   
+
+                     surface_pressure  cloud_cover  cloud_cover_low  \
+datetime                                                              
+2023-01-01 00:00:00            1006.4          100                0   
+2023-01-01 01:00:00            1006.5          100               12   
+2023-01-01 02:00:00            1006.9          100                8   
+2023-01-01 03:00:00            1006.9          100                1   
+2023-01-01 04:00:00            1007.1           85                0   
+
+                     cloud_cover_mid  cloud_cover_high  wind_speed_10m  \
+datetime                                                                 
+2023-01-01 00:00:00               14               100            30.5   
+2023-01-01 01:00:00               76               100            30.7   
+2023-01-01 02:00:00               25               100            31.3   
+2023-01-01 03:00:00              100                97            28.4   
+2023-01-01 04:00:00               32                78            28.3   
+
+                     wind_direction_10m  wind_gusts_10m  
+datetime                                                 
+2023-01-01 00:00:00                 232            49.7  
+2023-01-01 01:00:00                 231            52.2  
+2023-01-01 02:00:00                 232            52.2  
+2023-01-01 03:00:00                 231            52.2  
+2023-01-01 04:00:00                 223            47.9  </code></pre>
+</div>
+</div>
+</section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
 <table class="caption-top table">
@@ -1404,7 +1470,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive">fetch_archive</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_archive(start, end, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_archive(start, end, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fetch historical data from Archive API.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -1442,7 +1508,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast">fetch_forecast</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_forecast(days_ahead, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_forecast(days_ahead, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fetch forecast data from Forecast API.</p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -1470,9 +1536,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-
-
 </section>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div id="b0380a29" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.fetch_forecast(days_ahead<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     temperature_2m  relative_humidity_2m  precipitation  \
+datetime                                                                   
+2026-05-13 00:00:00             7.1                    81            0.0   
+2026-05-13 01:00:00             6.5                    86            0.0   
+2026-05-13 02:00:00             6.3                    86            0.0   
+2026-05-13 03:00:00             6.3                    87            0.0   
+2026-05-13 04:00:00             6.4                    84            0.0   
+
+                     rain  snowfall  weather_code  pressure_msl  \
+datetime                                                          
+2026-05-13 00:00:00   0.0       0.0             3        1006.9   
+2026-05-13 01:00:00   0.0       0.0             3        1006.1   
+2026-05-13 02:00:00   0.0       0.0             3        1005.4   
+2026-05-13 03:00:00   0.0       0.0             3        1005.1   
+2026-05-13 04:00:00   0.0       0.0             3        1004.0   
+
+                     surface_pressure  cloud_cover  cloud_cover_low  \
+datetime                                                              
+2026-05-13 00:00:00            1002.4           99                0   
+2026-05-13 01:00:00            1001.6           89                8   
+2026-05-13 02:00:00            1000.9           98               41   
+2026-05-13 03:00:00            1000.6           99                0   
+2026-05-13 04:00:00             999.5           98               60   
+
+                     cloud_cover_mid  cloud_cover_high  wind_speed_10m  \
+datetime                                                                 
+2026-05-13 00:00:00               99                 0             9.7   
+2026-05-13 01:00:00               85                 0             8.5   
+2026-05-13 02:00:00               95                 0             6.7   
+2026-05-13 03:00:00               99                 0             6.7   
+2026-05-13 04:00:00               95                 0             6.9   
+
+                     wind_direction_10m  wind_gusts_10m  
+datetime                                                 
+2026-05-13 00:00:00                 268            25.6  
+2026-05-13 01:00:00                 258            21.6  
+2026-05-13 02:00:00                 254            18.4  
+2026-05-13 03:00:00                 234            15.5  
+2026-05-13 04:00:00                 227            16.6  </code></pre>
+</div>
+</div>
+
+
 </section>
 </section>
 </section>
