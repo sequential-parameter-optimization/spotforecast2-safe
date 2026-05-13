@@ -14,6 +14,19 @@ Handles the low-level API interactions, parameter building, and response parsing
 | latitude  | [float](`float`) | Latitude of the location.  | _required_ |
 | longitude | [float](`float`) | Longitude of the location. | _required_ |
 
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather import WeatherClient
+client = WeatherClient(latitude=52.52, longitude=13.405)
+df = client.fetch_archive(
+    start=pd.Timestamp("2023-01-01", tz="UTC"),
+    end=pd.Timestamp("2023-01-02", tz="UTC"),
+)
+print(df.head())
+```
+
 ## Methods
 
 | Name | Description |
@@ -51,3 +64,12 @@ Fetch forecast data from Forecast API.
 |------------|--------------|----------------------------------------|------------|
 | days_ahead | [int](`int`) | Number of days ahead for the forecast. | _required_ |
 | timezone   | [str](`str`) | Timezone for the data (default "UTC"). | `'UTC'`    |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.weather import WeatherClient
+client = WeatherClient(latitude=52.52, longitude=13.405)
+df = client.fetch_forecast(days_ahead=7)
+print(df.head())
+```

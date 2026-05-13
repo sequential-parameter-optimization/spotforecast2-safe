@@ -38,18 +38,31 @@ weather.weather_client.WeatherService.get_dataframe(
     timezone='UTC',
     freq='h',
     fallback_on_failure=True,
+    fill_missing=False,
 )
 ```
 
 Get weather DataFrame for a specified range using best available methods.
-Refactored from spotpredict.create_weather_df.
+
+Refactored from spotpredict.create_weather_df.  Since the 1.0
+major release, remaining gaps after fetch are **rejected** by
+default so that synthesised values never reach downstream
+consumers labelled as measurements.  Pass ``fill_missing=True``
+to opt into the legacy forward/back-fill behavior.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name                | Type                                                                                    | Description                                             | Default    |
-|---------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------|------------|
-| start               | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start date for the data.                                | _required_ |
-| end                 | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | End date for the data.                                  | _required_ |
-| timezone            | [str](`str`)                                                                            | Timezone for the data (default "UTC").                  | `'UTC'`    |
-| freq                | [str](`str`)                                                                            | Frequency for the data (default "h").                   | `'h'`      |
-| fallback_on_failure | [bool](`bool`)                                                                          | Whether to use fallback data on failure (default True). | `True`     |
+| Name                | Type                                                                                    | Description                                                                                                                                                                                      | Default    |
+|---------------------|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| start               | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start date for the data.                                                                                                                                                                         | _required_ |
+| end                 | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | End date for the data.                                                                                                                                                                           | _required_ |
+| timezone            | [str](`str`)                                                                            | Timezone for the data (default "UTC").                                                                                                                                                           | `'UTC'`    |
+| freq                | [str](`str`)                                                                            | Frequency for the data (default "h").                                                                                                                                                            | `'h'`      |
+| fallback_on_failure | [bool](`bool`)                                                                          | Whether to use fallback data on failure (default True).                                                                                                                                          | `True`     |
+| fill_missing        | [bool](`bool`)                                                                          | Whether to forward- and back-fill remaining NaN gaps after fetch/resample (default False).  When False (the fail-safe default), any remaining NaN raises ``ValueError`` with the gap timestamps. | `False`    |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                        |
+|--------|----------------------------|------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If ``fill_missing=False`` and the merged frame still contains NaNs after resample. |
