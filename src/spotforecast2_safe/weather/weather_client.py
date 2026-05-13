@@ -274,6 +274,18 @@ class WeatherService(WeatherClient):
         Raises:
             ValueError: If ``fill_missing=False`` and the merged frame
                 still contains NaNs after resample.
+
+        Examples:
+             ```{python}
+             import pandas as pd
+             from spotforecast2_safe.weather import WeatherService
+             client = WeatherService(latitude=51.0267, longitude=7.5693)
+             # get the weather data for the last week, using the cache if available, and filling any remaining gaps
+             start = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=7)
+             end = pd.Timestamp.now(tz="UTC")
+             df = client.get_dataframe(start=start, end=end, fill_missing=False)
+             print(df.head())
+             ```
         """
         start_ts = pd.Timestamp(start)
         end_ts = pd.Timestamp(end)
