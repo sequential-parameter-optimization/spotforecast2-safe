@@ -37,8 +37,6 @@ _SCHEMA_PATH = Path(__file__).resolve().parent / "audit_log_schema.json"
 _AUDIT_SCHEMA: dict[str, Any] = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
 SCHEMA_VERSION: str = _AUDIT_SCHEMA["properties"]["schema_version"]["const"]
 
-_BASE_LOGRECORD_ATTRS = frozenset(vars(logging.LogRecord("", 0, "", 0, "", None, None)).keys()) | {"message", "asctime"}
-
 
 class JsonAuditFormatter(logging.Formatter):
     """Format ``LogRecord`` instances as single-line JSON per audit_log_schema.json.

@@ -33,6 +33,19 @@ on:
   workflow_dispatch:
 
 # ---------------------------------------------------------------------------
+# Serialise gh-pages publishers across workflows.
+# Both this workflow and release.yml push to gh-pages via
+# quarto-actions/publish.  Without a shared concurrency group they race
+# on a push to main and the loser fails non-fast-forward
+# ("cannot lock ref 'refs/heads/gh-pages'").  cancel-in-progress: false
+# is mandatory: cancelling release.yml mid-run would skip the PyPI
+# publish step.
+# ---------------------------------------------------------------------------
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+# ---------------------------------------------------------------------------
 # Principle of Least Privilege: base permissions are read-only.
 # The deploy job elevates only what it needs (contents: write).
 # ---------------------------------------------------------------------------

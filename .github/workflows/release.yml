@@ -6,6 +6,16 @@ on:
       - main
       - develop
 
+# Serialise gh-pages publishers across workflows.
+# Both this workflow and docs.yml push to gh-pages via
+# quarto-actions/publish.  Without a shared concurrency group they race
+# on a push to main and the loser fails non-fast-forward
+# ("cannot lock ref 'refs/heads/gh-pages'").  cancel-in-progress: false
+# is mandatory: cancelling release mid-run would skip the PyPI publish.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 # Principle of Least Privilege: Base permissions are read-only
 permissions: read-all
 
@@ -33,7 +43,7 @@ jobs:
           python-version: "3.13"
       
       - name: Set up uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5.4.2
 
       - name: Resolve dependency graph
         # uv.lock is not checked in. Regenerate it so tests/test_prohibited_dependencies.py
@@ -96,9 +106,7 @@ jobs:
         # permission; no long-lived secrets. Signature bundles land in the
         # public Rekor transparency log and are written next to each input
         # as ``<input>.sigstore`` (or ``.sigstore.json`` in v3+).
-        # TODO(supply-chain): pin this action to a commit SHA (the rest of
-        # the workflow uses SHA pins) before the next production release.
-        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46  # v3.0.0
         with:
           inputs: |
             ./dist/*.whl
