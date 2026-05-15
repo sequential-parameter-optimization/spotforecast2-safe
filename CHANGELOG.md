@@ -1,29 +1,14 @@
-## [5.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v4.1.0...v5.0.0) (2026-05-15)
+## [5.0.0-rc.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.0-rc.2...v5.0.0-rc.3) (2026-05-15)
 
-
-### ⚠ BREAKING CHANGES
-
-*   spotforecast2_safe.holiday and spotforecast2_safe.manager.exo.calendar
-  no longer exist. Import from spotforecast2_safe.calendar instead.
-  Manager and manager.exo no longer re-export the calendar functions.
-
-  data.fetch_data.fetch_holiday_data remains as a public helper.
-
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 
 ### Bug Fixes
 
-* **docs:** unbreak demo_loader render by removing \n escapes in {python} blocks ([cf6fa98](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cf6fa98f261e878accf4abbcbdcc5fbf18fc7ab7))
+* **docs:** pass on_missing='ffill_bfill' in load_timeseries examples ([e298a68](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e298a68f20c6546a6f7f55c95717bd89e2d5e837)), closes [#153](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/153)
 
 
 ### Documentation
 
 * **contributing:** require full local verification before pushing ([fd78870](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/fd788705e3dd3f8e5121d540e3948d3f7eaee548))
-
-
-### Code Refactoring
-
-* consolidate holiday and manager.exo.calendar into calendar/ ([53573f5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/53573f50d1454f538f5fd79ec30206ce0bbdb09f))
 
 ## [5.0.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.0-rc.1...v5.0.0-rc.2) (2026-05-15)
 
