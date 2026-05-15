@@ -8,8 +8,8 @@ from typing import Literal, Optional, Union
 import pandas as pd
 from pandas import Timestamp
 
+from spotforecast2_safe.holiday import create_holiday_df
 from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
-from spotforecast2_safe.utils.generate_holiday import create_holiday_df
 from spotforecast2_safe.weather.weather_client import WeatherService
 
 OnMissing = Literal["raise", "ffill_bfill", "passthrough"]
