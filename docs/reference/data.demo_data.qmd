@@ -1,6 +1,6 @@
-# manager.datasets.demo_data { #spotforecast2_safe.manager.datasets.demo_data }
+# data.demo_data { #spotforecast2_safe.data.demo_data }
 
-`manager.datasets.demo_data`
+`data.demo_data`
 
 Demo dataset configuration for safety-critical forecasting tasks.
 
@@ -11,12 +11,12 @@ parameters in demonstration and production forecasting workflows.
 
 | Name | Description |
 | --- | --- |
-| [DemoConfig](#spotforecast2_safe.manager.datasets.demo_data.DemoConfig) | Configuration for the safety-critical demo task. |
+| [DemoConfig](#spotforecast2_safe.data.demo_data.DemoConfig) | Configuration for the safety-critical demo task. |
 
-### DemoConfig { #spotforecast2_safe.manager.datasets.demo_data.DemoConfig }
+### DemoConfig { #spotforecast2_safe.data.demo_data.DemoConfig }
 
 ```python
-manager.datasets.demo_data.DemoConfig(
+data.demo_data.DemoConfig(
     data_path=(lambda: get_package_data_home() / 'demo11.csv')(),
     model_root=(lambda: Path.home() / 'spotforecast2_safe_models')(),
     log_root=(lambda: Path.home() / 'spotforecast2_safe_models' / 'logs')(),
@@ -56,7 +56,7 @@ overridden during initialization.
 
 ```python
 >>> from pathlib import Path
->>> from spotforecast2_safe.manager.datasets.demo_data import DemoConfig
+>>> from spotforecast2_safe.data.demo_data import DemoConfig
 >>>
 >>> # Example 1: Use default configuration
 >>> config = DemoConfig()

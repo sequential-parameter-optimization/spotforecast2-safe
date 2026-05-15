@@ -13,7 +13,7 @@ from typing import List, Optional
 
 import pandas as pd
 
-from spotforecast2_safe.manager.datasets.demo_data import DemoConfig
+from spotforecast2_safe.data.demo_data import DemoConfig
 from spotforecast2_safe.processing.agg_predict import agg_predict
 
 
@@ -53,8 +53,8 @@ def load_actual_combined(
         >>> import tempfile
         >>> import pandas as pd
         >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.datasets.demo_data import DemoConfig
-        >>> from spotforecast2_safe.manager.datasets.demo_loader import load_actual_combined
+        >>> from spotforecast2_safe.data.demo_data import DemoConfig
+        >>> from spotforecast2_safe.data.demo_loader import load_actual_combined
         >>>
         >>> # Example 1: Basic usage with default config parameters
         >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:

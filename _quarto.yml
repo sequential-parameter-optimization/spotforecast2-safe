@@ -101,6 +101,10 @@ website:
                 file: docs/reference/data.fetch_data.load_timeseries.qmd
               - text: "load_timeseries_forecast"
                 file: docs/reference/data.fetch_data.load_timeseries_forecast.qmd
+              - text: "demo_data"
+                file: docs/reference/data.demo_data.qmd
+              - text: "demo_loader"
+                file: docs/reference/data.demo_loader.qmd
 
           - section: "Preprocessing"
             contents:
@@ -230,12 +234,6 @@ website:
                 file: docs/reference/manager.persistence.qmd
               - text: "tools"
                 file: docs/reference/manager.tools.qmd
-              - section: "Datasets"
-                contents:
-                  - text: "demo_data"
-                    file: docs/reference/manager.datasets.demo_data.qmd
-                  - text: "demo_loader"
-                    file: docs/reference/manager.datasets.demo_loader.qmd
               - section: "Models"
                 contents:
                   - text: "ForecasterRecursiveLGBM"
@@ -458,6 +456,8 @@ quartodoc:
         - data.fetch_data.load_timeseries
         - data.fetch_data.load_timeseries_forecast
         - data.data
+        - data.demo_data
+        - data.demo_loader
 
     # ── Preprocessing ─────────────────────────────────────────────────────────
     - title: "Preprocessing"
@@ -539,8 +539,6 @@ quartodoc:
         - manager.predictor.get_model_prediction
         - manager.configurator.config_entsoe.ConfigEntsoe
         - manager.configurator.config_multi.ConfigMulti
-        - manager.datasets.demo_data
-        - manager.datasets.demo_loader
         - manager.logger
         - manager.models.forecaster_recursive_lgbm
         - manager.models.forecaster_recursive_model

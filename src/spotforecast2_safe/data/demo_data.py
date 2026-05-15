@@ -39,7 +39,7 @@ class DemoConfig:
 
     Examples:
         >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.datasets.demo_data import DemoConfig
+        >>> from spotforecast2_safe.data.demo_data import DemoConfig
         >>>
         >>> # Example 1: Use default configuration
         >>> config = DemoConfig()
