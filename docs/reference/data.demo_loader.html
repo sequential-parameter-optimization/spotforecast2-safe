@@ -1332,25 +1332,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.data.demo_loader" id="toc-spotforecast2_safe.data.demo_loader" class="nav-link active" data-scroll-target="#spotforecast2_safe.data.demo_loader">data.demo_loader</a>
-  <ul class="collapse">
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <li><a href="#functions" id="toc-functions" class="nav-link active" data-scroll-target="#functions">Functions</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.data.demo_loader.load_actual_combined" id="toc-spotforecast2_safe.data.demo_loader.load_actual_combined" class="nav-link" data-scroll-target="#spotforecast2_safe.data.demo_loader.load_actual_combined">load_actual_combined</a></li>
-  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.demo_loader.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.demo_loader.html">demo_loader</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.demo_loader.html">demo_loader</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">data.demo_loader</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.data.demo_loader" class="level1">
-<h1>data.demo_loader</h1>
+</header>
+
+
 <p><code>data.demo_loader</code></p>
 <p>Demo data loader for safety-critical forecasting tasks.</p>
 <p>This module provides flexible data loading functions for ground truth validation in forecasting demonstrations and production workflows.</p>
@@ -1471,112 +1482,147 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> tempfile</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.data.demo_data <span class="im">import</span> DemoConfig</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.data.demo_loader <span class="im">import</span> load_actual_combined</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 1: Basic usage with default config parameters</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">'w'</span>, suffix<span class="op">=</span><span class="st">'.csv'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'timestamp,col1,col2</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 00:00:00,1.0,2.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 01:00:00,3.0,4.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 02:00:00,5.0,6.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>...     temp_path <span class="op">=</span> Path(f.name)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'col1'</span>, <span class="st">'col2'</span>],</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>...                               forecast_horizon<span class="op">=</span><span class="dv">2</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Result length: </span><span class="sc">{</span><span class="bu">len</span>(result)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>Result length: <span class="dv">2</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"First value: </span><span class="sc">{</span>result<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>First value: <span class="fl">3.0</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> temp_path.unlink()  <span class="co"># Clean up</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 2: Override forecast_horizon</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">'w'</span>, suffix<span class="op">=</span><span class="st">'.csv'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'timestamp,col1,col2</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>...         _ <span class="op">=</span> f.write(<span class="ss">f'2020-01-01 </span><span class="sc">{</span>i<span class="sc">:02d}</span><span class="ss">:00:00,</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">.0,</span><span class="sc">{</span>i<span class="op">*</span><span class="dv">2</span><span class="sc">}</span><span class="ss">.0</span><span class="ch">\n</span><span class="ss">'</span>)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>...     temp_path <span class="op">=</span> Path(f.name)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path, forecast_horizon<span class="op">=</span><span class="dv">24</span>)</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'col1'</span>, <span class="st">'col2'</span>],</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>...                               forecast_horizon<span class="op">=</span><span class="dv">5</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">0.5</span>])</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Custom horizon length: </span><span class="sc">{</span><span class="bu">len</span>(result)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>Custom horizon length: <span class="dv">5</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> temp_path.unlink()</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 3: Override weights for custom aggregation</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">'w'</span>, suffix<span class="op">=</span><span class="st">'.csv'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'timestamp,A,B,C</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 00:00:00,10.0,5.0,2.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 01:00:00,20.0,10.0,4.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>...     temp_path <span class="op">=</span> Path(f.name)</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'A'</span>, <span class="st">'B'</span>, <span class="st">'C'</span>],</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>...                               forecast_horizon<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>...                               weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Weighted result shape: </span><span class="sc">{</span>result<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>Weighted result shape: (<span class="dv">2</span>,)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> temp_path.unlink()</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 4: Override data_path</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">'w'</span>, suffix<span class="op">=</span><span class="st">'.csv'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'timestamp,X,Y</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 00:00:00,100.0,200.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>...     custom_path <span class="op">=</span> Path(f.name)</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig()  <span class="co"># Uses default path</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'X'</span>, <span class="st">'Y'</span>],</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>...                               data_path<span class="op">=</span>custom_path,</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>...                               forecast_horizon<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>...                               weights<span class="op">=</span>[<span class="fl">0.5</span>, <span class="fl">0.5</span>])</span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Custom path result: </span><span class="sc">{</span>result<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>Custom path result: <span class="fl">150.0</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> custom_path.unlink()</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 5: Error handling - missing file</span></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>Path(<span class="st">'/nonexistent/file.csv'</span>))</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">try</span>:</span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>...     result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'A'</span>],</span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>...                                   forecast_horizon<span class="op">=</span><span class="dv">1</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>])</span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>... <span class="cf">except</span> <span class="pp">FileNotFoundError</span> <span class="im">as</span> e:</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">"File not found as expected"</span>)</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>File <span class="kw">not</span> found <span class="im">as</span> expected</span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 6: Error handling - missing columns</span></span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">'w'</span>, suffix<span class="op">=</span><span class="st">'.csv'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'timestamp,col1</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'2020-01-01 00:00:00,1.0</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>...     temp_path <span class="op">=</span> Path(f.name)</span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">try</span>:</span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>...     result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'col1'</span>, <span class="st">'col2'</span>],</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>...                                   forecast_horizon<span class="op">=</span><span class="dv">1</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>... <span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> e:</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">"Missing columns detected"</span>)</span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>Missing columns detected</span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> temp_path.unlink()</span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span></span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="co"># Example 7: Production usage with all defaults from config</span></span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">'w'</span>, suffix<span class="op">=</span><span class="st">'.csv'</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>...     _ <span class="op">=</span> f.write(<span class="st">'timestamp,load,solar,wind</span><span class="ch">\n</span><span class="st">'</span>)</span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">30</span>):</span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>...         _ <span class="op">=</span> f.write(<span class="ss">f'2020-01-01 </span><span class="sc">{</span>i<span class="sc">:02d}</span><span class="ss">:00:00,</span><span class="sc">{</span><span class="dv">100</span><span class="op">+</span>i<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span><span class="dv">50</span><span class="op">+</span>i<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span><span class="dv">25</span><span class="op">+</span>i<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>...     temp_path <span class="op">=</span> Path(f.name)</span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> config <span class="op">=</span> DemoConfig(</span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>...     data_path<span class="op">=</span>temp_path,</span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>...     forecast_horizon<span class="op">=</span><span class="dv">24</span>,</span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>...     weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>]</span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>... )</span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">'load'</span>, <span class="st">'solar'</span>, <span class="st">'wind'</span>])</span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Production forecast length: </span><span class="sc">{</span><span class="bu">len</span>(result)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>Production forecast length: <span class="dv">24</span></span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f"Result is pandas Series: </span><span class="sc">{</span><span class="bu">isinstance</span>(result, pd.Series)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>Result <span class="kw">is</span> pandas Series: <span class="va">True</span></span>
-<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> temp_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Basic usage with explicit forecast horizon and weights:</p>
+<div id="26e117dd" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.demo_data <span class="im">import</span> DemoConfig</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.demo_loader <span class="im">import</span> load_actual_combined</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">3</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"col1"</span>: [<span class="fl">1.0</span>, <span class="fl">3.0</span>, <span class="fl">5.0</span>], <span class="st">"col2"</span>: [<span class="fl">2.0</span>, <span class="fl">4.0</span>, <span class="fl">6.0</span>]}, index<span class="op">=</span>idx)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">"w"</span>, suffix<span class="op">=</span><span class="st">".csv"</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    config, columns<span class="op">=</span>[<span class="st">"col1"</span>, <span class="st">"col2"</span>], forecast_horizon<span class="op">=</span><span class="dv">2</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Result length: </span><span class="sc">{</span><span class="bu">len</span>(result)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"First value: </span><span class="sc">{</span>result<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>temp_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Result length: 2
+First value: 3.0</code></pre>
+</div>
+</div>
+<p>Override forecast horizon and weights:</p>
+<div id="fbd821ec" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"col1"</span>: [<span class="bu">float</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)], <span class="st">"col2"</span>: [<span class="bu">float</span>(i <span class="op">*</span> <span class="dv">2</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]},</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>idx,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">"w"</span>, suffix<span class="op">=</span><span class="st">".csv"</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path, forecast_horizon<span class="op">=</span><span class="dv">24</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    config, columns<span class="op">=</span>[<span class="st">"col1"</span>, <span class="st">"col2"</span>], forecast_horizon<span class="op">=</span><span class="dv">5</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">0.5</span>]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Custom horizon length: </span><span class="sc">{</span><span class="bu">len</span>(result)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>temp_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Custom horizon length: 5</code></pre>
+</div>
+</div>
+<p>Override <code>data_path</code> while keeping the rest of the config:</p>
+<div id="a452ec83" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"X"</span>: [<span class="fl">100.0</span>], <span class="st">"Y"</span>: [<span class="fl">200.0</span>]}, index<span class="op">=</span>idx)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">"w"</span>, suffix<span class="op">=</span><span class="st">".csv"</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    custom_path <span class="op">=</span> Path(f.name)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig()  <span class="co"># default data_path</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    config,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"X"</span>, <span class="st">"Y"</span>],</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    data_path<span class="op">=</span>custom_path,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    weights<span class="op">=</span>[<span class="fl">0.5</span>, <span class="fl">0.5</span>],</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Custom path result: </span><span class="sc">{</span>result<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>custom_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Custom path result: 150.0</code></pre>
+</div>
+</div>
+<p>Error handling — missing file:</p>
+<div id="ee42724e" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>Path(<span class="st">"/nonexistent/file.csv"</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    load_actual_combined(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        config, columns<span class="op">=</span>[<span class="st">"A"</span>], forecast_horizon<span class="op">=</span><span class="dv">1</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"File not found as expected"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>File not found as expected</code></pre>
+</div>
+</div>
+<p>Error handling — missing columns:</p>
+<div id="fb0e27db" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"col1"</span>: [<span class="fl">1.0</span>]}, index<span class="op">=</span>idx)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">"w"</span>, suffix<span class="op">=</span><span class="st">".csv"</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    load_actual_combined(</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        config,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span>[<span class="st">"col1"</span>, <span class="st">"col2"</span>],</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        forecast_horizon<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>],</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Missing columns detected"</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>temp_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Missing columns detected</code></pre>
+</div>
+</div>
+<p>Production usage with horizon and weights drawn from the config:</p>
+<div id="67f97c08" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">30</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"load"</span>: [<span class="dv">100</span> <span class="op">+</span> i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">30</span>)],</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"solar"</span>: [<span class="dv">50</span> <span class="op">+</span> i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">30</span>)],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"wind"</span>: [<span class="dv">25</span> <span class="op">+</span> i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">30</span>)],</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>idx,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.NamedTemporaryFile(mode<span class="op">=</span><span class="st">"w"</span>, suffix<span class="op">=</span><span class="st">".csv"</span>, delete<span class="op">=</span><span class="va">False</span>) <span class="im">as</span> f:</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    data_path<span class="op">=</span>temp_path, forecast_horizon<span class="op">=</span><span class="dv">24</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>]</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">"load"</span>, <span class="st">"solar"</span>, <span class="st">"wind"</span>])</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Production forecast length: </span><span class="sc">{</span><span class="bu">len</span>(result)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Result is pandas Series: </span><span class="sc">{</span><span class="bu">isinstance</span>(result, pd.Series)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>temp_path.unlink()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Production forecast length: 24
+Result is pandas Series: True</code></pre>
+</div>
+</div>
 
 
-</section>
 </section>
 </section>
 </section>
