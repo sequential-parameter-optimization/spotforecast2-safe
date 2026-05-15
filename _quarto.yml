@@ -283,8 +283,6 @@ website:
                 file: docs/reference/utils.qmd
               - text: "get_cpe_identifier"
                 file: docs/reference/utils.cpe.get_cpe_identifier.qmd
-              - text: "create_holiday_df"
-                file: docs/reference/utils.generate_holiday.create_holiday_df.qmd
               - text: "convert_to_utc"
                 file: docs/reference/utils.convert_to_utc.qmd
               - text: "data_transform"
@@ -309,6 +307,13 @@ website:
                     file: docs/reference/utils.validation.get_exog_dtypes.qmd
                   - text: "set_cpu_gpu_device"
                     file: docs/reference/utils.validation.set_cpu_gpu_device.qmd
+
+          - section: "Holiday"
+            contents:
+              - text: "Overview"
+                file: docs/reference/holiday.qmd
+              - text: "create_holiday_df"
+                file: docs/reference/holiday.generate_holiday.create_holiday_df.qmd
 
           - section: "Weather"
             contents:
@@ -555,11 +560,10 @@ quartodoc:
     # ── Utils ─────────────────────────────────────────────────────────────────
     - title: "Utils"
       desc: |
-        General-purpose utility functions: CPE generation, validation, holiday
-        calendars, and data transforms.
+        General-purpose utility functions: CPE generation, validation, and
+        data transforms.
       contents:
         - utils.cpe.get_cpe_identifier
-        - utils.generate_holiday.create_holiday_df
         - utils.validation.check_exog
         - utils.validation.check_exog_dtypes
         - utils.validation.check_interval
@@ -571,6 +575,13 @@ quartodoc:
         - utils.convert_to_utc
         - utils.data_transform
         - utils.forecaster_config
+
+    # ── Holiday ───────────────────────────────────────────────────────────────
+    - title: "Holiday"
+      desc: |
+        Holiday calendar utilities for covariate construction.
+      contents:
+        - holiday.generate_holiday.create_holiday_df
 
     # ── Weather ───────────────────────────────────────────────────────────────
     - title: "Weather"
