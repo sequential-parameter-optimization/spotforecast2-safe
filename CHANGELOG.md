@@ -1,9 +1,19 @@
-## [4.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v4.0.0...v4.1.0) (2026-05-15)
+## [5.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v4.0.0...v5.0.0-rc.1) (2026-05-15)
 
 
-### Features
+### ⚠ BREAKING CHANGES
 
-* data cleanup ([cf54cfa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cf54cfa74cd152f77d6a2ba1513958b53e04736d))
+*   spotforecast2_safe.holiday and spotforecast2_safe.manager.exo.calendar
+  no longer exist. Import from spotforecast2_safe.calendar instead.
+  Manager and manager.exo no longer re-export the calendar functions.
+
+  data.fetch_data.fetch_holiday_data remains as a public helper.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Code Refactoring
+
+* consolidate holiday and manager.exo.calendar into calendar/ ([53573f5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/53573f50d1454f538f5fd79ec30206ce0bbdb09f))
 
 ## [4.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.4...v4.0.0) (2026-05-15)
 

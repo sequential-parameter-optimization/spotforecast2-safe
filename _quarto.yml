@@ -255,12 +255,6 @@ website:
                 contents:
                   - text: "get_weather_features"
                     file: docs/reference/manager.exo.weather.get_weather_features.qmd
-                  - text: "get_calendar_features"
-                    file: docs/reference/manager.exo.calendar.get_calendar_features.qmd
-                  - text: "get_day_night_features"
-                    file: docs/reference/manager.exo.calendar.get_day_night_features.qmd
-                  - text: "get_holiday_features"
-                    file: docs/reference/manager.exo.calendar.get_holiday_features.qmd
 
               - section: "Feature Engineering"
                 contents:
@@ -306,12 +300,16 @@ website:
                   - text: "set_cpu_gpu_device"
                     file: docs/reference/utils.validation.set_cpu_gpu_device.qmd
 
-          - section: "Holiday"
+          - section: "Calendar"
             contents:
-              - text: "Overview"
-                file: docs/reference/holiday.qmd
               - text: "create_holiday_df"
-                file: docs/reference/holiday.generate_holiday.create_holiday_df.qmd
+                file: docs/reference/calendar.holiday.create_holiday_df.qmd
+              - text: "get_holiday_features"
+                file: docs/reference/calendar.holiday.get_holiday_features.qmd
+              - text: "get_calendar_features"
+                file: docs/reference/calendar.features.get_calendar_features.qmd
+              - text: "get_day_night_features"
+                file: docs/reference/calendar.features.get_day_night_features.qmd
 
           - section: "Weather"
             contents:
@@ -546,9 +544,6 @@ quartodoc:
         - manager.persistence
         - manager.tools
         - manager.exo.weather.get_weather_features
-        - manager.exo.calendar.get_calendar_features
-        - manager.exo.calendar.get_day_night_features
-        - manager.exo.calendar.get_holiday_features
         - manager.features.apply_cyclical_encoding
         - manager.features.create_interaction_features
         - manager.features.select_exogenous_features
@@ -574,12 +569,16 @@ quartodoc:
         - utils.data_transform
         - utils.forecaster_config
 
-    # ── Holiday ───────────────────────────────────────────────────────────────
-    - title: "Holiday"
+    # ── Calendar ──────────────────────────────────────────────────────────────
+    - title: "Calendar"
       desc: |
-        Holiday calendar utilities for covariate construction.
+        Calendar, holiday, and day/night feature engineering for covariate
+        construction.
       contents:
-        - holiday.generate_holiday.create_holiday_df
+        - calendar.holiday.create_holiday_df
+        - calendar.holiday.get_holiday_features
+        - calendar.features.get_calendar_features
+        - calendar.features.get_day_night_features
 
     # ── Weather ───────────────────────────────────────────────────────────────
     - title: "Weather"

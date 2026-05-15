@@ -1,6 +1,6 @@
 import pandas as pd
 
-from spotforecast2_safe.holiday import create_holiday_df
+from spotforecast2_safe.calendar import create_holiday_df
 
 
 def test_create_holiday_df_christmas():

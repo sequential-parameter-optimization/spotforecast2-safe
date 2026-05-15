@@ -18,14 +18,14 @@ import pandas as pd
 import pytest
 from astral import LocationInfo
 
-from spotforecast2_safe.manager.exo import (
+from spotforecast2_safe.calendar import (
     get_calendar_features,
     get_day_night_features,
     get_holiday_features,
 )
-from spotforecast2_safe.manager.exo.calendar import get_calendar_features as _cal
-from spotforecast2_safe.manager.exo.calendar import get_day_night_features as _dn
-from spotforecast2_safe.manager.exo.calendar import get_holiday_features as _hol
+from spotforecast2_safe.calendar import get_calendar_features as _cal
+from spotforecast2_safe.calendar import get_day_night_features as _dn
+from spotforecast2_safe.calendar import get_holiday_features as _hol
 from spotforecast2_safe.manager.exo.weather import get_weather_features
 
 # =============================================================================
@@ -315,30 +315,39 @@ class TestGetHolidayFeatures:
 # =============================================================================
 
 
-class TestExoPackageImports:
-    def test_all_symbols_importable(self):
-        from spotforecast2_safe.manager.exo import (  # noqa: F401
+class TestCalendarPackageImports:
+    def test_calendar_symbols_importable(self):
+        from spotforecast2_safe.calendar import (  # noqa: F401
+            create_holiday_df,
             get_calendar_features,
             get_day_night_features,
             get_holiday_features,
-            get_weather_features,
         )
 
-    def test_all_declared_in___all__(self):
+    def test_calendar___all__(self):
+        calendar_module = importlib.import_module("spotforecast2_safe.calendar")
+        for name in (
+            "create_holiday_df",
+            "get_calendar_features",
+            "get_day_night_features",
+            "get_holiday_features",
+        ):
+            assert name in calendar_module.__all__
+
+    def test_manager_exo_only_exposes_weather(self):
         exo_module = importlib.import_module("spotforecast2_safe.manager.exo")
+        assert exo_module.__all__ == ["get_weather_features"]
 
-        assert "get_calendar_features" in exo_module.__all__
-        assert "get_day_night_features" in exo_module.__all__
-        assert "get_holiday_features" in exo_module.__all__
-        assert "get_weather_features" in exo_module.__all__
+    def test_manager_exports_weather_only(self):
+        from spotforecast2_safe.manager import get_weather_features  # noqa: F401
 
-    def test_manager_exports_exo_functions(self):
-        from spotforecast2_safe.manager import (  # noqa: F401
-            get_calendar_features,
-            get_day_night_features,
-            get_holiday_features,
-            get_weather_features,
-        )
+        manager_module = importlib.import_module("spotforecast2_safe.manager")
+        for removed in (
+            "get_calendar_features",
+            "get_day_night_features",
+            "get_holiday_features",
+        ):
+            assert removed not in manager_module.__all__
 
 
 # =============================================================================
