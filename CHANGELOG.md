@@ -1,3 +1,15 @@
+## [3.0.4-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.3...v3.0.4-rc.1) (2026-05-15)
+
+
+### Documentation
+
+* docstring mv to __init.py__ ([11a98e0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/11a98e08770b2004e1864e8e9b3509a770ead2a7))
+
+
+### Code Refactoring
+
+* **holiday:** promote generate_holiday into top-level holiday package ([bf77263](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/bf77263d959d162433ceb6ef7a506c81562b8ec7))
+
 ## [3.0.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.2...v3.0.3) (2026-05-15)
 
 
