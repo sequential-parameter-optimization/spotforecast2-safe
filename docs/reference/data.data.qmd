@@ -77,13 +77,17 @@ converted to UTC.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data import Data
->>> data = Data.from_csv(
-...     Path("data.csv"),
-...     timezone="UTC",
-...     columns=["target_col"]
-... )
+```{python}
+#| eval: false
+from pathlib import Path
+
+from spotforecast2_safe.data import Data
+
+data = Data.from_csv(
+    Path("data.csv"),
+    timezone="UTC",
+    columns=["target_col"],
+)
 ```
 
 ##### from_dataframe { #spotforecast2_safe.data.data.Data.from_dataframe }
@@ -137,9 +141,9 @@ Class abstraction for the information required to encode a period.
 
 #### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data import Period
->>> period = Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))
->>> period.name
-'hour'
+```{python}
+from spotforecast2_safe.data import Period
+
+period = Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))
+period.name
 ```
