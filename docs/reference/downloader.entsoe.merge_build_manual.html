@@ -1349,27 +1349,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.downloader.entsoe.merge_build_manual" id="toc-spotforecast2_safe.downloader.entsoe.merge_build_manual" class="nav-link active" data-scroll-target="#spotforecast2_safe.downloader.entsoe.merge_build_manual">downloader.entsoe.merge_build_manual</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  </ul></li>
-  <li><a href="#example-1-merge-with-default-output-file-if-raw-data-exists" id="toc-example-1-merge-with-default-output-file-if-raw-data-exists" class="nav-link" data-scroll-target="#example-1-merge-with-default-output-file-if-raw-data-exists">Example 1: Merge with default output file (if raw data exists)</a></li>
-  <li><a href="#example-2-merge-with-a-custom-output-file-name" id="toc-example-2-merge-with-a-custom-output-file-name" class="nav-link" data-scroll-target="#example-2-merge-with-a-custom-output-file-name">Example 2: Merge with a custom output file name</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.merge_build_manual.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.merge_build_manual.html">merge_build_manual</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.merge_build_manual.html">merge_build_manual</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">downloader.entsoe.merge_build_manual</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.downloader.entsoe.merge_build_manual" class="level1">
-<h1>downloader.entsoe.merge_build_manual</h1>
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>downloader.entsoe.merge_build_manual(output_file<span class="op">=</span><span class="st">'energy_load.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Merge all raw CSV files from the ‘raw’ directory into a single interim file.</p>
 <p>This function looks for all <code>.csv</code> files in <code>get_data_home() / "raw"</code>, sorts them by time index, and saves the unique combined data to <code>get_data_home() / "interim" / output_file</code>.</p>
@@ -1420,32 +1429,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="notes" class="level2 doc-section doc-section-notes">
 <h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
-<p>Logging information can be selected by setting the log level for the <code>spotforecast2_safe.downloader.entsoe</code> logger. Common levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, and <code>CRITICAL</code>.</p>
-<p>Examples: # Show only warnings and errors (default) &gt;&gt;&gt; import logging &gt;&gt;&gt; logging.getLogger(“spotforecast2_safe.downloader.entsoe”).setLevel(logging.WARNING)</p>
-<pre><code># Show informative messages about the merging process
-&gt;&gt;&gt; logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-
-# Show detailed debug information
-&gt;&gt;&gt; logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)</code></pre>
+<p>Logging information can be selected by setting the log level for the <code>spotforecast2_safe.downloader.entsoe</code> logger. Common levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, and <code>CRITICAL</code>. The cell below shows the default (WARNING); change the level to <code>INFO</code> or <code>DEBUG</code> for more verbose output.</p>
+<div id="9dfccefc" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">"spotforecast2_safe.downloader.entsoe"</span>).setLevel(logging.WARNING)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-</section>
-</section>
-<section id="example-1-merge-with-default-output-file-if-raw-data-exists" class="level1">
-<h1>Example 1: Merge with default output file (if raw data exists)</h1>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> merge_build_manual</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">try</span>:</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>...     merge_build_manual()</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>... <span class="cf">except</span> <span class="pp">Exception</span>:</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">pass</span>  <span class="co"># Ignore errors if no raw data exists</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="example-2-merge-with-a-custom-output-file-name" class="level1">
-<h1>Example 2: Merge with a custom output file name</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">try</span>:</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>...     merge_build_manual(output_file<span class="op">=</span><span class="st">"custom_energy_load.csv"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>... <span class="cf">except</span> <span class="pp">Exception</span>:</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">pass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="a206fc29" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> merge_build_manual</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge with the default output filename</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>merge_build_manual()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Or merge with a custom output filename</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>merge_build_manual(output_file<span class="op">=</span><span class="st">"custom_energy_load.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 </section>
