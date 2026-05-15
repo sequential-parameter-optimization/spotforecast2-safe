@@ -1,8 +1,14 @@
-## [3.0.3-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.3-rc.1...v3.0.3-rc.2) (2026-05-15)
+## [3.0.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.2...v3.0.3) (2026-05-15)
+
+
+### Documentation
+
+* weather ([914316d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/914316d5ef695fe93aeba858e0ac6e07c83ef0dc))
 
 
 ### Code Refactoring
 
+* **weather:** drop unused timezone arg from _create_fallback / _finalize_df ([5870f6b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5870f6b939092b9a7eaea32c079a64af885742d7))
 * **weather:** modernise typing, urllib3 import, add NaT guard ([1362fca](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1362fca022b53b6baa15e000938d2b4c831f8e63))
 
 ## [3.0.3-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.2...v3.0.3-rc.1) (2026-05-15)
