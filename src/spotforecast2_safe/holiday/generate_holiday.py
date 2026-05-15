@@ -3,15 +3,13 @@
 
 """Utilities for generating holiday dataframe as covariate."""
 
-from typing import Union
-
 import holidays
 import pandas as pd
 
 
 def create_holiday_df(
-    start: Union[str, pd.Timestamp],
-    end: Union[str, pd.Timestamp],
+    start: str | pd.Timestamp,
+    end: str | pd.Timestamp,
     tz: str = "UTC",
     freq: str = "h",
     country_code: str = "DE",
@@ -31,12 +29,14 @@ def create_holiday_df(
 
     Returns:
         pd.DataFrame: DataFrame with index covering [start, end] at `freq`,
-                      and a 'holiday' column (1 if holiday, 0 otherwise).
+                      and an ``is_holiday`` column (1 if holiday, 0 otherwise).
 
     Examples:
-        >>> df = create_holiday_df("2023-12-24", "2023-12-26", freq="D")
-        >>> df["holiday"].tolist()
-        [0, 1, 1]
+        ```{python}
+        from spotforecast2_safe.holiday import create_holiday_df
+        df = create_holiday_df("2023-12-24", "2023-12-26", freq="D")
+        print(df["is_holiday"].tolist())
+        ```
     """
     # If start/end are Timestamps with timezones, use that timezone instead of
     # the default. This avoids conflicts when timezone-aware Timestamps are

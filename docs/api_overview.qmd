@@ -28,7 +28,7 @@ from spotforecast2_safe.manager.models import (
     ForecasterRecursiveModel,
 )
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.utils import generate_holiday
+from spotforecast2_safe.holiday import generate_holiday
 ```
 
 ### 2. Load & Prepare Data
@@ -146,7 +146,7 @@ print(exog.columns[:5].tolist())
 Generate holiday calendars for demand forecasting:
 
 ```{python}
-from spotforecast2_safe.utils import create_holiday_df
+from spotforecast2_safe.holiday import create_holiday_df
 
 holidays = create_holiday_df(
     start='2023-01-01',
@@ -223,7 +223,7 @@ from importlib.resources import files
 from sklearn.linear_model import Ridge
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.preprocessing import RollingFeatures
-from spotforecast2_safe.utils import create_holiday_df
+from spotforecast2_safe.holiday import create_holiday_df
 
 # 1. Load demo02.csv (column A, 1970–1972, resampled to regular hourly grid)
 path = files('spotforecast2_safe.datasets.csv').joinpath('demo02.csv')

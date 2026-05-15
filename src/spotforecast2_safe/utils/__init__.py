@@ -14,7 +14,6 @@ from spotforecast2_safe.utils.forecaster_config import (
     initialize_lags,
     initialize_weights,
 )
-from spotforecast2_safe.utils.generate_holiday import create_holiday_df
 from spotforecast2_safe.utils.validation import (
     DataTypeWarning,
     MissingValuesWarning,
@@ -43,7 +42,6 @@ __all__ = [
     "check_exog_dtypes",
     "check_predict_input",
     "transform_dataframe",
-    "create_holiday_df",
     "check_residuals_input",
     "date_to_index_position",
     "set_cpu_gpu_device",
