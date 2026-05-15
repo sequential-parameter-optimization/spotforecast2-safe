@@ -61,12 +61,18 @@ class Data:
             ValueError: If the index is timezone-naive and no timezone is provided.
 
         Examples:
-            >>> from spotforecast2_safe.data import Data
-            >>> data = Data.from_csv(
-            ...     Path("data.csv"),
-            ...     timezone="UTC",
-            ...     columns=["target_col"]
-            ... )
+            ```{python}
+            #| eval: false
+            from pathlib import Path
+
+            from spotforecast2_safe.data import Data
+
+            data = Data.from_csv(
+                Path("data.csv"),
+                timezone="UTC",
+                columns=["target_col"],
+            )
+            ```
         """
         # If columns specified, add index column to usecols for efficient reading
         usecols = None
@@ -156,10 +162,12 @@ class Period:
         input_range: Tuple of (min, max) values for the period (e.g., (0, 23) for hours).
 
     Examples:
-        >>> from spotforecast2_safe.data import Period
-        >>> period = Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))
-        >>> period.name
-        'hour'
+        ```{python}
+        from spotforecast2_safe.data import Period
+
+        period = Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))
+        period.name
+        ```
     """
 
     name: str

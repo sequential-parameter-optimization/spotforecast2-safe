@@ -50,109 +50,122 @@ def load_actual_combined(
             weights length doesn't match columns.
 
     Examples:
-        >>> import tempfile
-        >>> import pandas as pd
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.data.demo_data import DemoConfig
-        >>> from spotforecast2_safe.data.demo_loader import load_actual_combined
-        >>>
-        >>> # Example 1: Basic usage with default config parameters
-        >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        ...     _ = f.write('timestamp,col1,col2\\n')
-        ...     _ = f.write('2020-01-01 00:00:00,1.0,2.0\\n')
-        ...     _ = f.write('2020-01-01 01:00:00,3.0,4.0\\n')
-        ...     _ = f.write('2020-01-01 02:00:00,5.0,6.0\\n')
-        ...     temp_path = Path(f.name)
-        >>> config = DemoConfig(data_path=temp_path)
-        >>> result = load_actual_combined(config, columns=['col1', 'col2'],
-        ...                               forecast_horizon=2, weights=[1.0, 1.0])
-        >>> print(f"Result length: {len(result)}")
-        Result length: 2
-        >>> print(f"First value: {result.iloc[0]:.1f}")
-        First value: 3.0
-        >>> temp_path.unlink()  # Clean up
-        >>>
-        >>> # Example 2: Override forecast_horizon
-        >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        ...     _ = f.write('timestamp,col1,col2\\n')
-        ...     for i in range(10):
-        ...         _ = f.write(f'2020-01-01 {i:02d}:00:00,{i}.0,{i*2}.0\\n')
-        ...     temp_path = Path(f.name)
-        >>> config = DemoConfig(data_path=temp_path, forecast_horizon=24)
-        >>> result = load_actual_combined(config, columns=['col1', 'col2'],
-        ...                               forecast_horizon=5, weights=[1.0, 0.5])
-        >>> print(f"Custom horizon length: {len(result)}")
-        Custom horizon length: 5
-        >>> temp_path.unlink()
-        >>>
-        >>> # Example 3: Override weights for custom aggregation
-        >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        ...     _ = f.write('timestamp,A,B,C\\n')
-        ...     _ = f.write('2020-01-01 00:00:00,10.0,5.0,2.0\\n')
-        ...     _ = f.write('2020-01-01 01:00:00,20.0,10.0,4.0\\n')
-        ...     temp_path = Path(f.name)
-        >>> config = DemoConfig(data_path=temp_path)
-        >>> result = load_actual_combined(config, columns=['A', 'B', 'C'],
-        ...                               forecast_horizon=2,
-        ...                               weights=[1.0, -1.0, 1.0])
-        >>> print(f"Weighted result shape: {result.shape}")
-        Weighted result shape: (2,)
-        >>> temp_path.unlink()
-        >>>
-        >>> # Example 4: Override data_path
-        >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        ...     _ = f.write('timestamp,X,Y\\n')
-        ...     _ = f.write('2020-01-01 00:00:00,100.0,200.0\\n')
-        ...     custom_path = Path(f.name)
-        >>> config = DemoConfig()  # Uses default path
-        >>> result = load_actual_combined(config, columns=['X', 'Y'],
-        ...                               data_path=custom_path,
-        ...                               forecast_horizon=1,
-        ...                               weights=[0.5, 0.5])
-        >>> print(f"Custom path result: {result.iloc[0]:.1f}")
-        Custom path result: 150.0
-        >>> custom_path.unlink()
-        >>>
-        >>> # Example 5: Error handling - missing file
-        >>> config = DemoConfig(data_path=Path('/nonexistent/file.csv'))
-        >>> try:
-        ...     result = load_actual_combined(config, columns=['A'],
-        ...                                   forecast_horizon=1, weights=[1.0])
-        ... except FileNotFoundError as e:
-        ...     print("File not found as expected")
-        File not found as expected
-        >>>
-        >>> # Example 6: Error handling - missing columns
-        >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        ...     _ = f.write('timestamp,col1\\n')
-        ...     _ = f.write('2020-01-01 00:00:00,1.0\\n')
-        ...     temp_path = Path(f.name)
-        >>> config = DemoConfig(data_path=temp_path)
-        >>> try:
-        ...     result = load_actual_combined(config, columns=['col1', 'col2'],
-        ...                                   forecast_horizon=1, weights=[1.0, 1.0])
-        ... except ValueError as e:
-        ...     print("Missing columns detected")
-        Missing columns detected
-        >>> temp_path.unlink()
-        >>>
-        >>> # Example 7: Production usage with all defaults from config
-        >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-        ...     _ = f.write('timestamp,load,solar,wind\\n')
-        ...     for i in range(30):
-        ...         _ = f.write(f'2020-01-01 {i:02d}:00:00,{100+i},{50+i},{25+i}\\n')
-        ...     temp_path = Path(f.name)
-        >>> config = DemoConfig(
-        ...     data_path=temp_path,
-        ...     forecast_horizon=24,
-        ...     weights=[1.0, -0.5, -0.5]
-        ... )
-        >>> result = load_actual_combined(config, columns=['load', 'solar', 'wind'])
-        >>> print(f"Production forecast length: {len(result)}")
-        Production forecast length: 24
-        >>> print(f"Result is pandas Series: {isinstance(result, pd.Series)}")
-        Result is pandas Series: True
-        >>> temp_path.unlink()
+        Basic usage with explicit forecast horizon and weights:
+
+        ```{python}
+        import tempfile
+        from pathlib import Path
+
+        import pandas as pd
+
+        from spotforecast2_safe.data.demo_data import DemoConfig
+        from spotforecast2_safe.data.demo_loader import load_actual_combined
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            _ = f.write("timestamp,col1,col2\n")
+            _ = f.write("2020-01-01 00:00:00,1.0,2.0\n")
+            _ = f.write("2020-01-01 01:00:00,3.0,4.0\n")
+            _ = f.write("2020-01-01 02:00:00,5.0,6.0\n")
+            temp_path = Path(f.name)
+
+        config = DemoConfig(data_path=temp_path)
+        result = load_actual_combined(
+            config, columns=["col1", "col2"], forecast_horizon=2, weights=[1.0, 1.0]
+        )
+        print(f"Result length: {len(result)}")
+        print(f"First value: {result.iloc[0]:.1f}")
+        temp_path.unlink()
+        ```
+
+        Override forecast horizon and weights:
+
+        ```{python}
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            _ = f.write("timestamp,col1,col2\n")
+            for i in range(10):
+                _ = f.write(f"2020-01-01 {i:02d}:00:00,{i}.0,{i * 2}.0\n")
+            temp_path = Path(f.name)
+
+        config = DemoConfig(data_path=temp_path, forecast_horizon=24)
+        result = load_actual_combined(
+            config, columns=["col1", "col2"], forecast_horizon=5, weights=[1.0, 0.5]
+        )
+        print(f"Custom horizon length: {len(result)}")
+        temp_path.unlink()
+        ```
+
+        Override `data_path` while keeping the rest of the config:
+
+        ```{python}
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            _ = f.write("timestamp,X,Y\n")
+            _ = f.write("2020-01-01 00:00:00,100.0,200.0\n")
+            custom_path = Path(f.name)
+
+        config = DemoConfig()  # default data_path
+        result = load_actual_combined(
+            config,
+            columns=["X", "Y"],
+            data_path=custom_path,
+            forecast_horizon=1,
+            weights=[0.5, 0.5],
+        )
+        print(f"Custom path result: {result.iloc[0]:.1f}")
+        custom_path.unlink()
+        ```
+
+        Error handling — missing file:
+
+        ```{python}
+        config = DemoConfig(data_path=Path("/nonexistent/file.csv"))
+        try:
+            load_actual_combined(
+                config, columns=["A"], forecast_horizon=1, weights=[1.0]
+            )
+        except FileNotFoundError:
+            print("File not found as expected")
+        ```
+
+        Error handling — missing columns:
+
+        ```{python}
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            _ = f.write("timestamp,col1\n")
+            _ = f.write("2020-01-01 00:00:00,1.0\n")
+            temp_path = Path(f.name)
+
+        config = DemoConfig(data_path=temp_path)
+        try:
+            load_actual_combined(
+                config,
+                columns=["col1", "col2"],
+                forecast_horizon=1,
+                weights=[1.0, 1.0],
+            )
+        except ValueError:
+            print("Missing columns detected")
+        temp_path.unlink()
+        ```
+
+        Production usage with horizon and weights drawn from the config:
+
+        ```{python}
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            _ = f.write("timestamp,load,solar,wind\n")
+            for i in range(30):
+                _ = f.write(
+                    f"2020-01-01 {i:02d}:00:00,{100 + i},{50 + i},{25 + i}\n"
+                )
+            temp_path = Path(f.name)
+
+        config = DemoConfig(
+            data_path=temp_path, forecast_horizon=24, weights=[1.0, -0.5, -0.5]
+        )
+        result = load_actual_combined(config, columns=["load", "solar", "wind"])
+        print(f"Production forecast length: {len(result)}")
+        print(f"Result is pandas Series: {isinstance(result, pd.Series)}")
+        temp_path.unlink()
+        ```
     """
     # Use config defaults if parameters not provided
     actual_forecast_horizon = (
