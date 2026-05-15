@@ -1,3 +1,15 @@
+## [5.0.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.0-rc.1...v5.0.0-rc.2) (2026-05-15)
+
+
+### Features
+
+* data cleanup ([cf54cfa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cf54cfa74cd152f77d6a2ba1513958b53e04736d))
+
+
+### Bug Fixes
+
+* **docs:** unbreak demo_loader render by removing \n escapes in {python} blocks ([cf6fa98](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cf6fa98f261e878accf4abbcbdcc5fbf18fc7ab7))
+
 ## [5.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v4.0.0...v5.0.0-rc.1) (2026-05-15)
 
 
