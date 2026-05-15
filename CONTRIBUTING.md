@@ -219,6 +219,42 @@ formatted strings for vulnerability tracking and SBOM management.
 Closes #42
 ```
 
+## Pre-PR Verification (required)
+
+Before pushing a branch or opening a Pull Request, run the **full** local
+verification pipeline and make sure every step is green. Most GitHub Actions
+failures on this project — broken doc deploys in particular — would have been
+caught by running these four commands locally first.
+
+```bash
+uv run pytest tests/ -q                                            # full suite
+uv run ruff check src/ tests/
+uv run python docs/quartodoc_build.py && uv run quartodoc interlinks
+uv run quarto render --no-cache                                    # full site render
+```
+
+Why this matters:
+
+- **`{python}` example blocks in docstrings are executed at `quarto render`
+  time, not by pytest.** A green test suite tells you the library works; it
+  does not tell you the docs build. The two are independent.
+- **Past failures that local rendering would have caught**: escape stripping
+  inside `{python}` blocks (`\n` becoming a real newline at docstring-parse
+  time, breaking the rendered cell); the strict `on_missing='raise'` default
+  rejecting NaN rows in bundled demo CSVs; missing modules and broken
+  cross-references after a rename or move.
+- **Run the whole pipeline, not just the page you changed.** A rename can
+  break tests in modules you didn't touch, and a doc page can fail only when
+  the render runs end-to-end (kernel state, package install order). Per-page
+  renders are useful while iterating, but only the full render matches what
+  CI runs.
+- If a change spans `spotforecast2-safe` and the sibling `spotforecast2`,
+  run both repos' pipelines locally before opening either PR.
+
+If a step fails, fix it locally and re-run the **entire** pipeline. Pushing a
+partial fix and "letting CI tell you what's left" wastes everyone's time and
+pollutes the workflow-run history.
+
 ## Pull Request Process
 
 1. Create a feature branch from `develop`:
