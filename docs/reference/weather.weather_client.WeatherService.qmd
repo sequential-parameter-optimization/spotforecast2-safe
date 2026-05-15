@@ -23,6 +23,20 @@ and fallback strategies.
 | cache_path   | [Path](`pathlib.Path`) \| None | Optional path to cache file for storing fetched data. If provided, the service will attempt to load from cache before fetching and will save new data to this path. Default is None (no caching). | `None`     |
 | use_forecast | [bool](`bool`)                 | Whether to use forecast data for future dates (default True).                                                                                                                                     | `True`     |
 
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from pathlib import Path
+import pandas as pd
+from spotforecast2_safe.weather import WeatherService
+client = WeatherService(latitude=52.52, longitude=13.405, cache_path=Path("weather_cache.parquet"))
+start = pd.Timestamp("2023-01-01", tz="UTC")
+end = pd.Timestamp("2023-01-07", tz="UTC")
+df = client.get_dataframe(start=start, end=end, fill_missing=False)
+print(df.head())
+print(df.tail())
+```
+
 ## Methods
 
 | Name | Description |
@@ -78,4 +92,5 @@ start = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=7)
 end = pd.Timestamp.now(tz="UTC")
 df = client.get_dataframe(start=start, end=end, fill_missing=False)
 print(df.head())
+print(df.tail())
 ```

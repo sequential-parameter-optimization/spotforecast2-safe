@@ -27,36 +27,24 @@ sorts them by time index, and saves the unique combined data to
 
 Logging information can be selected by setting the log level for the
 `spotforecast2_safe.downloader.entsoe` logger. Common levels are
-`DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`.
+`DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell
+below shows the default (WARNING); change the level to `INFO` or
+`DEBUG` for more verbose output.
 
-Examples:
-    # Show only warnings and errors (default)
-    >>> import logging
-    >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
-
-    # Show informative messages about the merging process
-    >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-
-    # Show detailed debug information
-    >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+```{python}
+import logging
+logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
+```
 
 ## Examples {.doc-section .doc-section-examples}
 
-# Example 1: Merge with default output file (if raw data exists)
+```{python}
+#| eval: false
+from spotforecast2_safe.downloader.entsoe import merge_build_manual
 
-```python
->>> from spotforecast2_safe.downloader.entsoe import merge_build_manual
->>> try:
-...     merge_build_manual()
-... except Exception:
-...     pass  # Ignore errors if no raw data exists
-```
+# Merge with the default output filename
+merge_build_manual()
 
-# Example 2: Merge with a custom output file name
-
-```python
->>> try:
-...     merge_build_manual(output_file="custom_energy_load.csv")
-... except Exception:
-...     pass
+# Or merge with a custom output filename
+merge_build_manual(output_file="custom_energy_load.csv")
 ```
