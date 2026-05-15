@@ -36,29 +36,36 @@ forward/backward fill behavior that was the default before the
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import os, tempfile, shutil
->>> import pandas as pd
->>> from spotforecast2_safe.data.fetch_data import (
-...     load_timeseries, get_package_data_home,
-... )
->>> tmp = tempfile.mkdtemp()
->>> os.environ["SPOTFORECAST2_DATA"] = tmp
->>> interim = os.path.join(tmp, "interim")
->>> os.makedirs(interim, exist_ok=True)
->>> demo = get_package_data_home() / "demo01.csv"
->>> df = pd.read_csv(demo)
->>> df = df.rename(columns={
-...     "Time": "Time (UTC)",
-...     "Actual": "Actual Load",
-...     "Forecast": "Forecasted Load",
-... })
->>> df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
->>> y = load_timeseries()
->>> isinstance(y, pd.Series)
-True
->>> y.index.tz is not None
-True
->>> shutil.rmtree(tmp)
->>> del os.environ["SPOTFORECAST2_DATA"]
+```{python}
+import os
+import shutil
+import tempfile
+
+import pandas as pd
+
+from spotforecast2_safe.data.fetch_data import (
+    get_package_data_home,
+    load_timeseries,
+)
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+interim = os.path.join(tmp, "interim")
+os.makedirs(interim, exist_ok=True)
+
+demo = get_package_data_home() / "demo01.csv"
+df = pd.read_csv(demo).rename(
+    columns={
+        "Time": "Time (UTC)",
+        "Actual": "Actual Load",
+        "Forecast": "Forecasted Load",
+    }
+)
+df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
+
+y = load_timeseries()
+print(isinstance(y, pd.Series), y.index.tz is not None)
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
 ```

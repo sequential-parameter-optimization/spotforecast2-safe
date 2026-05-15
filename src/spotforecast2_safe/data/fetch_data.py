@@ -444,6 +444,36 @@ def fetch_weather_data(
     return weather_df
 
 
+def _load_energy_load_column(
+    column: str,
+    data_home: Optional[Union[str, Path]],
+    on_missing: OnMissing,
+) -> pd.Series:
+    """Shared loader for ``interim/energy_load.csv`` columns.
+
+    Returns the requested column as an hourly UTC-indexed series after
+    applying the ``on_missing`` contract from :func:`_apply_on_missing`.
+    Used by :func:`load_timeseries` and :func:`load_timeseries_forecast`,
+    which differ only in the column they read.
+    """
+    data_dir = get_data_home(data_home)
+    csv_path = data_dir / "interim" / "energy_load.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(
+            f"Data file not found: {csv_path}. "
+            "Run the downloader first or place energy_load.csv "
+            "in the 'interim' sub-directory."
+        )
+
+    df = pd.read_csv(csv_path, parse_dates=["Time (UTC)"])
+    df = df.set_index("Time (UTC)")
+    df.index = pd.to_datetime(df.index, utc=True)
+    df.index.name = "datetime"
+    df = df.asfreq("h")
+
+    return _apply_on_missing(df[column], on_missing, column, csv_path)
+
+
 def load_timeseries(
     data_home: Optional[Union[str, Path]] = None,
     on_missing: OnMissing = "raise",
@@ -473,48 +503,41 @@ def load_timeseries(
         ValueError: If ``on_missing='raise'`` and the series has NaNs.
 
     Examples:
-        >>> import os, tempfile, shutil
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.data.fetch_data import (
-        ...     load_timeseries, get_package_data_home,
-        ... )
-        >>> tmp = tempfile.mkdtemp()
-        >>> os.environ["SPOTFORECAST2_DATA"] = tmp
-        >>> interim = os.path.join(tmp, "interim")
-        >>> os.makedirs(interim, exist_ok=True)
-        >>> demo = get_package_data_home() / "demo01.csv"
-        >>> df = pd.read_csv(demo)
-        >>> df = df.rename(columns={
-        ...     "Time": "Time (UTC)",
-        ...     "Actual": "Actual Load",
-        ...     "Forecast": "Forecasted Load",
-        ... })
-        >>> df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
-        >>> y = load_timeseries()
-        >>> isinstance(y, pd.Series)
-        True
-        >>> y.index.tz is not None
-        True
-        >>> shutil.rmtree(tmp)
-        >>> del os.environ["SPOTFORECAST2_DATA"]
-    """
-    data_dir = get_data_home(data_home)
-    csv_path = data_dir / "interim" / "energy_load.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(
-            f"Data file not found: {csv_path}. "
-            "Run the downloader first or place energy_load.csv "
-            "in the 'interim' sub-directory."
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.data.fetch_data import (
+            get_package_data_home,
+            load_timeseries,
         )
 
-    df = pd.read_csv(csv_path, parse_dates=["Time (UTC)"])
-    df = df.set_index("Time (UTC)")
-    df.index = pd.to_datetime(df.index, utc=True)
-    df.index.name = "datetime"
-    df = df.asfreq("h")
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        interim = os.path.join(tmp, "interim")
+        os.makedirs(interim, exist_ok=True)
 
-    y = df["Actual Load"]
-    return _apply_on_missing(y, on_missing, "Actual Load", csv_path)
+        demo = get_package_data_home() / "demo01.csv"
+        df = pd.read_csv(demo).rename(
+            columns={
+                "Time": "Time (UTC)",
+                "Actual": "Actual Load",
+                "Forecast": "Forecasted Load",
+            }
+        )
+        df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
+
+        y = load_timeseries()
+        print(isinstance(y, pd.Series), y.index.tz is not None)
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
+    """
+    return _load_energy_load_column("Actual Load", data_home, on_missing)
 
 
 def load_timeseries_forecast(
@@ -547,43 +570,38 @@ def load_timeseries_forecast(
         ValueError: If ``on_missing='raise'`` and the series has NaNs.
 
     Examples:
-        >>> import os, tempfile, shutil
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.data.fetch_data import (
-        ...     load_timeseries_forecast, get_package_data_home,
-        ... )
-        >>> tmp = tempfile.mkdtemp()
-        >>> os.environ["SPOTFORECAST2_DATA"] = tmp
-        >>> interim = os.path.join(tmp, "interim")
-        >>> os.makedirs(interim, exist_ok=True)
-        >>> demo = get_package_data_home() / "demo01.csv"
-        >>> df = pd.read_csv(demo)
-        >>> df = df.rename(columns={
-        ...     "Time": "Time (UTC)",
-        ...     "Actual": "Actual Load",
-        ...     "Forecast": "Forecasted Load",
-        ... })
-        >>> df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
-        >>> y_f = load_timeseries_forecast()
-        >>> isinstance(y_f, pd.Series)
-        True
-        >>> shutil.rmtree(tmp)
-        >>> del os.environ["SPOTFORECAST2_DATA"]
-    """
-    data_dir = get_data_home(data_home)
-    csv_path = data_dir / "interim" / "energy_load.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(
-            f"Data file not found: {csv_path}. "
-            "Run the downloader first or place energy_load.csv "
-            "in the 'interim' sub-directory."
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.data.fetch_data import (
+            get_package_data_home,
+            load_timeseries_forecast,
         )
 
-    df = pd.read_csv(csv_path, parse_dates=["Time (UTC)"])
-    df = df.set_index("Time (UTC)")
-    df.index = pd.to_datetime(df.index, utc=True)
-    df.index.name = "datetime"
-    df = df.asfreq("h")
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        interim = os.path.join(tmp, "interim")
+        os.makedirs(interim, exist_ok=True)
 
-    y = df["Forecasted Load"]
-    return _apply_on_missing(y, on_missing, "Forecasted Load", csv_path)
+        demo = get_package_data_home() / "demo01.csv"
+        df = pd.read_csv(demo).rename(
+            columns={
+                "Time": "Time (UTC)",
+                "Actual": "Actual Load",
+                "Forecast": "Forecasted Load",
+            }
+        )
+        df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
+
+        y_f = load_timeseries_forecast()
+        print(isinstance(y_f, pd.Series))
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
+    """
+    return _load_energy_load_column("Forecasted Load", data_home, on_missing)
