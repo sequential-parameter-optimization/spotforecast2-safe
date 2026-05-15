@@ -57,12 +57,12 @@ Threat model (STRIDE).
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 
 class WeatherClient:
@@ -107,7 +107,7 @@ class WeatherClient:
         "wind_gusts_10m",
     ]
 
-    def __init__(self, latitude: float, longitude: float):
+    def __init__(self, latitude: float, longitude: float) -> None:
         """Initialize WeatherClient.
 
         Args:
@@ -139,7 +139,7 @@ class WeatherClient:
         session.mount("http://", adapter)
         return session
 
-    def _fetch(self, url: str, params: Dict[str, Any]) -> pd.DataFrame:
+    def _fetch(self, url: str, params: dict[str, Any]) -> pd.DataFrame:
         """Execute API request and return parsed DataFrame."""
         try:
             response = self._session.get(url, params=params, timeout=30)
@@ -178,6 +178,18 @@ class WeatherClient:
             start: Start date for the historical data.
             end: End date for the historical data.
             timezone: Timezone for the data (default "UTC").
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.weather import WeatherClient
+            client = WeatherClient(latitude=52.52, longitude=13.405)
+            df = client.fetch_archive(
+                start=pd.Timestamp("2023-01-01", tz="UTC"),
+                end=pd.Timestamp("2023-01-02", tz="UTC"),
+            )
+            print(df.head())
+            ```
         """
         params = {
             "latitude": self.latitude,
@@ -230,23 +242,36 @@ class WeatherService(WeatherClient):
             Default is None (no caching).
         use_forecast:
             Whether to use forecast data for future dates (default True).
+
+    Examples:
+        ```{python}
+        from pathlib import Path
+        import pandas as pd
+        from spotforecast2_safe.weather import WeatherService
+        client = WeatherService(latitude=52.52, longitude=13.405, cache_path=Path("weather_cache.parquet"))
+        start = pd.Timestamp("2023-01-01", tz="UTC")
+        end = pd.Timestamp("2023-01-07", tz="UTC")
+        df = client.get_dataframe(start=start, end=end, fill_missing=False)
+        print(df.head())
+        print(df.tail())
+        ```
     """
 
     def __init__(
         self,
         latitude: float,
         longitude: float,
-        cache_path: Optional[Path] = None,
+        cache_path: Path | None = None,
         use_forecast: bool = True,
-    ):
+    ) -> None:
         super().__init__(latitude, longitude)
         self.cache_path = cache_path
         self.use_forecast = use_forecast
 
     def get_dataframe(
         self,
-        start: Union[str, pd.Timestamp],
-        end: Union[str, pd.Timestamp],
+        start: str | pd.Timestamp,
+        end: str | pd.Timestamp,
         timezone: str = "UTC",
         freq: str = "h",
         fallback_on_failure: bool = True,
@@ -285,10 +310,16 @@ class WeatherService(WeatherClient):
              end = pd.Timestamp.now(tz="UTC")
              df = client.get_dataframe(start=start, end=end, fill_missing=False)
              print(df.head())
+             print(df.tail())
              ```
         """
         start_ts = pd.Timestamp(start)
         end_ts = pd.Timestamp(end)
+        if pd.isna(start_ts) or pd.isna(end_ts):
+            raise ValueError(
+                "start and end must be valid timestamps; "
+                f"got start={start!r}, end={end!r}"
+            )
 
         # Localize if naive
         if start_ts.tz is None:
@@ -396,7 +427,7 @@ class WeatherService(WeatherClient):
         new_data.index = idx
         return new_data
 
-    def _load_cache(self) -> Optional[pd.DataFrame]:
+    def _load_cache(self) -> pd.DataFrame | None:
         """Load the parquet cache, quarantining corrupt files.
 
         A missing cache file returns ``None`` silently (expected on the
@@ -466,7 +497,7 @@ class WeatherService(WeatherClient):
                 rename_exc,
             )
 
-    def _save_cache(self, df: pd.DataFrame):
+    def _save_cache(self, df: pd.DataFrame) -> None:
         if self.cache_path:
             self.cache_path.parent.mkdir(parents=True, exist_ok=True)
             df.to_parquet(self.cache_path)

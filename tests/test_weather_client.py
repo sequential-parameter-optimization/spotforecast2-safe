@@ -415,6 +415,15 @@ class TestWeatherServiceGetDataframe:
                 fallback_on_failure=False,
             )
 
+    def test_nat_timestamp_raises_value_error(self):
+        """NaT coerced from ``pd.Timestamp(...)`` is rejected at the boundary."""
+        from spotforecast2_safe.weather import WeatherService
+
+        svc = WeatherService(latitude=51.0, longitude=7.0)
+
+        with pytest.raises(ValueError, match="valid timestamps"):
+            svc.get_dataframe(start=pd.NaT, end=pd.NaT)
+
 
 class TestWeatherServiceCache:
     """WeatherService._load_cache quarantines corrupt parquet files."""
@@ -469,6 +478,92 @@ class TestWeatherServiceCache:
         loaded = svc._load_cache()
         assert loaded is not None
         pd.testing.assert_frame_equal(loaded, good, check_freq=False)
+
+    def test_load_cache_localises_tz_naive_parquet(self, tmp_path):
+        """A tz-naive cache file is localised to UTC on load."""
+        from spotforecast2_safe.weather import WeatherService
+
+        idx = pd.date_range("2023-01-01", periods=3, freq="h")
+        naive = pd.DataFrame({"temperature_2m": [1.0, 2.0, 3.0]}, index=idx)
+        cache = tmp_path / "weather_cache.parquet"
+        naive.to_parquet(cache)
+
+        svc = WeatherService(latitude=51.0, longitude=7.0, cache_path=cache)
+        loaded = svc._load_cache()
+        assert loaded is not None
+        assert loaded.index.tz is not None
+        assert str(loaded.index.tz) == "UTC"
+
+
+class TestWeatherServiceFallback:
+    """WeatherService._create_fallback repeats the last 24h to fill a range."""
+
+    def test_create_fallback_repeats_last_24h(self):
+        """Returns a UTC-indexed frame of the requested length whose values
+        cycle through the last 24h of the source frame."""
+        from spotforecast2_safe.weather import WeatherService
+
+        svc = WeatherService(latitude=51.0, longitude=7.0)
+
+        source_idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+        source_df = pd.DataFrame(
+            {"temperature_2m": [float(v) for v in range(100, 124)]},
+            index=source_idx,
+        )
+
+        start = pd.Timestamp("2023-07-01", tz="UTC")
+        end = start + pd.Timedelta(hours=35)
+        result = svc._create_fallback(start, end, source_df)
+
+        assert len(result) == 36
+        assert str(result.index.tz) == "UTC"
+        assert result.index[0] == start
+        assert result.index[-1] == start + pd.Timedelta(hours=35)
+        # First 24 rows must mirror source_df.tail(24); next 12 must mirror
+        # the first 12 hours of that block (the cycle wraps).
+        assert result["temperature_2m"].iloc[:24].tolist() == [
+            float(v) for v in range(100, 124)
+        ]
+        assert result["temperature_2m"].iloc[24:36].tolist() == [
+            float(v) for v in range(100, 112)
+        ]
+
+
+class TestWeatherServiceFetchHybrid:
+    """WeatherService._fetch_hybrid combines archive + forecast and tolerates partial failure."""
+
+    def test_archive_succeeds_forecast_fails_warns(self, caplog):
+        """A failing forecast leg is logged as WARNING but does not propagate
+        when the archive leg succeeds."""
+        import logging
+
+        from spotforecast2_safe.weather import WeatherService
+
+        svc = WeatherService(latitude=51.0, longitude=7.0)
+
+        now = pd.Timestamp.now(tz="UTC")
+        start = now - pd.Timedelta(days=10)
+        end = now + pd.Timedelta(days=1)
+
+        archive_idx = pd.date_range(start, periods=24, freq="h", tz="UTC")
+        archive_df = pd.DataFrame(
+            {"temperature_2m": [1.0] * 24}, index=archive_idx
+        )
+
+        with patch.object(
+            WeatherService, "fetch_archive", return_value=archive_df
+        ), patch.object(
+            WeatherService,
+            "fetch_forecast",
+            side_effect=RuntimeError("forecast api boom"),
+        ), caplog.at_level(logging.WARNING):
+            result = svc._fetch_hybrid(start, end, "UTC")
+
+        assert not result.empty
+        assert str(result.index.tz) == "UTC"
+        assert any(
+            "Forecast fetch warning" in rec.message for rec in caplog.records
+        ), "WARNING for forecast leg should be logged"
 
 
 class TestWeatherServiceFinalize:
