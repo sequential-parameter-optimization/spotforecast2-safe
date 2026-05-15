@@ -178,6 +178,18 @@ class WeatherClient:
             start: Start date for the historical data.
             end: End date for the historical data.
             timezone: Timezone for the data (default "UTC").
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.weather import WeatherClient
+            client = WeatherClient(latitude=52.52, longitude=13.405)
+            df = client.fetch_archive(
+                start=pd.Timestamp("2023-01-01", tz="UTC"),
+                end=pd.Timestamp("2023-01-02", tz="UTC"),
+            )
+            print(df.head())
+            ```
         """
         params = {
             "latitude": self.latitude,
@@ -230,6 +242,19 @@ class WeatherService(WeatherClient):
             Default is None (no caching).
         use_forecast:
             Whether to use forecast data for future dates (default True).
+
+    Examples:
+        ```{python}
+        from pathlib import Path
+        import pandas as pd
+        from spotforecast2_safe.weather import WeatherService
+        client = WeatherService(latitude=52.52, longitude=13.405, cache_path=Path("weather_cache.parquet"))
+        start = pd.Timestamp("2023-01-01", tz="UTC")
+        end = pd.Timestamp("2023-01-07", tz="UTC")
+        df = client.get_dataframe(start=start, end=end, fill_missing=False)
+        print(df.head())
+        print(df.tail())
+        ```
     """
 
     def __init__(
@@ -285,6 +310,7 @@ class WeatherService(WeatherClient):
              end = pd.Timestamp.now(tz="UTC")
              df = client.get_dataframe(start=start, end=end, fill_missing=False)
              print(df.head())
+             print(df.tail())
              ```
         """
         start_ts = pd.Timestamp(start)
