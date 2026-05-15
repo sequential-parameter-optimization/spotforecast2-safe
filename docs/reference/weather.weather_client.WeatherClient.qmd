@@ -50,6 +50,19 @@ Fetch historical data from Archive API.
 | end      | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date for the historical data.      | _required_ |
 | timezone | [str](`str`)                                   | Timezone for the data (default "UTC"). | `'UTC'`    |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather import WeatherClient
+client = WeatherClient(latitude=52.52, longitude=13.405)
+df = client.fetch_archive(
+    start=pd.Timestamp("2023-01-01", tz="UTC"),
+    end=pd.Timestamp("2023-01-02", tz="UTC"),
+)
+print(df.head())
+```
+
 ### fetch_forecast { #spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast }
 
 ```python

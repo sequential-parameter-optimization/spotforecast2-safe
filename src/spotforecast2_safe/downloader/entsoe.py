@@ -58,7 +58,6 @@ Threat model (STRIDE).
 
 import logging
 import time
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -66,6 +65,10 @@ import pandas as pd
 from spotforecast2_safe.data.fetch_data import fetch_data, get_data_home
 
 logger = logging.getLogger(__name__)
+
+_MAX_RETRIES = 5
+_RETRY_BACKOFF_SECONDS = 5
+_COOLDOWN_HOURS = 24
 
 
 def merge_build_manual(output_file: str = "energy_load.csv") -> None:
@@ -87,32 +90,26 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
     Notes:
         Logging information can be selected by setting the log level for the
         `spotforecast2_safe.downloader.entsoe` logger. Common levels are
-        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`.
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell
+        below shows the default (WARNING); change the level to `INFO` or
+        `DEBUG` for more verbose output.
 
-        Examples:
-            # Show only warnings and errors (default)
-            >>> import logging
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
-
-            # Show informative messages about the merging process
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-
-            # Show detailed debug information
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+        ```{python}
+        import logging
+        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
+        ```
 
     Examples:
-        # Example 1: Merge with default output file (if raw data exists)
-        >>> from spotforecast2_safe.downloader.entsoe import merge_build_manual
-        >>> try:
-        ...     merge_build_manual()
-        ... except Exception:
-        ...     pass  # Ignore errors if no raw data exists
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import merge_build_manual
 
-        # Example 2: Merge with a custom output file name
-        >>> try:
-        ...     merge_build_manual(output_file="custom_energy_load.csv")
-        ... except Exception:
-        ...     pass
+        # Merge with the default output filename
+        merge_build_manual()
+
+        # Or merge with a custom output filename
+        merge_build_manual(output_file="custom_energy_load.csv")
+        ```
     """
     data_home = get_data_home()
     raw_dir = data_home / "raw"
@@ -172,8 +169,8 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
 def download_new_data(
     api_key: str,
     country_code: str = "FR",
-    start: Optional[str] = None,
-    end: Optional[str] = None,
+    start: str | None = None,
+    end: str | None = None,
     force: bool = False,
 ) -> None:
     """
@@ -195,52 +192,46 @@ def download_new_data(
         ImportError:
             If the Python package 'entsoe-py' is not installed.
         ValueError:
-            If data fetching fails after retries.
+            If ``start`` or ``end`` cannot be parsed as a valid timestamp.
+        RuntimeError:
+            If data fetching fails after ``_MAX_RETRIES`` attempts.
 
     Notes:
         Logging information can be selected by setting the log level for the
         `spotforecast2_safe.downloader.entsoe` logger. Common levels are
-        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. For example, to
-        show only warnings and errors (default):
-        import logging;
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell
+        below shows the default (WARNING); change the level to `INFO` or
+        `DEBUG` for more verbose output.
+
+        ```{python}
+        import logging
         logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
-        to show informative messages about the merging process
-        import logging;
-        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-        to show detailed debug information:
-        import logging;
-        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+        ```
 
     Examples:
-        # Example 1: Basic download for Germany with specific start/end dates
-        >>> from spotforecast2_safe.downloader.entsoe import download_new_data
-        >>> try:
-        ...     download_new_data(
-        ...         api_key="YOUR_API_KEY",
-        ...         country_code="DE",
-        ...         start="202301010000",
-        ...         end="202301020000",
-        ...         force=True
-        ...     )
-        ... except (ImportError, ValueError, Exception):
-        ...     # In a real scenario, handle errors appropriately
-        ...     pass
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import download_new_data
 
-        # Example 2: Incremental download (automatically resumes from last data point)
-        >>> try:
-        ...     download_new_data(api_key="YOUR_API_KEY", country_code="FR")
-        ... except (ImportError, Exception):
-        ...     pass
+        # Basic download for Germany with explicit start/end dates
+        download_new_data(
+            api_key="YOUR_API_KEY",
+            country_code="DE",
+            start="202301010000",
+            end="202301020000",
+            force=True,
+        )
 
-        # Example 3: Forced download bypassing the 24h cooldown check
-        >>> try:
-        ...     download_new_data(
-        ...         api_key="YOUR_API_KEY",
-        ...         country_code="DE",
-        ...         force=True
-        ...     )
-        ... except (ImportError, Exception):
-        ...     pass
+        # Incremental download (automatically resumes from last data point)
+        download_new_data(api_key="YOUR_API_KEY", country_code="FR")
+
+        # Forced download bypassing the 24-hour cooldown check
+        download_new_data(
+            api_key="YOUR_API_KEY",
+            country_code="DE",
+            force=True,
+        )
+        ```
     """
 
     try:
@@ -278,7 +269,11 @@ def download_new_data(
                 start_date,
             )
     else:
-        start_date = pd.to_datetime(start, utc=True)
+        start_date = pd.to_datetime(start, utc=True, errors="coerce")
+        if pd.isna(start_date):
+            raise ValueError(
+                f"start={start!r} did not parse to a valid timestamp"
+            )
         logger.info("Using provided start date: %s", start_date)
 
     # Determine end date
@@ -286,14 +281,19 @@ def download_new_data(
         end_date = pd.Timestamp.now(tz="UTC").floor("D")
         logger.info("No end date provided. Using current date: %s", end_date)
     else:
-        end_date = pd.to_datetime(end, utc=True)
+        end_date = pd.to_datetime(end, utc=True, errors="coerce")
+        if pd.isna(end_date):
+            raise ValueError(
+                f"end={end!r} did not parse to a valid timestamp"
+            )
         logger.info("Using provided end date: %s", end_date)
 
     # Safety check: avoid redundant small downloads
     hours_diff = (end_date - start_date).total_seconds() / 3600
-    if hours_diff < 24 and not force:
+    if hours_diff < _COOLDOWN_HOURS and not force:
         logger.info(
-            "Last download was too recent (%.1f hours ago). Skipping.", 24 - hours_diff
+            "Last download was too recent (%.1f hours ago). Skipping.",
+            _COOLDOWN_HOURS - hours_diff,
         )
         return
 
@@ -304,13 +304,14 @@ def download_new_data(
     success = False
     downloaded_df = None
 
-    while retry_counter < 5:
+    while retry_counter < _MAX_RETRIES:
         try:
             logger.info(
-                "Downloading data from %s to %s (attempt %d/5)...",
+                "Downloading data from %s to %s (attempt %d/%d)...",
                 start_date,
                 end_date,
                 retry_counter + 1,
+                _MAX_RETRIES,
             )
             downloaded_df = client.query_load_and_forecast(
                 country_code=country_code, start=start_date, end=end_date
@@ -318,13 +319,18 @@ def download_new_data(
             success = True
             break
         except Exception as e:
-            logger.warning("Download failed: %s. Retrying in 5s...", e)
+            logger.warning(
+                "Download failed: %s. Retrying in %ds...",
+                e,
+                _RETRY_BACKOFF_SECONDS,
+            )
             retry_counter += 1
-            time.sleep(5)
+            time.sleep(_RETRY_BACKOFF_SECONDS)
 
     if not success or downloaded_df is None:
-        logger.error("Failed to download data from ENTSO-E after 5 attempts.")
-        return
+        raise RuntimeError(
+            f"Failed to download data from ENTSO-E after {_MAX_RETRIES} attempts."
+        )
 
     # Save to raw
     data_home = get_data_home()

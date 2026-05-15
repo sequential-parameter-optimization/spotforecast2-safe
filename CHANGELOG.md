@@ -1,3 +1,15 @@
+## [3.0.4-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.4-rc.1...v3.0.4-rc.2) (2026-05-15)
+
+
+### Documentation
+
+* **downloader:** convert entsoe docstring examples to Quarto {python} blocks ([c58b685](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c58b685dcf94d7d7a8b1d889464413da7a02419d))
+
+
+### Code Refactoring
+
+* **downloader:** raise on persistent ENTSO-E failure, guard NaT, extract retry constants ([06e5f84](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/06e5f846eeac3b948b2be8a5652196b22a5d29e0))
+
 ## [3.0.4-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.3...v3.0.4-rc.1) (2026-05-15)
 
 
