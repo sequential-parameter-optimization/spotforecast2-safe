@@ -530,7 +530,10 @@ def load_timeseries(
         )
         df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
 
-        y = load_timeseries()
+        # demo01.csv has gaps on Jan 1 of each year, so we opt into the
+        # legacy ffill/bfill behavior here.  Production callers should
+        # leave on_missing='raise' (the default) and surface the gaps.
+        y = load_timeseries(on_missing="ffill_bfill")
         print(isinstance(y, pd.Series), y.index.tz is not None)
 
         shutil.rmtree(tmp)
@@ -597,7 +600,10 @@ def load_timeseries_forecast(
         )
         df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
 
-        y_f = load_timeseries_forecast()
+        # demo01.csv has gaps on Jan 1 of each year, so we opt into the
+        # legacy ffill/bfill behavior here.  Production callers should
+        # leave on_missing='raise' (the default) and surface the gaps.
+        y_f = load_timeseries_forecast(on_missing="ffill_bfill")
         print(isinstance(y_f, pd.Series))
 
         shutil.rmtree(tmp)
