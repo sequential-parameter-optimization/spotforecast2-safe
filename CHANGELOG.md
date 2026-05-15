@@ -1,3 +1,10 @@
+## [3.0.3-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.3-rc.1...v3.0.3-rc.2) (2026-05-15)
+
+
+### Code Refactoring
+
+* **weather:** modernise typing, urllib3 import, add NaT guard ([1362fca](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1362fca022b53b6baa15e000938d2b4c831f8e63))
+
 ## [3.0.3-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.2...v3.0.3-rc.1) (2026-05-15)
 
 
