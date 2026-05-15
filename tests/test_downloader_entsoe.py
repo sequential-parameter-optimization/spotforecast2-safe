@@ -197,5 +197,67 @@ class TestDownloadNewDataResumeFallback(unittest.TestCase):
         mock_entsoe_mod.EntsoePandasClient.assert_not_called()
 
 
+class TestDownloadNewDataFailSafe(unittest.TestCase):
+    """Fail-safe contracts: NaT input rejection and raise-on-persistent-failure."""
+
+    def setUp(self):
+        self.test_dir = Path(tempfile.mkdtemp())
+        (self.test_dir / "raw").mkdir()
+        (self.test_dir / "interim").mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+
+    @patch("spotforecast2_safe.downloader.entsoe.time.sleep", lambda _s: None)
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_raises_runtimeerror_after_persistent_failure(
+        self, mock_fetch, mock_get_home
+    ):
+        """After exhausting the retry budget, raise RuntimeError instead of returning silently."""
+        mock_get_home.return_value = self.test_dir
+        mock_fetch.side_effect = FileNotFoundError("no prior data")
+
+        mock_entsoe_mod = MagicMock()
+        mock_client = mock_entsoe_mod.EntsoePandasClient.return_value
+        mock_client.query_load_and_forecast.side_effect = RuntimeError("api down")
+        sys.modules["entsoe"] = mock_entsoe_mod
+
+        with self.assertRaises(RuntimeError) as ctx:
+            download_new_data(api_key="fake_key", force=True)
+
+        self.assertIn("5 attempts", str(ctx.exception))
+        # All 5 attempts were made
+        self.assertEqual(mock_client.query_load_and_forecast.call_count, 5)
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    def test_invalid_start_raises_value_error(self, mock_get_home):
+        """A start string that does not parse as a timestamp raises ValueError."""
+        mock_get_home.return_value = self.test_dir
+
+        with self.assertRaises(ValueError) as ctx:
+            download_new_data(
+                api_key="fake_key",
+                start="not a date",
+                end="202301020000",
+                force=True,
+            )
+        self.assertIn("start=", str(ctx.exception))
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    def test_invalid_end_raises_value_error(self, mock_get_home):
+        """An end string that does not parse as a timestamp raises ValueError."""
+        mock_get_home.return_value = self.test_dir
+
+        with self.assertRaises(ValueError) as ctx:
+            download_new_data(
+                api_key="fake_key",
+                start="202301010000",
+                end="not a date",
+                force=True,
+            )
+        self.assertIn("end=", str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
