@@ -10,7 +10,7 @@ to ensure they execute correctly and produce expected results.
 
 import doctest
 
-from spotforecast2_safe.manager.datasets import demo_loader
+from spotforecast2_safe.data import demo_loader
 
 
 def test_docstring_examples_demo_loader():

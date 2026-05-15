@@ -48,7 +48,7 @@ from typing import Optional
 
 from lightgbm import LGBMRegressor
 
-from spotforecast2_safe.manager.datasets import DemoConfig, load_actual_combined
+from spotforecast2_safe.data import DemoConfig, load_actual_combined
 from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.metrics import calculate_metrics
 from spotforecast2_safe.manager.tools import _parse_bool

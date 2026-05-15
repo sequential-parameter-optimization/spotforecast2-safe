@@ -13,7 +13,7 @@ import doctest
 
 def test_docstring_examples_demo_data():
     """Test all docstring examples in datasets.demo_data module."""
-    import spotforecast2_safe.manager.datasets.demo_data as demo_data_module
+    import spotforecast2_safe.data.demo_data as demo_data_module
 
     results = doctest.testmod(
         demo_data_module,

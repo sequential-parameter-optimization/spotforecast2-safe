@@ -1,6 +1,6 @@
-# manager.datasets.demo_loader { #spotforecast2_safe.manager.datasets.demo_loader }
+# data.demo_loader { #spotforecast2_safe.data.demo_loader }
 
-`manager.datasets.demo_loader`
+`data.demo_loader`
 
 Demo data loader for safety-critical forecasting tasks.
 
@@ -11,12 +11,12 @@ validation in forecasting demonstrations and production workflows.
 
 | Name | Description |
 | --- | --- |
-| [load_actual_combined](#spotforecast2_safe.manager.datasets.demo_loader.load_actual_combined) | Load ground truth and compute combined actual series with validation. |
+| [load_actual_combined](#spotforecast2_safe.data.demo_loader.load_actual_combined) | Load ground truth and compute combined actual series with validation. |
 
-### load_actual_combined { #spotforecast2_safe.manager.datasets.demo_loader.load_actual_combined }
+### load_actual_combined { #spotforecast2_safe.data.demo_loader.load_actual_combined }
 
 ```python
-manager.datasets.demo_loader.load_actual_combined(
+data.demo_loader.load_actual_combined(
     config,
     columns,
     forecast_horizon=None,
@@ -35,7 +35,7 @@ horizon, and aggregates multiple columns using weighted averaging.
 
 | Name             | Type                                                                       | Description                                                                                         | Default    |
 |------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|------------|
-| config           | [DemoConfig](`spotforecast2_safe.manager.datasets.demo_data.DemoConfig`)   | Configuration object containing default paths and parameters.                                       | _required_ |
+| config           | [DemoConfig](`spotforecast2_safe.data.demo_data.DemoConfig`)               | Configuration object containing default paths and parameters.                                       | _required_ |
 | columns          | [List](`typing.List`)\[[str](`str`)\]                                      | List of column names to extract from the ground truth data.                                         | _required_ |
 | forecast_horizon | [Optional](`typing.Optional`)\[[int](`int`)\]                              | Number of time steps to extract. If None, uses config.forecast_horizon. Must be positive.           | `None`     |
 | weights          | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\] | Weights for aggregating columns. If None, uses config.weights. Length must match number of columns. | `None`     |
@@ -60,8 +60,8 @@ horizon, and aggregates multiple columns using weighted averaging.
 >>> import tempfile
 >>> import pandas as pd
 >>> from pathlib import Path
->>> from spotforecast2_safe.manager.datasets.demo_data import DemoConfig
->>> from spotforecast2_safe.manager.datasets.demo_loader import load_actual_combined
+>>> from spotforecast2_safe.data.demo_data import DemoConfig
+>>> from spotforecast2_safe.data.demo_loader import load_actual_combined
 >>>
 >>> # Example 1: Basic usage with default config parameters
 >>> with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
