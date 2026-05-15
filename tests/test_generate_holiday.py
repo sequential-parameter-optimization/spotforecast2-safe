@@ -1,6 +1,6 @@
 import pandas as pd
 
-from spotforecast2_safe.utils.generate_holiday import create_holiday_df
+from spotforecast2_safe.holiday import create_holiday_df
 
 
 def test_create_holiday_df_christmas():
@@ -62,3 +62,33 @@ def test_empty_range():
     df = create_holiday_df(start, end, freq="D", country_code="DE")  # New Year
     assert len(df) == 1
     assert df.iloc[0]["is_holiday"] == 1
+
+
+def test_mixed_naive_start_aware_end_raises_typeerror():
+    """A naive ``start`` paired with a tz-aware ``end`` raises ``TypeError``.
+
+    The source code's elif branch intends to infer the timezone from
+    ``end`` when ``start`` lacks tz info, but ``pd.date_range`` rejects
+    mismatched-tz endpoints before the inferred timezone is applied.
+    Pinning the current contract so a future enhancement that supports
+    this input shape must update the test deliberately.
+    """
+    import pytest
+
+    start = "2023-12-24"
+    end = pd.Timestamp("2023-12-26", tz="Europe/Berlin")
+    with pytest.raises(TypeError):
+        create_holiday_df(start, end, freq="D", country_code="DE", state="NW")
+
+
+def test_non_de_country_code_us():
+    """Non-default ``country_code`` / ``state`` plumbing reaches python-holidays."""
+    df = create_holiday_df(
+        "2023-07-03",
+        "2023-07-05",
+        freq="D",
+        country_code="US",
+        state="NY",
+    )
+
+    assert df["is_holiday"].tolist() == [0, 1, 0]  # Independence Day = July 4
