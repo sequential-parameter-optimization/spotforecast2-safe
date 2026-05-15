@@ -14,7 +14,7 @@ The `TestDemoConfig` class verifies that the defaults are meaningful. A `forecas
 The 11-element `weights` list is equally deliberate. The task aggregates predictions from 11 time series columns into a single combined forecast using a signed weighted average. Some weights are negative, which means those columns enter the combination with reversed sign. The test confirms there are exactly 7 positive weights and 4 negative weights — a contract that must hold for the aggregation arithmetic to produce the intended result.
 
 ```{python}
-from spotforecast2_safe.manager.datasets.demo_data import DemoConfig
+from spotforecast2_safe.data.demo_data import DemoConfig
 
 config = DemoConfig()
 print(f"forecast_horizon : {config.forecast_horizon}")

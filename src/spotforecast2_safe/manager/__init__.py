@@ -10,7 +10,6 @@ This module provides utilities for:
 - Model prediction management
 - Model training and retraining workflows
 - Model evaluation metrics
-- Dataset configurations (see manager.datasets submodule)
 - CLI argument parsing utilities
 - Exogenous feature engineering (see manager.exo submodule)
 """
