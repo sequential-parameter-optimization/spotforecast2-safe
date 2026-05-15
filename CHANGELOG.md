@@ -1,3 +1,10 @@
+## [5.0.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.0...v5.0.1-rc.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* **docs:** pass on_missing='ffill_bfill' in load_timeseries examples ([e298a68](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e298a68f20c6546a6f7f55c95717bd89e2d5e837)), closes [#153](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/153)
+
 ## [5.0.0-rc.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.0-rc.2...v5.0.0-rc.3) (2026-05-15)
 
 
