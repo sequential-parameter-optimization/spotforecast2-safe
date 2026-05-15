@@ -61,11 +61,11 @@ def load_actual_combined(
         from spotforecast2_safe.data.demo_data import DemoConfig
         from spotforecast2_safe.data.demo_loader import load_actual_combined
 
+        idx = pd.date_range("2020-01-01", periods=3, freq="h", name="timestamp")
+        sample_df = pd.DataFrame({"col1": [1.0, 3.0, 5.0], "col2": [2.0, 4.0, 6.0]}, index=idx)
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-            _ = f.write("timestamp,col1,col2\n")
-            _ = f.write("2020-01-01 00:00:00,1.0,2.0\n")
-            _ = f.write("2020-01-01 01:00:00,3.0,4.0\n")
-            _ = f.write("2020-01-01 02:00:00,5.0,6.0\n")
+            sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
         config = DemoConfig(data_path=temp_path)
@@ -80,10 +80,14 @@ def load_actual_combined(
         Override forecast horizon and weights:
 
         ```{python}
+        idx = pd.date_range("2020-01-01", periods=10, freq="h", name="timestamp")
+        sample_df = pd.DataFrame(
+            {"col1": [float(i) for i in range(10)], "col2": [float(i * 2) for i in range(10)]},
+            index=idx,
+        )
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-            _ = f.write("timestamp,col1,col2\n")
-            for i in range(10):
-                _ = f.write(f"2020-01-01 {i:02d}:00:00,{i}.0,{i * 2}.0\n")
+            sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
         config = DemoConfig(data_path=temp_path, forecast_horizon=24)
@@ -97,9 +101,11 @@ def load_actual_combined(
         Override `data_path` while keeping the rest of the config:
 
         ```{python}
+        idx = pd.date_range("2020-01-01", periods=1, freq="h", name="timestamp")
+        sample_df = pd.DataFrame({"X": [100.0], "Y": [200.0]}, index=idx)
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-            _ = f.write("timestamp,X,Y\n")
-            _ = f.write("2020-01-01 00:00:00,100.0,200.0\n")
+            sample_df.to_csv(f.name)
             custom_path = Path(f.name)
 
         config = DemoConfig()  # default data_path
@@ -129,9 +135,11 @@ def load_actual_combined(
         Error handling — missing columns:
 
         ```{python}
+        idx = pd.date_range("2020-01-01", periods=1, freq="h", name="timestamp")
+        sample_df = pd.DataFrame({"col1": [1.0]}, index=idx)
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-            _ = f.write("timestamp,col1\n")
-            _ = f.write("2020-01-01 00:00:00,1.0\n")
+            sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
         config = DemoConfig(data_path=temp_path)
@@ -150,12 +158,18 @@ def load_actual_combined(
         Production usage with horizon and weights drawn from the config:
 
         ```{python}
+        idx = pd.date_range("2020-01-01", periods=30, freq="h", name="timestamp")
+        sample_df = pd.DataFrame(
+            {
+                "load": [100 + i for i in range(30)],
+                "solar": [50 + i for i in range(30)],
+                "wind": [25 + i for i in range(30)],
+            },
+            index=idx,
+        )
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-            _ = f.write("timestamp,load,solar,wind\n")
-            for i in range(30):
-                _ = f.write(
-                    f"2020-01-01 {i:02d}:00:00,{100 + i},{50 + i},{25 + i}\n"
-                )
+            sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
         config = DemoConfig(
