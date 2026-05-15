@@ -1,3 +1,17 @@
+## [3.0.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.3...v3.0.4) (2026-05-15)
+
+
+### Documentation
+
+* docstring mv to __init.py__ ([11a98e0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/11a98e08770b2004e1864e8e9b3509a770ead2a7))
+* **downloader:** convert entsoe docstring examples to Quarto {python} blocks ([c58b685](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c58b685dcf94d7d7a8b1d889464413da7a02419d))
+
+
+### Code Refactoring
+
+* **downloader:** raise on persistent ENTSO-E failure, guard NaT, extract retry constants ([06e5f84](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/06e5f846eeac3b948b2be8a5652196b22a5d29e0))
+* **holiday:** promote generate_holiday into top-level holiday package ([bf77263](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/bf77263d959d162433ceb6ef7a506c81562b8ec7))
+
 ## [3.0.4-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.4-rc.1...v3.0.4-rc.2) (2026-05-15)
 
 
