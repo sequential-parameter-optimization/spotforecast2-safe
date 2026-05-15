@@ -90,32 +90,26 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
     Notes:
         Logging information can be selected by setting the log level for the
         `spotforecast2_safe.downloader.entsoe` logger. Common levels are
-        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`.
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell
+        below shows the default (WARNING); change the level to `INFO` or
+        `DEBUG` for more verbose output.
 
-        Examples:
-            # Show only warnings and errors (default)
-            >>> import logging
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
-
-            # Show informative messages about the merging process
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-
-            # Show detailed debug information
-            >>> logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+        ```{python}
+        import logging
+        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
+        ```
 
     Examples:
-        # Example 1: Merge with default output file (if raw data exists)
-        >>> from spotforecast2_safe.downloader.entsoe import merge_build_manual
-        >>> try:
-        ...     merge_build_manual()
-        ... except Exception:
-        ...     pass  # Ignore errors if no raw data exists
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import merge_build_manual
 
-        # Example 2: Merge with a custom output file name
-        >>> try:
-        ...     merge_build_manual(output_file="custom_energy_load.csv")
-        ... except Exception:
-        ...     pass
+        # Merge with the default output filename
+        merge_build_manual()
+
+        # Or merge with a custom output filename
+        merge_build_manual(output_file="custom_energy_load.csv")
+        ```
     """
     data_home = get_data_home()
     raw_dir = data_home / "raw"
@@ -205,47 +199,39 @@ def download_new_data(
     Notes:
         Logging information can be selected by setting the log level for the
         `spotforecast2_safe.downloader.entsoe` logger. Common levels are
-        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. For example, to
-        show only warnings and errors (default):
-        import logging;
+        `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell
+        below shows the default (WARNING); change the level to `INFO` or
+        `DEBUG` for more verbose output.
+
+        ```{python}
+        import logging
         logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNING)
-        to show informative messages about the merging process
-        import logging;
-        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.INFO)
-        to show detailed debug information:
-        import logging;
-        logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.DEBUG)
+        ```
 
     Examples:
-        # Example 1: Basic download for Germany with specific start/end dates
-        >>> from spotforecast2_safe.downloader.entsoe import download_new_data
-        >>> try:
-        ...     download_new_data(
-        ...         api_key="YOUR_API_KEY",
-        ...         country_code="DE",
-        ...         start="202301010000",
-        ...         end="202301020000",
-        ...         force=True
-        ...     )
-        ... except (ImportError, ValueError, Exception):
-        ...     # In a real scenario, handle errors appropriately
-        ...     pass
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import download_new_data
 
-        # Example 2: Incremental download (automatically resumes from last data point)
-        >>> try:
-        ...     download_new_data(api_key="YOUR_API_KEY", country_code="FR")
-        ... except (ImportError, Exception):
-        ...     pass
+        # Basic download for Germany with explicit start/end dates
+        download_new_data(
+            api_key="YOUR_API_KEY",
+            country_code="DE",
+            start="202301010000",
+            end="202301020000",
+            force=True,
+        )
 
-        # Example 3: Forced download bypassing the 24h cooldown check
-        >>> try:
-        ...     download_new_data(
-        ...         api_key="YOUR_API_KEY",
-        ...         country_code="DE",
-        ...         force=True
-        ...     )
-        ... except (ImportError, Exception):
-        ...     pass
+        # Incremental download (automatically resumes from last data point)
+        download_new_data(api_key="YOUR_API_KEY", country_code="FR")
+
+        # Forced download bypassing the 24-hour cooldown check
+        download_new_data(
+            api_key="YOUR_API_KEY",
+            country_code="DE",
+            force=True,
+        )
+        ```
     """
 
     try:
