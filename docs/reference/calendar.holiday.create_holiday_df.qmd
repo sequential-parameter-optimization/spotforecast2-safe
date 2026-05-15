@@ -1,7 +1,7 @@
-# holiday.generate_holiday.create_holiday_df { #spotforecast2_safe.holiday.generate_holiday.create_holiday_df }
+# calendar.holiday.create_holiday_df { #spotforecast2_safe.calendar.holiday.create_holiday_df }
 
 ```python
-holiday.generate_holiday.create_holiday_df(
+calendar.holiday.create_holiday_df(
     start,
     end,
     tz='UTC',
@@ -35,7 +35,7 @@ Expands daily holidays to all timestamps in the desired frequency.
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.holiday import create_holiday_df
+from spotforecast2_safe.calendar import create_holiday_df
 df = create_holiday_df("2023-12-24", "2023-12-26", freq="D")
 print(df["is_holiday"].tolist())
 ```
