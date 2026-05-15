@@ -1,3 +1,10 @@
+## [4.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v4.0.0...v4.1.0) (2026-05-15)
+
+
+### Features
+
+* data cleanup ([cf54cfa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cf54cfa74cd152f77d6a2ba1513958b53e04736d))
+
 ## [4.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.4...v4.0.0) (2026-05-15)
 
 
