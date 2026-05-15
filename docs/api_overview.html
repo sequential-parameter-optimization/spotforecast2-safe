@@ -917,24 +917,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">get_weather_features</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../docs/reference/manager.exo.calendar.get_calendar_features.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_calendar_features</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../docs/reference/manager.exo.calendar.get_day_night_features.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_day_night_features</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../docs/reference/manager.exo.calendar.get_holiday_features.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_holiday_features</span></a>
-  </div>
-</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1083,7 +1065,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
- <span class="menu-text">Holiday</span></a>
+ <span class="menu-text">Calendar</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1091,14 +1073,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../docs/reference/holiday.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Overview</span></a>
+  <a href="../docs/reference/calendar.holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_holiday_df</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../docs/reference/holiday.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_holiday_df</span></a>
+  <a href="../docs/reference/calendar.holiday.get_holiday_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_holiday_features</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs/reference/calendar.features.get_calendar_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_calendar_features</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs/reference/calendar.features.get_day_night_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_day_night_features</span></a>
   </div>
 </li>
       </ul>
@@ -1412,7 +1406,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
 <section id="import-core-components" class="level3">
 <h3 class="anchored" data-anchor-id="import-core-components">1. Import Core Components</h3>
-<div id="d358ad5e" class="cell" data-execution_count="1">
+<div id="e17bef7c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> (</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    ExogBuilder,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    RollingFeatures,</span>
@@ -1422,13 +1416,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveLGBM,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveModel,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.holiday <span class="im">import</span> generate_holiday</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="load-prepare-data" class="level3">
 <h3 class="anchored" data-anchor-id="load-prepare-data">2. Load &amp; Prepare Data</h3>
-<div id="134cd9cf" class="cell" data-execution_count="2">
+<div id="a2c54c1f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1441,7 +1434,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="define-forecasting-period" class="level3">
 <h3 class="anchored" data-anchor-id="define-forecasting-period">3. Define Forecasting Period</h3>
-<div id="d5c005f5" class="cell" data-execution_count="3">
+<div id="ef159092" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define train/test split dates for temporal validation</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'2022-12-31'</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>test_start <span class="op">=</span> <span class="st">'2023-01-01'</span></span>
@@ -1450,7 +1443,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="create-rolling-features" class="level3">
 <h3 class="anchored" data-anchor-id="create-rolling-features">4. Create Rolling Features</h3>
-<div id="f104445c" class="cell" data-execution_count="4">
+<div id="a0a3cb8c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1466,7 +1459,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="train-recursive-forecaster" class="level3">
 <h3 class="anchored" data-anchor-id="train-recursive-forecaster">5. Train Recursive Forecaster</h3>
-<div id="23a0e978" class="cell" data-execution_count="5">
+<div id="1e1a88d4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build forecaster with rolling-mean window features and fit on training data</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursive(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>Ridge(),</span>
@@ -1494,14 +1487,14 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="period-management" class="level3">
 <h3 class="anchored" data-anchor-id="period-management">Period Management</h3>
 <p>The <code>Period</code> dataclass encodes cyclical temporal features (e.g.&nbsp;hour-of-day, day-of-week):</p>
-<div id="afb0895c" class="cell" data-execution_count="6">
+<div id="7997210e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data <span class="im">import</span> Period</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Encode hour-of-day as a cyclical feature</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>period <span class="op">=</span> Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For train/test splits, use plain date strings with pandas boolean indexing:</p>
-<div id="fa6de08e" class="cell" data-execution_count="7">
+<div id="36702404" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>train_end <span class="op">=</span> <span class="st">'2023-06-30'</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>test_start <span class="op">=</span> <span class="st">'2023-07-01'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1515,7 +1508,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <li><code>ForecasterRecursiveLGBM</code>: LightGBM implementation (recommended for most use cases)</li>
 <li><code>ForecasterRecursiveXGB</code>: XGBoost implementation</li>
 </ul>
-<div id="73dbdd43" class="cell" data-execution_count="8">
+<div id="1cfd138f" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>forecaster_lgbm <span class="op">=</span> ForecasterRecursive(</span>
@@ -1552,7 +1545,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="feature-engineering" class="level3">
 <h3 class="anchored" data-anchor-id="feature-engineering">Feature Engineering</h3>
 <p>The <code>ExogBuilder</code> class constructs exogenous (external) features:</p>
-<div id="9c4255b7" class="cell" data-execution_count="9">
+<div id="1393cf8d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>builder <span class="op">=</span> ExogBuilder(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span>[Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))],</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
@@ -1572,8 +1565,8 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="holiday-integration" class="level3">
 <h3 class="anchored" data-anchor-id="holiday-integration">Holiday Integration</h3>
 <p>Generate holiday calendars for demand forecasting:</p>
-<div id="5cc63796" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.holiday <span class="im">import</span> create_holiday_df</span>
+<div id="580d25fc" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> create_holiday_df</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>holidays <span class="op">=</span> create_holiday_df(</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span><span class="st">'2023-01-01'</span>,</span>
@@ -1587,7 +1580,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="model-persistence-savingloading" class="level2">
 <h2 class="anchored" data-anchor-id="model-persistence-savingloading">Model Persistence (Saving/Loading)</h2>
 <p>Save trained models for production deployment:</p>
-<div id="dddb897d" class="cell" data-execution_count="11">
+<div id="ac4e6884" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> spotforecast2_safe.manager.persistence <span class="im">as</span> persistence</span>
@@ -1611,7 +1604,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="determinism" class="level3">
 <h3 class="anchored" data-anchor-id="determinism">Determinism</h3>
 <p>Same input always produces identical output (bit-level reproducible):</p>
-<div id="791869f3" class="cell" data-execution_count="12">
+<div id="cf311f9c" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pred1 <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pred2 <span class="op">=</span> forecaster.predict(steps<span class="op">=</span><span class="dv">7</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (pred1 <span class="op">==</span> pred2).<span class="bu">all</span>()</span>
@@ -1624,7 +1617,7 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 <section id="fail-safe-operation" class="level3">
 <h3 class="anchored" data-anchor-id="fail-safe-operation">Fail-Safe Operation</h3>
 <p>Invalid data raises explicit errors instead of silent failures:</p>
-<div id="b02a7992" class="cell" data-execution_count="13">
+<div id="17e394a4" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Missing values raise an explicit error — no silent NaN propagation</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y_with_nans <span class="op">=</span> pd.Series([<span class="fl">1.0</span>, np.nan, <span class="fl">3.0</span>, <span class="fl">4.0</span>, <span class="fl">5.0</span>],</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                        index<span class="op">=</span>pd.date_range(<span class="st">'2020-01-01'</span>, periods<span class="op">=</span><span class="dv">5</span>, freq<span class="op">=</span><span class="st">'D'</span>))</span>
@@ -1650,13 +1643,13 @@ Freq: D, Name: pred, dtype: float64</code></pre>
 </section>
 <section id="complete-example-end-to-end-forecasting" class="level2">
 <h2 class="anchored" data-anchor-id="complete-example-end-to-end-forecasting">Complete Example: End-to-End Forecasting</h2>
-<div id="cb819475" class="cell" data-execution_count="14">
+<div id="5a935641" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib.resources <span class="im">import</span> files</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.holiday <span class="im">import</span> create_holiday_df</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> create_holiday_df</span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Load demo02.csv (column A, 1970–1972, resampled to regular hourly grid)</span></span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> files(<span class="st">'spotforecast2_safe.datasets.csv'</span>).joinpath(<span class="st">'demo02.csv'</span>)</span>

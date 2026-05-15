@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>manager.exo.calendar.get_holiday_features – spotforecast2-safe</title>
+<title>calendar.holiday.create_holiday_df – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -305,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.metrics.calculate_metrics.html">Manager</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.exo.weather.get_weather_features.html">Exogenous Features</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.exo.calendar.get_holiday_features.html">get_holiday_features</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/calendar.holiday.create_holiday_df.html">Calendar</a></li><li class="breadcrumb-item"><a href="../../docs/reference/calendar.holiday.create_holiday_df.html">create_holiday_df</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -786,13 +786,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
  <span class="menu-text">Manager</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/manager.metrics.calculate_metrics.html" class="sidebar-item-text sidebar-link">
@@ -901,35 +901,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
  <span class="menu-text">Exogenous Features</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/manager.exo.weather.get_weather_features.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_weather_features</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.exo.calendar.get_calendar_features.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_calendar_features</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.exo.calendar.get_day_night_features.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_day_night_features</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.exo.calendar.get_holiday_features.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">get_holiday_features</span></a>
   </div>
 </li>
       </ul>
@@ -1079,23 +1061,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
- <span class="menu-text">Holiday</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="true">
+ <span class="menu-text">Calendar</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/holiday.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Overview</span></a>
+  <a href="../../docs/reference/calendar.holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">create_holiday_df</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/holiday.generate_holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_holiday_df</span></a>
+  <a href="../../docs/reference/calendar.holiday.get_holiday_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_holiday_features</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/calendar.features.get_calendar_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_calendar_features</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/calendar.features.get_day_night_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_day_night_features</span></a>
   </div>
 </li>
       </ul>
@@ -1340,16 +1334,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/manager.exo.calendar.get_holiday_features.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/calendar.holiday.create_holiday_df.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.metrics.calculate_metrics.html">Manager</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.exo.weather.get_weather_features.html">Exogenous Features</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.exo.calendar.get_holiday_features.html">get_holiday_features</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/calendar.holiday.create_holiday_df.html">Calendar</a></li><li class="breadcrumb-item"><a href="../../docs/reference/calendar.holiday.create_holiday_df.html">create_holiday_df</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">manager.exo.calendar.get_holiday_features</h1>
+<h1 class="title">calendar.holiday.create_holiday_df</h1>
 </div>
 
 
@@ -1366,18 +1361,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>manager.exo.calendar.get_holiday_features(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    data,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    start,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    cov_end,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    forecast_horizon,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    tz<span class="op">=</span><span class="st">'UTC'</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">'NW'</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Fetch public-holiday indicators and align them to a regular time grid.</p>
-<p>Downloads holiday data via :func:<code>~spotforecast2_safe.data.fetch_data.fetch_holiday_data</code>, validates coverage with :func:<code>~spotforecast2_safe.preprocessing.curate_data.curate_holidays</code>, and reindexes the result to a full <code>[start, cov_end]</code> grid with <code>fill_value=0</code> so that non-holiday timestamps are always zero.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>calendar.holiday.create_holiday_df(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    start,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    end,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    tz<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">'NW'</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create a DataFrame with datetime index and a binary holiday indicator column.</p>
+<p>Expands daily holidays to all timestamps in the desired frequency.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1391,51 +1384,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>data</td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>Reference time series DataFrame used for temporal coverage validation inside :func:<code>~spotforecast2_safe.preprocessing.curate_data.curate_holidays</code>.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
 <td>start</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>Start timestamp. String values are parsed with <code>utc=True</code>.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="odd">
-<td>cov_end</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>Inclusive end timestamp (should cover the full forecast horizon). String values are parsed with <code>utc=True</code>.</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
+<td>Start date/datetime.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td>forecast_horizon</td>
-<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Number of forecast steps ahead; passed to :func:<code>~spotforecast2_safe.preprocessing.curate_data.curate_holidays</code>.</td>
+<td>end</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
+<td>End date/datetime.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>tz</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Timezone applied to the generated index and passed to :func:<code>~spotforecast2_safe.data.fetch_data.fetch_holiday_data</code>. Defaults to <code>"UTC"</code>.</td>
+<td>Timezone to use if not inferred from start/end.</td>
 <td><code>'UTC'</code></td>
 </tr>
 <tr class="even">
 <td>freq</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Pandas-compatible frequency string for the output index. Defaults to <code>"h"</code> (hourly).</td>
+<td>Frequency of the resulting DataFrame.</td>
 <td><code>'h'</code></td>
 </tr>
 <tr class="odd">
 <td>country_code</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>ISO 3166-1 alpha-2 country code. Defaults to <code>"DE"</code> (Germany).</td>
+<td>Country code for holidays (e.g.&nbsp;“DE”, “US”).</td>
 <td><code>'DE'</code></td>
 </tr>
 <tr class="even">
 <td>state</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Sub-national state/region code. Defaults to <code>"NW"</code> (North Rhine-Westphalia).</td>
+<td>State code for holidays (e.g.&nbsp;“NW”, “CA”).</td>
 <td><code>'NW'</code></td>
 </tr>
 </tbody>
@@ -1455,58 +1436,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>pd.DataFrame: DataFrame with a single integer column</td>
-</tr>
-<tr class="even">
-<td></td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td><code>is_holiday</code>. The index is a tz-aware</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>class:<code>~pandas.DatetimeIndex</code> with the requested <code>freq</code>.</td>
+<td>pd.DataFrame: DataFrame with index covering [start, end] at <code>freq</code>, and an <code>is_holiday</code> column (1 if holiday, 0 otherwise).</td>
 </tr>
 </tbody>
 </table>
-<p>Examples:</p>
-<pre><code>::: {#81173abf .cell execution_count=1}
-``` {.python .cell-code}
-import pandas as pd
-from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
-from spotforecast2_safe.manager.exo.calendar import get_holiday_features
-
-# Minimal reference DataFrame for validation
-data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
-data = agg_and_resample_data(data, verbose=False)
-
-start = pd.Timestamp("2024-01-01", tz="UTC")
-cov_end = pd.Timestamp("2024-01-07 23:00", tz="UTC")
-
-holidays = get_holiday_features(
-    data=data,
-    start=start,
-    cov_end=cov_end,
-    forecast_horizon=24,
-    country_code="DE",
-    state="NW",
-)
-print("shape:", holidays.shape)
-print("columns:", holidays.columns.tolist())
-# New Year's Day (Jan 1) is a public holiday in Germany
-print("Jan 1 value:", holidays.loc["2024-01-01 00:00:00+00:00", "is_holiday"])
-```
-
-::: {.cell-output .cell-output-stdout}
-```
-Holiday dataframe has wrong shape.
-shape: (168, 1)
-columns: ['is_holiday']
-Jan 1 value: 1
-```
-:::
-:::</code></pre>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="f953c472" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> create_holiday_df</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> create_holiday_df(<span class="st">"2023-12-24"</span>, <span class="st">"2023-12-26"</span>, freq<span class="op">=</span><span class="st">"D"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"is_holiday"</span>].tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0, 1, 1]</code></pre>
+</div>
+</div>
 
 
 </section>
@@ -1939,7 +1883,7 @@ Jan 1 value: 1
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/manager.exo.calendar.get_holiday_features.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/calendar.holiday.create_holiday_df.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
