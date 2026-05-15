@@ -1396,7 +1396,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="b9b41c87" class="cell" data-execution_count="1">
+<div id="f16a637f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
@@ -1505,10 +1505,64 @@ datetime
 </tbody>
 </table>
 </section>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div id="704d46ed" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.fetch_archive(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>pd.Timestamp(<span class="st">"2023-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span>pd.Timestamp(<span class="st">"2023-01-02"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     temperature_2m  relative_humidity_2m  precipitation  \
+datetime                                                                   
+2023-01-01 00:00:00            15.2                    59            0.0   
+2023-01-01 01:00:00            15.6                    55            0.0   
+2023-01-01 02:00:00            15.7                    52            0.0   
+2023-01-01 03:00:00            15.8                    51            0.0   
+2023-01-01 04:00:00            15.8                    49            0.0   
+
+                     rain  snowfall  weather_code  pressure_msl  \
+datetime                                                          
+2023-01-01 00:00:00   0.0       0.0             3        1010.8   
+2023-01-01 01:00:00   0.0       0.0             3        1010.9   
+2023-01-01 02:00:00   0.0       0.0             3        1011.3   
+2023-01-01 03:00:00   0.0       0.0             3        1011.3   
+2023-01-01 04:00:00   0.0       0.0             3        1011.5   
+
+                     surface_pressure  cloud_cover  cloud_cover_low  \
+datetime                                                              
+2023-01-01 00:00:00            1006.4          100                0   
+2023-01-01 01:00:00            1006.5          100               12   
+2023-01-01 02:00:00            1006.9          100                8   
+2023-01-01 03:00:00            1006.9          100                1   
+2023-01-01 04:00:00            1007.1           85                0   
+
+                     cloud_cover_mid  cloud_cover_high  wind_speed_10m  \
+datetime                                                                 
+2023-01-01 00:00:00               14               100            30.5   
+2023-01-01 01:00:00               76               100            30.7   
+2023-01-01 02:00:00               25               100            31.3   
+2023-01-01 03:00:00              100                97            28.4   
+2023-01-01 04:00:00               32                78            28.3   
+
+                     wind_direction_10m  wind_gusts_10m  
+datetime                                                 
+2023-01-01 00:00:00                 232            49.7  
+2023-01-01 01:00:00                 231            52.2  
+2023-01-01 02:00:00                 232            52.2  
+2023-01-01 03:00:00                 231            52.2  
+2023-01-01 04:00:00                 223            47.9  </code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast">fetch_forecast</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_forecast(days_ahead, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>weather.weather_client.WeatherClient.fetch_forecast(days_ahead, timezone<span class="op">=</span><span class="st">'UTC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fetch forecast data from Forecast API.</p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -1537,13 +1591,13 @@ datetime
 </tbody>
 </table>
 </section>
-<section id="examples-1" class="level4 doc-section doc-section-examples">
-<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="8c5dc343" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.fetch_forecast(days_ahead<span class="op">=</span><span class="dv">7</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="examples-2" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div id="4d9c2202" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.fetch_forecast(days_ahead<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                     temperature_2m  relative_humidity_2m  precipitation  \
 datetime                                                                   
