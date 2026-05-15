@@ -1,3 +1,17 @@
+## [4.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.4...v4.0.0-rc.1) (2026-05-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* spotforecast2_safe.manager.datasets is gone. Import
+DemoConfig and load_actual_combined from spotforecast2_safe.data instead.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Code Refactoring
+
+* move DemoConfig and load_actual_combined to data/ ([ba512ce](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ba512ce6e5c78462102959f0f2da70492ddefe98))
+
 ## [3.0.4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v3.0.3...v3.0.4) (2026-05-15)
 
 
