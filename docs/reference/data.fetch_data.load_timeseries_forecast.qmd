@@ -64,7 +64,10 @@ df = pd.read_csv(demo).rename(
 )
 df.to_csv(os.path.join(interim, "energy_load.csv"), index=False)
 
-y_f = load_timeseries_forecast()
+# demo01.csv has gaps on Jan 1 of each year, so we opt into the
+# legacy ffill/bfill behavior here.  Production callers should
+# leave on_missing='raise' (the default) and surface the gaps.
+y_f = load_timeseries_forecast(on_missing="ffill_bfill")
 print(isinstance(y_f, pd.Series))
 
 shutil.rmtree(tmp)
