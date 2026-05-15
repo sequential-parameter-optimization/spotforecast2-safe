@@ -306,7 +306,7 @@ class WeatherService(WeatherClient):
             if cached_df.index.min() <= start_utc and cached_df.index.max() >= end_utc:
                 self.logger.info("Using full cached data.")
                 return self._finalize_df(
-                    cached_df.loc[start_utc:end_utc], freq, timezone, fill_missing
+                    cached_df.loc[start_utc:end_utc], freq, fill_missing
                 )
 
         # 2. Hybrid Fetch (filling gaps if cache exists, or fetching all)
@@ -320,7 +320,7 @@ class WeatherService(WeatherClient):
         except Exception as e:
             self.logger.warning(f"Fetch failed: {e}")
             if fallback_on_failure and cached_df is not None and len(cached_df) >= 24:
-                df = self._create_fallback(start_utc, end_utc, cached_df, timezone)
+                df = self._create_fallback(start_utc, end_utc, cached_df)
             else:
                 raise
 
@@ -334,7 +334,7 @@ class WeatherService(WeatherClient):
 
         # 4. Return slice
         return self._finalize_df(
-            df.loc[start_utc:end_utc], freq, timezone, fill_missing
+            df.loc[start_utc:end_utc], freq, fill_missing
         )
 
     def _fetch_hybrid(
@@ -383,7 +383,6 @@ class WeatherService(WeatherClient):
         start: pd.Timestamp,
         end: pd.Timestamp,
         source_df: pd.DataFrame,
-        timezone: str,
     ) -> pd.DataFrame:
         """Repeat last 24h of data."""
         last_24 = source_df.tail(24)
@@ -476,7 +475,6 @@ class WeatherService(WeatherClient):
         self,
         df: pd.DataFrame,
         freq: str,
-        timezone: str,
         fill_missing: bool = False,
     ) -> pd.DataFrame:
         """Resample, localise, and (optionally) fill gaps.
@@ -484,8 +482,6 @@ class WeatherService(WeatherClient):
         Args:
             df: Merged frame ready to be returned.
             freq: Target pandas frequency string.
-            timezone: Target timezone (unused; kept for signature
-                stability — callers slice in UTC beforehand).
             fill_missing: When True, forward- then back-fill any
                 remaining NaN (legacy behavior).  When False (the
                 fail-safe default), any remaining NaN raises

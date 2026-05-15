@@ -483,7 +483,7 @@ class TestWeatherServiceFinalize:
         df = pd.DataFrame({"temperature_2m": [1.0, None, None, 4.0, 5.0]}, index=idx)
 
         with pytest.raises(ValueError, match="missing row"):
-            svc._finalize_df(df, freq="h", timezone="UTC")
+            svc._finalize_df(df, freq="h")
 
     def test_finalize_fill_missing_true_restores_legacy(self):
         """``fill_missing=True`` opts into forward/back-fill behavior."""
@@ -493,7 +493,7 @@ class TestWeatherServiceFinalize:
         idx = pd.date_range("2023-01-01", periods=5, freq="h", tz="UTC")
         df = pd.DataFrame({"temperature_2m": [1.0, None, None, 4.0, 5.0]}, index=idx)
 
-        result = svc._finalize_df(df, freq="h", timezone="UTC", fill_missing=True)
+        result = svc._finalize_df(df, freq="h", fill_missing=True)
         assert not result.isnull().any().any()
 
     def test_finalize_hourly_does_not_resample(self):
@@ -504,5 +504,5 @@ class TestWeatherServiceFinalize:
         idx = pd.date_range("2023-01-01", periods=6, freq="h", tz="UTC")
         df = pd.DataFrame({"temperature_2m": list(range(6))}, index=idx)
 
-        result = svc._finalize_df(df, freq="h", timezone="UTC")
+        result = svc._finalize_df(df, freq="h")
         assert len(result) == 6
