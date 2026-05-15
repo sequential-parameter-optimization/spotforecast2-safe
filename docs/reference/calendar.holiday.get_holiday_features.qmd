@@ -1,7 +1,7 @@
-# manager.exo.calendar.get_holiday_features { #spotforecast2_safe.manager.exo.calendar.get_holiday_features }
+# calendar.holiday.get_holiday_features { #spotforecast2_safe.calendar.holiday.get_holiday_features }
 
 ```python
-manager.exo.calendar.get_holiday_features(
+calendar.holiday.get_holiday_features(
     data,
     start,
     cov_end,
@@ -13,11 +13,10 @@ manager.exo.calendar.get_holiday_features(
 )
 ```
 
-Fetch public-holiday indicators and align them to a regular time grid.
+Build public-holiday indicators and align them to a regular time grid.
 
-Downloads holiday data via
-:func:`~spotforecast2_safe.data.fetch_data.fetch_holiday_data`,
-validates coverage with
+Generates holiday indicators via :func:`create_holiday_df`, validates
+coverage with
 :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`,
 and reindexes the result to a full ``[start, cov_end]`` grid with
 ``fill_value=0`` so that non-holiday timestamps are always zero.
@@ -30,7 +29,7 @@ and reindexes the result to a full ``[start, cov_end]`` grid with
 | start            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start timestamp.  String values are parsed with ``utc=True``.                                                                                       | _required_ |
 | cov_end          | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end timestamp (should cover the full forecast horizon).  String values are parsed with ``utc=True``.                                      | _required_ |
 | forecast_horizon | [int](`int`)                                                                            | Number of forecast steps ahead; passed to :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`.                                    | _required_ |
-| tz               | [str](`str`)                                                                            | Timezone applied to the generated index and passed to :func:`~spotforecast2_safe.data.fetch_data.fetch_holiday_data`. Defaults to ``"UTC"``.        | `'UTC'`    |
+| tz               | [str](`str`)                                                                            | Timezone applied to the generated index and passed to :func:`create_holiday_df`.  Defaults to ``"UTC"``.                                            | `'UTC'`    |
 | freq             | [str](`str`)                                                                            | Pandas-compatible frequency string for the output index. Defaults to ``"h"`` (hourly).                                                              | `'h'`      |
 | country_code     | [str](`str`)                                                                            | ISO 3166-1 alpha-2 country code.  Defaults to ``"DE"`` (Germany).                                                                                   | `'DE'`     |
 | state            | [str](`str`)                                                                            | Sub-national state/region code.  Defaults to ``"NW"`` (North Rhine-Westphalia).                                                                     | `'NW'`     |
@@ -49,7 +48,7 @@ Examples:
     import pandas as pd
     from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
     from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
-    from spotforecast2_safe.manager.exo.calendar import get_holiday_features
+    from spotforecast2_safe.calendar import get_holiday_features
 
     # Minimal reference DataFrame for validation
     data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))

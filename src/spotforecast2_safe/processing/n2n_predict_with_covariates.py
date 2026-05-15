@@ -69,7 +69,7 @@ except ImportError:  # pragma: no cover - fallback when tqdm is not installed
 from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.forecaster.utils import predict_multivariate
-from spotforecast2_safe.manager.exo.calendar import (
+from spotforecast2_safe.calendar import (
     get_calendar_features,
     get_day_night_features,
     get_holiday_features,

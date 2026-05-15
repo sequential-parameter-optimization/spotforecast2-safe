@@ -14,12 +14,7 @@ This module provides utilities for:
 - Exogenous feature engineering (see manager.exo submodule)
 """
 
-from spotforecast2_safe.manager.exo import (
-    get_calendar_features,
-    get_day_night_features,
-    get_holiday_features,
-    get_weather_features,
-)
+from spotforecast2_safe.manager.exo import get_weather_features
 from spotforecast2_safe.manager.features import (
     apply_cyclical_encoding,
     create_interaction_features,
@@ -64,9 +59,6 @@ __all__ = [
     # Tools
     "_parse_bool",
     # Exo feature engineering
-    "get_calendar_features",
-    "get_day_night_features",
-    "get_holiday_features",
     "get_weather_features",
     # Feature engineering helpers
     "apply_cyclical_encoding",
