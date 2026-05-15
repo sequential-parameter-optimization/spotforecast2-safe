@@ -1418,7 +1418,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="implementation-example" class="level2">
 <h2 class="anchored" data-anchor-id="implementation-example">Implementation Example</h2>
 <p>The following example demonstrates how to prepare data with gaps for safe training and generate a forecast.</p>
-<div id="616b96ed" class="cell" data-execution_count="1">
+<div id="f407b095" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
@@ -1610,7 +1610,7 @@ Safety First
 <p>To make the mechanism concrete, this section walks through the exact numerical values at each step using a small, readable example: 30 hourly observations, two consecutive gaps at positions 10–11, and <code>window_size=5</code>.</p>
 <section id="step-1-raw-data-with-gaps" class="level3">
 <h3 class="anchored" data-anchor-id="step-1-raw-data-with-gaps">Step 1 — Raw data with gaps</h3>
-<div id="622401f4" class="cell" data-execution_count="2">
+<div id="7d0313f5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> get_missing_weights, WeightFunction</span>
@@ -1695,7 +1695,7 @@ Safety First
 <section id="step-2-imputation-and-weight-propagation" class="level3">
 <h3 class="anchored" data-anchor-id="step-2-imputation-and-weight-propagation">Step 2 — Imputation and weight propagation</h3>
 <p><code>get_missing_weights</code> forward-fills the gap with the last known value, then applies a <strong>rolling maximum</strong> of width <code>window_size + 1</code> over a binary “was-NaN” mask. Any row whose rolling window touches an imputed value receives weight <code>0</code>.</p>
-<div id="5aea30ee" class="cell" data-execution_count="3">
+<div id="a4567d27" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>filled_data, weights <span class="op">=</span> get_missing_weights(data, window_size<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> filled_data.copy()</span>
@@ -1803,7 +1803,7 @@ Note
 <section id="step-3-from-weights-to-x_train-and-sample_weight" class="level3">
 <h3 class="anchored" data-anchor-id="step-3-from-weights-to-x_train-and-sample_weight">Step 3 — From weights to <code>X_train</code> and <code>sample_weight</code></h3>
 <p><code>ForecasterRecursive._create_train_X_y()</code> converts the series into a lag matrix. With <code>lags=3</code> the training matrix starts at row 3 and the row indices become timestamps:</p>
-<div id="0b5f5891" class="cell" data-execution_count="4">
+<div id="a7e537a7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>forecaster_small <span class="op">=</span> ForecasterRecursive(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>LGBMRegressor(n_jobs<span class="op">=</span><span class="dv">1</span>, verbose<span class="op">=-</span><span class="dv">1</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">3</span>,</span>
@@ -1938,7 +1938,7 @@ Note
   └─ create_sample_weights(X_train) → weight_func(X_train.index)  → array([1,1,...,0,0,...,1])
   └─ estimator.fit(X_train, y_train, sample_weight=array)</code></pre>
 <p><code>LGBMRegressor</code> (and any sklearn-compatible estimator) interprets <code>sample_weight=0</code> as “skip this observation entirely”. The imputed rows are physically present in the training matrix but contribute zero gradient to the model.</p>
-<div id="316bf98d" class="cell" data-execution_count="5">
+<div id="337a77bd" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the weight distribution summary</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sw_series <span class="op">=</span> pd.Series(sample_weight, index<span class="op">=</span>X_train.index, name<span class="op">=</span><span class="st">'sample_weight'</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total training rows : </span><span class="sc">{</span><span class="bu">len</span>(sw_series)<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -1962,7 +1962,7 @@ Excluded timestamps:
 <p>You might wonder: if we already have the <code>weights</code> Series, why not pass it directly to the forecaster instead of wrapping it in a callable? There are three concrete reasons.</p>
 <p><strong>Reason 1 — Length mismatch: the lag matrix is shorter than the original series.</strong></p>
 <p><code>get_missing_weights</code> returns one weight per row of the original series (length <code>n</code>). <code>ForecasterRecursive._create_train_X_y</code> discards the first <code>max(lags)</code> rows because they cannot be fully populated with lag features. The resulting <code>X_train</code> has length <code>n − max(lags)</code>, which changes with every different <code>lags</code> setting.</p>
-<div id="9bd52727" class="cell" data-execution_count="6">
+<div id="f0f23029" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"len(filled_data) = </span><span class="sc">{</span><span class="bu">len</span>(filled_data)<span class="sc">}</span><span class="ss">   ← original series, one weight per row"</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"len(weights)     = </span><span class="sc">{</span><span class="bu">len</span>(weights)<span class="sc">}</span><span class="ss">   ← same"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
@@ -1991,7 +1991,7 @@ len(weights)     = 30   ← same
 <p>A plain array passed at construction time has no way to know which rows were dropped. A <strong>callable receives <code>X_train.index</code></strong> — the exact timestamps that survived — and performs a label-based lookup, returning a correctly sized array regardless of <code>lags</code>.</p>
 <p><strong>Reason 2 — Index-based lookup, not positional.</strong></p>
 <p>The forecaster calls <code>weight_func(X_train.index)</code> where <code>X_train.index</code> is a <code>DatetimeIndex</code>. The function maps each timestamp to its pre-computed weight by label:</p>
-<div id="491257d5" class="cell" data-execution_count="7">
+<div id="fbbbf326" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wf <span class="op">=</span> WeightFunction(weights)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Query a window that spans the gap boundary (mix of 1s and 0s)</span></span>
@@ -2019,7 +2019,7 @@ all-zero window → None  (None = uniform weights fallback)</code></pre>
 <p>A positional array <code>weights[7:10]</code> would silently return the wrong values because the lag-matrix offset shifts all positions by <code>max(lags)</code>.</p>
 <p><strong>Reason 3 — Picklability for model serialization.</strong></p>
 <p>Trained <code>ForecasterRecursive</code> instances are saved with <code>persistence.dump()</code> (joblib). Any closure or lambda that captures a local variable fails at serialization time:</p>
-<div id="8c3ec4d0" class="cell" data-execution_count="8">
+<div id="6d8c5333" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># A lambda closure over a local variable — NOT serializable</span></span>
