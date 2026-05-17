@@ -1334,6 +1334,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/calendar.holiday.get_holiday_features.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -1463,44 +1464,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>Examples:</p>
-<pre><code>::: {#ab6a79c5 .cell execution_count=1}
-``` {.python .cell-code}
-import pandas as pd
-from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
-from spotforecast2_safe.calendar import get_holiday_features
-
-# Minimal reference DataFrame for validation
-data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
-data = agg_and_resample_data(data, verbose=False)
-
-start = pd.Timestamp("2024-01-01", tz="UTC")
-cov_end = pd.Timestamp("2024-01-07 23:00", tz="UTC")
-
-holidays = get_holiday_features(
-    data=data,
-    start=start,
-    cov_end=cov_end,
-    forecast_horizon=24,
-    country_code="DE",
-    state="NW",
-)
-print("shape:", holidays.shape)
-print("columns:", holidays.columns.tolist())
-# New Year's Day (Jan 1) is a public holiday in Germany
-print("Jan 1 value:", holidays.loc["2024-01-01 00:00:00+00:00", "is_holiday"])
-```
-
-::: {.cell-output .cell-output-stdout}
-```
-Holiday dataframe has wrong shape.
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="a4be8fc7" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_data, get_package_data_home</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> agg_and_resample_data</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_holiday_features</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimal reference DataFrame for validation</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> fetch_data(filename<span class="op">=</span><span class="bu">str</span>(get_package_data_home() <span class="op">/</span> <span class="st">"demo10.csv"</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> agg_and_resample_data(data, verbose<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>cov_end <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-07 23:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>holidays <span class="op">=</span> get_holiday_features(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>start,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span>cov_end,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span><span class="dv">24</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">"NW"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape:"</span>, holidays.shape)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"columns:"</span>, holidays.columns.tolist())</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># New Year's Day (Jan 1) is a public holiday in Germany</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Jan 1 value:"</span>, holidays.loc[<span class="st">"2024-01-01 00:00:00+00:00"</span>, <span class="st">"is_holiday"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Holiday dataframe has wrong shape.
 shape: (168, 1)
 columns: ['is_holiday']
-Jan 1 value: 1
-```
-:::
-:::</code></pre>
+Jan 1 value: 1</code></pre>
+</div>
+</div>
 
 
 </section>
