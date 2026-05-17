@@ -13,6 +13,8 @@ import pandas as pd
 import pytest
 from lightgbm import LGBMRegressor
 
+from spotforecast2_safe.manager.demo_metrics import calculate_metrics
+
 
 class TestDemoConfig:
     """Test DemoConfig dataclass and initialization."""
@@ -54,37 +56,28 @@ class TestCalculateMetrics:
         actual = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
         predicted = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
 
-        diff = actual - predicted
-        mae = diff.abs().mean()
-        mse = (diff**2).mean()
+        result = calculate_metrics(actual, predicted)
 
-        assert mae == 0.0
-        assert mse == 0.0
+        assert result["MAE"] == 0.0
+        assert result["MSE"] == 0.0
 
     def test_calculate_metrics_constant_offset(self):
         """Test metrics with constant error offset."""
         actual = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
         predicted = pd.Series([2.0, 3.0, 4.0, 5.0, 6.0])  # Off by 1
 
-        diff = actual - predicted
-        mae = diff.abs().mean()
-        mse = (diff**2).mean()
+        result = calculate_metrics(actual, predicted)
 
-        assert mae == 1.0
-        assert mse == 1.0
+        assert result["MAE"] == 1.0
+        assert result["MSE"] == 1.0
 
-    def test_calculate_metrics_nan_handling(self):
-        """Test metrics with NaN values."""
+    def test_calculate_metrics_raises_on_nan(self):
+        """Test that NaN values in either series raise ValueError."""
         actual = pd.Series([1.0, np.nan, 3.0, 4.0, 5.0])
         predicted = pd.Series([1.5, 2.5, 3.5, 4.5, 5.5])
 
-        diff = actual - predicted
-        mae = diff.abs().mean()  # pandas mean() skips NaN by default
-        mse = (diff**2).mean()
-
-        # Should compute metrics for non-NaN values
-        assert not np.isnan(mae)
-        assert not np.isnan(mse)
+        with pytest.raises(ValueError, match="NaN"):
+            calculate_metrics(actual, predicted)
 
 
 class TestLogging:

@@ -77,8 +77,8 @@ def test_docstring_examples_trainer():
 
 
 def test_docstring_examples_metrics():
-    """Test all docstring examples in manager.metrics module."""
-    import spotforecast2_safe.manager.metrics as metrics_module
+    """Test all docstring examples in manager.demo_metrics module."""
+    import spotforecast2_safe.manager.demo_metrics as metrics_module
 
     results = doctest.testmod(
         metrics_module,
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     test_docstring_examples_trainer()
 
     print("\n" + "=" * 70)
-    print("Testing manager.metrics docstring examples...")
+    print("Testing manager.demo_metrics docstring examples...")
     print("=" * 70)
     test_docstring_examples_metrics()
 
