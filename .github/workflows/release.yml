@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - develop
+  # Manual trigger for recovery scenarios where the push-event run was
+  # skipped by the `chore(release)` guard below (e.g. a human-authored
+  # promotion PR whose title happens to start with `chore(release):`,
+  # which then ends up in the merge commit body).
+  workflow_dispatch:
 
 # Serialise gh-pages publishers across workflows.
 # Both this workflow and docs.yml push to gh-pages via
@@ -28,7 +33,15 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
-    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    # Skip on commits whose message contains `chore(release)` — semantic-release
+    # generates exactly that prefix for its auto-bump commits, and re-running
+    # the workflow on those would loop. WARNING: this is a substring match, so
+    # human-authored PR titles that include `chore(release)` anywhere (e.g. a
+    # promotion PR titled `chore(release): promote develop → main`) will also
+    # trip the guard once GitHub places the PR title into the merge commit body.
+    # If that happens, re-trigger via the `workflow_dispatch` button on the
+    # Actions tab.
+    if: "github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'chore(release)')"
     
     steps:
       - name: Checkout code
