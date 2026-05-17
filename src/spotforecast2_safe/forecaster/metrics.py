@@ -8,27 +8,31 @@ This module provides various metric functions for evaluating forecasting perform
 including custom metrics like MASE, RMSSE, and probabilistic metrics like CRPS.
 
 Examples:
-    Using standard metrics::
+    ```{python}
+    import numpy as np
 
-        import numpy as np
-        from spotforecast2.forecaster.metrics import _get_metric
+    from spotforecast2_safe.forecaster.metrics import _get_metric
 
-        y_true = np.array([1, 2, 3, 4, 5])
-        y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
+    y_true = np.array([1, 2, 3, 4, 5])
+    y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
 
-        # Get a metric function
-        mse = _get_metric('mean_squared_error')
-        error = mse(y_true, y_pred)
+    mse = _get_metric('mean_squared_error')
+    error = mse(y_true, y_pred)
+    print(f"MSE: {error:.4f}")
+    ```
 
-    Using scaled metrics::
+    ```{python}
+    import numpy as np
 
-        from spotforecast2.forecaster.metrics import mean_absolute_scaled_error
+    from spotforecast2_safe.forecaster.metrics import mean_absolute_scaled_error
 
-        y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-        y_true = np.array([9, 10, 11])
-        y_pred = np.array([8.8, 10.2, 10.9])
+    y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+    y_true = np.array([9, 10, 11])
+    y_pred = np.array([8.8, 10.2, 10.9])
 
-        mase = mean_absolute_scaled_error(y_true, y_pred, y_train)
+    mase = mean_absolute_scaled_error(y_true, y_pred, y_train)
+    print(f"MASE: {mase:.4f}")
+    ```
 """
 
 from __future__ import annotations
@@ -64,13 +68,16 @@ def _get_metric(metric: str) -> Callable:
         scikit-learn function to calculate the desired metric.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import _get_metric
-        >>> mse_func = _get_metric('mean_squared_error')
-        >>> y_true = np.array([1, 2, 3])
-        >>> y_pred = np.array([1.1, 1.9, 3.2])
-        >>> error = mse_func(y_true, y_pred)
-        >>> error > 0
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import _get_metric
+
+        mse_func = _get_metric('mean_squared_error')
+        y_true = np.array([1, 2, 3])
+        y_pred = np.array([1.1, 1.9, 3.2])
+        error = mse_func(y_true, y_pred)
+        print(error > 0)
+        ```
     """
 
     allowed_metrics = [
@@ -125,11 +132,17 @@ def add_y_train_argument(func: Callable) -> Callable:
         Function with `y_train` argument added.
 
     Examples:
-        >>> def my_metric(y_true, y_pred):
-        ...     return np.mean(np.abs(y_true - y_pred))
-        >>> enhanced_metric = add_y_train_argument(my_metric)
-        >>> # Now the function accepts y_train parameter
-        >>> result = enhanced_metric(np.array([1,2,3]), np.array([1,2,3]), y_train=None)
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import add_y_train_argument
+
+        def my_metric(y_true, y_pred):
+            return np.mean(np.abs(y_true - y_pred))
+
+        enhanced_metric = add_y_train_argument(my_metric)
+        result = enhanced_metric(np.array([1, 2, 3]), np.array([1, 2, 3]), y_train=None)
+        print(result)
+        ```
     """
 
     sig = inspect.signature(func)
@@ -178,13 +191,16 @@ def mean_absolute_scaled_error(
         MASE value.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import mean_absolute_scaled_error
-        >>> y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-        >>> y_true = np.array([9, 10, 11])
-        >>> y_pred = np.array([8.8, 10.2, 10.9])
-        >>> mase = mean_absolute_scaled_error(y_true, y_pred, y_train)
-        >>> mase < 1.0  # Good forecast
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import mean_absolute_scaled_error
+
+        y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+        y_true = np.array([9, 10, 11])
+        y_pred = np.array([8.8, 10.2, 10.9])
+        mase = mean_absolute_scaled_error(y_true, y_pred, y_train)
+        print(mase < 1.0)
+        ```
     """
 
     # NOTE: When using this metric in validation, `y_train` doesn't include
@@ -250,13 +266,16 @@ def root_mean_squared_scaled_error(
         RMSSE value.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import root_mean_squared_scaled_error
-        >>> y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-        >>> y_true = np.array([9, 10, 11])
-        >>> y_pred = np.array([8.8, 10.2, 10.9])
-        >>> rmsse = root_mean_squared_scaled_error(y_true, y_pred, y_train)
-        >>> rmsse < 1.0  # Good forecast
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import root_mean_squared_scaled_error
+
+        y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+        y_true = np.array([9, 10, 11])
+        y_pred = np.array([8.8, 10.2, 10.9])
+        rmsse = root_mean_squared_scaled_error(y_true, y_pred, y_train)
+        print(rmsse < 1.0)
+        ```
     """
 
     # NOTE: When using this metric in validation, `y_train` doesn't include
@@ -308,12 +327,15 @@ def crps_from_predictions(y_true: float, y_pred: np.ndarray) -> float:
         The CRPS score.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import crps_from_predictions
-        >>> y_true = 5.0
-        >>> y_pred = np.array([4.5, 5.1, 4.9, 5.3, 4.7])
-        >>> crps = crps_from_predictions(y_true, y_pred)
-        >>> crps >= 0
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import crps_from_predictions
+
+        y_true = 5.0
+        y_pred = np.array([4.5, 5.1, 4.9, 5.3, 4.7])
+        crps = crps_from_predictions(y_true, y_pred)
+        print(crps >= 0)
+        ```
     """
     if not isinstance(y_pred, np.ndarray) or y_pred.ndim != 1:
         raise TypeError("`y_pred` must be a 1D numpy array.")
@@ -352,13 +374,16 @@ def crps_from_quantiles(
         The CRPS score.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import crps_from_quantiles
-        >>> y_true = 5.0
-        >>> pred_quantiles = np.array([4.0, 4.5, 5.0, 5.5, 6.0])
-        >>> quantile_levels = np.array([0.1, 0.25, 0.5, 0.75, 0.9])
-        >>> crps = crps_from_quantiles(y_true, pred_quantiles, quantile_levels)
-        >>> crps >= 0
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import crps_from_quantiles
+
+        y_true = 5.0
+        pred_quantiles = np.array([4.0, 4.5, 5.0, 5.5, 6.0])
+        quantile_levels = np.array([0.1, 0.25, 0.5, 0.75, 0.9])
+        crps = crps_from_quantiles(y_true, pred_quantiles, quantile_levels)
+        print(crps >= 0)
+        ```
     """
     if not isinstance(y_true, (float, int)):
         raise TypeError("`y_true` must be a float or integer.")
@@ -421,13 +446,16 @@ def calculate_coverage(
         Coverage of the interval.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import calculate_coverage
-        >>> y_true = np.array([1, 2, 3, 4, 5])
-        >>> lower_bound = np.array([0.5, 1.5, 2.5, 3.5, 4.5])
-        >>> upper_bound = np.array([1.5, 2.5, 3.5, 4.5, 5.5])
-        >>> coverage = calculate_coverage(y_true, lower_bound, upper_bound)
-        >>> coverage == 1.0  # All values within bounds
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import calculate_coverage
+
+        y_true = np.array([1, 2, 3, 4, 5])
+        lower_bound = np.array([0.5, 1.5, 2.5, 3.5, 4.5])
+        upper_bound = np.array([1.5, 2.5, 3.5, 4.5, 5.5])
+        coverage = calculate_coverage(y_true, lower_bound, upper_bound)
+        print(coverage == 1.0)
+        ```
     """
     if not isinstance(y_true, (np.ndarray, pd.Series)) or y_true.ndim != 1:
         raise TypeError("`y_true` must be a 1D numpy array or pandas Series.")
@@ -466,13 +494,16 @@ def create_mean_pinball_loss(alpha: float) -> callable:
         Mean Pinball loss function for the given quantile.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import create_mean_pinball_loss
-        >>> pinball_loss_50 = create_mean_pinball_loss(alpha=0.5)
-        >>> y_true = np.array([1, 2, 3, 4, 5])
-        >>> y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
-        >>> loss = pinball_loss_50(y_true, y_pred)
-        >>> loss >= 0
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import create_mean_pinball_loss
+
+        pinball_loss_50 = create_mean_pinball_loss(alpha=0.5)
+        y_true = np.array([1, 2, 3, 4, 5])
+        y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
+        loss = pinball_loss_50(y_true, y_pred)
+        print(loss >= 0)
+        ```
     """
     if not (0 <= alpha <= 1):
         raise ValueError("alpha must be between 0 and 1, both inclusive.")
@@ -503,12 +534,17 @@ def symmetric_mean_absolute_percentage_error(
         SMAPE value as a percentage.
 
     Examples:
-        >>> from spotforecast2.forecaster.metrics import symmetric_mean_absolute_percentage_error
-        >>> y_true = np.array([100, 200, 0])
-        >>> y_pred = np.array([110, 180, 10])
-        >>> result = symmetric_mean_absolute_percentage_error(y_true, y_pred)
-        >>> 0 <= result <= 200
-        True
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.metrics import (
+            symmetric_mean_absolute_percentage_error,
+        )
+
+        y_true = np.array([100, 200, 0])
+        y_pred = np.array([110, 180, 10])
+        result = symmetric_mean_absolute_percentage_error(y_true, y_pred)
+        print(0 <= result <= 200)
+        ```
     """
 
     if not isinstance(y_true, (pd.Series, np.ndarray)):

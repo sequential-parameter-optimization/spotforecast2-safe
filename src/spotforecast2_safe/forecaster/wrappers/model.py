@@ -41,17 +41,19 @@ class ForecasterRecursiveModel:
         random_state (int): Seed for reproducibility.
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from sklearn.linear_model import LinearRegression
-        >>>
-        >>> model = ForecasterRecursiveModel(iteration=0)
-        >>> model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
-        >>> model.name = "linear"
-        >>> model.tune()
-        >>> model.is_tuned
-        True
+        ```{python}
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+        model = ForecasterRecursiveModel(iteration=0)
+        model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
+        model.name = "linear"
+        model.tune()
+        print(model.is_tuned)
+        ```
     """
 
     def __init__(
@@ -102,24 +104,19 @@ class ForecasterRecursiveModel:
             ValueError: If the forecaster has not been initialized.
 
         Examples:
-            >>> import pandas as pd
-            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-            >>> model = ForecasterRecursiveModel(iteration=0)
-            >>> model.name
-            'base'
-            >>> model.end_dev
-            NaT
-            >>> model.train_size
-            >>> model.random_state
-            123456789
-            >>> model.predict_size
-            24
-            >>> model.refit_size
-            7
-            >>> model.preprocessor # doctest: +ELLIPSIS
-            <spotforecast2_safe.preprocessing.exog_builder.ExogBuilder object at 0x...>
-            >>> model.is_tuned
-            False
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model = ForecasterRecursiveModel(iteration=0)
+            print(model.name)
+            print(model.end_dev)
+            print(model.train_size)
+            print(model.random_state)
+            print(model.predict_size)
+            print(model.refit_size)
+            print(model.is_tuned)
+            ```
         """
         self.iteration = iteration
         self.end_dev = pd.to_datetime(end_dev, utc=True)
@@ -168,14 +165,14 @@ class ForecasterRecursiveModel:
             An instance of *cls* (or the calling subclass).
 
         Examples:
-            >>> from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
-            >>> from spotforecast2_safe.forecaster.wrappers import (
-            ...     ForecasterRecursiveModel,
-            ... )
-            >>> cfg = ConfigMulti(country_code="FR", predict_size=48)
-            >>> model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
-            >>> model.predict_size
-            48
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+            from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+
+            cfg = ConfigMulti(country_code="FR", predict_size=48)
+            model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
+            print(model.predict_size)
+            ```
         """
         import inspect
 
@@ -235,35 +232,31 @@ class ForecasterRecursiveModel:
             params: Dictionary of parameter names mapped to their values.
 
         Examples:
-            >>> from spotforecast2_safe.forecaster.wrappers import (
-            ...     ForecasterRecursiveModel,
-            ... )
-            >>> model = ForecasterRecursiveModel(iteration=0)
-            >>> p = model.get_params(deep=False)
-            >>> p["iteration"]
-            0
-            >>> p["name"]
-            'base'
-            >>> p["predict_size"]
-            24
-            >>> "forecaster" not in p  # forecaster is None
-            True
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> model2 = ForecasterRecursiveModel(iteration=1)
-            >>> model2.forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(), lags=3
-            ... )
-            >>> p2 = model2.get_params(deep=False)
-            >>> len(p2["forecaster__lags"])
-            3
-            >>> isinstance(p2["forecaster__estimator"], LinearRegression)
-            True
+            model = ForecasterRecursiveModel(iteration=0)
+            p = model.get_params(deep=False)
+            print(p["iteration"])
+            print(p["name"])
+            print(p["predict_size"])
+            print("forecaster" not in p)
+            ```
 
-            >>> p3 = model2.get_params(deep=True)
-            >>> "forecaster__estimator__fit_intercept" in p3
-            True
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model2 = ForecasterRecursiveModel(iteration=1)
+            model2.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            p2 = model2.get_params(deep=False)
+            print(len(p2["forecaster__lags"]))
+            print(isinstance(p2["forecaster__estimator"], LinearRegression))
+
+            p3 = model2.get_params(deep=True)
+            print("forecaster__estimator__fit_intercept" in p3)
+            ```
         """
         # Wrapper-level parameters
         params: Dict[str, object] = {}
@@ -311,31 +304,25 @@ class ForecasterRecursiveModel:
                 parameters (supports method chaining).
 
         Examples:
-            Setting wrapper-level parameters:
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 
-            >>> from spotforecast2_safe.forecaster.wrappers import (
-            ...     ForecasterRecursiveModel,
-            ... )
-            >>> model = ForecasterRecursiveModel(iteration=0)
-            >>> _ = model.set_params(name="updated", predict_size=48)
-            >>> model.name
-            'updated'
-            >>> model.predict_size
-            48
+            model = ForecasterRecursiveModel(iteration=0)
+            _ = model.set_params(name="updated", predict_size=48)
+            print(model.name)
+            print(model.predict_size)
+            ```
 
-            Setting forecaster-level parameters on an attached forecaster:
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> model2 = ForecasterRecursiveModel(iteration=1)
-            >>> model2.forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(), lags=3
-            ... )
-            >>> _ = model2.set_params(
-            ...     params={"forecaster__estimator__fit_intercept": False}
-            ... )
-            >>> model2.forecaster.estimator.fit_intercept
-            False
+            model2 = ForecasterRecursiveModel(iteration=1)
+            model2.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            _ = model2.set_params(params={"forecaster__estimator__fit_intercept": False})
+            print(model2.forecaster.estimator.fit_intercept)
+            ```
         """
         # Merge params dict and kwargs
         all_params: Dict[str, object] = {}
@@ -394,15 +381,16 @@ class ForecasterRecursiveModel:
                 defaults to :func:`get_cache_home`.
 
         Examples:
-            >>> import tempfile
-            >>> from spotforecast2_safe.forecaster.wrappers import (
-            ...     ForecasterRecursiveModel,
-            ... )
-            >>> model = ForecasterRecursiveModel(iteration=0, name="test")
-            >>> with tempfile.TemporaryDirectory() as tmpdir:
-            ...     model.save_to_file(model_dir=tmpdir)
-            ...     import os; any("test_forecaster_0" in f for f in os.listdir(tmpdir))
-            True
+            ```{python}
+            import os
+            import tempfile
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model = ForecasterRecursiveModel(iteration=0, name="test")
+            with tempfile.TemporaryDirectory() as tmpdir:
+                model.save_to_file(model_dir=tmpdir)
+                print(any("test_forecaster_0" in f for f in os.listdir(tmpdir)))
+            ```
         """
         from spotforecast2_safe.manager.trainer import get_path_model
 
@@ -462,18 +450,17 @@ class ForecasterRecursiveModel:
             pd.Timestamp: Start of the training window.
 
         Examples:
-            >>> import pandas as pd
-            >>> from spotforecast2_safe.forecaster.wrappers import (
-            ...     ForecasterRecursiveModel,
-            ... )
-            >>> model = ForecasterRecursiveModel(iteration=0)
-            >>> start = pd.Timestamp("2020-01-01", tz="UTC")
-            >>> end = pd.Timestamp("2025-12-31", tz="UTC")
-            >>> model._get_init_train(start, end) == start
-            True
-            >>> model.train_size = pd.Timedelta(days=365)
-            >>> model._get_init_train(start, end)
-            Timestamp('2024-12-31 00:00:00+0000', tz='UTC')
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model = ForecasterRecursiveModel(iteration=0)
+            start = pd.Timestamp("2020-01-01", tz="UTC")
+            end = pd.Timestamp("2025-12-31", tz="UTC")
+            print(model._get_init_train(start, end) == start)
+            model.train_size = pd.Timedelta(days=365)
+            print(model._get_init_train(start, end))
+            ```
         """
         if self.train_size is None:
             return min_val
@@ -496,34 +483,46 @@ class ForecasterRecursiveModel:
             ValueError: If the forecaster has not been initialized.
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from sklearn.linear_model import LinearRegression
-            >>>
-            >>> # Example 1: Basic usage with pd.Series
-            >>> model = ForecasterRecursiveModel(iteration=0)
-            >>> model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> y = pd.Series(
-            ...     np.random.rand(10),
-            ...     index=pd.date_range("2023-01-01", periods=10, freq="h")
-            ... )
-            >>> model.fit(y=y)
-            >>> model.forecaster.is_fitted
-            True
-            >>>
-            >>> # Example 2: Usage with exogenous variables
-            >>> model_exog = ForecasterRecursiveModel(iteration=0)
-            >>> model_exog.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> exog = pd.DataFrame(
-            ...     np.random.rand(10, 2),
-            ...     index=y.index,
-            ...     columns=["exog_1", "exog_2"]
-            ... )
-            >>> model_exog.fit(y=y, exog=exog)
-            >>> model_exog.forecaster.is_fitted
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            rng = np.random.default_rng(0)
+            model = ForecasterRecursiveModel(iteration=0)
+            model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            y = pd.Series(
+                rng.random(10),
+                index=pd.date_range("2023-01-01", periods=10, freq="h"),
+            )
+            model.fit(y=y)
+            print(model.forecaster.is_fitted)
+            ```
+
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            rng = np.random.default_rng(1)
+            y = pd.Series(
+                rng.random(10),
+                index=pd.date_range("2023-01-01", periods=10, freq="h"),
+            )
+            model_exog = ForecasterRecursiveModel(iteration=0)
+            model_exog.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            exog = pd.DataFrame(
+                rng.random((10, 2)),
+                index=y.index,
+                columns=["exog_1", "exog_2"],
+            )
+            model_exog.fit(y=y, exog=exog)
+            print(model_exog.forecaster.is_fitted)
+            ```
         """
         if self.forecaster is None:
             raise ValueError("Forecaster not initialized")
@@ -869,47 +868,49 @@ class ForecasterRecursiveModel:
                 predictions, and calculated metrics (MAE, MAPE).
 
         Examples:
-            >>> import os
-            >>> import tempfile
-            >>> import pandas as pd
-            >>> from pathlib import Path
-            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
-            >>> from spotforecast2_safe.data.fetch_data import get_package_data_home
-            >>>
-            >>> # Setup temporary data environment
-            >>> tmp_dir = tempfile.mkdtemp()
-            >>> os.environ["SPOTFORECAST2_DATA"] = tmp_dir
-            >>> data_path = Path(tmp_dir) / "interim"
-            >>> data_path.mkdir(parents=True)
-            >>>
-            >>> # Load demo data and rename columns to match expectations
-            >>> demo_path = get_package_data_home() / "demo01.csv"
-            >>> df = pd.read_csv(demo_path)
-            >>> df = df.rename(columns={
-            ...     "Time": "Time (UTC)",
-            ...     "Actual": "Actual Load",
-            ...     "Forecast": "Forecasted Load"
-            ... })
-            >>> df.to_csv(data_path / "energy_load.csv", index=False)
-            >>>
-            >>> # Initialize model — override forecaster for small demo data
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from lightgbm import LGBMRegressor
-            >>> model = ForecasterRecursiveLGBM(iteration=0, end_dev="2022-01-05 00:00+00:00")
-            >>> model.forecaster = ForecasterRecursive(
-            ...     estimator=LGBMRegressor(n_jobs=-1, verbose=-1, random_state=123456789),
-            ...     lags=12,
-            ... )
-            >>> result = model.package_prediction(predict_size=24)
-            >>>
-            >>> # Validate output
-            >>> "train_actual" in result and "future_pred" in result
-            True
-            >>>
-            >>> # Cleanup
-            >>> import shutil
-            >>> shutil.rmtree(tmp_dir)
-            >>> del os.environ["SPOTFORECAST2_DATA"]
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+            from pathlib import Path
+
+            import pandas as pd
+            from lightgbm import LGBMRegressor
+
+            from spotforecast2_safe.data.fetch_data import get_package_data_home
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
+
+            # Setup temporary data environment
+            tmp_dir = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp_dir
+            data_path = Path(tmp_dir) / "interim"
+            data_path.mkdir(parents=True)
+
+            # Load demo data and rename columns to match expectations
+            demo_path = get_package_data_home() / "demo01.csv"
+            df = pd.read_csv(demo_path)
+            df = df.rename(columns={
+                "Time": "Time (UTC)",
+                "Actual": "Actual Load",
+                "Forecast": "Forecasted Load",
+            })
+            df.to_csv(data_path / "energy_load.csv", index=False)
+
+            # Initialize model — override forecaster for small demo data
+            model = ForecasterRecursiveLGBM(iteration=0, end_dev="2022-01-05 00:00+00:00")
+            model.forecaster = ForecasterRecursive(
+                estimator=LGBMRegressor(n_jobs=-1, verbose=-1, random_state=123456789),
+                lags=12,
+            )
+            result = model.package_prediction(predict_size=24)
+
+            print("train_actual" in result and "future_pred" in result)
+
+            # Cleanup
+            shutil.rmtree(tmp_dir)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
         """
         if self.forecaster is None:
             logger.error("Forecaster not initialized")

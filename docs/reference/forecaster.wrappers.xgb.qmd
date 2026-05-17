@@ -24,3 +24,16 @@ ForecasterRecursive specialization using XGBoost.
 |------------|--------|-----------------------------|
 | forecaster |        | The XGBoost forecaster.     |
 | name       |        | The name of the forecaster. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.forecaster.wrappers import (
+    ForecasterRecursiveModel,
+    ForecasterRecursiveXGB,
+)
+
+model = ForecasterRecursiveXGB(iteration=0)
+print(model.name)
+print(isinstance(model, ForecasterRecursiveModel))
+```

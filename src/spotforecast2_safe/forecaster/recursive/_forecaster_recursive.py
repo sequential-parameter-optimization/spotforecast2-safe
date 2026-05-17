@@ -127,67 +127,89 @@ class ForecasterRecursive(ForecasterBase):
           quantile predictions, and probabilistic forecasts via conformal methods.
 
     Examples:
-        Create a basic forecaster with lags:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
 
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> from sklearn.linear_model import LinearRegression
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> y = pd.Series(np.random.randn(100), name='y')
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=LinearRegression(),
-        ...     lags=10
-        ... )
-        >>> forecaster.fit(y)
-        >>> predictions = forecaster.predict(steps=5)
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 
-        Create a forecaster with window features and transformations:
+        rng = np.random.default_rng(0)
+        y = pd.Series(rng.standard_normal(100), name='y')
+        forecaster = ForecasterRecursive(
+            estimator=LinearRegression(),
+            lags=10,
+        )
+        forecaster.fit(y)
+        predictions = forecaster.predict(steps=5)
+        print(predictions)
+        ```
 
-        >>> from sklearn.ensemble import RandomForestRegressor
-        >>> from sklearn.preprocessing import StandardScaler
-        >>> from spotforecast2_safe.preprocessing import RollingFeatures
-        >>> import pandas as pd
-        >>> y = pd.Series(np.random.randn(100), name='y')
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=RandomForestRegressor(n_estimators=100),
-        ...     lags=[1, 7, 30],
-        ...     window_features=[RollingFeatures(stats='mean', window_sizes=7)],
-        ...     transformer_y=StandardScaler(),
-        ...     differentiation=1
-        ... )
-        >>> forecaster.fit(y)
-        >>> predictions = forecaster.predict(steps=10)
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.ensemble import RandomForestRegressor
+        from sklearn.preprocessing import StandardScaler
 
-        Create a forecaster with exogenous variables:
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.preprocessing import RollingFeatures
 
-        >>> import pandas as pd
-        >>> from sklearn.linear_model import Ridge
-        >>> y = pd.Series(np.random.randn(100), name='target')
-        >>> exog = pd.DataFrame({'temp': np.random.randn(100)}, index=y.index)
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=Ridge(),
-        ...     lags=7,
-        ...     forecaster_id='my_forecaster'
-        ... )
-        >>> forecaster.fit(y, exog)
-        >>> exog_future = pd.DataFrame(
-        ...     {'temp': np.random.randn(5)},
-        ...     index=pd.RangeIndex(start=100, stop=105)
-        ... )
-        >>> predictions = forecaster.predict(steps=5, exog=exog_future)
+        rng = np.random.default_rng(1)
+        y = pd.Series(rng.standard_normal(100), name='y')
+        forecaster = ForecasterRecursive(
+            estimator=RandomForestRegressor(n_estimators=100, random_state=1),
+            lags=[1, 7, 30],
+            window_features=[RollingFeatures(stats='mean', window_sizes=7)],
+            transformer_y=StandardScaler(),
+            differentiation=1,
+        )
+        forecaster.fit(y)
+        predictions = forecaster.predict(steps=10)
+        print(predictions)
+        ```
 
-        Create a forecaster with probabilistic prediction configuration:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import Ridge
 
-        >>> from sklearn.ensemble import GradientBoostingRegressor
-        >>> import pandas as pd
-        >>> y = pd.Series(np.random.randn(100), name='y')
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=GradientBoostingRegressor(),
-        ...     lags=14,
-        ...     binner_kwargs={'n_bins': 15, 'method': 'linear'}
-        ... )
-        >>> forecaster.fit(y, store_in_sample_residuals=True)
-        >>> predictions = forecaster.predict(steps=5)
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+        rng = np.random.default_rng(2)
+        y = pd.Series(rng.standard_normal(100), name='target')
+        exog = pd.DataFrame({'temp': rng.standard_normal(100)}, index=y.index)
+        forecaster = ForecasterRecursive(
+            estimator=Ridge(),
+            lags=7,
+            forecaster_id='my_forecaster',
+        )
+        forecaster.fit(y, exog)
+        exog_future = pd.DataFrame(
+            {'temp': rng.standard_normal(5)},
+            index=pd.RangeIndex(start=100, stop=105),
+        )
+        predictions = forecaster.predict(steps=5, exog=exog_future)
+        print(predictions)
+        ```
+
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.ensemble import GradientBoostingRegressor
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+        rng = np.random.default_rng(3)
+        y = pd.Series(rng.standard_normal(100), name='y')
+        forecaster = ForecasterRecursive(
+            estimator=GradientBoostingRegressor(random_state=3),
+            lags=14,
+            binner_kwargs={'n_bins': 15, 'method': 'linear'},
+        )
+        forecaster.fit(y, store_in_sample_residuals=True)
+        predictions = forecaster.predict(steps=5)
+        print(predictions)
+        ```
     """
 
     def __init__(
@@ -345,35 +367,13 @@ class ForecasterRecursive(ForecasterBase):
             str: String representation of the forecaster with key information about its configuration and state.
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> print(forecaster)  # doctest: +ELLIPSIS
-            =========================
-            ForecasterRecursive
-            =========================
-            Estimator: LinearRegression
-            Lags: [1, 2, 3]
-            Window features: []
-            Window size: 3
-            Series name: None
-            Exogenous included: False
-            Exogenous names: None
-            Transformer for y: None
-            Transformer for exog: None
-            Weight function included: False
-            Differentiation order: None
-            Training range: None
-            Training index type: None
-            Training index frequency: None
-            Estimator parameters: {...}
-            fit_kwargs: {...}
-            Creation date: ...
-            Last fit date: None
-            spotforecast version: ...
-            Python version: ...
-            Forecaster id: None
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            print(forecaster)
+            ```
         """
 
         params = (
@@ -419,11 +419,14 @@ class ForecasterRecursive(ForecasterBase):
             HTML string representation of the forecaster.
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> forecaster._repr_html_()  # doctest: +ELLIPSIS
-            '<div class="container-...">...</div>'
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            html = forecaster._repr_html_()
+            print(html[:40])
+            ```
         """
 
         params = (
@@ -559,19 +562,21 @@ class ForecasterRecursive(ForecasterBase):
                 specified lags.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(lags=3)
-            >>> y = np.arange(10)
-            >>> train_index = pd.RangeIndex(start=3, stop=10)
-            >>> X_data, y_data = forecaster._create_lags(y=y, X_as_pandas=True, train_index=train_index)
-            >>> isinstance(X_data, pd.DataFrame)
-            True
-            >>> X_data.shape
-            (7, 3)
-            >>> y_data.shape
-            (7,)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(lags=3)
+            y = np.arange(10)
+            train_index = pd.RangeIndex(start=3, stop=10)
+            X_data, y_data = forecaster._create_lags(
+                y=y, X_as_pandas=True, train_index=train_index
+            )
+            print(isinstance(X_data, pd.DataFrame))
+            print(X_data.shape)
+            print(y_data.shape)
+            ```
         """
         if X_as_pandas and train_index is None:
             raise ValueError(
@@ -635,29 +640,26 @@ class ForecasterRecursive(ForecasterBase):
                 does not match `train_index`.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> y = pd.Series(np.arange(30), name='y')
-            >>> forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(),
-            ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-            ... )
-            >>> train_index = y.index[3:]  # Assuming window_size is 3
-            >>> X_train_window_features, feature_names = forecaster._create_window_features(
-            ...     y=y,
-            ...     train_index=train_index,
-            ...     X_as_pandas=True
-            ... )
-            >>> isinstance(X_train_window_features[0], pd.DataFrame)
-            True
-            >>> X_train_window_features[0].shape[0] == len(train_index)
-            True
-            >>> (X_train_window_features[0].index == train_index).all()
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
 
+            y = pd.Series(np.arange(30), name='y')
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                window_features=[RollingFeatures(stats='mean', window_sizes=3)],
+            )
+            train_index = y.index[3:]
+            X_train_window_features, feature_names = forecaster._create_window_features(
+                y=y, train_index=train_index, X_as_pandas=True
+            )
+            print(isinstance(X_train_window_features[0], pd.DataFrame))
+            print(X_train_window_features[0].shape[0] == len(train_index))
+            print((X_train_window_features[0].index == train_index).all())
+            ```
         """
 
         len_train_index = len(train_index)
@@ -728,27 +730,28 @@ class ForecasterRecursive(ForecasterBase):
             ValueError: If `exog` is provided but contains data types that are not supported after transformation.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> y = pd.Series(np.arange(30), name='y')
-            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
-            >>> forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(),
-            ...     lags=3,
-            ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-            ... )
-            >>> (X_train, y_train, exog_names_in_, window_features_names,
-            ...  exog_names_out, feature_names, exog_dtypes_in_,
-            ...  exog_dtypes_out_) = forecaster._create_train_X_y(y=y, exog=exog)
-            >>> isinstance(X_train, pd.DataFrame)
-            True
-            >>> isinstance(y_train, pd.Series)
-            True
-            >>> feature_names == forecaster.lags_names + window_features_names + exog_names_out
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
+
+            rng = np.random.default_rng(0)
+            y = pd.Series(np.arange(30), name='y')
+            exog = pd.DataFrame({'temp': rng.standard_normal(30)}, index=y.index)
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=3,
+                window_features=[RollingFeatures(stats='mean', window_sizes=3)],
+            )
+            (X_train, y_train, exog_names_in_, window_features_names,
+             exog_names_out, feature_names, exog_dtypes_in_,
+             exog_dtypes_out_) = forecaster._create_train_X_y(y=y, exog=exog)
+            print(isinstance(X_train, pd.DataFrame))
+            print(isinstance(y_train, pd.Series))
+            print(feature_names == forecaster.lags_names + window_features_names + exog_names_out)
+            ```
         """
         check_y(y=y)
         y = input_to_frame(data=y, input_name="y")
@@ -930,24 +933,25 @@ class ForecasterRecursive(ForecasterBase):
                 - y_train: Series of target values aligned with the predictors.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> y = pd.Series(np.arange(30), name='y')
-            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
-            >>> forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(),
-            ...     lags=3,
-            ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-            ... )
-            >>> X_train, y_train = forecaster.create_train_X_y(y=y, exog=exog)
-            >>> isinstance(X_train, pd.DataFrame)
-            True
-            >>> isinstance(y_train, pd.Series)
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
 
+            rng = np.random.default_rng(0)
+            y = pd.Series(np.arange(30), name='y')
+            exog = pd.DataFrame({'temp': rng.standard_normal(30)}, index=y.index)
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=3,
+                window_features=[RollingFeatures(stats='mean', window_sizes=3)],
+            )
+            X_train, y_train = forecaster.create_train_X_y(y=y, exog=exog)
+            print(isinstance(X_train, pd.DataFrame))
+            print(isinstance(y_train, pd.Series))
+            ```
         """
         output = self._create_train_X_y(y=y, exog=exog)
 
@@ -980,27 +984,31 @@ class ForecasterRecursive(ForecasterBase):
                 - y_test: Target values related to each row of X_test as pandas Series.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> y = pd.Series(np.arange(30), name='y')
-            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
-            >>> forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(),
-            ...     lags=3,
-            ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-            ... )
-            >>> X_train, y_train, X_test, y_test = forecaster._train_test_split_one_step_ahead(y=y, initial_train_size=20, exog=exog)
-            >>> isinstance(X_train, pd.DataFrame)
-            True
-            >>> isinstance(y_train, pd.Series)
-            True
-            >>> isinstance(X_test, pd.DataFrame)
-            True
-            >>> isinstance(y_test, pd.Series)
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
+
+            rng = np.random.default_rng(0)
+            y = pd.Series(np.arange(30), name='y')
+            exog = pd.DataFrame({'temp': rng.standard_normal(30)}, index=y.index)
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=3,
+                window_features=[RollingFeatures(stats='mean', window_sizes=3)],
+            )
+            X_train, y_train, X_test, y_test = (
+                forecaster._train_test_split_one_step_ahead(
+                    y=y, initial_train_size=20, exog=exog
+                )
+            )
+            print(isinstance(X_train, pd.DataFrame))
+            print(isinstance(y_train, pd.Series))
+            print(isinstance(X_test, pd.DataFrame))
+            print(isinstance(y_test, pd.Series))
+            ```
         """
 
         is_fitted = self.is_fitted
@@ -1033,14 +1041,15 @@ class ForecasterRecursive(ForecasterBase):
             params: Dictionary of parameter names mapped to their values.
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> forecaster.get_params()  # doctest: +ELLIPSIS
-            {
-                'estimator': LinearRegression(), 'lags': 3, 'window_features': None,
-                'transformer_y': None, 'transformer_exog': None, 'weight_func': None,
-                'differentiation': None, 'fit_kwargs': {}, 'binner_kwargs': None, 'forecaster_id': '...'}
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            params = forecaster.get_params()
+            print(params['lags'])
+            print(params['differentiation'])
+            ```
         """
         params = {}
         for key in [
@@ -1084,12 +1093,14 @@ class ForecasterRecursive(ForecasterBase):
             self: The forecaster instance with updated parameters.
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> forecaster.set_params(estimator__fit_intercept=False)
-            >>> forecaster.estimator.get_params()["fit_intercept"]
-            False
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            forecaster.set_params(estimator__fit_intercept=False)
+            print(forecaster.estimator.get_params()["fit_intercept"])
+            ```
         """
 
         # Merge params dict and kwargs
@@ -1158,19 +1169,24 @@ class ForecasterRecursive(ForecasterBase):
             None
 
         Examples:
-                 >>> import numpy as np
-                 >>> import pandas as pd
-                 >>> from sklearn.linear_model import LinearRegression
-                 >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-                 >>> from spotforecast2_safe.preprocessing import RollingFeatures
-                 >>> y = pd.Series(np.arange(30), name='y')
-                 >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
-                 >>> forecaster = ForecasterRecursive(
-                 ...     estimator=LinearRegression(),
-                 ...     lags=3,
-                 ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-                 ... )
-                 >>> forecaster.fit(y=y, exog=exog, store_in_sample_residuals=True)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
+
+            rng = np.random.default_rng(0)
+            y = pd.Series(np.arange(30), name='y')
+            exog = pd.DataFrame({'temp': rng.standard_normal(30)}, index=y.index)
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=3,
+                window_features=[RollingFeatures(stats='mean', window_sizes=3)],
+            )
+            forecaster.fit(y=y, exog=exog, store_in_sample_residuals=True)
+            print(forecaster.is_fitted)
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -1565,22 +1581,26 @@ class ForecasterRecursive(ForecasterBase):
                 If `last_window_values` or `exog_values` are not of expected lengths.
 
         Examples:
-            >>> import numpy as np
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=2)
-            >>> _ = forecaster.fit(y=pd.Series(np.arange(10)))
-            >>> last_window = np.array([8, 9])
-            >>> residuals = np.random.normal(size=(3, 5)) # 3 steps, 5 boots
-            >>> preds = forecaster._recursive_predict_bootstrapping(
-            ...     steps=3,
-            ...     last_window_values=last_window,
-            ...     sampled_residuals=residuals,
-            ...     use_binned_residuals=False,
-            ...     n_boot=5
-            ... )
-            >>> preds.shape
-            (3, 5)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            rng = np.random.default_rng(42)
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=2)
+            _ = forecaster.fit(y=pd.Series(np.arange(10)))
+            last_window = np.array([8.0, 9.0])
+            residuals = rng.standard_normal(size=(3, 5))
+            preds = forecaster._recursive_predict_bootstrapping(
+                steps=3,
+                last_window_values=last_window,
+                sampled_residuals=residuals,
+                use_binned_residuals=False,
+                n_boot=5,
+            )
+            print(preds.shape)
+            ```
         """
 
         original_device = set_cpu_gpu_device(estimator=self.estimator, device="cpu")
@@ -1805,26 +1825,32 @@ class ForecasterRecursive(ForecasterBase):
             indexed according to the prediction index constructed from the last window and the number of steps.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> y = pd.Series(np.arange(30), name='y')
-            >>> exog = pd.DataFrame({'temp': np.random.randn(30)}, index=y.index)
-            >>> forecaster = ForecasterRecursive(
-            ...     estimator=LinearRegression(),
-            ...     lags=3,
-            ...     window_features=[RollingFeatures(stats='mean', window_sizes=3)]
-            ... )
-            >>> forecaster.fit(y=y, exog=exog)
-            >>> last_window = y.iloc[-3:]
-            >>> exog_future = pd.DataFrame({'temp': np.random.randn(5)}, index=pd.RangeIndex(start=30, stop=35))
-            >>> predictions = forecaster.predict(
-            ...     steps=5, last_window=last_window, exog=exog_future, check_inputs=True
-            ... )
-            >>> isinstance(predictions, pd.Series)
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
+
+            rng = np.random.default_rng(0)
+            y = pd.Series(np.arange(30), name='y')
+            exog = pd.DataFrame({'temp': rng.standard_normal(30)}, index=y.index)
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=3,
+                window_features=[RollingFeatures(stats='mean', window_sizes=3)],
+            )
+            forecaster.fit(y=y, exog=exog)
+            last_window = y.iloc[-3:]
+            exog_future = pd.DataFrame(
+                {'temp': rng.standard_normal(5)},
+                index=pd.RangeIndex(start=30, stop=35),
+            )
+            predictions = forecaster.predict(
+                steps=5, last_window=last_window, exog=exog_future, check_inputs=True
+            )
+            print(isinstance(predictions, pd.Series))
+            ```
         """
 
         last_window_values, exog_values, prediction_index, steps = (
@@ -1923,17 +1949,19 @@ class ForecasterRecursive(ForecasterBase):
                 If `use_in_sample_residuals=False` and `out_sample_residuals_` are not available.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> rng = np.random.default_rng(123)
-            >>> y = pd.Series(rng.normal(size=100), name='y')
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> _ = forecaster.fit(y=y)
-            >>> boot_preds = forecaster.predict_bootstrapping(steps=3, n_boot=5)
-            >>> boot_preds.shape
-            (3, 5)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            rng = np.random.default_rng(123)
+            y = pd.Series(rng.standard_normal(size=100), name='y')
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            _ = forecaster.fit(y=y, store_in_sample_residuals=True)
+            boot_preds = forecaster.predict_bootstrapping(steps=3, n_boot=5)
+            print(boot_preds.shape)
+            ```
 
         References:
             .. [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos.
@@ -2204,18 +2232,19 @@ class ForecasterRecursive(ForecasterBase):
                 If inputs are invalid (checked by `_create_predict_inputs`).
 
         Examples:
-            >>> # Internal method, typically used via predict_interval(method='conformal')
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> rng = np.random.default_rng(123)
-            >>> y = pd.Series(rng.normal(size=100), name='y')
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> _ = forecaster.fit(y=y)
-            >>> preds = forecaster._predict_interval_conformal(steps=3, nominal_coverage=0.9)
-            >>> preds.columns.tolist()
-            ['pred', 'lower_bound', 'upper_bound']
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            rng = np.random.default_rng(123)
+            y = pd.Series(rng.standard_normal(size=100), name='y')
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            _ = forecaster.fit(y=y, store_in_sample_residuals=True)
+            preds = forecaster._predict_interval_conformal(steps=3, nominal_coverage=0.9)
+            print(preds.columns.tolist())
+            ```
 
         References:
             .. [1] MAPIE - Model Agnostic Prediction Interval Estimator.
@@ -2381,27 +2410,37 @@ class ForecasterRecursive(ForecasterBase):
                 If inputs (`steps`, `exog`, etc.) are invalid.
 
         Examples:
-            >>> import numpy as np
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> rng = np.random.default_rng(123)
-            >>> y = pd.Series(rng.normal(size=100), name='y')
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> _ = forecaster.fit(y=y)
-            >>> # Bootstrapping method
-            >>> intervals_boot = forecaster.predict_interval(
-            ...     steps=3, method='bootstrapping', interval=[5, 95]
-            ... )
-            >>> intervals_boot.columns.tolist()
-            ['pred', 'lower_bound', 'upper_bound']
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 
-            >>> # Conformal method
-            >>> intervals_conf = forecaster.predict_interval(
-            ...     steps=3, method='conformal', interval=0.95
-            ... )
-            >>> intervals_conf.columns.tolist()
-            ['pred', 'lower_bound', 'upper_bound']
+            rng = np.random.default_rng(123)
+            y = pd.Series(rng.standard_normal(size=100), name='y')
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            _ = forecaster.fit(y=y, store_in_sample_residuals=True)
+            intervals_boot = forecaster.predict_interval(
+                steps=3, method='bootstrapping', interval=[5, 95]
+            )
+            print(intervals_boot.columns.tolist())
+            ```
+
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            rng = np.random.default_rng(123)
+            y = pd.Series(rng.standard_normal(size=100), name='y')
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            _ = forecaster.fit(y=y, store_in_sample_residuals=True)
+            intervals_conf = forecaster.predict_interval(
+                steps=3, method='conformal', interval=0.95
+            )
+            print(intervals_conf.columns.tolist())
+            ```
 
         References:
             .. [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos.
@@ -2587,18 +2626,17 @@ class ForecasterRecursive(ForecasterBase):
             None
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> from spotforecast2_safe.preprocessing import RollingFeatures
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> rolling = RollingFeatures(stats=['mean', 'std'], window_sizes=[3, 5])
-            >>> forecaster.set_window_features(window_features=rolling)
-            >>> forecaster.window_features_names
-            ['roll_mean_3', 'roll_std_3', 'roll_mean_5', 'roll_std_5']
-            >>> forecaster.window_size
-            5
+            ```{python}
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.preprocessing import RollingFeatures
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            rolling = RollingFeatures(stats=['mean', 'std'], window_sizes=[3, 5])
+            forecaster.set_window_features(window_features=rolling)
+            print(forecaster.window_features_names)
+            print(forecaster.window_size)
+            ```
         """
 
         if window_features is None and self.lags is None:
@@ -2645,17 +2683,16 @@ class ForecasterRecursive(ForecasterBase):
             NotFittedError: If the forecaster is not fitted.
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> forecaster.fit(y=pd.Series(np.arange(20)))
-            >>> forecaster.get_feature_importances()
-              feature  importance
-            0   lag_1         1.0
-            1   lag_2         0.0
-            2   lag_3         0.0
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            forecaster.fit(y=pd.Series(np.arange(20)))
+            print(forecaster.get_feature_importances())
+            ```
         """
 
         if not self.is_fitted:
@@ -2740,13 +2777,17 @@ class ForecasterRecursive(ForecasterBase):
                 match those used during the training process.
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> forecaster.fit(y=pd.Series(np.arange(20)), store_in_sample_residuals=False)
-            >>> forecaster.set_in_sample_residuals(y=pd.Series(np.arange(20)))
-            >>> forecaster.in_sample_residuals_
-            array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            forecaster.fit(y=pd.Series(np.arange(20)), store_in_sample_residuals=False)
+            forecaster.set_in_sample_residuals(y=pd.Series(np.arange(20)))
+            print(forecaster.in_sample_residuals_)
+            ```
         """
         if not self.is_fitted:
             raise NotFittedError(
@@ -2845,17 +2886,19 @@ class ForecasterRecursive(ForecasterBase):
             ValueError: If `y_true` and `y_pred` have different length or index (if Series).
 
         Examples:
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
-            >>> forecaster.fit(y=pd.Series(np.arange(20)), store_in_sample_residuals=False)
-            >>> y_true = np.array([20, 21, 22, 23, 24])
-            >>> y_pred = np.array([20.1, 20.9, 22.2, 22.8, 24.0])
-            >>> forecaster.set_out_sample_residuals(y_true=y_true, y_pred=y_pred)
-            >>> forecaster.out_sample_residuals_
-            array([-0.1,  0.1, -0.2,  0.2,  0. ])
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+            forecaster.fit(y=pd.Series(np.arange(20)), store_in_sample_residuals=False)
+            y_true = np.array([20, 21, 22, 23, 24])
+            y_pred = np.array([20.1, 20.9, 22.2, 22.8, 24.0])
+            forecaster.set_out_sample_residuals(y_true=y_true, y_pred=y_pred)
+            print(forecaster.out_sample_residuals_)
+            ```
         """
         if not self.is_fitted:
             raise NotFittedError(

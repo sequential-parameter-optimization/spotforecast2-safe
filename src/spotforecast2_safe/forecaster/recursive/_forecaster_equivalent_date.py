@@ -125,22 +125,20 @@ class ForecasterEquivalentDate:
         differentiation_max (Ignored): Not used, present here for API consistency by convention.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-        >>> # Series with daily frequency
-        >>> data = pd.Series(
-        ...     data = np.arange(14),
-        ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-        ... )
-        >>> # Forecast based on the value 7 days ago
-        >>> forecaster = ForecasterEquivalentDate(offset=7)
-        >>> forecaster.fit(y=data)
-        >>> forecaster.predict(steps=3)
-        2022-01-15    7
-        2022-01-16    8
-        2022-01-17    9
-        Freq: D, Name: pred, dtype: int64
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+        data = pd.Series(
+            data=np.arange(14),
+            index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+        )
+        forecaster = ForecasterEquivalentDate(offset=7)
+        forecaster.fit(y=data)
+        print(forecaster.predict(steps=3))
+        ```
     """
 
     def __init__(
@@ -249,33 +247,19 @@ class ForecasterEquivalentDate:
 
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data = np.arange(14),
-            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
-            >>> print(forecaster)
-            ============================
-            ForecasterEquivalentDate
-            ============================
-            Offset: 7
-            Number of offsets: 1
-            Aggregation function: mean
-            Window size: 7
-            Series name: y
-            Training range: [Timestamp('2022-01-01 00:00:00'), Timestamp('2022-01-14 00:00:00')]
-            Training index type: DatetimeIndex
-            Training index frequency: D
-            Creation date: 2023-11-19 12:00:00
-            Last fit date: 2023-11-19 12:00:00
-            spotforecast version: 1.0.0
-            Python version: 3.8.10
-            Forecaster id: None
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
 
+            data = pd.Series(
+                data=np.arange(14),
+                index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            print(forecaster)
+            ```
         """
 
         info = (
@@ -323,18 +307,20 @@ class ForecasterEquivalentDate:
             - Forecaster id: Name used as an identifier of the forecaster.
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data = np.arange(14),
-            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
-            >>> forecaster._repr_html_()  # doctest: +ELLIPSIS
-            '<style>...</style><div class="container-...">...</div>'
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
 
+            data = pd.Series(
+                data=np.arange(14),
+                index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            html = forecaster._repr_html_()
+            print(html[:30])
+            ```
         """
 
         style, unique_id = get_style_repr_html(self.is_fitted)
@@ -394,15 +380,19 @@ class ForecasterEquivalentDate:
             None
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data = np.arange(14),
-            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+            data = pd.Series(
+                data=np.arange(14),
+                index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            print(forecaster.is_fitted)
+            ```
         """
 
         if not isinstance(y, pd.Series):
@@ -530,24 +520,23 @@ class ForecasterEquivalentDate:
             None
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data = np.arange(21, dtype=float),
-            ...     index = pd.date_range(start='2022-01-01', periods=21, freq='D')
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(
-            ...     offset=7,
-            ...     binner_kwargs={'n_bins': 2, 'random_state': 123}
-            ... )
-            >>> forecaster.fit(y=data, store_in_sample_residuals=True)
-            >>> forecaster.in_sample_residuals_
-            array([7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7., 7.])
-            >>> forecaster.in_sample_residuals_by_bin_
-            {0: array([7., 7., 7., 7., 7., 7., 7.]), 1: array([7., 7., 7., 7., 7., 7., 7.])}
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
 
-
+            data = pd.Series(
+                data=np.arange(21, dtype=float),
+                index=pd.date_range(start='2022-01-01', periods=21, freq='D'),
+            )
+            forecaster = ForecasterEquivalentDate(
+                offset=7,
+                binner_kwargs={'n_bins': 2, 'random_state': 123},
+            )
+            forecaster.fit(y=data, store_in_sample_residuals=True)
+            print(forecaster.in_sample_residuals_)
+            print(forecaster.in_sample_residuals_by_bin_)
+            ```
         """
 
         if isinstance(self.offset, pd.tseries.offsets.DateOffset):
@@ -656,20 +645,19 @@ class ForecasterEquivalentDate:
                 To avoid this, increase the `last_window` size or decrease the number of `n_offsets`.
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data = np.arange(14),
-            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
-            >>> forecaster.predict(steps=3)
-            2022-01-15    7
-            2022-01-16    8
-            2022-01-17    9
-            Freq: D, Name: pred, dtype: int64
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+            data = pd.Series(
+                data=np.arange(14),
+                index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            print(forecaster.predict(steps=3))
+            ```
         """
 
         if last_window is None:
@@ -844,20 +832,19 @@ class ForecasterEquivalentDate:
                 https://mapie.readthedocs.io/en/stable/theoretical_description_regression.html#the-split-method
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data = np.arange(14, dtype=float),
-            ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data, store_in_sample_residuals=True)
-            >>> forecaster.predict_interval(steps=3, interval=0.8)
-                        pred  lower_bound  upper_bound
-            2022-01-15   7.0          6.0          8.0
-            2022-01-16   8.0          7.0          9.0
-            2022-01-17   9.0          8.0         10.0
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+            data = pd.Series(
+                data=np.arange(14, dtype=float),
+                index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data, store_in_sample_residuals=True)
+            print(forecaster.predict_interval(steps=3, interval=0.8))
+            ```
         """
 
         if method != "conformal":
@@ -1051,20 +1038,20 @@ class ForecasterEquivalentDate:
             IndexError: If the index range of `y` does not match the training range.
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data=np.arange(14, dtype=float),
-            ...     index=pd.date_range(start="2022-01-01", periods=14, freq="D"),
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
-            >>> # Recompute and store residuals if needed
-            >>> forecaster.set_in_sample_residuals(y=data, random_state=123)
-            >>> forecaster.in_sample_residuals_.shape
-            (7,)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
 
+            data = pd.Series(
+                data=np.arange(14, dtype=float),
+                index=pd.date_range(start="2022-01-01", periods=14, freq="D"),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            forecaster.set_in_sample_residuals(y=data, random_state=123)
+            print(forecaster.in_sample_residuals_.shape)
+            ```
         """
 
         if not self.is_fitted:
@@ -1138,21 +1125,22 @@ class ForecasterEquivalentDate:
             ValueError: If `y_true` and `y_pred` are pandas Series with different indexes.
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data=np.arange(21, dtype=float),
-            ...     index=pd.date_range(start="2022-01-01", periods=21, freq="D"),
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
-            >>> preds = forecaster.predict(steps=7)
-            >>> y_true = pd.Series(data[-7:].to_numpy(), index=preds.index)
-            >>> forecaster.set_out_sample_residuals(y_true=y_true, y_pred=preds)
-            >>> forecaster.out_sample_residuals_.shape
-            (7,)
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
 
+            data = pd.Series(
+                data=np.arange(21, dtype=float),
+                index=pd.date_range(start="2022-01-01", periods=21, freq="D"),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            preds = forecaster.predict(steps=7)
+            y_true = pd.Series(data[-7:].to_numpy(), index=preds.index)
+            forecaster.set_out_sample_residuals(y_true=y_true, y_pred=preds)
+            print(forecaster.out_sample_residuals_.shape)
+            ```
         """
 
         if not self.is_fitted:
@@ -1265,11 +1253,13 @@ class ForecasterEquivalentDate:
             dict: Dictionary with forecaster tags.
 
         Examples:
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> tags = forecaster.get_tags()
-            >>> sorted(tags.keys())[:3]
-            ['allowed_input_types_exog', 'allowed_input_types_series', 'forecaster_name']
+            ```{python}
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+            forecaster = ForecasterEquivalentDate(offset=7)
+            tags = forecaster.get_tags()
+            print(sorted(tags.keys())[:3])
+            ```
         """
 
         return self.__spotforecast_tags__
@@ -1282,17 +1272,19 @@ class ForecasterEquivalentDate:
             None
 
         Examples:
-            >>> import pandas as pd
-            >>> import numpy as np
-            >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-            >>> data = pd.Series(
-            ...     data=np.arange(14, dtype=float),
-            ...     index=pd.date_range(start="2022-01-01", periods=14, freq="D"),
-            ... )
-            >>> forecaster = ForecasterEquivalentDate(offset=7)
-            >>> forecaster.fit(y=data)
-            >>> forecaster.summary()  # doctest: +ELLIPSIS
-            ============================
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+            data = pd.Series(
+                data=np.arange(14, dtype=float),
+                index=pd.date_range(start="2022-01-01", periods=14, freq="D"),
+            )
+            forecaster = ForecasterEquivalentDate(offset=7)
+            forecaster.fit(y=data)
+            forecaster.summary()
+            ```
         """
 
         print(self)

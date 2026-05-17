@@ -20,10 +20,14 @@ Add `y_train` argument to a function if it is not already present.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> def my_metric(y_true, y_pred):
-...     return np.mean(np.abs(y_true - y_pred))
->>> enhanced_metric = add_y_train_argument(my_metric)
->>> # Now the function accepts y_train parameter
->>> result = enhanced_metric(np.array([1,2,3]), np.array([1,2,3]), y_train=None)
+```{python}
+import numpy as np
+from spotforecast2_safe.forecaster.metrics import add_y_train_argument
+
+def my_metric(y_true, y_pred):
+    return np.mean(np.abs(y_true - y_pred))
+
+enhanced_metric = add_y_train_argument(my_metric)
+result = enhanced_metric(np.array([1, 2, 3]), np.array([1, 2, 3]), y_train=None)
+print(result)
 ```
