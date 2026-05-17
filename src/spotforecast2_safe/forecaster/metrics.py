@@ -11,7 +11,7 @@ Examples:
     Using standard metrics::
 
         import numpy as np
-        from spotforecast2.forecaster.metrics import _get_metric
+        from spotforecast2_safe.forecaster.metrics import _get_metric
 
         y_true = np.array([1, 2, 3, 4, 5])
         y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
@@ -22,7 +22,7 @@ Examples:
 
     Using scaled metrics::
 
-        from spotforecast2.forecaster.metrics import mean_absolute_scaled_error
+        from spotforecast2_safe.forecaster.metrics import mean_absolute_scaled_error
 
         y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
         y_true = np.array([9, 10, 11])

@@ -133,7 +133,8 @@ class ForecasterRecursive(ForecasterBase):
         >>> import pandas as pd
         >>> from sklearn.linear_model import LinearRegression
         >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> y = pd.Series(np.random.randn(100), name='y')
+        >>> rng = np.random.default_rng(0)
+        >>> y = pd.Series(rng.standard_normal(100), name='y')
         >>> forecaster = ForecasterRecursive(
         ...     estimator=LinearRegression(),
         ...     lags=10
@@ -143,11 +144,14 @@ class ForecasterRecursive(ForecasterBase):
 
         Create a forecaster with window features and transformations:
 
+        >>> import numpy as np
+        >>> import pandas as pd
         >>> from sklearn.ensemble import RandomForestRegressor
         >>> from sklearn.preprocessing import StandardScaler
         >>> from spotforecast2_safe.preprocessing import RollingFeatures
-        >>> import pandas as pd
-        >>> y = pd.Series(np.random.randn(100), name='y')
+        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        >>> rng = np.random.default_rng(1)
+        >>> y = pd.Series(rng.standard_normal(100), name='y')
         >>> forecaster = ForecasterRecursive(
         ...     estimator=RandomForestRegressor(n_estimators=100),
         ...     lags=[1, 7, 30],
