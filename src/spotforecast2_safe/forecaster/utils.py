@@ -86,86 +86,67 @@ def check_preprocess_series(
             It is recommended to use a dictionary of pandas Series instead.
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.forecaster.utils import check_preprocess_series
-        >>> # Example with wide-format DataFrame
-        >>> dates = pd.date_range('2020-01-01', periods=5, freq='D')
-        >>> df_wide = pd.DataFrame({
-        ...     'series_1': [1, 2, 3, 4, 5],
-        ...     'series_2': [5, 4, 3, 2, 1],
-        ... }, index=dates)
-        >>> series_dict, series_indexes = check_preprocess_series(df_wide)
-        UserWarning: `series` DataFrame has multiple columns. Only the values of first column, 'series_1', will be used as series values. All other columns will be ignored.
-        UserWarning: Passing a DataFrame (either wide or long format) as `series` requires additional internal transformations, which can increase computational time.
-        It is recommended to use a dictionary of pandas Series instead.
-        >>> print(series_dict['series_1'])
-        2020-01-01    1
-        2020-01-02    2
-        2020-01-03    3
-        2020-01-04    4
-        2020-01-05    5
-        Name: series_1, dtype: int64
-        >>> print(series_indexes['series_1'])
-        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
-                       '2020-01-05'],
-                      dtype='datetime64[ns]', freq='D')
-        >>> # Example with long-format DataFrame
-        >>> df_long = pd.DataFrame({
-        ...     'series_id': ['series_1'] * 5 + ['series_2'] * 5,
-        ...     'value': [1, 2, 3, 4, 5, 5, 4, 3, 2, 1],
-        ... }, index=pd.MultiIndex.from_product([['series_1', 'series_2'], dates], names=['series_id', 'date']))
-        >>> series_dict, series_indexes = check_preprocess_series(df_long)
-        UserWarning: `series` DataFrame has multiple columns. Only the values of first column, 'value', will be used as series values. All other columns will be ignored.
-        UserWarning: Passing a DataFrame (either wide or long format) as `series` requires additional internal transformations, which can increase computational time.
-        It is recommended to use a dictionary of pandas Series instead.
-        >>> print(series_dict['series_1'])
-        2020-01-01    1
-        2020-01-02    2
-        2020-01-03    3
-        2020-01-04    4
-        2020-01-05    5
-        Name: series_1, dtype: int64
-        >>> print(series_indexes['series_1'])
-        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
-                          '2020-01-05'],
-                         dtype='datetime64[ns]', freq='D')
+        ```{python}
+        import warnings
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import check_preprocess_series
 
-        >>> # Example with dictionary of Series
-        >>> series_dict_input = {
-        ...     'series_1': pd.Series([1, 2, 3, 4, 5], index=dates),
-        ...     'series_2': pd.Series([5, 4, 3, 2, 1], index=dates),
-        ... }
-        >>> series_dict, series_indexes = check_preprocess_series(series_dict_input)
-        >>> print(series_dict['series_1'])
-        2020-01-01    1
-        2020-01-02    2
-        2020-01-03    3
-        2020-01-04    4
-        2020-01-05    5
-        Name: series_1, dtype: int64
-        >>> print(series_indexes['series_1'])
-        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
-                       '2020-01-05'],
-                      dtype='datetime64[ns]', freq='D')
-            >>> # Example with dictionary of DataFrames
-            >>> df_series_1 = pd.DataFrame({'value': [1, 2, 3, 4, 5]}, index=dates)
-            >>> df_series_2 = pd.DataFrame({'value': [5, 4, 3, 2, 1]}, index=dates)
-            >>> series_dict_input = {
-            ...     'series_1': df_series_1,
-            ...     'series_2': df_series_2,
-            ... }
-            >>> series_dict, series_indexes = check_preprocess_series(series_dict_input)
-            >>> print(series_dict['series_1'])
-        2020-01-01    1
-        2020-01-02    2
-        2020-01-03    3
-        2020-01-04    4
-        2020-01-05    5
-        Name: series_1, dtype: int64
-        >>> print(series_indexes['series_1'])
-        DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
-                       '2020-01-05'],
-                      dtype='datetime64[ns]', freq='D')
+        dates = pd.date_range('2020-01-01', periods=5, freq='D')
+        df_wide = pd.DataFrame({
+            'series_1': [1, 2, 3, 4, 5],
+            'series_2': [5, 4, 3, 2, 1],
+        }, index=dates)
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            series_dict, series_indexes = check_preprocess_series(df_wide)
+        print(series_dict['series_1'])
+        print(series_indexes['series_1'])
+        ```
+
+        ```{python}
+        import warnings
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import check_preprocess_series
+
+        dates = pd.date_range('2020-01-01', periods=5, freq='D')
+        df_long = pd.DataFrame(
+            {'value': [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]},
+            index=pd.MultiIndex.from_product(
+                [['series_1', 'series_2'], dates], names=['series_id', 'date']
+            ),
+        )
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            series_dict, series_indexes = check_preprocess_series(df_long)
+        print(series_dict['series_1'])
+        ```
+
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import check_preprocess_series
+
+        dates = pd.date_range('2020-01-01', periods=5, freq='D')
+        series_dict_input = {
+            'series_1': pd.Series([1, 2, 3, 4, 5], index=dates, name='series_1'),
+            'series_2': pd.Series([5, 4, 3, 2, 1], index=dates, name='series_2'),
+        }
+        series_dict, series_indexes = check_preprocess_series(series_dict_input)
+        print(series_dict['series_1'])
+        print(series_indexes['series_1'])
+        ```
+
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import check_preprocess_series
+
+        dates = pd.date_range('2020-01-01', periods=5, freq='D')
+        df_series_1 = pd.DataFrame({'value': [1, 2, 3, 4, 5]}, index=dates)
+        df_series_2 = pd.DataFrame({'value': [5, 4, 3, 2, 1]}, index=dates)
+        series_dict_input = {'series_1': df_series_1, 'series_2': df_series_2}
+        series_dict, series_indexes = check_preprocess_series(series_dict_input)
+        print(series_dict['series_1'])
+        print(series_indexes['series_1'])
+        ```
     """
     if not isinstance(series, (pd.DataFrame, dict)):
         raise TypeError(
@@ -347,17 +328,16 @@ def exog_to_direct_numpy(
               variables transformed. Only created if `exog` is a pandas format.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.utils import exog_to_direct_numpy
-        >>> import numpy as np
-        >>> exog = np.array([10, 20, 30, 40, 50])
-        >>> steps = 3
-        >>> exog_direct, exog_direct_names = exog_to_direct_numpy(exog, steps)
-        >>> print(exog_direct)
-        [[10 20 30]
-         [20 30 40]
-         [30 40 50]]
-        >>> print(exog_direct_names)
-        None
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.utils import exog_to_direct_numpy
+
+        exog = np.array([10, 20, 30, 40, 50])
+        steps = 3
+        exog_direct, exog_direct_names = exog_to_direct_numpy(exog, steps)
+        print(exog_direct)
+        print(exog_direct_names)
+        ```
     """
 
     if isinstance(exog, (pd.Series, pd.DataFrame)):
@@ -401,21 +381,13 @@ def prepare_steps_direct(
         list: Steps to be predicted.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.utils import prepare_steps_direct
-        >>> max_step = 5
-        >>> steps = 3
-        >>> prepare_steps_direct(max_step, steps)
-        [1, 2, 3]
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import prepare_steps_direct
 
-        >>> max_step = 5
-        >>> steps = [1, 3, 5]
-        >>> prepare_steps_direct(max_step, steps)
-        [1, 3, 5]
-
-        >>> max_step = 5
-        >>> steps = None
-        >>> prepare_steps_direct(max_step, steps)
-        [1, 2, 3, 4, 5]
+        print(prepare_steps_direct(max_step=5, steps=3))
+        print(prepare_steps_direct(max_step=5, steps=[1, 3, 5]))
+        print(prepare_steps_direct(max_step=5, steps=None))
+        ```
     """
 
     if isinstance(steps, int):
@@ -471,17 +443,20 @@ def transform_numpy(
             ColumnTransformer.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.utils import transform_numpy
-        >>> from sklearn.preprocessing import StandardScaler
-        >>> import numpy as np
-        >>> array = np.array([1, 2, 3, 4, 5])
-        >>> transformer = StandardScaler()
-        >>> array_transformed = transform_numpy(array, transformer, fit=True)
-        >>> print(array_transformed)
-        [-1.41421356 -0.70710678  0.          0.70710678  1.41421356]
-        >>> array_inversed = transform_numpy(array_transformed, transformer, inverse_transform=True)
-        >>> print(array_inversed)
-        [1. 2. 3. 4. 5.]
+        ```{python}
+        import numpy as np
+        from sklearn.preprocessing import StandardScaler
+        from spotforecast2_safe.forecaster.utils import transform_numpy
+
+        array = np.array([1, 2, 3, 4, 5])
+        transformer = StandardScaler()
+        array_transformed = transform_numpy(array, transformer, fit=True)
+        print(array_transformed)
+        array_inversed = transform_numpy(
+            array_transformed, transformer, inverse_transform=True
+        )
+        print(array_inversed)
+        ```
     """
 
     if transformer is None:
@@ -623,26 +598,31 @@ def initialize_window_features(
         TypeError: If `window_sizes` or `features_names` have incorrect types.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.preprocessing import RollingFeatures
-        >>> wf = RollingFeatures(stats=['mean', 'std'], window_sizes=[7, 14])
-        >>> wf_list, names, max_size = initialize_window_features(wf)
-        >>> print(f"Max window size: {max_size}")
-        Max window size: 14
-        >>> print(f"Number of features: {len(names)}")
-        Number of features: 4
+        ```{python}
+        from spotforecast2_safe.preprocessing import RollingFeatures
+        from spotforecast2_safe.forecaster.utils import initialize_window_features
 
-        Multiple window features:
-        >>> class MockWF:
-        ...     def __init__(self, names, sizes):
-        ...         self.features_names = names
-        ...         self.window_sizes = sizes
-        ...     def transform_batch(self, X): pass
-        ...     def transform(self, X): pass
-        >>> wf1 = MockWF(['f1'], 7)
-        >>> wf2 = MockWF(['f2', 'f3'], 3)
-        >>> wf_list, names, max_size = initialize_window_features([wf1, wf2])
-        >>> print(f"Max window size: {max_size}")
-        Max window size: 7
+        wf = RollingFeatures(stats=['mean', 'std'], window_sizes=[7, 14])
+        wf_list, names, max_size = initialize_window_features(wf)
+        print(f"Max window size: {max_size}")
+        print(f"Number of features: {len(names)}")
+        ```
+
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import initialize_window_features
+
+        class MockWF:
+            def __init__(self, names, sizes):
+                self.features_names = names
+                self.window_sizes = sizes
+            def transform_batch(self, X): pass
+            def transform(self, X): pass
+
+        wf1 = MockWF(['f1'], 7)
+        wf2 = MockWF(['f2', 'f3'], 3)
+        wf_list, names, max_size = initialize_window_features([wf1, wf2])
+        print(f"Max window size: {max_size}")
+        ```
     """
 
     needed_atts = ["window_sizes", "features_names"]
@@ -767,20 +747,28 @@ def check_extract_values_and_index(
         UserWarning: If DatetimeIndex has no frequency (inferred automatically).
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> dates = pd.date_range('2020-01-01', periods=10, freq='D')
-        >>> series = pd.Series(np.arange(10), index=dates)
-        >>> values, index = check_extract_values_and_index(series)
-        >>> print(values.shape)
-        (10,)
-        >>> print(type(index))
-        <class 'pandas.core.indexes.datetimes.DatetimeIndex'>
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import check_extract_values_and_index
 
-        Extract index only:
-        >>> _, index = check_extract_values_and_index(series, return_values=False)
-        >>> print(index[0])
-        2020-01-01 00:00:00
+        dates = pd.date_range('2020-01-01', periods=10, freq='D')
+        series = pd.Series(np.arange(10), index=dates)
+        values, index = check_extract_values_and_index(series)
+        print(values.shape)
+        print(type(index))
+        ```
+
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import check_extract_values_and_index
+
+        dates = pd.date_range('2020-01-01', periods=10, freq='D')
+        series = pd.Series(np.arange(10), index=dates)
+        _, index = check_extract_values_and_index(series, return_values=False)
+        print(index[0])
+        ```
     """
 
     if not isinstance(data, (pd.Series, pd.DataFrame)):
@@ -819,17 +807,14 @@ def get_style_repr_html(is_fitted: bool = False) -> Tuple[str, str]:
             - unique_id (str): Unique 8-character ID for the container element.
 
     Examples:
-        >>> style, uid = get_style_repr_html(is_fitted=True)
-        >>> print(f"Container ID: {uid}")
-        Container ID: a1b2c3d4
-        >>> print(f"Style contains CSS: {'container-' in style}")
-        Style contains CSS: True
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import get_style_repr_html
 
-        Using in HTML rendering:
-        >>> style, uid = get_style_repr_html(is_fitted=False)
-        >>> html = f"{style}<div class='container-{uid}'>Forecaster Info</div>"
-        >>> print("background-color" in html)
-        True
+        style, uid = get_style_repr_html(is_fitted=True)
+        print(f"Style contains CSS: {'container-' in style}")
+        html = f"{style}<div class='container-{uid}'>Forecaster Info</div>"
+        print("background-color" in html)
+        ```
     """
 
     unique_id = str(uuid.uuid4())[:8]
@@ -1145,24 +1130,27 @@ def check_residuals_input(
         None
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.utils import check_residuals_input
-        >>> import numpy as np
-        >>> forecaster_name = "ForecasterRecursiveMultiSeries"
-        >>> use_in_sample_residuals = True
-        >>> in_sample_residuals_ = {'series_1': np.array([0.1, -0.2]), 'series_2': np.array([0.3, -0.1])}
-        >>> out_sample_residuals_ = None
-        >>> use_binned_residuals = False
-        >>> check_residuals_input(
-        ...     forecaster_name,
-        ...     use_in_sample_residuals,
-        ...     in_sample_residuals_,
-        ...     out_sample_residuals_,
-        ...     use_binned_residuals,
-        ...     in_sample_residuals_by_bin_=None,
-        ...     out_sample_residuals_by_bin_=None,
-        ...     levels=['series_1', 'series_2'],
-        ...     encoding='onehot'
-        ... )
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.forecaster.utils import check_residuals_input
+
+        in_sample_residuals_ = {
+            'series_1': np.array([0.1, -0.2]),
+            'series_2': np.array([0.3, -0.1]),
+        }
+        check_residuals_input(
+            "ForecasterRecursiveMultiSeries",
+            use_in_sample_residuals=True,
+            in_sample_residuals_=in_sample_residuals_,
+            out_sample_residuals_=None,
+            use_binned_residuals=False,
+            in_sample_residuals_by_bin_=None,
+            out_sample_residuals_by_bin_=None,
+            levels=['series_1', 'series_2'],
+            encoding='onehot',
+        )
+        print("check passed")
+        ```
     """
 
     forecasters_multiseries = (
@@ -1267,18 +1255,15 @@ def date_to_index_position(
         ValueError: If `date_input` is a date and does not meet requirement.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.utils import date_to_index_position
-        >>> import pandas as pd
-        >>> index = pd.date_range(start='2020-01-01', periods=10, freq='D')
-        >>> # Using an integer input
-        >>> date_to_index_position(index, 5)
-        5
-        >>> # Using a date input for prediction
-        >>> date_to_index_position(index, '2020-01-15', method='prediction')
-        5
-        >>> # Using a date input for validation
-        >>> date_to_index_position(index, '2020-01-05', method='validation')
-        5
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import date_to_index_position
+
+        index = pd.date_range(start='2020-01-01', periods=10, freq='D')
+        print(date_to_index_position(index, 5))
+        print(date_to_index_position(index, '2020-01-15', method='prediction'))
+        print(date_to_index_position(index, '2020-01-05', method='validation'))
+        ```
     """
 
     if method not in ["prediction", "validation"]:
@@ -1349,17 +1334,17 @@ def initialize_estimator(
         ValueError: If both `estimator` and `regressor` are provided.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster.utils import initialize_estimator
-        >>> from sklearn.linear_model import LinearRegression
-        >>> # Using the `estimator` argument
-        >>> estimator = LinearRegression()
-        >>> initialize_estimator(estimator=estimator)
-        LinearRegression()
-        >>> # Using the deprecated `regressor` argument
-        >>> regressor = LinearRegression()
-        >>> initialize_estimator(regressor=regressor)
-        LinearRegression()
+        ```{python}
+        import warnings
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.forecaster.utils import initialize_estimator
 
+        estimator = LinearRegression()
+        print(initialize_estimator(estimator=estimator))
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            print(initialize_estimator(regressor=LinearRegression()))
+        ```
     """
 
     if regressor is not None:
@@ -1401,22 +1386,22 @@ def predict_multivariate(
         pd.DataFrame: DataFrame with predictions for all targets.
 
     Examples:
-        >>> import pandas as pd
-        >>> from sklearn.linear_model import LinearRegression
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from spotforecast2_safe.forecaster.utils import predict_multivariate
-        >>> y1 = pd.Series([1, 2, 3, 4, 5])
-        >>> y2 = pd.Series([2, 4, 6, 8, 10])
-        >>> f1 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
-        >>> f2 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
-        >>> f1.fit(y=y1)
-        >>> f2.fit(y=y2)
-        >>> forecasters = {'target1': f1, 'target2': f2}
-        >>> predictions = predict_multivariate(forecasters, steps_ahead=2)
-        >>> predictions
-           target1  target2
-        5      6.0     12.0
-        6      7.0     14.0
+        ```{python}
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.forecaster.utils import predict_multivariate
+
+        y1 = pd.Series([1, 2, 3, 4, 5])
+        y2 = pd.Series([2, 4, 6, 8, 10])
+        f1 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
+        f2 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
+        f1.fit(y=y1)
+        f2.fit(y=y2)
+        forecasters = {'target1': f1, 'target2': f2}
+        predictions = predict_multivariate(forecasters, steps_ahead=2)
+        print(predictions)
+        ```
     """
 
     if not forecasters:
@@ -1480,47 +1465,46 @@ def initialize_transformer_series(
             are not present in the dict keys (those series get no transformation).
 
     Examples:
-        No transformation:
-        >>> from spotforecast2_safe.forecaster.utils import initialize_transformer_series
-        >>> series = ['series1', 'series2', 'series3']
-        >>> result = initialize_transformer_series(
-        ...     forecaster_name='ForecasterDirectMultiVariate',
-        ...     series_names_in_=series,
-        ...     transformer_series=None
-        ... )
-        >>> print(result)
-        {'series1': None, 'series2': None, 'series3': None}
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import initialize_transformer_series
 
-        Same transformer for all series:
-        >>> from sklearn.preprocessing import StandardScaler
-        >>> scaler = StandardScaler()
-        >>> result = initialize_transformer_series(
-        ...     forecaster_name='ForecasterDirectMultiVariate',
-        ...     series_names_in_=['series1', 'series2'],
-        ...     transformer_series=scaler
-        ... )
-        >>> len(result)
-        2
-        >>> all(isinstance(v, StandardScaler) for v in result.values())
-        True
-        >>> result['series1'] is result['series2']  # Different clones
-        False
+        series = ['series1', 'series2', 'series3']
+        result = initialize_transformer_series(
+            forecaster_name='ForecasterDirectMultiVariate',
+            series_names_in_=series,
+            transformer_series=None,
+        )
+        print(result)
+        ```
 
-        Different transformer per series:
-        >>> from sklearn.preprocessing import MinMaxScaler
-        >>> transformers = {
-        ...     'series1': StandardScaler(),
-        ...     'series2': MinMaxScaler()
-        ... }
-        >>> result = initialize_transformer_series(
-        ...     forecaster_name='ForecasterDirectMultiVariate',
-        ...     series_names_in_=['series1', 'series2'],
-        ...     transformer_series=transformers
-        ... )
-        >>> isinstance(result['series1'], StandardScaler)
-        True
-        >>> isinstance(result['series2'], MinMaxScaler)
-        True
+        ```{python}
+        from sklearn.preprocessing import StandardScaler
+        from spotforecast2_safe.forecaster.utils import initialize_transformer_series
+
+        scaler = StandardScaler()
+        result = initialize_transformer_series(
+            forecaster_name='ForecasterDirectMultiVariate',
+            series_names_in_=['series1', 'series2'],
+            transformer_series=scaler,
+        )
+        print(len(result))
+        print(all(isinstance(v, StandardScaler) for v in result.values()))
+        print(result['series1'] is result['series2'])
+        ```
+
+        ```{python}
+        from sklearn.preprocessing import MinMaxScaler, StandardScaler
+        from spotforecast2_safe.forecaster.utils import initialize_transformer_series
+
+        transformers = {'series1': StandardScaler(), 'series2': MinMaxScaler()}
+        result = initialize_transformer_series(
+            forecaster_name='ForecasterDirectMultiVariate',
+            series_names_in_=['series1', 'series2'],
+            transformer_series=transformers,
+        )
+        print(isinstance(result['series1'], StandardScaler))
+        print(isinstance(result['series2'], MinMaxScaler))
+        ```
     """
     from copy import deepcopy
 

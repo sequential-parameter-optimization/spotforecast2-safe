@@ -10,28 +10,28 @@ class level in their __init__.
 
 ## Examples {.doc-section .doc-section-examples}
 
-Create a custom forecaster inheriting from ForecasterBase:
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge
 
-```python
->>> from spotforecast2_safe.forecaster.base import ForecasterBase
->>> import pandas as pd
->>> import numpy as np
->>> class MyForecaster(ForecasterBase):
-...     def __init__(self, estimator):
-...         self.estimator = estimator
-...         self.__spotforecast_tags__ = {'hide_lags': True}
-...     def create_train_X_y(self, y, exog=None):
-...         return pd.DataFrame(), pd.Series(dtype=float)
-...     def fit(self, y, exog=None):
-...         pass
-...     def predict(self, steps, last_window=None, exog=None):
-...         return pd.Series(np.zeros(steps))
-...     def set_params(self, params):
-...         pass
->>> from sklearn.linear_model import Ridge
->>> forecaster = MyForecaster(estimator=Ridge())
->>> forecaster
-MyForecaster(estimator=Ridge())
+from spotforecast2_safe.forecaster.base import ForecasterBase
+
+class MyForecaster(ForecasterBase):
+    def __init__(self, estimator):
+        self.estimator = estimator
+        self.__spotforecast_tags__ = {'hide_lags': True}
+    def create_train_X_y(self, y, exog=None):
+        return pd.DataFrame(), pd.Series(dtype=float)
+    def fit(self, y, exog=None):
+        pass
+    def predict(self, steps, last_window=None, exog=None):
+        return pd.Series(np.zeros(steps))
+    def set_params(self, params):
+        pass
+
+forecaster = MyForecaster(estimator=Ridge())
+print(repr(forecaster))
 ```
 
 ## Classes
@@ -59,13 +59,15 @@ the class level in their __init__.
 
 #### Examples {.doc-section .doc-section-examples}
 
-To see all abstract methods that need to be implemented:
+```{python}
+import inspect
 
-```python
->>> import inspect
->>> from spotforecast2_safe.forecaster.base import ForecasterBase
->>> [m[0] for m in inspect.getmembers(ForecasterBase, predicate=inspect.isabstract)]
-['create_train_X_y', 'fit', 'predict', 'set_params']
+from spotforecast2_safe.forecaster.base import ForecasterBase
+
+abstract_methods = [
+    m[0] for m in inspect.getmembers(ForecasterBase, predicate=inspect.isabstract)
+]
+print(abstract_methods)
 ```
 
 #### Methods
@@ -106,22 +108,17 @@ Create training matrices from univariate time series and exogenous variables.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> import pandas as pd
->>> import numpy as np
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> y = pd.Series(np.arange(10), name='y')
->>> X_train, y_train = forecaster.create_train_X_y(y)
->>> X_train.head(2)
-   lag_1  lag_2  lag_3
-3    2.0    1.0    0.0
-4    3.0    2.0    1.0
->>> y_train.head(2)
-3    3
-4    4
-Name: y, dtype: int64
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+y = pd.Series(np.arange(10), name='y')
+X_train, y_train = forecaster.create_train_X_y(y)
+print(X_train.head(2))
+print(y_train.head(2))
 ```
 
 ##### fit { #spotforecast2_safe.forecaster.base.ForecasterBase.fit }
@@ -147,16 +144,16 @@ Training Forecaster.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> import pandas as pd
->>> import numpy as np
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> y = pd.Series(np.arange(10), name='y')
->>> forecaster.fit(y)
->>> forecaster.is_fitted
-True
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+y = pd.Series(np.arange(10), name='y')
+forecaster.fit(y)
+print(forecaster.is_fitted)
 ```
 
 ##### get_tags { #spotforecast2_safe.forecaster.base.ForecasterBase.get_tags }
@@ -175,13 +172,13 @@ Return the tags that characterize the behavior of the forecaster.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> tags = forecaster.get_tags()
->>> tags['forecaster_task']
-'regression'
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+tags = forecaster.get_tags()
+print(tags['forecaster_task'])
 ```
 
 ##### predict { #spotforecast2_safe.forecaster.base.ForecasterBase.predict }
@@ -208,19 +205,16 @@ Predict n steps ahead.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> import pandas as pd
->>> import numpy as np
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> y = pd.Series(np.arange(10), name='y')
->>> forecaster.fit(y)
->>> forecaster.predict(steps=3)
-10    9.5
-11    9.0
-12    8.5
-Name: pred, dtype: float64
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+y = pd.Series(np.arange(10), name='y')
+forecaster.fit(y)
+print(forecaster.predict(steps=3))
 ```
 
 ##### set_lags { #spotforecast2_safe.forecaster.base.ForecasterBase.set_lags }
@@ -247,13 +241,13 @@ Attributes max_lag and window_size are also updated.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> forecaster.set_lags(lags=5)
->>> forecaster.lags
-array([1, 2, 3, 4, 5])
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+forecaster.set_lags(lags=5)
+print(forecaster.lags)
 ```
 
 ##### set_params { #spotforecast2_safe.forecaster.base.ForecasterBase.set_params }
@@ -278,13 +272,13 @@ Set new values to the parameters of the scikit-learn model stored in the forecas
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> forecaster = ForecasterRecursive(estimator=Ridge(alpha=1.0), lags=3)
->>> forecaster.set_params({'estimator__alpha': 0.5})
->>> forecaster.estimator.alpha
-0.5
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(alpha=1.0), lags=3)
+forecaster.set_params({'estimator__alpha': 0.5})
+print(forecaster.estimator.alpha)
 ```
 
 ##### set_window_features { #spotforecast2_safe.forecaster.base.ForecasterBase.set_window_features }
@@ -312,15 +306,15 @@ window_features_class_names and window_size are also updated.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from spotforecast2_safe.forecaster.preprocessing import RollingFeatures
->>> from sklearn.linear_model import Ridge
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> window_feat = RollingFeatures(stats='mean', window_sizes=3)
->>> forecaster.set_window_features(window_features=window_feat)
->>> forecaster.window_features
-[RollingFeatures(stats=['mean'], window_sizes=[3])]
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.preprocessing import RollingFeatures
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+window_feat = RollingFeatures(stats='mean', window_sizes=3)
+forecaster.set_window_features(window_features=window_feat)
+print(forecaster.window_features)
 ```
 
 ##### summary { #spotforecast2_safe.forecaster.base.ForecasterBase.summary }
@@ -339,14 +333,10 @@ Show forecaster information.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import Ridge
->>> forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
->>> forecaster.summary()
-ForecasterRecursive
-===================
-Estimator: Ridge()
-Lags: [1 2 3]
-...
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+forecaster.summary()
 ```
