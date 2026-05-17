@@ -1,3 +1,19 @@
+## [7.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v6.0.0...v7.0.0-rc.1) (2026-05-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **forecaster:** spotforecast2_safe.manager.models is removed.
+Replace imports of spotforecast2_safe.manager.models.forecaster_recursive_*
+with spotforecast2_safe.forecaster.wrappers. The three wrapper classes
+keep the same names, signatures, and inheritance relationships.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Code Refactoring
+
+* **forecaster:** consolidate manager/models into forecaster/wrappers ([05cfe16](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/05cfe16d507b624f02f83029fa3295665cc739d3))
+
 ## [6.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.1...v6.0.0) (2026-05-17)
 
 
