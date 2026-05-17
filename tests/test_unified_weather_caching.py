@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_weather_data
-from spotforecast2_safe.manager.exo.weather import get_weather_features
+from spotforecast2_safe.weather import get_weather_features
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -193,7 +193,7 @@ class TestGetWeatherFeaturesCaching:
         data = pd.DataFrame({"value": range(48)}, index=idx)
 
         with patch(
-            "spotforecast2_safe.manager.exo.weather.fetch_weather_data"
+            "spotforecast2_safe.data.fetch_data.fetch_weather_data"
         ) as mock_fetch:
             weather_df = pd.DataFrame(
                 {p: [1.0] * 48 for p in HOURLY_PARAMS},
@@ -218,7 +218,7 @@ class TestGetWeatherFeaturesCaching:
         data = pd.DataFrame({"value": range(48)}, index=idx)
 
         with patch(
-            "spotforecast2_safe.manager.exo.weather.fetch_weather_data"
+            "spotforecast2_safe.data.fetch_data.fetch_weather_data"
         ) as mock_fetch:
             weather_df = pd.DataFrame(
                 {p: [1.0] * 48 for p in HOURLY_PARAMS},

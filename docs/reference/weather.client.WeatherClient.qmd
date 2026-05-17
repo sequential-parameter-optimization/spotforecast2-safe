@@ -1,7 +1,7 @@
-# weather.weather_client.WeatherClient { #spotforecast2_safe.weather.weather_client.WeatherClient }
+# weather.client.WeatherClient { #spotforecast2_safe.weather.client.WeatherClient }
 
 ```python
-weather.weather_client.WeatherClient(latitude, longitude)
+weather.client.WeatherClient(latitude, longitude)
 ```
 
 Client for fetching weather data from Open-Meteo API.
@@ -31,13 +31,13 @@ print(df.head())
 
 | Name | Description |
 | --- | --- |
-| [fetch_archive](#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive) | Fetch historical data from Archive API. |
-| [fetch_forecast](#spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast) | Fetch forecast data from Forecast API. |
+| [fetch_archive](#spotforecast2_safe.weather.client.WeatherClient.fetch_archive) | Fetch historical data from Archive API. |
+| [fetch_forecast](#spotforecast2_safe.weather.client.WeatherClient.fetch_forecast) | Fetch forecast data from Forecast API. |
 
-### fetch_archive { #spotforecast2_safe.weather.weather_client.WeatherClient.fetch_archive }
+### fetch_archive { #spotforecast2_safe.weather.client.WeatherClient.fetch_archive }
 
 ```python
-weather.weather_client.WeatherClient.fetch_archive(start, end, timezone='UTC')
+weather.client.WeatherClient.fetch_archive(start, end, timezone='UTC')
 ```
 
 Fetch historical data from Archive API.
@@ -63,10 +63,10 @@ df = client.fetch_archive(
 print(df.head())
 ```
 
-### fetch_forecast { #spotforecast2_safe.weather.weather_client.WeatherClient.fetch_forecast }
+### fetch_forecast { #spotforecast2_safe.weather.client.WeatherClient.fetch_forecast }
 
 ```python
-weather.weather_client.WeatherClient.fetch_forecast(days_ahead, timezone='UTC')
+weather.client.WeatherClient.fetch_forecast(days_ahead, timezone='UTC')
 ```
 
 Fetch forecast data from Forecast API.

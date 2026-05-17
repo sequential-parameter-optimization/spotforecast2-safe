@@ -251,11 +251,6 @@ website:
                   - text: "load_iteration"
                     file: docs/reference/manager.trainer.load_iteration.qmd
 
-              - section: "Exogenous Features"
-                contents:
-                  - text: "get_weather_features"
-                    file: docs/reference/manager.exo.weather.get_weather_features.qmd
-
               - section: "Feature Engineering"
                 contents:
                   - text: "apply_cyclical_encoding"
@@ -316,9 +311,11 @@ website:
               - text: "Overview"
                 file: docs/reference/weather.qmd
               - text: "WeatherClient"
-                file: docs/reference/weather.weather_client.WeatherClient.qmd
+                file: docs/reference/weather.client.WeatherClient.qmd
               - text: "WeatherService"
-                file: docs/reference/weather.weather_client.WeatherService.qmd
+                file: docs/reference/weather.client.WeatherService.qmd
+              - text: "get_weather_features"
+                file: docs/reference/weather.features.get_weather_features.qmd
 
           - section: "Downloader"
             contents:
@@ -543,7 +540,6 @@ quartodoc:
         - manager.models.forecaster_recursive_xgb
         - manager.persistence
         - manager.tools
-        - manager.exo.weather.get_weather_features
         - manager.features.apply_cyclical_encoding
         - manager.features.create_interaction_features
         - manager.features.select_exogenous_features
@@ -585,8 +581,9 @@ quartodoc:
       desc: |
         Weather data integration using the Open-Meteo API.
       contents:
-        - weather.weather_client.WeatherClient
-        - weather.weather_client.WeatherService
+        - weather.client.WeatherClient
+        - weather.client.WeatherService
+        - weather.features.get_weather_features
 
     # ── Downloader ────────────────────────────────────────────────────────────
     - title: "Downloader"

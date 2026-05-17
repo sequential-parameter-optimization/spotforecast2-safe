@@ -1,7 +1,7 @@
-# manager.exo.weather.get_weather_features { #spotforecast2_safe.manager.exo.weather.get_weather_features }
+# weather.features.get_weather_features { #spotforecast2_safe.weather.features.get_weather_features }
 
 ```python
-manager.exo.weather.get_weather_features(
+weather.features.get_weather_features(
     data,
     start,
     cov_end,
@@ -58,32 +58,32 @@ windows.
 |--------|----------------------------|------------------------------------------------------------------------------------------------|
 |        | [ValueError](`ValueError`) | If no numeric weather columns are found, or if missing values cannot be filled after fetching. |
 
-Examples:
+## Examples {.doc-section .doc-section-examples}
 
-    ```{python}
-    import pandas as pd
-    from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-    from spotforecast2_safe.preprocessing.curate_data import (
-        agg_and_resample_data,
-        get_start_end,
-    )
-    from spotforecast2_safe.manager.exo.weather import get_weather_features
+```{python}
+import pandas as pd
+from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+from spotforecast2_safe.preprocessing.curate_data import (
+    agg_and_resample_data,
+    get_start_end,
+)
+from spotforecast2_safe.weather import get_weather_features
 
-    # Load and resample demo data
-    data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
-    data = agg_and_resample_data(data, verbose=False)
-    start, end, _, cov_end = get_start_end(data=data, forecast_horizon=24, verbose=False)
+# Load and resample demo data
+data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
+data = agg_and_resample_data(data, verbose=False)
+start, end, _, cov_end = get_start_end(data=data, forecast_horizon=24, verbose=False)
 
-    # Fetch weather features for one week of data
-    week_start = pd.Timestamp("2020-06-01", tz="UTC")
-    week_end = pd.Timestamp("2020-06-08", tz="UTC")
-    weather_features, weather_aligned = get_weather_features(
-        data=data,
-        start=week_start,
-        cov_end=week_end,
-        forecast_horizon=24,
-        verbose=False,
-    )
-    print("weather_features shape:", weather_features.shape)
-    print("weather_aligned shape:", weather_aligned.shape)
-    ```
+# Fetch weather features for one week of data
+week_start = pd.Timestamp("2020-06-01", tz="UTC")
+week_end = pd.Timestamp("2020-06-08", tz="UTC")
+weather_features, weather_aligned = get_weather_features(
+    data=data,
+    start=week_start,
+    cov_end=week_end,
+    forecast_horizon=24,
+    verbose=False,
+)
+print("weather_features shape:", weather_features.shape)
+print("weather_aligned shape:", weather_aligned.shape)
+```
