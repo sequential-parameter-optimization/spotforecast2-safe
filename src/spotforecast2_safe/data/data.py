@@ -164,7 +164,6 @@ class Period:
     Examples:
         ```{python}
         from spotforecast2_safe.data import Period
-
         period = Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))
         period.name
         ```
