@@ -7,8 +7,8 @@ Demo reporting metrics module.
 This module provides the fixed-shape reporting helper that produces the
 ``{"MAE": float, "MSE": float}`` dictionary printed at the end of demo
 and production runs.  It is intentionally separate from
-``forecaster.metrics`` (the skforecast-aligned, string-dispatch metric
-library used by the CV/backtesting engine).
+``spotforecast2_safe.forecaster.metrics`` (the skforecast-aligned,
+string-dispatch metric library used by the CV/backtesting engine).
 """
 
 from typing import Dict
@@ -99,6 +99,16 @@ def calculate_metrics(actual: pd.Series, predicted: pd.Series) -> Dict[str, floa
         ...     print("Model B has better MAE")
         Model A has better MAE
     """
+    if len(actual) != len(predicted):
+        raise ValueError(
+            f"Length mismatch: actual has {len(actual)} elements, "
+            f"predicted has {len(predicted)}."
+        )
+    if actual.isna().any() or predicted.isna().any():
+        raise ValueError(
+            "Input series contain NaN values; metric computation requires "
+            "complete data."
+        )
     diff = actual - predicted
     mae = diff.abs().mean()
     mse = (diff**2).mean()
