@@ -180,6 +180,14 @@ website:
                 file: docs/reference/forecaster.recursive._forecaster_recursive_multiseries.qmd
               - text: "utils"
                 file: docs/reference/forecaster.utils.qmd
+              - section: "Wrappers"
+                contents:
+                  - text: "ForecasterRecursiveModel"
+                    file: docs/reference/forecaster.wrappers.model.qmd
+                  - text: "ForecasterRecursiveLGBM"
+                    file: docs/reference/forecaster.wrappers.lgbm.qmd
+                  - text: "ForecasterRecursiveXGB"
+                    file: docs/reference/forecaster.wrappers.xgb.qmd
               - section: "Metrics"
                 contents:
                   - text: "add_y_train_argument"
@@ -234,14 +242,6 @@ website:
                 file: docs/reference/manager.persistence.qmd
               - text: "tools"
                 file: docs/reference/manager.tools.qmd
-              - section: "Models"
-                contents:
-                  - text: "ForecasterRecursiveLGBM"
-                    file: docs/reference/manager.models.forecaster_recursive_lgbm.qmd
-                  - text: "ForecasterRecursiveModel"
-                    file: docs/reference/manager.models.forecaster_recursive_model.qmd
-                  - text: "ForecasterRecursiveXGB"
-                    file: docs/reference/manager.models.forecaster_recursive_xgb.qmd
               - section: "Trainer"
                 contents:
                   - text: "get_last_model"
@@ -507,6 +507,9 @@ quartodoc:
         - forecaster.metrics.mean_absolute_scaled_error
         - forecaster.metrics.root_mean_squared_scaled_error
         - forecaster.metrics.symmetric_mean_absolute_percentage_error
+        - forecaster.wrappers.model
+        - forecaster.wrappers.lgbm
+        - forecaster.wrappers.xgb
 
     # ── Model Selection ───────────────────────────────────────────────────────
     - title: "Model Selection"
@@ -535,9 +538,6 @@ quartodoc:
         - manager.configurator.config_entsoe.ConfigEntsoe
         - manager.configurator.config_multi.ConfigMulti
         - manager.logger
-        - manager.models.forecaster_recursive_lgbm
-        - manager.models.forecaster_recursive_model
-        - manager.models.forecaster_recursive_xgb
         - manager.persistence
         - manager.tools
         - manager.features.apply_cyclical_encoding

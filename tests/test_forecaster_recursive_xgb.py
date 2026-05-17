@@ -5,12 +5,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.manager.models.forecaster_recursive_model import (
-    ForecasterRecursiveModel,
-)
-from spotforecast2_safe.manager.models.forecaster_recursive_xgb import (
-    ForecasterRecursiveXGB,
-)
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveXGB
 
 
 def test_forecaster_recursive_xgb_initialization():
@@ -28,7 +24,7 @@ def test_forecaster_recursive_xgb_inheritance():
 
 def test_forecaster_recursive_xgb_import_location():
     """Verify it can be imported from the new location."""
-    from spotforecast2_safe.manager.models import ForecasterRecursiveXGB as XGB
+    from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveXGB as XGB
 
     assert XGB is ForecasterRecursiveXGB
 
@@ -54,7 +50,7 @@ def test_forecaster_recursive_xgb_fit_predict_interface(sample_ts_data):
 
     # If XGBoost is available, we can test fit/predict
     # If not, it should log a warning but the interface exists
-    from spotforecast2_safe.manager.models.forecaster_recursive_xgb import XGBRegressor
+    from spotforecast2_safe.forecaster.wrappers.xgb import XGBRegressor
 
     if XGBRegressor is not None:
         model.fit(sample_ts_data)

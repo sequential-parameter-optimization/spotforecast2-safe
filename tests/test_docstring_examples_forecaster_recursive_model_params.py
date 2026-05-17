@@ -9,9 +9,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.manager.models.forecaster_recursive_model import (
-    ForecasterRecursiveModel,
-)
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 
 # ---------------------------------------------------------------------------
 # get_params examples

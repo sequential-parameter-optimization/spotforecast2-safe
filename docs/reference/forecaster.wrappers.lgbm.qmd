@@ -1,0 +1,33 @@
+# forecaster.wrappers.lgbm { #spotforecast2_safe.forecaster.wrappers.lgbm }
+
+`forecaster.wrappers.lgbm`
+
+Recursive forecaster wrapper using LightGBM.
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [ForecasterRecursiveLGBM](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM) | ForecasterRecursive specialization using LightGBM. |
+
+### ForecasterRecursiveLGBM { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM }
+
+```python
+forecaster.wrappers.lgbm.ForecasterRecursiveLGBM(iteration, lags=12, **kwargs)
+```
+
+ForecasterRecursive specialization using LightGBM.
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
+>>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+>>> model = ForecasterRecursiveLGBM(iteration=0)
+>>> model.name
+'lgbm'
+>>> isinstance(model, ForecasterRecursiveModel)
+True
+>>> model.forecaster is not None
+True
+```

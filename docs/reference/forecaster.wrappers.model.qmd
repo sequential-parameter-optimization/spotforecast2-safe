@@ -1,6 +1,6 @@
-# manager.models.forecaster_recursive_model { #spotforecast2_safe.manager.models.forecaster_recursive_model }
+# forecaster.wrappers.model { #spotforecast2_safe.forecaster.wrappers.model }
 
-`manager.models.forecaster_recursive_model`
+`forecaster.wrappers.model`
 
 Recursive forecaster model wrappers for different estimators.
 
@@ -8,12 +8,12 @@ Recursive forecaster model wrappers for different estimators.
 
 | Name | Description |
 | --- | --- |
-| [ForecasterRecursiveModel](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel) | Base wrapper around ForecasterRecursive to match application logic. |
+| [ForecasterRecursiveModel](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel) | Base wrapper around ForecasterRecursive to match application logic. |
 
-### ForecasterRecursiveModel { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel }
+### ForecasterRecursiveModel { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel(
+forecaster.wrappers.model.ForecasterRecursiveModel(
     iteration,
     end_dev=None,
     train_size=None,
@@ -51,7 +51,7 @@ feature building, tuning (simulated), and packaging predictions for UI.
 
 ```python
 >>> import pandas as pd
->>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+>>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 >>> from sklearn.linear_model import LinearRegression
 >>>
@@ -67,25 +67,25 @@ True
 
 | Name | Description |
 | --- | --- |
-| [backtest](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.backtest) | Back-test the forecaster on the test data. |
-| [fit](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.fit) | Fit the underlying forecaster. |
-| [fit_with_best](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.fit_with_best) | Fit the forecaster using the recorded best hyperparameters. |
-| [from_config](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.from_config) | Create a model instance with defaults drawn from a config object. |
-| [get_error_forecast](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_error_forecast) | Compute the error of the ENTSO-E benchmark forecast. |
-| [get_error_training](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_error_training) | Compute in-sample error on the training data. |
-| [get_feature_importance](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_feature_importance) | Return feature importances from the underlying estimator. |
-| [get_global_shap_feature_importance](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_global_shap_feature_importance) | Return global SHAP-based feature importances. |
-| [get_params](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_params) | Get parameters for this forecaster model. |
-| [package_prediction](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.package_prediction) | Package predictions, training errors, and benchmarks for the UI. |
-| [predict](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.predict) | Generate predictions and compute error metrics. |
-| [save_to_file](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.save_to_file) | Serialize the model to disk via :func:`joblib.dump`. |
-| [set_params](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.set_params) | Set the parameters of this forecaster model. |
-| [tune](#spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.tune) | Simulate hyperparameter tuning. |
+| [backtest](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.backtest) | Back-test the forecaster on the test data. |
+| [fit](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.fit) | Fit the underlying forecaster. |
+| [fit_with_best](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.fit_with_best) | Fit the forecaster using the recorded best hyperparameters. |
+| [from_config](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.from_config) | Create a model instance with defaults drawn from a config object. |
+| [get_error_forecast](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_error_forecast) | Compute the error of the ENTSO-E benchmark forecast. |
+| [get_error_training](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_error_training) | Compute in-sample error on the training data. |
+| [get_feature_importance](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_feature_importance) | Return feature importances from the underlying estimator. |
+| [get_global_shap_feature_importance](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_global_shap_feature_importance) | Return global SHAP-based feature importances. |
+| [get_params](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_params) | Get parameters for this forecaster model. |
+| [package_prediction](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.package_prediction) | Package predictions, training errors, and benchmarks for the UI. |
+| [predict](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.predict) | Generate predictions and compute error metrics. |
+| [save_to_file](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.save_to_file) | Serialize the model to disk via :func:`joblib.dump`. |
+| [set_params](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.set_params) | Set the parameters of this forecaster model. |
+| [tune](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.tune) | Simulate hyperparameter tuning. |
 
-##### backtest { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.backtest }
+##### backtest { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.backtest }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.backtest()
+forecaster.wrappers.model.ForecasterRecursiveModel.backtest()
 ```
 
 Back-test the forecaster on the test data.
@@ -102,13 +102,10 @@ Back-test the forecaster on the test data.
 |--------|----------------------------|---------------------------------------------|
 |        | [ValueError](`ValueError`) | If the forecaster has not been initialized. |
 
-##### fit { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.fit }
+##### fit { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.fit }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.fit(
-    y,
-    exog=None,
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.fit(y, exog=None)
 ```
 
 Fit the underlying forecaster.
@@ -131,7 +128,7 @@ Fit the underlying forecaster.
 ```python
 >>> import pandas as pd
 >>> import numpy as np
->>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+>>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 >>> from sklearn.linear_model import LinearRegression
 >>>
@@ -159,11 +156,10 @@ True
 True
 ```
 
-##### fit_with_best { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.fit_with_best }
+##### fit_with_best { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.fit_with_best }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.fit_with_best(
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.fit_with_best()
 ```
 
 Fit the forecaster using the recorded best hyperparameters.
@@ -179,10 +175,10 @@ fits the forecaster on the full training + dev set up to
 |--------|----------------------------|---------------------------------------------|
 |        | [ValueError](`ValueError`) | If the forecaster has not been initialized. |
 
-##### from_config { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.from_config }
+##### from_config { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.from_config }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.from_config(
+forecaster.wrappers.model.ForecasterRecursiveModel.from_config(
     iteration,
     config,
     **overrides,
@@ -207,15 +203,15 @@ attribute, translating the two known name mismatches
 
 ###### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                                                                                | Description                                     |
-|--------|---------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-|        | [ForecasterRecursiveModel](`spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel`) | An instance of *cls* (or the calling subclass). |
+| Name   | Type                                                                                                | Description                                     |
+|--------|-----------------------------------------------------------------------------------------------------|-------------------------------------------------|
+|        | [ForecasterRecursiveModel](`spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel`) | An instance of *cls* (or the calling subclass). |
 
 ###### Examples {.doc-section .doc-section-examples}
 
 ```python
 >>> from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
->>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+>>> from spotforecast2_safe.forecaster.wrappers import (
 ...     ForecasterRecursiveModel,
 ... )
 >>> cfg = ConfigMulti(country_code="FR", predict_size=48)
@@ -224,10 +220,10 @@ attribute, translating the two known name mismatches
 48
 ```
 
-##### get_error_forecast { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_error_forecast }
+##### get_error_forecast { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_error_forecast }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_error_forecast(
+forecaster.wrappers.model.ForecasterRecursiveModel.get_error_forecast(
     delta_predict=None,
 )
 ```
@@ -246,11 +242,10 @@ Compute the error of the ENTSO-E benchmark forecast.
 |--------|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 |        | [Tuple](`typing.Tuple`)\[[dict](`dict`), [Tuple](`typing.Tuple`)\[[pd](`pandas`).[Series](`pandas.Series`), [pd](`pandas`).[Series](`pandas.Series`)\]\] | Tuple[dict, Tuple[pd.Series, pd.Series]]: ``(metrics, (y_actual, y_forecast))``. |
 
-##### get_error_training { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_error_training }
+##### get_error_training { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_error_training }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_error_training(
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.get_error_training()
 ```
 
 Compute in-sample error on the training data.
@@ -261,11 +256,10 @@ Compute in-sample error on the training data.
 |--------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 |        | [Tuple](`typing.Tuple`)\[[dict](`dict`), [Tuple](`typing.Tuple`)\[[pd](`pandas`).[Series](`pandas.Series`), [pd](`pandas`).[Series](`pandas.Series`)\]\] | Tuple[dict, Tuple[pd.Series, pd.Series]]: ``(metrics, (y_train, y_train_pred))``. |
 
-##### get_feature_importance { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_feature_importance }
+##### get_feature_importance { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_feature_importance }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_feature_importance(
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.get_feature_importance()
 ```
 
 Return feature importances from the underlying estimator.
@@ -278,10 +272,10 @@ Only supported for tree-based models (``xgb``, ``lgbm``).
 |--------|---------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 |        | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | pd.DataFrame or None: Feature importances, or *None* if the model does not support this operation. |
 
-##### get_global_shap_feature_importance { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_global_shap_feature_importance }
+##### get_global_shap_feature_importance { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_global_shap_feature_importance }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_global_shap_feature_importance(
+forecaster.wrappers.model.ForecasterRecursiveModel.get_global_shap_feature_importance(
     frac=0.1,
 )
 ```
@@ -308,12 +302,10 @@ Return global SHAP-based feature importances.
 |--------|------------------------------------------|---------------------------------|
 |        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: Empty series (stub). |
 
-##### get_params { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_params }
+##### get_params { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_params }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.get_params(
-    deep=True,
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.get_params(deep=True)
 ```
 
 Get parameters for this forecaster model.
@@ -339,7 +331,7 @@ parameters (``estimator``, ``lags``, ``window_features``, etc.).
 ###### Examples {.doc-section .doc-section-examples}
 
 ```python
->>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+>>> from spotforecast2_safe.forecaster.wrappers import (
 ...     ForecasterRecursiveModel,
 ... )
 >>> model = ForecasterRecursiveModel(iteration=0)
@@ -374,10 +366,10 @@ True
 True
 ```
 
-##### package_prediction { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.package_prediction }
+##### package_prediction { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.package_prediction }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.package_prediction(
+forecaster.wrappers.model.ForecasterRecursiveModel.package_prediction(
     predict_size=None,
 )
 ```
@@ -407,7 +399,7 @@ and :meth:`get_error_forecast`.
 >>> import tempfile
 >>> import pandas as pd
 >>> from pathlib import Path
->>> from spotforecast2_safe.manager.models.forecaster_recursive_lgbm import ForecasterRecursiveLGBM
+>>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
 >>> from spotforecast2_safe.data.fetch_data import get_package_data_home
 >>>
 >>> # Setup temporary data environment
@@ -446,12 +438,10 @@ True
 >>> del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### predict { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.predict }
+##### predict { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.predict }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.predict(
-    delta_predict=None,
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.predict(delta_predict=None)
 ```
 
 Generate predictions and compute error metrics.
@@ -474,12 +464,10 @@ Generate predictions and compute error metrics.
 |--------|----------------------------|---------------------------------------------|
 |        | [ValueError](`ValueError`) | If the forecaster has not been initialized. |
 
-##### save_to_file { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.save_to_file }
+##### save_to_file { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.save_to_file }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.save_to_file(
-    model_dir=None,
-)
+forecaster.wrappers.model.ForecasterRecursiveModel.save_to_file(model_dir=None)
 ```
 
 Serialize the model to disk via :func:`joblib.dump`.
@@ -494,7 +482,7 @@ Serialize the model to disk via :func:`joblib.dump`.
 
 ```python
 >>> import tempfile
->>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+>>> from spotforecast2_safe.forecaster.wrappers import (
 ...     ForecasterRecursiveModel,
 ... )
 >>> model = ForecasterRecursiveModel(iteration=0, name="test")
@@ -504,10 +492,10 @@ Serialize the model to disk via :func:`joblib.dump`.
 True
 ```
 
-##### set_params { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.set_params }
+##### set_params { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.set_params }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.set_params(
+forecaster.wrappers.model.ForecasterRecursiveModel.set_params(
     params=None,
     **kwargs,
 )
@@ -528,16 +516,16 @@ are forwarded to :meth:`ForecasterRecursive.set_params`.
 
 ###### Returns {.doc-section .doc-section-returns}
 
-| Name                     | Type                                                                                                                | Description                                                            |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| ForecasterRecursiveModel | [ForecasterRecursiveModel](`spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel`) | The model instance with updated parameters (supports method chaining). |
+| Name                     | Type                                                                                                | Description                                                            |
+|--------------------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
+| ForecasterRecursiveModel | [ForecasterRecursiveModel](`spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel`) | The model instance with updated parameters (supports method chaining). |
 
 ###### Examples {.doc-section .doc-section-examples}
 
 Setting wrapper-level parameters:
 
 ```python
->>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+>>> from spotforecast2_safe.forecaster.wrappers import (
 ...     ForecasterRecursiveModel,
 ... )
 >>> model = ForecasterRecursiveModel(iteration=0)
@@ -564,10 +552,10 @@ Setting forecaster-level parameters on an attached forecaster:
 False
 ```
 
-##### tune { #spotforecast2_safe.manager.models.forecaster_recursive_model.ForecasterRecursiveModel.tune }
+##### tune { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.tune }
 
 ```python
-manager.models.forecaster_recursive_model.ForecasterRecursiveModel.tune()
+forecaster.wrappers.model.ForecasterRecursiveModel.tune()
 ```
 
 Simulate hyperparameter tuning.

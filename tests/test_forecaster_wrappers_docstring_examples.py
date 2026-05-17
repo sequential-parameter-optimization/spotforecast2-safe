@@ -1,11 +1,14 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Tests for docstring examples in ForecasterRecursiveModel."""
 
 import doctest
 
-import spotforecast2_safe.manager.models.forecaster_recursive_model as model_module
+import spotforecast2_safe.forecaster.wrappers.model as model_module
 
 
-def test_manager_models_docstring_examples():
+def test_forecaster_wrappers_docstring_examples():
     """Validate ForecasterRecursiveModel docstring examples using doctest."""
     # Using testmod for the whole module is safer to ensure consistency with other docstring tests in the repo.
     results = doctest.testmod(
