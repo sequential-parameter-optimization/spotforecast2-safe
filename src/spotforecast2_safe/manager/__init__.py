@@ -21,7 +21,7 @@ from spotforecast2_safe.manager.features import (
     select_exogenous_features,
 )
 from spotforecast2_safe.manager.logger import setup_logging
-from spotforecast2_safe.manager.metrics import calculate_metrics
+from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 from spotforecast2_safe.manager.persistence import (
     _ensure_model_dir,
     _get_model_filepath,

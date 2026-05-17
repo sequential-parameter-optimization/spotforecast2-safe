@@ -2,10 +2,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 """
-Metrics module for model evaluation.
+Demo reporting metrics module.
 
-This module provides utilities for calculating performance metrics
-for prediction models in safety-critical systems.
+This module provides the fixed-shape reporting helper that produces the
+``{"MAE": float, "MSE": float}`` dictionary printed at the end of demo
+and production runs.  It is intentionally separate from
+``forecaster.metrics`` (the skforecast-aligned, string-dispatch metric
+library used by the CV/backtesting engine).
 """
 
 from typing import Dict
@@ -35,7 +38,7 @@ def calculate_metrics(actual: pd.Series, predicted: pd.Series) -> Dict[str, floa
 
     Examples:
         >>> import pandas as pd
-        >>> from spotforecast2_safe.manager.metrics import calculate_metrics
+        >>> from spotforecast2_safe.manager.demo_metrics import calculate_metrics
         >>>
         >>> # Example 1: Perfect predictions
         >>> actual = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
