@@ -1,3 +1,29 @@
+## [6.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.1...v6.0.0-rc.1) (2026-05-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* spotforecast2_safe.manager.exo,
+spotforecast2_safe.manager.exo.weather and the
+spotforecast2_safe.manager.get_weather_features re-export are removed.
+Import get_weather_features from spotforecast2_safe.weather.
+spotforecast2_safe.weather.weather_client is renamed to
+spotforecast2_safe.weather.client; WeatherClient and WeatherService
+remain importable from the top-level spotforecast2_safe.weather package.
+spotforecast2_safe.calendar._common is deleted; to_utc_timestamp is now
+available from spotforecast2_safe.utils.convert_to_utc.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Documentation
+
+* formatting ([481104c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/481104ce921f2842c83bcd5f9a3c014ab3f5e86e))
+
+
+### Code Refactoring
+
+* consolidate weather into weather/ package, drop manager/exo/ ([ff15185](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ff15185a54163fafabeac77c2a056a091e4d5592))
+
 ## [5.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v5.0.0...v5.0.1) (2026-05-15)
 
 
