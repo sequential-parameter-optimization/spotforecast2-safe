@@ -1321,25 +1321,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.forecaster.wrappers.xgb" id="toc-spotforecast2_safe.forecaster.wrappers.xgb" class="nav-link active" data-scroll-target="#spotforecast2_safe.forecaster.wrappers.xgb">forecaster.wrappers.xgb</a>
-  <ul class="collapse">
-  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <li><a href="#classes" id="toc-classes" class="nav-link active" data-scroll-target="#classes">Classes</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB" id="toc-spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB">ForecasterRecursiveXGB</a></li>
-  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.wrappers.xgb.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.model.html">Wrappers</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.xgb.html">ForecasterRecursiveXGB</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.model.html">Wrappers</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.xgb.html">ForecasterRecursiveXGB</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">forecaster.wrappers.xgb</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.forecaster.wrappers.xgb" class="level1">
-<h1>forecaster.wrappers.xgb</h1>
+</header>
+
+
 <p><code>forecaster.wrappers.xgb</code></p>
 <p>Recursive forecaster model wrappers for different estimators.</p>
 <section id="classes" class="level2">
@@ -1385,9 +1396,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-
-
 </section>
+<section id="examples" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
+<div id="b3a13a90" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveModel,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveXGB,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveXGB(iteration<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model.name)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">isinstance</span>(model, ForecasterRecursiveModel))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>XGBoost not installed. This model will fail during fit/predict.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>xgb
+True</code></pre>
+</div>
+</div>
+
+
 </section>
 </section>
 </section>

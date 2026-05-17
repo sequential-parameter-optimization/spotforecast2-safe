@@ -1321,24 +1321,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.forecaster.metrics.symmetric_mean_absolute_percentage_error" id="toc-spotforecast2_safe.forecaster.metrics.symmetric_mean_absolute_percentage_error" class="nav-link active" data-scroll-target="#spotforecast2_safe.forecaster.metrics.symmetric_mean_absolute_percentage_error">forecaster.metrics.symmetric_mean_absolute_percentage_error</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.metrics.add_y_train_argument.html">Metrics</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.html">symmetric_mean_absolute_percentage_error</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.metrics.add_y_train_argument.html">Metrics</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.html">symmetric_mean_absolute_percentage_error</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">forecaster.metrics.symmetric_mean_absolute_percentage_error</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.forecaster.metrics.symmetric_mean_absolute_percentage_error" class="level1">
-<h1>forecaster.metrics.symmetric_mean_absolute_percentage_error</h1>
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>forecaster.metrics.symmetric_mean_absolute_percentage_error(y_true, y_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Compute the Symmetric Mean Absolute Percentage Error (SMAPE).</p>
 <p>SMAPE is a relative error metric used to measure the accuracy of forecasts. Unlike MAPE, it is symmetric and prevents division by zero by averaging the absolute values of actual and predicted values.</p>
@@ -1391,15 +1402,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2.forecaster.metrics <span class="im">import</span> symmetric_mean_absolute_percentage_error</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y_true <span class="op">=</span> np.array([<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">0</span>])</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> y_pred <span class="op">=</span> np.array([<span class="dv">110</span>, <span class="dv">180</span>, <span class="dv">10</span>])</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> result <span class="op">=</span> symmetric_mean_absolute_percentage_error(y_true, y_pred)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">0</span> <span class="op">&lt;=</span> result <span class="op">&lt;=</span> <span class="dv">200</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bf5ca05d" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.metrics <span class="im">import</span> (</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    symmetric_mean_absolute_percentage_error,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> np.array([<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">0</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> np.array([<span class="dv">110</span>, <span class="dv">180</span>, <span class="dv">10</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> symmetric_mean_absolute_percentage_error(y_true, y_pred)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="dv">0</span> <span class="op">&lt;=</span> result <span class="op">&lt;=</span> <span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True</code></pre>
+</div>
+</div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
