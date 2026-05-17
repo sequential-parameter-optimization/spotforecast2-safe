@@ -1,3 +1,10 @@
+## [7.0.1-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.1-rc.1...v7.0.1-rc.2) (2026-05-17)
+
+
+### Code Refactoring
+
+* **security:** extract mask_estimator into spotforecast2_safe.security.masking ([66d0b94](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/66d0b947be926142124f4fc7c2342f0f1204bf43))
+
 ## [7.0.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.0...v7.0.1-rc.1) (2026-05-17)
 
 
