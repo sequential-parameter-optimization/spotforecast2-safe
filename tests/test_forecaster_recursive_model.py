@@ -4,7 +4,7 @@ from lightgbm import LGBMRegressor
 from sklearn.linear_model import LinearRegression
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.manager.models import (
+from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
     ForecasterRecursiveXGB,

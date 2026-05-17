@@ -4,7 +4,7 @@
 
 from spotforecast2_safe.data import Period
 from spotforecast2_safe.manager.configurator import ConfigEntsoe
-from spotforecast2_safe.manager.models import (
+from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
     ForecasterRecursiveXGB,

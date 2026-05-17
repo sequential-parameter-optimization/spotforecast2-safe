@@ -3,8 +3,16 @@
 
 from .base import ForecasterBase
 from .recursive import ForecasterRecursive
+from .wrappers import (
+    ForecasterRecursiveLGBM,
+    ForecasterRecursiveModel,
+    ForecasterRecursiveXGB,
+)
 
 __all__ = [
     "ForecasterBase",
     "ForecasterRecursive",
+    "ForecasterRecursiveModel",
+    "ForecasterRecursiveLGBM",
+    "ForecasterRecursiveXGB",
 ]
