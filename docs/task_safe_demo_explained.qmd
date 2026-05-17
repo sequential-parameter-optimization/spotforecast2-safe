@@ -28,12 +28,12 @@ print(f"weights          : {config.weights}")
 
 Once predictions exist they must be evaluated. The `calculate_metrics` function returns a dictionary with two keys, `MAE` and `MSE`, computed directly from the difference series `actual - predicted`. The `TestCalculateMetrics` class establishes three behavioral guarantees.
 
-When a model's predictions are identical to the actuals, both metrics must be exactly zero. This sounds obvious but is the anchor point for all threshold-based safety assertions downstream. When predictions are uniformly offset by a constant — say, every prediction is one unit too high — the MAE equals that offset and the MSE equals its square. The third scenario introduces a NaN in the actual series and confirms that pandas' default `mean()` skips missing values, so the metric calculation degrades gracefully rather than producing a silent NaN result.
+When a model's predictions are identical to the actuals, both metrics must be exactly zero. This sounds obvious but is the anchor point for all threshold-based safety assertions downstream. When predictions are uniformly offset by a constant — say, every prediction is one unit too high — the MAE equals that offset and the MSE equals its square. The third scenario introduces a NaN in the actual series and confirms that `calculate_metrics` enforces the fail-safe contract: it raises a `ValueError` rather than silently propagating a corrupted metric.
 
 ```{python}
 import pandas as pd
 import numpy as np
-from spotforecast2_safe.manager.metrics import calculate_metrics
+from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 
 actual    = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
 predicted = pd.Series([2.0, 3.0, 4.0, 5.0, 6.0])
@@ -41,8 +41,10 @@ metrics   = calculate_metrics(actual, predicted)
 print(f"constant offset → MAE={metrics['MAE']:.1f}, MSE={metrics['MSE']:.1f}")
 
 actual_with_nan = pd.Series([1.0, np.nan, 3.0, 4.0, 5.0])
-metrics_nan = calculate_metrics(actual_with_nan, predicted)
-print(f"with NaN        → MAE={metrics_nan['MAE']:.4f} (no NaN propagation)")
+try:
+    calculate_metrics(actual_with_nan, predicted)
+except ValueError as exc:
+    print(f"NaN rejected    → {exc}")
 ```
 
 ## Logging as an Audit Trail
@@ -142,7 +144,7 @@ predictions = {
     "custom_lgbm": pd.Series([1.0, 2.0, 3.0, 4.0, 5.0]),
 }
 
-from spotforecast2_safe.manager.metrics import calculate_metrics
+from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 
 results = {
     name: calculate_metrics(actual, pred)

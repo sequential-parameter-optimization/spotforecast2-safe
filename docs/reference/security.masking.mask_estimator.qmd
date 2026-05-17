@@ -1,0 +1,41 @@
+# security.masking.mask_estimator { #spotforecast2_safe.security.masking.mask_estimator }
+
+```python
+security.masking.mask_estimator(estimator)
+```
+
+Return a non-sensitive string representation of an estimator.
+
+Logs the estimator *type* without exposing its hyperparameters or any other
+configuration. This is the safe form to emit at INFO level when the actual
+estimator object may carry tuning details that should not be persisted in
+log aggregation systems (CWE-532).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                | Description                                                                                                                     | Default    |
+|-----------|---------------------|---------------------------------------------------------------------------------------------------------------------------------|------------|
+| estimator | [Any](`typing.Any`) | An estimator instance, an estimator name (string), or ``None``. When ``None``, the default project estimator label is returned. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                            |
+|--------|--------------|--------------------------------------------------------|
+|        | [str](`str`) | A short, safe string identifying the estimator family. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.security.masking import mask_estimator
+
+mask_estimator(None)
+```
+
+```{python}
+mask_estimator("ForecasterRecursive")
+```
+
+```{python}
+from sklearn.linear_model import Ridge
+mask_estimator(Ridge(alpha=42.0))
+```

@@ -227,7 +227,7 @@ website:
           - section: "Manager"
             contents:
               - text: "calculate_metrics"
-                file: docs/reference/manager.metrics.calculate_metrics.qmd
+                file: docs/reference/manager.demo_metrics.calculate_metrics.qmd
               - text: "build_prediction_package"
                 file: docs/reference/manager.predictor.build_prediction_package.qmd
               - text: "get_model_prediction"
@@ -294,6 +294,11 @@ website:
                     file: docs/reference/utils.validation.get_exog_dtypes.qmd
                   - text: "set_cpu_gpu_device"
                     file: docs/reference/utils.validation.set_cpu_gpu_device.qmd
+
+          - section: "Security"
+            contents:
+              - text: "mask_estimator"
+                file: docs/reference/security.masking.mask_estimator.qmd
 
           - section: "Calendar"
             contents:
@@ -529,7 +534,7 @@ quartodoc:
       desc: |
         High-level training, prediction, and model persistence orchestration.
       contents:
-        - manager.metrics.calculate_metrics
+        - manager.demo_metrics.calculate_metrics
         - manager.trainer.get_last_model
         - manager.trainer.get_path_model
         - manager.trainer.load_iteration
@@ -564,6 +569,14 @@ quartodoc:
         - utils.convert_to_utc
         - utils.data_transform
         - utils.forecaster_config
+
+    # ── Security ──────────────────────────────────────────────────────────────
+    - title: "Security"
+      desc: |
+        Masking and PII-protection utilities for safe logging
+        (CWE-532, CWE-312).
+      contents:
+        - security.masking.mask_estimator
 
     # ── Calendar ──────────────────────────────────────────────────────────────
     - title: "Calendar"

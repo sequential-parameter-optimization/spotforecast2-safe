@@ -50,6 +50,7 @@ from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     n2n_predict_with_covariates,
 )
+from spotforecast2_safe.security.masking import mask_estimator
 
 # Default aggregation weights for the N-to-1 forecasting task.
 #
@@ -80,58 +81,6 @@ DEFAULT_WEIGHTS: List[float] = [
 
 warnings.simplefilter("ignore", category=FutureWarning)
 warnings.simplefilter("ignore", category=UserWarning)
-
-
-def _mask_latitude(lat: float) -> str:
-    """Mask latitude to 1 decimal place for safe logging (security: CWE-532, CWE-312).
-
-    Geographic precision beyond 1 decimal (~11km) is considered sensitive PII.
-    This function rounds coordinates for INFO-level logging.
-
-    Args:
-        lat: Latitude value to mask.
-
-    Returns:
-        Masked latitude string representation (e.g., "51.5°N").
-    """
-    masked = round(lat, 1)
-    direction = "N" if masked >= 0 else "S"
-    return f"{abs(masked)}°{direction}"
-
-
-def _mask_longitude(lon: float) -> str:
-    """Mask longitude to 1 decimal place for safe logging (security: CWE-532, CWE-312).
-
-    Geographic precision beyond 1 decimal (~11km) is considered sensitive PII.
-    This function rounds coordinates for INFO-level logging.
-
-    Args:
-        lon: Longitude value to mask.
-
-    Returns:
-        Masked longitude string representation (e.g., "7.5°E").
-    """
-    masked = round(lon, 1)
-    direction = "E" if masked >= 0 else "W"
-    return f"{abs(masked)}°{direction}"
-
-
-def _mask_estimator(estimator: Any) -> str:
-    """Mask estimator details for safe logging (security: CWE-532).
-
-    Logs estimator type but not configuration to avoid exposing model details.
-
-    Args:
-        estimator: Estimator object or name.
-
-    Returns:
-        Safe string representation of estimator type.
-    """
-    if estimator is None:
-        return "LGBMRegressor (default)"
-    if isinstance(estimator, str):
-        return estimator
-    return type(estimator).__name__
 
 
 def n_to_1_with_covariates(
@@ -348,7 +297,7 @@ def n_to_1_with_covariates(
     # Security: Mask sensitive coordinates immediately (CWE-532, CWE-312)
     # This prevents raw latitude/longitude from being accessed in logging contexts
 
-    masked_estimator = _mask_estimator(estimator)
+    masked_estimator = mask_estimator(estimator)
 
     # Default weights if not provided
     if weights is None:
