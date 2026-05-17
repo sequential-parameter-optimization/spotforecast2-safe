@@ -1,3 +1,22 @@
+## [7.0.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.0...v7.0.1-rc.1) (2026-05-17)
+
+
+### Bug Fixes
+
+* **manager:** add NaN/length validation to calculate_metrics and update tests ([45feffc](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/45feffc388d74be2969c8833331246006ddf4a2c))
+
+
+### Documentation
+
+* **forecaster:** convert method docstring Examples to {python} cells ([ce0b97a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ce0b97ac9a905a0eb300d7a67bf6a05c1e748e41))
+* **forecaster:** convert module and class docstring Examples to {python} cells ([6e49fbb](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/6e49fbb4e627984279ffa6ae19e97ac22b1df1ea))
+* **forecaster:** fix broken Examples and require {python} cells in CLAUDE.md ([7bb1ab7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7bb1ab7a7eb776c8272eec005ef064ae75eb6295))
+
+
+### Code Refactoring
+
+* **manager:** rename metrics.py to demo_metrics.py to disambiguate from forecaster.metrics ([56c15fa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/56c15fae685e0d8122877da9ba974e0c692d8b8f))
+
 ## [7.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v6.0.0...v7.0.0) (2026-05-17)
 
 
