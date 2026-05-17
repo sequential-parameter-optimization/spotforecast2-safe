@@ -29,7 +29,7 @@ This card follows the Hugging Face Model Card Guidebook taxonomy [@ozon22a].
 ### Downstream Use
 
 - Feeding the generated feature matrices into `scikit-learn` regressors, `lightgbm`, or `xgboost` via the bundled `ForecasterRecursiveLGBM` / `ForecasterRecursiveXGB` wrappers.
-- Building custom recursive multi-step forecasters on top of the `ForecasterRecursiveModel` base class in `spotforecast2_safe.manager.models`.
+- Building custom recursive multi-step forecasters on top of the `ForecasterRecursiveModel` base class in `spotforecast2_safe.forecaster.wrappers`.
 
 ### Out-of-Scope Use
 

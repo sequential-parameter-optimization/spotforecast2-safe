@@ -8,7 +8,7 @@ from typing import Any
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 
-from .forecaster_recursive_model import ForecasterRecursiveModel
+from .model import ForecasterRecursiveModel
 
 # Try to import XGBoost
 try:
@@ -46,7 +46,7 @@ class ForecasterRecursiveXGB(ForecasterRecursiveModel):
         Examples:
             >>> import pandas as pd
             >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
             >>>
             >>> # Initialization
             >>> model = ForecasterRecursiveXGB(iteration=0)

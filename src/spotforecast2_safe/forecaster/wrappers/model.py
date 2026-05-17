@@ -42,7 +42,7 @@ class ForecasterRecursiveModel:
 
     Examples:
         >>> import pandas as pd
-        >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+        >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
         >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
         >>> from sklearn.linear_model import LinearRegression
         >>>
@@ -103,7 +103,7 @@ class ForecasterRecursiveModel:
 
         Examples:
             >>> import pandas as pd
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
             >>> model = ForecasterRecursiveModel(iteration=0)
             >>> model.name
             'base'
@@ -169,7 +169,7 @@ class ForecasterRecursiveModel:
 
         Examples:
             >>> from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            >>> from spotforecast2_safe.forecaster.wrappers import (
             ...     ForecasterRecursiveModel,
             ... )
             >>> cfg = ConfigMulti(country_code="FR", predict_size=48)
@@ -235,7 +235,7 @@ class ForecasterRecursiveModel:
             params: Dictionary of parameter names mapped to their values.
 
         Examples:
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            >>> from spotforecast2_safe.forecaster.wrappers import (
             ...     ForecasterRecursiveModel,
             ... )
             >>> model = ForecasterRecursiveModel(iteration=0)
@@ -313,7 +313,7 @@ class ForecasterRecursiveModel:
         Examples:
             Setting wrapper-level parameters:
 
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            >>> from spotforecast2_safe.forecaster.wrappers import (
             ...     ForecasterRecursiveModel,
             ... )
             >>> model = ForecasterRecursiveModel(iteration=0)
@@ -395,7 +395,7 @@ class ForecasterRecursiveModel:
 
         Examples:
             >>> import tempfile
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            >>> from spotforecast2_safe.forecaster.wrappers import (
             ...     ForecasterRecursiveModel,
             ... )
             >>> model = ForecasterRecursiveModel(iteration=0, name="test")
@@ -463,7 +463,7 @@ class ForecasterRecursiveModel:
 
         Examples:
             >>> import pandas as pd
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import (
+            >>> from spotforecast2_safe.forecaster.wrappers import (
             ...     ForecasterRecursiveModel,
             ... )
             >>> model = ForecasterRecursiveModel(iteration=0)
@@ -498,7 +498,7 @@ class ForecasterRecursiveModel:
         Examples:
             >>> import pandas as pd
             >>> import numpy as np
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
             >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
             >>> from sklearn.linear_model import LinearRegression
             >>>
@@ -873,7 +873,7 @@ class ForecasterRecursiveModel:
             >>> import tempfile
             >>> import pandas as pd
             >>> from pathlib import Path
-            >>> from spotforecast2_safe.manager.models.forecaster_recursive_lgbm import ForecasterRecursiveLGBM
+            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
             >>> from spotforecast2_safe.data.fetch_data import get_package_data_home
             >>>
             >>> # Setup temporary data environment

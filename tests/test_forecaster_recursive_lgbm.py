@@ -6,12 +6,8 @@ import pandas as pd
 import pytest
 from lightgbm import LGBMRegressor
 
-from spotforecast2_safe.manager.models.forecaster_recursive_lgbm import (
-    ForecasterRecursiveLGBM,
-)
-from spotforecast2_safe.manager.models.forecaster_recursive_model import (
-    ForecasterRecursiveModel,
-)
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 
 
 def test_forecaster_recursive_lgbm_initialization():
@@ -31,7 +27,7 @@ def test_forecaster_recursive_lgbm_inheritance():
 
 def test_forecaster_recursive_lgbm_import_location():
     """Verify it can be imported from the new location."""
-    from spotforecast2_safe.manager.models import ForecasterRecursiveLGBM as LGBM
+    from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM as LGBM
 
     assert LGBM is ForecasterRecursiveLGBM
 

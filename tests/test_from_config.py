@@ -7,10 +7,8 @@ import pandas as pd
 
 from spotforecast2_safe.manager.configurator.config_entsoe import ConfigEntsoe
 from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
-from spotforecast2_safe.manager.models.forecaster_recursive_lgbm import (
+from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
-)
-from spotforecast2_safe.manager.models.forecaster_recursive_model import (
     ForecasterRecursiveModel,
 )
 

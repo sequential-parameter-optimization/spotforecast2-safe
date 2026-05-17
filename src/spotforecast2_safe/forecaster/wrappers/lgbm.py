@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+"""Recursive forecaster wrapper using LightGBM."""
+
 import logging
 from typing import Any
 
@@ -8,7 +10,7 @@ from lightgbm import LGBMRegressor
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 
-from .forecaster_recursive_model import ForecasterRecursiveModel
+from .model import ForecasterRecursiveModel
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +20,8 @@ class ForecasterRecursiveLGBM(ForecasterRecursiveModel):
     ForecasterRecursive specialization using LightGBM.
 
     Examples:
-        >>> from spotforecast2_safe.manager.models.forecaster_recursive_lgbm import ForecasterRecursiveLGBM
-        >>> from spotforecast2_safe.manager.models.forecaster_recursive_model import ForecasterRecursiveModel
+        >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
+        >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
         >>> model = ForecasterRecursiveLGBM(iteration=0)
         >>> model.name
         'lgbm'
