@@ -295,6 +295,11 @@ website:
                   - text: "set_cpu_gpu_device"
                     file: docs/reference/utils.validation.set_cpu_gpu_device.qmd
 
+          - section: "Security"
+            contents:
+              - text: "mask_estimator"
+                file: docs/reference/security.masking.mask_estimator.qmd
+
           - section: "Calendar"
             contents:
               - text: "create_holiday_df"
@@ -564,6 +569,14 @@ quartodoc:
         - utils.convert_to_utc
         - utils.data_transform
         - utils.forecaster_config
+
+    # ── Security ──────────────────────────────────────────────────────────────
+    - title: "Security"
+      desc: |
+        Masking and PII-protection utilities for safe logging
+        (CWE-532, CWE-312).
+      contents:
+        - security.masking.mask_estimator
 
     # ── Calendar ──────────────────────────────────────────────────────────────
     - title: "Calendar"
