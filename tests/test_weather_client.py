@@ -76,11 +76,12 @@ class TestImports:
         """WeatherClient and WeatherService are importable together."""
 
     def test_dunder_all(self):
-        """spotforecast2_safe.weather.__all__ exposes both classes."""
+        """spotforecast2_safe.weather.__all__ exposes the public client classes and get_weather_features."""
         from spotforecast2_safe.weather import __all__ as weather_all
 
         assert "WeatherClient" in weather_all
         assert "WeatherService" in weather_all
+        assert "get_weather_features" in weather_all
 
     def test_weather_service_is_subclass(self):
         """WeatherService is a subclass of WeatherClient."""

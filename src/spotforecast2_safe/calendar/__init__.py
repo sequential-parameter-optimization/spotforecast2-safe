@@ -5,8 +5,9 @@
 
 Consolidates what was previously split across
 ``spotforecast2_safe.holiday`` (holiday DataFrame generation) and
-``spotforecast2_safe.manager.exo.calendar`` (calendar / day-night /
-holiday feature builders).
+the former ``manager/exo/calendar`` module (calendar / day-night /
+holiday feature builders). All public symbols are now exposed under
+``spotforecast2_safe.calendar``.
 """
 
 from spotforecast2_safe.calendar.features import (
