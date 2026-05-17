@@ -141,7 +141,7 @@ def test_fetch_weather_data_alignment():
     """Verify that the resulting index exactly matches requested range and frequency."""
     # We'll mock the internal _fetch_hybrid to avoid networking but keep the alignment logic
     with patch(
-        "spotforecast2_safe.weather.weather_client.WeatherService._fetch_hybrid"
+        "spotforecast2_safe.weather.client.WeatherService._fetch_hybrid"
     ) as mock_hybrid:
         start = "2023-01-01T00:00:00Z"
         end = "2023-01-01T10:00:00Z"

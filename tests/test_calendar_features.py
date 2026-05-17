@@ -1,13 +1,13 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Pytest tests for spotforecast2_safe.manager.exo (calendar, holiday, weather features).
+"""Pytest tests for spotforecast2_safe.calendar (calendar, holiday, day/night features).
 
 Covers:
 - get_calendar_features: shape, columns, dtypes, string inputs
 - get_day_night_features: shape, columns, values, string inputs
 - get_holiday_features: shape, column, holiday marker, string inputs
-- Package-level imports from spotforecast2_safe.manager.exo
+- Package-level imports from spotforecast2_safe.calendar
 - Backward-compatible private aliases in n2n_predict_with_covariates
 """
 
@@ -26,7 +26,7 @@ from spotforecast2_safe.calendar import (
 from spotforecast2_safe.calendar import get_calendar_features as _cal
 from spotforecast2_safe.calendar import get_day_night_features as _dn
 from spotforecast2_safe.calendar import get_holiday_features as _hol
-from spotforecast2_safe.manager.exo.weather import get_weather_features
+from spotforecast2_safe.weather import get_weather_features
 
 # =============================================================================
 # Shared fixtures
@@ -334,13 +334,16 @@ class TestCalendarPackageImports:
         ):
             assert name in calendar_module.__all__
 
-    def test_manager_exo_only_exposes_weather(self):
-        exo_module = importlib.import_module("spotforecast2_safe.manager.exo")
-        assert exo_module.__all__ == ["get_weather_features"]
+    def test_weather_features_importable_from_weather(self):
+        """get_weather_features is now in spotforecast2_safe.weather, not manager.exo."""
+        from spotforecast2_safe.weather import get_weather_features  # noqa: F401
 
-    def test_manager_exports_weather_only(self):
-        from spotforecast2_safe.manager import get_weather_features  # noqa: F401
+    def test_manager_does_not_export_weather(self):
+        """manager.__all__ must not contain get_weather_features after the refactor."""
+        manager_module = importlib.import_module("spotforecast2_safe.manager")
+        assert "get_weather_features" not in manager_module.__all__
 
+    def test_manager_does_not_export_calendar_symbols(self):
         manager_module = importlib.import_module("spotforecast2_safe.manager")
         for removed in (
             "get_calendar_features",

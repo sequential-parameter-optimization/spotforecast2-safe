@@ -24,7 +24,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.weather.weather_client import WeatherService
+from spotforecast2_safe.weather import WeatherService
 
 # ---------------------------------------------------------------------------
 # Module constants

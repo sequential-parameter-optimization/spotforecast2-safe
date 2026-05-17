@@ -20,7 +20,7 @@ from astral import LocationInfo
 from astral.sun import sun
 from feature_engine.datetime import DatetimeFeatures
 
-from spotforecast2_safe.calendar._common import to_utc_timestamp
+from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
 
 
 def get_calendar_features(

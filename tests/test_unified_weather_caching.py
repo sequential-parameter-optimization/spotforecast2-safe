@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_weather_data
-from spotforecast2_safe.manager.exo.weather import get_weather_features
+from spotforecast2_safe.weather import get_weather_features
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -192,8 +192,13 @@ class TestGetWeatherFeaturesCaching:
         idx = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
         data = pd.DataFrame({"value": range(48)}, index=idx)
 
+        # Patch the source binding in `data.fetch_data` because `weather.features`
+        # imports `fetch_weather_data` lazily inside `get_weather_features` to break
+        # a circular import. The consumer-side name
+        # `spotforecast2_safe.weather.features.fetch_weather_data` therefore does
+        # not exist at patch time.
         with patch(
-            "spotforecast2_safe.manager.exo.weather.fetch_weather_data"
+            "spotforecast2_safe.data.fetch_data.fetch_weather_data"
         ) as mock_fetch:
             weather_df = pd.DataFrame(
                 {p: [1.0] * 48 for p in HOURLY_PARAMS},
@@ -217,8 +222,13 @@ class TestGetWeatherFeaturesCaching:
         idx = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
         data = pd.DataFrame({"value": range(48)}, index=idx)
 
+        # Patch the source binding in `data.fetch_data` because `weather.features`
+        # imports `fetch_weather_data` lazily inside `get_weather_features` to break
+        # a circular import. The consumer-side name
+        # `spotforecast2_safe.weather.features.fetch_weather_data` therefore does
+        # not exist at patch time.
         with patch(
-            "spotforecast2_safe.manager.exo.weather.fetch_weather_data"
+            "spotforecast2_safe.data.fetch_data.fetch_weather_data"
         ) as mock_fetch:
             weather_df = pd.DataFrame(
                 {p: [1.0] * 48 for p in HOURLY_PARAMS},
