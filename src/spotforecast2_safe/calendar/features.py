@@ -58,7 +58,6 @@ def get_calendar_features(
         ValueError: If ``start`` is later than ``cov_end``.
 
     Examples:
-
         ```{python}
         import pandas as pd
         from spotforecast2_safe.calendar import get_calendar_features
@@ -135,7 +134,6 @@ def get_day_night_features(
         ``freq``.
 
     Examples:
-
         ```{python}
         import pandas as pd
         from astral import LocationInfo
