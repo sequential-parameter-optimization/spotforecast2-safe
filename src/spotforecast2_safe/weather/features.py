@@ -14,16 +14,10 @@ from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from feature_engine.timeseries.forecasting import WindowFeatures
 
-from spotforecast2_safe.data.fetch_data import fetch_weather_data
 from spotforecast2_safe.preprocessing.curate_data import curate_weather
-
-try:
-    from feature_engine.timeseries.forecasting import WindowFeatures
-except ImportError:  # pragma: no cover
-    raise ImportError(
-        "feature_engine is required. Install with: pip install feature-engine"
-    )
+from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
 
 
 def get_weather_features(
@@ -97,7 +91,6 @@ def get_weather_features(
             missing values cannot be filled after fetching.
 
     Examples:
-
         ```{python}
         import pandas as pd
         from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
@@ -105,7 +98,7 @@ def get_weather_features(
             agg_and_resample_data,
             get_start_end,
         )
-        from spotforecast2_safe.manager.exo.weather import get_weather_features
+        from spotforecast2_safe.weather import get_weather_features
 
         # Load and resample demo data
         data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
@@ -131,10 +124,13 @@ def get_weather_features(
     if window_functions is None:
         window_functions = ["mean", "max", "min"]
 
-    if isinstance(start, str):
-        start = pd.to_datetime(start, utc=True)
-    if isinstance(cov_end, str):
-        cov_end = pd.to_datetime(cov_end, utc=True)
+    # Deferred import to break the weather → data.fetch_data → weather circular
+    # dependency that arises because fetch_data imports WeatherService from
+    # weather.__init__, which in turn re-exports get_weather_features.
+    from spotforecast2_safe.data.fetch_data import fetch_weather_data  # noqa: PLC0415
+
+    start = to_utc_timestamp(start)
+    cov_end = to_utc_timestamp(cov_end)
 
     if verbose:
         print("Fetching weather data...")

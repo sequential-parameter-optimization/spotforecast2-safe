@@ -11,10 +11,8 @@ This module provides utilities for:
 - Model training and retraining workflows
 - Model evaluation metrics
 - CLI argument parsing utilities
-- Exogenous feature engineering (see manager.exo submodule)
 """
 
-from spotforecast2_safe.manager.exo import get_weather_features
 from spotforecast2_safe.manager.features import (
     apply_cyclical_encoding,
     create_interaction_features,
@@ -58,8 +56,6 @@ __all__ = [
     "get_last_model",
     # Tools
     "_parse_bool",
-    # Exo feature engineering
-    "get_weather_features",
     # Feature engineering helpers
     "apply_cyclical_encoding",
     "create_interaction_features",

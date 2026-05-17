@@ -3,9 +3,36 @@
 
 """Utility functions for timezone conversion."""
 
-from typing import Optional
+from typing import Optional, Union
 
 import pandas as pd
+
+
+def to_utc_timestamp(value: Union[str, pd.Timestamp]) -> pd.Timestamp:
+    """Coerce a string or Timestamp to a UTC-aware :class:`pandas.Timestamp`.
+
+    Strings are parsed with ``utc=True``; existing Timestamps are returned
+    unchanged.  This deduplicates the same three-line pattern repeated
+    across public feature builders in this package.
+
+    Args:
+        value: A date/time string or an existing :class:`pandas.Timestamp`.
+
+    Returns:
+        A UTC-aware :class:`pandas.Timestamp`.
+
+    Examples:
+        >>> from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
+        >>> to_utc_timestamp("2024-01-01")
+        Timestamp('2024-01-01 00:00:00+0000', tz='UTC')
+        >>> import pandas as pd
+        >>> ts = pd.Timestamp("2024-06-15", tz="UTC")
+        >>> to_utc_timestamp(ts) is ts
+        True
+    """
+    if isinstance(value, str):
+        return pd.to_datetime(value, utc=True)
+    return value
 
 
 def convert_to_utc(df: pd.DataFrame, timezone: Optional[str]) -> pd.DataFrame:

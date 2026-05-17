@@ -74,7 +74,7 @@ from spotforecast2_safe.calendar import (
     get_day_night_features,
     get_holiday_features,
 )
-from spotforecast2_safe.manager.exo.weather import get_weather_features
+from spotforecast2_safe.weather import get_weather_features
 from spotforecast2_safe.manager.features import (
     apply_cyclical_encoding,
     create_interaction_features,

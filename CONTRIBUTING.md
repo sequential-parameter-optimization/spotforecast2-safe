@@ -296,7 +296,7 @@ and where that countermeasure is implemented.
 The network-facing modules currently covered are:
 
 - `src/spotforecast2_safe/downloader/entsoe.py` (ENTSO-E Transparency Platform)
-- `src/spotforecast2_safe/weather/weather_client.py` (Open-Meteo API)
+- `src/spotforecast2_safe/weather/client.py` (Open-Meteo API)
 
 **Rule.** Any pull request that changes the network-facing attack surface MUST
 update the STRIDE table in the module docstring of every affected file in the

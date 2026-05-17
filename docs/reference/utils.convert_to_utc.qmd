@@ -9,6 +9,7 @@ Utility functions for timezone conversion.
 | Name | Description |
 | --- | --- |
 | [convert_to_utc](#spotforecast2_safe.utils.convert_to_utc.convert_to_utc) | Convert DataFrame index timezone to UTC. |
+| [to_utc_timestamp](#spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp) | Coerce a string or Timestamp to a UTC-aware :class:`pandas.Timestamp`. |
 
 ### convert_to_utc { #spotforecast2_safe.utils.convert_to_utc.convert_to_utc }
 
@@ -47,4 +48,40 @@ Convert DataFrame index timezone to UTC.
 2022-01-01 00:00:00+01:00
 2022-01-02 00:00:00+01:00
 2022-01-03 00:00:00+01:00
+```
+
+### to_utc_timestamp { #spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp }
+
+```python
+utils.convert_to_utc.to_utc_timestamp(value)
+```
+
+Coerce a string or Timestamp to a UTC-aware :class:`pandas.Timestamp`.
+
+Strings are parsed with ``utc=True``; existing Timestamps are returned
+unchanged.  This deduplicates the same three-line pattern repeated
+across public feature builders in this package.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                                                    | Description                                                  | Default    |
+|--------|-----------------------------------------------------------------------------------------|--------------------------------------------------------------|------------|
+| value  | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | A date/time string or an existing :class:`pandas.Timestamp`. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                            |
+|--------|------------------------------------------------|----------------------------------------|
+|        | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | A UTC-aware :class:`pandas.Timestamp`. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
+>>> to_utc_timestamp("2024-01-01")
+Timestamp('2024-01-01 00:00:00+0000', tz='UTC')
+>>> import pandas as pd
+>>> ts = pd.Timestamp("2024-06-15", tz="UTC")
+>>> to_utc_timestamp(ts) is ts
+True
 ```

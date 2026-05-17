@@ -41,22 +41,22 @@ one integer column per requested feature.
 |--------|----------------------------|-----------------------------------------|
 |        | [ValueError](`ValueError`) | If ``start`` is later than ``cov_end``. |
 
-Examples:
+## Examples {.doc-section .doc-section-examples}
 
-    ```{python}
-    import pandas as pd
-    from spotforecast2_safe.calendar import get_calendar_features
+```{python}
+import pandas as pd
+from spotforecast2_safe.calendar import get_calendar_features
 
-    start = pd.Timestamp("2024-01-01", tz="UTC")
-    cov_end = pd.Timestamp("2024-01-07 23:00", tz="UTC")
+start = pd.Timestamp("2024-01-01", tz="UTC")
+cov_end = pd.Timestamp("2024-01-07 23:00", tz="UTC")
 
-    features = get_calendar_features(
-        start=start,
-        cov_end=cov_end,
-        freq="h",
-        timezone="UTC",
-    )
-    print("shape:", features.shape)
-    print("columns:", features.columns.tolist())
-    print(features.head(3))
-    ```
+features = get_calendar_features(
+    start=start,
+    cov_end=cov_end,
+    freq="h",
+    timezone="UTC",
+)
+print("shape:", features.shape)
+print("columns:", features.columns.tolist())
+print(features.head(3))
+```
