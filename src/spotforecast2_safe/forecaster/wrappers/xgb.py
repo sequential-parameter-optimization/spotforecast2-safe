@@ -26,6 +26,18 @@ class ForecasterRecursiveXGB(ForecasterRecursiveModel):
     Attributes:
         forecaster: The XGBoost forecaster.
         name: The name of the forecaster.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.forecaster.wrappers import (
+            ForecasterRecursiveModel,
+            ForecasterRecursiveXGB,
+        )
+
+        model = ForecasterRecursiveXGB(iteration=0)
+        print(model.name)
+        print(isinstance(model, ForecasterRecursiveModel))
+        ```
     """
 
     def __init__(self, iteration: int, lags: int = 12, **kwargs: Any):
@@ -42,20 +54,6 @@ class ForecasterRecursiveXGB(ForecasterRecursiveModel):
 
         Raises:
             ImportError: If xgboost is not installed.
-
-        Examples:
-            >>> import pandas as pd
-            >>> from sklearn.linear_model import LinearRegression
-            >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-            >>>
-            >>> # Initialization
-            >>> model = ForecasterRecursiveXGB(iteration=0)
-            >>> model.name
-            'xgb'
-            >>> # If XGBoost is not available, we can still test the interface
-            >>> # using a mock forecaster or checking attributes
-            >>> isinstance(model, ForecasterRecursiveModel)
-            True
         """
         super().__init__(iteration, name="xgb", **kwargs)
         if XGBRegressor is not None:

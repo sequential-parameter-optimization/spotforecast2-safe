@@ -41,17 +41,19 @@ class ForecasterRecursiveModel:
         random_state (int): Seed for reproducibility.
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from sklearn.linear_model import LinearRegression
-        >>>
-        >>> model = ForecasterRecursiveModel(iteration=0)
-        >>> model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
-        >>> model.name = "linear"
-        >>> model.tune()
-        >>> model.is_tuned
-        True
+        ```{python}
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+        model = ForecasterRecursiveModel(iteration=0)
+        model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
+        model.name = "linear"
+        model.tune()
+        print(model.is_tuned)
+        ```
     """
 
     def __init__(
@@ -168,14 +170,14 @@ class ForecasterRecursiveModel:
             An instance of *cls* (or the calling subclass).
 
         Examples:
-            >>> from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
-            >>> from spotforecast2_safe.forecaster.wrappers import (
-            ...     ForecasterRecursiveModel,
-            ... )
-            >>> cfg = ConfigMulti(country_code="FR", predict_size=48)
-            >>> model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
-            >>> model.predict_size
-            48
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+            from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+
+            cfg = ConfigMulti(country_code="FR", predict_size=48)
+            model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
+            print(model.predict_size)
+            ```
         """
         import inspect
 

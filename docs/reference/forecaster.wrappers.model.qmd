@@ -49,18 +49,18 @@ feature building, tuning (simulated), and packaging predictions for UI.
 
 #### Examples {.doc-section .doc-section-examples}
 
-```python
->>> import pandas as pd
->>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
->>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
->>> from sklearn.linear_model import LinearRegression
->>>
->>> model = ForecasterRecursiveModel(iteration=0)
->>> model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
->>> model.name = "linear"
->>> model.tune()
->>> model.is_tuned
-True
+```{python}
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+model = ForecasterRecursiveModel(iteration=0)
+model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
+model.name = "linear"
+model.tune()
+print(model.is_tuned)
 ```
 
 #### Methods
@@ -209,15 +209,13 @@ attribute, translating the two known name mismatches
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
->>> from spotforecast2_safe.forecaster.wrappers import (
-...     ForecasterRecursiveModel,
-... )
->>> cfg = ConfigMulti(country_code="FR", predict_size=48)
->>> model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
->>> model.predict_size
-48
+```{python}
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+
+cfg = ConfigMulti(country_code="FR", predict_size=48)
+model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
+print(model.predict_size)
 ```
 
 ##### get_error_forecast { #spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_error_forecast }

@@ -127,71 +127,89 @@ class ForecasterRecursive(ForecasterBase):
           quantile predictions, and probabilistic forecasts via conformal methods.
 
     Examples:
-        Create a basic forecaster with lags:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
 
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> from sklearn.linear_model import LinearRegression
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> rng = np.random.default_rng(0)
-        >>> y = pd.Series(rng.standard_normal(100), name='y')
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=LinearRegression(),
-        ...     lags=10
-        ... )
-        >>> forecaster.fit(y)
-        >>> predictions = forecaster.predict(steps=5)
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 
-        Create a forecaster with window features and transformations:
+        rng = np.random.default_rng(0)
+        y = pd.Series(rng.standard_normal(100), name='y')
+        forecaster = ForecasterRecursive(
+            estimator=LinearRegression(),
+            lags=10,
+        )
+        forecaster.fit(y)
+        predictions = forecaster.predict(steps=5)
+        print(predictions)
+        ```
 
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> from sklearn.ensemble import RandomForestRegressor
-        >>> from sklearn.preprocessing import StandardScaler
-        >>> from spotforecast2_safe.preprocessing import RollingFeatures
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> rng = np.random.default_rng(1)
-        >>> y = pd.Series(rng.standard_normal(100), name='y')
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=RandomForestRegressor(n_estimators=100),
-        ...     lags=[1, 7, 30],
-        ...     window_features=[RollingFeatures(stats='mean', window_sizes=7)],
-        ...     transformer_y=StandardScaler(),
-        ...     differentiation=1
-        ... )
-        >>> forecaster.fit(y)
-        >>> predictions = forecaster.predict(steps=10)
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.ensemble import RandomForestRegressor
+        from sklearn.preprocessing import StandardScaler
 
-        Create a forecaster with exogenous variables:
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.preprocessing import RollingFeatures
 
-        >>> import pandas as pd
-        >>> from sklearn.linear_model import Ridge
-        >>> y = pd.Series(np.random.randn(100), name='target')
-        >>> exog = pd.DataFrame({'temp': np.random.randn(100)}, index=y.index)
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=Ridge(),
-        ...     lags=7,
-        ...     forecaster_id='my_forecaster'
-        ... )
-        >>> forecaster.fit(y, exog)
-        >>> exog_future = pd.DataFrame(
-        ...     {'temp': np.random.randn(5)},
-        ...     index=pd.RangeIndex(start=100, stop=105)
-        ... )
-        >>> predictions = forecaster.predict(steps=5, exog=exog_future)
+        rng = np.random.default_rng(1)
+        y = pd.Series(rng.standard_normal(100), name='y')
+        forecaster = ForecasterRecursive(
+            estimator=RandomForestRegressor(n_estimators=100, random_state=1),
+            lags=[1, 7, 30],
+            window_features=[RollingFeatures(stats='mean', window_sizes=7)],
+            transformer_y=StandardScaler(),
+            differentiation=1,
+        )
+        forecaster.fit(y)
+        predictions = forecaster.predict(steps=10)
+        print(predictions)
+        ```
 
-        Create a forecaster with probabilistic prediction configuration:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import Ridge
 
-        >>> from sklearn.ensemble import GradientBoostingRegressor
-        >>> import pandas as pd
-        >>> y = pd.Series(np.random.randn(100), name='y')
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=GradientBoostingRegressor(),
-        ...     lags=14,
-        ...     binner_kwargs={'n_bins': 15, 'method': 'linear'}
-        ... )
-        >>> forecaster.fit(y, store_in_sample_residuals=True)
-        >>> predictions = forecaster.predict(steps=5)
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+        rng = np.random.default_rng(2)
+        y = pd.Series(rng.standard_normal(100), name='target')
+        exog = pd.DataFrame({'temp': rng.standard_normal(100)}, index=y.index)
+        forecaster = ForecasterRecursive(
+            estimator=Ridge(),
+            lags=7,
+            forecaster_id='my_forecaster',
+        )
+        forecaster.fit(y, exog)
+        exog_future = pd.DataFrame(
+            {'temp': rng.standard_normal(5)},
+            index=pd.RangeIndex(start=100, stop=105),
+        )
+        predictions = forecaster.predict(steps=5, exog=exog_future)
+        print(predictions)
+        ```
+
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.ensemble import GradientBoostingRegressor
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+        rng = np.random.default_rng(3)
+        y = pd.Series(rng.standard_normal(100), name='y')
+        forecaster = ForecasterRecursive(
+            estimator=GradientBoostingRegressor(random_state=3),
+            lags=14,
+            binner_kwargs={'n_bins': 15, 'method': 'linear'},
+        )
+        forecaster.fit(y, store_in_sample_residuals=True)
+        predictions = forecaster.predict(steps=5)
+        print(predictions)
+        ```
     """
 
     def __init__(

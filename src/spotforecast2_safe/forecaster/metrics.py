@@ -8,27 +8,31 @@ This module provides various metric functions for evaluating forecasting perform
 including custom metrics like MASE, RMSSE, and probabilistic metrics like CRPS.
 
 Examples:
-    Using standard metrics::
+    ```{python}
+    import numpy as np
 
-        import numpy as np
-        from spotforecast2_safe.forecaster.metrics import _get_metric
+    from spotforecast2_safe.forecaster.metrics import _get_metric
 
-        y_true = np.array([1, 2, 3, 4, 5])
-        y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
+    y_true = np.array([1, 2, 3, 4, 5])
+    y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
 
-        # Get a metric function
-        mse = _get_metric('mean_squared_error')
-        error = mse(y_true, y_pred)
+    mse = _get_metric('mean_squared_error')
+    error = mse(y_true, y_pred)
+    print(f"MSE: {error:.4f}")
+    ```
 
-    Using scaled metrics::
+    ```{python}
+    import numpy as np
 
-        from spotforecast2_safe.forecaster.metrics import mean_absolute_scaled_error
+    from spotforecast2_safe.forecaster.metrics import mean_absolute_scaled_error
 
-        y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-        y_true = np.array([9, 10, 11])
-        y_pred = np.array([8.8, 10.2, 10.9])
+    y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+    y_true = np.array([9, 10, 11])
+    y_pred = np.array([8.8, 10.2, 10.9])
 
-        mase = mean_absolute_scaled_error(y_true, y_pred, y_train)
+    mase = mean_absolute_scaled_error(y_true, y_pred, y_train)
+    print(f"MASE: {mase:.4f}")
+    ```
 """
 
 from __future__ import annotations

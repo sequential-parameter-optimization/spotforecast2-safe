@@ -10,27 +10,29 @@ All forecasters should specify all the parameters that can be set at the
 class level in their __init__.
 
 Examples:
-    Create a custom forecaster inheriting from ForecasterBase:
+    ```{python}
+    import numpy as np
+    import pandas as pd
+    from sklearn.linear_model import Ridge
 
-    >>> from spotforecast2_safe.forecaster.base import ForecasterBase
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> class MyForecaster(ForecasterBase):
-    ...     def __init__(self, estimator):
-    ...         self.estimator = estimator
-    ...         self.__spotforecast_tags__ = {'hide_lags': True}
-    ...     def create_train_X_y(self, y, exog=None):
-    ...         return pd.DataFrame(), pd.Series(dtype=float)
-    ...     def fit(self, y, exog=None):
-    ...         pass
-    ...     def predict(self, steps, last_window=None, exog=None):
-    ...         return pd.Series(np.zeros(steps))
-    ...     def set_params(self, params):
-    ...         pass
-    >>> from sklearn.linear_model import Ridge
-    >>> forecaster = MyForecaster(estimator=Ridge())
-    >>> forecaster
-    MyForecaster(estimator=Ridge())
+    from spotforecast2_safe.forecaster.base import ForecasterBase
+
+    class MyForecaster(ForecasterBase):
+        def __init__(self, estimator):
+            self.estimator = estimator
+            self.__spotforecast_tags__ = {'hide_lags': True}
+        def create_train_X_y(self, y, exog=None):
+            return pd.DataFrame(), pd.Series(dtype=float)
+        def fit(self, y, exog=None):
+            pass
+        def predict(self, steps, last_window=None, exog=None):
+            return pd.Series(np.zeros(steps))
+        def set_params(self, params):
+            pass
+
+    forecaster = MyForecaster(estimator=Ridge())
+    print(repr(forecaster))
+    ```
 """
 
 from __future__ import annotations
@@ -56,12 +58,16 @@ class ForecasterBase(ABC):
             the behavior of the forecaster.
 
     Examples:
-        To see all abstract methods that need to be implemented:
+        ```{python}
+        import inspect
 
-        >>> import inspect
-        >>> from spotforecast2_safe.forecaster.base import ForecasterBase
-        >>> [m[0] for m in inspect.getmembers(ForecasterBase, predicate=inspect.isabstract)]
-        ['create_train_X_y', 'fit', 'predict', 'set_params']
+        from spotforecast2_safe.forecaster.base import ForecasterBase
+
+        abstract_methods = [
+            m[0] for m in inspect.getmembers(ForecasterBase, predicate=inspect.isabstract)
+        ]
+        print(abstract_methods)
+        ```
     """
 
     def _preprocess_repr(

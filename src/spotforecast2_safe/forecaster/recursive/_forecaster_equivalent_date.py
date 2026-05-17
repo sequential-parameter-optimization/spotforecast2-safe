@@ -125,22 +125,20 @@ class ForecasterEquivalentDate:
         differentiation_max (Ignored): Not used, present here for API consistency by convention.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
-        >>> # Series with daily frequency
-        >>> data = pd.Series(
-        ...     data = np.arange(14),
-        ...     index = pd.date_range(start='2022-01-01', periods=14, freq='D')
-        ... )
-        >>> # Forecast based on the value 7 days ago
-        >>> forecaster = ForecasterEquivalentDate(offset=7)
-        >>> forecaster.fit(y=data)
-        >>> forecaster.predict(steps=3)
-        2022-01-15    7
-        2022-01-16    8
-        2022-01-17    9
-        Freq: D, Name: pred, dtype: int64
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
+
+        data = pd.Series(
+            data=np.arange(14),
+            index=pd.date_range(start='2022-01-01', periods=14, freq='D'),
+        )
+        forecaster = ForecasterEquivalentDate(offset=7)
+        forecaster.fit(y=data)
+        print(forecaster.predict(steps=3))
+        ```
     """
 
     def __init__(

@@ -20,14 +20,14 @@ ForecasterRecursive specialization using LightGBM.
 
 #### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
->>> from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
->>> model = ForecasterRecursiveLGBM(iteration=0)
->>> model.name
-'lgbm'
->>> isinstance(model, ForecasterRecursiveModel)
-True
->>> model.forecaster is not None
-True
+```{python}
+from spotforecast2_safe.forecaster.wrappers import (
+    ForecasterRecursiveLGBM,
+    ForecasterRecursiveModel,
+)
+
+model = ForecasterRecursiveLGBM(iteration=0)
+print(model.name)
+print(isinstance(model, ForecasterRecursiveModel))
+print(model.forecaster is not None)
 ```
