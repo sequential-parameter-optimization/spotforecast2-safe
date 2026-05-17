@@ -23,12 +23,13 @@ function from scikit-learn.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2.forecaster.metrics import create_mean_pinball_loss
->>> pinball_loss_50 = create_mean_pinball_loss(alpha=0.5)
->>> y_true = np.array([1, 2, 3, 4, 5])
->>> y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
->>> loss = pinball_loss_50(y_true, y_pred)
->>> loss >= 0
-True
+```{python}
+import numpy as np
+from spotforecast2_safe.forecaster.metrics import create_mean_pinball_loss
+
+pinball_loss_50 = create_mean_pinball_loss(alpha=0.5)
+y_true = np.array([1, 2, 3, 4, 5])
+y_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
+loss = pinball_loss_50(y_true, y_pred)
+print(loss >= 0)
 ```

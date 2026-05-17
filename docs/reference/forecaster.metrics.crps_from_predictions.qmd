@@ -24,11 +24,12 @@ to a scalar observation. The smaller the CRPS, the better.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2.forecaster.metrics import crps_from_predictions
->>> y_true = 5.0
->>> y_pred = np.array([4.5, 5.1, 4.9, 5.3, 4.7])
->>> crps = crps_from_predictions(y_true, y_pred)
->>> crps >= 0
-True
+```{python}
+import numpy as np
+from spotforecast2_safe.forecaster.metrics import crps_from_predictions
+
+y_true = 5.0
+y_pred = np.array([4.5, 5.1, 4.9, 5.3, 4.7])
+crps = crps_from_predictions(y_true, y_pred)
+print(crps >= 0)
 ```
