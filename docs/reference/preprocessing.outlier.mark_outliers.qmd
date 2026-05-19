@@ -29,12 +29,20 @@ Marks outliers as NaN in the dataset using Isolation Forest.
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+import numpy as np
+import pandas as pd
+
 from spotforecast2_safe.preprocessing.outlier import mark_outliers
-path_demo = get_package_data_home() / "demo02.csv"
-data = fetch_data(filename=path_demo)
-print(data.head())
-cleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)
-print(cleaned_data.head())
-print(outlier_labels[:10])
+
+rng = np.random.default_rng(0)
+# 50 normal values plus two clear outliers (1000, -1000)
+values = np.concatenate([rng.normal(loc=10.0, scale=1.0, size=50), [1000.0, -1000.0]])
+data = pd.DataFrame({"load": values})
+
+cleaned_data, outlier_labels = mark_outliers(
+    data, contamination=0.05, random_state=42, verbose=True
+)
+n_nan = cleaned_data["load"].isna().sum()
+print(f"Outliers marked as NaN: {n_nan}")
+assert n_nan >= 2, "Expected at least the two injected extreme outliers to be marked"
 ```

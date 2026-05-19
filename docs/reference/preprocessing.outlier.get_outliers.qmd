@@ -40,21 +40,21 @@ to outlier detection.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import pandas as pd
->>> import numpy as np
->>> from spotforecast2_safe.preprocessing.outlier import get_outliers
->>>
->>> # Create sample data with outliers
->>> np.random.seed(42)
->>> data = pd.DataFrame({
-...     'A': np.concatenate([np.random.normal(0, 1, 100), [10, 11, 12]]),
-...     'B': np.concatenate([np.random.normal(5, 2, 100), [100, 110, 120]])
-... })
->>> data_original = data.copy()
->>>
->>> # Detect outliers
->>> outliers = get_outliers(data_original, contamination=0.03)
->>> for col, outlier_vals in outliers.items():
-...     print(f"{col}: {len(outlier_vals)} outliers detected")
+```{python}
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.outlier import get_outliers
+
+rng = np.random.default_rng(0)
+data = pd.DataFrame({
+    "A": np.concatenate([rng.normal(loc=0.0, scale=1.0, size=100), [10.0, 11.0, 12.0]]),
+    "B": np.concatenate([rng.normal(loc=5.0, scale=2.0, size=100), [100.0, 110.0, 120.0]]),
+})
+data_original = data.copy()
+
+outliers = get_outliers(data_original, contamination=0.03)
+for col, outlier_vals in outliers.items():
+    print(f"{col}: {len(outlier_vals)} outliers detected")
+assert len(outliers) == 2
 ```

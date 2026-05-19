@@ -21,12 +21,22 @@ Return 0 if index is in or near any gap.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data.fetch_data import fetch_data
->>> from spotforecast2_safe.preprocessing.imputation import custom_weights
->>> data = fetch_data()
->>> _, missing_weights = get_missing_weights(data, window_size=72, verbose=False)
->>> for idx in data.index[:5]:
-...     weight = custom_weights(idx, missing_weights)
-...     print(f"Index: {idx}, Weight: {weight}")
+```{python}
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.preprocessing.imputation import custom_weights
+
+# Build a small synthetic weights Series with a DatetimeIndex
+idx = pd.date_range("2024-01-01", periods=5, freq="h")
+weights_series = pd.Series([1.0, 1.0, 0.0, 0.0, 1.0], index=idx)
+
+# Single-index scalar lookup
+w = custom_weights(idx[0], weights_series)
+print(f"Index: {idx[0]}, Weight: {w}")
+assert w == 1.0
+
+# pd.Index slice lookup returns a numpy array
+result = custom_weights(idx[:3], weights_series)
+print(result)
+assert np.allclose(result, [1.0, 1.0, 0.0])
 ```

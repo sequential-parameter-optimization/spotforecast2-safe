@@ -26,21 +26,28 @@ weighted imputation for windows that do contain positive weights.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import pandas as pd
->>> import pickle
->>> weights = pd.Series([1.0, 0.9, 0.8], index=[0, 1, 2])
->>> weight_func = WeightFunction(weights)
->>> weight_func(pd.Index([0, 1]))
-array([1. , 0.9])
->>> # Returns None when all weights in the window are zero
->>> zero_weights = pd.Series([0.0, 0.0, 0.0], index=[0, 1, 2])
->>> wf_zero = WeightFunction(zero_weights)
->>> wf_zero(pd.Index([0, 1])) is None
-True
->>> # Can be pickled
->>> pickled = pickle.dumps(weight_func)
->>> unpickled = pickle.loads(pickled)
->>> unpickled(pd.Index([0, 1]))
-array([1. , 0.9])
+```{python}
+import pickle
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.preprocessing.imputation import WeightFunction
+
+weights = pd.Series([1.0, 0.9, 0.8], index=[0, 1, 2])
+weight_func = WeightFunction(weights)
+
+# Callable interface: returns weights for a pd.Index
+result = weight_func(pd.Index([0, 1]))
+print(result)
+assert np.allclose(result, [1.0, 0.9])
+
+# Returns None when all weights in the window are zero
+zero_weights = pd.Series([0.0, 0.0, 0.0], index=[0, 1, 2])
+wf_zero = WeightFunction(zero_weights)
+assert wf_zero(pd.Index([0, 1])) is None
+
+# Can be pickled and unpickled (no closure, fully serialisable)
+unpickled = pickle.loads(pickle.dumps(weight_func))
+result2 = unpickled(pd.Index([0, 1]))
+print(result2)
+assert np.allclose(result2, [1.0, 0.9])
 ```

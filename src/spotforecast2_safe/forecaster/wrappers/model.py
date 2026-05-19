@@ -167,7 +167,7 @@ class ForecasterRecursiveModel:
         Examples:
             ```{python}
             from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-            from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+            from spotforecast2_safe.configurator.config_multi import ConfigMulti
 
             cfg = ConfigMulti(country_code="FR", predict_size=48)
             model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)

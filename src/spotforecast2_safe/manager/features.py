@@ -30,7 +30,7 @@ import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 
 if TYPE_CHECKING:
-    from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+    from spotforecast2_safe.configurator.config_multi import ConfigMulti
 
 try:
     from feature_engine.creation import CyclicalFeatures
@@ -561,7 +561,7 @@ def get_target_data(
         import pandas as pd
         import numpy as np
         from spotforecast2_safe.manager.features import get_target_data
-        from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
 
         idx = pd.date_range("2024-01-01", periods=168, freq="h", tz="UTC")
         df_pipeline = pd.DataFrame({"load": np.random.default_rng(0).normal(100, 10, 168)}, index=idx)
@@ -589,7 +589,7 @@ def get_target_data(
         import pandas as pd
         import numpy as np
         from spotforecast2_safe.manager.features import get_target_data
-        from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
 
         rng = np.random.default_rng(1)
         idx_train = pd.date_range("2024-01-01", periods=168, freq="h", tz="UTC")

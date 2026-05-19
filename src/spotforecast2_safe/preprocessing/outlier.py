@@ -31,14 +31,22 @@ def mark_outliers(
 
     Examples:
         ```{python}
-        from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+        import numpy as np
+        import pandas as pd
+
         from spotforecast2_safe.preprocessing.outlier import mark_outliers
-        path_demo = get_package_data_home() / "demo02.csv"
-        data = fetch_data(filename=path_demo)
-        print(data.head())
-        cleaned_data, outlier_labels = mark_outliers(data, contamination=0.1, random_state=42, verbose=True)
-        print(cleaned_data.head())
-        print(outlier_labels[:10])
+
+        rng = np.random.default_rng(0)
+        # 50 normal values plus two clear outliers (1000, -1000)
+        values = np.concatenate([rng.normal(loc=10.0, scale=1.0, size=50), [1000.0, -1000.0]])
+        data = pd.DataFrame({"load": values})
+
+        cleaned_data, outlier_labels = mark_outliers(
+            data, contamination=0.05, random_state=42, verbose=True
+        )
+        n_nan = cleaned_data["load"].isna().sum()
+        print(f"Outliers marked as NaN: {n_nan}")
+        assert n_nan >= 2, "Expected at least the two injected extreme outliers to be marked"
         ```
     """
     for col in data.columns:
@@ -84,15 +92,28 @@ def manual_outlier_removal(
         tuple[pd.DataFrame, int]: A tuple containing the modified dataset with outliers marked as NaN and the number of outliers marked.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> from spotforecast2_safe.preprocessing.outlier import manual_outlier_removal
-        >>> data = fetch_data()
-        >>> data, n_manual_outliers = manual_outlier_removal(
-        ...     data,
-        ...     column='ABC',
-        ...     lower_threshold=50,
-        ...     upper_threshold=700,
-        ...     verbose=True
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.outlier import manual_outlier_removal
+
+        rng = np.random.default_rng(0)
+        # 20 normal values with two injected boundary violations
+        values = np.concatenate([rng.uniform(low=100.0, high=600.0, size=20), [10.0, 800.0]])
+        data = pd.DataFrame({"ABC": values})
+
+        cleaned_data, n_outliers = manual_outlier_removal(
+            data,
+            column="ABC",
+            lower_threshold=50,
+            upper_threshold=700,
+            verbose=True,
+        )
+        print(f"Outliers removed: {n_outliers}")
+        assert n_outliers >= 2, "Expected the two injected boundary violations to be removed"
+        assert cleaned_data["ABC"].isna().sum() == n_outliers
+        ```
     """
     if lower_threshold is None and upper_threshold is None:
         if verbose:
@@ -156,22 +177,24 @@ def get_outliers(
         ValueError: If data is empty or contains no columns.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.preprocessing.outlier import get_outliers
-        >>>
-        >>> # Create sample data with outliers
-        >>> np.random.seed(42)
-        >>> data = pd.DataFrame({
-        ...     'A': np.concatenate([np.random.normal(0, 1, 100), [10, 11, 12]]),
-        ...     'B': np.concatenate([np.random.normal(5, 2, 100), [100, 110, 120]])
-        ... })
-        >>> data_original = data.copy()
-        >>>
-        >>> # Detect outliers
-        >>> outliers = get_outliers(data_original, contamination=0.03)
-        >>> for col, outlier_vals in outliers.items():
-        ...     print(f"{col}: {len(outlier_vals)} outliers detected")
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.outlier import get_outliers
+
+        rng = np.random.default_rng(0)
+        data = pd.DataFrame({
+            "A": np.concatenate([rng.normal(loc=0.0, scale=1.0, size=100), [10.0, 11.0, 12.0]]),
+            "B": np.concatenate([rng.normal(loc=5.0, scale=2.0, size=100), [100.0, 110.0, 120.0]]),
+        })
+        data_original = data.copy()
+
+        outliers = get_outliers(data_original, contamination=0.03)
+        for col, outlier_vals in outliers.items():
+            print(f"{col}: {len(outlier_vals)} outliers detected")
+        assert len(outliers) == 2
+        ```
     """
     if data.empty:
         raise ValueError("Input data is empty")
