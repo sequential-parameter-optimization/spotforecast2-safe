@@ -8,7 +8,6 @@ Covers:
 - get_day_night_features: shape, columns, values, string inputs
 - get_holiday_features: shape, column, holiday marker, string inputs
 - Package-level imports from spotforecast2_safe.calendar
-- Backward-compatible private aliases in n2n_predict_with_covariates
 """
 
 import importlib
@@ -26,7 +25,6 @@ from spotforecast2_safe.calendar import (
 from spotforecast2_safe.calendar import get_calendar_features as _cal
 from spotforecast2_safe.calendar import get_day_night_features as _dn
 from spotforecast2_safe.calendar import get_holiday_features as _hol
-from spotforecast2_safe.weather import get_weather_features
 
 # =============================================================================
 # Shared fixtures
@@ -353,36 +351,3 @@ class TestCalendarPackageImports:
             assert removed not in manager_module.__all__
 
 
-# =============================================================================
-# Backward-compatible private aliases in n2n_predict_with_covariates
-# =============================================================================
-
-
-class TestBackwardCompatibleAliases:
-    def test_private_calendar_alias(self):
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-            _get_calendar_features,
-        )
-
-        assert _get_calendar_features is get_calendar_features
-
-    def test_private_day_night_alias(self):
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-            _get_day_night_features,
-        )
-
-        assert _get_day_night_features is get_day_night_features
-
-    def test_private_holiday_alias(self):
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-            _get_holiday_features,
-        )
-
-        assert _get_holiday_features is get_holiday_features
-
-    def test_private_weather_alias(self):
-        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-            _get_weather_features,
-        )
-
-        assert _get_weather_features is get_weather_features

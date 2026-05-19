@@ -1,3 +1,10 @@
+## [7.0.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.1...v7.0.2-rc.1) (2026-05-19)
+
+
+### Code Refactoring
+
+* **processing:** remove backward-compat underscore aliases from n2n_predict_with_covariates ([86b92c5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/86b92c527a98cf93099027bc87e9e005859c0e07))
+
 ## [7.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.0...v7.0.1) (2026-05-17)
 
 
