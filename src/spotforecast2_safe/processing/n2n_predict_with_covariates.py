@@ -13,45 +13,52 @@ Model persistence follows scikit-learn conventions using joblib for efficient
 serialization and deserialization of trained forecasters.
 
 Examples:
-    Basic usage with default parameters:
+    ```{python}
+    import tempfile
 
-    >>> from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-    ...     n2n_predict_with_covariates
-    ... )
-    >>> predictions = n2n_predict_with_covariates(
-    ...     forecast_horizon=24,
-    ...     verbose=True
-    ... )
+    from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+        n2n_predict_with_covariates,
+    )
 
-    With custom parameters:
+    predictions, metadata, forecasters = n2n_predict_with_covariates(
+        forecast_horizon=2,
+        lags=4,
+        window_size=8,
+        force_train=True,
+        model_dir=tempfile.mkdtemp(),
+        verbose=False,
+    )
+    print(predictions.shape)
+    print(sorted(metadata.keys())[:5])
+    ```
 
-    >>> predictions = n2n_predict_with_covariates(
-    ...     forecast_horizon=48,
-    ...     contamination=0.02,
-    ...     window_size=100,
-    ...     lags=48,
-    ...     train_ratio=0.75,
-    ...     verbose=True
-    ... )
+    ```{python}
+    import tempfile
 
-    Using cached models:
+    from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+        n2n_predict_with_covariates,
+    )
 
-    >>> # Load existing models if available, or train new ones
-    >>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-    ...     forecast_horizon=24,
-    ...     force_train=False,
-    ...     model_dir="./models",
-    ...     verbose=True
-    ... )
-
-    Force retraining and update cache:
-
-    >>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-    ...     forecast_horizon=24,
-    ...     force_train=True,
-    ...     model_dir="./models",
-    ...     verbose=True
-    ... )
+    cache_dir = tempfile.mkdtemp()
+    preds_first, _, _ = n2n_predict_with_covariates(
+        forecast_horizon=2,
+        lags=4,
+        window_size=8,
+        force_train=True,
+        model_dir=cache_dir,
+        verbose=False,
+    )
+    preds_cached, _, _ = n2n_predict_with_covariates(
+        forecast_horizon=2,
+        lags=4,
+        window_size=8,
+        force_train=False,
+        model_dir=cache_dir,
+        verbose=False,
+    )
+    assert preds_first.shape == preds_cached.shape
+    print(preds_cached.shape)
+    ```
 """
 
 from pathlib import Path
@@ -95,16 +102,6 @@ from spotforecast2_safe.preprocessing.curate_data import (
 from spotforecast2_safe.preprocessing.imputation import get_missing_weights
 from spotforecast2_safe.preprocessing.outlier import mark_outliers
 from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
-
-# ============================================================================
-# Model Persistence Functions
-# imported from spotforecast2_safe.manager.persistence
-# ============================================================================
-
-
-# ============================================================================
-# Main Function
-# ============================================================================
 
 
 def n2n_predict_with_covariates(
@@ -182,42 +179,44 @@ def n2n_predict_with_covariates(
         OSError: If models cannot be saved to disk.
 
     Examples:
-        Basic usage with automatic model caching:
+        ```{python}
+        import tempfile
 
-        >>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-        ...     forecast_horizon=24,
-        ...     verbose=True
-        ... )
-        >>> print(predictions.shape)
-        (24, 11)
+        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+            n2n_predict_with_covariates,
+        )
 
-        Load cached models (if available):
+        predictions, metadata, forecasters = n2n_predict_with_covariates(
+            forecast_horizon=2,
+            lags=4,
+            window_size=8,
+            force_train=True,
+            model_dir=tempfile.mkdtemp(),
+            verbose=False,
+        )
+        print(predictions.shape)
+        ```
 
-        >>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-        ...     forecast_horizon=24,
-        ...     force_train=False,
-        ...     model_dir="./saved_models"
-        ... )
+        ```{python}
+        import tempfile
 
-        Force retraining and update cache:
+        from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+            n2n_predict_with_covariates,
+        )
 
-        >>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-        ...     forecast_horizon=24,
-        ...     force_train=True,
-        ...     model_dir="./saved_models"
-        ... )
-
-        Custom location and features:
-
-        >>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-        ...     forecast_horizon=48,
-        ...     latitude=52.5200,  # Berlin
-        ...     longitude=13.4050,
-        ...     lags=48,
-        ...     include_poly_features=True,
-        ...     force_train=False,
-        ...     verbose=True
-        ... )
+        predictions, metadata, forecasters = n2n_predict_with_covariates(
+            forecast_horizon=3,
+            lags=4,
+            window_size=8,
+            latitude=52.5200,
+            longitude=13.4050,
+            force_train=True,
+            model_dir=tempfile.mkdtemp(),
+            verbose=False,
+        )
+        print(predictions.shape)
+        print(metadata["forecast_horizon"])
+        ```
 
     Notes:
         - The function uses cached weather data when available.
