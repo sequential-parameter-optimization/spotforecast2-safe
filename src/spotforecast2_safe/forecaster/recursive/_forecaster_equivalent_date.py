@@ -24,7 +24,7 @@ from spotforecast2_safe.preprocessing.checking import (
     check_predict_input,
     check_y,
 )
-from spotforecast2_safe.utils import expand_index
+from spotforecast2_safe.preprocessing.data_transform import expand_index
 
 from ._warnings import ResidualsUsageWarning
 

@@ -26,13 +26,15 @@ from spotforecast2_safe.preprocessing.checking import (
     check_y,
     get_exog_dtypes,
 )
-from spotforecast2_safe.utils import (
-    check_select_fit_kwargs,
+from spotforecast2_safe.preprocessing.data_transform import (
     expand_index,
-    initialize_lags,
-    initialize_weights,
     input_to_frame,
     transform_dataframe,
+)
+from spotforecast2_safe.preprocessing.forecaster_config import (
+    check_select_fit_kwargs,
+    initialize_lags,
+    initialize_weights,
 )
 
 try:

@@ -118,6 +118,10 @@ website:
                 file: docs/reference/preprocessing.repeating_basis_function.qmd
               - text: "RollingFeatures"
                 file: docs/reference/preprocessing.rolling.RollingFeatures.qmd
+              - text: "data_transform"
+                file: docs/reference/preprocessing.data_transform.qmd
+              - text: "forecaster_config"
+                file: docs/reference/preprocessing.forecaster_config.qmd
               - section: "Curate Data"
                 contents:
                   - text: "agg_and_resample_data"
@@ -296,10 +300,6 @@ website:
                 file: docs/reference/utils.cpe.get_cpe_identifier.qmd
               - text: "convert_to_utc"
                 file: docs/reference/utils.convert_to_utc.qmd
-              - text: "data_transform"
-                file: docs/reference/utils.data_transform.qmd
-              - text: "forecaster_config"
-                file: docs/reference/utils.forecaster_config.qmd
 
           - section: "Security"
             contents:
@@ -494,6 +494,8 @@ quartodoc:
         - preprocessing.imputation.WeightFunction
         - preprocessing.imputation.custom_weights
         - preprocessing.imputation.get_missing_weights
+        - preprocessing.data_transform
+        - preprocessing.forecaster_config
         - preprocessing.linearly_interpolate_ts
         - preprocessing.repeating_basis_function
         - preprocessing.rolling.RollingFeatures
@@ -587,8 +589,6 @@ quartodoc:
       contents:
         - utils.cpe.get_cpe_identifier
         - utils.convert_to_utc
-        - utils.data_transform
-        - utils.forecaster_config
 
     # ── Security ──────────────────────────────────────────────────────────────
     - title: "Security"

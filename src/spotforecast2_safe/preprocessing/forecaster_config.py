@@ -43,48 +43,46 @@ def initialize_lags(
             or array contains non-integer values.
 
     Examples:
-        >>> import numpy as np
-        >>> from spotforecast2_safe.utils.forecaster_config import initialize_lags
-        >>>
-        >>> # Integer input
-        >>> lags, names, max_lag = initialize_lags("ForecasterRecursive", 3)
-        >>> lags
-        array([1, 2, 3])
-        >>> names
-        ['lag_1', 'lag_2', 'lag_3']
-        >>> max_lag
-        3
-        >>>
-        >>> # List input
-        >>> lags, names, max_lag = initialize_lags("ForecasterRecursive", [1, 3, 5])
-        >>> lags
-        array([1, 3, 5])
-        >>> names
-        ['lag_1', 'lag_3', 'lag_5']
-        >>>
-        >>> # Range input
-        >>> lags, names, max_lag = initialize_lags("ForecasterRecursive", range(1, 4))
-        >>> lags
-        array([1, 2, 3])
-        >>>
-        >>> # None input
-        >>> lags, names, max_lag = initialize_lags("ForecasterRecursive", None)
-        >>> lags is None
-        True
-        >>>
-        >>> # Invalid: lags < 1
-        >>> try:
-        ...     initialize_lags("ForecasterRecursive", 0)
-        ... except ValueError as e:
-        ...     print("Error: Minimum value of lags allowed is 1")
-        Error: Minimum value of lags allowed is 1
-        >>>
-        >>> # Invalid: negative lags
-        >>> try:
-        ...     initialize_lags("ForecasterRecursive", [1, -2, 3])
-        ... except ValueError as e:
-        ...     print("Error: Minimum value of lags allowed is 1")
-        Error: Minimum value of lags allowed is 1
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.preprocessing.forecaster_config import initialize_lags
+
+        # Integer input
+        lags, names, max_lag = initialize_lags("ForecasterRecursive", 3)
+        assert list(lags) == [1, 2, 3]
+        assert names == ["lag_1", "lag_2", "lag_3"]
+        assert max_lag == 3
+
+        # List input
+        lags, names, max_lag = initialize_lags("ForecasterRecursive", [1, 3, 5])
+        assert list(lags) == [1, 3, 5]
+        assert names == ["lag_1", "lag_3", "lag_5"]
+
+        # Range input
+        lags, names, max_lag = initialize_lags("ForecasterRecursive", range(1, 4))
+        assert list(lags) == [1, 2, 3]
+
+        # None input
+        lags, names, max_lag = initialize_lags("ForecasterRecursive", None)
+        assert lags is None
+        print("initialize_lags: valid inputs OK")
+        ```
+
+        ```{python}
+        from spotforecast2_safe.preprocessing.forecaster_config import initialize_lags
+
+        # Invalid: lags < 1
+        try:
+            initialize_lags("ForecasterRecursive", 0)
+        except ValueError as e:
+            print(f"ValueError: {e}")
+
+        # Invalid: negative lag in list
+        try:
+            initialize_lags("ForecasterRecursive", [1, -2, 3])
+        except ValueError as e:
+            print(f"ValueError: {e}")
+        ```
     """
     lags_names = None
     max_lag = None
@@ -161,38 +159,37 @@ def initialize_weights(
         IgnoredArgumentWarning: If estimator doesn't support sample_weight.
 
     Examples:
-        >>> import numpy as np
-        >>> from sklearn.linear_model import Ridge
-        >>> from spotforecast2_safe.utils.forecaster_config import initialize_weights
-        >>>
-        >>> # Simple weight function
-        >>> def custom_weights(index):
-        ...     return np.ones(len(index))
-        >>>
-        >>> estimator = Ridge()
-        >>> wf, source, sw = initialize_weights(
-        ...     "ForecasterRecursive", estimator, custom_weights, None
-        ... )
-        >>> wf is not None
-        True
-        >>> isinstance(source, str)
-        True
-        >>>
-        >>> # No weight function
-        >>> wf, source, sw = initialize_weights(
-        ...     "ForecasterRecursive", estimator, None, None
-        ... )
-        >>> wf is None
-        True
-        >>> source is None
-        True
-        >>>
-        >>> # Invalid type for non-MultiSeries forecaster
-        >>> try:
-        ...     initialize_weights("ForecasterRecursive", estimator, "invalid", None)
-        ... except TypeError as e:
-        ...     print("Error: weight_func must be Callable")
-        Error: weight_func must be Callable
+        ```{python}
+        import numpy as np
+        from sklearn.linear_model import Ridge
+        from spotforecast2_safe.preprocessing.forecaster_config import initialize_weights
+
+        def custom_weights(index):
+            return np.ones(len(index))
+
+        estimator = Ridge()
+
+        # Valid callable weight function
+        wf, source, sw = initialize_weights(
+            "ForecasterRecursive", estimator, custom_weights, None
+        )
+        assert wf is not None
+        assert isinstance(source, str)
+        assert sw is None
+
+        # No weight function
+        wf, source, sw = initialize_weights(
+            "ForecasterRecursive", estimator, None, None
+        )
+        assert wf is None
+        assert source is None
+
+        # Invalid type raises TypeError
+        try:
+            initialize_weights("ForecasterRecursive", estimator, "invalid", None)
+        except TypeError as e:
+            print(f"TypeError: {e}")
+        ```
     """
     import inspect
     import warnings
@@ -290,17 +287,22 @@ def check_select_fit_kwargs(estimator: Any, fit_kwargs: Optional[dict] = None) -
             or if 'sample_weight' is present (it gets removed).
 
     Examples:
-        >>> from sklearn.linear_model import Ridge
-        >>> from spotforecast2_safe.utils.forecaster_config import check_select_fit_kwargs
-        >>>
-        >>> estimator = Ridge()
-        >>> # Valid argument for Ridge.fit
-        >>> kwargs = {"sample_weight": [1, 1], "invalid_arg": 10}
-        >>> # sample_weight is removed (should be passed via weight_func in forecaster)
-        >>> # invalid_arg is ignored
-        >>> filtered = check_select_fit_kwargs(estimator, kwargs)
-        >>> filtered
-        {}
+        ```{python}
+        import warnings
+        from sklearn.linear_model import Ridge
+        from spotforecast2_safe.preprocessing.forecaster_config import check_select_fit_kwargs
+
+        estimator = Ridge()
+
+        # sample_weight is removed (should be passed via weight_func in forecaster);
+        # invalid_arg is ignored; both trigger IgnoredArgumentWarning
+        kwargs = {"sample_weight": [1, 1], "invalid_arg": 10}
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            filtered = check_select_fit_kwargs(estimator, kwargs)
+        assert filtered == {}
+        print(f"filtered fit_kwargs: {filtered}")
+        ```
     """
     import inspect
     import warnings
