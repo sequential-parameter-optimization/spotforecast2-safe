@@ -1470,7 +1470,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
 <p>Default configuration:</p>
-<div id="37589a36" class="cell" data-execution_count="1">
+<div id="41a4c186" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.demo_data <span class="im">import</span> DemoConfig</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig()</span>
@@ -1484,7 +1484,7 @@ Random seed: 42</code></pre>
 </div>
 </div>
 <p>Override specific parameters:</p>
-<div id="3997d986" class="cell" data-execution_count="2">
+<div id="29b5f1c8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(forecast_horizon<span class="op">=</span><span class="dv">48</span>, contamination<span class="op">=</span><span class="fl">0.05</span>, random_seed<span class="op">=</span><span class="dv">123</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Forecast horizon: </span><span class="sc">{</span>config<span class="sc">.</span>forecast_horizon<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Contamination: </span><span class="sc">{</span>config<span class="sc">.</span>contamination<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1494,7 +1494,7 @@ Contamination: 0.05</code></pre>
 </div>
 </div>
 <p>Customize paths for a specific environment:</p>
-<div id="dc882e40" class="cell" data-execution_count="3">
+<div id="86acf8ca" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1512,7 +1512,7 @@ Model root name: models</code></pre>
 </div>
 </div>
 <p>Custom weights for multi-variable aggregation:</p>
-<div id="cac2eccc" class="cell" data-execution_count="4">
+<div id="a29d3642" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of weights: </span><span class="sc">{</span><span class="bu">len</span>(config.weights)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1520,7 +1520,7 @@ Model root name: models</code></pre>
 </div>
 </div>
 <p>Immutability check (frozen dataclass):</p>
-<div id="592e9809" class="cell" data-execution_count="5">
+<div id="cf69eda2" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig()</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    config.forecast_horizon <span class="op">=</span> <span class="dv">100</span></span>
@@ -1531,7 +1531,7 @@ Model root name: models</code></pre>
 </div>
 </div>
 <p>Production configuration with a long horizon:</p>
-<div id="fcbccce8" class="cell" data-execution_count="6">
+<div id="888c686b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>prod_config <span class="op">=</span> DemoConfig(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span><span class="dv">168</span>,  <span class="co"># 1 week</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">336</span>,       <span class="co"># 2 weeks</span></span>
