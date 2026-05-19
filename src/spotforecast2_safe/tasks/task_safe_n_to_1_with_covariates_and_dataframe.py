@@ -121,7 +121,7 @@ def n_to_1_with_covariates(
 
     Args:
         data (Optional[pd.DataFrame]): Optional DataFrame with target time series data.
-            If None, fetches data automatically. Default: None.
+            If None, fetches data automatically ("data10.csv"). Default: None.
 
         forecast_horizon (int): Number of forecast steps ahead.
             Determines how many time steps to predict into the future.
