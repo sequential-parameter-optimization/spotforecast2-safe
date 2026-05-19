@@ -15,11 +15,14 @@ Checks if the time series data has a datetime index and is sorted.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data.fetch_data import fetch_data
->>> from spotforecast2_safe.preprocessing.curate_data import basic_ts_checks
->>> data = fetch_data()
->>> basic_ts_checks(data)
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.curate_data import basic_ts_checks
+
+date_rng = pd.date_range(start="2023-01-01", periods=5, freq="h", tz="UTC")
+data = pd.DataFrame({"value": range(5)}, index=date_rng)
+result = basic_ts_checks(data, verbose=True)
+assert result is True
 ```
 
 ## Raises {.doc-section .doc-section-raises}

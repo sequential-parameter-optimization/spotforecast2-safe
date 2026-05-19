@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 from collections.abc import Callable
+from typing import Literal
 
 import pandas as pd
 
@@ -67,24 +68,26 @@ def curate_holidays(
             The forecast horizon in hours.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data, fetch_holiday_data
-        >>> from spotforecast2_safe.preprocessing.curate_data import get_start_end, curate_holidays
-        >>> data = fetch_data()
-        >>> START, END, COV_START, COV_END = get_start_end(
-        ...     data=data,
-        ...     forecast_horizon=24,
-        ...     verbose=False
-        ... )
-        >>> holiday_df = fetch_holiday_data(
-        ...     start='2023-01-01T00:00',
-        ...     end='2023-01-10T00:00',
-        ...     tz='UTC',
-        ...     freq='h',
-        ...     country_code='DE',
-        ...     state='NW'
-        ... )
-        >>> FORECAST_HORIZON = 24
-        >>> curate_holidays(holiday_df, data, forecast_horizon=FORECAST_HORIZON)
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.curate_data import curate_holidays
+
+        FORECAST_HORIZON = 24
+        n_data = 48
+        data = pd.DataFrame(
+            {"load": range(n_data)},
+            index=pd.date_range("2023-01-01", periods=n_data, freq="h", tz="UTC"),
+        )
+        holiday_df = pd.DataFrame(
+            {"holiday": range(n_data + FORECAST_HORIZON)},
+            index=pd.date_range(
+                "2023-01-01", periods=n_data + FORECAST_HORIZON, freq="h", tz="UTC"
+            ),
+        )
+        curate_holidays(holiday_df, data, forecast_horizon=FORECAST_HORIZON)
+        assert holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON
+        print("holiday_df shape is correct:", holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON)
+        ```
 
     Raises:
         AssertionError:
@@ -108,24 +111,26 @@ def curate_weather(weather_df: pd.DataFrame, data: pd.DataFrame, forecast_horizo
             The forecast horizon in hours.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data, fetch_weather_data
-        >>> from spotforecast2_safe.preprocessing.curate_data import get_start_end, curate_weather
-        >>> data = fetch_data()
-        >>> START, END, COV_START, COV_END = get_start_end(
-        ...     data=data,
-        ...     forecast_horizon=24,
-        ...     verbose=False
-        ... )
-        >>> weather_df = fetch_weather_data(
-        ...     cov_start=COV_START,
-        ...     cov_end=COV_END,
-        ...     tz='UTC',
-        ...     freq='h',
-        ...     latitude=51.5136,
-        ...     longitude=7.4653
-        ... )
-        >>> FORECAST_HORIZON = 24
-        >>> curate_weather(weather_df, data, forecast_horizon=FORECAST_HORIZON)
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.curate_data import curate_weather
+
+        FORECAST_HORIZON = 24
+        n_data = 48
+        data = pd.DataFrame(
+            {"load": range(n_data)},
+            index=pd.date_range("2023-01-01", periods=n_data, freq="h", tz="UTC"),
+        )
+        weather_df = pd.DataFrame(
+            {"temp": range(n_data + FORECAST_HORIZON)},
+            index=pd.date_range(
+                "2023-01-01", periods=n_data + FORECAST_HORIZON, freq="h", tz="UTC"
+            ),
+        )
+        curate_weather(weather_df, data, forecast_horizon=FORECAST_HORIZON)
+        assert weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON
+        print("weather_df shape is correct:", weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON)
+        ```
 
     Raises:
         AssertionError:
@@ -147,10 +152,15 @@ def basic_ts_checks(data: pd.DataFrame, verbose: bool = False) -> bool:
             Whether to print additional information.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> from spotforecast2_safe.preprocessing.curate_data import basic_ts_checks
-        >>> data = fetch_data()
-        >>> basic_ts_checks(data)
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.curate_data import basic_ts_checks
+
+        date_rng = pd.date_range(start="2023-01-01", periods=5, freq="h", tz="UTC")
+        data = pd.DataFrame({"value": range(5)}, index=date_rng)
+        result = basic_ts_checks(data, verbose=True)
+        assert result is True
+        ```
 
     Raises:
         TypeError:
@@ -191,13 +201,13 @@ def basic_ts_checks(data: pd.DataFrame, verbose: bool = False) -> bool:
 def agg_and_resample_data(
     data: pd.DataFrame,
     rule: str = "h",
-    closed: str = "left",
-    label: str = "left",
+    closed: Literal["left", "right"] = "left",
+    label: Literal["left", "right"] = "left",
     by="mean",
     verbose: bool = False,
 ) -> pd.DataFrame:
     """
-    Aggregates and resamples the data to (e.g.,hourly) frequency by computing the specified aggregation (e.g. for each hour).
+    Aggregates and resamples the data to (e.g., hourly) frequency by computing the specified aggregation (e.g. for each hour).
 
     Args:
         data (pd.DataFrame):
@@ -235,14 +245,16 @@ def agg_and_resample_data(
         - .agg({...: by}): Aggregates values within each time bin
 
     Examples:
-        >>> from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
-        >>> import pandas as pd
-        >>> date_rng = pd.date_range(start='2023-01-01', end='2023-01-02', freq='15min')
-        >>> data = pd.DataFrame(date_rng, columns=['date'])
-        >>> data.set_index('date', inplace=True)
-        >>> data['value'] = range(len(data))
-        >>> resampled_data = agg_and_resample_data(data, rule='h', by='mean')
-        >>> print(resampled_data.head())
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
+
+        date_rng = pd.date_range(start="2023-01-01", end="2023-01-02", freq="15min")
+        data = pd.DataFrame({"value": range(len(date_rng))}, index=date_rng)
+        resampled_data = agg_and_resample_data(data, rule="h", by="mean")
+        print(resampled_data.head())
+        assert resampled_data.shape == (25, 1)
+        ```
     """
     if verbose:
         print(f"Original data shape: {data.shape}")
@@ -284,7 +296,7 @@ def reset_index(
         ```
     """
     df.index.name = index_name
-    if isinstance(df.index, pd.DatetimeIndex) and df.index.tzinfo is None:
+    if isinstance(df.index, pd.DatetimeIndex) and df.index.tz is None:
         df.index = df.index.tz_localize(timezone)
     df = df.reset_index()
     return df
@@ -323,7 +335,6 @@ def remove_duplicate_timestamps(
 
     Examples:
         Mean-aggregate two data columns with the default time column:
-
         ```{python}
         import pandas as pd
         from spotforecast2_safe.preprocessing.curate_data import remove_duplicate_timestamps
@@ -343,9 +354,7 @@ def remove_duplicate_timestamps(
         print(f"Load A: {float(out.loc[0, 'Load A'])}")
         print(f"Load B: {float(out.loc[0, 'Load B'])}")
         ```
-
         Median aggregation on a custom time column:
-
         ```{python}
         import pandas as pd
         from spotforecast2_safe.preprocessing.curate_data import remove_duplicate_timestamps
