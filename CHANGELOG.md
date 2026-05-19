@@ -1,3 +1,14 @@
+## [11.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v10.0.0...v11.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* promote RollingFeatures module from _rolling to rolling
+
+### Code Refactoring
+
+* promote RollingFeatures module from _rolling to rolling ([2fea5d7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2fea5d75e104ac43345ac3ba41116067c67eac7d))
+
 ## [10.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v9.0.0...v10.0.0) (2026-05-19)
 
 
