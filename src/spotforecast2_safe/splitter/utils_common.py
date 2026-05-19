@@ -173,14 +173,21 @@ class OneStepAheadValidationWarning(UserWarning):
         message (str): The warning message to be displayed.
 
     Examples:
-        >>> import warnings
-        >>> from spotforecast2_safe.model_selection.utils_common import OneStepAheadValidationWarning
-        >>> warnings.warn(
-        ...     "This is a one-step-ahead validation warning.",
-        ...     OneStepAheadValidationWarning
-        ... )
-        This is a one-step-ahead validation warning.
-        You can suppress this warning using: warnings.simplefilter('ignore', category=OneStepAheadValidationWarning)
+        ```{python}
+        import warnings
+        from spotforecast2_safe.splitter.utils_common import OneStepAheadValidationWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn(
+                "This is a one-step-ahead validation warning.",
+                OneStepAheadValidationWarning,
+            )
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, OneStepAheadValidationWarning)
+        print(str(caught[0].message))
+        ```
     """
 
     def __init__(self, message):
@@ -218,16 +225,18 @@ def initialize_lags_grid(
             - lags_label (str): Label for lags representation in the results object.
 
     Examples:
-        >>> from spotforecast2_safe.model_selection.utils_common import initialize_lags_grid
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from sklearn.linear_model import LinearRegression
-        >>> forecaster = ForecasterRecursive(LinearRegression(), lags=2)
-        >>> lags_grid = [2, 4]
-        >>> lags_grid, lags_label = initialize_lags_grid(forecaster, lags_grid)
-        >>> print(lags_grid)
-        {'2': 2, '4': 4}
-        >>> print(lags_label)
-        values
+        ```{python}
+        from spotforecast2_safe.splitter.utils_common import initialize_lags_grid
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from sklearn.linear_model import LinearRegression
+
+        forecaster = ForecasterRecursive(LinearRegression(), lags=2)
+        lags_grid, lags_label = initialize_lags_grid(forecaster, lags_grid=[2, 4])
+        print(lags_grid)
+        print(lags_label)
+        assert lags_grid == {"2": 2, "4": 4}
+        assert lags_label == "values"
+        ```
     """
 
     if not isinstance(lags_grid, (list, dict, type(None))):
@@ -271,7 +280,7 @@ def check_backtesting_input(
 ) -> None:
     """
     This is a helper function to check most inputs of backtesting functions in
-    modules `model_selection`.
+    `spotforecast2_safe.backtesting`.
 
     Args:
         forecaster (object): Forecaster model.
@@ -313,28 +322,33 @@ def check_backtesting_input(
         None
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.model_selection.utils_common import check_backtesting_input
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from spotforecast2_safe.model_selection import TimeSeriesFold
-        >>> from sklearn.linear_model import LinearRegression
-        >>> from sklearn.metrics import mean_squared_error
-        >>> y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        >>> forecaster = ForecasterRecursive(LinearRegression(), lags=2)
-        >>> cv = TimeSeriesFold(
-        ...     steps=3,
-        ...     initial_train_size=5,
-        ...     gap=0,
-        ...     refit=False,
-        ...     fixed_train_size=False,
-        ...     allow_incomplete_fold=True
-        ... )
-        >>> check_backtesting_input(
-        ...     forecaster=forecaster,
-        ...     cv=cv,
-        ...     metric=mean_squared_error,
-        ...     y=y
-        ... )
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.splitter.utils_common import check_backtesting_input
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.splitter import TimeSeriesFold
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import mean_squared_error
+
+        y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        forecaster = ForecasterRecursive(LinearRegression(), lags=2)
+        cv = TimeSeriesFold(
+            steps=3,
+            initial_train_size=5,
+            gap=0,
+            refit=False,
+            fixed_train_size=False,
+            allow_incomplete_fold=True,
+        )
+        result = check_backtesting_input(
+            forecaster=forecaster,
+            cv=cv,
+            metric=mean_squared_error,
+            y=y,
+        )
+        assert result is None
+        print("check_backtesting_input passed")
+        ```
     """
 
     forecaster_name = type(forecaster).__name__
@@ -633,7 +647,7 @@ def check_one_step_ahead_input(
 ) -> None:
     """
     This is a helper function to check most inputs of hyperparameter tuning
-    functions in modules `model_selection` when using a `OneStepAheadFold`.
+    functions in `spotforecast2_safe.splitter` when using a `OneStepAheadFold`.
 
     Args:
         forecaster (object): Forecaster model.
@@ -654,24 +668,32 @@ def check_one_step_ahead_input(
         None
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.model_selection.utils_common import check_one_step_ahead_input
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from spotforecast2_safe.model_selection import OneStepAheadFold
-        >>> from sklearn.linear_model import LinearRegression
-        >>> from sklearn.metrics import mean_squared_error
-        >>> y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        >>> forecaster = ForecasterRecursive(LinearRegression(), lags=2)
-        >>> cv = OneStepAheadFold(
-        ...     initial_train_size=5,
-        ...     return_all_predictions=False
-        ... )
-        >>> check_one_step_ahead_input(
-        ...     forecaster=forecaster,
-        ...     cv=cv,
-        ...     metric=mean_squared_error,
-        ...     y=y
-        ... )
+        ```{python}
+        import warnings
+        import pandas as pd
+        from spotforecast2_safe.splitter.utils_common import (
+            OneStepAheadValidationWarning,
+            check_one_step_ahead_input,
+        )
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.splitter import OneStepAheadFold
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import mean_squared_error
+
+        y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        forecaster = ForecasterRecursive(LinearRegression(), lags=2)
+        cv = OneStepAheadFold(initial_train_size=5, return_all_indexes=False, verbose=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", OneStepAheadValidationWarning)
+            result = check_one_step_ahead_input(
+                forecaster=forecaster,
+                cv=cv,
+                metric=mean_squared_error,
+                y=y,
+            )
+        assert result is None
+        print("check_one_step_ahead_input passed")
+        ```
     """
 
     forecaster_name = type(forecaster).__name__
@@ -836,12 +858,16 @@ def select_n_jobs_backtesting(forecaster: object, refit: bool | int) -> int:
         int: The number of jobs to run in parallel.
 
     Examples:
-        >>> from spotforecast2_safe.model_selection.utils_common import select_n_jobs_backtesting
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from sklearn.linear_model import LinearRegression
-        >>> forecaster = ForecasterRecursive(LinearRegression(), lags=2)
-        >>> select_n_jobs_backtesting(forecaster, refit=True)
-        1
+        ```{python}
+        from spotforecast2_safe.splitter.utils_common import select_n_jobs_backtesting
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from sklearn.linear_model import LinearRegression
+
+        forecaster = ForecasterRecursive(LinearRegression(), lags=2)
+        n_jobs = select_n_jobs_backtesting(forecaster, refit=True)
+        print(n_jobs)
+        assert n_jobs == 1
+        ```
     """
 
     forecaster_name = type(forecaster).__name__

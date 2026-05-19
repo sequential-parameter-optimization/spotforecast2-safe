@@ -171,23 +171,27 @@ class BaseFold:
             ValueError: If any of the input parameters are invalid.
 
         Examples:
-            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
-            >>> cv = TimeSeriesFold(steps=1)
-            >>> cv._validate_params(
-            ...     cv_name="TimeSeriesFold",
-            ...     steps=1,
-            ...     initial_train_size=1,
-            ...     fold_stride=1,
-            ...     window_size=1,
-            ...     differentiation=1,
-            ...     refit=False,
-            ...     fixed_train_size=True,
-            ...     gap=0,
-            ...     skip_folds=None,
-            ...     allow_incomplete_fold=True,
-            ...     return_all_indexes=False,
-            ...     verbose=True,
-            ... )
+            ```{python}
+            from spotforecast2_safe.splitter import TimeSeriesFold
+
+            cv = TimeSeriesFold(steps=1)
+            cv._validate_params(
+                cv_name="TimeSeriesFold",
+                steps=1,
+                initial_train_size=1,
+                fold_stride=1,
+                window_size=1,
+                differentiation=1,
+                refit=False,
+                fixed_train_size=True,
+                gap=0,
+                skip_folds=None,
+                allow_incomplete_fold=True,
+                return_all_indexes=False,
+                verbose=False,
+            )
+            assert cv.steps == 1
+            ```
         """
 
         if cv_name == "TimeSeriesFold":
@@ -327,11 +331,18 @@ class BaseFold:
                 series have no frequency.
 
         Examples:
-            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
-            >>> cv = TimeSeriesFold(steps=1)
-            >>> idx = cv._extract_index(pd.Series([1, 2, 3], index=pd.date_range("2020-01-01", periods=3)))
-            >>> print(idx)
-            DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03'], dtype='datetime64[ns]', freq='D')
+            ```{python}
+            import pandas as pd
+
+            from spotforecast2_safe.splitter import TimeSeriesFold
+
+            cv = TimeSeriesFold(steps=1)
+            series = pd.Series([1, 2, 3], index=pd.date_range("2020-01-01", periods=3, freq="D"))
+            idx = cv._extract_index(series)
+            print(idx)
+            assert len(idx) == 3
+            assert idx[0] == pd.Timestamp("2020-01-01")
+            ```
         """
 
         if isinstance(X, (pd.Series, pd.DataFrame)):
@@ -400,22 +411,27 @@ class BaseFold:
             params (dict): Dictionary with the parameters to set.
 
         Examples:
-            >>> from spotforecast2_safe.model_selection import TimeSeriesFold
-            >>> cv = TimeSeriesFold(steps=1)
-            >>> cv.set_params({
-            ...     "steps": 2,
-            ...     "initial_train_size": 10,
-            ...     "fold_stride": 2,
-            ...     "window_size": 5,
-            ...     "differentiation": 1,
-            ...     "refit": True,
-            ...     "fixed_train_size": False,
-            ...     "gap": 1,
-            ...     "skip_folds": 2,
-            ...     "allow_incomplete_fold": False,
-            ...     "return_all_indexes": True,
-            ...     "verbose": False,
-            ... })
+            ```{python}
+            from spotforecast2_safe.splitter import TimeSeriesFold
+
+            cv = TimeSeriesFold(steps=1)
+            cv.set_params({
+                "steps": 2,
+                "initial_train_size": 10,
+                "fold_stride": 2,
+                "window_size": 5,
+                "differentiation": 1,
+                "refit": True,
+                "fixed_train_size": False,
+                "gap": 1,
+                "skip_folds": 2,
+                "allow_incomplete_fold": False,
+                "return_all_indexes": True,
+                "verbose": False,
+            })
+            assert cv.initial_train_size == 10
+            assert cv.window_size == 5
+            ```
         """
 
         if not isinstance(params, dict):

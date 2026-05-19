@@ -19,9 +19,9 @@ from spotforecast2_safe.exceptions import (
     set_skforecast_warnings,
 )
 from spotforecast2_safe.forecaster.metrics import _get_metric, add_y_train_argument
-from spotforecast2_safe.model_selection.split_one_step import OneStepAheadFold
-from spotforecast2_safe.model_selection.split_ts_cv import TimeSeriesFold
-from spotforecast2_safe.model_selection.utils_common import (
+from spotforecast2_safe.splitter.split_one_step import OneStepAheadFold
+from spotforecast2_safe.splitter.split_ts_cv import TimeSeriesFold
+from spotforecast2_safe.splitter.utils_common import (
     check_backtesting_input,
     check_one_step_ahead_input,
     select_n_jobs_backtesting,
@@ -517,38 +517,36 @@ def backtesting_forecaster_one_step(
         Depending on the `interval` and `interval_method` parameters, it can also generate probabilistic predictions.
 
     Examples:
-        >>> from spotforecast2_safe.forecaster import ForecasterRecursive
-        >>> from spotforecast2_safe.model_selection.split_one_step import OneStepAheadFold
-        >>> from spotforecast2_safe.model_selection.validation import backtesting_forecaster_one_step
-        >>> # Create a forecaster and a one-step-ahead fold
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> from sklearn.linear_model import LinearRegression
-        >>> y = pd.Series(np.random.randn(100), name='y')
-        >>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=5)
-        >>> cv = OneStepAheadFold(initial_train_size=20, window_size=5)
-        >>> # Perform backtesting
-        >>> metric_values, backtest_predictions = backtesting_forecaster_one_step(
-        ...     forecaster=forecaster,
-        ...     y=y,
-        ...     cv=cv,
-        ...     metric='mean_squared_error',
-        ...     exog=None,
-        ...     interval=0.95,
-        ...     interval_method='bootstrapping',
-        ...     n_boot=20,
-        ...     use_in_sample_residuals=True,
-        ...     use_binned_residuals=False,
-        ...     random_state=42,
-        ...     return_predictors=False,
-        ...     n_jobs=1,
-        ...     verbose=True,
-        ...     show_progress=True,
-        ...     suppress_warnings=False
-        ... )
-        # Note: For reliable bootstrapping with binned residuals, use a sufficiently large series and value spread.
-        # For random data, use_binned_residuals=False.
-        # TODO: Setting return_predictors=True requires ForecasterRecursive.create_predict_X().
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
+
+        from spotforecast2_safe.backtesting.validation import backtesting_forecaster_one_step
+        from spotforecast2_safe.forecaster import ForecasterRecursive
+        from spotforecast2_safe.splitter.split_one_step import OneStepAheadFold
+
+        rng = np.random.default_rng(0)
+        y = pd.Series(rng.standard_normal(100), name="y")
+        forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+        cv = OneStepAheadFold(initial_train_size=50)
+
+        metric_values, backtest_predictions = backtesting_forecaster_one_step(
+            forecaster=forecaster,
+            y=y,
+            cv=cv,
+            metric="mean_squared_error",
+            n_jobs=1,
+            verbose=False,
+            show_progress=False,
+            suppress_warnings=True,
+        )
+        print(metric_values)
+        assert "mean_squared_error" in metric_values.columns
+        assert backtest_predictions.shape[0] == 50
+        assert "fold" in backtest_predictions.columns
+        assert "pred" in backtest_predictions.columns
+        ```
 
     """
 
@@ -828,36 +826,36 @@ def backtesting_forecaster(
           so the output DataFrame has non-contiguous indexes.
 
     Examples:
-        >>> import pandas as pd
-        >>> from sklearn.ensemble import RandomForestRegressor
-        >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-        >>> from spotforecast2_safe.model_selection import backtesting_forecaster, TimeSeriesFold
-        >>> y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        >>> forecaster = ForecasterRecursive(
-        ...     estimator=RandomForestRegressor(random_state=123),
-        ...     lags=5
-        ... )
-        >>> cv = TimeSeriesFold(
-        ...     steps=2,
-        ...     initial_train_size=5,
-        ...     refit=False
-        ... )
-        >>> metric_values, backtest_predictions = backtesting_forecaster(
-        ...     forecaster=forecaster,
-        ...     y=y,
-        ...     cv=cv,
-        ...     metric='mean_squared_error'
-        ... )
-        >>> metric_values
-           mean_squared_error
-        0            0.201334
-        >>> backtest_predictions
-           fold  pred
-        5     0  5.18
-        6     0  6.10
-        7     1  7.36
-        8     1  8.40
-        9     2  9.31
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import LinearRegression
+
+        from spotforecast2_safe.backtesting.validation import backtesting_forecaster
+        from spotforecast2_safe.forecaster import ForecasterRecursive
+        from spotforecast2_safe.splitter import TimeSeriesFold
+
+        rng = np.random.default_rng(0)
+        y = pd.Series(rng.standard_normal(80), name="y")
+        forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+        cv = TimeSeriesFold(steps=2, initial_train_size=40, refit=False)
+
+        metric_values, backtest_predictions = backtesting_forecaster(
+            forecaster=forecaster,
+            y=y,
+            cv=cv,
+            metric="mean_squared_error",
+            n_jobs=1,
+            verbose=False,
+            show_progress=False,
+            suppress_warnings=True,
+        )
+        print(metric_values)
+        print(backtest_predictions.head())
+        assert "mean_squared_error" in metric_values.columns
+        assert "fold" in backtest_predictions.columns
+        assert "pred" in backtest_predictions.columns
+        ```
     """
 
     if type(cv).__name__ == "OneStepAheadFold":

@@ -57,7 +57,7 @@ from spotforecast2_safe.forecaster.utils import (
     transform_dataframe,
     transform_numpy,
 )
-from spotforecast2_safe.model_selection.utils_common import (
+from spotforecast2_safe.splitter.utils_common import (
     _extract_data_folds_multiseries,
 )
 from spotforecast2_safe.preprocessing import QuantileBinner, TimeSeriesDifferentiator

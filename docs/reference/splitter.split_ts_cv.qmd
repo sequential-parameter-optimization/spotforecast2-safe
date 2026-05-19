@@ -1,6 +1,6 @@
-# model_selection.split_ts_cv { #spotforecast2_safe.model_selection.split_ts_cv }
+# splitter.split_ts_cv { #spotforecast2_safe.splitter.split_ts_cv }
 
-`model_selection.split_ts_cv`
+`splitter.split_ts_cv`
 
 Time series cross-validation splitting.
 
@@ -8,12 +8,12 @@ Time series cross-validation splitting.
 
 | Name | Description |
 | --- | --- |
-| [TimeSeriesFold](#spotforecast2_safe.model_selection.split_ts_cv.TimeSeriesFold) | Class to split time series data into train and test folds. |
+| [TimeSeriesFold](#spotforecast2_safe.splitter.split_ts_cv.TimeSeriesFold) | Class to split time series data into train and test folds. |
 
-### TimeSeriesFold { #spotforecast2_safe.model_selection.split_ts_cv.TimeSeriesFold }
+### TimeSeriesFold { #spotforecast2_safe.splitter.split_ts_cv.TimeSeriesFold }
 
 ```python
-model_selection.split_ts_cv.TimeSeriesFold(
+splitter.split_ts_cv.TimeSeriesFold(
     steps,
     initial_train_size=None,
     fold_stride=None,
@@ -73,60 +73,108 @@ functions.
 
 #### Examples {.doc-section .doc-section-examples}
 
-Basic usage with fixed train size:
+```{python}
+import warnings
 
-```python
->>> import pandas as pd
->>> import numpy as np
->>> from spotforecast2_safe.model_selection import TimeSeriesFold
->>> # Create sample time series data
->>> dates = pd.date_range('2020-01-01', periods=100, freq='D')
->>> y = pd.Series(np.arange(100), index=dates)
->>> # Create fold splitter
->>> cv = TimeSeriesFold(
-...     steps=10,
-...     initial_train_size=50,
-...     refit=True,
-...     fixed_train_size=True
-... )
->>> # Get folds
->>> folds = cv.split(y)
->>> print(f"Number of folds: {len(folds)}")
-Number of folds: 4
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.exceptions import IgnoredArgumentWarning
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+dates = pd.date_range("2020-01-01", periods=100, freq="D")
+y = pd.Series(np.arange(100), index=dates)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", IgnoredArgumentWarning)
+    cv = TimeSeriesFold(
+        steps=10,
+        initial_train_size=50,
+        refit=True,
+        fixed_train_size=True,
+        verbose=False,
+    )
+    folds = cv.split(y)
+print(f"Number of folds: {len(folds)}")
+assert len(folds) == 5
 ```
 
-Overlapping folds with custom stride:
+```{python}
+import warnings
 
-```python
->>> cv = TimeSeriesFold(
-...     steps=30,
-...     initial_train_size=50,
-...     fold_stride=7,
-...     fixed_train_size=False
-... )
->>> folds = cv.split(y)
->>> # First test fold covers [50, 80), second [57, 87), etc.
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.exceptions import IgnoredArgumentWarning
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+dates = pd.date_range("2020-01-01", periods=100, freq="D")
+y = pd.Series(np.arange(100), index=dates)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", IgnoredArgumentWarning)
+    cv = TimeSeriesFold(
+        steps=30,
+        initial_train_size=50,
+        fold_stride=7,
+        fixed_train_size=False,
+        verbose=False,
+    )
+    folds = cv.split(y)
+# First test fold covers [50, 80), second [57, 87), etc.
+assert len(folds) == 8
 ```
 
-Return as pandas DataFrame:
+```{python}
+import warnings
 
-```python
->>> cv = TimeSeriesFold(steps=10, initial_train_size=50)
->>> folds_df = cv.split(y, as_pandas=True)
->>> print(folds_df.columns.tolist())
-['fold', 'train_start', 'train_end', 'last_window_start', 'last_window_end', 'test_start', 'test_end', 'test_start_with_gap', 'test_end_with_gap', 'fit_forecaster']
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.exceptions import IgnoredArgumentWarning
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+dates = pd.date_range("2020-01-01", periods=100, freq="D")
+y = pd.Series(np.arange(100), index=dates)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", IgnoredArgumentWarning)
+    cv = TimeSeriesFold(steps=10, initial_train_size=50, verbose=False)
+    folds_df = cv.split(y, as_pandas=True)
+print(folds_df.columns.tolist())
+expected_cols = [
+    "fold", "train_start", "train_end",
+    "last_window_start", "last_window_end",
+    "test_start", "test_end",
+    "test_start_with_gap", "test_end_with_gap",
+    "fit_forecaster",
+]
+assert folds_df.columns.tolist() == expected_cols
 ```
 
-Skip folds for faster evaluation:
+```{python}
+import warnings
 
-```python
->>> cv = TimeSeriesFold(
-...     steps=5,
-...     initial_train_size=50,
-...     skip_folds=2
-... )
->>> folds = cv.split(y)
->>> # Returns folds 0, 2, 4, 6, ...
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.exceptions import IgnoredArgumentWarning
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+dates = pd.date_range("2020-01-01", periods=100, freq="D")
+y = pd.Series(np.arange(100), index=dates)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", IgnoredArgumentWarning)
+    cv = TimeSeriesFold(
+        steps=5,
+        initial_train_size=50,
+        skip_folds=2,
+        verbose=False,
+    )
+    folds = cv.split(y)
+# Returns every second fold: 0, 2, 4, ...
+assert len(folds) == 5
 ```
 
 #### Note {.doc-section .doc-section-note}
@@ -159,12 +207,12 @@ evaluation.
 
 | Name | Description |
 | --- | --- |
-| [split](#spotforecast2_safe.model_selection.split_ts_cv.TimeSeriesFold.split) | Split the time series data into train and test folds. |
+| [split](#spotforecast2_safe.splitter.split_ts_cv.TimeSeriesFold.split) | Split the time series data into train and test folds. |
 
-##### split { #spotforecast2_safe.model_selection.split_ts_cv.TimeSeriesFold.split }
+##### split { #spotforecast2_safe.splitter.split_ts_cv.TimeSeriesFold.split }
 
 ```python
-model_selection.split_ts_cv.TimeSeriesFold.split(X, as_pandas=False)
+splitter.split_ts_cv.TimeSeriesFold.split(X, as_pandas=False)
 ```
 
 Split the time series data into train and test folds.

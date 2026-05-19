@@ -2,7 +2,7 @@ import warnings
 
 import pytest
 
-from spotforecast2_safe.model_selection.utils_common import (
+from spotforecast2_safe.splitter.utils_common import (
     OneStepAheadValidationWarning,
 )
 

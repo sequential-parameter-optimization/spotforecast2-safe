@@ -1,6 +1,6 @@
-# model_selection.split_one_step { #spotforecast2_safe.model_selection.split_one_step }
+# splitter.split_one_step { #spotforecast2_safe.splitter.split_one_step }
 
-`model_selection.split_one_step`
+`splitter.split_one_step`
 
 One step ahead cross-validation splitting.
 
@@ -8,12 +8,12 @@ One step ahead cross-validation splitting.
 
 | Name | Description |
 | --- | --- |
-| [OneStepAheadFold](#spotforecast2_safe.model_selection.split_one_step.OneStepAheadFold) | Class to split time series data into train and test folds for one-step-ahead |
+| [OneStepAheadFold](#spotforecast2_safe.splitter.split_one_step.OneStepAheadFold) | Class to split time series data into train and test folds for one-step-ahead |
 
-### OneStepAheadFold { #spotforecast2_safe.model_selection.split_one_step.OneStepAheadFold }
+### OneStepAheadFold { #spotforecast2_safe.splitter.split_one_step.OneStepAheadFold }
 
 ```python
-model_selection.split_one_step.OneStepAheadFold(
+splitter.split_one_step.OneStepAheadFold(
     initial_train_size,
     window_size=None,
     differentiation=None,
@@ -49,12 +49,12 @@ forecasting.
 
 | Name | Description |
 | --- | --- |
-| [split](#spotforecast2_safe.model_selection.split_one_step.OneStepAheadFold.split) | Split the time series data into train and test folds. |
+| [split](#spotforecast2_safe.splitter.split_one_step.OneStepAheadFold.split) | Split the time series data into train and test folds. |
 
-##### split { #spotforecast2_safe.model_selection.split_one_step.OneStepAheadFold.split }
+##### split { #spotforecast2_safe.splitter.split_one_step.OneStepAheadFold.split }
 
 ```python
-model_selection.split_one_step.OneStepAheadFold.split(
+splitter.split_one_step.OneStepAheadFold.split(
     X,
     as_pandas=False,
     externally_fitted=None,

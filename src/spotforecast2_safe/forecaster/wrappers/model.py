@@ -14,7 +14,8 @@ from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 from spotforecast2_safe.data.data import Period
 from spotforecast2_safe.data.fetch_data import load_timeseries, load_timeseries_forecast
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.model_selection import TimeSeriesFold, backtesting_forecaster
+from spotforecast2_safe.splitter import TimeSeriesFold
+from spotforecast2_safe.backtesting import backtesting_forecaster
 from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 
