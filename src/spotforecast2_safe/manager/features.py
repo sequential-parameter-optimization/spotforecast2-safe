@@ -6,19 +6,19 @@
 This module provides five public helper functions used to transform raw
 exogenous inputs into model-ready feature matrices:
 
-- :func:`apply_cyclical_encoding` — convert periodic integer features (hour,
+- `apply_cyclical_encoding()` — convert periodic integer features (hour,
   month, …) to sine/cosine pairs via
-  :class:`~feature_engine.creation.CyclicalFeatures`.
-- :func:`create_interaction_features` — append bilinear interaction terms
+  `CyclicalFeatures`.
+- `create_interaction_features()` — append bilinear interaction terms
   between calendar, weather-window, and holiday columns using
-  :class:`~sklearn.preprocessing.PolynomialFeatures`.
-- :func:`select_exogenous_features` — filter and deduplicate the column list
+  `PolynomialFeatures`.
+- `select_exogenous_features()` — filter and deduplicate the column list
   that should be passed as ``exog`` to a recursive forecaster.
-- :func:`merge_data_and_covariates` — inner-join target data with exogenous
+- `merge_data_and_covariates()` — inner-join target data with exogenous
   features and produce separate train and prediction covariate slices.
-- :func:`get_target_data` — extract the training series and exogenous
+- `get_target_data()` — extract the training series and exogenous
   feature slices for a single target column from the shared pipeline
-  state held in a :class:`~spotforecast2_safe.manager.configurator.config_multi.ConfigMulti`
+  state held in a `ConfigMulti`
   object.
 """
 
@@ -58,7 +58,7 @@ def apply_cyclical_encoding(
     Columns that appear in *features_to_encode* but are absent from *data* are
     silently skipped.
 
-    Uses :class:`~feature_engine.creation.CyclicalFeatures` internally, so
+    Uses `CyclicalFeatures` internally, so
     the new columns follow the ``<feature>_sin`` / ``<feature>_cos`` naming
     convention.
 
@@ -176,7 +176,7 @@ def create_interaction_features(
             in *exogenous_features* it is added to the interaction pool.
             Defaults to ``"is_holiday"``.
         degree: Polynomial degree passed to
-            :class:`~sklearn.preprocessing.PolynomialFeatures`.  At degree 1
+            `PolynomialFeatures`.  At degree 1
             only pairwise products are produced (no higher-order terms).
             Defaults to ``1``.
 
@@ -397,11 +397,11 @@ def merge_data_and_covariates(
     ``(end+1h, cov_end]`` is also returned for use during inference.
 
     String timestamps are converted to UTC-aware
-    :class:`~pandas.Timestamp` objects automatically.
+    `Timestamp` objects automatically.
 
     Args:
         data: DataFrame containing one or more target time series with a
-            tz-aware :class:`~pandas.DatetimeIndex`.
+            tz-aware `DatetimeIndex`.
         exogenous_features: DataFrame with all exogenous feature columns,
             covering at least the window ``[start, cov_end]``.
         target_columns: Column names of the target variables to keep from
@@ -417,7 +417,7 @@ def merge_data_and_covariates(
         forecast_horizon: Number of forecast steps ahead (informational; used
             by calling code to validate slice length).
         cast_dtype: NumPy dtype string applied to the merged training
-            DataFrame via :meth:`~pandas.DataFrame.astype`.  Pass ``None`` to
+            DataFrame via `astype()`.  Pass ``None`` to
             skip casting.  Defaults to ``"float32"``.
 
     Returns:
@@ -516,16 +516,16 @@ def get_target_data(
 
     Args:
         target: Name of the target column to extract from *df_pipeline*.
-        df_pipeline: DataFrame with a tz-aware :class:`~pandas.DatetimeIndex`
+        df_pipeline: DataFrame with a tz-aware `DatetimeIndex`
             containing all target columns produced by the preprocessing
             pipeline.
         config: Pipeline configuration object.  Must have the following
             attributes set before calling this function:
 
             - ``start_train_ts`` — inclusive start of the training window
-              (:class:`~pandas.Timestamp`, tz-aware).
+              (`Timestamp`, tz-aware).
             - ``end_train_ts`` — inclusive end of the training window
-              (:class:`~pandas.Timestamp`, tz-aware).
+              (`Timestamp`, tz-aware).
             - ``use_exogenous_features`` — ``bool`` flag controlling whether
               exogenous features are used.
         data_with_exog: Merged DataFrame of target and exogenous columns
@@ -546,7 +546,7 @@ def get_target_data(
 
         - **y_train** — 1-D Series with the target values over the training
             window ``[config.start_train_ts, config.end_train_ts]``, squeezed
-            to a plain :class:`~pandas.Series`.
+            to a plain `Series`.
         - **exog_train** — DataFrame of selected exogenous features over the
             training window, cast to ``float32``.  ``None`` when exogenous
             features are disabled or *data_with_exog* is ``None``.

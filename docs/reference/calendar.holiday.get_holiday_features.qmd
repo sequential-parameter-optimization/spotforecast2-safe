@@ -15,32 +15,32 @@ calendar.holiday.get_holiday_features(
 
 Build public-holiday indicators and align them to a regular time grid.
 
-Generates holiday indicators via :func:`create_holiday_df`, validates
+Generates holiday indicators via `create_holiday_df()`, validates
 coverage with
-:func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`,
+`curate_holidays()`,
 and reindexes the result to a full ``[start, cov_end]`` grid with
 ``fill_value=0`` so that non-holiday timestamps are always zero.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name             | Type                                                                                    | Description                                                                                                                                         | Default    |
-|------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| data             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | Reference time series DataFrame used for temporal coverage validation inside :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`. | _required_ |
-| start            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start timestamp.  String values are parsed with ``utc=True``.                                                                                       | _required_ |
-| cov_end          | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end timestamp (should cover the full forecast horizon).  String values are parsed with ``utc=True``.                                      | _required_ |
-| forecast_horizon | [int](`int`)                                                                            | Number of forecast steps ahead; passed to :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`.                                    | _required_ |
-| tz               | [str](`str`)                                                                            | Timezone applied to the generated index and passed to :func:`create_holiday_df`.  Defaults to ``"UTC"``.                                            | `'UTC'`    |
-| freq             | [str](`str`)                                                                            | Pandas-compatible frequency string for the output index. Defaults to ``"h"`` (hourly).                                                              | `'h'`      |
-| country_code     | [str](`str`)                                                                            | ISO 3166-1 alpha-2 country code.  Defaults to ``"DE"`` (Germany).                                                                                   | `'DE'`     |
-| state            | [str](`str`)                                                                            | Sub-national state/region code.  Defaults to ``"NW"`` (North Rhine-Westphalia).                                                                     | `'NW'`     |
+| Name             | Type                                                                                    | Description                                                                                                    | Default    |
+|------------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|------------|
+| data             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | Reference time series DataFrame used for temporal coverage validation inside `curate_holidays()`.              | _required_ |
+| start            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start timestamp.  String values are parsed with ``utc=True``.                                                  | _required_ |
+| cov_end          | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end timestamp (should cover the full forecast horizon).  String values are parsed with ``utc=True``. | _required_ |
+| forecast_horizon | [int](`int`)                                                                            | Number of forecast steps ahead; passed to `curate_holidays()`.                                                 | _required_ |
+| tz               | [str](`str`)                                                                            | Timezone applied to the generated index and passed to `create_holiday_df()`.  Defaults to ``"UTC"``.           | `'UTC'`    |
+| freq             | [str](`str`)                                                                            | Pandas-compatible frequency string for the output index. Defaults to ``"h"`` (hourly).                         | `'h'`      |
+| country_code     | [str](`str`)                                                                            | ISO 3166-1 alpha-2 country code.  Defaults to ``"DE"`` (Germany).                                              | `'DE'`     |
+| state            | [str](`str`)                                                                            | Sub-national state/region code.  Defaults to ``"NW"`` (North Rhine-Westphalia).                                | `'NW'`     |
 
 ## Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                           | Description                                                |
-|--------|------------------------------------------------|------------------------------------------------------------|
-|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: DataFrame with a single integer column       |
-|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``is_holiday``.  The index is a tz-aware                   |
-|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | class:`~pandas.DatetimeIndex` with the requested ``freq``. |
+| Name   | Type                                           | Description                                          |
+|--------|------------------------------------------------|------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: DataFrame with a single integer column |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``is_holiday``.  The index is a tz-aware             |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | `DatetimeIndex` with the requested ``freq``.         |
 
 ## Examples {.doc-section .doc-section-examples}
 

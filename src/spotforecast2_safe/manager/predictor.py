@@ -6,9 +6,9 @@ Module for managing model predictions.
 
 Public helpers
 --------------
-- :func:`build_prediction_package` — assemble a standardized prediction dict
+- `build_prediction_package()` — assemble a standardized prediction dict
   from a fitted forecaster (in-sample fit + future forecast + metrics).
-- :func:`get_model_prediction` — load the latest persisted model and call its
+- `get_model_prediction()` — load the latest persisted model and call its
   ``package_prediction()`` method.
 """
 

@@ -29,7 +29,7 @@ def get_path_model(
         name: Model name (e.g. ``"lgbm"``, ``"xgb"``).
         iteration: Iteration of the model.
         model_dir: Directory where models are stored.
-            If *None*, defaults to :func:`get_cache_home`.
+            If *None*, defaults to `get_cache_home()`.
 
     Returns:
         Path: Full path where the model file should be stored.
@@ -61,7 +61,7 @@ def load_iteration(
         name: Model name (e.g. ``"lgbm"``).
         iteration: Iteration of the model.
         model_dir: Directory where models are stored.
-            If *None*, defaults to :func:`get_cache_home`.
+            If *None*, defaults to `get_cache_home()`.
 
     Returns:
         The loaded model instance, or *None* if the file does not exist.

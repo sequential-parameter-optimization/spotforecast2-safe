@@ -46,9 +46,9 @@ from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
 from spotforecast2_safe.forecaster.recursive import ForecasterEquivalentDate
 from spotforecast2_safe.forecaster.utils import predict_multivariate
 from spotforecast2_safe.manager.persistence import (
-    _load_forecasters,
-    _model_directory_exists,
-    _save_forecasters,
+    load_forecasters,
+    model_directory_exists,
+    save_forecasters,
 )
 from spotforecast2_safe.preprocessing.curate_data import (
     agg_and_resample_data,
@@ -244,10 +244,10 @@ def n2n_predict(
     targets_to_train = list(data.columns)
 
     # Attempt to load cached models if force_train=False
-    if not force_train and _model_directory_exists(model_dir):
+    if not force_train and model_directory_exists(model_dir):
         if verbose:
             print("  Attempting to load cached models...")
-        cached_forecasters, missing_targets = _load_forecasters(
+        cached_forecasters, missing_targets = load_forecasters(
             target_columns=list(data.columns),
             model_dir=model_dir,
             verbose=verbose,
@@ -293,7 +293,7 @@ def n2n_predict(
         # Save newly trained models to disk
         if verbose:
             print(f"  Saving {len(targets_to_train)} trained forecasters to disk...")
-        _save_forecasters(
+        save_forecasters(
             forecasters={t: baseline_forecasters[t] for t in targets_to_train},
             model_dir=model_dir,
             verbose=verbose,
