@@ -127,32 +127,34 @@ def input_to_frame(
         name if available, otherwise uses a default name based on input_name.
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.utils.data_transform import input_to_frame
-        >>>
-        >>> # Series with name
-        >>> y = pd.Series([1, 2, 3], name="sales")
-        >>> df = input_to_frame(y, input_name="y")
-        >>> df.columns.tolist()
-        ['sales']
-        >>>
-        >>> # Series without name (uses default)
-        >>> y_no_name = pd.Series([1, 2, 3])
-        >>> df = input_to_frame(y_no_name, input_name="y")
-        >>> df.columns.tolist()
-        ['y']
-        >>>
-        >>> # DataFrame (returned as-is)
-        >>> df_input = pd.DataFrame({"temp": [20, 21], "humidity": [50, 55]})
-        >>> df_output = input_to_frame(df_input, input_name="exog")
-        >>> df_output.columns.tolist()
-        ['temp', 'humidity']
-        >>>
-        >>> # Exog series without name
-        >>> exog = pd.Series([10, 20, 30])
-        >>> df_exog = input_to_frame(exog, input_name="exog")
-        >>> df_exog.columns.tolist()
-        ['exog']
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.data_transform import input_to_frame
+
+        # Series with name
+        y = pd.Series([1, 2, 3], name="sales")
+        df = input_to_frame(y, input_name="y")
+        print(df.columns.tolist())
+        assert df.columns.tolist() == ["sales"]
+
+        # Series without name (uses default)
+        y_no_name = pd.Series([1, 2, 3])
+        df = input_to_frame(y_no_name, input_name="y")
+        print(df.columns.tolist())
+        assert df.columns.tolist() == ["y"]
+
+        # DataFrame (returned as-is)
+        df_input = pd.DataFrame({"temp": [20, 21], "humidity": [50, 55]})
+        df_output = input_to_frame(df_input, input_name="exog")
+        print(df_output.columns.tolist())
+        assert df_output.columns.tolist() == ["temp", "humidity"]
+
+        # Exog series without name
+        exog = pd.Series([10, 20, 30])
+        df_exog = input_to_frame(exog, input_name="exog")
+        print(df_exog.columns.tolist())
+        assert df_exog.columns.tolist() == ["exog"]
+        ```
     """
     output_col_name = {"y": "y", "last_window": "y", "exog": "exog"}
 
@@ -185,32 +187,34 @@ def expand_index(index: Union[pd.Index, None], steps: int) -> pd.Index:
             nor RangeIndex.
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.utils.data_transform import expand_index
-        >>>
-        >>> # DatetimeIndex
-        >>> dates = pd.date_range("2023-01-01", periods=5, freq="D")
-        >>> new_index = expand_index(dates, 3)
-        >>> new_index
-        DatetimeIndex(['2023-01-06', '2023-01-07', '2023-01-08'], dtype='datetime64[ns]', freq='D')
-        >>>
-        >>> # RangeIndex
-        >>> range_idx = pd.RangeIndex(start=0, stop=10)
-        >>> new_index = expand_index(range_idx, 5)
-        >>> new_index
-        RangeIndex(start=10, stop=15, step=1)
-        >>>
-        >>> # None index (creates new RangeIndex)
-        >>> new_index = expand_index(None, 3)
-        >>> new_index
-        RangeIndex(start=0, stop=3, step=1)
-        >>>
-        >>> # Invalid: steps not an integer
-        >>> try:
-        ...     expand_index(dates, 3.5)
-        ... except TypeError as e:
-        ...     print("Error: steps must be an integer")
-        Error: steps must be an integer
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.data_transform import expand_index
+
+        # DatetimeIndex
+        dates = pd.date_range("2023-01-01", periods=5, freq="D")
+        new_index = expand_index(dates, 3)
+        print(new_index)
+        assert len(new_index) == 3
+        assert str(new_index[0].date()) == "2023-01-06"
+
+        # RangeIndex
+        range_idx = pd.RangeIndex(start=0, stop=10)
+        new_index = expand_index(range_idx, 5)
+        print(new_index)
+        assert new_index.equals(pd.RangeIndex(start=10, stop=15, step=1))
+
+        # None index (creates new RangeIndex)
+        new_index = expand_index(None, 3)
+        print(new_index)
+        assert new_index.equals(pd.RangeIndex(start=0, stop=3, step=1))
+
+        # Invalid: steps not an integer raises TypeError
+        try:
+            expand_index(dates, 3.5)
+        except TypeError as e:
+            print("Error: steps must be an integer")
+        ```
     """
     if not isinstance(steps, (int, np.integer)):
         raise TypeError(f"`steps` must be an integer. Got {type(steps)}.")
