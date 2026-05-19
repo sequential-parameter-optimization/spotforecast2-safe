@@ -34,22 +34,31 @@ class WeightFunction:
         weights_series: Series containing weight values for each index.
 
     Examples:
-        >>> import pandas as pd
-        >>> import pickle
-        >>> weights = pd.Series([1.0, 0.9, 0.8], index=[0, 1, 2])
-        >>> weight_func = WeightFunction(weights)
-        >>> weight_func(pd.Index([0, 1]))
-        array([1. , 0.9])
-        >>> # Returns None when all weights in the window are zero
-        >>> zero_weights = pd.Series([0.0, 0.0, 0.0], index=[0, 1, 2])
-        >>> wf_zero = WeightFunction(zero_weights)
-        >>> wf_zero(pd.Index([0, 1])) is None
-        True
-        >>> # Can be pickled
-        >>> pickled = pickle.dumps(weight_func)
-        >>> unpickled = pickle.loads(pickled)
-        >>> unpickled(pd.Index([0, 1]))
-        array([1. , 0.9])
+        ```{python}
+        import pickle
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.imputation import WeightFunction
+
+        weights = pd.Series([1.0, 0.9, 0.8], index=[0, 1, 2])
+        weight_func = WeightFunction(weights)
+
+        # Callable interface: returns weights for a pd.Index
+        result = weight_func(pd.Index([0, 1]))
+        print(result)
+        assert np.allclose(result, [1.0, 0.9])
+
+        # Returns None when all weights in the window are zero
+        zero_weights = pd.Series([0.0, 0.0, 0.0], index=[0, 1, 2])
+        wf_zero = WeightFunction(zero_weights)
+        assert wf_zero(pd.Index([0, 1])) is None
+
+        # Can be pickled and unpickled (no closure, fully serialisable)
+        unpickled = pickle.loads(pickle.dumps(weight_func))
+        result2 = unpickled(pd.Index([0, 1]))
+        print(result2)
+        assert np.allclose(result2, [1.0, 0.9])
+        ```
     """
 
     def __init__(self, weights_series: pd.Series):
@@ -80,17 +89,27 @@ class WeightFunction:
             weights is zero (degenerate window).
 
         Examples:
-            >>> import pandas as pd
-            >>> weights = pd.Series([1.0, 0.5, 0.0], index=[0, 1, 2])
-            >>> wf = WeightFunction(weights)
-            >>> wf(pd.Index([0, 1]))
-            array([1. , 0.5])
-            >>> # Scalar access always returns the stored weight (no None fallback)
-            >>> wf(2)
-            0.0
-            >>> # pd.Index with all-zero weights → None (ForecasterRecursive path)
-            >>> wf(pd.Index([2])) is None
-            True
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.imputation import WeightFunction
+
+            weights = pd.Series([1.0, 0.5, 0.0], index=[0, 1, 2])
+            wf = WeightFunction(weights)
+
+            # pd.Index lookup returns a numpy array of weights
+            result = wf(pd.Index([0, 1]))
+            print(result)
+            assert np.allclose(result, [1.0, 0.5])
+
+            # Scalar access returns the stored weight directly (no None fallback)
+            scalar = wf(2)
+            print(scalar)
+            assert scalar == 0.0
+
+            # pd.Index whose weights all sum to zero triggers the None path
+            assert wf(pd.Index([2])) is None
+            ```
         """
         result = custom_weights(index, self.weights_series)
         if isinstance(index, pd.Index) and np.sum(result) == 0:
@@ -121,13 +140,25 @@ def custom_weights(index, weights_series: pd.Series) -> float:
         float: The weight corresponding to the index.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> from spotforecast2_safe.preprocessing.imputation import custom_weights
-        >>> data = fetch_data()
-        >>> _, missing_weights = get_missing_weights(data, window_size=72, verbose=False)
-        >>> for idx in data.index[:5]:
-        ...     weight = custom_weights(idx, missing_weights)
-        ...     print(f"Index: {idx}, Weight: {weight}")
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.imputation import custom_weights
+
+        # Build a small synthetic weights Series with a DatetimeIndex
+        idx = pd.date_range("2024-01-01", periods=5, freq="h")
+        weights_series = pd.Series([1.0, 1.0, 0.0, 0.0, 1.0], index=idx)
+
+        # Single-index scalar lookup
+        w = custom_weights(idx[0], weights_series)
+        print(f"Index: {idx[0]}, Weight: {w}")
+        assert w == 1.0
+
+        # pd.Index slice lookup returns a numpy array
+        result = custom_weights(idx[:3], weights_series)
+        print(result)
+        assert np.allclose(result, [1.0, 1.0, 0.0])
+        ```
     """
     # do plausibility check
     if isinstance(index, pd.Index):
@@ -159,10 +190,29 @@ def get_missing_weights(
             A tuple containing the forward and backward filled DataFrame and a numeric series (0.0 or 1.0) where 0.0 indicates a weight for missing values/gaps.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> from spotforecast2_safe.preprocessing.imputation import get_missing_weights
-        >>> data = fetch_data()
-        >>> filled_data, missing_weights = get_missing_weights(data, window_size=72, verbose=True)
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.imputation import get_missing_weights
+
+        # Synthetic DataFrame with a deliberate two-row NaN gap at positions 3-4
+        idx = pd.date_range("2024-01-01", periods=10, freq="h")
+        values = [1.0, 2.0, 3.0, None, None, 6.0, 7.0, 8.0, 9.0, 10.0]
+        df = pd.DataFrame({"A": values}, index=idx)
+
+        filled, weights = get_missing_weights(df, window_size=3, verbose=True)
+
+        # No NaNs remain after forward/backward fill
+        assert filled.isnull().sum().sum() == 0
+
+        # Rows inside (and immediately after) the gap receive weight 0
+        gap_weights = weights.loc[idx[3:5]]
+        print(gap_weights.tolist())
+        assert (gap_weights == 0.0).all()
+
+        # Rows well before the gap retain weight 1
+        assert weights.loc[idx[0]] == 1.0
+        ```
 
     """
     # first perform some checks if dataframe has enough data and if window_size is appropriate
