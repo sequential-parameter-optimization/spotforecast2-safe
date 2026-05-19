@@ -1434,58 +1434,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="d8c1961c" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_data, get_package_data_home</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.outlier <span class="im">import</span> mark_outliers</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>path_demo <span class="op">=</span> get_package_data_home() <span class="op">/</span> <span class="st">"demo02.csv"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> fetch_data(filename<span class="op">=</span>path_demo)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data.head())</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>cleaned_data, outlier_labels <span class="op">=</span> mark_outliers(data, contamination<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>, verbose<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaned_data.head())</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(outlier_labels[:<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="59dcf287" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.outlier <span class="im">import</span> mark_outliers</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 50 normal values plus two clear outliers (1000, -1000)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.concatenate([rng.normal(loc<span class="op">=</span><span class="fl">10.0</span>, scale<span class="op">=</span><span class="fl">1.0</span>, size<span class="op">=</span><span class="dv">50</span>), [<span class="fl">1000.0</span>, <span class="op">-</span><span class="fl">1000.0</span>]])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">"load"</span>: values})</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>cleaned_data, outlier_labels <span class="op">=</span> mark_outliers(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    data, contamination<span class="op">=</span><span class="fl">0.05</span>, random_state<span class="op">=</span><span class="dv">42</span>, verbose<span class="op">=</span><span class="va">True</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>n_nan <span class="op">=</span> cleaned_data[<span class="st">"load"</span>].isna().<span class="bu">sum</span>()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Outliers marked as NaN: </span><span class="sc">{</span>n_nan<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> n_nan <span class="op">&gt;=</span> <span class="dv">2</span>, <span class="st">"Expected at least the two injected extreme outliers to be marked"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                                  A         B      C  D         E         F  \
-DateTime                                                                      
-1964-08-02 14:00:00+00:00  0.202969  8.255128  334.0  0  0.111049 -0.121741   
-1964-08-02 15:00:00+00:00  0.145975  7.542355  339.0  0 -0.003927  0.103541   
-1964-08-02 16:00:00+00:00  0.094389  8.174336  344.0  0  0.043963  0.041291   
-1964-08-02 17:00:00+00:00 -0.202353  7.387896  341.0  0  0.067118  0.072999   
-1964-08-02 18:00:00+00:00 -0.013810  7.581125  335.0  0 -0.138614 -0.006495   
-
-                                G         H  I   J    K  
-DateTime                                                 
-1964-08-02 14:00:00+00:00  1597.0  0.067896  0 NaN  0.0  
-1964-08-02 15:00:00+00:00  1609.0 -0.093175  0 NaN  0.0  
-1964-08-02 16:00:00+00:00  1660.0  0.047823  0 NaN  0.0  
-1964-08-02 17:00:00+00:00  1567.0 -0.051628  0 NaN  0.0  
-1964-08-02 18:00:00+00:00  1467.0  0.016003  0 NaN  0.0  
-Column 'A': Marked 9.9934% of data points as outliers.
-Column 'B': Marked 9.9997% of data points as outliers.
-Column 'C': Marked 9.9347% of data points as outliers.
-Column 'D': Marked 6.5549% of data points as outliers.
-Column 'E': Marked 9.9577% of data points as outliers.
-Column 'F': Marked 9.9787% of data points as outliers.
-Column 'G': Marked 9.9682% of data points as outliers.
-Column 'H': Marked 9.9840% of data points as outliers.
-Column 'I': Marked 9.9546% of data points as outliers.
-Column 'J': Marked 0.0000% of data points as outliers.
-Column 'K': Marked 9.9074% of data points as outliers.
-                                  A   B      C    D         E         F  \
-DateTime                                                                  
-1964-08-02 14:00:00+00:00  0.202969 NaN  334.0  0.0  0.111049 -0.121741   
-1964-08-02 15:00:00+00:00  0.145975 NaN  339.0  0.0 -0.003927  0.103541   
-1964-08-02 16:00:00+00:00  0.094389 NaN  344.0  0.0  0.043963  0.041291   
-1964-08-02 17:00:00+00:00       NaN NaN  341.0  0.0  0.067118  0.072999   
-1964-08-02 18:00:00+00:00 -0.013810 NaN  335.0  0.0 -0.138614 -0.006495   
-
-                                G         H    I   J    K  
-DateTime                                                   
-1964-08-02 14:00:00+00:00  1597.0  0.067896  0.0 NaN  0.0  
-1964-08-02 15:00:00+00:00  1609.0 -0.093175  0.0 NaN  0.0  
-1964-08-02 16:00:00+00:00  1660.0  0.047823  0.0 NaN  0.0  
-1964-08-02 17:00:00+00:00  1567.0 -0.051628  0.0 NaN  0.0  
-1964-08-02 18:00:00+00:00  1467.0  0.016003  0.0 NaN  0.0  
-[1 1 1 1 1 1 1 1 1 1]</code></pre>
+<pre><code>Column 'load': Marked 5.7692% of data points as outliers.
+Outliers marked as NaN: 3</code></pre>
 </div>
 </div>
 
