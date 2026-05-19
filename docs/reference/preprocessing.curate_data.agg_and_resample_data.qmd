@@ -11,7 +11,7 @@ preprocessing.curate_data.agg_and_resample_data(
 )
 ```
 
-Aggregates and resamples the data to (e.g.,hourly) frequency by computing the specified aggregation (e.g. for each hour).
+Aggregates and resamples the data to (e.g., hourly) frequency by computing the specified aggregation (e.g. for each hour).
 
 ## Parameters {.doc-section .doc-section-parameters}
 
@@ -38,13 +38,13 @@ Aggregates and resamples the data to (e.g.,hourly) frequency by computing the sp
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
->>> import pandas as pd
->>> date_rng = pd.date_range(start='2023-01-01', end='2023-01-02', freq='15min')
->>> data = pd.DataFrame(date_rng, columns=['date'])
->>> data.set_index('date', inplace=True)
->>> data['value'] = range(len(data))
->>> resampled_data = agg_and_resample_data(data, rule='h', by='mean')
->>> print(resampled_data.head())
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
+
+date_rng = pd.date_range(start="2023-01-01", end="2023-01-02", freq="15min")
+data = pd.DataFrame({"value": range(len(date_rng))}, index=date_rng)
+resampled_data = agg_and_resample_data(data, rule="h", by="mean")
+print(resampled_data.head())
+assert resampled_data.shape == (25, 1)
 ```
