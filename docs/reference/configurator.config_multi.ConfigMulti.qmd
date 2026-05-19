@@ -1,7 +1,7 @@
-# manager.configurator.config_multi.ConfigMulti { #spotforecast2_safe.manager.configurator.config_multi.ConfigMulti }
+# configurator.config_multi.ConfigMulti { #spotforecast2_safe.configurator.config_multi.ConfigMulti }
 
 ```python
-manager.configurator.config_multi.ConfigMulti(
+configurator.config_multi.ConfigMulti(
     country_code='DE',
     periods=None,
     lags_consider=None,
@@ -162,7 +162,7 @@ See `docs/PERIOD_CONFIGURATION_RATIONALE.md` for a detailed analysis.
 
 ```{python}
 import pandas as pd
-from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
 config = ConfigMulti()
 print(f"country_code: {config.country_code}")
 print(f"API_COUNTRY_CODE: {config.API_COUNTRY_CODE}")
@@ -219,13 +219,13 @@ print(f"First period name: {config.periods[0].name}")
 
 | Name | Description |
 | --- | --- |
-| [get_params](#spotforecast2_safe.manager.configurator.config_multi.ConfigMulti.get_params) | Get parameters for this configuration object. |
-| [set_params](#spotforecast2_safe.manager.configurator.config_multi.ConfigMulti.set_params) | Set the parameters of this configuration object. |
+| [get_params](#spotforecast2_safe.configurator.config_multi.ConfigMulti.get_params) | Get parameters for this configuration object. |
+| [set_params](#spotforecast2_safe.configurator.config_multi.ConfigMulti.set_params) | Set the parameters of this configuration object. |
 
-### get_params { #spotforecast2_safe.manager.configurator.config_multi.ConfigMulti.get_params }
+### get_params { #spotforecast2_safe.configurator.config_multi.ConfigMulti.get_params }
 
 ```python
-manager.configurator.config_multi.ConfigMulti.get_params(deep=True)
+configurator.config_multi.ConfigMulti.get_params(deep=True)
 ```
 
 Get parameters for this configuration object.
@@ -245,7 +245,7 @@ Get parameters for this configuration object.
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
 config = ConfigMulti(country_code="FR")
 p = config.get_params()
 print(f"country_code: {p['country_code']}")
@@ -260,10 +260,10 @@ print(f"bounds: {p['bounds']}")
 print(f"agg_weights: {p['agg_weights']}")
 ```
 
-### set_params { #spotforecast2_safe.manager.configurator.config_multi.ConfigMulti.set_params }
+### set_params { #spotforecast2_safe.configurator.config_multi.ConfigMulti.set_params }
 
 ```python
-manager.configurator.config_multi.ConfigMulti.set_params(params=None, **kwargs)
+configurator.config_multi.ConfigMulti.set_params(params=None, **kwargs)
 ```
 
 Set the parameters of this configuration object.
@@ -277,14 +277,14 @@ Set the parameters of this configuration object.
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name        | Type                                                                              | Description                                                                    |
-|-------------|-----------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| ConfigMulti | [ConfigMulti](`spotforecast2_safe.manager.configurator.config_multi.ConfigMulti`) | The configuration instance with updated parameters (supports method chaining). |
+| Name        | Type                                                                      | Description                                                                    |
+|-------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| ConfigMulti | [ConfigMulti](`spotforecast2_safe.configurator.config_multi.ConfigMulti`) | The configuration instance with updated parameters (supports method chaining). |
 
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
 config = ConfigMulti()
 _ = config.set_params(country_code="FR", predict_size=48)
 print(f"country_code: {config.country_code}")

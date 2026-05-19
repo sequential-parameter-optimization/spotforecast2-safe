@@ -154,7 +154,7 @@ class ConfigMulti:
     Examples:
         ```{python}
         import pandas as pd
-        from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
         config = ConfigMulti()
         print(f"country_code: {config.country_code}")
         print(f"API_COUNTRY_CODE: {config.API_COUNTRY_CODE}")
@@ -378,7 +378,7 @@ class ConfigMulti:
 
         Examples:
             ```{python}
-            from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+            from spotforecast2_safe.configurator.config_multi import ConfigMulti
             config = ConfigMulti(country_code="FR")
             p = config.get_params()
             print(f"country_code: {p['country_code']}")
@@ -478,7 +478,7 @@ class ConfigMulti:
 
         Examples:
             ```{python}
-            from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+            from spotforecast2_safe.configurator.config_multi import ConfigMulti
             config = ConfigMulti()
             _ = config.set_params(country_code="FR", predict_size=48)
             print(f"country_code: {config.country_code}")
