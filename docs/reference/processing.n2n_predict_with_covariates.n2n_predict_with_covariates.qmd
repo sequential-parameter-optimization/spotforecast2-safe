@@ -83,49 +83,43 @@ By default, models are retrained (force_train=True). Set force_train=False to re
 
 ## Examples {.doc-section .doc-section-examples}
 
-Basic usage with automatic model caching:
+```{python}
+import tempfile
 
-```python
->>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-...     forecast_horizon=24,
-...     verbose=True
-... )
->>> print(predictions.shape)
-(24, 11)
+from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+    n2n_predict_with_covariates,
+)
+
+predictions, metadata, forecasters = n2n_predict_with_covariates(
+    forecast_horizon=2,
+    lags=4,
+    window_size=8,
+    force_train=True,
+    model_dir=tempfile.mkdtemp(),
+    verbose=False,
+)
+print(predictions.shape)
 ```
 
-Load cached models (if available):
+```{python}
+import tempfile
 
-```python
->>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-...     forecast_horizon=24,
-...     force_train=False,
-...     model_dir="./saved_models"
-... )
-```
+from spotforecast2_safe.processing.n2n_predict_with_covariates import (
+    n2n_predict_with_covariates,
+)
 
-Force retraining and update cache:
-
-```python
->>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-...     forecast_horizon=24,
-...     force_train=True,
-...     model_dir="./saved_models"
-... )
-```
-
-Custom location and features:
-
-```python
->>> predictions, metadata, forecasters = n2n_predict_with_covariates(
-...     forecast_horizon=48,
-...     latitude=52.5200,  # Berlin
-...     longitude=13.4050,
-...     lags=48,
-...     include_poly_features=True,
-...     force_train=False,
-...     verbose=True
-... )
+predictions, metadata, forecasters = n2n_predict_with_covariates(
+    forecast_horizon=3,
+    lags=4,
+    window_size=8,
+    latitude=52.5200,
+    longitude=13.4050,
+    force_train=True,
+    model_dir=tempfile.mkdtemp(),
+    verbose=False,
+)
+print(predictions.shape)
+print(metadata["forecast_horizon"])
 ```
 
 ## Notes {.doc-section .doc-section-notes}
