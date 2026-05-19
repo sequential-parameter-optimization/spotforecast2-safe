@@ -1,7 +1,7 @@
 import pandas as pd
 
 from spotforecast2_safe.data import Period
-from spotforecast2_safe.manager.configurator.config_entsoe import ConfigEntsoe
+from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 
 
 def test_config_entsoe_defaults():

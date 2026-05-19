@@ -53,38 +53,33 @@ class ConfigEntsoe:
         See `docs/PERIOD_CONFIGURATION_RATIONALE.md` for a detailed analysis.
 
     Examples:
-        >>> from spotforecast2_safe import Config
-        >>> import pandas as pd
-        >>>
-        >>> # Use default configuration
-        >>> config = Config()
-        >>> config.API_COUNTRY_CODE
-        'DE'
-        >>> config.predict_size
-        24
-        >>> config.random_state
-        314159
-        >>>
-        >>> # Create custom configuration
-        >>> custom_config = Config(
-        ...     api_country_code='FR',
-        ...     predict_size=48,
-        ...     random_state=42
-        ... )
-        >>> custom_config.API_COUNTRY_CODE
-        'FR'
-        >>> custom_config.predict_size
-        48
-        >>>
-        >>> # Verify training window
-        >>> config.train_size == pd.Timedelta(days=3 * 365)
-        True
-        >>>
-        >>> # Check default periods
-        >>> len(config.periods)
-        5
-        >>> config.periods[0].name
-        'daily'
+        ```{python}
+        import pandas as pd
+
+        from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
+
+        # Use default configuration
+        config = ConfigEntsoe()
+        print(config.API_COUNTRY_CODE)
+        print(config.predict_size)
+        print(config.random_state)
+
+        # Create custom configuration
+        custom_config = ConfigEntsoe(
+            api_country_code="FR",
+            predict_size=48,
+            random_state=42,
+        )
+        print(custom_config.API_COUNTRY_CODE)
+        print(custom_config.predict_size)
+
+        # Verify training window
+        assert config.train_size == pd.Timedelta(days=3 * 365)
+
+        # Check default periods
+        print(len(config.periods))
+        print(config.periods[0].name)
+        ```
     """
 
     def __init__(
@@ -160,13 +155,16 @@ class ConfigEntsoe:
             params: Dictionary of parameter names mapped to their values.
 
         Examples:
-            >>> from spotforecast2_safe.manager.configurator.config_entsoe import ConfigEntsoe
-            >>> config = ConfigEntsoe(api_country_code="FR")
-            >>> p = config.get_params()
-            >>> p["api_country_code"]
-            'FR'
-            >>> p["predict_size"]
-            24
+            ```{python}
+            from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
+
+            config = ConfigEntsoe(api_country_code="FR")
+            p = config.get_params()
+            print(p["api_country_code"])
+            print(p["predict_size"])
+            assert p["api_country_code"] == "FR"
+            assert p["predict_size"] == 24
+            ```
         """
         params = {
             "api_country_code": self.API_COUNTRY_CODE,
@@ -210,18 +208,24 @@ class ConfigEntsoe:
                 parameters (supports method chaining).
 
         Examples:
-            >>> from spotforecast2_safe.manager.configurator.config_entsoe import ConfigEntsoe
-            >>> config = ConfigEntsoe()
-            >>> _ = config.set_params(api_country_code="FR", predict_size=48)
-            >>> config.API_COUNTRY_CODE
-            'FR'
-            >>> config.predict_size
-            48
+            ```{python}
+            from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 
-            >>> # Deep parameter setting
-            >>> _ = config.set_params(periods__daily__n_periods=24)
-            >>> next(p.n_periods for p in config.periods if p.name == "daily")
-            24
+            config = ConfigEntsoe()
+
+            # Flat parameter setting
+            config.set_params(api_country_code="FR", predict_size=48)
+            print(config.API_COUNTRY_CODE)
+            print(config.predict_size)
+            assert config.API_COUNTRY_CODE == "FR"
+            assert config.predict_size == 48
+
+            # Deep parameter setting for nested Period objects
+            config.set_params(periods__daily__n_periods=24)
+            daily_n = next(p.n_periods for p in config.periods if p.name == "daily")
+            print(daily_n)
+            assert daily_n == 24
+            ```
         """
         # Merge params dict and kwargs
         all_params: Dict[str, object] = {}

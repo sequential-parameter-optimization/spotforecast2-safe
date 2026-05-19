@@ -17,7 +17,7 @@ import pandas as pd
 import pytest
 
 from spotforecast2_safe.data import Period
-from spotforecast2_safe.manager.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
 
 # ---------------------------------------------------------------------------
 # Helpers

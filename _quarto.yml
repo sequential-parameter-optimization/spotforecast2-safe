@@ -224,6 +224,13 @@ website:
               - text: "utils_common"
                 file: docs/reference/model_selection.utils_common.qmd
 
+          - section: "Configurator"
+            contents:
+              - text: "ConfigEntsoe"
+                file: docs/reference/configurator.config_entsoe.ConfigEntsoe.qmd
+              - text: "ConfigMulti"
+                file: docs/reference/configurator.config_multi.ConfigMulti.qmd
+
           - section: "Manager"
             contents:
               - text: "calculate_metrics"
@@ -232,10 +239,6 @@ website:
                 file: docs/reference/manager.predictor.build_prediction_package.qmd
               - text: "get_model_prediction"
                 file: docs/reference/manager.predictor.get_model_prediction.qmd
-              - text: "ConfigEntsoe"
-                file: docs/reference/manager.configurator.config_entsoe.ConfigEntsoe.qmd
-              - text: "ConfigMulti"
-                file: docs/reference/manager.configurator.config_multi.ConfigMulti.qmd
               - text: "logger"
                 file: docs/reference/manager.logger.qmd
               - text: "persistence"
@@ -529,6 +532,14 @@ quartodoc:
         - model_selection.utils_common
         - model_selection.validation
 
+    # ── Configurator ──────────────────────────────────────────────────────────
+    - title: "Configurator"
+      desc: |
+        Task-level configuration objects for the forecasting pipelines.
+      contents:
+        - configurator.config_entsoe.ConfigEntsoe
+        - configurator.config_multi.ConfigMulti
+
     # ── Manager ───────────────────────────────────────────────────────────────
     - title: "Manager"
       desc: |
@@ -540,8 +551,6 @@ quartodoc:
         - manager.trainer.load_iteration
         - manager.predictor.build_prediction_package
         - manager.predictor.get_model_prediction
-        - manager.configurator.config_entsoe.ConfigEntsoe
-        - manager.configurator.config_multi.ConfigMulti
         - manager.logger
         - manager.persistence
         - manager.tools
