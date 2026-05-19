@@ -19,12 +19,12 @@ from spotforecast2_safe.forecaster.utils import (
     get_style_repr_html,
 )
 from spotforecast2_safe.preprocessing import QuantileBinner
-from spotforecast2_safe.utils import (
+from spotforecast2_safe.preprocessing.checking import (
     check_interval,
     check_predict_input,
     check_y,
-    expand_index,
 )
+from spotforecast2_safe.utils import expand_index
 
 from ._warnings import ResidualsUsageWarning
 

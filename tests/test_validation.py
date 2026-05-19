@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 from spotforecast2_safe.exceptions import DataTypeWarning, MissingValuesWarning
-from spotforecast2_safe.utils.validation import (  # MissingValuesWarning, # Imported locally in function if needed, or from exceptions; DataTypeWarning, # Imported locally or from exceptions
+from spotforecast2_safe.preprocessing.checking import (  # MissingValuesWarning, # Imported locally in function if needed, or from exceptions; DataTypeWarning, # Imported locally or from exceptions
     check_exog,
     check_exog_dtypes,
     check_interval,

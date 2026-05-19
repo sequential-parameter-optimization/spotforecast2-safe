@@ -30,21 +30,23 @@ from spotforecast2_safe.forecaster.utils import (
     transform_numpy,
 )
 from spotforecast2_safe.preprocessing import QuantileBinner, TimeSeriesDifferentiator
-from spotforecast2_safe.utils import (
+from spotforecast2_safe.preprocessing.checking import (
     check_exog,
     check_exog_dtypes,
     check_interval,
     check_predict_input,
     check_residuals_input,
-    check_select_fit_kwargs,
     check_y,
+    get_exog_dtypes,
+    set_cpu_gpu_device,
+)
+from spotforecast2_safe.utils import (
+    check_select_fit_kwargs,
     date_to_index_position,
     expand_index,
-    get_exog_dtypes,
     initialize_lags,
     initialize_weights,
     input_to_frame,
-    set_cpu_gpu_device,
     transform_dataframe,
 )
 
