@@ -1,3 +1,14 @@
+## [12.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v11.0.0...v12.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* move utils/data_transform + utils/forecaster_config into preprocessing/
+
+### Code Refactoring
+
+* move utils/data_transform + utils/forecaster_config into preprocessing/ ([8276463](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/82764636010823b5c88bb40730a9d0f61a2b953f))
+
 ## [11.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v10.0.0...v11.0.0) (2026-05-19)
 
 
