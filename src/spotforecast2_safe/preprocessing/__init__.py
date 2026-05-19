@@ -3,7 +3,7 @@
 
 from ._binner import QuantileBinner
 from ._differentiator import TimeSeriesDifferentiator
-from ._rolling import RollingFeatures
+from .rolling import RollingFeatures
 from .curate_data import (
     agg_and_resample_data,
     basic_ts_checks,

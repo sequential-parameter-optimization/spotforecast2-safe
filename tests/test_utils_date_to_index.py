@@ -4,7 +4,7 @@
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.utils import date_to_index_position
+from spotforecast2_safe.preprocessing.data_transform import date_to_index_position
 
 
 def test_date_to_index_position_prediction():
