@@ -1,3 +1,16 @@
+## [7.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.1...v7.0.2) (2026-05-19)
+
+
+### Documentation
+
+* **processing:** convert n2n_predict_with_covariates Examples to {python} cells ([175de2e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/175de2effbe2a8763b50601e07382e80fc73b1a4))
+* **tasks:** embed runnable n_to_1_with_covariates example in task page ([e9f1e81](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e9f1e815860bc53b644d63110310beb0023cee24))
+
+
+### Code Refactoring
+
+* **processing:** remove backward-compat underscore aliases from n2n_predict_with_covariates ([86b92c5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/86b92c527a98cf93099027bc87e9e005859c0e07))
+
 ## [7.0.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.1...v7.0.2-rc.1) (2026-05-19)
 
 
