@@ -23,7 +23,6 @@ from .imputation import (
 from .linearly_interpolate_ts import LinearlyInterpolateTS
 from .outlier import get_outliers, manual_outlier_removal, mark_outliers
 from .repeating_basis_function import RepeatingBasisFunction
-from .split import split_abs_train_val_test, split_rel_train_val_test
 
 # No recursive models here anymore
 
@@ -42,8 +41,6 @@ __all__ = [
     "custom_weights",
     "get_missing_weights",
     "WeightFunction",
-    "split_abs_train_val_test",
-    "split_rel_train_val_test",
     "TimeSeriesDifferentiator",
     "QuantileBinner",
     "RollingFeatures",

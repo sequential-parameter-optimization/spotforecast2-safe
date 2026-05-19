@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from spotforecast2_safe.model_selection import TimeSeriesFold
+from spotforecast2_safe.splitter import TimeSeriesFold
 
 
 def test_repr_example():

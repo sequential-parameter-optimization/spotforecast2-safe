@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.preprocessing.split import (
+from spotforecast2_safe.splitter.split import (
     split_abs_train_val_test,
     split_rel_train_val_test,
 )

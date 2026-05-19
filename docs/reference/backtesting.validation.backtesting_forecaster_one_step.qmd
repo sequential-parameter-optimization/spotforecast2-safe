@@ -1,7 +1,7 @@
-# model_selection.validation.backtesting_forecaster_one_step { #spotforecast2_safe.model_selection.validation.backtesting_forecaster_one_step }
+# backtesting.validation.backtesting_forecaster_one_step { #spotforecast2_safe.backtesting.validation.backtesting_forecaster_one_step }
 
 ```python
-model_selection.validation.backtesting_forecaster_one_step(
+backtesting.validation.backtesting_forecaster_one_step(
     forecaster,
     y,
     cv,
@@ -29,7 +29,7 @@ Backtesting of forecaster model using one-step-ahead predictions.
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|-------------------|
 | forecaster              | ([ForecasterRecursive](`ForecasterRecursive`), [ForecasterDirect](`ForecasterDirect`), [ForecasterEquivalentDate](`ForecasterEquivalentDate`)) | Forecaster model.                                                                 | _required_        |
 | y                       | [pd](`pandas`).[Series](`pandas.Series`)                                                                                                       | Training time series.                                                             | _required_        |
-| cv                      | [OneStepAheadFold](`spotforecast2_safe.model_selection.split_one_step.OneStepAheadFold`)                                                       | OneStepAheadFold object with the information needed to split the data into folds. | _required_        |
+| cv                      | [OneStepAheadFold](`spotforecast2_safe.splitter.split_one_step.OneStepAheadFold`)                                                              | OneStepAheadFold object with the information needed to split the data into folds. | _required_        |
 | metric                  | [str](`str`) \| [Callable](`typing.Callable`) \| [list](`list`)                                                                                | Metric used to quantify the goodness of fit of the model.                         | _required_        |
 | exog                    | [pd](`pandas`).[Series](`pandas.Series`) \| [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                                     | Exogenous variable/s included as predictor/s. Defaults to None.                   | `None`            |
 | interval                | [float](`float`) \| [list](`list`) \| [tuple](`tuple`) \| [str](`str`) \| [object](`object`)                                                   | Specifies whether probabilistic predictions should be estimated.                  | `None`            |
@@ -60,37 +60,33 @@ Depending on the `interval` and `interval_method` parameters, it can also genera
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.forecaster import ForecasterRecursive
->>> from spotforecast2_safe.model_selection.split_one_step import OneStepAheadFold
->>> from spotforecast2_safe.model_selection.validation import backtesting_forecaster_one_step
->>> # Create a forecaster and a one-step-ahead fold
->>> import numpy as np
->>> import pandas as pd
->>> from sklearn.linear_model import LinearRegression
->>> y = pd.Series(np.random.randn(100), name='y')
->>> forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=5)
->>> cv = OneStepAheadFold(initial_train_size=20, window_size=5)
->>> # Perform backtesting
->>> metric_values, backtest_predictions = backtesting_forecaster_one_step(
-...     forecaster=forecaster,
-...     y=y,
-...     cv=cv,
-...     metric='mean_squared_error',
-...     exog=None,
-...     interval=0.95,
-...     interval_method='bootstrapping',
-...     n_boot=20,
-...     use_in_sample_residuals=True,
-...     use_binned_residuals=False,
-...     random_state=42,
-...     return_predictors=False,
-...     n_jobs=1,
-...     verbose=True,
-...     show_progress=True,
-...     suppress_warnings=False
-... )
-# Note: For reliable bootstrapping with binned residuals, use a sufficiently large series and value spread.
-# For random data, use_binned_residuals=False.
-# TODO: Setting return_predictors=True requires ForecasterRecursive.create_predict_X().
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+from spotforecast2_safe.backtesting.validation import backtesting_forecaster_one_step
+from spotforecast2_safe.forecaster import ForecasterRecursive
+from spotforecast2_safe.splitter.split_one_step import OneStepAheadFold
+
+rng = np.random.default_rng(0)
+y = pd.Series(rng.standard_normal(100), name="y")
+forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+cv = OneStepAheadFold(initial_train_size=50)
+
+metric_values, backtest_predictions = backtesting_forecaster_one_step(
+    forecaster=forecaster,
+    y=y,
+    cv=cv,
+    metric="mean_squared_error",
+    n_jobs=1,
+    verbose=False,
+    show_progress=False,
+    suppress_warnings=True,
+)
+print(metric_values)
+assert "mean_squared_error" in metric_values.columns
+assert backtest_predictions.shape[0] == 50
+assert "fold" in backtest_predictions.columns
+assert "pred" in backtest_predictions.columns
 ```

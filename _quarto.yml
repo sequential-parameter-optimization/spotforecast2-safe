@@ -150,12 +150,6 @@ website:
                     file: docs/reference/preprocessing.outlier.manual_outlier_removal.qmd
                   - text: "get_outliers"
                     file: docs/reference/preprocessing.outlier.get_outliers.qmd
-              - section: "Split"
-                contents:
-                  - text: "split_abs_train_val_test"
-                    file: docs/reference/preprocessing.split.split_abs_train_val_test.qmd
-                  - text: "split_rel_train_val_test"
-                    file: docs/reference/preprocessing.split.split_rel_train_val_test.qmd
 
           - section: "Processing"
             contents:
@@ -207,22 +201,29 @@ website:
                   - text: "symmetric_mean_absolute_percentage_error"
                     file: docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.qmd
 
-          - section: "Model Selection"
+          - section: "Splitter"
+            contents:
+              - text: "BaseFold"
+                file: docs/reference/splitter.split_base.qmd
+              - text: "OneStepAheadFold"
+                file: docs/reference/splitter.split_one_step.qmd
+              - text: "TimeSeriesFold"
+                file: docs/reference/splitter.split_ts_cv.qmd
+              - text: "split_abs_train_val_test"
+                file: docs/reference/splitter.split.split_abs_train_val_test.qmd
+              - text: "split_rel_train_val_test"
+                file: docs/reference/splitter.split.split_rel_train_val_test.qmd
+              - text: "utils_common"
+                file: docs/reference/splitter.utils_common.qmd
+
+          - section: "Backtesting"
             contents:
               - text: "backtesting_forecaster"
-                file: docs/reference/model_selection.validation.backtesting_forecaster.qmd
+                file: docs/reference/backtesting.validation.backtesting_forecaster.qmd
               - text: "backtesting_forecaster_one_step"
-                file: docs/reference/model_selection.validation.backtesting_forecaster_one_step.qmd
+                file: docs/reference/backtesting.validation.backtesting_forecaster_one_step.qmd
               - text: "validation"
-                file: docs/reference/model_selection.validation.qmd
-              - text: "BaseFold"
-                file: docs/reference/model_selection.split_base.qmd
-              - text: "OneStepAheadFold"
-                file: docs/reference/model_selection.split_one_step.qmd
-              - text: "TimeSeriesFold"
-                file: docs/reference/model_selection.split_ts_cv.qmd
-              - text: "utils_common"
-                file: docs/reference/model_selection.utils_common.qmd
+                file: docs/reference/backtesting.validation.qmd
 
           - section: "Configurator"
             contents:
@@ -478,8 +479,6 @@ quartodoc:
         - preprocessing.outlier.get_outliers
         - preprocessing.outlier.manual_outlier_removal
         - preprocessing.outlier.mark_outliers
-        - preprocessing.split.split_abs_train_val_test
-        - preprocessing.split.split_rel_train_val_test
         - preprocessing.exog_builder.ExogBuilder
         - preprocessing.imputation.apply_imputation
         - preprocessing.imputation.WeightFunction
@@ -519,18 +518,27 @@ quartodoc:
         - forecaster.wrappers.lgbm
         - forecaster.wrappers.xgb
 
-    # ── Model Selection ───────────────────────────────────────────────────────
-    - title: "Model Selection"
+    # ── Splitter ──────────────────────────────────────────────────────────────
+    - title: "Splitter"
       desc: |
-        Backtesting and cross-validation utilities for time series models.
+        Time-series-aware cross-validation folds and train/val/test holdout
+        helpers.
       contents:
-        - model_selection.validation.backtesting_forecaster
-        - model_selection.validation.backtesting_forecaster_one_step
-        - model_selection.split_base
-        - model_selection.split_one_step
-        - model_selection.split_ts_cv
-        - model_selection.utils_common
-        - model_selection.validation
+        - splitter.split_base
+        - splitter.split_one_step
+        - splitter.split_ts_cv
+        - splitter.split.split_abs_train_val_test
+        - splitter.split.split_rel_train_val_test
+        - splitter.utils_common
+
+    # ── Backtesting ───────────────────────────────────────────────────────────
+    - title: "Backtesting"
+      desc: |
+        Backtesting orchestration for time series forecasters.
+      contents:
+        - backtesting.validation.backtesting_forecaster
+        - backtesting.validation.backtesting_forecaster_one_step
+        - backtesting.validation
 
     # ── Configurator ──────────────────────────────────────────────────────────
     - title: "Configurator"

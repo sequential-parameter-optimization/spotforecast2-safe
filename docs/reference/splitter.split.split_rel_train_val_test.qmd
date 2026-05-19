@@ -1,7 +1,7 @@
-# preprocessing.split.split_rel_train_val_test { #spotforecast2_safe.preprocessing.split.split_rel_train_val_test }
+# splitter.split.split_rel_train_val_test { #spotforecast2_safe.splitter.split.split_rel_train_val_test }
 
 ```python
-preprocessing.split.split_rel_train_val_test(
+splitter.split.split_rel_train_val_test(
     data,
     perc_train,
     perc_val,
@@ -31,14 +31,24 @@ Sizes are rounded to ensure the splits sum to the full dataset size.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data.fetch_data import fetch_data
->>> from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
->>> data = fetch_data()
->>> data_train, data_val, data_test = split_rel_train_val_test(
-...     data,
-...     perc_train=0.7,
-...     perc_val=0.2,
-...     verbose=True
-... )
+```{python}
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.splitter.split import split_rel_train_val_test
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2022-01-01", periods=100, freq="D")
+data = pd.DataFrame({"value": rng.standard_normal(100)}, index=idx)
+
+data_train, data_val, data_test = split_rel_train_val_test(
+    data,
+    perc_train=0.7,
+    perc_val=0.2,
+    verbose=True,
+)
+assert len(data_train) == 70
+assert len(data_val) == 20
+assert len(data_test) == 10
+print(f"Train: {len(data_train)}, Val: {len(data_val)}, Test: {len(data_test)}")
 ```
