@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>data.fetch_data.load_timeseries_forecast – spotforecast2-safe</title>
+<title>preprocessing.rolling.rollingfeatures – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -305,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html">load_timeseries_forecast</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.html">Preprocessing</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.rolling.RollingFeatures.html">RollingFeatures</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -346,13 +346,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/data.data.html" class="sidebar-item-text sidebar-link">
@@ -403,7 +403,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">load_timeseries_forecast</span></a>
   </div>
 </li>
@@ -423,13 +423,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
  <span class="menu-text">Preprocessing</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/preprocessing.html" class="sidebar-item-text sidebar-link">
@@ -456,7 +456,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/preprocessing.rolling.RollingFeatures.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/reference/preprocessing.rolling.RollingFeatures.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">RollingFeatures</span></a>
   </div>
 </li>
@@ -1356,19 +1356,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#note" id="toc-note" class="nav-link" data-scroll-target="#note">Note</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.fit" id="toc-spotforecast2_safe.preprocessing.rolling.RollingFeatures.fit" class="nav-link" data-scroll-target="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.fit">fit</a></li>
+  <li><a href="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform" id="toc-spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform" class="nav-link" data-scroll-target="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform">transform</a></li>
+  <li><a href="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform_batch" id="toc-spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform_batch" class="nav-link" data-scroll-target="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform_batch">transform_batch</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.fetch_data.load_timeseries_forecast.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/preprocessing.rolling.RollingFeatures.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html">load_timeseries_forecast</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.html">Preprocessing</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.rolling.RollingFeatures.html">RollingFeatures</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">data.fetch_data.load_timeseries_forecast</h1>
+<h1 class="title">preprocessing.rolling.RollingFeatures</h1>
 </div>
 
 
@@ -1385,9 +1391,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.load_timeseries_forecast(data_home<span class="op">=</span><span class="va">None</span>, on_missing<span class="op">=</span><span class="st">'raise'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Load the day-ahead forecast time series from <code>interim/energy_load.csv</code>.</p>
-<p>Reads the <code>Forecasted Load</code> column and converts the index to a UTC <code>DatetimeIndex</code> with hourly frequency. Missing values are <strong>rejected</strong> by default so callers cannot accidentally feed imputed values into downstream safety-critical pipelines. Pass <code>on_missing='ffill_bfill'</code> to opt into the legacy forward/backward fill behavior that was the default before the 1.0 major release.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.rolling.RollingFeatures(stats, window_sizes, features_names<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compute rolling window statistics over time series data.</p>
+<p>This transformer computes rolling statistics (mean, std, min, max, sum, median) over windows of specified sizes from a time series. The class follows the scikit-learn transformer API with fit() and transform() methods, making it compatible with scikit-learn pipelines. It also provides transform_batch() for pandas Series input.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1401,23 +1407,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>data_home</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]]</td>
-<td>Root data directory. If None, resolved via <code>get_data_home()</code>.</td>
+<td>stats</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Rolling statistics to compute. Can be a single string (‘mean’, ‘std’, ‘min’, ‘max’, ‘sum’, ‘median’), list of statistic names, or list of callable functions. Multiple statistics can be computed simultaneously.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>window_sizes</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | <a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]</td>
+<td>Window size(s) for rolling computation. Can be a single integer or list of integers. Multiple windows are applied to all statistics.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>features_names</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</td>
+<td>Custom names for output features. If None, names are auto-generated from statistic names and window sizes (e.g., ‘roll_mean_7’, ‘roll_std_14’). Defaults to None.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
-<td>on_missing</td>
-<td><code>OnMissing</code></td>
-<td>How to handle NaN rows in <code>Forecasted Load</code>. <code>'raise'</code> (default) fails fast with the gap timestamps; <code>'ffill_bfill'</code> forward- then back-fills.</td>
-<td><code>'raise'</code></td>
-</tr>
 </tbody>
 </table>
 </section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
+<section id="attributes" class="level2 doc-section doc-section-attributes">
+<h2 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 9%">
+<col style="width: 71%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -1427,85 +1444,353 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td>stats</td>
 <td></td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
-<td>pd.Series: Hourly forecasted-load series indexed by UTC timestamps.</td>
+<td>Statistics specification as provided during initialization.</td>
+</tr>
+<tr class="even">
+<td>window_sizes</td>
+<td></td>
+<td>List of window sizes for rolling computation.</td>
+</tr>
+<tr class="odd">
+<td>features_names</td>
+<td></td>
+<td>List of output feature names.</td>
+</tr>
+<tr class="even">
+<td>stats_funcs</td>
+<td></td>
+<td>List of compiled/numba-optimized statistical functions.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="raises" class="level2 doc-section doc-section-raises">
-<h2 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError">FileNotFoundError</a></td>
-<td>If <code>interim/energy_load.csv</code> does not exist.</td>
-</tr>
-<tr class="even">
-<td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#KeyError">KeyError</a></td>
-<td>If <code>Forecasted Load</code> column is not present.</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
-<td>If <code>on_missing='raise'</code> and the series has NaNs.</td>
-</tr>
-</tbody>
-</table>
+<section id="note" class="level2 doc-section doc-section-note">
+<h2 class="doc-section doc-section-note anchored" data-anchor-id="note">Note</h2>
+<ul>
+<li>Output contains NaN values for positions where the rolling window cannot be fully computed (first window_size-1 positions).</li>
+<li>Statistics are computed using numba-optimized JIT functions for performance.</li>
+<li>The transformer returns numpy arrays from transform() and pandas DataFrames from transform_batch() to maintain index alignment.</li>
+<li>Supports custom user-defined functions in the stats parameter.</li>
+</ul>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="9db61962" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> (</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    get_package_data_home,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    load_timeseries_forecast,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> tempfile.mkdtemp()</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"SPOTFORECAST2_DATA"</span>] <span class="op">=</span> tmp</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>interim <span class="op">=</span> os.path.join(tmp, <span class="st">"interim"</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>os.makedirs(interim, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>demo <span class="op">=</span> get_package_data_home() <span class="op">/</span> <span class="st">"demo01.csv"</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(demo).rename(</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Time"</span>: <span class="st">"Time (UTC)"</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Actual"</span>: <span class="st">"Actual Load"</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Forecast"</span>: <span class="st">"Forecasted Load"</span>,</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>df.to_csv(os.path.join(interim, <span class="st">"energy_load.csv"</span>), index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># demo01.csv has gaps on Jan 1 of each year, so we opt into the</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># legacy ffill/bfill behavior here.  Production callers should</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># leave on_missing='raise' (the default) and surface the gaps.</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>y_f <span class="op">=</span> load_timeseries_forecast(on_missing<span class="op">=</span><span class="st">"ffill_bfill"</span>)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">isinstance</span>(y_f, pd.Series))</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>shutil.rmtree(tmp)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> os.environ[<span class="st">"SPOTFORECAST2_DATA"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="5a2aabb8" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Single statistic and window size — transform() returns the last</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># window's statistic as a 1D array of shape (n_features,).</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.arange(<span class="dv">10</span>, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> rf.fit(y).transform(y)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"transform output:"</span>, features)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> features.shape <span class="op">==</span> (<span class="dv">1</span>,)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean of last window [7, 8, 9] = 8.0</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">float</span>(features[<span class="dv">0</span>]) <span class="op">==</span> <span class="fl">8.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>True</code></pre>
+<pre><code>transform output: [8.]</code></pre>
+</div>
+</div>
+<div id="728b1c92" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statistics and window sizes — feature names are</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># auto-generated as roll_&lt;stat&gt;_&lt;window&gt;.</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.arange(<span class="dv">10</span>, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    stats<span class="op">=</span>[<span class="st">'mean'</span>, <span class="st">'std'</span>, <span class="st">'min'</span>, <span class="st">'max'</span>],</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    window_sizes<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">5</span>],</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>rf.fit(y)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"features_names:"</span>, rf.features_names)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> rf.features_names <span class="op">==</span> [</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'roll_mean_3'</span>, <span class="st">'roll_std_3'</span>, <span class="st">'roll_min_3'</span>, <span class="st">'roll_max_3'</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'roll_mean_5'</span>, <span class="st">'roll_std_5'</span>, <span class="st">'roll_min_5'</span>, <span class="st">'roll_max_5'</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>features_names: ['roll_mean_3', 'roll_std_3', 'roll_min_3', 'roll_max_3', 'roll_mean_5', 'roll_std_5', 'roll_min_5', 'roll_max_5']</code></pre>
+</div>
+</div>
+<div id="72ec6221" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use transform_batch() with a pandas Series to preserve the index.</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">'2024-01-01'</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">'D'</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>y_series <span class="op">=</span> pd.Series(np.arange(<span class="dv">10</span>, dtype<span class="op">=</span><span class="bu">float</span>), index<span class="op">=</span>dates)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(stats<span class="op">=</span>[<span class="st">'mean'</span>, <span class="st">'max'</span>], window_sizes<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>features_df <span class="op">=</span> rf.transform_batch(y_series)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(features_df.head())</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> features_df.shape <span class="op">==</span> (<span class="dv">10</span>, <span class="dv">2</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> features_df.index.equals(y_series.index)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            roll_mean_5  roll_max_5
+2024-01-01          NaN         NaN
+2024-01-02          NaN         NaN
+2024-01-03          NaN         NaN
+2024-01-04          NaN         NaN
+2024-01-05          2.0         4.0</code></pre>
+</div>
+</div>
+<div id="4c5364c1" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom feature names override the auto-generated ones.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    stats<span class="op">=</span><span class="st">'mean'</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    window_sizes<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>],</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    features_names<span class="op">=</span>[<span class="st">'ma_3'</span>, <span class="st">'ma_5'</span>, <span class="st">'ma_7'</span>],</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>rf.fit(np.arange(<span class="dv">10</span>, dtype<span class="op">=</span><span class="bu">float</span>))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"features_names:"</span>, rf.features_names)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> rf.features_names <span class="op">==</span> [<span class="st">'ma_3'</span>, <span class="st">'ma_5'</span>, <span class="st">'ma_7'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>features_names: ['ma_3', 'ma_5', 'ma_7']</code></pre>
+</div>
+</div>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.fit">fit</a></td>
+<td>Fit the rolling features transformer (no-op).</td>
+</tr>
+<tr class="even">
+<td><a href="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform">transform</a></td>
+<td>Compute rolling window statistics from time series data.</td>
+</tr>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform_batch">transform_batch</a></td>
+<td>Compute rolling features from a pandas Series with index preservation.</td>
+</tr>
+</tbody>
+</table>
+<section id="spotforecast2_safe.preprocessing.rolling.RollingFeatures.fit" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.rolling.RollingFeatures.fit">fit</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>preprocessing.rolling.RollingFeatures.fit(X, y<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Fit the rolling features transformer (no-op).</p>
+<p>This transformer does not learn any parameters from the data. Method exists for scikit-learn compatibility.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></td>
+<td>Time series data (not used for fitting).</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>y</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></td>
+<td>Target values (ignored). Defaults to None.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>self</td>
+<td><a href="../../docs/reference/preprocessing.rolling.RollingFeatures.html#spotforecast2_safe.preprocessing.rolling.RollingFeatures">RollingFeatures</a></td>
+<td>Returns the fitted transformer.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div id="2ac152a0" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.arange(<span class="dv">10</span>, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> rf.fit(y)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="kw">is</span> rf, <span class="st">"fit() must return self"</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> result.transform(y)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"fit() returns self:"</span>, result <span class="kw">is</span> rf)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"transform output:"</span>, features)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>fit() returns self: True
+transform output: [8.]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform">transform</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>preprocessing.rolling.RollingFeatures.transform(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compute rolling window statistics from time series data.</p>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X</td>
+<td><a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></td>
+<td>Time series data as 1D or 2D numpy array.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></td>
+<td>np.ndarray: Array of rolling statistics. - If X is 1D: shape (n_features,) — statistics over the last window of the series. - If X is 2D: shape (X.shape[1], n_features) — used for vectorized bootstrap.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-2" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div id="3c12c13e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1D input: returns a 1D array of shape (n_features,) with</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># the statistic computed over the last window of the series.</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.arange(<span class="dv">10</span>, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(stats<span class="op">=</span><span class="st">'mean'</span>, window_sizes<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> rf.transform(y)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"transform output:"</span>, out, <span class="st">"shape:"</span>, out.shape)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean of last window [7, 8, 9] = 8.0</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> out.shape <span class="op">==</span> (<span class="dv">1</span>,)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">float</span>(out[<span class="dv">0</span>]) <span class="op">==</span> <span class="fl">8.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>transform output: [8.] shape: (1,)</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform_batch" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.rolling.RollingFeatures.transform_batch">transform_batch</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>preprocessing.rolling.RollingFeatures.transform_batch(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compute rolling features from a pandas Series with index preservation.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
+<td>Time series data as a pandas Series with a datetime index.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
+<td>pd.DataFrame: DataFrame of rolling statistics with the same index as X and one column per (window_size, statistic) combination.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-3" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<div id="966bf454" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.rolling <span class="im">import</span> RollingFeatures</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    np.arange(<span class="dv">20</span>, dtype<span class="op">=</span><span class="bu">float</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>pd.date_range(<span class="st">"2024-01-01"</span>, periods<span class="op">=</span><span class="dv">20</span>, freq<span class="op">=</span><span class="st">"D"</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RollingFeatures(stats<span class="op">=</span>[<span class="st">'mean'</span>, <span class="st">'std'</span>], window_sizes<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">5</span>])</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> rf.transform_batch(y)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> df.shape <span class="op">==</span> (<span class="dv">20</span>, <span class="dv">4</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">list</span>(df.columns) <span class="op">==</span> [</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'roll_mean_3'</span>, <span class="st">'roll_std_3'</span>, <span class="st">'roll_mean_5'</span>, <span class="st">'roll_std_5'</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> df.index.equals(y.index)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            roll_mean_3  roll_std_3  roll_mean_5  roll_std_5
+2024-01-01          NaN         NaN          NaN         NaN
+2024-01-02          NaN         NaN          NaN         NaN
+2024-01-03          1.0    0.816497          NaN         NaN
+2024-01-04          2.0    0.816497          NaN         NaN
+2024-01-05          3.0    0.816497          2.0    1.414214</code></pre>
 </div>
 </div>
 
 
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -1936,7 +2221,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.fetch_data.load_timeseries_forecast.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/preprocessing.rolling.RollingFeatures.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
