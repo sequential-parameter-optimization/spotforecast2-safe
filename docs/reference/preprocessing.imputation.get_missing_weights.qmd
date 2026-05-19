@@ -26,9 +26,26 @@ Return imputed DataFrame and a series indicating missing weights.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data.fetch_data import fetch_data
->>> from spotforecast2_safe.preprocessing.imputation import get_missing_weights
->>> data = fetch_data()
->>> filled_data, missing_weights = get_missing_weights(data, window_size=72, verbose=True)
+```{python}
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.preprocessing.imputation import get_missing_weights
+
+# Synthetic DataFrame with a deliberate two-row NaN gap at positions 3-4
+idx = pd.date_range("2024-01-01", periods=10, freq="h")
+values = [1.0, 2.0, 3.0, None, None, 6.0, 7.0, 8.0, 9.0, 10.0]
+df = pd.DataFrame({"A": values}, index=idx)
+
+filled, weights = get_missing_weights(df, window_size=3, verbose=True)
+
+# No NaNs remain after forward/backward fill
+assert filled.isnull().sum().sum() == 0
+
+# Rows inside (and immediately after) the gap receive weight 0
+gap_weights = weights.loc[idx[3:5]]
+print(gap_weights.tolist())
+assert (gap_weights == 0.0).all()
+
+# Rows well before the gap retain weight 1
+assert weights.loc[idx[0]] == 1.0
 ```
