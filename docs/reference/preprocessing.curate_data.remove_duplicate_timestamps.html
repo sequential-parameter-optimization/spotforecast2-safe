@@ -1401,7 +1401,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>agg</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a></td>
-<td>Aggregation applied when collapsing duplicate rows. Accepts any string recognised by :meth:<code>pandas.core.groupby.GroupBy.agg</code> (<code>"mean"</code>, <code>"median"</code>, <code>"min"</code>, <code>"max"</code>, <code>"sum"</code>, <code>"std"</code>, <code>"var"</code>, <code>"first"</code>, <code>"last"</code>) as well as <code>"mode"</code> (most frequent value per group) or any custom callable. Defaults to <code>"mean"</code>.</td>
+<td>Aggregation applied when collapsing duplicate rows. Accepts any string recognised by <code>pandas.core.groupby.GroupBy.agg()</code> (<code>"mean"</code>, <code>"median"</code>, <code>"min"</code>, <code>"max"</code>, <code>"sum"</code>, <code>"std"</code>, <code>"var"</code>, <code>"first"</code>, <code>"last"</code>) as well as <code>"mode"</code> (most frequent value per group) or any custom callable. Defaults to <code>"mean"</code>.</td>
 <td><code>'mean'</code></td>
 </tr>
 </tbody>
@@ -1453,7 +1453,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Mean-aggregate two data columns with the default time column:</p>
-<div id="f98eb082" class="cell" data-execution_count="1">
+<div id="83da4191" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> remove_duplicate_timestamps</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
@@ -1478,7 +1478,7 @@ Load B: 210.0</code></pre>
 </div>
 </div>
 <p>Median aggregation on a custom time column:</p>
-<div id="a89dcc15" class="cell" data-execution_count="2">
+<div id="294ea7a8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> remove_duplicate_timestamps</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.DataFrame(</span>

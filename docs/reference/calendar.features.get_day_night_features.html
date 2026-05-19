@@ -1375,7 +1375,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Create day/night features using astronomical sunrise and sunset times.</p>
-<p>Sunrise and sunset times are computed once per unique calendar date (using :func:<code>astral.sun.sun</code>) and then broadcast to all timestamps in the requested hourly grid, which avoids redundant computation for large date ranges.</p>
+<p>Sunrise and sunset times are computed once per unique calendar date (using <code>astral.sun.sun()</code>) and then broadcast to all timestamps in the requested hourly grid, which avoids redundant computation for large date ranges.</p>
 <p>The returned DataFrame contains four columns:</p>
 <ul>
 <li><code>sunrise_hour</code> — rounded sunrise hour (0–23).</li>
@@ -1410,7 +1410,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>location</td>
 <td><code>LocationInfo</code></td>
-<td>:class:<code>~astral.LocationInfo</code> instance describing the geographic location (latitude, longitude, timezone).</td>
+<td><code>LocationInfo</code> instance describing the geographic location (latitude, longitude, timezone).</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
@@ -1452,7 +1452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>is a tz-aware :class:<code>~pandas.DatetimeIndex</code> with the requested</td>
+<td>is a tz-aware <code>DatetimeIndex</code> with the requested</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -1464,7 +1464,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="fbf39df0" class="cell" data-execution_count="1">
+<div id="a8f28c99" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> astral <span class="im">import</span> LocationInfo</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_day_night_features</span>

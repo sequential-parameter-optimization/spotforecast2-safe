@@ -1377,8 +1377,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Apply imputation to a DataFrame based on the method specified in config.</p>
 <p>Supports two strategies:</p>
 <ul>
-<li><code>"weighted"</code>: forward-fill then backward-fill gaps, then build a :class:<code>WeightFunction</code> that down-weights training rows near any gap. Rows inside a gap receive weight 0; the rolling window <code>config.window_size</code> controls how far the penalty extends.</li>
-<li><code>"linear"</code>: apply :class:<code>LinearlyInterpolateTS</code> column-by-column.</li>
+<li><code>"weighted"</code>: forward-fill then backward-fill gaps, then build a <code>WeightFunction</code> that down-weights training rows near any gap. Rows inside a gap receive weight 0; the rolling window <code>config.window_size</code> controls how far the penalty extends.</li>
+<li><code>"linear"</code>: apply <code>LinearlyInterpolateTS</code> column-by-column.</li>
 </ul>
 <p>A diagnostic summary (NaN count before <strong>and</strong> after imputation) is always written to the logger.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1396,13 +1396,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>df_pipeline</td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>DataFrame to impute. Modified in-place for the <code>"linear"</code> method; a new DataFrame is returned for <code>"weighted"</code> (via :func:<code>get_missing_weights</code>).</td>
+<td>DataFrame to impute. Modified in-place for the <code>"linear"</code> method; a new DataFrame is returned for <code>"weighted"</code> (via <code>get_missing_weights()</code>).</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>config</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></td>
-<td>Configuration object that must expose: - <code>imputation_method</code> (<code>str</code>): <code>"weighted"</code> or <code>"linear"</code>. - <code>targets</code> (<code>list[str]</code>): column names to interpolate (<code>"linear"</code> method only). - <code>window_size</code> (<code>int</code>): rolling-window size passed to :func:<code>get_missing_weights</code> (<code>"weighted"</code> method only).</td>
+<td>Configuration object that must expose: - <code>imputation_method</code> (<code>str</code>): <code>"weighted"</code> or <code>"linear"</code>. - <code>targets</code> (<code>list[str]</code>): column names to interpolate (<code>"linear"</code> method only). - <code>window_size</code> (<code>int</code>): rolling-window size passed to <code>get_missing_weights()</code> (<code>"weighted"</code> method only).</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
@@ -1444,7 +1444,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="../../docs/reference/preprocessing.imputation.WeightFunction.html#spotforecast2_safe.preprocessing.imputation.WeightFunction">WeightFunction</a> | None]</td>
-<td>- <strong>weight_func</strong> – a :class:<code>WeightFunction</code> instance ready to be passed to a forecaster’s <code>weight_func</code> parameter, or <code>None</code> when <code>"linear"</code> imputation is used.</td>
+<td>- <strong>weight_func</strong> – a <code>WeightFunction</code> instance ready to be passed to a forecaster’s <code>weight_func</code> parameter, or <code>None</code> when <code>"linear"</code> imputation is used.</td>
 </tr>
 </tbody>
 </table>
@@ -1470,7 +1470,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="337732cd" class="cell" data-execution_count="1">
+<div id="6d0af741" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

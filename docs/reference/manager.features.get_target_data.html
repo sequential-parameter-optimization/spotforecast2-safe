@@ -1399,13 +1399,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>df_pipeline</td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>DataFrame with a tz-aware :class:<code>~pandas.DatetimeIndex</code> containing all target columns produced by the preprocessing pipeline.</td>
+<td>DataFrame with a tz-aware <code>DatetimeIndex</code> containing all target columns produced by the preprocessing pipeline.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>config</td>
 <td>'ConfigMulti'</td>
-<td>Pipeline configuration object. Must have the following attributes set before calling this function: - <code>start_train_ts</code> — inclusive start of the training window (:class:<code>~pandas.Timestamp</code>, tz-aware). - <code>end_train_ts</code> — inclusive end of the training window (:class:<code>~pandas.Timestamp</code>, tz-aware). - <code>use_exogenous_features</code> — <code>bool</code> flag controlling whether exogenous features are used.</td>
+<td>Pipeline configuration object. Must have the following attributes set before calling this function: - <code>start_train_ts</code> — inclusive start of the training window (<code>Timestamp</code>, tz-aware). - <code>end_train_ts</code> — inclusive end of the training window (<code>Timestamp</code>, tz-aware). - <code>use_exogenous_features</code> — <code>bool</code> flag controlling whether exogenous features are used.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
@@ -1453,7 +1453,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>- <strong>y_train</strong> — 1-D Series with the target values over the training window <code>[config.start_train_ts, config.end_train_ts]</code>, squeezed to a plain :class:<code>~pandas.Series</code>.</td>
+<td>- <strong>y_train</strong> — 1-D Series with the target values over the training window <code>[config.start_train_ts, config.end_train_ts]</code>, squeezed to a plain <code>Series</code>.</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -1471,7 +1471,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Extract training data for a single target without exogenous features:</p>
-<div id="acc1dde7" class="cell" data-execution_count="1">
+<div id="52fac321" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> get_target_data</span>
@@ -1502,7 +1502,7 @@ exog_future:    None</code></pre>
 </div>
 </div>
 <p>Extract training data with exogenous features enabled:</p>
-<div id="2c978d42" class="cell" data-execution_count="2">
+<div id="6d07e31e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> get_target_data</span>
