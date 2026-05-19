@@ -10,7 +10,6 @@ Covers:
 - merge_data_and_covariates: train/pred split, inner join, cast_dtype, string timestamps
 - get_target_data: y_train slice, exog disabled/enabled, dtype, missing target
 - Package-level imports from spotforecast2_safe.manager
-- Backward-compatible private aliases in n2n_predict_with_covariates
 """
 
 import numpy as np
@@ -498,44 +497,6 @@ class TestPackageLevelImports:
         assert callable(create_interaction_features)
         assert callable(select_exogenous_features)
         assert callable(merge_data_and_covariates)
-
-
-# =============================================================================
-# Backward-compatible private aliases in n2n_predict_with_covariates
-# =============================================================================
-
-
-class TestBackwardCompatibleAliases:
-    @pytest.fixture(autouse=True)
-    def _n2n_module(self):
-        """Return the actual n2n_predict_with_covariates module (not the function)."""
-        import sys
-
-        # Ensure the module is imported so it appears in sys.modules.
-        import spotforecast2_safe.processing.n2n_predict_with_covariates  # noqa: F401
-
-        self.mod = sys.modules[
-            "spotforecast2_safe.processing.n2n_predict_with_covariates"
-        ]
-
-    def test_private_aliases_exist(self):
-        assert hasattr(self.mod, "_apply_cyclical_encoding")
-        assert hasattr(self.mod, "_create_interaction_features")
-        assert hasattr(self.mod, "_select_exogenous_features")
-        assert hasattr(self.mod, "_merge_data_and_covariates")
-
-    def test_aliases_point_to_public_functions(self):
-        from spotforecast2_safe.manager.features import (
-            apply_cyclical_encoding,
-            create_interaction_features,
-            merge_data_and_covariates,
-            select_exogenous_features,
-        )
-
-        assert self.mod._apply_cyclical_encoding is apply_cyclical_encoding
-        assert self.mod._create_interaction_features is create_interaction_features
-        assert self.mod._select_exogenous_features is select_exogenous_features
-        assert self.mod._merge_data_and_covariates is merge_data_and_covariates
 
 
 # =============================================================================

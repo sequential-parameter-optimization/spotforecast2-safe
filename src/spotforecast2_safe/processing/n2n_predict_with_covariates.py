@@ -97,23 +97,6 @@ from spotforecast2_safe.preprocessing.outlier import mark_outliers
 from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
 
 # ============================================================================
-# Helper Functions for Feature Engineering
-# (public implementations live in spotforecast2_safe.manager.features)
-# ============================================================================
-
-# Private aliases kept for backward compatibility with existing callers
-# that import the private names from this module.
-_get_weather_features = get_weather_features
-_get_calendar_features = get_calendar_features
-_get_day_night_features = get_day_night_features
-_get_holiday_features = get_holiday_features
-_apply_cyclical_encoding = apply_cyclical_encoding
-_create_interaction_features = create_interaction_features
-_select_exogenous_features = select_exogenous_features
-_merge_data_and_covariates = merge_data_and_covariates
-
-
-# ============================================================================
 # Model Persistence Functions
 # imported from spotforecast2_safe.manager.persistence
 # ============================================================================
@@ -366,7 +349,7 @@ def n2n_predict_with_covariates(
     )
 
     # Holidays
-    holiday_features = _get_holiday_features(
+    holiday_features = get_holiday_features(
         data=imputed_data,
         start=start,
         cov_end=cov_end,
@@ -378,7 +361,7 @@ def n2n_predict_with_covariates(
     )
 
     # Weather
-    weather_features, weather_aligned = _get_weather_features(
+    weather_features, weather_aligned = get_weather_features(
         data=imputed_data,
         start=start,
         cov_end=cov_end,
@@ -391,7 +374,7 @@ def n2n_predict_with_covariates(
     )
 
     # Calendar
-    calendar_features = _get_calendar_features(
+    calendar_features = get_calendar_features(
         start=start,
         cov_end=cov_end,
         freq="h",
@@ -399,7 +382,7 @@ def n2n_predict_with_covariates(
     )
 
     # Day/night
-    sun_light_features = _get_day_night_features(
+    sun_light_features = get_day_night_features(
         start=start,
         cov_end=cov_end,
         location=location,
@@ -431,13 +414,13 @@ def n2n_predict_with_covariates(
         )
 
     # Apply cyclical encoding
-    exogenous_features = _apply_cyclical_encoding(
+    exogenous_features = apply_cyclical_encoding(
         data=exogenous_features,
         drop_original=False,
     )
 
     # Create interactions
-    exogenous_features = _create_interaction_features(
+    exogenous_features = create_interaction_features(
         exogenous_features=exogenous_features,
         weather_aligned=weather_aligned,
     )
@@ -446,7 +429,7 @@ def n2n_predict_with_covariates(
     # 6. SELECT EXOGENOUS FEATURES
     # ========================================================================
 
-    exog_features = _select_exogenous_features(
+    exog_features = select_exogenous_features(
         exogenous_features=exogenous_features,
         weather_aligned=weather_aligned,
         include_weather_windows=include_weather_windows,
@@ -464,7 +447,7 @@ def n2n_predict_with_covariates(
     if verbose:
         print("\n[6/9] Merging target and exogenous data...")
 
-    data_with_exog, exo_tmp, exo_pred = _merge_data_and_covariates(
+    data_with_exog, exo_tmp, exo_pred = merge_data_and_covariates(
         data=imputed_data,
         exogenous_features=exogenous_features,
         target_columns=target_columns,
