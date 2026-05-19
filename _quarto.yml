@@ -150,6 +150,24 @@ website:
                     file: docs/reference/preprocessing.outlier.manual_outlier_removal.qmd
                   - text: "get_outliers"
                     file: docs/reference/preprocessing.outlier.get_outliers.qmd
+              - section: "Checking"
+                contents:
+                  - text: "check_y"
+                    file: docs/reference/preprocessing.checking.check_y.qmd
+                  - text: "check_exog"
+                    file: docs/reference/preprocessing.checking.check_exog.qmd
+                  - text: "check_exog_dtypes"
+                    file: docs/reference/preprocessing.checking.check_exog_dtypes.qmd
+                  - text: "check_interval"
+                    file: docs/reference/preprocessing.checking.check_interval.qmd
+                  - text: "check_predict_input"
+                    file: docs/reference/preprocessing.checking.check_predict_input.qmd
+                  - text: "check_residuals_input"
+                    file: docs/reference/preprocessing.checking.check_residuals_input.qmd
+                  - text: "get_exog_dtypes"
+                    file: docs/reference/preprocessing.checking.get_exog_dtypes.qmd
+                  - text: "set_cpu_gpu_device"
+                    file: docs/reference/preprocessing.checking.set_cpu_gpu_device.qmd
 
           - section: "Processing"
             contents:
@@ -280,24 +298,6 @@ website:
                 file: docs/reference/utils.data_transform.qmd
               - text: "forecaster_config"
                 file: docs/reference/utils.forecaster_config.qmd
-              - section: "Validation"
-                contents:
-                  - text: "check_y"
-                    file: docs/reference/utils.validation.check_y.qmd
-                  - text: "check_exog"
-                    file: docs/reference/utils.validation.check_exog.qmd
-                  - text: "check_exog_dtypes"
-                    file: docs/reference/utils.validation.check_exog_dtypes.qmd
-                  - text: "check_interval"
-                    file: docs/reference/utils.validation.check_interval.qmd
-                  - text: "check_predict_input"
-                    file: docs/reference/utils.validation.check_predict_input.qmd
-                  - text: "check_residuals_input"
-                    file: docs/reference/utils.validation.check_residuals_input.qmd
-                  - text: "get_exog_dtypes"
-                    file: docs/reference/utils.validation.get_exog_dtypes.qmd
-                  - text: "set_cpu_gpu_device"
-                    file: docs/reference/utils.validation.set_cpu_gpu_device.qmd
 
           - section: "Security"
             contents:
@@ -479,6 +479,14 @@ quartodoc:
         - preprocessing.outlier.get_outliers
         - preprocessing.outlier.manual_outlier_removal
         - preprocessing.outlier.mark_outliers
+        - preprocessing.checking.check_exog
+        - preprocessing.checking.check_exog_dtypes
+        - preprocessing.checking.check_interval
+        - preprocessing.checking.check_predict_input
+        - preprocessing.checking.check_residuals_input
+        - preprocessing.checking.check_y
+        - preprocessing.checking.get_exog_dtypes
+        - preprocessing.checking.set_cpu_gpu_device
         - preprocessing.exog_builder.ExogBuilder
         - preprocessing.imputation.apply_imputation
         - preprocessing.imputation.WeightFunction
@@ -575,14 +583,6 @@ quartodoc:
         data transforms.
       contents:
         - utils.cpe.get_cpe_identifier
-        - utils.validation.check_exog
-        - utils.validation.check_exog_dtypes
-        - utils.validation.check_interval
-        - utils.validation.check_predict_input
-        - utils.validation.check_residuals_input
-        - utils.validation.check_y
-        - utils.validation.get_exog_dtypes
-        - utils.validation.set_cpu_gpu_device
         - utils.convert_to_utc
         - utils.data_transform
         - utils.forecaster_config
