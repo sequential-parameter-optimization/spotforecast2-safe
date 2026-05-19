@@ -101,7 +101,7 @@ from spotforecast2_safe.preprocessing.curate_data import (
 )
 from spotforecast2_safe.preprocessing.imputation import get_missing_weights
 from spotforecast2_safe.preprocessing.outlier import mark_outliers
-from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
+from spotforecast2_safe.splitter.split import split_rel_train_val_test
 
 
 def n2n_predict_with_covariates(

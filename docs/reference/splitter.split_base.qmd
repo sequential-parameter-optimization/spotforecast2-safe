@@ -1,6 +1,6 @@
-# model_selection.split_base { #spotforecast2_safe.model_selection.split_base }
+# splitter.split_base { #spotforecast2_safe.splitter.split_base }
 
-`model_selection.split_base`
+`splitter.split_base`
 
 Base class for time series cross-validation splitting.
 
@@ -8,12 +8,12 @@ Base class for time series cross-validation splitting.
 
 | Name | Description |
 | --- | --- |
-| [BaseFold](#spotforecast2_safe.model_selection.split_base.BaseFold) | Base class for all Fold classes in spotforecast. All fold classes should specify |
+| [BaseFold](#spotforecast2_safe.splitter.split_base.BaseFold) | Base class for all Fold classes in spotforecast. All fold classes should specify |
 
-### BaseFold { #spotforecast2_safe.model_selection.split_base.BaseFold }
+### BaseFold { #spotforecast2_safe.splitter.split_base.BaseFold }
 
 ```python
-model_selection.split_base.BaseFold(
+splitter.split_base.BaseFold(
     steps=None,
     initial_train_size=None,
     fold_stride=None,
@@ -71,12 +71,12 @@ Set the parameters of the Fold object after validating them.
 
 | Name | Description |
 | --- | --- |
-| [set_params](#spotforecast2_safe.model_selection.split_base.BaseFold.set_params) | Set the parameters of the Fold object. Before overwriting the current |
+| [set_params](#spotforecast2_safe.splitter.split_base.BaseFold.set_params) | Set the parameters of the Fold object. Before overwriting the current |
 
-##### set_params { #spotforecast2_safe.model_selection.split_base.BaseFold.set_params }
+##### set_params { #spotforecast2_safe.splitter.split_base.BaseFold.set_params }
 
 ```python
-model_selection.split_base.BaseFold.set_params(params)
+splitter.split_base.BaseFold.set_params(params)
 ```
 
 Set the parameters of the Fold object. Before overwriting the current
@@ -90,21 +90,24 @@ parameters, the input parameters are validated to ensure correctness.
 
 ###### Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.model_selection import TimeSeriesFold
->>> cv = TimeSeriesFold(steps=1)
->>> cv.set_params({
-...     "steps": 2,
-...     "initial_train_size": 10,
-...     "fold_stride": 2,
-...     "window_size": 5,
-...     "differentiation": 1,
-...     "refit": True,
-...     "fixed_train_size": False,
-...     "gap": 1,
-...     "skip_folds": 2,
-...     "allow_incomplete_fold": False,
-...     "return_all_indexes": True,
-...     "verbose": False,
-... })
+```{python}
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+cv = TimeSeriesFold(steps=1)
+cv.set_params({
+    "steps": 2,
+    "initial_train_size": 10,
+    "fold_stride": 2,
+    "window_size": 5,
+    "differentiation": 1,
+    "refit": True,
+    "fixed_train_size": False,
+    "gap": 1,
+    "skip_folds": 2,
+    "allow_incomplete_fold": False,
+    "return_all_indexes": True,
+    "verbose": False,
+})
+assert cv.initial_train_size == 10
+assert cv.window_size == 5
 ```

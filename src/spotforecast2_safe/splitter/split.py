@@ -24,17 +24,29 @@ def split_abs_train_val_test(
             - data_test (pd.DataFrame): The test set.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> from spotforecast2_safe.preprocessing.split import split_train_val_test
-        >>> data = fetch_data()
-        >>> end_train = pd.Timestamp('2020-12-31 23:00:00')
-        >>> end_validation = pd.Timestamp('2021-06-30 23:00:00')
-        >>> data_train, data_val, data_test = split_train_val_test(
-        ...     data,
-        ...     end_train=end_train,
-        ...     end_validation=end_validation,
-        ...     verbose=True
-        ... )
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.splitter.split import split_abs_train_val_test
+
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2022-01-01", periods=100, freq="D")
+        data = pd.DataFrame({"value": rng.standard_normal(100)}, index=idx)
+
+        end_train = pd.Timestamp("2022-02-28")
+        end_validation = pd.Timestamp("2022-03-31")
+        data_train, data_val, data_test = split_abs_train_val_test(
+            data,
+            end_train=end_train,
+            end_validation=end_validation,
+            verbose=True,
+        )
+        assert data_train.index.max() == end_train
+        assert data_val.index.max() == end_validation
+        assert data_test.index.min() == end_validation
+        print(f"Train: {len(data_train)}, Val: {len(data_val)}, Test: {len(data_test)}")
+        ```
     """
     data = data.copy()
     start_date = data.index.min()
@@ -84,15 +96,27 @@ def split_rel_train_val_test(
             - data_test (pd.DataFrame): The test set.
 
     Examples:
-        >>> from spotforecast2_safe.data.fetch_data import fetch_data
-        >>> from spotforecast2_safe.preprocessing.split import split_rel_train_val_test
-        >>> data = fetch_data()
-        >>> data_train, data_val, data_test = split_rel_train_val_test(
-        ...     data,
-        ...     perc_train=0.7,
-        ...     perc_val=0.2,
-        ...     verbose=True
-        ... )
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.splitter.split import split_rel_train_val_test
+
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2022-01-01", periods=100, freq="D")
+        data = pd.DataFrame({"value": rng.standard_normal(100)}, index=idx)
+
+        data_train, data_val, data_test = split_rel_train_val_test(
+            data,
+            perc_train=0.7,
+            perc_val=0.2,
+            verbose=True,
+        )
+        assert len(data_train) == 70
+        assert len(data_val) == 20
+        assert len(data_test) == 10
+        print(f"Train: {len(data_train)}, Val: {len(data_val)}, Test: {len(data_test)}")
+        ```
     """
     data = data.copy()
     if data.shape[0] == 0:

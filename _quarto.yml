@@ -150,12 +150,24 @@ website:
                     file: docs/reference/preprocessing.outlier.manual_outlier_removal.qmd
                   - text: "get_outliers"
                     file: docs/reference/preprocessing.outlier.get_outliers.qmd
-              - section: "Split"
+              - section: "Checking"
                 contents:
-                  - text: "split_abs_train_val_test"
-                    file: docs/reference/preprocessing.split.split_abs_train_val_test.qmd
-                  - text: "split_rel_train_val_test"
-                    file: docs/reference/preprocessing.split.split_rel_train_val_test.qmd
+                  - text: "check_y"
+                    file: docs/reference/preprocessing.checking.check_y.qmd
+                  - text: "check_exog"
+                    file: docs/reference/preprocessing.checking.check_exog.qmd
+                  - text: "check_exog_dtypes"
+                    file: docs/reference/preprocessing.checking.check_exog_dtypes.qmd
+                  - text: "check_interval"
+                    file: docs/reference/preprocessing.checking.check_interval.qmd
+                  - text: "check_predict_input"
+                    file: docs/reference/preprocessing.checking.check_predict_input.qmd
+                  - text: "check_residuals_input"
+                    file: docs/reference/preprocessing.checking.check_residuals_input.qmd
+                  - text: "get_exog_dtypes"
+                    file: docs/reference/preprocessing.checking.get_exog_dtypes.qmd
+                  - text: "set_cpu_gpu_device"
+                    file: docs/reference/preprocessing.checking.set_cpu_gpu_device.qmd
 
           - section: "Processing"
             contents:
@@ -207,22 +219,29 @@ website:
                   - text: "symmetric_mean_absolute_percentage_error"
                     file: docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.qmd
 
-          - section: "Model Selection"
+          - section: "Splitter"
+            contents:
+              - text: "BaseFold"
+                file: docs/reference/splitter.split_base.qmd
+              - text: "OneStepAheadFold"
+                file: docs/reference/splitter.split_one_step.qmd
+              - text: "TimeSeriesFold"
+                file: docs/reference/splitter.split_ts_cv.qmd
+              - text: "split_abs_train_val_test"
+                file: docs/reference/splitter.split.split_abs_train_val_test.qmd
+              - text: "split_rel_train_val_test"
+                file: docs/reference/splitter.split.split_rel_train_val_test.qmd
+              - text: "utils_common"
+                file: docs/reference/splitter.utils_common.qmd
+
+          - section: "Backtesting"
             contents:
               - text: "backtesting_forecaster"
-                file: docs/reference/model_selection.validation.backtesting_forecaster.qmd
+                file: docs/reference/backtesting.validation.backtesting_forecaster.qmd
               - text: "backtesting_forecaster_one_step"
-                file: docs/reference/model_selection.validation.backtesting_forecaster_one_step.qmd
+                file: docs/reference/backtesting.validation.backtesting_forecaster_one_step.qmd
               - text: "validation"
-                file: docs/reference/model_selection.validation.qmd
-              - text: "BaseFold"
-                file: docs/reference/model_selection.split_base.qmd
-              - text: "OneStepAheadFold"
-                file: docs/reference/model_selection.split_one_step.qmd
-              - text: "TimeSeriesFold"
-                file: docs/reference/model_selection.split_ts_cv.qmd
-              - text: "utils_common"
-                file: docs/reference/model_selection.utils_common.qmd
+                file: docs/reference/backtesting.validation.qmd
 
           - section: "Configurator"
             contents:
@@ -279,24 +298,6 @@ website:
                 file: docs/reference/utils.data_transform.qmd
               - text: "forecaster_config"
                 file: docs/reference/utils.forecaster_config.qmd
-              - section: "Validation"
-                contents:
-                  - text: "check_y"
-                    file: docs/reference/utils.validation.check_y.qmd
-                  - text: "check_exog"
-                    file: docs/reference/utils.validation.check_exog.qmd
-                  - text: "check_exog_dtypes"
-                    file: docs/reference/utils.validation.check_exog_dtypes.qmd
-                  - text: "check_interval"
-                    file: docs/reference/utils.validation.check_interval.qmd
-                  - text: "check_predict_input"
-                    file: docs/reference/utils.validation.check_predict_input.qmd
-                  - text: "check_residuals_input"
-                    file: docs/reference/utils.validation.check_residuals_input.qmd
-                  - text: "get_exog_dtypes"
-                    file: docs/reference/utils.validation.get_exog_dtypes.qmd
-                  - text: "set_cpu_gpu_device"
-                    file: docs/reference/utils.validation.set_cpu_gpu_device.qmd
 
           - section: "Security"
             contents:
@@ -478,8 +479,14 @@ quartodoc:
         - preprocessing.outlier.get_outliers
         - preprocessing.outlier.manual_outlier_removal
         - preprocessing.outlier.mark_outliers
-        - preprocessing.split.split_abs_train_val_test
-        - preprocessing.split.split_rel_train_val_test
+        - preprocessing.checking.check_exog
+        - preprocessing.checking.check_exog_dtypes
+        - preprocessing.checking.check_interval
+        - preprocessing.checking.check_predict_input
+        - preprocessing.checking.check_residuals_input
+        - preprocessing.checking.check_y
+        - preprocessing.checking.get_exog_dtypes
+        - preprocessing.checking.set_cpu_gpu_device
         - preprocessing.exog_builder.ExogBuilder
         - preprocessing.imputation.apply_imputation
         - preprocessing.imputation.WeightFunction
@@ -519,18 +526,27 @@ quartodoc:
         - forecaster.wrappers.lgbm
         - forecaster.wrappers.xgb
 
-    # ── Model Selection ───────────────────────────────────────────────────────
-    - title: "Model Selection"
+    # ── Splitter ──────────────────────────────────────────────────────────────
+    - title: "Splitter"
       desc: |
-        Backtesting and cross-validation utilities for time series models.
+        Time-series-aware cross-validation folds and train/val/test holdout
+        helpers.
       contents:
-        - model_selection.validation.backtesting_forecaster
-        - model_selection.validation.backtesting_forecaster_one_step
-        - model_selection.split_base
-        - model_selection.split_one_step
-        - model_selection.split_ts_cv
-        - model_selection.utils_common
-        - model_selection.validation
+        - splitter.split_base
+        - splitter.split_one_step
+        - splitter.split_ts_cv
+        - splitter.split.split_abs_train_val_test
+        - splitter.split.split_rel_train_val_test
+        - splitter.utils_common
+
+    # ── Backtesting ───────────────────────────────────────────────────────────
+    - title: "Backtesting"
+      desc: |
+        Backtesting orchestration for time series forecasters.
+      contents:
+        - backtesting.validation.backtesting_forecaster
+        - backtesting.validation.backtesting_forecaster_one_step
+        - backtesting.validation
 
     # ── Configurator ──────────────────────────────────────────────────────────
     - title: "Configurator"
@@ -567,14 +583,6 @@ quartodoc:
         data transforms.
       contents:
         - utils.cpe.get_cpe_identifier
-        - utils.validation.check_exog
-        - utils.validation.check_exog_dtypes
-        - utils.validation.check_interval
-        - utils.validation.check_predict_input
-        - utils.validation.check_residuals_input
-        - utils.validation.check_y
-        - utils.validation.get_exog_dtypes
-        - utils.validation.set_cpu_gpu_device
         - utils.convert_to_utc
         - utils.data_transform
         - utils.forecaster_config

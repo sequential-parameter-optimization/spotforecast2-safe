@@ -18,15 +18,17 @@ from spotforecast2_safe.exceptions import (
     UnknownLevelWarning,
     set_skforecast_warnings,
 )
-from spotforecast2_safe.utils import (
+from spotforecast2_safe.preprocessing.checking import (
     check_exog,
     check_exog_dtypes,
     check_interval,
     check_predict_input,
-    check_select_fit_kwargs,
     check_y,
-    expand_index,
     get_exog_dtypes,
+)
+from spotforecast2_safe.utils import (
+    check_select_fit_kwargs,
+    expand_index,
     initialize_lags,
     initialize_weights,
     input_to_frame,

@@ -1,7 +1,7 @@
-# utils.validation.get_exog_dtypes { #spotforecast2_safe.utils.validation.get_exog_dtypes }
+# preprocessing.checking.get_exog_dtypes { #spotforecast2_safe.preprocessing.checking.get_exog_dtypes }
 
 ```python
-utils.validation.get_exog_dtypes(exog)
+preprocessing.checking.get_exog_dtypes(exog)
 ```
 
 Extract and store the data types of exogenous variables.
@@ -23,26 +23,26 @@ For Series, uses the series name as the key. For DataFrames, uses all column nam
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import pandas as pd
->>> import numpy as np
->>> from spotforecast2_safe.utils.validation import get_exog_dtypes
->>>
->>> # DataFrame with mixed types
->>> exog_df = pd.DataFrame({
-...     "temp": pd.Series([20.5, 21.3, 22.1], dtype='float64'),
-...     "day": pd.Series([1, 2, 3], dtype='int64'),
-...     "is_weekend": pd.Series([False, False, True], dtype='bool')
-... })
->>> dtypes = get_exog_dtypes(exog_df)
->>> dtypes['temp']
-dtype('float64')
->>> dtypes['day']
-dtype('int64')
->>>
->>> # Series
->>> exog_series = pd.Series([1.0, 2.0, 3.0], name="temperature", dtype='float64')
->>> dtypes = get_exog_dtypes(exog_series)
->>> dtypes
-{'temperature': dtype('float64')}
+```{python}
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.checking import get_exog_dtypes
+
+# DataFrame with mixed types
+exog_df = pd.DataFrame({
+    "temp": pd.Series([20.5, 21.3, 22.1], dtype="float64"),
+    "day": pd.Series([1, 2, 3], dtype="int64"),
+})
+dtypes = get_exog_dtypes(exog_df)
+print(dtypes["temp"])
+print(dtypes["day"])
+assert dtypes["temp"] == np.dtype("float64")
+assert dtypes["day"] == np.dtype("int64")
+
+# Series
+exog_series = pd.Series([1.0, 2.0, 3.0], name="temperature", dtype="float64")
+dtypes_series = get_exog_dtypes(exog_series)
+print(dtypes_series)
+assert dtypes_series == {"temperature": np.dtype("float64")}
 ```

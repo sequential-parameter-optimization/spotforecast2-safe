@@ -37,28 +37,29 @@ def check_y(y: Any, series_id: str = "`y`") -> None:
         ValueError: If y contains missing (NaN) values.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.utils.validation import check_y
-        >>>
-        >>> # Valid series
-        >>> y = pd.Series([1, 2, 3, 4, 5])
-        >>> check_y(y)  # No error
-        >>>
-        >>> # Invalid: not a Series
-        >>> try:
-        ...     check_y([1, 2, 3])
-        ... except TypeError as e:
-        ...     print(f"Error: {e}")
-        Error: `y` must be a pandas Series with a DatetimeIndex or a RangeIndex. Found <class 'list'>.
-        >>>
-        >>> # Invalid: contains NaN
-        >>> y_with_nan = pd.Series([1, 2, np.nan, 4])
-        >>> try:
-        ...     check_y(y_with_nan)
-        ... except ValueError as e:
-        ...     print(f"Error: {e}")
-        Error: `y` has missing values.
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.checking import check_y
+
+        # Valid series — no error raised
+        y = pd.Series([1, 2, 3, 4, 5])
+        check_y(y)
+
+        # Invalid: not a Series
+        try:
+            check_y([1, 2, 3])
+        except TypeError as e:
+            print(f"TypeError: {e}")
+
+        # Invalid: contains NaN
+        y_with_nan = pd.Series([1, 2, np.nan, 4])
+        try:
+            check_y(y_with_nan)
+        except ValueError as e:
+            print(f"ValueError: {e}")
+        ```
     """
     if not isinstance(y, pd.Series):
         raise TypeError(
@@ -99,32 +100,32 @@ def check_exog(
         MissingValuesWarning: If allow_nan=True and exog contains NaN values.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.utils.validation import check_exog
-        >>>
-        >>> # Valid DataFrame
-        >>> exog_df = pd.DataFrame({"temp": [20, 21, 22], "humidity": [50, 55, 60]})
-        >>> check_exog(exog_df)  # No error
-        >>>
-        >>> # Valid Series with name
-        >>> exog_series = pd.Series([1, 2, 3], name="temperature")
-        >>> check_exog(exog_series)  # No error
-        >>>
-        >>> # Invalid: Series without name
-        >>> exog_no_name = pd.Series([1, 2, 3])
-        >>> try:
-        ...     check_exog(exog_no_name)
-        ... except ValueError as e:
-        ...     print(f"Error: {e}")
-        Error: When `exog` is a pandas Series, it must have a name.
-        >>>
-        >>> # Invalid: not a Series/DataFrame
-        >>> try:
-        ...     check_exog([1, 2, 3])
-        ... except TypeError as e:
-        ...     print(f"Error: {e}")
-        Error: `exog` must be a pandas Series or DataFrame. Got <class 'list'>.
+        ```{python}
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.checking import check_exog
+
+        # Valid DataFrame — no error raised
+        exog_df = pd.DataFrame({"temp": [20, 21, 22], "humidity": [50, 55, 60]})
+        check_exog(exog_df)
+
+        # Valid Series with name — no error raised
+        exog_series = pd.Series([1, 2, 3], name="temperature")
+        check_exog(exog_series)
+
+        # Invalid: Series without name
+        exog_no_name = pd.Series([1, 2, 3])
+        try:
+            check_exog(exog_no_name)
+        except ValueError as e:
+            print(f"ValueError: {e}")
+
+        # Invalid: not a Series/DataFrame
+        try:
+            check_exog([1, 2, 3])
+        except TypeError as e:
+            print(f"TypeError: {e}")
+        ```
     """
     if not isinstance(exog, (pd.Series, pd.DataFrame)):
         raise TypeError(
@@ -174,29 +175,33 @@ def check_exog_dtypes(
             are found.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.utils.validation import check_exog_dtypes
-        >>>
-        >>> # Valid types (float, int)
-        >>> df_valid = pd.DataFrame({
-        ...     "a": [1.0, 2.0, 3.0],
-        ...     "b": [1, 2, 3]
-        ... })
-        >>> check_exog_dtypes(df_valid)  # No warning
-        >>>
-        >>> # Invalid type (object/string)
-        >>> df_invalid = pd.DataFrame({
-        ...     "a": [1, 2, 3],
-        ...     "b": ["x", "y", "z"]
-        ... })
-        >>> check_exog_dtypes(df_invalid)
-        ... # Issues DataTypeWarning about column 'b'
-        >>>
-        >>> # Valid categorical (with integer categories)
-        >>> df_cat = pd.DataFrame({"a": [1, 2, 1]})
-        >>> df_cat["a"] = df_cat["a"].astype("category")
-        >>> check_exog_dtypes(df_cat)  # No warning
+        ```{python}
+        import warnings
+
+        import pandas as pd
+
+        from spotforecast2_safe.exceptions import DataTypeWarning
+        from spotforecast2_safe.preprocessing.checking import check_exog_dtypes
+
+        # Valid types (float, int) — no warning
+        df_valid = pd.DataFrame({"a": [1.0, 2.0, 3.0], "b": [1, 2, 3]})
+        check_exog_dtypes(df_valid)
+
+        # Invalid type (object/string) — issues DataTypeWarning about column 'b'
+        df_invalid = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            check_exog_dtypes(df_invalid)
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, DataTypeWarning)
+        print(f"Warning issued: {caught[0].category.__name__}")
+
+        # Valid categorical (with integer categories) — no warning
+        df_cat = pd.DataFrame({"a": [1, 2, 1]})
+        df_cat["a"] = df_cat["a"].astype("category")
+        check_exog_dtypes(df_cat)
+        print("All checks passed.")
+        ```
     """
     if call_check_exog:
         check_exog(exog=exog, allow_nan=False, series_id=series_id)
@@ -261,27 +266,29 @@ def get_exog_dtypes(exog: Union[pd.Series, pd.DataFrame]) -> Dict[str, type]:
         Dictionary mapping variable names to their pandas dtypes.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.utils.validation import get_exog_dtypes
-        >>>
-        >>> # DataFrame with mixed types
-        >>> exog_df = pd.DataFrame({
-        ...     "temp": pd.Series([20.5, 21.3, 22.1], dtype='float64'),
-        ...     "day": pd.Series([1, 2, 3], dtype='int64'),
-        ...     "is_weekend": pd.Series([False, False, True], dtype='bool')
-        ... })
-        >>> dtypes = get_exog_dtypes(exog_df)
-        >>> dtypes['temp']
-        dtype('float64')
-        >>> dtypes['day']
-        dtype('int64')
-        >>>
-        >>> # Series
-        >>> exog_series = pd.Series([1.0, 2.0, 3.0], name="temperature", dtype='float64')
-        >>> dtypes = get_exog_dtypes(exog_series)
-        >>> dtypes
-        {'temperature': dtype('float64')}
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.checking import get_exog_dtypes
+
+        # DataFrame with mixed types
+        exog_df = pd.DataFrame({
+            "temp": pd.Series([20.5, 21.3, 22.1], dtype="float64"),
+            "day": pd.Series([1, 2, 3], dtype="int64"),
+        })
+        dtypes = get_exog_dtypes(exog_df)
+        print(dtypes["temp"])
+        print(dtypes["day"])
+        assert dtypes["temp"] == np.dtype("float64")
+        assert dtypes["day"] == np.dtype("int64")
+
+        # Series
+        exog_series = pd.Series([1.0, 2.0, 3.0], name="temperature", dtype="float64")
+        dtypes_series = get_exog_dtypes(exog_series)
+        print(dtypes_series)
+        assert dtypes_series == {"temperature": np.dtype("float64")}
+        ```
     """
     if isinstance(exog, pd.Series):
         exog_dtypes = {exog.name: exog.dtypes}
@@ -320,34 +327,35 @@ def check_interval(
             lower >= upper, or intervals not symmetric when required.
 
     Examples:
-        >>> from spotforecast2_safe.utils.validation import check_interval
-        >>>
-        >>> # Valid 95% confidence interval
-        >>> check_interval(interval=[2.5, 97.5])  # No error
-        >>>
-        >>> # Valid symmetric interval
-        >>> check_interval(interval=[2.5, 97.5], ensure_symmetric_intervals=True)  # No error
-        >>>
-        >>> # Invalid: not symmetric
-        >>> try:
-        ...     check_interval(interval=[5, 90], ensure_symmetric_intervals=True)
-        ... except ValueError as e:
-        ...     print("Error: Interval not symmetric")
-        Error: Interval not symmetric
-        >>>
-        >>> # Invalid: wrong number of values
-        >>> try:
-        ...     check_interval(interval=[2.5, 50, 97.5])
-        ... except ValueError as e:
-        ...     print("Error: Must have exactly 2 values")
-        Error: Must have exactly 2 values
-        >>>
-        >>> # Invalid: out of range
-        >>> try:
-        ...     check_interval(interval=[-5, 105])
-        ... except ValueError as e:
-        ...     print("Error: Values out of range")
-        Error: Values out of range
+        ```{python}
+        from spotforecast2_safe.preprocessing.checking import check_interval
+
+        # Valid 95% confidence interval — no error
+        check_interval(interval=[2.5, 97.5])
+
+        # Valid symmetric interval — no error
+        check_interval(interval=[2.5, 97.5], ensure_symmetric_intervals=True)
+
+        # Invalid: not symmetric
+        try:
+            check_interval(interval=[5, 90], ensure_symmetric_intervals=True)
+        except ValueError as e:
+            print(f"ValueError (not symmetric): {e}")
+
+        # Invalid: wrong number of values
+        try:
+            check_interval(interval=[2.5, 50, 97.5])
+        except ValueError as e:
+            print(f"ValueError (wrong length): {e}")
+
+        # Invalid: out of range
+        try:
+            check_interval(interval=[-5, 105])
+        except ValueError as e:
+            print(f"ValueError (out of range): {e}")
+
+        print("check_interval examples done.")
+        ```
     """
     if interval is not None:
         if not isinstance(interval, (list, tuple)):

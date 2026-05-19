@@ -1,7 +1,7 @@
-# utils.validation.check_exog_dtypes { #spotforecast2_safe.utils.validation.check_exog_dtypes }
+# preprocessing.checking.check_exog_dtypes { #spotforecast2_safe.preprocessing.checking.check_exog_dtypes }
 
 ```python
-utils.validation.check_exog_dtypes(
+preprocessing.checking.check_exog_dtypes(
     exog,
     call_check_exog=True,
     series_id='`exog`',
@@ -38,28 +38,30 @@ are found.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import pandas as pd
->>> import numpy as np
->>> from spotforecast2_safe.utils.validation import check_exog_dtypes
->>>
->>> # Valid types (float, int)
->>> df_valid = pd.DataFrame({
-...     "a": [1.0, 2.0, 3.0],
-...     "b": [1, 2, 3]
-... })
->>> check_exog_dtypes(df_valid)  # No warning
->>>
->>> # Invalid type (object/string)
->>> df_invalid = pd.DataFrame({
-...     "a": [1, 2, 3],
-...     "b": ["x", "y", "z"]
-... })
->>> check_exog_dtypes(df_invalid)
-... # Issues DataTypeWarning about column 'b'
->>>
->>> # Valid categorical (with integer categories)
->>> df_cat = pd.DataFrame({"a": [1, 2, 1]})
->>> df_cat["a"] = df_cat["a"].astype("category")
->>> check_exog_dtypes(df_cat)  # No warning
+```{python}
+import warnings
+
+import pandas as pd
+
+from spotforecast2_safe.exceptions import DataTypeWarning
+from spotforecast2_safe.preprocessing.checking import check_exog_dtypes
+
+# Valid types (float, int) — no warning
+df_valid = pd.DataFrame({"a": [1.0, 2.0, 3.0], "b": [1, 2, 3]})
+check_exog_dtypes(df_valid)
+
+# Invalid type (object/string) — issues DataTypeWarning about column 'b'
+df_invalid = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    check_exog_dtypes(df_invalid)
+assert len(caught) == 1
+assert issubclass(caught[0].category, DataTypeWarning)
+print(f"Warning issued: {caught[0].category.__name__}")
+
+# Valid categorical (with integer categories) — no warning
+df_cat = pd.DataFrame({"a": [1, 2, 1]})
+df_cat["a"] = df_cat["a"].astype("category")
+check_exog_dtypes(df_cat)
+print("All checks passed.")
 ```

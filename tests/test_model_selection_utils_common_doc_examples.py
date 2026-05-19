@@ -6,8 +6,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.model_selection import TimeSeriesFold
-from spotforecast2_safe.model_selection.utils_common import (
+from spotforecast2_safe.splitter import TimeSeriesFold
+from spotforecast2_safe.splitter.utils_common import (
     OneStepAheadValidationWarning,
     check_backtesting_input,
     initialize_lags_grid,
@@ -18,7 +18,7 @@ from spotforecast2_safe.model_selection.utils_common import (
 def test_onestepahead_validation_warning_example():
     """
     >>> import warnings
-    >>> from spotforecast2_safe.model_selection.utils_common import OneStepAheadValidationWarning
+    >>> from spotforecast2_safe.splitter.utils_common import OneStepAheadValidationWarning
     >>> warnings.warn(
     ...     "This is a one-step-ahead validation warning.",
     ...     OneStepAheadValidationWarning
@@ -42,7 +42,7 @@ def test_onestepahead_validation_warning_example():
 
 def test_initialize_lags_grid_example():
     """
-    >>> from spotforecast2_safe.model_selection.utils_common import initialize_lags_grid
+    >>> from spotforecast2_safe.splitter.utils_common import initialize_lags_grid
     >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
     >>> from sklearn.linear_model import LinearRegression
     >>> forecaster = ForecasterRecursive(LinearRegression(), lags=2)
@@ -64,9 +64,9 @@ def test_initialize_lags_grid_example():
 def test_check_backtesting_input_example():
     """
     >>> import pandas as pd
-    >>> from spotforecast2_safe.model_selection.utils_common import check_backtesting_input
+    >>> from spotforecast2_safe.splitter.utils_common import check_backtesting_input
     >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-    >>> from spotforecast2_safe.model_selection import TimeSeriesFold
+    >>> from spotforecast2_safe.splitter import TimeSeriesFold
     >>> from sklearn.linear_model import LinearRegression
     >>> from sklearn.metrics import mean_squared_error
     >>> y = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -104,7 +104,7 @@ def test_check_backtesting_input_example():
 
 def test_select_n_jobs_backtesting_example():
     """
-    >>> from spotforecast2_safe.model_selection.utils_common import select_n_jobs_backtesting
+    >>> from spotforecast2_safe.splitter.utils_common import select_n_jobs_backtesting
     >>> from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
     >>> from sklearn.linear_model import LinearRegression
     >>> forecaster = ForecasterRecursive(LinearRegression(), lags=2)

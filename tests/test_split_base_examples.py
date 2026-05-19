@@ -1,6 +1,6 @@
 import pandas as pd
 
-from spotforecast2_safe.model_selection import TimeSeriesFold
+from spotforecast2_safe.splitter import TimeSeriesFold
 
 
 def test_set_params():
