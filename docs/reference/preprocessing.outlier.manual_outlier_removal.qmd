@@ -30,14 +30,25 @@ Manual outlier removal function.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.data.fetch_data import fetch_data
->>> from spotforecast2_safe.preprocessing.outlier import manual_outlier_removal
->>> data = fetch_data()
->>> data, n_manual_outliers = manual_outlier_removal(
-...     data,
-...     column='ABC',
-...     lower_threshold=50,
-...     upper_threshold=700,
-...     verbose=True
+```{python}
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.outlier import manual_outlier_removal
+
+rng = np.random.default_rng(0)
+# 20 normal values with two injected boundary violations
+values = np.concatenate([rng.uniform(low=100.0, high=600.0, size=20), [10.0, 800.0]])
+data = pd.DataFrame({"ABC": values})
+
+cleaned_data, n_outliers = manual_outlier_removal(
+    data,
+    column="ABC",
+    lower_threshold=50,
+    upper_threshold=700,
+    verbose=True,
+)
+print(f"Outliers removed: {n_outliers}")
+assert n_outliers >= 2, "Expected the two injected boundary violations to be removed"
+assert cleaned_data["ABC"].isna().sum() == n_outliers
 ```
