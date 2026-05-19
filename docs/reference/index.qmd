@@ -37,6 +37,14 @@ feature engineering, and temporal train/test splitting.
 | [preprocessing.outlier.get_outliers](preprocessing.outlier.get_outliers.qmd#spotforecast2_safe.preprocessing.outlier.get_outliers) | Detect outliers in each column using Isolation Forest. |
 | [preprocessing.outlier.manual_outlier_removal](preprocessing.outlier.manual_outlier_removal.qmd#spotforecast2_safe.preprocessing.outlier.manual_outlier_removal) | Manual outlier removal function. |
 | [preprocessing.outlier.mark_outliers](preprocessing.outlier.mark_outliers.qmd#spotforecast2_safe.preprocessing.outlier.mark_outliers) | Marks outliers as NaN in the dataset using Isolation Forest. |
+| [preprocessing.checking.check_exog](preprocessing.checking.check_exog.qmd#spotforecast2_safe.preprocessing.checking.check_exog) | Validate that exog is a pandas Series or DataFrame. |
+| [preprocessing.checking.check_exog_dtypes](preprocessing.checking.check_exog_dtypes.qmd#spotforecast2_safe.preprocessing.checking.check_exog_dtypes) | Check that exogenous variables have valid data types (int, float, category). |
+| [preprocessing.checking.check_interval](preprocessing.checking.check_interval.qmd#spotforecast2_safe.preprocessing.checking.check_interval) | Validate that a confidence interval specification is valid. |
+| [preprocessing.checking.check_predict_input](preprocessing.checking.check_predict_input.qmd#spotforecast2_safe.preprocessing.checking.check_predict_input) | Check all inputs of predict method. This is a helper function to validate |
+| [preprocessing.checking.check_residuals_input](preprocessing.checking.check_residuals_input.qmd#spotforecast2_safe.preprocessing.checking.check_residuals_input) | Check residuals input arguments in Forecasters. |
+| [preprocessing.checking.check_y](preprocessing.checking.check_y.qmd#spotforecast2_safe.preprocessing.checking.check_y) | Validate that y is a pandas Series without missing values. |
+| [preprocessing.checking.get_exog_dtypes](preprocessing.checking.get_exog_dtypes.qmd#spotforecast2_safe.preprocessing.checking.get_exog_dtypes) | Extract and store the data types of exogenous variables. |
+| [preprocessing.checking.set_cpu_gpu_device](preprocessing.checking.set_cpu_gpu_device.qmd#spotforecast2_safe.preprocessing.checking.set_cpu_gpu_device) | Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None. |
 | [preprocessing.exog_builder.ExogBuilder](preprocessing.exog_builder.ExogBuilder.qmd#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder) | Builds a set of exogenous features for a given date range. |
 | [preprocessing.imputation.apply_imputation](preprocessing.imputation.apply_imputation.qmd#spotforecast2_safe.preprocessing.imputation.apply_imputation) | Apply imputation to a DataFrame based on the method specified in config. |
 | [preprocessing.imputation.WeightFunction](preprocessing.imputation.WeightFunction.qmd#spotforecast2_safe.preprocessing.imputation.WeightFunction) | Callable class for sample weights that can be pickled. |
@@ -147,14 +155,6 @@ data transforms.
 | | |
 | --- | --- |
 | [utils.cpe.get_cpe_identifier](utils.cpe.get_cpe_identifier.qmd#spotforecast2_safe.utils.cpe.get_cpe_identifier) | Generates the CPE 2.3 identifier for the spotforecast2-safe project. |
-| [utils.validation.check_exog](utils.validation.check_exog.qmd#spotforecast2_safe.utils.validation.check_exog) | Validate that exog is a pandas Series or DataFrame. |
-| [utils.validation.check_exog_dtypes](utils.validation.check_exog_dtypes.qmd#spotforecast2_safe.utils.validation.check_exog_dtypes) | Check that exogenous variables have valid data types (int, float, category). |
-| [utils.validation.check_interval](utils.validation.check_interval.qmd#spotforecast2_safe.utils.validation.check_interval) | Validate that a confidence interval specification is valid. |
-| [utils.validation.check_predict_input](utils.validation.check_predict_input.qmd#spotforecast2_safe.utils.validation.check_predict_input) | Check all inputs of predict method. This is a helper function to validate |
-| [utils.validation.check_residuals_input](utils.validation.check_residuals_input.qmd#spotforecast2_safe.utils.validation.check_residuals_input) | Check residuals input arguments in Forecasters. |
-| [utils.validation.check_y](utils.validation.check_y.qmd#spotforecast2_safe.utils.validation.check_y) | Validate that y is a pandas Series without missing values. |
-| [utils.validation.get_exog_dtypes](utils.validation.get_exog_dtypes.qmd#spotforecast2_safe.utils.validation.get_exog_dtypes) | Extract and store the data types of exogenous variables. |
-| [utils.validation.set_cpu_gpu_device](utils.validation.set_cpu_gpu_device.qmd#spotforecast2_safe.utils.validation.set_cpu_gpu_device) | Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None. |
 | [utils.convert_to_utc](utils.convert_to_utc.qmd#spotforecast2_safe.utils.convert_to_utc) | Utility functions for timezone conversion. |
 | [utils.data_transform](utils.data_transform.qmd#spotforecast2_safe.utils.data_transform) | Data transformation utilities for time series forecasting. |
 | [utils.forecaster_config](utils.forecaster_config.qmd#spotforecast2_safe.utils.forecaster_config) | Forecaster configuration utilities. |
