@@ -1,3 +1,16 @@
+## [10.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v9.0.0...v10.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* move utils/validation.py → preprocessing/checking.py
+* split model_selection into splitter + backtesting, relocate preprocessing/split
+
+### Code Refactoring
+
+* move utils/validation.py → preprocessing/checking.py ([9ce56cf](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9ce56cfc07c1bfff20ea80605a0331a6e3224d1e))
+* split model_selection into splitter + backtesting, relocate preprocessing/split ([750e73a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/750e73a724794b6f07e841e54577f9108373d331))
+
 ## [9.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v8.0.0...v9.0.0) (2026-05-19)
 
 
