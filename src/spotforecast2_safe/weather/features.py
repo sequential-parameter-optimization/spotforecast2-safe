@@ -3,8 +3,8 @@
 
 """Weather feature engineering for time series forecasting pipelines.
 
-This module provides the :func:`get_weather_features` function, which fetches
-historical and forecast weather data via :func:`~spotforecast2_safe.data.fetch_data.fetch_weather_data`
+This module provides the `get_weather_features()` function, which fetches
+historical and forecast weather data via `fetch_weather_data()`
 and transforms it into rolling-window features suitable for use as exogenous
 variables in recursive forecasting models.
 """
@@ -39,21 +39,21 @@ def get_weather_features(
 
     Downloads weather observations/forecasts for the requested period,
     aligns them to a regular ``freq`` grid, and applies
-    :class:`~feature_engine.timeseries.forecasting.WindowFeatures` to
+    `WindowFeatures` to
     produce rolling-mean, -max, and -min features over configurable
     windows.
 
     Args:
         data: Reference time series DataFrame used only for validation
             (shape / temporal coverage checks via
-            :func:`~spotforecast2_safe.preprocessing.curate_data.curate_weather`).
+            `curate_weather()`).
         start: Start of the feature window.  String values are parsed
             with ``utc=True``.
         cov_end: Inclusive end of the feature window (must cover the
             full forecast horizon beyond ``end``).  String values are
             parsed with ``utc=True``.
         forecast_horizon: Number of forecast steps; passed to
-            :func:`~spotforecast2_safe.preprocessing.curate_data.curate_weather`
+            `curate_weather()`
             for validation.
         latitude: Latitude of the target location in decimal degrees.
             Defaults to ``51.5136`` (Dortmund, Germany).
@@ -64,7 +64,7 @@ def get_weather_features(
         freq: Pandas-compatible frequency string for the output index.
             Defaults to ``"h"`` (hourly).
         window_periods: Rolling window sizes passed to
-            :class:`~feature_engine.timeseries.forecasting.WindowFeatures`.
+            `WindowFeatures`.
             Defaults to ``["1D", "7D"]``.
         window_functions: Aggregation functions applied over each window.
             Defaults to ``["mean", "max", "min"]``.

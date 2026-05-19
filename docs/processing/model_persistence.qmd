@@ -15,38 +15,38 @@ The model persistence functionality enables you to:
 ::: {.callout-tip}
 ## API Reference
 Full API documentation for all model persistence functions
-(`_save_forecasters`, `_load_forecasters`, `_ensure_model_dir`,
-`_model_directory_exists`) is auto-generated in the
+(`save_forecasters`, `load_forecasters`, `ensure_model_dir`,
+`model_directory_exists`) is auto-generated in the
 [Processing Reference](../reference/processing.qmd).
 :::
 
 ### Saving Models
 
-See [`_save_forecasters`](../reference/processing.qmd) in the API reference.
+See [`save_forecasters`](../reference/processing.qmd) in the API reference.
 
 ### Loading Models
 
-See [`_load_forecasters`](../reference/processing.qmd) in the API reference.
+See [`load_forecasters`](../reference/processing.qmd) in the API reference.
 
 ### Model Directory Management
 
-See [`_ensure_model_dir`](../reference/processing.qmd) and
-[`_model_directory_exists`](../reference/processing.qmd) in the API reference.
+See [`ensure_model_dir`](../reference/processing.qmd) and
+[`model_directory_exists`](../reference/processing.qmd) in the API reference.
 
 ## Examples
 
 ```python
 from spotforecast2_safe.manager.persistence import (
-    _save_forecasters,
-    _load_forecasters,
+    save_forecasters,
+    load_forecasters,
 )
 
 # Save trained models
 trained_forecasters = {...}  # Your trained forecasters
-_save_forecasters(trained_forecasters, model_dir="models/")
+save_forecasters(trained_forecasters, model_dir="models/")
 
 # Load previously trained models
-forecasters, missing = _load_forecasters(
+forecasters, missing = load_forecasters(
     target_columns=["power"], 
     model_dir="models/"
 )

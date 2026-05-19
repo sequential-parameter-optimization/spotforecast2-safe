@@ -5,12 +5,12 @@
 
 Provides:
 
-- :func:`create_holiday_df` — build a tz-aware DataFrame whose index covers
+- `create_holiday_df()` — build a tz-aware DataFrame whose index covers
   ``[start, end]`` at the requested frequency and whose single column
   ``is_holiday`` is ``1`` on public-holiday days and ``0`` otherwise.
-- :func:`get_holiday_features` — align those indicators to a forecast grid,
+- `get_holiday_features()` — align those indicators to a forecast grid,
   validating temporal coverage via
-  :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`.
+  `curate_holidays()`.
 """
 
 from typing import Union
@@ -93,24 +93,24 @@ def get_holiday_features(
 ) -> pd.DataFrame:
     """Build public-holiday indicators and align them to a regular time grid.
 
-    Generates holiday indicators via :func:`create_holiday_df`, validates
+    Generates holiday indicators via `create_holiday_df()`, validates
     coverage with
-    :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`,
+    `curate_holidays()`,
     and reindexes the result to a full ``[start, cov_end]`` grid with
     ``fill_value=0`` so that non-holiday timestamps are always zero.
 
     Args:
         data: Reference time series DataFrame used for temporal coverage
             validation inside
-            :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`.
+            `curate_holidays()`.
         start: Start timestamp.  String values are parsed with
             ``utc=True``.
         cov_end: Inclusive end timestamp (should cover the full forecast
             horizon).  String values are parsed with ``utc=True``.
         forecast_horizon: Number of forecast steps ahead; passed to
-            :func:`~spotforecast2_safe.preprocessing.curate_data.curate_holidays`.
+            `curate_holidays()`.
         tz: Timezone applied to the generated index and passed to
-            :func:`create_holiday_df`.  Defaults to ``"UTC"``.
+            `create_holiday_df()`.  Defaults to ``"UTC"``.
         freq: Pandas-compatible frequency string for the output index.
             Defaults to ``"h"`` (hourly).
         country_code: ISO 3166-1 alpha-2 country code.  Defaults to
@@ -121,7 +121,7 @@ def get_holiday_features(
     Returns:
         pd.DataFrame: DataFrame with a single integer column
         ``is_holiday``.  The index is a tz-aware
-        :class:`~pandas.DatetimeIndex` with the requested ``freq``.
+        `DatetimeIndex` with the requested ``freq``.
 
     Examples:
         ```{python}

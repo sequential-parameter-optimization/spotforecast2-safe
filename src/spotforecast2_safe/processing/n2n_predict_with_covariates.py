@@ -89,9 +89,9 @@ from spotforecast2_safe.manager.features import (
     select_exogenous_features,
 )
 from spotforecast2_safe.manager.persistence import (
-    _load_forecasters,
-    _model_directory_exists,
-    _save_forecasters,
+    load_forecasters,
+    model_directory_exists,
+    save_forecasters,
 )
 from spotforecast2_safe.preprocessing import RollingFeatures
 from spotforecast2_safe.preprocessing.curate_data import (
@@ -269,7 +269,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[1/9] Loading and preparing target data...")
+        print("\n[1/10] Loading and preparing target data...")
 
     # Handle data input - fetch_data handles both CSV and DataFrame
     if data is None:
@@ -302,7 +302,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[2/9] Detecting and marking outliers...")
+        print("\n[2/10] Detecting and marking outliers...")
 
     data, outliers = mark_outliers(
         data,
@@ -316,7 +316,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[3/9] Processing missing values and creating sample weights...")
+        print("\n[3/10] Processing missing values and creating sample weights...")
 
     imputed_data, weights_series = get_missing_weights(
         data, window_size=window_size, verbose=verbose
@@ -338,7 +338,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[4/9] Creating exogenous features...")
+        print("\n[4/10] Creating exogenous features...")
 
     # Location for day/night features
     location = LocationInfo(
@@ -394,7 +394,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[5/9] Combining and encoding exogenous features...")
+        print("\n[5/10] Combining and encoding exogenous features...")
 
     exogenous_features = pd.concat(
         [
@@ -428,6 +428,9 @@ def n2n_predict_with_covariates(
     # 6. SELECT EXOGENOUS FEATURES
     # ========================================================================
 
+    if verbose:
+        print("\n[6/10] Selecting exogenous features...")
+
     exog_features = select_exogenous_features(
         exogenous_features=exogenous_features,
         weather_aligned=weather_aligned,
@@ -444,7 +447,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[6/9] Merging target and exogenous data...")
+        print("\n[7/10] Merging target and exogenous data...")
 
     data_with_exog, exo_tmp, exo_pred = merge_data_and_covariates(
         data=imputed_data,
@@ -467,7 +470,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[7/9] Splitting data into train/validation/test...")
+        print("\n[8/10] Splitting data into train/validation/test...")
 
     perc_val = 1.0 - train_ratio
     data_train, data_val, data_test = split_rel_train_val_test(
@@ -483,7 +486,7 @@ def n2n_predict_with_covariates(
 
     if verbose:
         print(
-            "\n[8/9] Loading or training recursive forecasters with exogenous variables..."
+            "\n[9/10] Loading or training recursive forecasters with exogenous variables..."
         )
 
     if estimator is None:
@@ -496,10 +499,10 @@ def n2n_predict_with_covariates(
     recursive_forecasters = {}
     targets_to_train = target_columns
 
-    if use_model_persistence and not force_train and _model_directory_exists(model_dir):
+    if use_model_persistence and not force_train and model_directory_exists(model_dir):
         if verbose:
             print("  Attempting to load cached models...")
-        cached_forecasters, missing_targets = _load_forecasters(
+        cached_forecasters, missing_targets = load_forecasters(
             target_columns=target_columns,
             model_dir=model_dir,
             verbose=verbose,
@@ -560,7 +563,7 @@ def n2n_predict_with_covariates(
                 print(
                     f"  Saving {len(targets_to_train)} trained forecasters to disk..."
                 )
-            _save_forecasters(
+            save_forecasters(
                 forecasters={t: recursive_forecasters[t] for t in targets_to_train},
                 model_dir=model_dir,
                 verbose=verbose,
@@ -574,7 +577,7 @@ def n2n_predict_with_covariates(
     # ========================================================================
 
     if verbose:
-        print("\n[9/9] Generating predictions...")
+        print("\n[10/10] Generating predictions...")
 
     exo_pred_subset = exo_pred[exog_features]
 

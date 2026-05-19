@@ -22,21 +22,21 @@ window ``[start, end]``.  A separate prediction covariate slice
 ``(end+1h, cov_end]`` is also returned for use during inference.
 
 String timestamps are converted to UTC-aware
-:class:`~pandas.Timestamp` objects automatically.
+`Timestamp` objects automatically.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name               | Type                                                                                    | Description                                                                                                                                                   | Default     |
-|--------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
-| data               | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | DataFrame containing one or more target time series with a tz-aware :class:`~pandas.DatetimeIndex`.                                                           | _required_  |
-| exogenous_features | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | DataFrame with all exogenous feature columns, covering at least the window ``[start, cov_end]``.                                                              | _required_  |
-| target_columns     | [List](`typing.List`)\[[str](`str`)\]                                                   | Column names of the target variables to keep from *data*.                                                                                                     | _required_  |
-| exog_features      | [List](`typing.List`)\[[str](`str`)\]                                                   | Column names of the exogenous features to include in the merged output and the prediction slice.                                                              | _required_  |
-| start              | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive start of the training window.  String values are parsed with ``utc=True``.                                                                          | _required_  |
-| end                | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end of the training window.  String values are parsed with ``utc=True``.                                                                            | _required_  |
-| cov_end            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end of the covariate (forecast) window.  String values are parsed with ``utc=True``.                                                                | _required_  |
-| forecast_horizon   | [int](`int`)                                                                            | Number of forecast steps ahead (informational; used by calling code to validate slice length).                                                                | _required_  |
-| cast_dtype         | [Optional](`typing.Optional`)\[[str](`str`)\]                                           | NumPy dtype string applied to the merged training DataFrame via :meth:`~pandas.DataFrame.astype`.  Pass ``None`` to skip casting.  Defaults to ``"float32"``. | `'float32'` |
+| Name               | Type                                                                                    | Description                                                                                                                             | Default     |
+|--------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| data               | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | DataFrame containing one or more target time series with a tz-aware `DatetimeIndex`.                                                    | _required_  |
+| exogenous_features | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | DataFrame with all exogenous feature columns, covering at least the window ``[start, cov_end]``.                                        | _required_  |
+| target_columns     | [List](`typing.List`)\[[str](`str`)\]                                                   | Column names of the target variables to keep from *data*.                                                                               | _required_  |
+| exog_features      | [List](`typing.List`)\[[str](`str`)\]                                                   | Column names of the exogenous features to include in the merged output and the prediction slice.                                        | _required_  |
+| start              | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive start of the training window.  String values are parsed with ``utc=True``.                                                    | _required_  |
+| end                | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end of the training window.  String values are parsed with ``utc=True``.                                                      | _required_  |
+| cov_end            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end of the covariate (forecast) window.  String values are parsed with ``utc=True``.                                          | _required_  |
+| forecast_horizon   | [int](`int`)                                                                            | Number of forecast steps ahead (informational; used by calling code to validate slice length).                                          | _required_  |
+| cast_dtype         | [Optional](`typing.Optional`)\[[str](`str`)\]                                           | NumPy dtype string applied to the merged training DataFrame via `astype()`.  Pass ``None`` to skip casting.  Defaults to ``"float32"``. | `'float32'` |
 
 ## Returns {.doc-section .doc-section-returns}
 

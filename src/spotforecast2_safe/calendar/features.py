@@ -5,9 +5,9 @@
 
 Public helpers:
 
-- :func:`get_calendar_features` — extract month, week, day-of-week, and hour
+- `get_calendar_features()` — extract month, week, day-of-week, and hour
   from a time index.
-- :func:`get_day_night_features` — derive sunrise hour, sunset hour, daylight
+- `get_day_night_features()` — derive sunrise hour, sunset hour, daylight
   hours, and an ``is_daylight`` indicator using the
   `astral <https://astral.readthedocs.io>`_ library.
 """
@@ -32,7 +32,7 @@ def get_calendar_features(
 ) -> pd.DataFrame:
     """Create calendar-based features for a contiguous time range.
 
-    Uses :class:`~feature_engine.datetime.DatetimeFeatures` to extract
+    Uses `DatetimeFeatures` to extract
     temporal components from a regularly spaced ``DatetimeIndex``.  The
     resulting DataFrame has the same index as the generated time grid and
     one integer column per requested feature.
@@ -52,7 +52,7 @@ def get_calendar_features(
     Returns:
         pd.DataFrame: DataFrame with integer columns for each extracted
         calendar feature.  The index is a tz-aware
-        :class:`~pandas.DatetimeIndex` with the requested ``freq``.
+        `DatetimeIndex` with the requested ``freq``.
 
     Raises:
         ValueError: If ``start`` is later than ``cov_end``.
@@ -103,7 +103,7 @@ def get_day_night_features(
     """Create day/night features using astronomical sunrise and sunset times.
 
     Sunrise and sunset times are computed once per unique calendar date
-    (using :func:`astral.sun.sun`) and then broadcast to all timestamps
+    (using `astral.sun.sun()`) and then broadcast to all timestamps
     in the requested hourly grid, which avoids redundant computation for
     large date ranges.
 
@@ -120,7 +120,7 @@ def get_day_night_features(
             ``utc=True``.
         cov_end: Inclusive end of the time range.  String values are
             parsed with ``utc=True``.
-        location: :class:`~astral.LocationInfo` instance describing the
+        location: `LocationInfo` instance describing the
             geographic location (latitude, longitude, timezone).
         freq: Pandas-compatible frequency string for the output index.
             Defaults to ``"h"`` (hourly).
@@ -130,7 +130,7 @@ def get_day_night_features(
     Returns:
         pd.DataFrame: DataFrame with columns ``sunrise_hour``,
         ``sunset_hour``, ``daylight_hours``, ``is_daylight``.  The index
-        is a tz-aware :class:`~pandas.DatetimeIndex` with the requested
+        is a tz-aware `DatetimeIndex` with the requested
         ``freq``.
 
     Examples:

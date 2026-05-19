@@ -9,17 +9,17 @@ import pandas as pd
 
 
 def to_utc_timestamp(value: Union[str, pd.Timestamp]) -> pd.Timestamp:
-    """Coerce a string or Timestamp to a UTC-aware :class:`pandas.Timestamp`.
+    """Coerce a string or Timestamp to a UTC-aware `pandas.Timestamp`.
 
     Strings are parsed with ``utc=True``; existing Timestamps are returned
     unchanged.  This deduplicates the same three-line pattern repeated
     across public feature builders in this package.
 
     Args:
-        value: A date/time string or an existing :class:`pandas.Timestamp`.
+        value: A date/time string or an existing `pandas.Timestamp`.
 
     Returns:
-        A UTC-aware :class:`pandas.Timestamp`.
+        A UTC-aware `pandas.Timestamp`.
 
     Examples:
         >>> from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp

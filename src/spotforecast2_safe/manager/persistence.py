@@ -11,7 +11,7 @@ from joblib import dump, load
 # ============================================================================
 
 
-def _ensure_model_dir(model_dir: Union[str, Path]) -> Path:
+def ensure_model_dir(model_dir: Union[str, Path]) -> Path:
     """Ensure model directory exists.
 
     Args:
@@ -24,24 +24,28 @@ def _ensure_model_dir(model_dir: Union[str, Path]) -> Path:
         OSError: If directory cannot be created.
 
     Examples:
-        >>> import tempfile
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.persistence import _ensure_model_dir
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     model_path = _ensure_model_dir(Path(tmpdir) / "models")
-        ...     print(model_path.exists())
-        True
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     nested = _ensure_model_dir(Path(tmpdir) / "a" / "b" / "c")
-        ...     print(nested.is_dir())
-        True
+        ```{python}
+        import tempfile
+        from pathlib import Path
+        from spotforecast2_safe.manager.persistence import ensure_model_dir
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            model_path = ensure_model_dir(Path(tmpdir) / "models")
+            assert model_path.exists()
+            print(model_path.exists())
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            nested = ensure_model_dir(Path(tmpdir) / "a" / "b" / "c")
+            assert nested.is_dir()
+            print(nested.is_dir())
+        ```
     """
     model_path = Path(model_dir)
     model_path.mkdir(parents=True, exist_ok=True)
     return model_path
 
 
-def _get_model_filepath(model_dir: Path, target: str) -> Path:
+def get_model_filepath(model_dir: Path, target: str) -> Path:
     """Get filepath for a single model.
 
     Args:
@@ -52,21 +56,25 @@ def _get_model_filepath(model_dir: Path, target: str) -> Path:
         Path: Full filepath for the model.
 
     Examples:
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.persistence import _get_model_filepath
-        >>> path = _get_model_filepath(Path("./models"), "power")
-        >>> str(path)
-        'models/forecaster_power.joblib'
-        >>> path = _get_model_filepath(Path("/tmp/models"), "energy")
-        >>> path.name
-        'forecaster_energy.joblib'
-        >>> path.suffix
-        '.joblib'
+        ```{python}
+        from pathlib import Path
+        from spotforecast2_safe.manager.persistence import get_model_filepath
+
+        path = get_model_filepath(Path("./models"), "power")
+        assert str(path) == "models/forecaster_power.joblib"
+        print(str(path))
+
+        path2 = get_model_filepath(Path("/tmp/models"), "energy")
+        assert path2.name == "forecaster_energy.joblib"
+        assert path2.suffix == ".joblib"
+        print(path2.name)
+        print(path2.suffix)
+        ```
     """
     return model_dir / f"forecaster_{target}.joblib"
 
 
-def _save_forecasters(
+def save_forecasters(
     forecasters: Dict[str, object],
     model_dir: Union[str, Path],
     verbose: bool = False,
@@ -89,28 +97,33 @@ def _save_forecasters(
         TypeError: If forecasters contain non-serializable objects.
 
     Examples:
-        >>> import tempfile
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.persistence import _save_forecasters
-        >>> from sklearn.linear_model import LinearRegression
-        >>> mock_model = LinearRegression()
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     forecasters = {"power": mock_model, "energy": mock_model}
-        ...     paths = _save_forecasters(forecasters, tmpdir, verbose=False)
-        ...     print("power" in paths)
-        ...     print(paths["power"].exists())
-        True
-        True
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     paths = _save_forecasters({"demand": mock_model}, tmpdir)
-        ...     print(paths["demand"].suffix)
-        .joblib
+        ```{python}
+        import tempfile
+        from pathlib import Path
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.manager.persistence import save_forecasters
+
+        mock_model = LinearRegression()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            forecasters = {"power": mock_model, "energy": mock_model}
+            paths = save_forecasters(forecasters, tmpdir, verbose=False)
+            assert "power" in paths
+            assert paths["power"].exists()
+            print("power" in paths)
+            print(paths["power"].exists())
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            paths = save_forecasters({"demand": mock_model}, tmpdir)
+            assert paths["demand"].suffix == ".joblib"
+            print(paths["demand"].suffix)
+        ```
     """
-    model_path = _ensure_model_dir(model_dir)
+    model_path = ensure_model_dir(model_dir)
     saved_paths = {}
 
     for target, forecaster in forecasters.items():
-        filepath = _get_model_filepath(model_path, target)
+        filepath = get_model_filepath(model_path, target)
         try:
             dump(forecaster, filepath, compress=3)
             saved_paths[target] = filepath
@@ -122,7 +135,7 @@ def _save_forecasters(
     return saved_paths
 
 
-def _load_forecasters(
+def load_forecasters(
     target_columns: List[str],
     model_dir: Union[str, Path],
     verbose: bool = False,
@@ -143,36 +156,37 @@ def _load_forecasters(
         - missing_targets: List of target names without saved models.
 
     Examples:
-        >>> import tempfile
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.persistence import (
-        ...     _save_forecasters,
-        ...     _load_forecasters,
-        ... )
-        >>> from sklearn.linear_model import LinearRegression
-        >>> mock_model = LinearRegression()
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     _ = _save_forecasters({"power": mock_model}, tmpdir)
-        ...     forecasters, missing = _load_forecasters(
-        ...         ["power", "energy"],
-        ...         tmpdir,
-        ...         verbose=False
-        ...     )
-        ...     print("power" in forecasters)
-        ...     print("energy" in missing)
-        True
-        True
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     forecasters, missing = _load_forecasters(["nonexistent"], tmpdir)
-        ...     print(len(forecasters), len(missing))
-        0 1
+        ```{python}
+        import tempfile
+        from pathlib import Path
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.manager.persistence import load_forecasters, save_forecasters
+
+        mock_model = LinearRegression()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _ = save_forecasters({"power": mock_model}, tmpdir)
+            forecasters, missing = load_forecasters(
+                ["power", "energy"], tmpdir, verbose=False
+            )
+            assert "power" in forecasters
+            assert "energy" in missing
+            print("power" in forecasters)
+            print("energy" in missing)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            forecasters, missing = load_forecasters(["nonexistent"], tmpdir)
+            assert len(forecasters) == 0
+            assert len(missing) == 1
+            print(len(forecasters), len(missing))
+        ```
     """
     model_path = Path(model_dir)
     forecasters = {}
     missing_targets = []
 
     for target in target_columns:
-        filepath = _get_model_filepath(model_path, target)
+        filepath = get_model_filepath(model_path, target)
         if filepath.exists():
             try:
                 forecasters[target] = load(filepath)
@@ -188,7 +202,7 @@ def _load_forecasters(
     return forecasters, missing_targets
 
 
-def _model_directory_exists(model_dir: Union[str, Path]) -> bool:
+def model_directory_exists(model_dir: Union[str, Path]) -> bool:
     """Check if model directory exists.
 
     Args:
@@ -198,14 +212,18 @@ def _model_directory_exists(model_dir: Union[str, Path]) -> bool:
         bool: True if directory exists, False otherwise.
 
     Examples:
-        >>> import tempfile
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.persistence import _model_directory_exists
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     print(_model_directory_exists(tmpdir))
-        True
-        >>> print(_model_directory_exists("/nonexistent/path/to/models"))
-        False
+        ```{python}
+        import tempfile
+        from pathlib import Path
+        from spotforecast2_safe.manager.persistence import model_directory_exists
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            assert model_directory_exists(tmpdir)
+            print(model_directory_exists(tmpdir))
+
+        assert not model_directory_exists("/nonexistent/path/to/models")
+        print(model_directory_exists("/nonexistent/path/to/models"))
+        ```
     """
     return Path(model_dir).exists()
 
@@ -219,10 +237,10 @@ def save_forecaster(
 ) -> Path:
     """Save a single trained forecaster to disk using joblib.
 
-    Public single-model counterpart to :func:`_save_forecasters`.  When
-    ``task_name`` is provided the file is named
-    ``{task_name}_{target}.joblib``; otherwise the standard convention
-    ``forecaster_{target}.joblib`` (identical to :func:`_get_model_filepath`)
+    Public single-model counterpart to `save_forecasters()`. When
+    `task_name` is provided the file is named
+    `{task_name}_{target}.joblib`; otherwise the standard convention
+    `forecaster_{target}.joblib` (identical to `get_model_filepath()`)
     is used.
 
     Args:
@@ -240,25 +258,30 @@ def save_forecaster(
         OSError: If the model cannot be written to disk.
 
     Examples:
-        >>> import tempfile
-        >>> from pathlib import Path
-        >>> from sklearn.linear_model import LinearRegression
-        >>> from spotforecast2_safe.manager.persistence import save_forecaster
-        >>> model = LinearRegression()
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     path = save_forecaster(model, tmpdir, "power")
-        ...     print(path.name)
-        forecaster_power.joblib
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     path = save_forecaster(model, tmpdir, "power", task_name="task_1")
-        ...     print(path.name)
-        task_1_power.joblib
+        ```{python}
+        import tempfile
+        from pathlib import Path
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.manager.persistence import save_forecaster
+
+        model = LinearRegression()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = save_forecaster(model, tmpdir, "power")
+            assert path.name == "forecaster_power.joblib"
+            print(path.name)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = save_forecaster(model, tmpdir, "power", task_name="task_1")
+            assert path.name == "task_1_power.joblib"
+            print(path.name)
+        ```
     """
-    model_path = _ensure_model_dir(model_dir)
+    model_path = ensure_model_dir(model_dir)
     if task_name:
         filepath = model_path / f"{task_name}_{target}.joblib"
     else:
-        filepath = _get_model_filepath(model_path, target)
+        filepath = get_model_filepath(model_path, target)
     try:
         dump(forecaster, filepath, compress=3)
         if verbose:
