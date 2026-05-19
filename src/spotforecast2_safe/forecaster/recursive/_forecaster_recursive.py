@@ -40,14 +40,16 @@ from spotforecast2_safe.preprocessing.checking import (
     get_exog_dtypes,
     set_cpu_gpu_device,
 )
-from spotforecast2_safe.utils import (
-    check_select_fit_kwargs,
+from spotforecast2_safe.preprocessing.data_transform import (
     date_to_index_position,
     expand_index,
-    initialize_lags,
-    initialize_weights,
     input_to_frame,
     transform_dataframe,
+)
+from spotforecast2_safe.preprocessing.forecaster_config import (
+    check_select_fit_kwargs,
+    initialize_lags,
+    initialize_weights,
 )
 
 # from spotforecast2_safe import __version__  # Removed to avoid circular import
