@@ -1,3 +1,14 @@
+## [10.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v9.0.0...v10.0.0-rc.1) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* split model_selection into splitter + backtesting, relocate preprocessing/split
+
+### Code Refactoring
+
+* split model_selection into splitter + backtesting, relocate preprocessing/split ([750e73a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/750e73a724794b6f07e841e54577f9108373d331))
+
 ## [9.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v8.0.0...v9.0.0) (2026-05-19)
 
 
