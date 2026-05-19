@@ -78,7 +78,7 @@ print(model.is_tuned)
 | [get_params](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.get_params) | Get parameters for this forecaster model. |
 | [package_prediction](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.package_prediction) | Package predictions, training errors, and benchmarks for the UI. |
 | [predict](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.predict) | Generate predictions and compute error metrics. |
-| [save_to_file](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.save_to_file) | Serialize the model to disk via :func:`joblib.dump`. |
+| [save_to_file](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.save_to_file) | Serialize the model to disk via `joblib.dump()`. |
 | [set_params](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.set_params) | Set the parameters of this forecaster model. |
 | [tune](#spotforecast2_safe.forecaster.wrappers.model.ForecasterRecursiveModel.tune) | Simulate hyperparameter tuning. |
 
@@ -321,7 +321,7 @@ Get parameters for this forecaster model.
 Collects wrapper-level parameters (``iteration``, ``end_dev``,
 ``train_size``, ``random_state``, ``predict_size``, ``refit_size``,
 ``name``) and, when a forecaster is attached, delegates to
-:meth:`ForecasterRecursive.get_params` for forecaster-level
+`ForecasterRecursive.get_params()` for forecaster-level
 parameters (``estimator``, ``lags``, ``window_features``, etc.).
 
 ###### Parameters {.doc-section .doc-section-parameters}
@@ -375,8 +375,8 @@ forecaster.wrappers.model.ForecasterRecursiveModel.package_prediction(
 Package predictions, training errors, and benchmarks for the UI.
 
 This is the main entry-point used by the application layer.
-It delegates to :meth:`predict`, :meth:`get_error_training`,
-and :meth:`get_error_forecast`.
+It delegates to `predict()`, `get_error_training()`,
+and `get_error_forecast()`.
 
 ###### Parameters {.doc-section .doc-section-parameters}
 
@@ -468,13 +468,13 @@ Generate predictions and compute error metrics.
 forecaster.wrappers.model.ForecasterRecursiveModel.save_to_file(model_dir=None)
 ```
 
-Serialize the model to disk via :func:`joblib.dump`.
+Serialize the model to disk via `joblib.dump()`.
 
 ###### Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                                                             | Description                                                                   | Default   |
-|-----------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|-----------|
-| model_dir | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Directory for the model file.  If *None*, defaults to :func:`get_cache_home`. | `None`    |
+| Name      | Type                                                                                             | Description                                                               | Default   |
+|-----------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|-----------|
+| model_dir | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Directory for the model file.  If *None*, defaults to `get_cache_home()`. | `None`    |
 
 ###### Examples {.doc-section .doc-section-examples}
 
@@ -502,7 +502,7 @@ Set the parameters of this forecaster model.
 
 Wrapper-level keys (``iteration``, ``name``, ``predict_size``, …)
 are set directly on the model.  Keys prefixed with ``forecaster__``
-are forwarded to :meth:`ForecasterRecursive.set_params`.
+are forwarded to `ForecasterRecursive.set_params()`.
 
 ###### Parameters {.doc-section .doc-section-parameters}
 

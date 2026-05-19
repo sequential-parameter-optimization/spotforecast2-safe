@@ -308,7 +308,7 @@ def remove_duplicate_timestamps(
             ``"Time (UTC)"``.
         agg: Aggregation applied when collapsing duplicate rows.  Accepts
             any string recognised by
-            :meth:`pandas.core.groupby.GroupBy.agg` (``"mean"``,
+            `pandas.core.groupby.GroupBy.agg()` (``"mean"``,
             ``"median"``, ``"min"``, ``"max"``, ``"sum"``, ``"std"``,
             ``"var"``, ``"first"``, ``"last"``) as well as ``"mode"``
             (most frequent value per group) or any custom callable.

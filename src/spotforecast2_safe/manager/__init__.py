@@ -23,12 +23,12 @@ from spotforecast2_safe.manager.features import (
 from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 from spotforecast2_safe.manager.persistence import (
-    _ensure_model_dir,
-    _get_model_filepath,
-    _load_forecasters,
-    _model_directory_exists,
-    _save_forecasters,
+    ensure_model_dir,
+    get_model_filepath,
+    load_forecasters,
+    model_directory_exists,
     save_forecaster,
+    save_forecasters,
 )
 from spotforecast2_safe.manager.predictor import (
     build_prediction_package,
@@ -43,11 +43,11 @@ __all__ = [
     # Metrics
     "calculate_metrics",
     # Persistence
-    "_ensure_model_dir",
-    "_get_model_filepath",
-    "_save_forecasters",
-    "_load_forecasters",
-    "_model_directory_exists",
+    "ensure_model_dir",
+    "get_model_filepath",
+    "save_forecasters",
+    "load_forecasters",
+    "model_directory_exists",
     "save_forecaster",
     # Predictor
     "build_prediction_package",

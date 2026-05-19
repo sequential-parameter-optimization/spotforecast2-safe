@@ -1,3 +1,17 @@
+## [8.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.2...v8.0.0-rc.1) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **manager:** callers of the underscore-prefixed persistence helpers
+must update to the new public names.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Code Refactoring
+
+* **manager:** promote persistence helpers to public API and modernize docstrings ([3f35f97](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3f35f978a96fbfc1259d54d408352579f361d413))
+
 ## [7.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.1...v7.0.2) (2026-05-19)
 
 

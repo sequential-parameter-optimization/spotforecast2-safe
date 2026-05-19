@@ -7,7 +7,7 @@ from spotforecast2_safe.processing.n2n_predict import n2n_predict
 
 
 @patch(
-    "spotforecast2_safe.processing.n2n_predict._model_directory_exists",
+    "spotforecast2_safe.processing.n2n_predict.model_directory_exists",
     return_value=False,
 )
 @patch("spotforecast2_safe.manager.persistence.dump")
@@ -95,7 +95,7 @@ def test_n2n_predict_flow(
 
 
 @patch(
-    "spotforecast2_safe.processing.n2n_predict._model_directory_exists",
+    "spotforecast2_safe.processing.n2n_predict.model_directory_exists",
     return_value=False,
 )
 @patch("spotforecast2_safe.manager.persistence.dump")

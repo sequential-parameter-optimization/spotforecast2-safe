@@ -221,7 +221,7 @@ class ForecasterRecursiveModel:
         Collects wrapper-level parameters (``iteration``, ``end_dev``,
         ``train_size``, ``random_state``, ``predict_size``, ``refit_size``,
         ``name``) and, when a forecaster is attached, delegates to
-        :meth:`ForecasterRecursive.get_params` for forecaster-level
+        `ForecasterRecursive.get_params()` for forecaster-level
         parameters (``estimator``, ``lags``, ``window_features``, etc.).
 
         Args:
@@ -288,7 +288,7 @@ class ForecasterRecursiveModel:
 
         Wrapper-level keys (``iteration``, ``name``, ``predict_size``, …)
         are set directly on the model.  Keys prefixed with ``forecaster__``
-        are forwarded to :meth:`ForecasterRecursive.set_params`.
+        are forwarded to `ForecasterRecursive.set_params()`.
 
         Args:
             params: Optional dictionary of parameter names mapped to their
@@ -374,11 +374,11 @@ class ForecasterRecursiveModel:
         self,
         model_dir: Optional[Union[str, Path]] = None,
     ) -> None:
-        """Serialize the model to disk via :func:`joblib.dump`.
+        """Serialize the model to disk via `joblib.dump()`.
 
         Args:
             model_dir: Directory for the model file.  If *None*,
-                defaults to :func:`get_cache_home`.
+                defaults to `get_cache_home()`.
 
         Examples:
             ```{python}
@@ -857,8 +857,8 @@ class ForecasterRecursiveModel:
         """Package predictions, training errors, and benchmarks for the UI.
 
         This is the main entry-point used by the application layer.
-        It delegates to :meth:`predict`, :meth:`get_error_training`,
-        and :meth:`get_error_forecast`.
+        It delegates to `predict()`, `get_error_training()`,
+        and `get_error_forecast()`.
 
         Args:
             predict_size: Optional override for the prediction horizon.

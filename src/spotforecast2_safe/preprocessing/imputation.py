@@ -65,7 +65,7 @@ class WeightFunction:
     ) -> Optional[np.ndarray]:
         """Return sample weights for the given index, or None if all weights are zero.
 
-        Computes the weights via :func:`custom_weights`.  When every weight in
+        Computes the weights via `custom_weights()`.  When every weight in
         the result sums to zero — which happens when the entire requested window
         falls within gap-penalty zones created by outlier detection — the method
         logs a warning and returns ``None``.  ``ForecasterRecursive`` interprets
@@ -213,10 +213,10 @@ def apply_imputation(
     Supports two strategies:
 
     - ``"weighted"``: forward-fill then backward-fill gaps, then build a
-      :class:`WeightFunction` that down-weights training rows near any gap.
+      `WeightFunction` that down-weights training rows near any gap.
       Rows inside a gap receive weight 0; the rolling window
       ``config.window_size`` controls how far the penalty extends.
-    - ``"linear"``: apply :class:`LinearlyInterpolateTS` column-by-column.
+    - ``"linear"``: apply `LinearlyInterpolateTS` column-by-column.
 
     A diagnostic summary (NaN count before **and** after imputation) is
     always written to the logger.
@@ -224,13 +224,13 @@ def apply_imputation(
     Args:
         df_pipeline (pd.DataFrame): DataFrame to impute.  Modified in-place
             for the ``"linear"`` method; a new DataFrame is returned for
-            ``"weighted"`` (via :func:`get_missing_weights`).
+            ``"weighted"`` (via `get_missing_weights()`).
         config: Configuration object that must expose:
             - ``imputation_method`` (``str``): ``"weighted"`` or ``"linear"``.
             - ``targets`` (``list[str]``): column names to interpolate
               (``"linear"`` method only).
             - ``window_size`` (``int``): rolling-window size passed to
-              :func:`get_missing_weights` (``"weighted"`` method only).
+              `get_missing_weights()` (``"weighted"`` method only).
         logger (logging.Logger): Standard-library logger used to emit
             ``INFO`` and ``WARNING`` messages.
         verbose (bool): Whether to print additional information. Defaults to False.
@@ -240,7 +240,7 @@ def apply_imputation(
 
         - **df_pipeline** – imputed DataFrame with no NaN values (when the
             chosen method can fill all gaps).
-        - **weight_func** – a :class:`WeightFunction` instance ready to be
+        - **weight_func** – a `WeightFunction` instance ready to be
             passed to a forecaster's ``weight_func`` parameter, or ``None``
             when ``"linear"`` imputation is used.
 

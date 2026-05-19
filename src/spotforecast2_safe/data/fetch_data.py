@@ -32,7 +32,7 @@ def _apply_on_missing(
             ``'ffill_bfill'`` opts into the legacy forward/back-fill
             behavior; ``'passthrough'`` returns the series as read, so
             an explicit downstream imputer (e.g.
-            :class:`spotforecast2_safe.preprocessing.LinearlyInterpolateTS`)
+            `spotforecast2_safe.preprocessing.LinearlyInterpolateTS`)
             can decide.
         column: Name of the column for the error message.
         csv_path: Source path for the error message.
@@ -452,8 +452,8 @@ def _load_energy_load_column(
     """Shared loader for ``interim/energy_load.csv`` columns.
 
     Returns the requested column as an hourly UTC-indexed series after
-    applying the ``on_missing`` contract from :func:`_apply_on_missing`.
-    Used by :func:`load_timeseries` and :func:`load_timeseries_forecast`,
+    applying the ``on_missing`` contract from `_apply_on_missing()`.
+    Used by `load_timeseries()` and `load_timeseries_forecast()`,
     which differ only in the column they read.
     """
     data_dir = get_data_home(data_home)
