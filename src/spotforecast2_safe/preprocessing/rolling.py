@@ -56,58 +56,69 @@ class RollingFeatures:
         - Supports custom user-defined functions in the stats parameter.
 
     Examples:
-        Create a transformer with single statistic and window size:
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.preprocessing.rolling import RollingFeatures
 
-        >>> import numpy as np
-        >>> from spotforecast2_safe.preprocessing import RollingFeatures
-        >>> y = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
-        >>> rf = RollingFeatures(stats='mean', window_sizes=3)
-        >>> rf.fit(y)
-        >>> features = rf.transform(y)
-        >>> features.shape
-        (10, 1)
-        >>> features[:4]  # First 3 values are NaN
-        array([[nan],
-               [nan],
-               [2.],
-               [3.]])
+        # Single statistic and window size — transform() returns the last
+        # window's statistic as a 1D array of shape (n_features,).
+        y = np.arange(10, dtype=float)
+        rf = RollingFeatures(stats='mean', window_sizes=3)
+        features = rf.fit(y).transform(y)
+        print("transform output:", features)
+        assert features.shape == (1,)
+        # Mean of last window [7, 8, 9] = 8.0
+        assert float(features[0]) == 8.0
+        ```
 
-        Create a transformer with multiple statistics and window sizes:
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.preprocessing.rolling import RollingFeatures
 
-        >>> rf = RollingFeatures(
-        ...     stats=['mean', 'std', 'min', 'max'],
-        ...     window_sizes=[3, 7]
-        ... )
-        >>> rf.fit(y)
-        >>> features = rf.transform(y)
-        >>> features.shape
-        (10, 8)  # 4 stats × 2 window sizes
-        >>> rf.features_names
-        ['roll_mean_3', 'roll_std_3', 'roll_min_3', 'roll_max_3',
-         'roll_mean_7', 'roll_std_7', 'roll_min_7', 'roll_max_7']
+        # Multiple statistics and window sizes — feature names are
+        # auto-generated as roll_<stat>_<window>.
+        y = np.arange(10, dtype=float)
+        rf = RollingFeatures(
+            stats=['mean', 'std', 'min', 'max'],
+            window_sizes=[3, 5],
+        )
+        rf.fit(y)
+        print("features_names:", rf.features_names)
+        assert rf.features_names == [
+            'roll_mean_3', 'roll_std_3', 'roll_min_3', 'roll_max_3',
+            'roll_mean_5', 'roll_std_5', 'roll_min_5', 'roll_max_5',
+        ]
+        ```
 
-        Use with pandas Series to preserve index:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.rolling import RollingFeatures
 
-        >>> import pandas as pd
-        >>> dates = pd.date_range('2024-01-01', periods=10, freq='D')
-        >>> y_series = pd.Series(y, index=dates)
-        >>> rf = RollingFeatures(stats=['mean', 'max'], window_sizes=5)
-        >>> features_df = rf.transform_batch(y_series)
-        >>> features_df.shape
-        (10, 2)
-        >>> features_df.index.equals(y_series.index)
-        True
+        # Use transform_batch() with a pandas Series to preserve the index.
+        dates = pd.date_range('2024-01-01', periods=10, freq='D')
+        y_series = pd.Series(np.arange(10, dtype=float), index=dates)
+        rf = RollingFeatures(stats=['mean', 'max'], window_sizes=5)
+        features_df = rf.transform_batch(y_series)
+        print(features_df.head())
+        assert features_df.shape == (10, 2)
+        assert features_df.index.equals(y_series.index)
+        ```
 
-        Use with custom feature names:
+        ```{python}
+        import numpy as np
+        from spotforecast2_safe.preprocessing.rolling import RollingFeatures
 
-        >>> rf = RollingFeatures(
-        ...     stats='mean',
-        ...     window_sizes=[7, 14, 30],
-        ...     features_names=['ma_7', 'ma_14', 'ma_30']
-        ... )
-        >>> rf.fit(y)
-        >>> rf.features_names
-        ['ma_7', 'ma_14', 'ma_30']
+        # Custom feature names override the auto-generated ones.
+        rf = RollingFeatures(
+            stats='mean',
+            window_sizes=[3, 5, 7],
+            features_names=['ma_3', 'ma_5', 'ma_7'],
+        )
+        rf.fit(np.arange(10, dtype=float))
+        print("features_names:", rf.features_names)
+        assert rf.features_names == ['ma_3', 'ma_5', 'ma_7']
+        ```
     """
 
     def __init__(
@@ -193,6 +204,20 @@ class RollingFeatures:
 
         Returns:
             self: Returns the fitted transformer.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            from spotforecast2_safe.preprocessing.rolling import RollingFeatures
+
+            rf = RollingFeatures(stats='mean', window_sizes=3)
+            y = np.arange(10, dtype=float)
+            result = rf.fit(y)
+            assert result is rf, "fit() must return self"
+            features = result.transform(y)
+            print("fit() returns self:", result is rf)
+            print("transform output:", features)
+            ```
         """
         return self
 
@@ -205,8 +230,24 @@ class RollingFeatures:
 
         Returns:
             np.ndarray: Array of rolling statistics.
-                - If X is 1D: shape (len(X), n_features)
-                - If X is 2D: shape (X.shape[1], n_features) - used for vectorized bootstrap.
+                - If X is 1D: shape (n_features,) — statistics over the last window of the series.
+                - If X is 2D: shape (X.shape[1], n_features) — used for vectorized bootstrap.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            from spotforecast2_safe.preprocessing.rolling import RollingFeatures
+
+            # 1D input: returns a 1D array of shape (n_features,) with
+            # the statistic computed over the last window of the series.
+            y = np.arange(10, dtype=float)
+            rf = RollingFeatures(stats='mean', window_sizes=3)
+            out = rf.transform(y)
+            print("transform output:", out, "shape:", out.shape)
+            # Mean of last window [7, 8, 9] = 8.0
+            assert out.shape == (1,)
+            assert float(out[0]) == 8.0
+            ```
         """
         array_ndim = X.ndim
         if array_ndim == 1:
@@ -305,6 +346,33 @@ class RollingFeatures:
     def transform_batch(self, X: pd.Series) -> pd.DataFrame:
         """
         Compute rolling features from a pandas Series with index preservation.
+
+        Args:
+            X: Time series data as a pandas Series with a datetime index.
+
+        Returns:
+            pd.DataFrame: DataFrame of rolling statistics with the same index as
+                X and one column per (window_size, statistic) combination.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.rolling import RollingFeatures
+
+            y = pd.Series(
+                np.arange(20, dtype=float),
+                index=pd.date_range("2024-01-01", periods=20, freq="D"),
+            )
+            rf = RollingFeatures(stats=['mean', 'std'], window_sizes=[3, 5])
+            df = rf.transform_batch(y)
+            print(df.head())
+            assert df.shape == (20, 4)
+            assert list(df.columns) == [
+                'roll_mean_3', 'roll_std_3', 'roll_mean_5', 'roll_std_5',
+            ]
+            assert df.index.equals(y.index)
+            ```
         """
         n_samples = len(X)
         output = np.full((n_samples, len(self.features_names)), np.nan)
