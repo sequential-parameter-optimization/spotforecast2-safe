@@ -64,10 +64,14 @@ import inspect
 
 from spotforecast2_safe.forecaster.base import ForecasterBase
 
-abstract_methods = [
-    m[0] for m in inspect.getmembers(ForecasterBase, predicate=inspect.isabstract)
-]
+abstract_methods = sorted(
+    name
+    for name, method in inspect.getmembers(ForecasterBase)
+    if getattr(method, "__isabstractmethod__", False)
+)
 print(abstract_methods)
+assert "fit" in abstract_methods
+assert "predict" in abstract_methods
 ```
 
 #### Methods

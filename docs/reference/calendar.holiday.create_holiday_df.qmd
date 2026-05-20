@@ -36,6 +36,10 @@ Expands daily holidays to all timestamps in the desired frequency.
 
 ```{python}
 from spotforecast2_safe.calendar import create_holiday_df
+
+# Christmas Day and Boxing Day are public holidays in Germany (NW).
 df = create_holiday_df("2023-12-24", "2023-12-26", freq="D")
-print(df["is_holiday"].tolist())
+print("is_holiday:", df["is_holiday"].tolist())
+assert df["is_holiday"].tolist() == [0, 1, 1]
+assert df.shape == (3, 1)
 ```

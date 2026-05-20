@@ -266,6 +266,24 @@ def check_preprocess_series(
 
 
 def check_preprocess_exog_multiseries(exog):
+    """Check and preprocess `exog` argument in `ForecasterRecursiveMultiSeries`.
+
+    Currently a placeholder; returns None for all inputs.
+
+    Args:
+        exog: Exogenous variables (any type accepted by the multiseries forecaster).
+
+    Returns:
+        None
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import check_preprocess_exog_multiseries
+
+        result = check_preprocess_exog_multiseries(None)
+        print(result)
+        ```
+    """
     pass
 
 
@@ -284,6 +302,30 @@ def exog_to_direct(
         tuple: A tuple containing:
             - exog_direct (pd.DataFrame): Exogenous variables transformed.
             - exog_direct_names (list): Names of the columns of the exogenous variables transformed.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import exog_to_direct
+
+        exog = pd.Series([10, 20, 30, 40, 50], name='temperature')
+        exog_direct, exog_direct_names = exog_to_direct(exog, steps=2)
+        print(exog_direct.shape)
+        print(exog_direct_names)
+        assert exog_direct.shape[0] == 4
+        assert exog_direct.shape[1] == 2
+        ```
+
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import exog_to_direct
+
+        df = pd.DataFrame({'wind': [1.0, 2.0, 3.0, 4.0, 5.0],
+                           'solar': [0.5, 1.0, 1.5, 2.0, 2.5]})
+        exog_direct, exog_direct_names = exog_to_direct(df, steps=2)
+        print(exog_direct.shape)
+        print(exog_direct_names)
+        ```
     """
 
     if not isinstance(exog, (pd.Series, pd.DataFrame)):
@@ -532,6 +574,21 @@ def select_n_jobs_fit_forecaster(forecaster_name: str, estimator: object) -> int
 
     Returns:
         int: The number of jobs (CPUs) to use for parallel processing.
+
+    Examples:
+        ```{python}
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.forecaster.utils import select_n_jobs_fit_forecaster
+
+        estimator = LinearRegression()
+        n_jobs = select_n_jobs_fit_forecaster(
+            forecaster_name='ForecasterRecursive',
+            estimator=estimator,
+        )
+        print(f"n_jobs: {n_jobs}")
+        assert isinstance(n_jobs, int)
+        assert n_jobs >= 1
+        ```
     """
     import os
 
@@ -854,6 +911,23 @@ def align_series_and_exog_multiseries(
         tuple: A tuple containing:
             - series_dict (dict): Dictionary with the aligned series.
             - exog_dict (dict): Dictionary with the aligned exogenous variables.
+
+    Examples:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import align_series_and_exog_multiseries
+
+        dates = pd.date_range('2020-01-01', periods=6, freq='D')
+        s1 = pd.Series([np.nan, 1.0, 2.0, 3.0, 4.0, np.nan], index=dates, name='s1')
+        s2 = pd.Series([5.0, 6.0, 7.0, 8.0, 9.0, 10.0], index=dates, name='s2')
+        series_dict = {'s1': s1, 's2': s2}
+        series_dict_out, exog_dict_out = align_series_and_exog_multiseries(
+            series_dict, exog_dict=None
+        )
+        print(series_dict_out['s1'].tolist())
+        assert len(series_dict_out['s1']) == 4
+        ```
     """
 
     for k in series_dict.keys():
@@ -905,6 +979,26 @@ def prepare_levels_multiseries(
         tuple: A tuple containing:
             - levels (list): Names of the series (levels) to be predicted.
             - input_levels_is_list (bool): Indicates if input levels argument is a list.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import prepare_levels_multiseries
+
+        series_names = ['series_1', 'series_2', 'series_3']
+
+        # levels=None returns all series
+        levels, is_list = prepare_levels_multiseries(series_names, levels=None)
+        print(levels, is_list)
+
+        # levels as string is wrapped in a list
+        levels, is_list = prepare_levels_multiseries(series_names, levels='series_1')
+        print(levels, is_list)
+
+        # levels as list is passed through unchanged
+        levels, is_list = prepare_levels_multiseries(series_names, levels=['series_1', 'series_2'])
+        print(levels, is_list)
+        assert is_list is True
+        ```
     """
 
     input_levels_is_list = False
@@ -938,6 +1032,28 @@ def preprocess_levels_self_last_window_multiseries(
         tuple: A tuple containing:
             - levels (list): Names of the series (levels) to be predicted.
             - last_window (pd.DataFrame): Series values used to create predictors.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.forecaster.utils import (
+            preprocess_levels_self_last_window_multiseries,
+        )
+
+        dates = pd.date_range('2020-01-01', periods=5, freq='D')
+        last_window_ = {
+            's1': pd.Series([1, 2, 3, 4, 5], index=dates),
+            's2': pd.Series([10, 20, 30, 40, 50], index=dates),
+        }
+        levels, last_window = preprocess_levels_self_last_window_multiseries(
+            levels=['s1', 's2'],
+            input_levels_is_list=True,
+            last_window_=last_window_,
+        )
+        print(levels)
+        print(last_window.shape)
+        assert last_window.shape == (5, 2)
+        ```
     """
 
     available_last_windows = set() if last_window_ is None else set(last_window_.keys())
@@ -999,6 +1115,31 @@ def initialize_differentiator_multiseries(
 
     Returns:
         dict: Dictionary with the `differentiator` for each series.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.forecaster.utils import initialize_differentiator_multiseries
+
+        series_names = ['series_1', 'series_2']
+
+        # No differentiation applied (all None)
+        result = initialize_differentiator_multiseries(series_names, differentiator=None)
+        print(result)
+        assert all(v is None for v in result.values())
+        ```
+
+        ```{python}
+        from spotforecast2_safe.preprocessing._differentiator import TimeSeriesDifferentiator
+        from spotforecast2_safe.forecaster.utils import initialize_differentiator_multiseries
+
+        differentiator = TimeSeriesDifferentiator(order=1)
+        result = initialize_differentiator_multiseries(
+            ['series_1', 'series_2'],
+            differentiator=differentiator,
+        )
+        print(list(result.keys()))
+        assert all(v is not None for v in result.values())
+        ```
     """
 
     series_names_in_ = series_names_in_ + ["_unknown_level"]
@@ -1040,6 +1181,29 @@ def set_cpu_gpu_device(
 
     Returns:
         str, None: The original device of the estimator.
+
+    Examples:
+        ```{python}
+        from lightgbm import LGBMRegressor
+        from spotforecast2_safe.forecaster.utils import set_cpu_gpu_device
+
+        estimator = LGBMRegressor(n_estimators=10, random_state=0, verbose=-1)
+        original_device = set_cpu_gpu_device(estimator, device='cpu')
+        print(f"original_device: {original_device}")
+        print(f"estimator.device: {estimator.device}")
+        assert estimator.device == 'cpu'
+        ```
+
+        ```{python}
+        from sklearn.linear_model import LinearRegression
+        from spotforecast2_safe.forecaster.utils import set_cpu_gpu_device
+
+        # Unsupported estimator returns None without modifying it
+        estimator = LinearRegression()
+        result = set_cpu_gpu_device(estimator, device='cpu')
+        print(result)
+        assert result is None
+        ```
     """
 
     valid_devices = {"gpu", "cpu", "cuda", "GPU", "CPU", None}

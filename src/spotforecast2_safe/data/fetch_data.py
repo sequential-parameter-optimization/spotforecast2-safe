@@ -87,10 +87,14 @@ def get_data_home(data_home: Optional[Union[str, Path]] = None) -> Path:
 
     Examples:
         ```{python}
-        from spotforecast2_safe.data.fetch_data import get_data_home
+        import tempfile
         from pathlib import Path
-        get_data_home()
-        get_data_home(Path('/tmp/spotforecast2_data'))
+        from spotforecast2_safe.data.fetch_data import get_data_home
+
+        with tempfile.TemporaryDirectory() as tmp:
+            p = get_data_home(Path(tmp) / "spotforecast2_data")
+            print(p.exists())
+            assert p.is_dir()
         ```
     """
     if data_home is None:
@@ -411,17 +415,24 @@ def fetch_weather_data(
 
     Examples:
         ```{python}
+        #| eval: false
+        # Requires a live HTTP call to the Open-Meteo API; cannot execute offline.
+        import tempfile
+        from pathlib import Path
         from spotforecast2_safe.data.fetch_data import fetch_weather_data
-        weather_df = fetch_weather_data(
-            cov_start='2023-01-01T00:00',
-            cov_end='2023-01-11T00:00',
-            latitude=51.5136,
-            longitude=7.4653,
-            timezone='UTC',
-            freq='h',
-            fallback_on_failure=True,
-            cache_home='~/.spotforecast2_cache')
-        weather_df.head()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            weather_df = fetch_weather_data(
+                cov_start='2023-01-01T00:00',
+                cov_end='2023-01-03T00:00',
+                latitude=51.5136,
+                longitude=7.4653,
+                timezone='UTC',
+                freq='h',
+                fallback_on_failure=True,
+                cache_home=Path(tmp) / 'weather_cache',
+            )
+            print(weather_df.shape)
         ```
     """
     if cache_home is not None:

@@ -363,6 +363,17 @@ class ForecasterRecursiveModel:
         provided in the ``spotforecast2`` package.
 
         #TODO: Implement real Bayesian search in spotforecast2
+
+        Examples:
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model = ForecasterRecursiveModel(iteration=0, name="ridge")
+            assert not model.is_tuned
+            model.tune()
+            assert model.is_tuned
+            print(model.is_tuned)
+            ```
         """
         logger.info("Tuning %s model (simulated)...", self.name)
         self.is_tuned = True
@@ -540,6 +551,55 @@ class ForecasterRecursiveModel:
 
         Raises:
             ValueError: If the forecaster has not been initialized.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+            from pathlib import Path
+
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.data.fetch_data import get_package_data_home
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+
+            demo = get_package_data_home() / "demo01.csv"
+            df = pd.read_csv(demo).rename(
+                columns={
+                    "Time": "Time (UTC)",
+                    "Actual": "Actual Load",
+                    "Forecast": "Forecasted Load",
+                }
+            )
+            df["Time (UTC)"] = pd.to_datetime(df["Time (UTC)"], utc=True)
+            df[df["Time (UTC)"] <= "2022-01-15 23:00:00+00:00"].to_csv(
+                interim / "energy_load.csv", index=False
+            )
+
+            model = ForecasterRecursiveModel(
+                iteration=0,
+                end_dev="2022-01-10 00:00+00:00",
+                predict_size=4,
+                refit_size=1,
+            )
+            model.forecaster = ForecasterRecursive(estimator=Ridge(), lags=4)
+            model.best_params = {}
+            model.best_lags = list(range(1, 5))
+            model.fit_with_best()
+            assert model.forecaster.is_fitted
+            print(model.forecaster.is_fitted)
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
         """
         logger.info(
             "Fitting %s Forecaster %d for predictions",
@@ -625,6 +685,55 @@ class ForecasterRecursiveModel:
 
         Raises:
             ValueError: If the forecaster has not been initialized.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+            from pathlib import Path
+
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.data.fetch_data import get_package_data_home
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+
+            demo = get_package_data_home() / "demo01.csv"
+            df = pd.read_csv(demo).rename(
+                columns={
+                    "Time": "Time (UTC)",
+                    "Actual": "Actual Load",
+                    "Forecast": "Forecasted Load",
+                }
+            )
+            df["Time (UTC)"] = pd.to_datetime(df["Time (UTC)"], utc=True)
+            df[df["Time (UTC)"] <= "2022-01-15 23:00:00+00:00"].to_csv(
+                interim / "energy_load.csv", index=False
+            )
+
+            model = ForecasterRecursiveModel(
+                iteration=0,
+                end_dev="2022-01-10 00:00+00:00",
+                predict_size=4,
+                refit_size=1,
+            )
+            model.forecaster = ForecasterRecursive(estimator=Ridge(), lags=4)
+            model.best_params = {}
+            model.best_lags = list(range(1, 5))
+            metrics = model.backtest()
+            assert "mean_absolute_error" in metrics.columns
+            print(metrics[["mean_absolute_error", "mean_absolute_percentage_error"]])
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
         """
         logger.info(
             "Backtesting %s Forecaster %d",
@@ -683,6 +792,67 @@ class ForecasterRecursiveModel:
 
         Raises:
             ValueError: If the forecaster has not been initialized.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+            from pathlib import Path
+
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.data.fetch_data import get_package_data_home, load_timeseries
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+            from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+
+            demo = get_package_data_home() / "demo01.csv"
+            df = pd.read_csv(demo).rename(
+                columns={
+                    "Time": "Time (UTC)",
+                    "Actual": "Actual Load",
+                    "Forecast": "Forecasted Load",
+                }
+            )
+            df["Time (UTC)"] = pd.to_datetime(df["Time (UTC)"], utc=True)
+            df[df["Time (UTC)"] <= "2022-01-15 23:00:00+00:00"].to_csv(
+                interim / "energy_load.csv", index=False
+            )
+
+            model = ForecasterRecursiveModel(
+                iteration=0,
+                end_dev="2022-01-10 00:00+00:00",
+                predict_size=4,
+                refit_size=1,
+            )
+            model.forecaster = ForecasterRecursive(estimator=Ridge(), lags=4)
+            model.tune()
+
+            y = load_timeseries(on_missing="passthrough")
+            y = LinearlyInterpolateTS(on_missing="ffill_bfill").fit_transform(y)
+            X = model.preprocessor.build(
+                start_date=y.index.min(), end_date=y.index.max()
+            )
+            model.forecaster.fit(
+                y.loc[: model.end_dev], exog=X.loc[: model.end_dev]
+            )
+
+            metrics, (y_actual, y_pred) = model.predict(
+                delta_predict=pd.Timedelta(hours=4)
+            )
+            assert {"mae", "mape"} == set(metrics.keys())
+            print(f"MAE: {metrics['mae']:.4f}, steps predicted: {len(y_pred)}")
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
         """
         logger.info(
             "Making predictions with %s Forecaster %d",
@@ -739,6 +909,66 @@ class ForecasterRecursiveModel:
         Returns:
             Tuple[dict, Tuple[pd.Series, pd.Series]]:
                 ``(metrics, (y_train, y_train_pred))``.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+            from pathlib import Path
+
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.data.fetch_data import get_package_data_home, load_timeseries
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+            from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+
+            demo = get_package_data_home() / "demo01.csv"
+            df = pd.read_csv(demo).rename(
+                columns={
+                    "Time": "Time (UTC)",
+                    "Actual": "Actual Load",
+                    "Forecast": "Forecasted Load",
+                }
+            )
+            df["Time (UTC)"] = pd.to_datetime(df["Time (UTC)"], utc=True)
+            df[df["Time (UTC)"] <= "2022-01-15 23:00:00+00:00"].to_csv(
+                interim / "energy_load.csv", index=False
+            )
+
+            model = ForecasterRecursiveModel(
+                iteration=0,
+                end_dev="2022-01-10 00:00+00:00",
+                predict_size=4,
+                refit_size=1,
+            )
+            model.forecaster = ForecasterRecursive(estimator=Ridge(), lags=4)
+            model.tune()
+
+            y = load_timeseries(on_missing="passthrough")
+            y = LinearlyInterpolateTS(on_missing="ffill_bfill").fit_transform(y)
+            X = model.preprocessor.build(
+                start_date=y.index.min(), end_date=model.end_dev
+            )
+            model.forecaster.fit(
+                y.loc[: model.end_dev], exog=X.loc[: model.end_dev]
+            )
+
+            metrics, (y_train, y_train_pred) = model.get_error_training()
+            assert {"mae", "mape"} == set(metrics.keys())
+            assert len(y_train) == len(y_train_pred)
+            print(f"Train MAE: {metrics['mae']:.4f}")
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
         """
         logger.info(
             "Obtaining training estimation with Forecaster %d",
@@ -779,6 +1009,51 @@ class ForecasterRecursiveModel:
         Returns:
             Tuple[dict, Tuple[pd.Series, pd.Series]]:
                 ``(metrics, (y_actual, y_forecast))``.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+            from pathlib import Path
+
+            import pandas as pd
+
+            from spotforecast2_safe.data.fetch_data import get_package_data_home
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+
+            demo = get_package_data_home() / "demo01.csv"
+            df = pd.read_csv(demo).rename(
+                columns={
+                    "Time": "Time (UTC)",
+                    "Actual": "Actual Load",
+                    "Forecast": "Forecasted Load",
+                }
+            )
+            df["Time (UTC)"] = pd.to_datetime(df["Time (UTC)"], utc=True)
+            df[df["Time (UTC)"] <= "2022-01-15 23:00:00+00:00"].to_csv(
+                interim / "energy_load.csv", index=False
+            )
+
+            model = ForecasterRecursiveModel(
+                iteration=0,
+                end_dev="2022-01-10 00:00+00:00",
+            )
+            metrics, (y_actual, y_forecast) = model.get_error_forecast(
+                delta_predict=pd.Timedelta(hours=4)
+            )
+            assert {"mae", "mape"} == set(metrics.keys())
+            assert len(y_actual) == len(y_forecast)
+            print(f"Benchmark MAE: {metrics['mae']:.4f}, steps: {len(y_actual)}")
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
         """
         y = load_timeseries(on_missing="passthrough")
         y = LinearlyInterpolateTS(on_missing="ffill_bfill").fit_transform(y)
@@ -818,6 +1093,43 @@ class ForecasterRecursiveModel:
         Returns:
             pd.DataFrame or None: Feature importances, or *None* if the
                 model does not support this operation.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from lightgbm import LGBMRegressor
+
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            rng = np.random.default_rng(0)
+            y = pd.Series(
+                rng.random(50),
+                index=pd.date_range("2023-01-01", periods=50, freq="h"),
+            )
+            model = ForecasterRecursiveModel(iteration=0)
+            model.name = "lgbm"
+            model.forecaster = ForecasterRecursive(
+                estimator=LGBMRegressor(n_jobs=1, verbose=-1, random_state=0),
+                lags=4,
+            )
+            model.forecaster.fit(y=y)
+            fi = model.get_feature_importance()
+            assert fi is not None
+            assert "feature" in fi.columns and "importance" in fi.columns
+            print(fi.head(3).to_string(index=False))
+            ```
+
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model_no_tree = ForecasterRecursiveModel(iteration=0)
+            model_no_tree.name = "ridge"
+            fi = model_no_tree.get_feature_importance()
+            assert fi is None
+            print(fi)
+            ```
         """
         if self.name not in ["xgb", "lgbm"]:
             logger.error("Regressor does not support feature importance!")
@@ -842,6 +1154,16 @@ class ForecasterRecursiveModel:
 
         Returns:
             pd.Series: Empty series (stub).
+
+        Examples:
+            ```{python}
+            from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+
+            model = ForecasterRecursiveModel(iteration=0, name="lgbm")
+            shap_vals = model.get_global_shap_feature_importance(frac=0.1)
+            assert shap_vals.empty
+            print(type(shap_vals), shap_vals.empty)
+            ```
         """
         logger.warning(
             "get_global_shap_feature_importance is a stub in "

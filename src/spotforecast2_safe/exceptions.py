@@ -8,19 +8,18 @@ This module contains all the custom warnings and error classes used
 across spotforecast2.
 
 Examples:
-    Using custom warnings::
+    ```{python}
+    import warnings
+    from spotforecast2_safe.exceptions import MissingValuesWarning
 
-        import warnings
-        from spotforecast2_safe.exceptions import MissingValuesWarning
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        warnings.warn("Missing values detected in input data.", MissingValuesWarning)
 
-        # Raise a warning
-        warnings.warn(
-            "Missing values detected in input data.",
-            MissingValuesWarning
-        )
-
-        # Suppress a specific warning
-        warnings.simplefilter('ignore', category=MissingValuesWarning)
+    assert len(caught) == 1
+    assert issubclass(caught[0].category, MissingValuesWarning)
+    print(caught[0].category.__name__)
+    ```
 """
 
 import inspect
@@ -59,11 +58,24 @@ def runtime_deprecated(
         Decorator function.
 
     Examples:
-        >>> @runtime_deprecated(replacement='new_function', version='0.5', removal='1.0')
-        ... def old_function():
-        ...     pass
-        >>> old_function()  # doctest: +SKIP
-        FutureWarning: old_function() is deprecated since version 0.5; use new_function instead...
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import runtime_deprecated
+
+        @runtime_deprecated(replacement='new_function', version='0.5', removal='1.0')
+        def old_function():
+            return 42
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            result = old_function()
+
+        assert result == 42
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, FutureWarning)
+        assert "0.5" in str(caught[0].message)
+        print(type(caught[0].category).__name__, str(caught[0].message)[:60])
+        ```
     """
 
     def decorator(obj):
@@ -153,11 +165,18 @@ class DataTypeWarning(UserWarning):
     accept other data types, therefore the forecaster `fit` and `predict` may fail.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Exogenous data contains unsupported dtypes.",
-        ...     DataTypeWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import DataTypeWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Exogenous data contains unsupported dtypes.", DataTypeWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, DataTypeWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -168,7 +187,7 @@ class DataTypeWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=DataTypeWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class DataTransformationWarning(UserWarning):
@@ -177,11 +196,18 @@ class DataTransformationWarning(UserWarning):
     Used to notify that the output data is in the transformed space.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Output is in transformed space.",
-        ...     DataTransformationWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import DataTransformationWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Output is in transformed space.", DataTransformationWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, DataTransformationWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -192,7 +218,7 @@ class DataTransformationWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=DataTransformationWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class ExogenousInterpretationWarning(UserWarning):
@@ -202,11 +228,21 @@ class ExogenousInterpretationWarning(UserWarning):
     variables with models that use a two-step approach (e.g., regression + ARAR).
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Exogenous variables may not be used as expected.",
-        ...     ExogenousInterpretationWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import ExogenousInterpretationWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn(
+                "Exogenous variables may not be used as expected.",
+                ExogenousInterpretationWarning,
+            )
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, ExogenousInterpretationWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -217,7 +253,7 @@ class ExogenousInterpretationWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=ExogenousInterpretationWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class FeatureOutOfRangeWarning(UserWarning):
@@ -226,11 +262,18 @@ class FeatureOutOfRangeWarning(UserWarning):
     Used to notify that a feature is out of the range seen during training.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Feature value exceeds training range.",
-        ...     FeatureOutOfRangeWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import FeatureOutOfRangeWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Feature value exceeds training range.", FeatureOutOfRangeWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, FeatureOutOfRangeWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -241,7 +284,7 @@ class FeatureOutOfRangeWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=FeatureOutOfRangeWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class IgnoredArgumentWarning(UserWarning):
@@ -251,11 +294,18 @@ class IgnoredArgumentWarning(UserWarning):
     or a function.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Argument 'x' is ignored in this context.",
-        ...     IgnoredArgumentWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import IgnoredArgumentWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Argument 'x' is ignored in this context.", IgnoredArgumentWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, IgnoredArgumentWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -266,7 +316,7 @@ class IgnoredArgumentWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=IgnoredArgumentWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class InputTypeWarning(UserWarning):
@@ -276,11 +326,20 @@ class InputTypeWarning(UserWarning):
     recommended for the forecaster.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Input format is not optimal for this forecaster.",
-        ...     InputTypeWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import InputTypeWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn(
+                "Input format is not optimal for this forecaster.", InputTypeWarning
+            )
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, InputTypeWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -291,7 +350,7 @@ class InputTypeWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=InputTypeWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class LongTrainingWarning(UserWarning):
@@ -301,11 +360,18 @@ class LongTrainingWarning(UserWarning):
     the process may take a while to run.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Training may take a long time.",
-        ...     LongTrainingWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import LongTrainingWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Training may take a long time.", LongTrainingWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, LongTrainingWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -316,7 +382,7 @@ class LongTrainingWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=LongTrainingWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class MissingExogWarning(UserWarning):
@@ -327,11 +393,18 @@ class MissingExogWarning(UserWarning):
     Forecaster's `fit' and `predict' methods may fail.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Missing exogenous variables detected.",
-        ...     MissingExogWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import MissingExogWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Missing exogenous variables detected.", MissingExogWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, MissingExogWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -342,7 +415,7 @@ class MissingExogWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=MissingExogWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class MissingValuesWarning(UserWarning):
@@ -357,12 +430,18 @@ class MissingValuesWarning(UserWarning):
         message (str): The message to display.
 
     Examples:
-        >>> import warnings
-        >>> from spotforecast2_safe.exceptions import MissingValuesWarning
-        >>> warnings.warn(
-        ...     "Missing values detected in input data.",
-        ...     MissingValuesWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import MissingValuesWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Missing values detected in input data.", MissingValuesWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, MissingValuesWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message: str) -> None:
@@ -373,7 +452,7 @@ class MissingValuesWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=MissingValuesWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class OneStepAheadValidationWarning(UserWarning):
@@ -382,11 +461,20 @@ class OneStepAheadValidationWarning(UserWarning):
     Used to notify that the one-step-ahead validation is being used.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Using one-step-ahead validation.",
-        ...     OneStepAheadValidationWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import OneStepAheadValidationWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn(
+                "Using one-step-ahead validation.", OneStepAheadValidationWarning
+            )
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, OneStepAheadValidationWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -397,7 +485,7 @@ class OneStepAheadValidationWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=OneStepAheadValidationWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class ResidualsUsageWarning(UserWarning):
@@ -407,11 +495,18 @@ class ResidualsUsageWarning(UserWarning):
     probabilistic forecasting process.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Residuals are not properly used.",
-        ...     ResidualsUsageWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import ResidualsUsageWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Residuals are not properly used.", ResidualsUsageWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, ResidualsUsageWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -422,7 +517,7 @@ class ResidualsUsageWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=ResidualsUsageWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class UnknownLevelWarning(UserWarning):
@@ -432,11 +527,18 @@ class UnknownLevelWarning(UserWarning):
     training data.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Predicting for an unknown level.",
-        ...     UnknownLevelWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import UnknownLevelWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Predicting for an unknown level.", UnknownLevelWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, UnknownLevelWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -447,7 +549,7 @@ class UnknownLevelWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=UnknownLevelWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class SaveLoadSkforecastWarning(UserWarning):
@@ -457,11 +559,20 @@ class SaveLoadSkforecastWarning(UserWarning):
     a forecaster.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Issues detected when saving forecaster.",
-        ...     SaveLoadSkforecastWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import SaveLoadSkforecastWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn(
+                "Issues detected when saving forecaster.", SaveLoadSkforecastWarning
+            )
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, SaveLoadSkforecastWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -472,7 +583,7 @@ class SaveLoadSkforecastWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=SaveLoadSkforecastWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class SpotforecastVersionWarning(UserWarning):
@@ -482,11 +593,18 @@ class SpotforecastVersionWarning(UserWarning):
     environment differs from the version used to initialize the forecaster.
 
     Examples:
-        >>> import warnings
-        >>> warnings.warn(
-        ...     "Version mismatch detected.",
-        ...     SpotforecastVersionWarning
-        ... )  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import SpotforecastVersionWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Version mismatch detected.", SpotforecastVersionWarning)
+
+        assert len(caught) == 1
+        assert issubclass(caught[0].category, SpotforecastVersionWarning)
+        print(caught[0].category.__name__)
+        ```
     """
 
     def __init__(self, message):
@@ -497,7 +615,7 @@ class SpotforecastVersionWarning(UserWarning):
             "You can suppress this warning using: "
             "warnings.simplefilter('ignore', category=SpotforecastVersionWarning)"
         )
-        return self.message + "\\n" + extra_message
+        return self.message + "\n" + extra_message
 
 
 class NotFittedError(ValueError, AttributeError):
@@ -507,12 +625,17 @@ class NotFittedError(ValueError, AttributeError):
     exception handling and backward compatibility.
 
     Examples:
-        >>> from spotforecast2_safe.exceptions import NotFittedError
-        >>> try:
-        ...     raise NotFittedError("Forecaster not fitted")
-        ... except NotFittedError as e:
-        ...     print(e)
-        Forecaster not fitted
+        ```{python}
+        from spotforecast2_safe.exceptions import NotFittedError
+
+        try:
+            raise NotFittedError("Forecaster not fitted")
+        except NotFittedError as e:
+            print(type(e).__name__, str(e))
+
+        assert issubclass(NotFittedError, ValueError)
+        assert issubclass(NotFittedError, AttributeError)
+        ```
     """
 
 
@@ -556,14 +679,30 @@ def format_warning_handler(
         None
 
     Examples:
-        >>> # This is used internally by the warnings module
-        >>> set_warnings_style('skforecast')  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import (
+            MissingValuesWarning,
+            set_warnings_style,
+        )
+
+        # Activate the custom box-formatted handler, then emit one warning.
+        set_warnings_style("skforecast")
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Missing values in test data.", MissingValuesWarning)
+
+        # Restore default style so subsequent examples are unaffected.
+        set_warnings_style("default")
+        assert len(caught) == 1
+        print("handler demo: warning category =", caught[0].category.__name__)
+        ```
     """
 
     if isinstance(message, tuple(warn_skforecast_categories)):
         width = 88
         title = type(message).__name__
-        output_text = ["\\n"]
+        output_text = ["\n"]
 
         wrapped_message = textwrap.fill(
             str(message), width=width - 2, expand_tabs=True, replace_whitespace=True
@@ -574,13 +713,13 @@ def format_warning_handler(
         bottom_border = f"╰{'─' * width}╯"
         output_text.append(title_top_border)
 
-        for line in wrapped_message.split("\\n"):
+        for line in wrapped_message.split("\n"):
             output_text.append(f"│ {line.ljust(width - 2)} │")
 
         output_text.append(bottom_border)
-        output_text = "\\n".join(output_text)
-        color = "\\033[38;5;208m"
-        reset = "\\033[0m"
+        output_text = "\n".join(output_text)
+        color = "\033[38;5;208m"
+        reset = "\033[0m"
         output_text = f"{color}{output_text}{reset}"
         print(output_text)
     else:
@@ -610,8 +749,24 @@ def rich_warning_handler(
         None
 
     Examples:
-        >>> # This is used internally when rich is available
-        >>> set_warnings_style('skforecast')  # doctest: +SKIP
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import (
+            InputTypeWarning,
+            set_warnings_style,
+        )
+
+        # Activate the rich (or box-formatted fallback) handler, emit one warning.
+        set_warnings_style("skforecast")
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Input format is suboptimal.", InputTypeWarning)
+
+        # Restore default style so subsequent examples are unaffected.
+        set_warnings_style("default")
+        assert len(caught) == 1
+        print("rich handler demo: warning category =", caught[0].category.__name__)
+        ```
     """
 
     if isinstance(message, tuple(warn_skforecast_categories)):
@@ -624,9 +779,9 @@ def rich_warning_handler(
 
         category_name = category.__name__
         text = (
-            f"{message.message}\\n\\n"
-            f"Category : spotforecast2.exceptions.{category_name}\\n"
-            f"Location : {filename}:{lineno}\\n"
+            f"{message.message}\n\n"
+            f"Category : spotforecast2.exceptions.{category_name}\n"
+            f"Location : {filename}:{lineno}\n"
             f"Suppress : warnings.simplefilter('ignore', category={category_name})"
         )
 
@@ -654,10 +809,28 @@ def set_warnings_style(style: str = "skforecast") -> None:
         None
 
     Examples:
-        >>> set_warnings_style('skforecast')
-        >>> # Now warnings will be displayed with formatting
-        >>> set_warnings_style('default')
-        >>> # Back to default Python warning format
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import (
+            IgnoredArgumentWarning,
+            set_warnings_style,
+        )
+
+        # Switch to skforecast box-formatted style and emit a warning.
+        set_warnings_style("skforecast")
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warnings.warn("Argument 'verbose' is ignored here.", IgnoredArgumentWarning)
+        assert len(caught) == 1
+
+        # Switch back to Python default style.
+        set_warnings_style("default")
+        with warnings.catch_warnings(record=True) as caught2:
+            warnings.simplefilter("always")
+            warnings.warn("Argument 'verbose' is ignored here.", IgnoredArgumentWarning)
+        assert len(caught2) == 1
+        print("style toggle: both modes captured 1 warning each")
+        ```
     """
     if style == "skforecast":
         if not hasattr(warnings, "_original_showwarning"):
@@ -675,14 +848,60 @@ set_warnings_style(style="skforecast")
 
 
 def set_skforecast_warnings(suppress_warnings: bool, action: str = "ignore") -> None:
-    """
-    Suppress spotforecast warnings.
+    """Suppress or configure spotforecast warning filters.
+
+    Iterates over all spotforecast warning categories and registers
+    a `warnings.simplefilter` for each one.
 
     Args:
-        suppress_warnings: bool
-            If True, spotforecast warnings will be suppressed.
-        action: str, default 'ignore'
-            Action to take regarding the warnings.
+        suppress_warnings (bool): If True, apply `action` to all spotforecast
+            warning categories.
+        action (str): Filter action passed to `warnings.simplefilter`.
+            Common values are ``'ignore'``, ``'always'``, and ``'once'``.
+            Defaults to ``'ignore'``.
+
+    Examples:
+        ```{python}
+        import warnings
+        from spotforecast2_safe.exceptions import (
+            MissingValuesWarning,
+            ResidualsUsageWarning,
+            set_skforecast_warnings,
+        )
+
+        # Suppress all spotforecast warnings.
+        with warnings.catch_warnings(record=True) as caught_suppressed:
+            warnings.simplefilter("always")   # baseline: catch everything first
+            set_skforecast_warnings(suppress_warnings=True, action="ignore")
+            warnings.warn("Missing values.", MissingValuesWarning)
+            warnings.warn("Bad residuals.", ResidualsUsageWarning)
+
+        suppressed = [w for w in caught_suppressed
+                      if issubclass(w.category, (MissingValuesWarning, ResidualsUsageWarning))]
+        assert len(suppressed) == 0, f"Expected 0 suppressed warnings, got {len(suppressed)}"
+        print(f"suppressed warnings: {len(suppressed)}")
+
+        # Re-enable all spotforecast warnings with 'always'.
+        with warnings.catch_warnings(record=True) as caught_enabled:
+            set_skforecast_warnings(suppress_warnings=True, action="always")
+            warnings.warn("Missing values.", MissingValuesWarning)
+            warnings.warn("Bad residuals.", ResidualsUsageWarning)
+
+        enabled = [w for w in caught_enabled
+                   if issubclass(w.category, (MissingValuesWarning, ResidualsUsageWarning))]
+        assert len(enabled) == 2, f"Expected 2 enabled warnings, got {len(enabled)}"
+        print(f"enabled warnings: {len(enabled)}")
+
+        # suppress_warnings=False is a no-op.
+        with warnings.catch_warnings(record=True) as caught_noop:
+            warnings.simplefilter("always")
+            set_skforecast_warnings(suppress_warnings=False)
+            warnings.warn("Missing values.", MissingValuesWarning)
+
+        noop = [w for w in caught_noop if issubclass(w.category, MissingValuesWarning)]
+        assert len(noop) == 1
+        print(f"no-op (False) warnings: {len(noop)}")
+        ```
     """
     if suppress_warnings:
         for category in warn_skforecast_categories:

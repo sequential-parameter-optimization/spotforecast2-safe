@@ -61,29 +61,37 @@ windows.
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
+import tempfile
+
 import pandas as pd
-from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-from spotforecast2_safe.preprocessing.curate_data import (
-    agg_and_resample_data,
-    get_start_end,
-)
+
 from spotforecast2_safe.weather import get_weather_features
 
-# Load and resample demo data
-data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
-data = agg_and_resample_data(data, verbose=False)
-start, end, _, cov_end = get_start_end(data=data, forecast_horizon=24, verbose=False)
+# Build a minimal synthetic reference DataFrame whose row count is
+# consistent with the requested weather window so curate_weather
+# validation passes without warnings.
+forecast_horizon = 2
+start = pd.Timestamp("2020-06-01", tz="UTC")
+cov_end = pd.Timestamp("2020-06-03", tz="UTC")
+data_end = cov_end - pd.Timedelta(hours=forecast_horizon)
+data_idx = pd.date_range(start=start, end=data_end, freq="h", tz="UTC")
+data = pd.DataFrame({"load": range(len(data_idx))}, index=data_idx)
 
-# Fetch weather features for one week of data
-week_start = pd.Timestamp("2020-06-01", tz="UTC")
-week_end = pd.Timestamp("2020-06-08", tz="UTC")
+cache_home = tempfile.mkdtemp()
 weather_features, weather_aligned = get_weather_features(
     data=data,
-    start=week_start,
-    cov_end=week_end,
-    forecast_horizon=24,
+    start=start,
+    cov_end=cov_end,
+    forecast_horizon=forecast_horizon,
+    cache_home=cache_home,
     verbose=False,
 )
 print("weather_features shape:", weather_features.shape)
 print("weather_aligned shape:", weather_aligned.shape)
+print("weather_aligned columns (first 3):", list(weather_aligned.columns)[:3])
+assert weather_features.shape[0] > 0
+assert weather_aligned.shape[0] > 0
+assert "temperature_2m" in weather_aligned.columns
+# Rolling-window transformer adds more columns than raw aligned data
+assert weather_features.shape[1] > weather_aligned.shape[1]
 ```

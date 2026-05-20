@@ -48,8 +48,12 @@ def create_holiday_df(
     Examples:
         ```{python}
         from spotforecast2_safe.calendar import create_holiday_df
+
+        # Christmas Day and Boxing Day are public holidays in Germany (NW).
         df = create_holiday_df("2023-12-24", "2023-12-26", freq="D")
-        print(df["is_holiday"].tolist())
+        print("is_holiday:", df["is_holiday"].tolist())
+        assert df["is_holiday"].tolist() == [0, 1, 1]
+        assert df.shape == (3, 1)
         ```
     """
     # If start/end are Timestamps with timezones, use that timezone instead of
@@ -126,29 +130,35 @@ def get_holiday_features(
     Examples:
         ```{python}
         import pandas as pd
-        from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-        from spotforecast2_safe.preprocessing.curate_data import agg_and_resample_data
         from spotforecast2_safe.calendar import get_holiday_features
 
-        # Minimal reference DataFrame for validation
-        data = fetch_data(filename=str(get_package_data_home() / "demo10.csv"))
-        data = agg_and_resample_data(data, verbose=False)
+        # Build a minimal synthetic reference DataFrame.
+        # curate_holidays requires: holiday_df.shape[0] == data.shape[0] + forecast_horizon.
+        # With n_data=48 rows and forecast_horizon=24, we need 72 hourly steps total,
+        # so cov_end = start + 71 h (inclusive date_range).
+        forecast_horizon = 24
+        n_data = 48
+        data = pd.DataFrame(
+            {"load": range(n_data)},
+            index=pd.date_range("2024-01-01", periods=n_data, freq="h", tz="UTC"),
+        )
+        start = data.index[0]
+        cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
 
-        start = pd.Timestamp("2024-01-01", tz="UTC")
-        cov_end = pd.Timestamp("2024-01-07 23:00", tz="UTC")
-
-        holidays = get_holiday_features(
+        hf = get_holiday_features(
             data=data,
             start=start,
             cov_end=cov_end,
-            forecast_horizon=24,
+            forecast_horizon=forecast_horizon,
             country_code="DE",
             state="NW",
         )
-        print("shape:", holidays.shape)
-        print("columns:", holidays.columns.tolist())
-        # New Year's Day (Jan 1) is a public holiday in Germany
-        print("Jan 1 value:", holidays.loc["2024-01-01 00:00:00+00:00", "is_holiday"])
+        print("shape:", hf.shape)
+        print("columns:", hf.columns.tolist())
+        # New Year's Day (2024-01-01) is a public holiday in Germany.
+        print("Jan 1 00:00 is_holiday:", hf.loc["2024-01-01 00:00:00+00:00", "is_holiday"])
+        assert hf.shape == (n_data + forecast_horizon, 1)
+        assert hf.loc["2024-01-01 00:00:00+00:00", "is_holiday"] == 1
         ```
     """
     # Local import to avoid a hard cycle: preprocessing.curate_data does

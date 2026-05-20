@@ -31,16 +31,28 @@ a default weighting scheme based on specific predefined columns is used.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> from spotforecast2_safe.processing import agg_predict
->>> import pandas as pd
->>> df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
->>> agg_predict(df, weights={"A": 1.0, "B": -1.0})
-0   -2.0
-1   -2.0
-dtype: float64
->>> agg_predict(df, weights=[0.5, 2.0])
-0    6.5
-1    9.0
-dtype: float64
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing import agg_predict
+
+df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+
+result_dict = agg_predict(df, weights={"A": 1.0, "B": -1.0})
+print(result_dict.tolist())
+assert result_dict.tolist() == [-2.0, -2.0]
+
+result_list = agg_predict(df, weights=[0.5, 2.0])
+print(result_list.tolist())
+assert result_list.tolist() == [6.5, 9.0]
+```
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing import agg_predict
+
+# Default behaviour: equal weight 1.0 for every column (sum)
+df = pd.DataFrame({"X": [10.0, 20.0], "Y": [5.0, 3.0]})
+result_default = agg_predict(df)
+print(result_default.tolist())
+assert result_default.tolist() == [15.0, 23.0]
 ```

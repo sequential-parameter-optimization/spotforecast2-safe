@@ -24,11 +24,14 @@ Covariate range is extended by the forecast horizon.
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.preprocessing.curate_data import get_start_end
 import pandas as pd
-date_rng = pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')
-data = pd.DataFrame(date_rng, columns=['date'])
-data.set_index('date', inplace=True)
+from spotforecast2_safe.preprocessing.curate_data import get_start_end
+
+date_rng = pd.date_range(start="2023-01-01", periods=48, freq="h", tz="UTC")
+data = pd.DataFrame({"load": range(48)}, index=date_rng)
 start, end, cov_start, cov_end = get_start_end(data, forecast_horizon=24, verbose=False)
-print(start, end, cov_start, cov_end)
+print(f"data: {start} → {end}")
+print(f"covariates: {cov_start} → {cov_end}")
+assert start == "2023-01-01T00:00"
+assert cov_end == "2023-01-03T23:00"
 ```

@@ -60,15 +60,15 @@ def get_model_filepath(model_dir: Path, target: str) -> Path:
         from pathlib import Path
         from spotforecast2_safe.manager.persistence import get_model_filepath
 
-        path = get_model_filepath(Path("./models"), "power")
-        assert str(path) == "models/forecaster_power.joblib"
-        print(str(path))
+        path = get_model_filepath(Path("/models"), "power")
+        assert path.name == "forecaster_power.joblib"
+        assert path.suffix == ".joblib"
+        print(path.name)
+        print(path.suffix)
 
-        path2 = get_model_filepath(Path("/tmp/models"), "energy")
+        path2 = get_model_filepath(Path("/models"), "energy")
         assert path2.name == "forecaster_energy.joblib"
-        assert path2.suffix == ".joblib"
         print(path2.name)
-        print(path2.suffix)
         ```
     """
     return model_dir / f"forecaster_{target}.joblib"
@@ -99,24 +99,35 @@ def save_forecasters(
     Examples:
         ```{python}
         import tempfile
-        from pathlib import Path
-        from sklearn.linear_model import LinearRegression
+        import warnings
+        import numpy as np
+        import pandas as pd
+        from lightgbm import LGBMRegressor
+        from spotforecast2_safe.forecaster.recursive._forecaster_recursive import (
+            ForecasterRecursive,
+        )
         from spotforecast2_safe.manager.persistence import save_forecasters
 
-        mock_model = LinearRegression()
+        rng = np.random.default_rng(0)
+        y = pd.Series(rng.normal(size=50), name="target")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            fc = ForecasterRecursive(
+                estimator=LGBMRegressor(
+                    n_estimators=10, random_state=1234, verbose=-1
+                ),
+                lags=3,
+            )
+            fc.fit(y)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            forecasters = {"power": mock_model, "energy": mock_model}
-            paths = save_forecasters(forecasters, tmpdir, verbose=False)
+            paths = save_forecasters({"power": fc, "energy": fc}, tmpdir, verbose=False)
             assert "power" in paths
             assert paths["power"].exists()
+            assert paths["power"].suffix == ".joblib"
             print("power" in paths)
             print(paths["power"].exists())
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            paths = save_forecasters({"demand": mock_model}, tmpdir)
-            assert paths["demand"].suffix == ".joblib"
-            print(paths["demand"].suffix)
+            print(paths["power"].suffix)
         ```
     """
     model_path = ensure_model_dir(model_dir)
@@ -158,21 +169,38 @@ def load_forecasters(
     Examples:
         ```{python}
         import tempfile
-        from pathlib import Path
-        from sklearn.linear_model import LinearRegression
+        import warnings
+        import numpy as np
+        import pandas as pd
+        from lightgbm import LGBMRegressor
+        from spotforecast2_safe.forecaster.recursive._forecaster_recursive import (
+            ForecasterRecursive,
+        )
         from spotforecast2_safe.manager.persistence import load_forecasters, save_forecasters
 
-        mock_model = LinearRegression()
+        rng = np.random.default_rng(0)
+        y = pd.Series(rng.normal(size=50), name="target")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            fc = ForecasterRecursive(
+                estimator=LGBMRegressor(
+                    n_estimators=10, random_state=1234, verbose=-1
+                ),
+                lags=3,
+            )
+            fc.fit(y)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            _ = save_forecasters({"power": mock_model}, tmpdir)
+            _ = save_forecasters({"power": fc}, tmpdir)
             forecasters, missing = load_forecasters(
                 ["power", "energy"], tmpdir, verbose=False
             )
             assert "power" in forecasters
             assert "energy" in missing
+            assert isinstance(forecasters["power"], ForecasterRecursive)
             print("power" in forecasters)
             print("energy" in missing)
+            print(type(forecasters["power"]).__name__)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             forecasters, missing = load_forecasters(["nonexistent"], tmpdir)

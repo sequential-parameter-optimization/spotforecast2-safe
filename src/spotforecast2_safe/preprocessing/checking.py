@@ -473,6 +473,78 @@ def check_predict_input(
 
     Returns:
         None
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        import numpy as np
+
+        from spotforecast2_safe.preprocessing.checking import check_predict_input
+
+        last_window = pd.Series(
+            [1.0, 2.0, 3.0],
+            index=pd.date_range("2020-01-01", periods=3, freq="h"),
+        )
+
+        # Success path: fitted forecaster, no exog
+        check_predict_input(
+            forecaster_name="ForecasterRecursive",
+            steps=2,
+            is_fitted=True,
+            exog_in_=False,
+            index_type_=pd.DatetimeIndex,
+            index_freq_="h",
+            window_size=3,
+            last_window=last_window,
+        )
+        print("Success: valid predict inputs accepted.")
+
+        # Failure path: not fitted
+        try:
+            check_predict_input(
+                forecaster_name="ForecasterRecursive",
+                steps=2,
+                is_fitted=False,
+                exog_in_=False,
+                index_type_=pd.DatetimeIndex,
+                index_freq_="h",
+                window_size=3,
+                last_window=last_window,
+            )
+        except RuntimeError as e:
+            print(f"RuntimeError (not fitted): {type(e).__name__}")
+
+        # Failure path: steps < 1
+        try:
+            check_predict_input(
+                forecaster_name="ForecasterRecursive",
+                steps=0,
+                is_fitted=True,
+                exog_in_=False,
+                index_type_=pd.DatetimeIndex,
+                index_freq_="h",
+                window_size=3,
+                last_window=last_window,
+            )
+        except ValueError as e:
+            print(f"ValueError (steps=0): {type(e).__name__}")
+
+        # Failure path: exog required but not provided
+        try:
+            check_predict_input(
+                forecaster_name="ForecasterRecursive",
+                steps=2,
+                is_fitted=True,
+                exog_in_=True,
+                index_type_=pd.DatetimeIndex,
+                index_freq_="h",
+                window_size=3,
+                last_window=last_window,
+                exog=None,
+            )
+        except ValueError as e:
+            print(f"ValueError (missing exog): {type(e).__name__}")
+        ```
     """
 
     if not is_fitted:
@@ -608,33 +680,76 @@ def check_residuals_input(
     """
     Check residuals input arguments in Forecasters.
 
-    Parameters
-    ----------
-    forecaster_name : str
-        Forecaster name.
-    use_in_sample_residuals : bool
-        Indicates if in sample or out sample residuals are used.
-    in_sample_residuals_ : numpy ndarray, dict
-        Residuals of the model when predicting training data.
-    out_sample_residuals_ : numpy ndarray, dict
-        Residuals of the model when predicting non training data.
-    use_binned_residuals : bool
-        Indicates if residuals are binned.
-    in_sample_residuals_by_bin_ : dict
-        In sample residuals binned according to the predicted value each residual
-        is associated with.
-    out_sample_residuals_by_bin_ : dict
-        Out of sample residuals binned according to the predicted value each residual
-        is associated with.
-    levels : list, default None
-        Names of the series (levels) to be predicted (Forecasters multiseries).
-    encoding : str, default None
-        Encoding used to identify the different series (ForecasterRecursiveMultiSeries).
+    Args:
+        forecaster_name: Forecaster name.
+        use_in_sample_residuals: Indicates if in-sample or out-of-sample residuals
+            are used.
+        in_sample_residuals_: Residuals of the model when predicting training data.
+        out_sample_residuals_: Residuals of the model when predicting non-training data.
+        use_binned_residuals: Indicates if residuals are binned.
+        in_sample_residuals_by_bin_: In-sample residuals binned according to the
+            predicted value each residual is associated with.
+        out_sample_residuals_by_bin_: Out-of-sample residuals binned according to the
+            predicted value each residual is associated with.
+        levels: Names of the series (levels) to be predicted (multiseries forecasters).
+            Defaults to None.
+        encoding: Encoding used to identify the different series
+            (`ForecasterRecursiveMultiSeries`). Defaults to None.
 
-    Returns
-    -------
-    None
+    Returns:
+        None
 
+    Raises:
+        ValueError: If the requested residuals store is None or empty.
+
+    Examples:
+        ```{python}
+        import numpy as np
+
+        from spotforecast2_safe.preprocessing.checking import check_residuals_input
+
+        residuals = np.array([0.1, -0.2, 0.3, -0.1, 0.2])
+
+        # Success path: in-sample residuals present
+        check_residuals_input(
+            forecaster_name="ForecasterRecursive",
+            use_in_sample_residuals=True,
+            in_sample_residuals_=residuals,
+            out_sample_residuals_=None,
+            use_binned_residuals=False,
+            in_sample_residuals_by_bin_=None,
+            out_sample_residuals_by_bin_=None,
+        )
+        print("Success: residuals accepted.")
+
+        # Failure path: in-sample residuals are None
+        try:
+            check_residuals_input(
+                forecaster_name="ForecasterRecursive",
+                use_in_sample_residuals=True,
+                in_sample_residuals_=None,
+                out_sample_residuals_=None,
+                use_binned_residuals=False,
+                in_sample_residuals_by_bin_=None,
+                out_sample_residuals_by_bin_=None,
+            )
+        except ValueError as e:
+            print(f"ValueError (no residuals): {type(e).__name__}")
+
+        # Failure path: out-of-sample residuals not set
+        try:
+            check_residuals_input(
+                forecaster_name="ForecasterRecursive",
+                use_in_sample_residuals=False,
+                in_sample_residuals_=residuals,
+                out_sample_residuals_=None,
+                use_binned_residuals=False,
+                in_sample_residuals_by_bin_=None,
+                out_sample_residuals_by_bin_=None,
+            )
+        except ValueError as e:
+            print(f"ValueError (out-sample missing): {type(e).__name__}")
+        ```
     """
 
     forecasters_multiseries = (
@@ -730,6 +845,33 @@ def set_cpu_gpu_device(estimator: object, device: str | None = "cpu") -> str | N
 
     Returns:
         The device that was set on the estimator before the function was called.
+
+    Examples:
+        ```{python}
+        from lightgbm import LGBMRegressor
+        from sklearn.linear_model import LinearRegression
+
+        from spotforecast2_safe.preprocessing.checking import set_cpu_gpu_device
+
+        # LGBMRegressor: device parameter is set; original value returned
+        lgbm = LGBMRegressor()
+        original_device = set_cpu_gpu_device(lgbm, device="cpu")
+        print(f"Original device was: {repr(original_device)}")
+        print(f"Device after set: {repr(lgbm.device)}")
+        assert lgbm.device == "cpu"
+
+        # LinearRegression: unsupported estimator — returns None, no-op
+        lr = LinearRegression()
+        result = set_cpu_gpu_device(lr, device="cpu")
+        assert result is None
+        print(f"LinearRegression result (no-op): {result}")
+
+        # Invalid device raises ValueError
+        try:
+            set_cpu_gpu_device(lgbm, device="tpu")
+        except ValueError as e:
+            print(f"ValueError (bad device): {type(e).__name__}")
+        ```
     """
 
     valid_devices = {"gpu", "cpu", "cuda", "GPU", "CPU", None}
