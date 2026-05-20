@@ -565,10 +565,10 @@ for target in target_columns:
     recursive_forecasters[target] = forecaster
 
 sample_target = target_columns[0]
-sample_fit = recursive_forecasters[sample_target].regressor
+sample_fit = recursive_forecasters[sample_target].estimator
 print("forecasters trained        :", len(recursive_forecasters))
 print("sample target              :", sample_target)
-print("sample regressor type      :", type(sample_fit).__name__)
+print("sample estimator type      :", type(sample_fit).__name__)
 print("sample n_features_in_      :", getattr(sample_fit, "n_features_in_", "—"))
 ```
 
