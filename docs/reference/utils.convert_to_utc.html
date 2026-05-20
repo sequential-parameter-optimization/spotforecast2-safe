@@ -1485,31 +1485,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div id="71a10be3" class="cell" data-execution_count="1">
+<div id="273fe73a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> convert_to_utc</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"value"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]},</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>pd.to_datetime([<span class="st">"2022-01-01"</span>, <span class="st">"2022-01-02"</span>, <span class="st">"2022-01-03"</span>]),</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> convert_to_utc(df, <span class="st">"Europe/Berlin"</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">str</span>(result.index.tz) <span class="op">==</span> <span class="st">"UTC"</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result.index[<span class="dv">0</span>] <span class="op">==</span> pd.Timestamp(<span class="st">"2021-12-31 23:00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Scenario 1: tz-naive index → localise to Europe/Berlin then convert to UTC</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df_naive <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"value"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]},</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>pd.to_datetime([<span class="st">"2022-01-01"</span>, <span class="st">"2022-01-02"</span>, <span class="st">"2022-01-03"</span>]),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>result_naive <span class="op">=</span> convert_to_utc(df_naive, <span class="st">"Europe/Berlin"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"tz-naive result:"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result_naive)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">str</span>(result_naive.index.tz) <span class="op">==</span> <span class="st">"UTC"</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2022-01-01 CET = UTC+1, so midnight Berlin = 23:00 UTC previous day</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result_naive.index[<span class="dv">0</span>] <span class="op">==</span> pd.Timestamp(<span class="st">"2021-12-31 23:00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                           value
+<pre><code>tz-naive result:
+                           value
 2021-12-31 23:00:00+00:00      1
 2022-01-01 23:00:00+00:00      2
 2022-01-02 23:00:00+00:00      3</code></pre>
+</div>
+</div>
+<div id="84cc056c" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> convert_to_utc</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Scenario 2: non-UTC tz-aware index (US/Eastern) → converted to UTC</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2022-06-01"</span>, periods<span class="op">=</span><span class="dv">3</span>, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"US/Eastern"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>df_eastern <span class="op">=</span> pd.DataFrame({<span class="st">"value"</span>: [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>]}, index<span class="op">=</span>idx)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>result_eastern <span class="op">=</span> convert_to_utc(df_eastern, timezone<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"US/Eastern → UTC result:"</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result_eastern)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">str</span>(result_eastern.index.tz) <span class="op">==</span> <span class="st">"UTC"</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># US/Eastern is UTC-4 in June (EDT), so 00:00 Eastern = 04:00 UTC</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result_eastern.index[<span class="dv">0</span>] <span class="op">==</span> pd.Timestamp(<span class="st">"2022-06-01 04:00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>US/Eastern → UTC result:
+                           value
+2022-06-01 04:00:00+00:00     10
+2022-06-01 05:00:00+00:00     20
+2022-06-01 06:00:00+00:00     30</code></pre>
 </div>
 </div>
 </section>
 </section>
 <section id="spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp">to_utc_timestamp</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>utils.convert_to_utc.to_utc_timestamp(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>utils.convert_to_utc.to_utc_timestamp(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Coerce a string or Timestamp to a UTC-aware <code>pandas.Timestamp</code>.</p>
 <p>Strings are parsed with <code>utc=True</code>; existing Timestamps are returned unchanged. This deduplicates the same three-line pattern repeated across public feature builders in this package.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
@@ -1554,19 +1580,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="851406fd" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> to_utc_timestamp</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> to_utc_timestamp(<span class="st">"2024-01-01"</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> pd.Timestamp(<span class="st">"2024-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-06-15"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> to_utc_timestamp(ts) <span class="kw">is</span> ts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3506e917" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> to_utc_timestamp</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Date-only string → UTC-aware Timestamp</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> to_utc_timestamp(<span class="st">"2024-01-01"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result.tz <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">str</span>(result.tz) <span class="op">==</span> <span class="st">"UTC"</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> pd.Timestamp(<span class="st">"2024-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Datetime string with offset → UTC-aware Timestamp</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>result2 <span class="op">=</span> to_utc_timestamp(<span class="st">"2024-06-15 12:00:00+02:00"</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result2)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">str</span>(result2.tz) <span class="op">==</span> <span class="st">"UTC"</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result2 <span class="op">==</span> pd.Timestamp(<span class="st">"2024-06-15 10:00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Pre-existing UTC Timestamp → returned unchanged (identity)</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-06-15"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> to_utc_timestamp(ts) <span class="kw">is</span> ts</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"pass-through identity: ok"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>2024-01-01 00:00:00+00:00</code></pre>
+<pre><code>2024-01-01 00:00:00+00:00
+2024-06-15 10:00:00+00:00
+pass-through identity: ok</code></pre>
 </div>
 </div>
 

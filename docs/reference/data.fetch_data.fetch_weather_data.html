@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -106,9 +106,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -1496,157 +1493,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="f015e70e" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_weather_data</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>weather_df <span class="op">=</span> fetch_weather_data(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="st">'2023-01-01T00:00'</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="st">'2023-01-11T00:00'</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="st">'~/.spotforecast2_cache'</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>weather_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">temperature_2m</th>
-<th data-quarto-table-cell-role="th">relative_humidity_2m</th>
-<th data-quarto-table-cell-role="th">precipitation</th>
-<th data-quarto-table-cell-role="th">rain</th>
-<th data-quarto-table-cell-role="th">snowfall</th>
-<th data-quarto-table-cell-role="th">weather_code</th>
-<th data-quarto-table-cell-role="th">pressure_msl</th>
-<th data-quarto-table-cell-role="th">surface_pressure</th>
-<th data-quarto-table-cell-role="th">cloud_cover</th>
-<th data-quarto-table-cell-role="th">cloud_cover_low</th>
-<th data-quarto-table-cell-role="th">cloud_cover_mid</th>
-<th data-quarto-table-cell-role="th">cloud_cover_high</th>
-<th data-quarto-table-cell-role="th">wind_speed_10m</th>
-<th data-quarto-table-cell-role="th">wind_direction_10m</th>
-<th data-quarto-table-cell-role="th">wind_gusts_10m</th>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">datetime</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-01 00:00:00+00:00</td>
-<td>16.6</td>
-<td>43</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1010.4</td>
-<td>998.2</td>
-<td>97</td>
-<td>0</td>
-<td>100</td>
-<td>6</td>
-<td>35.2</td>
-<td>228</td>
-<td>63.7</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2023-01-01 01:00:00+00:00</td>
-<td>16.6</td>
-<td>42</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1010.3</td>
-<td>998.1</td>
-<td>100</td>
-<td>0</td>
-<td>99</td>
-<td>87</td>
-<td>32.6</td>
-<td>229</td>
-<td>64.8</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-01 02:00:00+00:00</td>
-<td>15.9</td>
-<td>43</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1011.0</td>
-<td>998.8</td>
-<td>100</td>
-<td>0</td>
-<td>99</td>
-<td>100</td>
-<td>29.1</td>
-<td>222</td>
-<td>60.1</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2023-01-01 03:00:00+00:00</td>
-<td>15.1</td>
-<td>46</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1011.3</td>
-<td>999.0</td>
-<td>100</td>
-<td>0</td>
-<td>100</td>
-<td>99</td>
-<td>28.4</td>
-<td>218</td>
-<td>54.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-01 04:00:00+00:00</td>
-<td>14.6</td>
-<td>50</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>3</td>
-<td>1011.7</td>
-<td>999.4</td>
-<td>100</td>
-<td>5</td>
-<td>100</td>
-<td>94</td>
-<td>28.4</td>
-<td>219</td>
-<td>55.1</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
+<div id="39262c95" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Requires a live HTTP call to the Open-Meteo API; cannot execute offline.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_weather_data</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    weather_df <span class="op">=</span> fetch_weather_data(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        cov_start<span class="op">=</span><span class="st">'2023-01-01T00:00'</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        cov_end<span class="op">=</span><span class="st">'2023-01-03T00:00'</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        freq<span class="op">=</span><span class="st">'h'</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        cache_home<span class="op">=</span>Path(tmp) <span class="op">/</span> <span class="st">'weather_cache'</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(weather_df.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

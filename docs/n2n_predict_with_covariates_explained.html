@@ -1381,6 +1381,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#metadata-and-return-values" id="toc-metadata-and-return-values" class="nav-link" data-scroll-target="#metadata-and-return-values">Metadata and return values</a></li>
   <li><a href="#sec-end-to-end" id="toc-sec-end-to-end" class="nav-link" data-scroll-target="#sec-end-to-end">End-to-end example</a></li>
   <li><a href="#the-complete-execution-flow" id="toc-the-complete-execution-flow" class="nav-link" data-scroll-target="#the-complete-execution-flow">The complete execution flow</a></li>
+  <li><a href="#sf2-safe-api-surface-used-in-this-walkthrough" id="toc-sf2-safe-api-surface-used-in-this-walkthrough" class="nav-link" data-scroll-target="#sf2-safe-api-surface-used-in-this-walkthrough">sf2-safe API surface used in this walkthrough</a>
+  <ul class="collapse">
+  <li><a href="#direct-orchestrator-prose" id="toc-direct-orchestrator-prose" class="nav-link" data-scroll-target="#direct-orchestrator-prose">Direct (orchestrator + prose)</a></li>
+  <li><a href="#transitive-imported-by-the-direct-dependencies" id="toc-transitive-imported-by-the-direct-dependencies" class="nav-link" data-scroll-target="#transitive-imported-by-the-direct-dependencies">Transitive (imported by the direct dependencies)</a></li>
+  </ul></li>
+  <li><a href="#sf2-safe-internal-dependencies" id="toc-sf2-safe-internal-dependencies" class="nav-link" data-scroll-target="#sf2-safe-internal-dependencies">sf2-safe internal dependencies</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_explained.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -1533,7 +1539,7 @@ Why a strict, gap-free hourly index matters
 <p>The fixed <code>random_state=1234</code> ensures that two runs on identical input produce identical outlier flags — a core requirement of the reproducible artefact design.</p>
 <div id="exm-isolation-forest" class="theorem example">
 <p><span class="theorem-title"><strong>Example 1 (Isolation Forest on injected spikes)</strong></span> &nbsp;</p>
-<div id="65f1e1e2" class="cell" data-execution_count="1">
+<div id="f82f6ca0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> IsolationForest</span>
@@ -1588,7 +1594,7 @@ What is an outlier in a time series?
 </ul>
 <div id="exm-weight-function" class="theorem example">
 <p><span class="theorem-title"><strong>Example 2 (Label-based weight lookup)</strong></span> &nbsp;</p>
-<div id="40530d42" class="cell" data-execution_count="2">
+<div id="d2995c02" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1637,7 +1643,7 @@ Why we weight instead of drop
 </ol>
 <div id="exm-day-night" class="theorem example">
 <p><span class="theorem-title"><strong>Example 3 (Daylight flag for a June day)</strong></span> &nbsp;</p>
-<div id="308d0115" class="cell" data-execution_count="3">
+<div id="ad79a5de" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1674,7 +1680,7 @@ Why we weight instead of drop
 </ol>
 <div id="exm-cyclical-month" class="theorem example">
 <p><span class="theorem-title"><strong>Example 4 (Cyclical encoding of the month)</strong></span> &nbsp;</p>
-<div id="a9632ed6" class="cell" data-execution_count="4">
+<div id="387bf5e1" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1824,7 +1830,7 @@ Why sine and cosine instead of just the hour number?
 <p>The boundary timestamp <code>end_validation</code> — the last index of the combined train + validation segment — is the cutoff used for <code>forecaster.fit(...)</code>, so the test set stays genuinely unseen during training.</p>
 <div id="exm-split-ratios" class="theorem example">
 <p><span class="theorem-title"><strong>Example 5 (Computing train/val/test sizes)</strong></span> &nbsp;</p>
-<div id="de25c900" class="cell" data-execution_count="5">
+<div id="c8089765" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1890,7 +1896,7 @@ Why temporal, not random?
 <p>Note that the fit uses <code>:end_validation</code>, not the end of the full dataset — the test portion is held out so a downstream evaluation step can score the model on truly unseen data.</p>
 <p>After training, <code>save_forecasters(forecasters, model_dir)</code> serialises each fitted object with joblib, one file per target column. Because <code>WeightFunction</code> is a regular class (not a closure), it survives the pickle/unpickle round trip together with the rest of the model.</p>
 <p>A <code>show_progress=True</code> flag wraps the per-target loop in a <code>tqdm</code> progress bar — useful for runs with many target columns.</p>
-<div id="be567f2d" class="cell" data-execution_count="6">
+<div id="e041b42c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>estimator <span class="op">=</span> LGBMRegressor(random_state<span class="op">=</span><span class="dv">1234</span>, verbose<span class="op">=-</span><span class="dv">1</span>)</span>
@@ -1921,7 +1927,7 @@ What a recursive forecaster does, one step at a time
 <h2 class="anchored" data-anchor-id="stage-10-prediction">Stage 10 — Prediction</h2>
 <p><em>Why this step exists.</em> This is the payoff: turn the trained forecasters and the future exogenous matrix into actual forecasts.</p>
 <p><code>predict_multivariate(recursive_forecasters, steps_ahead=forecast_horizon,exog=exo_pred[exog_features],show_progress=show_progress)</code> iterates over the trained forecasters dictionary and calls <code>.predict(steps=horizon,exog=...)</code> on each. The exogenous matrix passed to every forecaster is the same slice <code>exo_pred[exog_features]</code> covering exactly <code>forecast_horizon</code> steps after <code>end_validation</code>. The result is assembled into a <code>predictions</code> DataFrame with one column per target and <code>forecast_horizon</code> rows.</p>
-<div id="9da398dc" class="cell" data-execution_count="7">
+<div id="a276af3a" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2039,7 +2045,7 @@ Last  timestamp   : 2023-01-02 23:00:00</code></pre>
 <p>The cell below runs the entire pipeline with very small parameters (<code>forecast_horizon=2</code>, <code>lags=4</code>, <code>window_size=8</code>), using <code>tempfile.mkdtemp()</code> as the model directory so the run does not pollute the user’s persistent cache.</p>
 <div id="exm-end-to-end" class="theorem example">
 <p><span class="theorem-title"><strong>Example 6 (Full pipeline on small parameters)</strong></span> &nbsp;</p>
-<div id="63d2bd99" class="cell" data-execution_count="8">
+<div id="7b442f67" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.n2n_predict_with_covariates <span class="im">import</span> (</span>
@@ -2144,6 +2150,312 @@ prediction window : 2021-12-24 22:00:00+00:00 → 2021-12-24 23:00:00+00:00</cod
 <li>Predictions are generated for the <code>forecast_horizon</code> steps beyond the training end (Stage 10).</li>
 </ol>
 <p>Every public parameter is validated at entry, every exogenous feature matrix is checked for completeness before it enters the model, and every fitted object is serialised in a form that survives process boundaries. These invariants make the pipeline safe to embed in automated batch jobs where a silent failure would not be discovered until long after the prediction window has closed.</p>
+</section>
+<section id="sf2-safe-api-surface-used-in-this-walkthrough" class="level2">
+<h2 class="anchored" data-anchor-id="sf2-safe-api-surface-used-in-this-walkthrough">sf2-safe API surface used in this walkthrough</h2>
+<p>The first table below lists every <code>spotforecast2_safe</code> symbol referenced <strong>directly</strong> by the orchestrator or named in this page’s prose. The second table extends that set with the <strong>transitive</strong> symbols that the direct dependencies themselves import from <code>spotforecast2_safe</code> — these are the classes and helpers a reader will encounter as soon as they open one of the level-1 modules. Third-party dependencies (pandas, numpy, scikit-learn, lightgbm, astral, holidays, feature-engine, joblib, tqdm) are deliberately omitted from both tables.</p>
+<section id="direct-orchestrator-prose" class="level3">
+<h3 class="anchored" data-anchor-id="direct-orchestrator-prose">Direct (orchestrator + prose)</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Kind</th>
+<th>sf2-safe module</th>
+<th>Stage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../docs/reference/processing.n2n_predict_with_covariates.n2n_predict_with_covariates.html#spotforecast2_safe.processing.n2n_predict_with_covariates.n2n_predict_with_covariates"><code>n2n_predict_with_covariates</code></a></td>
+<td>function</td>
+<td><code>spotforecast2_safe.processing.n2n_predict_with_covariates</code></td>
+<td>orchestrator</td>
+</tr>
+<tr class="even">
+<td><a href="../docs/reference/data.fetch_data.fetch_data.html#spotforecast2_safe.data.fetch_data.fetch_data"><code>fetch_data</code></a></td>
+<td>function</td>
+<td><code>spotforecast2_safe.data.fetch_data</code></td>
+<td>Stage 1</td>
+</tr>
+<tr class="odd">
+<td><a href="../docs/reference/data.fetch_data.get_package_data_home.html#spotforecast2_safe.data.fetch_data.get_package_data_home"><code>get_package_data_home</code></a></td>
+<td>function</td>
+<td><code>spotforecast2_safe.data.fetch_data</code></td>
+<td>Stage 1</td>
+</tr>
+<tr class="even">
+<td><a href="../docs/reference/data.fetch_data.get_cache_home.html#spotforecast2_safe.data.fetch_data.get_cache_home"><code>get_cache_home</code></a></td>
+<td>function</td>
+<td><code>spotforecast2_safe.data.fetch_data</code></td>
+<td>Stage 9</td>
+</tr>
+<tr class="odd">
+<td><code>get_start_end</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.preprocessing.curate_data</code></td>
+<td>Stage 1</td>
+</tr>
+<tr class="even">
+<td><code>basic_ts_checks</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.preprocessing.curate_data</code></td>
+<td>Stage 1</td>
+</tr>
+<tr class="odd">
+<td><code>agg_and_resample_data</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.preprocessing.curate_data</code></td>
+<td>Stage 1</td>
+</tr>
+<tr class="even">
+<td><code>mark_outliers</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.preprocessing.outlier</code></td>
+<td>Stage 2</td>
+</tr>
+<tr class="odd">
+<td><code>get_missing_weights</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.preprocessing.imputation</code></td>
+<td>Stage 3</td>
+</tr>
+<tr class="even">
+<td><code>WeightFunction</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.preprocessing</code> (re-export of <code>.imputation.WeightFunction</code>)</td>
+<td>Stage 3</td>
+</tr>
+<tr class="odd">
+<td><code>get_calendar_features</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.calendar</code></td>
+<td>Stage 4</td>
+</tr>
+<tr class="even">
+<td><code>get_day_night_features</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.calendar</code></td>
+<td>Stage 4</td>
+</tr>
+<tr class="odd">
+<td><code>get_holiday_features</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.calendar</code></td>
+<td>Stage 4</td>
+</tr>
+<tr class="even">
+<td><code>get_weather_features</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.weather</code></td>
+<td>Stage 4</td>
+</tr>
+<tr class="odd">
+<td><code>apply_cyclical_encoding</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.manager.features</code></td>
+<td>Stage 5</td>
+</tr>
+<tr class="even">
+<td><code>create_interaction_features</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.manager.features</code></td>
+<td>Stage 5</td>
+</tr>
+<tr class="odd">
+<td><code>select_exogenous_features</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.manager.features</code></td>
+<td>Stage 6</td>
+</tr>
+<tr class="even">
+<td><code>merge_data_and_covariates</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.manager.features</code></td>
+<td>Stage 7</td>
+</tr>
+<tr class="odd">
+<td><code>split_rel_train_val_test</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.splitter.split</code></td>
+<td>Stage 8</td>
+</tr>
+<tr class="even">
+<td><code>ForecasterRecursive</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.forecaster.recursive</code></td>
+<td>Stage 9</td>
+</tr>
+<tr class="odd">
+<td><code>ForecasterRecursive._create_train_X_y</code></td>
+<td>method</td>
+<td><code>spotforecast2_safe.forecaster.recursive.ForecasterRecursive</code></td>
+<td>Stage 3 (referenced)</td>
+</tr>
+<tr class="even">
+<td><code>RollingFeatures</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.preprocessing</code> (re-export of <code>.rolling.RollingFeatures</code>)</td>
+<td>Stage 9</td>
+</tr>
+<tr class="odd">
+<td><code>load_forecasters</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.manager.persistence</code></td>
+<td>Stage 9</td>
+</tr>
+<tr class="even">
+<td><code>save_forecasters</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.manager.persistence</code></td>
+<td>Stage 9</td>
+</tr>
+<tr class="odd">
+<td><code>predict_multivariate</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.forecaster.utils</code></td>
+<td>Stage 10</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="transitive-imported-by-the-direct-dependencies" class="level3">
+<h3 class="anchored" data-anchor-id="transitive-imported-by-the-direct-dependencies">Transitive (imported by the direct dependencies)</h3>
+<p>These symbols are not invoked from the orchestrator or named in the prose above, but the direct dependencies pull them in from <code>spotforecast2_safe</code>. A reader who opens any of the level-1 modules will land on these next, so they are part of the same internal contract.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Kind</th>
+<th>sf2-safe module</th>
+<th>Surfaces in</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>QuantileBinner</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.preprocessing</code> (re-export of <code>._binner.QuantileBinner</code>)</td>
+<td><code>ForecasterRecursive</code> internals (residual-binning)</td>
+</tr>
+<tr class="even">
+<td><code>TimeSeriesDifferentiator</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.preprocessing</code> (re-export of <code>._differentiator.TimeSeriesDifferentiator</code>)</td>
+<td><code>ForecasterRecursive</code> internals (differentiation)</td>
+</tr>
+<tr class="odd">
+<td><code>LinearlyInterpolateTS</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.preprocessing.linearly_interpolate_ts</code></td>
+<td><code>get_missing_weights</code> imputation path</td>
+</tr>
+<tr class="even">
+<td><code>WeatherService</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.weather</code></td>
+<td><code>fetch_data</code> weather-fetch helper</td>
+</tr>
+<tr class="odd">
+<td><code>create_holiday_df</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.calendar</code> (re-export of <code>.holiday.create_holiday_df</code>)</td>
+<td><code>fetch_data.fetch_holiday_data</code></td>
+</tr>
+<tr class="even">
+<td><code>curate_weather</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.preprocessing.curate_data</code></td>
+<td><code>get_weather_features</code> post-fetch curation</td>
+</tr>
+<tr class="odd">
+<td><code>convert_to_utc</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.utils.convert_to_utc</code></td>
+<td><code>fetch_data</code> index normalisation</td>
+</tr>
+<tr class="even">
+<td><code>to_utc_timestamp</code></td>
+<td>function</td>
+<td><code>spotforecast2_safe.utils.convert_to_utc</code></td>
+<td>calendar + weather range-boundary normalisation</td>
+</tr>
+<tr class="odd">
+<td><code>ForecasterBase</code></td>
+<td>class</td>
+<td><code>spotforecast2_safe.forecaster.base</code></td>
+<td>base class of <code>ForecasterRecursive</code></td>
+</tr>
+<tr class="even">
+<td><code>check_y</code>, <code>check_exog</code>, <code>check_exog_dtypes</code>, <code>check_interval</code>, <code>check_predict_input</code>, <code>check_residuals_input</code>, <code>get_exog_dtypes</code>, <code>set_cpu_gpu_device</code></td>
+<td>functions</td>
+<td><code>spotforecast2_safe.preprocessing.checking</code></td>
+<td>fail-safe input validation in <code>ForecasterRecursive.fit</code> / <code>predict</code> and in <code>forecaster.utils</code></td>
+</tr>
+<tr class="odd">
+<td><code>expand_index</code>, <code>input_to_frame</code>, <code>transform_dataframe</code>, <code>date_to_index_position</code></td>
+<td>functions</td>
+<td><code>spotforecast2_safe.preprocessing.data_transform</code></td>
+<td>index / frame coercion in <code>forecaster.utils</code> and <code>ForecasterRecursive</code></td>
+</tr>
+<tr class="even">
+<td><code>check_select_fit_kwargs</code>, <code>initialize_lags</code>, <code>initialize_weights</code></td>
+<td>functions</td>
+<td><code>spotforecast2_safe.preprocessing.forecaster_config</code></td>
+<td>constructor + fit-time configuration for <code>ForecasterRecursive</code></td>
+</tr>
+<tr class="odd">
+<td><code>check_extract_values_and_index</code>, <code>get_style_repr_html</code>, <code>initialize_estimator</code>, <code>initialize_window_features</code>, <code>transform_numpy</code></td>
+<td>functions</td>
+<td><code>spotforecast2_safe.forecaster.utils</code></td>
+<td>helpers consumed by <code>ForecasterRecursive</code> (already exported by the module table above)</td>
+</tr>
+<tr class="even">
+<td><code>DataTransformationWarning</code>, <code>NotFittedError</code>, <code>ResidualsUsageWarning</code>, <code>IgnoredArgumentWarning</code>, <code>InputTypeWarning</code>, <code>MissingValuesWarning</code>, <code>UnknownLevelWarning</code>, <code>set_skforecast_warnings</code></td>
+<td>exceptions / warnings</td>
+<td><code>spotforecast2_safe.exceptions</code></td>
+<td>raised across <code>ForecasterRecursive</code>, <code>forecaster.utils</code>, and the preprocessing layer</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="sf2-safe-internal-dependencies" class="level2">
+<h2 class="anchored" data-anchor-id="sf2-safe-internal-dependencies">sf2-safe internal dependencies</h2>
+<p>The walkthrough touches the following <code>spotforecast2_safe</code> subpackages. Each line collapses the symbols listed above into the module they live in, so the dependency footprint of this page is visible at a glance.</p>
+<ul>
+<li><code>spotforecast2_safe.processing.n2n_predict_with_covariates</code> — the orchestrator entry point exercised by the end-to-end cell.</li>
+<li><code>spotforecast2_safe.data.fetch_data</code> — <code>fetch_data</code>, <code>get_package_data_home</code>, <code>get_cache_home</code>.</li>
+<li><code>spotforecast2_safe.preprocessing.curate_data</code> — <code>get_start_end</code>, <code>basic_ts_checks</code>, <code>agg_and_resample_data</code>.</li>
+<li><code>spotforecast2_safe.preprocessing.outlier</code> — <code>mark_outliers</code>.</li>
+<li><code>spotforecast2_safe.preprocessing.imputation</code> — <code>get_missing_weights</code>, <code>WeightFunction</code> (re-exported one level up at <code>spotforecast2_safe.preprocessing.WeightFunction</code>).</li>
+<li><code>spotforecast2_safe.preprocessing.rolling</code> — <code>RollingFeatures</code> (re-exported one level up at <code>spotforecast2_safe.preprocessing.RollingFeatures</code>).</li>
+<li><code>spotforecast2_safe.calendar</code> — <code>get_calendar_features</code>, <code>get_day_night_features</code>, <code>get_holiday_features</code>.</li>
+<li><code>spotforecast2_safe.weather</code> — <code>get_weather_features</code>.</li>
+<li><code>spotforecast2_safe.manager.features</code> — <code>apply_cyclical_encoding</code>, <code>create_interaction_features</code>, <code>select_exogenous_features</code>, <code>merge_data_and_covariates</code>.</li>
+<li><code>spotforecast2_safe.manager.persistence</code> — <code>load_forecasters</code>, <code>save_forecasters</code> (and the orchestrator additionally calls <code>model_directory_exists</code>).</li>
+<li><code>spotforecast2_safe.splitter.split</code> — <code>split_rel_train_val_test</code>.</li>
+<li><code>spotforecast2_safe.forecaster.recursive</code> — <code>ForecasterRecursive</code> (and its internal <code>_create_train_X_y</code> referenced in Stage 3).</li>
+<li><code>spotforecast2_safe.forecaster.utils</code> — <code>predict_multivariate</code> (and the helpers <code>check_extract_values_and_index</code>, <code>get_style_repr_html</code>, <code>initialize_estimator</code>, <code>initialize_window_features</code>, <code>transform_numpy</code> consumed by <code>ForecasterRecursive</code>).</li>
+</ul>
+<p>The following modules are not imported by the orchestrator directly, but the level-1 dependencies above pull them in. Any change to a public symbol in one of these modules can therefore propagate up into this walkthrough’s pipeline.</p>
+<ul>
+<li><code>spotforecast2_safe.forecaster.base</code> — <code>ForecasterBase</code> (base class of <code>ForecasterRecursive</code>).</li>
+<li><code>spotforecast2_safe.preprocessing._binner</code> — <code>QuantileBinner</code> (re-exported at <code>spotforecast2_safe.preprocessing.QuantileBinner</code>, used by <code>ForecasterRecursive</code> for residual binning).</li>
+<li><code>spotforecast2_safe.preprocessing._differentiator</code> — <code>TimeSeriesDifferentiator</code> (re-exported at <code>spotforecast2_safe.preprocessing.TimeSeriesDifferentiator</code>, used by <code>ForecasterRecursive</code> for differentiation).</li>
+<li><code>spotforecast2_safe.preprocessing.linearly_interpolate_ts</code> — <code>LinearlyInterpolateTS</code>, used by the imputation path of <code>get_missing_weights</code>.</li>
+<li><code>spotforecast2_safe.preprocessing.checking</code> — <code>check_y</code>, <code>check_exog</code>, <code>check_exog_dtypes</code>, <code>check_interval</code>, <code>check_predict_input</code>, <code>check_residuals_input</code>, <code>get_exog_dtypes</code>, <code>set_cpu_gpu_device</code> (fail-safe input validation throughout <code>ForecasterRecursive</code> and <code>forecaster.utils</code>).</li>
+<li><code>spotforecast2_safe.preprocessing.data_transform</code> — <code>expand_index</code>, <code>input_to_frame</code>, <code>transform_dataframe</code>, <code>date_to_index_position</code> (index and frame coercion).</li>
+<li><code>spotforecast2_safe.preprocessing.forecaster_config</code> — <code>check_select_fit_kwargs</code>, <code>initialize_lags</code>, <code>initialize_weights</code> (constructor and fit-time configuration).</li>
+<li><code>spotforecast2_safe.utils.convert_to_utc</code> — <code>convert_to_utc</code>, <code>to_utc_timestamp</code> (timezone normalisation used by <code>fetch_data</code>, <code>calendar.*</code>, and <code>weather.features</code>).</li>
+<li><code>spotforecast2_safe.exceptions</code> — <code>DataTransformationWarning</code>, <code>NotFittedError</code>, <code>ResidualsUsageWarning</code>, <code>IgnoredArgumentWarning</code>, <code>InputTypeWarning</code>, <code>MissingValuesWarning</code>, <code>UnknownLevelWarning</code>, <code>set_skforecast_warnings</code> (raised across the pipeline).</li>
+</ul>
 
 
 </section>
