@@ -29,14 +29,40 @@ class ForecasterRecursiveXGB(ForecasterRecursiveModel):
 
     Examples:
         ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import Ridge
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
         from spotforecast2_safe.forecaster.wrappers import (
             ForecasterRecursiveModel,
             ForecasterRecursiveXGB,
         )
 
-        model = ForecasterRecursiveXGB(iteration=0)
-        print(model.name)
-        print(isinstance(model, ForecasterRecursiveModel))
+        model = ForecasterRecursiveXGB(iteration=0, lags=3)
+        assert model.name == "xgb"
+        assert isinstance(model, ForecasterRecursiveModel)
+        print(f"name: {model.name}")
+        print(f"random_state: {model.random_state}")
+
+        # When xgboost is not installed, substitute a Ridge estimator so the
+        # fit/predict lifecycle can still be demonstrated end-to-end.
+        if model.forecaster is None:
+            model.forecaster = ForecasterRecursive(
+                estimator=Ridge(random_state=1234), lags=3
+            )
+
+        rng = np.random.default_rng(0)
+        y = pd.Series(
+            rng.random(20),
+            index=pd.date_range("2023-01-01", periods=20, freq="h"),
+        )
+        model.fit(y=y)
+        assert model.forecaster.is_fitted
+        pred = model.forecaster.predict(steps=2)
+        assert len(pred) == 2
+        print(f"is_fitted: {model.forecaster.is_fitted}")
+        print(f"forecast horizon: {len(pred)} steps")
         ```
     """
 

@@ -40,44 +40,70 @@ class LinearlyInterpolateTS(BaseEstimator, TransformerMixin):
             NaN remains after linear interpolation.
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
 
-        Interior gaps are bridged by linear interpolation under every
-        mode; the default ``"raise"`` then succeeds because nothing
-        remains:
+        # Interior gaps are bridged by linear interpolation under every
+        # mode; the default "raise" then succeeds because nothing remains.
+        s = pd.Series([1.0, np.nan, 3.0])
+        result = LinearlyInterpolateTS().fit_transform(s)
+        print(result.tolist())
+        assert result.tolist() == [1.0, 2.0, 3.0]
+        ```
 
-        >>> s = pd.Series([1.0, np.nan, 3.0])
-        >>> LinearlyInterpolateTS().fit_transform(s).tolist()
-        [1.0, 2.0, 3.0]
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
 
-        Endpoint NaNs are bridged only when the caller opts in
-        explicitly:
+        # Endpoint NaNs are bridged only when the caller opts in explicitly.
+        s = pd.Series([1.0, np.nan, 3.0, np.nan])
+        result = LinearlyInterpolateTS(on_missing="ffill_bfill").fit_transform(s)
+        print(result.tolist())
+        assert result.tolist() == [1.0, 2.0, 3.0, 3.0]
+        ```
 
-        >>> s = pd.Series([1.0, np.nan, 3.0, np.nan])
-        >>> LinearlyInterpolateTS(on_missing="ffill_bfill").fit_transform(s).tolist()
-        [1.0, 2.0, 3.0, 3.0]
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
 
-        ``"passthrough"`` lets the residual NaN survive for the caller
-        to handle:
-
-        >>> out = LinearlyInterpolateTS(on_missing="passthrough").fit_transform(s)
-        >>> bool(out.isna().iloc[-1])
-        True
+        # "passthrough" lets the residual NaN survive for the caller to handle.
+        s = pd.Series([1.0, np.nan, 3.0, np.nan])
+        out = LinearlyInterpolateTS(on_missing="passthrough").fit_transform(s)
+        print(out.isna().tolist())
+        assert bool(out.isna().iloc[-1]) is True
+        ```
     """
 
     on_missing: OnMissing = "raise"
 
     def fit(self, X: Any, y: Any = None) -> "LinearlyInterpolateTS":
-        """Fitted transformer (no-op).
+        """Fit the transformer (no-op; satisfies the sklearn fit contract).
 
         Args:
-            X: Input data.
+            X: Input data (ignored — this transformer is stateless).
             y: Ignored.
 
         Returns:
-            self: The fitted transformer.
+            LinearlyInterpolateTS: The fitted transformer (``self``).
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
+
+            idx = pd.date_range("2024-01-01", periods=4, freq="h")
+            df = pd.DataFrame({"load_mw": [100.0, np.nan, 120.0, 130.0]}, index=idx)
+
+            interp = LinearlyInterpolateTS()
+            result = interp.fit(df)
+            assert result is interp, "fit() must return self"
+            print(f"fit() returned self: {result is interp}")
+            ```
         """
         return self
 
@@ -86,12 +112,34 @@ class LinearlyInterpolateTS(BaseEstimator, TransformerMixin):
     ) -> Union[pd.Series, pd.DataFrame]:
         """Transform the input data by applying linear interpolation.
 
+        Delegates to `LinearlyInterpolateTS.apply()` after the sklearn
+        ``fit`` → ``transform`` contract is satisfied by `fit()`.
+
         Args:
-            X: Input Series or DataFrame to interpolate.
+            X (Union[pd.Series, pd.DataFrame]): Input Series or DataFrame
+                to interpolate.
 
         Returns:
             Union[pd.Series, pd.DataFrame]: Interpolated data, with
             residual NaN handled according to ``self.on_missing``.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
+
+            # Fit-then-transform mirrors the canonical sklearn workflow.
+            idx = pd.date_range("2024-01-01", periods=4, freq="h")
+            df = pd.DataFrame({"load_mw": [100.0, np.nan, 120.0, 130.0]}, index=idx)
+
+            interp = LinearlyInterpolateTS()
+            interp.fit(df)
+            df_out = interp.transform(df)
+            print(df_out)
+            assert df_out["load_mw"].iloc[1] == 110.0, "interior NaN must be filled"
+            assert not df_out.isna().any().any(), "no NaN must remain"
+            ```
         """
         return self.apply(X)
 
@@ -114,6 +162,24 @@ class LinearlyInterpolateTS(BaseEstimator, TransformerMixin):
             ValueError: If ``self.on_missing`` is not a recognized
                 value, or if ``self.on_missing == "raise"`` and any NaN
                 remains after linear interpolation.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
+
+            # Small hourly DataFrame with a deliberately-placed interior NaN.
+            idx = pd.date_range("2024-01-01", periods=6, freq="h")
+            df = pd.DataFrame({"load_mw": [100.0, 110.0, 120.0, 130.0, 140.0, 150.0]}, index=idx)
+            df.iloc[2, 0] = np.nan
+
+            transformer = LinearlyInterpolateTS()
+            result = transformer.apply(df)
+            print(result)
+            assert result["load_mw"].iloc[2] == 120.0
+            assert not result.isna().any().any()
+            ```
         """
         if self.on_missing not in ("raise", "ffill_bfill", "passthrough"):
             raise ValueError(

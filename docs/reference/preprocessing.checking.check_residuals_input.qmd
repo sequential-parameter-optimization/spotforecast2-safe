@@ -16,33 +16,78 @@ preprocessing.checking.check_residuals_input(
 
 Check residuals input arguments in Forecasters.
 
-
-
 ## Parameters {.doc-section .doc-section-parameters}
 
-forecaster_name : str
-    Forecaster name.
-use_in_sample_residuals : bool
-    Indicates if in sample or out sample residuals are used.
-in_sample_residuals_ : numpy ndarray, dict
-    Residuals of the model when predicting training data.
-out_sample_residuals_ : numpy ndarray, dict
-    Residuals of the model when predicting non training data.
-use_binned_residuals : bool
-    Indicates if residuals are binned.
-in_sample_residuals_by_bin_ : dict
-    In sample residuals binned according to the predicted value each residual
-    is associated with.
-out_sample_residuals_by_bin_ : dict
-    Out of sample residuals binned according to the predicted value each residual
-    is associated with.
-levels : list, default None
-    Names of the series (levels) to be predicted (Forecasters multiseries).
-encoding : str, default None
-    Encoding used to identify the different series (ForecasterRecursiveMultiSeries).
-
-
+| Name                         | Type                                                                                                                                                                         | Description                                                                                          | Default    |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| forecaster_name              | [str](`str`)                                                                                                                                                                 | Forecaster name.                                                                                     | _required_ |
+| use_in_sample_residuals      | [bool](`bool`)                                                                                                                                                               | Indicates if in-sample or out-of-sample residuals are used.                                          | _required_ |
+| in_sample_residuals_         | [np](`numpy`).[ndarray](`numpy.ndarray`) \| [dict](`dict`)\[[str](`str`), [np](`numpy`).[ndarray](`numpy.ndarray`)\] \| None                                                 | Residuals of the model when predicting training data.                                                | _required_ |
+| out_sample_residuals_        | [np](`numpy`).[ndarray](`numpy.ndarray`) \| [dict](`dict`)\[[str](`str`), [np](`numpy`).[ndarray](`numpy.ndarray`)\] \| None                                                 | Residuals of the model when predicting non-training data.                                            | _required_ |
+| use_binned_residuals         | [bool](`bool`)                                                                                                                                                               | Indicates if residuals are binned.                                                                   | _required_ |
+| in_sample_residuals_by_bin_  | [dict](`dict`)\[[str](`str`) \| [int](`int`), [np](`numpy`).[ndarray](`numpy.ndarray`) \| [dict](`dict`)\[[int](`int`), [np](`numpy`).[ndarray](`numpy.ndarray`)\]\] \| None | In-sample residuals binned according to the predicted value each residual is associated with.        | _required_ |
+| out_sample_residuals_by_bin_ | [dict](`dict`)\[[str](`str`) \| [int](`int`), [np](`numpy`).[ndarray](`numpy.ndarray`) \| [dict](`dict`)\[[int](`int`), [np](`numpy`).[ndarray](`numpy.ndarray`)\]\] \| None | Out-of-sample residuals binned according to the predicted value each residual is associated with.    | _required_ |
+| levels                       | [list](`list`)\[[str](`str`)\] \| None                                                                                                                                       | Names of the series (levels) to be predicted (multiseries forecasters). Defaults to None.            | `None`     |
+| encoding                     | [str](`str`) \| None                                                                                                                                                         | Encoding used to identify the different series (`ForecasterRecursiveMultiSeries`). Defaults to None. | `None`     |
 
 ## Returns {.doc-section .doc-section-returns}
 
-None
+| Name   | Type   | Description   |
+|--------|--------|---------------|
+|        | None   | None          |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                        |
+|--------|----------------------------|----------------------------------------------------|
+|        | [ValueError](`ValueError`) | If the requested residuals store is None or empty. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+
+from spotforecast2_safe.preprocessing.checking import check_residuals_input
+
+residuals = np.array([0.1, -0.2, 0.3, -0.1, 0.2])
+
+# Success path: in-sample residuals present
+check_residuals_input(
+    forecaster_name="ForecasterRecursive",
+    use_in_sample_residuals=True,
+    in_sample_residuals_=residuals,
+    out_sample_residuals_=None,
+    use_binned_residuals=False,
+    in_sample_residuals_by_bin_=None,
+    out_sample_residuals_by_bin_=None,
+)
+print("Success: residuals accepted.")
+
+# Failure path: in-sample residuals are None
+try:
+    check_residuals_input(
+        forecaster_name="ForecasterRecursive",
+        use_in_sample_residuals=True,
+        in_sample_residuals_=None,
+        out_sample_residuals_=None,
+        use_binned_residuals=False,
+        in_sample_residuals_by_bin_=None,
+        out_sample_residuals_by_bin_=None,
+    )
+except ValueError as e:
+    print(f"ValueError (no residuals): {type(e).__name__}")
+
+# Failure path: out-of-sample residuals not set
+try:
+    check_residuals_input(
+        forecaster_name="ForecasterRecursive",
+        use_in_sample_residuals=False,
+        in_sample_residuals_=residuals,
+        out_sample_residuals_=None,
+        use_binned_residuals=False,
+        in_sample_residuals_by_bin_=None,
+        out_sample_residuals_by_bin_=None,
+    )
+except ValueError as e:
+    print(f"ValueError (out-sample missing): {type(e).__name__}")
+```

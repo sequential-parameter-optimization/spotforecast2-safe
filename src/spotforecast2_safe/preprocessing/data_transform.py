@@ -53,6 +53,29 @@ def date_to_index_position(
         TypeError: If `index` is not a DatetimeIndex when `date_input` is not an integer.
         ValueError: If `date_input` (as date) does not meet the method's constraints.
         TypeError: If `date_input` is not an integer, string, or pandas Timestamp.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.data_transform import date_to_index_position
+
+        # Integer input returns itself unchanged
+        idx = pd.date_range("2020-01-01", periods=10, freq="h")
+        result = date_to_index_position(idx, 5)
+        print(result)
+        assert result == 5
+
+        # String date → prediction steps from the last date in the index
+        # idx[-1] == "2020-01-01 09:00", so 3 steps to reach "2020-01-01 12:00"
+        steps = date_to_index_position(idx, "2020-01-01 12:00", method="prediction")
+        print(steps)
+        assert steps == 3
+
+        # String date → validation position (1-based count from start)
+        pos = date_to_index_position(idx, "2020-01-01 03:00", method="validation")
+        print(pos)
+        assert pos == 4
+        ```
     """
     # Initialize output to satisfy static analyzers; it will be overwritten
     # on all valid execution paths before being returned.
@@ -269,6 +292,29 @@ def transform_dataframe(
     Raises:
         TypeError: If df is not a pandas DataFrame.
         ValueError: If inverse_transform is requested for ColumnTransformer.
+
+    Examples:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from sklearn.preprocessing import StandardScaler
+        from spotforecast2_safe.preprocessing.data_transform import transform_dataframe
+
+        rng = np.random.default_rng(0)
+        df = pd.DataFrame({"a": rng.normal(0, 1, 8), "b": rng.normal(10, 2, 8)})
+
+        # Fit-transform: scale columns to zero mean and unit variance
+        scaler = StandardScaler()
+        df_scaled = transform_dataframe(df, transformer=scaler, fit=True)
+        print(df_scaled.shape)
+        assert df_scaled.shape == df.shape
+        assert abs(df_scaled["a"].mean()) < 1e-10
+
+        # Inverse transform recovers the original values
+        df_recovered = transform_dataframe(df_scaled, transformer=scaler, inverse_transform=True)
+        print(df_recovered.round(6).equals(df.round(6)))
+        assert np.allclose(df_recovered.values, df.values)
+        ```
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"`df` argument must be a pandas DataFrame. Got {type(df)}")

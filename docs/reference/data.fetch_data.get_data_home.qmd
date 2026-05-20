@@ -26,8 +26,12 @@ If the folder does not already exist, it is automatically created.
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.data.fetch_data import get_data_home
+import tempfile
 from pathlib import Path
-get_data_home()
-get_data_home(Path('/tmp/spotforecast2_data'))
+from spotforecast2_safe.data.fetch_data import get_data_home
+
+with tempfile.TemporaryDirectory() as tmp:
+    p = get_data_home(Path(tmp) / "spotforecast2_data")
+    print(p.exists())
+    assert p.is_dir()
 ```

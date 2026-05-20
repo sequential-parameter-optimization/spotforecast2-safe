@@ -1,6 +1,13 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+"""Time series curation helpers for Stage 1 of the n2n prediction pipeline.
+
+Provides deterministic, fail-safe utilities for validating, resampling,
+and aligning timezone-aware hourly DataFrames before they enter the
+forecasting pipeline.
+"""
+
 from collections.abc import Callable
 from typing import Literal
 
@@ -29,13 +36,16 @@ def get_start_end(
 
     Examples:
         ```{python}
-        from spotforecast2_safe.preprocessing.curate_data import get_start_end
         import pandas as pd
-        date_rng = pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')
-        data = pd.DataFrame(date_rng, columns=['date'])
-        data.set_index('date', inplace=True)
+        from spotforecast2_safe.preprocessing.curate_data import get_start_end
+
+        date_rng = pd.date_range(start="2023-01-01", periods=48, freq="h", tz="UTC")
+        data = pd.DataFrame({"load": range(48)}, index=date_rng)
         start, end, cov_start, cov_end = get_start_end(data, forecast_horizon=24, verbose=False)
-        print(start, end, cov_start, cov_end)
+        print(f"data: {start} → {end}")
+        print(f"covariates: {cov_start} → {cov_end}")
+        assert start == "2023-01-01T00:00"
+        assert cov_end == "2023-01-03T23:00"
         ```
     """
     FORECAST_HORIZON = forecast_horizon

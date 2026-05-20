@@ -211,13 +211,16 @@ def create_interaction_features(
             index=idx,
         )
 
+        # degree=2 generates pairwise products (e.g. hour_sin * temperature)
         result = create_interaction_features(
             exogenous_features=exog,
             weather_aligned=weather,
+            degree=2,
         )
         poly_cols = [c for c in result.columns if c.startswith("poly_")]
         print("poly columns:", poly_cols[:4])
         print("total columns:", result.shape[1])
+        assert len(poly_cols) > 0
         ```
     """
     if base_cols is None:

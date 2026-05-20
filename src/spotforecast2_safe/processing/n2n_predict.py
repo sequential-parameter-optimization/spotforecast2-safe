@@ -12,29 +12,49 @@ Model persistence follows scikit-learn conventions using joblib for efficient
 serialization and deserialization of trained forecasters.
 
 Examples:
-    Basic usage with default parameters:
+    ```{python}
+    import tempfile
 
-    >>> from spotforecast2_safe.processing.n2n_predict import n2n_predict
-    >>> predictions = n2n_predict(forecast_horizon=24, verbose=True)
+    from spotforecast2_safe.processing.n2n_predict import n2n_predict
 
-    Using cached models:
+    predictions, forecasters = n2n_predict(
+        forecast_horizon=2,
+        force_train=True,
+        model_dir=tempfile.mkdtemp(),
+        verbose=False,
+        show_progress=False,
+    )
+    print(predictions.shape)
+    assert predictions.shape[0] == 2
+    ```
 
-    >>> # Load existing models if available, or train new ones
-    >>> predictions = n2n_predict(
-    ...     forecast_horizon=24,
-    ...     force_train=False,
-    ...     model_dir="./models",
-    ...     verbose=True
-    ... )
+    Using cached models (load from a pre-existing model directory):
 
-    Force retraining and update cache:
+    ```{python}
+    import tempfile
 
-    >>> predictions = n2n_predict(
-    ...     forecast_horizon=24,
-    ...     force_train=True,
-    ...     model_dir="./models",
-    ...     verbose=True
-    ... )
+    from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+    model_dir = tempfile.mkdtemp()
+    # First call trains and saves models
+    n2n_predict(
+        forecast_horizon=2,
+        force_train=True,
+        model_dir=model_dir,
+        verbose=False,
+        show_progress=False,
+    )
+    # Second call loads cached models instead of retraining
+    predictions, forecasters = n2n_predict(
+        forecast_horizon=2,
+        force_train=False,
+        model_dir=model_dir,
+        verbose=False,
+        show_progress=False,
+    )
+    print(predictions.shape)
+    assert len(forecasters) > 0
+    ```
 """
 
 from pathlib import Path
@@ -118,41 +138,84 @@ def n2n_predict(
         OSError: If models cannot be saved to disk.
 
     Examples:
-        Basic usage with automatic model caching:
+        ```{python}
+        import tempfile
 
-        >>> predictions, forecasters = n2n_predict(
-        ...     forecast_horizon=24,
-        ...     verbose=True
-        ... )
-        >>> print(predictions.shape)
-        (24, 11)
+        from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+        predictions, forecasters = n2n_predict(
+            forecast_horizon=2,
+            force_train=True,
+            model_dir=tempfile.mkdtemp(),
+            verbose=False,
+            show_progress=False,
+        )
+        print(predictions.shape)
+        assert predictions.shape == (2, 11)
+        ```
 
         Load cached models (if available):
 
-        >>> predictions, forecasters = n2n_predict(
-        ...     forecast_horizon=24,
-        ...     force_train=False,
-        ...     model_dir="./saved_models",
-        ...     verbose=True
-        ... )
+        ```{python}
+        import tempfile
+
+        from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+        model_dir = tempfile.mkdtemp()
+        n2n_predict(
+            forecast_horizon=2,
+            force_train=True,
+            model_dir=model_dir,
+            verbose=False,
+            show_progress=False,
+        )
+        predictions, forecasters = n2n_predict(
+            forecast_horizon=2,
+            force_train=False,
+            model_dir=model_dir,
+            verbose=False,
+            show_progress=False,
+        )
+        print(predictions.shape)
+        assert len(forecasters) == 11
+        ```
 
         Force retraining and update cache:
 
-        >>> predictions, forecasters = n2n_predict(
-        ...     forecast_horizon=24,
-        ...     force_train=True,
-        ...     model_dir="./saved_models",
-        ...     verbose=True
-        ... )
+        ```{python}
+        import tempfile
+
+        from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+        predictions, forecasters = n2n_predict(
+            forecast_horizon=2,
+            force_train=True,
+            model_dir=tempfile.mkdtemp(),
+            verbose=False,
+            show_progress=False,
+        )
+        print(sorted(forecasters.keys())[:3])
+        assert "A" in forecasters
+        ```
 
         With specific target columns:
 
-        >>> predictions, forecasters = n2n_predict(
-        ...     columns=["power", "energy"],
-        ...     forecast_horizon=48,
-        ...     force_train=False,
-        ...     verbose=True
-        ... )
+        ```{python}
+        import tempfile
+
+        from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+        predictions, forecasters = n2n_predict(
+            columns=["A", "B"],
+            forecast_horizon=2,
+            force_train=True,
+            model_dir=tempfile.mkdtemp(),
+            verbose=False,
+            show_progress=False,
+        )
+        print(predictions.shape)
+        assert list(predictions.columns) == ["A", "B"]
+        ```
 
     Notes:
         - Trained models are saved to disk using joblib for fast reuse.

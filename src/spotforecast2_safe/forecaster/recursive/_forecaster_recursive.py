@@ -1291,6 +1291,35 @@ class ForecasterRecursive(ForecasterBase):
 
         Returns:
             Weights to use in `fit` method.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            y = pd.Series(
+                np.sin(np.linspace(0, 4 * np.pi, 100)), name="y"
+            )
+
+            def linear_weight(index):
+                return np.linspace(0.5, 1.0, len(index))
+
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=4,
+                weight_func=linear_weight,
+            )
+            X_train, _ = forecaster.create_train_X_y(y=y)
+            weights = forecaster.create_sample_weights(X_train=X_train)
+            print(f"weights shape: {weights.shape}")
+            assert weights is not None
+            assert weights.shape == (len(X_train),)
+            ```
         """
 
         sample_weight = None
@@ -1721,6 +1750,30 @@ class ForecasterRecursive(ForecasterBase):
         Returns:
             Pandas DataFrame with the predictors for each step. The index
             is the same as the prediction index.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            y = pd.Series(
+                np.sin(np.linspace(0, 4 * np.pi, 100)), name="y"
+            )
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=4,
+            )
+            forecaster.fit(y=y)
+            X_predict = forecaster.create_predict_X(steps=3)
+            print(X_predict)
+            assert isinstance(X_predict, pd.DataFrame)
+            assert X_predict.shape == (3, 4)
+            ```
         """
 
         (
@@ -2091,6 +2144,36 @@ class ForecasterRecursive(ForecasterBase):
 
         Returns:
             Quantiles predicted by the forecaster.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            y = pd.Series(
+                np.sin(np.linspace(0, 4 * np.pi, 100)), name="y"
+            )
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=4,
+            )
+            forecaster.fit(y=y, store_in_sample_residuals=True)
+            quantiles = forecaster.predict_quantiles(
+                steps=3,
+                quantiles=[0.1, 0.5, 0.9],
+                n_boot=10,
+                random_state=1234,
+            )
+            print(quantiles)
+            assert isinstance(quantiles, pd.DataFrame)
+            assert list(quantiles.columns) == ["q_0.1", "q_0.5", "q_0.9"]
+            assert quantiles.shape == (3, 3)
+            ```
         """
 
         check_interval(quantiles=quantiles)
@@ -2152,6 +2235,38 @@ class ForecasterRecursive(ForecasterBase):
 
         Returns:
             Distribution parameters estimated for each step.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from scipy.stats import norm
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            y = pd.Series(
+                np.sin(np.linspace(0, 4 * np.pi, 100)), name="y"
+            )
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=4,
+            )
+            forecaster.fit(y=y, store_in_sample_residuals=True)
+            dist_params = forecaster.predict_dist(
+                steps=2,
+                distribution=norm,
+                n_boot=10,
+                random_state=1234,
+            )
+            print(dist_params)
+            assert isinstance(dist_params, pd.DataFrame)
+            assert "loc" in dist_params.columns
+            assert "scale" in dist_params.columns
+            assert dist_params.shape[0] == 2
+            ```
         """
 
         if not hasattr(distribution, "_pdf") or not callable(
@@ -2572,6 +2687,22 @@ class ForecasterRecursive(ForecasterBase):
 
         Args:
             fit_kwargs: Dict of the form {"argument": new_value}.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from lightgbm import LGBMRegressor
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(
+                estimator=LGBMRegressor(n_estimators=10, random_state=1234, verbose=-1),
+                lags=4,
+            )
+            forecaster.set_fit_kwargs({"categorical_feature": "auto"})
+            print(forecaster.fit_kwargs)
+            assert "categorical_feature" in forecaster.fit_kwargs
+            ```
         """
 
         self.fit_kwargs = check_select_fit_kwargs(self.estimator, fit_kwargs=fit_kwargs)
@@ -2589,6 +2720,23 @@ class ForecasterRecursive(ForecasterBase):
                 - `list`, `1d numpy ndarray` or `range`: include only lags present in
                 `lags`, all elements must be int.
                 - `None`: no lags are included as predictors.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            from sklearn.linear_model import LinearRegression
+            from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+            forecaster = ForecasterRecursive(
+                estimator=LinearRegression(),
+                lags=4,
+            )
+            print(f"before: lags={forecaster.lags}, window_size={forecaster.window_size}")
+            forecaster.set_lags(lags=[1, 2, 6])
+            print(f"after:  lags={forecaster.lags}, window_size={forecaster.window_size}")
+            assert list(forecaster.lags) == [1, 2, 6]
+            assert forecaster.window_size == 6
+            ```
         """
 
         if self.window_features is None and lags is None:
