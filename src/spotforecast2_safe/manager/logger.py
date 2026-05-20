@@ -45,9 +45,85 @@ class JsonAuditFormatter(logging.Formatter):
     section, never more. Callers pass optional structured context through the
     standard ``logging`` ``extra=`` mechanism; recognised extras are ``event``,
     ``task``, and ``context``.
+
+    Examples:
+        ```{python}
+        import io
+        import json
+        import logging
+
+        from spotforecast2_safe.manager.logger import JsonAuditFormatter, SCHEMA_VERSION
+
+        formatter = JsonAuditFormatter()
+        stream = io.StringIO()
+        handler = logging.StreamHandler(stream)
+        handler.setFormatter(formatter)
+
+        logger = logging.getLogger("example.audit")
+        logger.setLevel(logging.DEBUG)
+        # Avoid duplicate handlers across repeated runs in the same process
+        logger.handlers.clear()
+        logger.addHandler(handler)
+        logger.propagate = False
+
+        logger.info(
+            "model fitted",
+            extra={"event": "fit", "task": "demo", "context": {"lags": 3}},
+        )
+
+        line = stream.getvalue().strip()
+        record = json.loads(line)
+        assert record["schema_version"] == SCHEMA_VERSION
+        assert record["event"] == "fit"
+        assert record["task"] == "demo"
+        assert record["context"] == {"lags": 3}
+        print(f"schema_version={record['schema_version']} event={record['event']}")
+        ```
     """
 
     def format(self, record: logging.LogRecord) -> str:
+        """Format a ``LogRecord`` as a single-line JSON string.
+
+        Args:
+            record: The log record to format.
+
+        Returns:
+            A JSON string containing the required audit fields plus any
+            optional ``event``, ``task``, ``context``, and ``exception``
+            extras carried by the record.
+
+        Examples:
+            ```{python}
+            import json
+            import logging
+            import time
+
+            from spotforecast2_safe.manager.logger import JsonAuditFormatter, SCHEMA_VERSION
+
+            formatter = JsonAuditFormatter()
+
+            record = logging.LogRecord(
+                name="test.logger",
+                level=logging.WARNING,
+                pathname="",
+                lineno=0,
+                msg="threshold exceeded",
+                args=(),
+                exc_info=None,
+            )
+            record.__dict__.update({"event": "threshold_check", "task": "predict"})
+
+            line = formatter.format(record)
+            payload = json.loads(line)
+
+            assert payload["schema_version"] == SCHEMA_VERSION
+            assert payload["level"] == "WARNING"
+            assert payload["message"] == "threshold exceeded"
+            assert payload["event"] == "threshold_check"
+            assert payload["task"] == "predict"
+            print(f"level={payload['level']} message={payload['message']}")
+            ```
+        """
         payload: dict[str, Any] = {
             "schema_version": SCHEMA_VERSION,
             "timestamp_utc": _utc_isoformat(record.created),
@@ -96,6 +172,40 @@ def setup_logging(
     Returns:
         Tuple of the configured logger and the audit log file path (or
         ``None`` if ``log_dir`` was omitted).
+
+    Examples:
+        ```{python}
+        import json
+        import logging
+        import tempfile
+        from pathlib import Path
+
+        from spotforecast2_safe.manager.logger import setup_logging
+
+        # Reset the named logger so the example is idempotent when the notebook
+        # kernel re-runs this cell.
+        named = logging.getLogger("task_safe_n_to_1")
+        named.handlers.clear()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            log_dir = Path(tmp)
+            logger, log_path = setup_logging(level=logging.WARNING, log_dir=log_dir)
+
+            assert log_path is not None
+            assert log_path.exists()
+
+            logger.info("pipeline started", extra={"event": "task_start"})
+
+            lines = [l for l in log_path.read_text(encoding="utf-8").splitlines() if l]
+            assert len(lines) >= 1
+            record = json.loads(lines[0])
+            assert record["event"] == "audit_log_init"
+            print(f"log file created: {log_path.name}")
+            print(f"first record event: {record['event']}")
+
+        # Tear down so subsequent cells start clean
+        named.handlers.clear()
+        ```
     """
     logger = logging.getLogger("task_safe_n_to_1")
     logger.setLevel(logging.DEBUG)
