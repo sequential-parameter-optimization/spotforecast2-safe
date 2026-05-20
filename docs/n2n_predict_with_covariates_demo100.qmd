@@ -501,9 +501,10 @@ is `float32`, including the eleven target columns.
 ## Stage 8 — Train / validation / test split
 
 The split is purely temporal: the first `train_ratio=0.8` fraction of
-rows is training data, and the remaining twenty percent is split evenly
-into validation and test. `end_validation` is the cutoff timestamp used
-by `forecaster.fit(...)` — the test segment stays unseen during training.
+rows is training data, and the remaining twenty percent goes to validation.
+The test segment is empty because `perc_val = 1 - train_ratio` consumes
+all remaining rows. `end_validation` is the cutoff timestamp used by
+`forecaster.fit(...)`.
 
 ::: {#exm-s8-split}
 
