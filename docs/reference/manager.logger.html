@@ -1343,6 +1343,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">n2n_predict_with_covariates Explained</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/n2n_predict_with_covariates_demo100.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">n2n_predict_with_covariates on demo100</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -1355,9 +1361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.manager.logger" id="toc-spotforecast2_safe.manager.logger" class="nav-link active" data-scroll-target="#spotforecast2_safe.manager.logger">manager.logger</a>
-  <ul class="collapse">
-  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <li><a href="#classes" id="toc-classes" class="nav-link active" data-scroll-target="#classes">Classes</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.manager.logger.JsonAuditFormatter" id="toc-spotforecast2_safe.manager.logger.JsonAuditFormatter" class="nav-link" data-scroll-target="#spotforecast2_safe.manager.logger.JsonAuditFormatter">JsonAuditFormatter</a></li>
   </ul></li>
@@ -1365,19 +1369,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.manager.logger.setup_logging" id="toc-spotforecast2_safe.manager.logger.setup_logging" class="nav-link" data-scroll-target="#spotforecast2_safe.manager.logger.setup_logging">setup_logging</a></li>
   </ul></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/manager.logger.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.demo_metrics.calculate_metrics.html">Manager</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.logger.html">logger</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.demo_metrics.calculate_metrics.html">Manager</a></li><li class="breadcrumb-item"><a href="../../docs/reference/manager.logger.html">logger</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">manager.logger</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.manager.logger" class="level1">
-<h1>manager.logger</h1>
+</header>
+
+
 <p><code>manager.logger</code></p>
 <p>Audit-grade logging for spotforecast2-safe.</p>
 <p>This module sets up a dual-handler logger: a console handler for humans and a file handler that writes one JSON object per line, conforming to the schema at <code>audit_log_schema.json</code> next to this file. The file is the compliance-relevant sink (EU AI Act Article 12, IEC 62443-4-2 SAR 6.1, IEC 61508-3 §7.4.7); the console handler is plaintext for interactive use.</p>
@@ -1403,6 +1420,152 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>manager.logger.JsonAuditFormatter()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Format <code>LogRecord</code> instances as single-line JSON per audit_log_schema.json.</p>
 <p>The formatter emits exactly the fields named in the schema’s <code>properties</code> section, never more. Callers pass optional structured context through the standard <code>logging</code> <code>extra=</code> mechanism; recognised extras are <code>event</code>, <code>task</code>, and <code>context</code>.</p>
+<section id="examples" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
+<div id="86aa9feb" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.logger <span class="im">import</span> JsonAuditFormatter, SCHEMA_VERSION</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>formatter <span class="op">=</span> JsonAuditFormatter()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>stream <span class="op">=</span> io.StringIO()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>handler <span class="op">=</span> logging.StreamHandler(stream)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>handler.setFormatter(formatter)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>logger <span class="op">=</span> logging.getLogger(<span class="st">"example.audit"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>logger.setLevel(logging.DEBUG)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Avoid duplicate handlers across repeated runs in the same process</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>logger.handlers.clear()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>logger.addHandler(handler)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>logger.propagate <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>logger.info(</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"model fitted"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    extra<span class="op">=</span>{<span class="st">"event"</span>: <span class="st">"fit"</span>, <span class="st">"task"</span>: <span class="st">"demo"</span>, <span class="st">"context"</span>: {<span class="st">"lags"</span>: <span class="dv">3</span>}},</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>line <span class="op">=</span> stream.getvalue().strip()</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>record <span class="op">=</span> json.loads(line)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> record[<span class="st">"schema_version"</span>] <span class="op">==</span> SCHEMA_VERSION</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> record[<span class="st">"event"</span>] <span class="op">==</span> <span class="st">"fit"</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> record[<span class="st">"task"</span>] <span class="op">==</span> <span class="st">"demo"</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> record[<span class="st">"context"</span>] <span class="op">==</span> {<span class="st">"lags"</span>: <span class="dv">3</span>}</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"schema_version=</span><span class="sc">{</span>record[<span class="st">'schema_version'</span>]<span class="sc">}</span><span class="ss"> event=</span><span class="sc">{</span>record[<span class="st">'event'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>schema_version=1.0.0 event=fit</code></pre>
+</div>
+</div>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#spotforecast2_safe.manager.logger.JsonAuditFormatter.format">format</a></td>
+<td>Format a <code>LogRecord</code> as a single-line JSON string.</td>
+</tr>
+</tbody>
+</table>
+<section id="spotforecast2_safe.manager.logger.JsonAuditFormatter.format" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.manager.logger.JsonAuditFormatter.format">format</h5>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>manager.logger.JsonAuditFormatter.<span class="bu">format</span>(record)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Format a <code>LogRecord</code> as a single-line JSON string.</p>
+<section id="parameters" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>record</td>
+<td><a href="https://docs.python.org/3/library/logging.html#module-logging">logging</a>.<a href="https://docs.python.org/3/library/logging.html#logging.LogRecord">LogRecord</a></td>
+<td>The log record to format.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>A JSON string containing the required audit fields plus any</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>optional <code>event</code>, <code>task</code>, <code>context</code>, and <code>exception</code></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>extras carried by the record.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-1" class="level6 doc-section doc-section-examples">
+<h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h6>
+<div id="aa38eda3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.logger <span class="im">import</span> JsonAuditFormatter, SCHEMA_VERSION</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>formatter <span class="op">=</span> JsonAuditFormatter()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>record <span class="op">=</span> logging.LogRecord(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"test.logger"</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    level<span class="op">=</span>logging.WARNING,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    pathname<span class="op">=</span><span class="st">""</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    lineno<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    msg<span class="op">=</span><span class="st">"threshold exceeded"</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>(),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    exc_info<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>record.__dict__.update({<span class="st">"event"</span>: <span class="st">"threshold_check"</span>, <span class="st">"task"</span>: <span class="st">"predict"</span>})</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>line <span class="op">=</span> formatter.<span class="bu">format</span>(record)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>payload <span class="op">=</span> json.loads(line)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> payload[<span class="st">"schema_version"</span>] <span class="op">==</span> SCHEMA_VERSION</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> payload[<span class="st">"level"</span>] <span class="op">==</span> <span class="st">"WARNING"</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> payload[<span class="st">"message"</span>] <span class="op">==</span> <span class="st">"threshold exceeded"</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> payload[<span class="st">"event"</span>] <span class="op">==</span> <span class="st">"threshold_check"</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> payload[<span class="st">"task"</span>] <span class="op">==</span> <span class="st">"predict"</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"level=</span><span class="sc">{</span>payload[<span class="st">'level'</span>]<span class="sc">}</span><span class="ss"> message=</span><span class="sc">{</span>payload[<span class="st">'message'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>level=WARNING message=threshold exceeded</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
 </section>
 </section>
 <section id="functions" class="level2">
@@ -1423,11 +1586,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.manager.logger.setup_logging" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.manager.logger.setup_logging">setup_logging</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>manager.logger.setup_logging(level<span class="op">=</span>logging.INFO, log_dir<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>manager.logger.setup_logging(level<span class="op">=</span>logging.INFO, log_dir<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configure dual-handler logging for safety-critical execution.</p>
 <p>Attaches a stream handler (stdout, human-readable plaintext) and, when <code>log_dir</code> is provided, a file handler that writes JSON records per <code>audit_log_schema.json</code>. The console handler honours <code>level</code>; the file handler is always at <code>INFO</code> so the audit trail stays complete even when the operator silences the console.</p>
-<section id="parameters" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1453,8 +1616,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1476,9 +1639,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-
-
 </section>
+<section id="examples-2" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div id="1892e1fc" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.logger <span class="im">import</span> setup_logging</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Reset the named logger so the example is idempotent when the notebook</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># kernel re-runs this cell.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>named <span class="op">=</span> logging.getLogger(<span class="st">"task_safe_n_to_1"</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>named.handlers.clear()</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    log_dir <span class="op">=</span> Path(tmp)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    logger, log_path <span class="op">=</span> setup_logging(level<span class="op">=</span>logging.WARNING, log_dir<span class="op">=</span>log_dir)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> log_path <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> log_path.exists()</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    logger.info(<span class="st">"pipeline started"</span>, extra<span class="op">=</span>{<span class="st">"event"</span>: <span class="st">"task_start"</span>})</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> [l <span class="cf">for</span> l <span class="kw">in</span> log_path.read_text(encoding<span class="op">=</span><span class="st">"utf-8"</span>).splitlines() <span class="cf">if</span> l]</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(lines) <span class="op">&gt;=</span> <span class="dv">1</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    record <span class="op">=</span> json.loads(lines[<span class="dv">0</span>])</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> record[<span class="st">"event"</span>] <span class="op">==</span> <span class="st">"audit_log_init"</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"log file created: </span><span class="sc">{</span>log_path<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"first record event: </span><span class="sc">{</span>record[<span class="st">'event'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Tear down so subsequent cells start clean</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>named.handlers.clear()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>log file created: task_safe_n_to_1_20260520_103957.log
+first record event: audit_log_init</code></pre>
+</div>
+</div>
+
+
 </section>
 </section>
 </section>

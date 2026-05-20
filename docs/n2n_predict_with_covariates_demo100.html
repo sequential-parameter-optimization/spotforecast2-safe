@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A step-by-step explanation of the N-to-N covariate forecasting pipeline for readers new to time-series analysis.">
+<meta name="description" content="Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo100.csv, one helper at a time.">
 
-<title>n2n_predict_with_covariates: A Beginner’s Walkthrough – spotforecast2-safe</title>
+<title>n2n_predict_with_covariates on demo100: Step by Step on Real Data – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -309,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../docs/n2n_predict_with_covariates_explained.html">n2n_predict_with_covariates Explained</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../docs/n2n_predict_with_covariates_demo100.html">n2n_predict_with_covariates on demo100</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1343,13 +1343,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../docs/n2n_predict_with_covariates_explained.html" class="sidebar-item-text sidebar-link active">
+  <a href="../docs/n2n_predict_with_covariates_explained.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">n2n_predict_with_covariates Explained</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../docs/n2n_predict_with_covariates_demo100.html" class="sidebar-item-text sidebar-link">
+  <a href="../docs/n2n_predict_with_covariates_demo100.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">n2n_predict_with_covariates on demo100</span></a>
   </div>
 </li>
@@ -1365,37 +1365,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#what-this-pipeline-does-in-one-paragraph" id="toc-what-this-pipeline-does-in-one-paragraph" class="nav-link active" data-scroll-target="#what-this-pipeline-does-in-one-paragraph">What this pipeline does, in one paragraph</a></li>
-  <li><a href="#sec-vocabulary" id="toc-sec-vocabulary" class="nav-link" data-scroll-target="#sec-vocabulary">Vocabulary</a></li>
-  <li><a href="#input-validation" id="toc-input-validation" class="nav-link" data-scroll-target="#input-validation">Input validation</a></li>
+  <li><a href="#what-this-page-does" id="toc-what-this-page-does" class="nav-link active" data-scroll-target="#what-this-page-does">What this page does</a></li>
+  <li><a href="#about-demo100.csv" id="toc-about-demo100.csv" class="nav-link" data-scroll-target="#about-demo100.csv">About <code>demo100.csv</code></a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
   <li><a href="#stage-1-loading-and-preparing-the-target-series" id="toc-stage-1-loading-and-preparing-the-target-series" class="nav-link" data-scroll-target="#stage-1-loading-and-preparing-the-target-series">Stage 1 — Loading and preparing the target series</a></li>
   <li><a href="#stage-2-outlier-detection-and-removal" id="toc-stage-2-outlier-detection-and-removal" class="nav-link" data-scroll-target="#stage-2-outlier-detection-and-removal">Stage 2 — Outlier detection and removal</a></li>
   <li><a href="#stage-3-imputation-and-sample-weighting" id="toc-stage-3-imputation-and-sample-weighting" class="nav-link" data-scroll-target="#stage-3-imputation-and-sample-weighting">Stage 3 — Imputation and sample weighting</a></li>
-  <li><a href="#stage-4-exogenous-feature-engineering" id="toc-stage-4-exogenous-feature-engineering" class="nav-link" data-scroll-target="#stage-4-exogenous-feature-engineering">Stage 4 — Exogenous feature engineering</a></li>
+  <li><a href="#stage-4-exogenous-feature-engineering" id="toc-stage-4-exogenous-feature-engineering" class="nav-link" data-scroll-target="#stage-4-exogenous-feature-engineering">Stage 4 — Exogenous feature engineering</a>
+  <ul class="collapse">
+  <li><a href="#stage-4a-calendar-features" id="toc-stage-4a-calendar-features" class="nav-link" data-scroll-target="#stage-4a-calendar-features">Stage 4a — Calendar features</a></li>
+  <li><a href="#stage-4b-daynight-features" id="toc-stage-4b-daynight-features" class="nav-link" data-scroll-target="#stage-4b-daynight-features">Stage 4b — Day/night features</a></li>
+  <li><a href="#stage-4c-weather-features" id="toc-stage-4c-weather-features" class="nav-link" data-scroll-target="#stage-4c-weather-features">Stage 4c — Weather features</a></li>
+  <li><a href="#stage-4d-holiday-features" id="toc-stage-4d-holiday-features" class="nav-link" data-scroll-target="#stage-4d-holiday-features">Stage 4d — Holiday features</a></li>
+  </ul></li>
   <li><a href="#stage-5-combining-and-encoding-exogenous-features" id="toc-stage-5-combining-and-encoding-exogenous-features" class="nav-link" data-scroll-target="#stage-5-combining-and-encoding-exogenous-features">Stage 5 — Combining and encoding exogenous features</a></li>
   <li><a href="#stage-6-feature-selection" id="toc-stage-6-feature-selection" class="nav-link" data-scroll-target="#stage-6-feature-selection">Stage 6 — Feature selection</a></li>
   <li><a href="#stage-7-merging-target-and-exogenous-data" id="toc-stage-7-merging-target-and-exogenous-data" class="nav-link" data-scroll-target="#stage-7-merging-target-and-exogenous-data">Stage 7 — Merging target and exogenous data</a></li>
   <li><a href="#stage-8-train-validation-test-split" id="toc-stage-8-train-validation-test-split" class="nav-link" data-scroll-target="#stage-8-train-validation-test-split">Stage 8 — Train / validation / test split</a></li>
-  <li><a href="#stage-9-training-or-loading-recursive-forecasters" id="toc-stage-9-training-or-loading-recursive-forecasters" class="nav-link" data-scroll-target="#stage-9-training-or-loading-recursive-forecasters">Stage 9 — Training or loading recursive forecasters</a></li>
+  <li><a href="#stage-9-training-recursive-forecasters" id="toc-stage-9-training-recursive-forecasters" class="nav-link" data-scroll-target="#stage-9-training-recursive-forecasters">Stage 9 — Training recursive forecasters</a></li>
   <li><a href="#stage-10-prediction" id="toc-stage-10-prediction" class="nav-link" data-scroll-target="#stage-10-prediction">Stage 10 — Prediction</a></li>
-  <li><a href="#metadata-and-return-values" id="toc-metadata-and-return-values" class="nav-link" data-scroll-target="#metadata-and-return-values">Metadata and return values</a></li>
-  <li><a href="#sec-end-to-end" id="toc-sec-end-to-end" class="nav-link" data-scroll-target="#sec-end-to-end">End-to-end example</a></li>
-  <li><a href="#the-complete-execution-flow" id="toc-the-complete-execution-flow" class="nav-link" data-scroll-target="#the-complete-execution-flow">The complete execution flow</a></li>
+  <li><a href="#metadata" id="toc-metadata" class="nav-link" data-scroll-target="#metadata">Metadata</a></li>
+  <li><a href="#cross-check-against-the-orchestrator" id="toc-cross-check-against-the-orchestrator" class="nav-link" data-scroll-target="#cross-check-against-the-orchestrator">Cross-check against the orchestrator</a></li>
+  <li><a href="#what-to-take-away" id="toc-what-to-take-away" class="nav-link" data-scroll-target="#what-to-take-away">What to take away</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_explained.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_demo100.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../docs/n2n_predict_with_covariates_explained.html">n2n_predict_with_covariates Explained</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../docs/n2n_predict_with_covariates_demo100.html">n2n_predict_with_covariates on demo100</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">n2n_predict_with_covariates: A Beginner’s Walkthrough</h1>
+<h1 class="title">n2n_predict_with_covariates on demo100: Step by Step on Real Data</h1>
 </div>
 
 <div>
   <div class="description">
-    A step-by-step explanation of the N-to-N covariate forecasting pipeline for readers new to time-series analysis.
+    Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo100.csv, one helper at a time.
   </div>
 </div>
 
@@ -1412,106 +1418,177 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="what-this-pipeline-does-in-one-paragraph" class="level2">
-<h2 class="anchored" data-anchor-id="what-this-pipeline-does-in-one-paragraph">What this pipeline does, in one paragraph</h2>
-<p>The function <code>n2n_predict_with_covariates</code> takes a table of historical measurements (one or more numeric columns indexed by time), augments it with side information that is known both for the past and for the near future (calendar effects, daylight, weather forecasts, public holidays), and then trains one machine-learning forecaster per target column. Each forecaster is asked to predict the next <code>forecast_horizon</code> time steps. The function returns three things: a DataFrame of predictions, a dictionary of metadata that records <em>how</em> the run was configured, and the fitted forecaster objects themselves (so a caller can re-use them later without retraining). The function is deliberately one long pipeline rather than many small calls, because every stage depends tightly on the previous one — and a single entry point makes the whole pipeline easy to embed in a daily batch job.</p>
+<section id="what-this-page-does" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-page-does">What this page does</h2>
+<p>This is the executable companion to <a href="../docs/n2n_predict_with_covariates_explained.html"><em>n2n_predict_with_covariates</em>: A Beginner’s Walkthrough</a>. The sibling page introduces the vocabulary and explains the <em>why</em> of each stage with small synthetic examples. This page does the opposite: every code cell executes one real stage of <code>spotforecast2_safe.processing.n2n_predict_with_covariates</code> against the bundled <code>demo100.csv</code> dataset, prints the intermediate state, and then discusses what just happened. Refer back to the sibling page for the vocabulary — <code>@def-time-series</code>, <code>@def-lag</code>, <code>@def-forecast-horizon</code>, <code>@def-recursive-forecaster</code>, <code>@def-train-val-test</code>, <code>@def-outlier</code>, <code>@def-imputation</code>, <code>@def-sample-weight</code>, <code>@def-cyclical-encoding</code>, <code>@def-persistence</code> — all definitions are reused unchanged.</p>
+<p>The closing section calls <code>n2n_predict_with_covariates</code> end-to-end on the same input as a sanity check that the per-stage breakdown above is equivalent to the orchestrator.</p>
 </section>
-<section id="sec-vocabulary" class="level2">
-<h2 class="anchored" data-anchor-id="sec-vocabulary">Vocabulary</h2>
-<p>The walkthrough below uses a handful of technical terms. Their definitions are kept brief here so that the rest of the page can stay focused on the mechanics of the pipeline. Each definition is cross-referenceable — later sections link back with <code>@def-…</code> where it helps the reader.</p>
-<div id="def-time-series" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 1 (Time series)</strong></span> A sequence of numeric measurements indexed by timestamps at a regular interval (here: one row per hour).</p>
-</div>
-<div id="def-target-variable" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 2 (Target variable)</strong></span> The quantity we want to predict — in this pipeline, any column of the input DataFrame.</p>
-</div>
-<div id="def-exogenous-variable" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 3 (Exogenous variable (covariate))</strong></span> Any other feature known at the same timestamps as the target <em>and</em> available for the future window — for example, the hour of the day or a weather forecast.</p>
-</div>
-<div id="def-lag" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 4 (Lag)</strong></span> A past value of the same series, e.g.&nbsp;<em>lag 1</em> = “the value one hour ago”, <em>lag 24</em> = “the value at the same hour yesterday”.</p>
-</div>
-<div id="def-forecast-horizon" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 5 (Forecast horizon)</strong></span> How many time steps ahead the model has to predict (e.g. <code>forecast_horizon=24</code> means “predict the next 24 hours”).</p>
-</div>
-<div id="def-recursive-forecaster" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 6 (Recursive multi-step forecaster)</strong></span> A model that predicts one step ahead, then feeds its own prediction back in as the most recent lag, and repeats. We use it because we want long horizons (24+ steps) without training a separate model per step.</p>
-</div>
-<div id="def-train-val-test" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 7 (Train / validation / test split)</strong></span> The historical data is sliced into three temporally ordered chunks: training (used to fit the model), validation (used to compare configurations), and test (held back as unseen data for the final check).</p>
-</div>
-<div id="def-outlier" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 8 (Outlier)</strong></span> A value that is much larger or smaller than the rest of the series — often a sensor glitch or a one-off event we do not want the model to learn from.</p>
-</div>
-<div id="def-imputation" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 9 (Imputation)</strong></span> Filling in missing entries so the model sees a complete series.</p>
-</div>
-<div id="def-sample-weight" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 10 (Sample weight)</strong></span> A non-negative number attached to each training row that tells the model how much that row should contribute to the loss. Weight <code>0</code> effectively ignores the row.</p>
-</div>
-<div id="def-cyclical-encoding" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 11 (Cyclical encoding)</strong></span> Replacing a periodic integer like “hour of day” by its sine and cosine on a unit circle, so the model sees that hour 23 and hour 0 are neighbors.</p>
-</div>
-<div id="def-persistence" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 12 (Persistence (serialization))</strong></span> Saving a trained model to disk so the next run can load it instead of retraining.</p>
-</div>
+<section id="about-demo100.csv" class="level2">
+<h2 class="anchored" data-anchor-id="about-demo100.csv">About <code>demo100.csv</code></h2>
+<p><code>demo100.csv</code> is bundled in the wheel at <code>spotforecast2_safe/datasets/csv/demo100.csv</code>. It carries eleven numeric columns A–K, indexed by hourly UTC timestamps from late 2010 through December 2021 — about 96 000 rows. Column K comes online late and starts with a long run of <code>NaN</code>, which makes it a useful exercise for the imputation step in Stage 3.</p>
+<p>To keep render times tractable while still exercising every helper faithfully (in particular the 7-day rolling weather window in Stage 4 and the 80/20 temporal split in Stage 8) the page slices the data to the last two years before Stage 1 begins.</p>
 </section>
-<section id="input-validation" class="level2">
-<h2 class="anchored" data-anchor-id="input-validation">Input validation</h2>
-<p>Before any computation begins, <code>n2n_predict_with_covariates</code> checks that the five numerical parameters make sense:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 17%">
-<col style="width: 19%">
-<col style="width: 62%">
-</colgroup>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div id="exm-setup" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1 (Loading and slicing demo100)</strong></span> &nbsp;</p>
+<div id="29306ac4" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_data, get_package_data_home</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_full <span class="op">=</span> fetch_data(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span>get_package_data_home() <span class="op">/</span> <span class="st">"demo100.csv"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> data_full.index.<span class="bu">max</span>() <span class="op">-</span> pd.Timedelta(days<span class="op">=</span><span class="dv">730</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>data_sliced <span class="op">=</span> data_full.loc[data_full.index <span class="op">&gt;=</span> cutoff].copy()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>cache_home <span class="op">=</span> Path.home() <span class="op">/</span> <span class="st">".spotforecast2_cache"</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"full shape   :"</span>, data_full.shape)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sliced shape :"</span>, data_sliced.shape)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"window       :"</span>, data_sliced.index[<span class="dv">0</span>], <span class="st">"→"</span>, data_sliced.index[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NaN per col  :"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data_sliced.isna().<span class="bu">sum</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>full shape   : (96263, 11)
+sliced shape : (17521, 11)
+window       : 2019-12-25 21:00:00+00:00 → 2021-12-24 21:00:00+00:00
+NaN per col  :
+A        0
+B        0
+C    12110
+D        0
+E        0
+F        0
+G        0
+H        0
+I        0
+J        0
+K        0
+dtype: int64</code></pre>
+</div>
+</div>
+</div>
+<p>The slicing is done in user code rather than via <code>fetch_data</code> arguments because <code>fetch_data</code> exposes column selection, not row selection. The 730-day window is intentionally wider than the longest rolling weather window (seven days), so Stage 4 has full lookback at <code>start</code>. <code>cache_home</code> points at the same directory that <code>get_cache_home()</code> would resolve to (<code>~/.spotforecast2_cache</code>); reusing it means subsequent renders read the weather parquet cache instead of refetching from Open-Meteo.</p>
+</section>
+<section id="stage-1-loading-and-preparing-the-target-series" class="level2">
+<h2 class="anchored" data-anchor-id="stage-1-loading-and-preparing-the-target-series">Stage 1 — Loading and preparing the target series</h2>
+<p>A forecasting model needs a clean, regularly spaced time series with a known time zone. Stage 1 turns whatever the caller supplied into exactly that. <code>get_start_end</code> returns four boundary timestamps: <code>start</code> and <code>end</code> delimit the historical window used for training, and <code>cov_start</code> / <code>cov_end</code> are the same window extended forward by <code>forecast_horizon</code> steps — that extension is the future window for which covariates must be constructed in Stage 4.</p>
+<div id="exm-s1-fetch" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2 (Boundary timestamps, hourly resample)</strong></span> &nbsp;</p>
+<div id="7f59eb10" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    agg_and_resample_data,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    basic_ts_checks,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    get_start_end,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>forecast_horizon <span class="op">=</span> <span class="dv">24</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data_sliced</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>start, end, cov_start, cov_end <span class="op">=</span> get_start_end(</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span>forecast_horizon,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>basic_ts_checks(data, verbose<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> agg_and_resample_data(data, verbose<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>target_columns <span class="op">=</span> data.columns.tolist()</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"start      :"</span>, start)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"end        :"</span>, end)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"cov_start  :"</span>, cov_start)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"cov_end    :"</span>, cov_end)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"targets    :"</span>, target_columns)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape      :"</span>, data.shape)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>data.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>start      : 2019-12-25T21:00
+end        : 2021-12-24T21:00
+cov_start  : 2019-12-25T21:00
+cov_end    : 2021-12-25T21:00
+targets    : ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+shape      : (17521, 11)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
-<th>Parameter</th>
-<th>Allowed range</th>
-<th>Error if violated</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">A</th>
+<th data-quarto-table-cell-role="th">B</th>
+<th data-quarto-table-cell-role="th">C</th>
+<th data-quarto-table-cell-role="th">D</th>
+<th data-quarto-table-cell-role="th">E</th>
+<th data-quarto-table-cell-role="th">F</th>
+<th data-quarto-table-cell-role="th">G</th>
+<th data-quarto-table-cell-role="th">H</th>
+<th data-quarto-table-cell-role="th">I</th>
+<th data-quarto-table-cell-role="th">J</th>
+<th data-quarto-table-cell-role="th">K</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">DateTime</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>forecast_horizon</code></td>
-<td><code>&gt; 0</code></td>
-<td><code>ValueError: forecast_horizon must be positive, got …</code></td>
+<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
+<td>1782.828059</td>
+<td>2238.445922</td>
+<td>NaN</td>
+<td>-681.484981</td>
+<td>4210.035867</td>
+<td>65.138973</td>
+<td>11.604584</td>
+<td>8886.463967</td>
+<td>541.565142</td>
+<td>-304.380545</td>
+<td>-242.209990</td>
 </tr>
 <tr class="even">
-<td><code>contamination</code></td>
-<td><code>0 ≤ x ≤ 0.5</code></td>
-<td><code>ValueError: contamination must be between 0 and 0.5, got …</code></td>
-</tr>
-<tr class="odd">
-<td><code>window_size</code></td>
-<td><code>&gt; 0</code></td>
-<td><code>ValueError: window_size must be positive, got …</code></td>
-</tr>
-<tr class="even">
-<td><code>lags</code></td>
-<td><code>&gt; 0</code></td>
-<td><code>ValueError: lags must be positive, got …</code></td>
-</tr>
-<tr class="odd">
-<td><code>train_ratio</code></td>
-<td><code>0 &lt; x &lt; 1</code></td>
-<td><code>ValueError: train_ratio must be between 0 and 1, got …</code></td>
+<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td>1589.476196</td>
+<td>1949.805937</td>
+<td>NaN</td>
+<td>270.929304</td>
+<td>3545.350084</td>
+<td>50.165714</td>
+<td>17.353879</td>
+<td>6576.533396</td>
+<td>228.936882</td>
+<td>-272.812188</td>
+<td>246.625979</td>
 </tr>
 </tbody>
 </table>
-<p>The pipeline follows a <em>fail-fast</em> philosophy: rather than silently coercing a bad value (and producing wrong predictions hours later), it stops at the front door with an informative message. The most consequential check is the one on <code>forecast_horizon</code>: a non-positive value would cause downstream array-slicing to return empty results, which the model would happily train on without complaint.</p>
-</section>
-<section id="stage-1-loading-and-preparing-the-target-series" class="level2">
-<h2 class="anchored" data-anchor-id="stage-1-loading-and-preparing-the-target-series">Stage 1 — Loading and preparing the target series</h2>
-<p><em>Why this step exists.</em> A forecasting model can only learn from a clean, regularly spaced time series with a known time zone. The first stage’s job is to produce exactly that, regardless of whether the caller passed a DataFrame or relied on the default demo data set.</p>
-<p>When the caller supplies a <code>data</code> argument, the series is forwarded to <code>fetch_data(dataframe=data, timezone=timezone)</code>. When no data is supplied, <code>fetch_data</code> reads the bundled demonstration file <code>demo10.csv</code> (located via <code>get_package_data_home()</code>). Either way, the result is a DataFrame with a timezone-aware <code>DatetimeIndex</code> and numeric columns for each target. The column names are immediately stored in <code>target_columns</code>, because they will determine the names of the saved model files and the columns of the prediction DataFrame.</p>
-<p>Next, <code>get_start_end(data, forecast_horizon)</code> returns four boundary timestamps:</p>
-<ul>
-<li><code>start</code>, <code>end</code> — the historical window used for training,</li>
-<li><code>cov_start</code>, <code>cov_end</code> — the same window <em>extended</em> forward by <code>forecast_horizon</code> steps, so that covariates can be aligned with the prediction period.</li>
-</ul>
-<p><code>basic_ts_checks(data)</code> then verifies that the index is a <code>DatetimeIndex</code>, strictly monotonically increasing, and free of gaps. Finally, <code>agg_and_resample_data(data)</code> enforces an hourly grid: sub-hourly data is aggregated by mean over each hour bin, and the result is a uniformly spaced table that the lag-based forecaster can consume safely.</p>
+
+</div>
+</div>
+</div>
+</div>
+<p><code>cov_end</code> lies exactly <code>forecast_horizon</code> hours past <code>end</code> — that is the window for which Stage 4 will assemble covariates and Stage 10 will emit predictions. <code>basic_ts_checks</code> confirms the index is a strict, gap-free, timezone-aware <code>DatetimeIndex</code>; if it were not, <code>agg_and_resample_data</code> could not safely enforce the hourly grid.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1522,172 +1599,106 @@ Why a strict, gap-free hourly index matters
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A recursive forecaster predicts lag 1, lag 2, lag 24, etc. by <em>positional</em> lookup. If the index skips an hour, “lag 24” no longer means “24 hours ago” — it means “24 rows ago”, which might be 25 wall-clock hours. The fail-fast checks here prevent that silent error.</p>
+<p>A recursive forecaster (see <code>@def-recursive-forecaster</code> in the sibling page) looks up lag 1, lag 24, etc. by <em>positional</em> offset. A skipped hour would silently turn “lag 24” into “25 wall-clock hours ago”, which is the kind of error that compounds for hundreds of forecast steps before it is noticed.</p>
 </div>
 </div>
 </section>
 <section id="stage-2-outlier-detection-and-removal" class="level2">
 <h2 class="anchored" data-anchor-id="stage-2-outlier-detection-and-removal">Stage 2 — Outlier detection and removal</h2>
-<p><em>Why this step exists.</em> Real-world sensors occasionally produce values that are not signal but noise (a spike from a calibration error, a dip from a brief power loss). Letting the model train on these outliers (see <a href="#def-outlier" class="quarto-xref">Definition&nbsp;8</a>) contaminates its idea of “normal” behaviour. We replace them with <code>NaN</code> so the next stage can treat them the same way it treats genuine gaps.</p>
-<p><code>mark_outliers(data, contamination=contamination, random_state=1234)</code> applies an <a href="https://en.wikipedia.org/wiki/Isolation_forest">Isolation Forest</a>: the algorithm builds random partitioning trees, and points that are isolated in only a few splits are flagged as anomalous. The <code>contamination</code> parameter is the expected fraction of anomalies per column — <code>0.01</code> means “about 1 % of rows should be marked”. The function returns a modified DataFrame (outlier positions set to <code>NaN</code>) and an outlier-label array (Isolation Forest’s convention: <code>-1</code> for outliers, <code>+1</code> for inliers). The label array is kept aside so the metadata dictionary at the end of the pipeline can report the number of detected outliers.</p>
-<p>The fixed <code>random_state=1234</code> ensures that two runs on identical input produce identical outlier flags — a core requirement of the reproducible artefact design.</p>
-<div id="exm-isolation-forest" class="theorem example">
-<p><span class="theorem-title"><strong>Example 1 (Isolation Forest on injected spikes)</strong></span> &nbsp;</p>
-<div id="03d61a28" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> IsolationForest</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(rng.standard_normal(n))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>y.iloc[<span class="dv">50</span>] <span class="op">=</span> <span class="fl">15.0</span>    <span class="co"># inject a spike</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>y.iloc[<span class="dv">100</span>] <span class="op">=</span> <span class="op">-</span><span class="fl">12.0</span>  <span class="co"># inject a dip</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>iso <span class="op">=</span> IsolationForest(contamination<span class="op">=</span><span class="fl">0.01</span>, random_state<span class="op">=</span><span class="dv">1234</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> iso.fit_predict(y.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>flagged_positions <span class="op">=</span> np.where(labels <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>)[<span class="dv">0</span>].tolist()</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Series length      : </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Injected positions : [50, 100]"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Flagged positions  : </span><span class="sc">{</span>flagged_positions<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Stage 2 replaces likely sensor glitches with <code>NaN</code> so Stage 3 can treat them the same way it treats genuine gaps. An Isolation Forest is applied per column with <code>contamination=0.01</code>, meaning about one percent of rows per column should be flagged. The <code>random_state=1234</code> is fixed so two runs on identical input produce identical outlier flags.</p>
+<div id="exm-s2-outliers" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3 (Marking outliers with Isolation Forest)</strong></span> &nbsp;</p>
+<div id="f12928ef" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.outlier <span class="im">import</span> mark_outliers</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>data, outliers <span class="op">=</span> mark_outliers(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.01</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">1234</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"outliers flagged    :"</span>, <span class="bu">int</span>((outliers <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>()) <span class="cf">if</span> <span class="bu">hasattr</span>(outliers, <span class="st">"__iter__"</span>) <span class="cf">else</span> <span class="st">"—"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NaN per column after outlier removal:"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data.isna().<span class="bu">sum</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Series length      : 200
-Injected positions : [50, 100]
-Flagged positions  : [50, 100]</code></pre>
+<pre><code>outliers flagged    : 176
+NaN per column after outlier removal:
+A      176
+B      176
+C    12110
+D      176
+E      174
+F      169
+G      173
+H      175
+I      174
+J      171
+K      176
+dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-What is an outlier in a time series?
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Time-series outliers come in flavours: a one-off spike (instrumentation error), a short burst of “wrong” values (a sensor reboot), or a sustained shift (a real but rare event like a heat wave). The Isolation Forest defaults used here are tuned to catch the first kind. Treat the <code>contamination</code> parameter as a guess at how rare such spikes are — if the data is famously clean, set it low; if it is famously messy, set it higher.</p>
-</div>
-</div>
+<p>The per-column <code>NaN</code> counts now combine pre-existing gaps (notably the long leading run in column K) with the freshly removed outlier rows. Stage 3 will not distinguish between the two: imputation closes the gaps, and sample weighting penalises the model for paying attention to either source.</p>
 </section>
 <section id="stage-3-imputation-and-sample-weighting" class="level2">
 <h2 class="anchored" data-anchor-id="stage-3-imputation-and-sample-weighting">Stage 3 — Imputation and sample weighting</h2>
-<p><em>Why this step exists.</em> After stage 2 the series has <code>NaN</code>s wherever it originally had missing rows <em>or</em> where stage 2 just removed an outlier. Lag-based models cannot accept <code>NaN</code> in the input. We fill the gaps via imputation (see <a href="#def-imputation" class="quarto-xref">Definition&nbsp;9</a>), but we also remember which rows were imputed so the loss function can pay less attention to them by way of sample weights (see <a href="#def-sample-weight" class="quarto-xref">Definition&nbsp;10</a>).</p>
-<p><code>get_missing_weights(data, window_size=window_size)</code> does two things:</p>
-<ol type="1">
-<li>It fills the gaps using both forward-fill and backward-fill so no <code>NaN</code> survives.</li>
-<li>It builds a weight series: a binary contamination mask (<code>1</code> where the value was imputed, <code>0</code> otherwise) is propagated forward by <code>window_size</code> positions with a rolling maximum. Any training row whose lag window <em>touches</em> an imputed value receives weight <code>0</code>. All other rows receive weight <code>1</code>. The downstream forecaster will then see the filled-in values but down-weight their gradient contribution to zero.</li>
-</ol>
-<p>The resulting <code>weights_series</code> is wrapped in a <code>WeightFunction</code> object, <em>not</em> passed as a plain array. This indirection solves three problems at once:</p>
-<ul>
-<li>The training matrix produced by <code>ForecasterRecursive._create_train_X_y</code> is shorter than the original series by <code>max(lags)</code> rows. A positional array would misalign.</li>
-<li>A <em>callable</em> that receives <code>X_train.index</code> does a label-based lookup into the Series and is immune to that offset regardless of <code>lags</code>.</li>
-<li><code>WeightFunction</code> is a plain class, so it is picklable and gets saved to disk together with the forecaster (a closure-based weight function would not be).</li>
-</ul>
-<div id="exm-weight-function" class="theorem example">
-<p><span class="theorem-title"><strong>Example 2 (Label-based weight lookup)</strong></span> &nbsp;</p>
-<div id="c479b6fa" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> pd.Series([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>], dtype<span class="op">=</span><span class="bu">float</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                    index<span class="op">=</span>pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">8</span>, freq<span class="op">=</span><span class="st">"h"</span>))</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> WeightFunction:</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, weights_series):</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights_series <span class="op">=</span> weights_series</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, index):</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.weights_series.reindex(index).fillna(<span class="fl">1.0</span>).values</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>wf <span class="op">=</span> WeightFunction(weights)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>query_idx <span class="op">=</span> weights.index[<span class="dv">1</span>:<span class="dv">5</span>]</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Queried timestamps :"</span>, query_idx.tolist())</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Returned weights   :"</span>, wf(query_idx).tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>get_missing_weights</code> forward- and backward-fills every <code>NaN</code>, then builds a per-row weight series: rows whose <code>window_size=72</code> neighbourhood touched an imputed cell receive weight <code>0</code>; all other rows receive <code>1</code>. The weights are wrapped in a <code>WeightFunction</code>, which is a picklable class that the forecaster can carry into a <code>joblib</code> dump alongside the model itself — a closure would survive <code>pickle.dumps</code> but not a <code>pickle.load</code> in a fresh process.</p>
+<div id="exm-s3-weights" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4 (Imputation count and the weight distribution)</strong></span> &nbsp;</p>
+<div id="7a814a8c" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> WeightFunction</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> get_missing_weights</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>imputed_data, weights_series <span class="op">=</span> get_missing_weights(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    data,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>weight_func <span class="op">=</span> WeightFunction(weights_series)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"imputed NaN remaining :"</span>, <span class="bu">int</span>(imputed_data.isna().<span class="bu">sum</span>().<span class="bu">sum</span>()))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"weight distribution   :"</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(weights_series.value_counts(dropna<span class="op">=</span><span class="va">False</span>).sort_index())</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"weight_func on first 5 timestamps :"</span>, weight_func(imputed_data.index[:<span class="dv">5</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Queried timestamps : [Timestamp('2020-01-01 01:00:00'), Timestamp('2020-01-01 02:00:00'), Timestamp('2020-01-01 03:00:00'), Timestamp('2020-01-01 04:00:00')]
-Returned weights   : [1.0, 0.0, 0.0, 0.0]</code></pre>
+<pre><code>imputed NaN remaining : 0
+weight distribution   :
+0.0    17152
+1.0      369
+Name: count, dtype: int64
+weight_func on first 5 timestamps : None</code></pre>
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Why we weight instead of drop
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>We <em>could</em> delete every row near a gap, but that breaks the “regular hourly grid” invariant the recursive forecaster needs. By keeping the rows but giving them weight <code>0</code>, the time axis stays uniform and the loss function still ignores the bad data.</p>
-</div>
-</div>
+<p>The <code>imputed NaN remaining</code> count is zero — every gap is closed. The weight distribution shows how many rows the forecaster will effectively ignore; the bulk of the zero-weighted rows are concentrated at the start of the window where column K had its leading <code>NaN</code> run.</p>
 </section>
 <section id="stage-4-exogenous-feature-engineering" class="level2">
 <h2 class="anchored" data-anchor-id="stage-4-exogenous-feature-engineering">Stage 4 — Exogenous feature engineering</h2>
-<p><em>Why this step exists.</em> A target series alone often does not contain enough signal to forecast accurately — but combining it with calendar and weather context typically does. Stage 4 produces four feature DataFrames, each indexed on the <em>extended</em> timeline <code>[start, cov_end]</code> so that the feature matrix is defined both over the training window and over the prediction window.</p>
-<p>The four feature categories, in the order they will be concatenated in stage 5, are:</p>
-<ol type="1">
-<li>Calendar features — <code>get_calendar_features(start, cov_end, freq="h",    timezone=timezone)</code> uses <code>feature_engine.DatetimeFeatures</code> to extract <code>month</code>, <code>week</code>, <code>day_of_week</code>, and <code>hour</code> from the index alone. Because these are derived from the index, they are always complete — no imputation needed.</li>
-<li>Day/night features — <code>get_day_night_features(start, cov_end, location,    ...)</code> computes sunrise and sunset times for the configured geographic location using the <code>astral</code> library. Sunrise and sunset hours are rounded to the nearest hour, and an <code>is_daylight</code> flag equals <code>1</code> during the hours between sunrise and sunset. Per-day sunrise/sunset values are cached so multi-year series do not recompute the solar position for every hourly row.</li>
-<li>Weather features — <code>get_weather_features(...)</code> fetches weather data for the configured latitude/longitude and applies a sliding window transform that computes rolling mean, max, and min over one-day and seven-day windows for each numeric weather column. The helper itself resolves missing values (backward fill + curate step) before returning, so callers can treat the result as gap-free.</li>
-<li>Holiday features — <code>get_holiday_features(...)</code> calls the <code>holidays</code> library for the configured <code>country_code</code> and <code>state</code>, validates the returned dates with an internal curate step, and reindexes the binary flag to the hourly grid with <code>fill_value=0</code>. The model sees a clean <code>0 / 1</code> column it can split on directly.</li>
-</ol>
-<div id="exm-day-night" class="theorem example">
-<p><span class="theorem-title"><strong>Example 3 (Daylight flag for a June day)</strong></span> &nbsp;</p>
-<div id="7f69c9c6" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-06-01"</span>, periods<span class="op">=</span><span class="dv">24</span>, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>sunrise_hour <span class="op">=</span> <span class="dv">4</span>   <span class="co"># approximate June sunrise at 51°N</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>sunset_hour  <span class="op">=</span> <span class="dv">21</span>  <span class="co"># approximate June sunset  at 51°N</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>is_daylight <span class="op">=</span> np.where(</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    (dates.hour <span class="op">&gt;=</span> sunrise_hour) <span class="op">&amp;</span> (dates.hour <span class="op">&lt;</span> sunset_hour), <span class="dv">1</span>, <span class="dv">0</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>df_sun <span class="op">=</span> pd.DataFrame({<span class="st">"hour"</span>: dates.hour, <span class="st">"is_daylight"</span>: is_daylight}, index<span class="op">=</span>dates)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_sun.groupby(<span class="st">"is_daylight"</span>)[<span class="st">"hour"</span>].<span class="bu">apply</span>(<span class="bu">list</span>).to_string())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Stage 4 builds four feature DataFrames, each indexed on the extended timeline <code>[start, cov_end]</code> so the feature matrix is defined both over the training window and over the future prediction window. The sub-stages are independent and can run in any order.</p>
+<section id="stage-4a-calendar-features" class="level3">
+<h3 class="anchored" data-anchor-id="stage-4a-calendar-features">Stage 4a — Calendar features</h3>
+<div id="exm-s4a-calendar" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5 (Calendar features from the index alone)</strong></span> &nbsp;</p>
+<div id="4e18ddce" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_calendar_features</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>calendar_features <span class="op">=</span> get_calendar_features(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>start,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span>cov_end,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">"h"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape   :"</span>, calendar_features.shape)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"columns :"</span>, calendar_features.columns.tolist())</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>calendar_features.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>is_daylight
-0                             [0, 1, 2, 3, 21, 22, 23]
-1    [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,...</code></pre>
+<pre><code>shape   : (17545, 4)
+columns : ['month', 'week', 'day_of_week', 'hour']</code></pre>
 </div>
-</div>
-</div>
-</section>
-<section id="stage-5-combining-and-encoding-exogenous-features" class="level2">
-<h2 class="anchored" data-anchor-id="stage-5-combining-and-encoding-exogenous-features">Stage 5 — Combining and encoding exogenous features</h2>
-<p><em>Why this step exists.</em> The four DataFrames from stage 4 need to be joined into one matrix and then transformed so the model can learn from the periodic structure of calendar variables.</p>
-<p>The pipeline concatenates the four feature DataFrames column-wise in this exact order:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>exogenous_features <span class="op">=</span> pd.concat(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    [calendar_features, sun_light_features, weather_features, holiday_features],</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>It then runs a <em>single</em> hard check: if any <code>NaN</code> survived into <code>exogenous_features</code>, a <code>ValueError</code> is raised reporting the count of missing entries. This guard is the catch-all for any silent gap left by a feature helper.</p>
-<p>Two transformations follow:</p>
-<ol type="1">
-<li>Cyclical encoding — <code>apply_cyclical_encoding(data,    drop_original=False)</code> replaces each periodic integer column (<code>month</code>, <code>week</code>, <code>day_of_week</code>, <code>hour</code>, <code>sunrise_hour</code>, <code>sunset_hour</code>) by its sine and cosine on a unit circle scaled to the natural period of the column. Because <code>drop_original=False</code>, the original integer columns are kept alongside the new sine/cosine columns — the model can use either representation depending on which is more informative.</li>
-<li>Interaction terms — <code>create_interaction_features(exogenous_features,    weather_aligned)</code> uses <code>sklearn.preprocessing.PolynomialFeatures</code> with <code>interaction_only=True</code> to produce pairwise products of the calendar cyclical columns with weather-window columns, raw weather columns, and (if present) the holiday column. These columns are prefixed with <code>poly_</code> and capture joint effects such as “cold morning <em>and</em> weekday peak” that neither feature can describe on its own.</li>
-</ol>
-<div id="exm-cyclical-month" class="theorem example">
-<p><span class="theorem-title"><strong>Example 4 (Cyclical encoding of the month)</strong></span> &nbsp;</p>
-<div id="73b4c591" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">12</span>, freq<span class="op">=</span><span class="st">"ME"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>month <span class="op">=</span> dates.month</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>month_sin <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>month_cos <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"month"</span>: month, <span class="st">"sin"</span>: month_sin.<span class="bu">round</span>(<span class="dv">4</span>), <span class="st">"cos"</span>: month_cos.<span class="bu">round</span>(<span class="dv">4</span>)},</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>dates,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 
 
@@ -1696,82 +1707,25 @@ Why we weight instead of drop
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">month</th>
-<th data-quarto-table-cell-role="th">sin</th>
-<th data-quarto-table-cell-role="th">cos</th>
+<th data-quarto-table-cell-role="th">week</th>
+<th data-quarto-table-cell-role="th">day_of_week</th>
+<th data-quarto-table-cell-role="th">hour</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2020-01-31</td>
-<td>1</td>
-<td>0.500</td>
-<td>0.866</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2020-02-29</td>
-<td>2</td>
-<td>0.866</td>
-<td>0.500</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2020-03-31</td>
-<td>3</td>
-<td>1.000</td>
-<td>0.000</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2020-04-30</td>
-<td>4</td>
-<td>0.866</td>
-<td>-0.500</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2020-05-31</td>
-<td>5</td>
-<td>0.500</td>
-<td>-0.866</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2020-06-30</td>
-<td>6</td>
-<td>0.000</td>
-<td>-1.000</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2020-07-31</td>
-<td>7</td>
-<td>-0.500</td>
-<td>-0.866</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2020-08-31</td>
-<td>8</td>
-<td>-0.866</td>
-<td>-0.500</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2020-09-30</td>
-<td>9</td>
-<td>-1.000</td>
-<td>-0.000</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2020-10-31</td>
-<td>10</td>
-<td>-0.866</td>
-<td>0.500</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2020-11-30</td>
-<td>11</td>
-<td>-0.500</td>
-<td>0.866</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">2020-12-31</td>
+<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
 <td>12</td>
-<td>-0.000</td>
-<td>1.000</td>
+<td>52</td>
+<td>2</td>
+<td>21</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td>12</td>
+<td>52</td>
+<td>2</td>
+<td>22</td>
 </tr>
 </tbody>
 </table>
@@ -1780,170 +1734,117 @@ Why we weight instead of drop
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
+<p>Calendar features are derived from the index alone, so they are always complete by construction — no imputation is needed and the missing-value check at the end of Stage 5 cannot fail on these columns.</p>
+</section>
+<section id="stage-4b-daynight-features" class="level3">
+<h3 class="anchored" data-anchor-id="stage-4b-daynight-features">Stage 4b — Day/night features</h3>
+<div id="exm-s4b-daynight" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6 (Sunrise, sunset, and the daylight flag)</strong></span> &nbsp;</p>
+<div id="518080cc" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> astral <span class="im">import</span> LocationInfo</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_day_night_features</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> LocationInfo(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>sun_light_features <span class="op">=</span> get_day_night_features(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>start,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span>cov_end,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    location<span class="op">=</span>location,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">"h"</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape           :"</span>, sun_light_features.shape)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"is_daylight mean:"</span>, <span class="bu">round</span>(<span class="bu">float</span>(sun_light_features[<span class="st">"is_daylight"</span>].mean()), <span class="dv">3</span>))</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>sun_light_features.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>shape           : (17545, 4)
+is_daylight mean: 0.512</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sunrise_hour</th>
+<th data-quarto-table-cell-role="th">sunset_hour</th>
+<th data-quarto-table-cell-role="th">daylight_hours</th>
+<th data-quarto-table-cell-role="th">is_daylight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
+<td>8</td>
+<td>15</td>
+<td>7</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td>8</td>
+<td>15</td>
+<td>7</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p><code>is_daylight.mean()</code> averaged over two years at 51° N should land close to <code>0.5</code>. Per-day sunrise and sunset values are cached internally so the solar position is not recomputed for every hourly row.</p>
+</section>
+<section id="stage-4c-weather-features" class="level3">
+<h3 class="anchored" data-anchor-id="stage-4c-weather-features">Stage 4c — Weather features</h3>
+<div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Why sine and cosine instead of just the hour number?
+First render needs network
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>If you feed an integer hour 0–23 directly to a tree-based model, hour 23 and hour 0 look <em>very</em> far apart numerically — even though they are neighbours on a clock. Sine and cosine wrap the integer onto a unit circle, so adjacent hours stay adjacent in the encoded space and the model does not learn a spurious discontinuity at midnight.</p>
+<p>Stage 4c reaches Open-Meteo. The helper defaults to <code>fallback_on_failure=True</code>, so renders without network will still succeed (with degraded weather data); but the page is most informative when run locally once with <code>cache_home</code> pointed at a writable directory.</p>
 </div>
 </div>
-</section>
-<section id="stage-6-feature-selection" class="level2">
-<h2 class="anchored" data-anchor-id="stage-6-feature-selection">Stage 6 — Feature selection</h2>
-<p><em>Why this step exists.</em> The combined matrix from stage 5 contains many columns the caller may not want. Stage 6 builds the final list of column names that will be passed as <code>exog</code> to the forecaster.</p>
-<p><code>select_exogenous_features(exogenous_features, weather_aligned, include_weather_windows, include_holiday_features, include_poly_features)</code> applies these rules:</p>
-<ul>
-<li>Always included: the cyclical sine/cosine columns (matched by the regular expression <code>_sin$|_cos$</code>) and the raw weather columns (which are exactly the columns of <code>weather_aligned</code>).</li>
-<li>Included only if <code>include_weather_windows=True</code>: the rolling-window weather features.</li>
-<li>Included only if <code>include_holiday_features=True</code>: the binary <code>is_holiday</code> column.</li>
-<li>Included only if <code>include_poly_features=True</code>: the <code>poly_</code>-prefixed interaction features.</li>
-</ul>
-<p>The final list is deduplicated with the order-preserving idiom <code>list(dict.fromkeys(exog_features))</code> so that no column name appears twice (a duplicate column would crash the forecaster’s lag-matrix construction).</p>
-</section>
-<section id="stage-7-merging-target-and-exogenous-data" class="level2">
-<h2 class="anchored" data-anchor-id="stage-7-merging-target-and-exogenous-data">Stage 7 — Merging target and exogenous data</h2>
-<p><em>Why this step exists.</em> The forecaster expects one DataFrame with the target column and a separate DataFrame of exogenous features, both indexed on the same training window — and a separate exogenous slice covering the future prediction window.</p>
-<p><code>merge_data_and_covariates(data, exogenous_features, target_columns, exog_features, start, end, cov_end, forecast_horizon, cast_dtype="float32")</code> returns three DataFrames:</p>
-<ul>
-<li><code>data_with_exog</code> — an <em>inner join</em> of the target columns and the selected exogenous columns over <code>[start, end]</code>. The inner join is the belt-and-braces guarantee that only rows where both sides are defined survive; any residual misalignment is dropped here.</li>
-<li><code>exo_tmp</code> — the slice of the exogenous feature matrix that covers <code>[start, end]</code>. Useful for inspection.</li>
-<li><code>exo_pred</code> — the slice that covers <code>(end, cov_end]</code>, the future window used at prediction time.</li>
-</ul>
-<p>Every column of <code>data_with_exog</code> is cast to <code>float32</code> to halve memory consumption during lag-matrix construction without measurable loss in predictive accuracy for this class of model.</p>
-</section>
-<section id="stage-8-train-validation-test-split" class="level2">
-<h2 class="anchored" data-anchor-id="stage-8-train-validation-test-split">Stage 8 — Train / validation / test split</h2>
-<p><em>Why this step exists.</em> The model must be evaluated on data it has never seen. Random shuffling is dangerous in time series — it lets the model “learn from the future”. The split here is purely temporal — see <a href="#def-train-val-test" class="quarto-xref">Definition&nbsp;7</a>.</p>
-<p><code>split_rel_train_val_test(data_with_exog, perc_train=train_ratio, perc_val=1.0 - train_ratio)</code> slices the rows in order: the first <code>train_ratio</code> fraction goes to training, the next half of the remainder to validation, the rest to test. With the default <code>train_ratio=0.8</code>, that is roughly 80 % training and 10 % each for validation and test.</p>
-<p>The boundary timestamp <code>end_validation</code> — the last index of the combined train + validation segment — is the cutoff used for <code>forecaster.fit(...)</code>, so the test set stays genuinely unseen during training.</p>
-<div id="exm-split-ratios" class="theorem example">
-<p><span class="theorem-title"><strong>Example 5 (Computing train/val/test sizes)</strong></span> &nbsp;</p>
-<div id="32905911" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">"h"</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>y   <span class="op">=</span> pd.Series(np.arange(n, dtype<span class="op">=</span><span class="bu">float</span>), index<span class="op">=</span>idx)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>train_ratio <span class="op">=</span> <span class="fl">0.8</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>n_train <span class="op">=</span> <span class="bu">int</span>(n <span class="op">*</span> train_ratio)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>n_val   <span class="op">=</span> <span class="bu">int</span>(n <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> train_ratio) <span class="op">/</span> <span class="dv">2</span>)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>n_test  <span class="op">=</span> n <span class="op">-</span> n_train <span class="op">-</span> n_val</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total rows : </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Train rows : </span><span class="sc">{</span>n_train<span class="sc">}</span><span class="ss">  (</span><span class="sc">{</span>train_ratio<span class="sc">:.0%}</span><span class="ss">)"</span>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Val rows   : </span><span class="sc">{</span>n_val<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Test rows  : </span><span class="sc">{</span>n_test<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Train ends : </span><span class="sc">{</span>y<span class="sc">.</span>index[n_train <span class="op">-</span> <span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="exm-s4c-weather" class="theorem example">
+<p><span class="theorem-title"><strong>Example 7 (Open-Meteo fetch and rolling weather windows)</strong></span> &nbsp;</p>
+<div id="3f5176a4" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> get_weather_features</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>weather_features, weather_aligned <span class="op">=</span> get_weather_features(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>imputed_data,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>start,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span>cov_end,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span>forecast_horizon,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">"h"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span>cache_home,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"weather_features shape :"</span>, weather_features.shape)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"weather_aligned shape  :"</span>, weather_aligned.shape)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"aligned columns        :"</span>, weather_aligned.columns.tolist())</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>weather_aligned.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Total rows : 100
-Train rows : 80  (80%)
-Val rows   : 9
-Test rows  : 11
-Train ends : 2020-01-04 07:00:00</code></pre>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Why temporal, not random?
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If you shuffled rows before splitting, the model might be trained on hour 14 of 1 March 2024 and tested on hour 13 of the same day — i.e.&nbsp;it would know the “answer” sits one step before the “question”. A temporal split forces the model to forecast a real future from a real past.</p>
-</div>
-</div>
-</section>
-<section id="stage-9-training-or-loading-recursive-forecasters" class="level2">
-<h2 class="anchored" data-anchor-id="stage-9-training-or-loading-recursive-forecasters">Stage 9 — Training or loading recursive forecasters</h2>
-<p><em>Why this step exists.</em> Retraining a forecaster takes time. For repeated calls with the same configuration (a typical operational pattern), we want to load previously trained models from disk instead.</p>
-<p>The decision is governed by two parameters:</p>
-<ul>
-<li><code>force_train</code> (default <code>True</code>): if <code>True</code>, all forecasters are retrained from scratch and any cached models are overwritten. Set <code>force_train=False</code> to skip training when cached models exist.</li>
-<li><code>model_dir</code>: directory where the joblib <code>.pkl</code> files live. If <code>None</code> (the default), the pipeline uses <code>get_cache_home() / "forecasters"</code> — i.e. <code>~/spotforecast2_cache/forecasters</code> unless overridden by the <code>SPOTFORECAST2_CACHE</code> environment variable.</li>
-</ul>
-<p>When <code>force_train=False</code> <em>and</em> the model directory exists, <code>load_forecasters(target_columns, model_dir)</code> attempts to deserialise one <code>ForecasterRecursive</code> object per target column. Targets whose model file is missing are collected into <code>targets_to_train</code> and trained below; the others are reused.</p>
-<p>When training is required, a <code>ForecasterRecursive</code> is constructed for each target in <code>targets_to_train</code> (see <a href="#def-recursive-forecaster" class="quarto-xref">Definition&nbsp;6</a> for the underlying idea):</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>forecaster <span class="op">=</span> ForecasterRecursive(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>estimator,                <span class="co"># default: LGBMRegressor(random_state=1234, verbose=-1)</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span>lags,                          <span class="co"># how many past values to use as features</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    window_features<span class="op">=</span>RollingFeatures(</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        stats<span class="op">=</span>[<span class="st">"mean"</span>], window_sizes<span class="op">=</span>window_size,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    ),                                  <span class="co"># adds a rolling-mean feature alongside the lags</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    weight_func<span class="op">=</span>weight_func,            <span class="co"># the WeightFunction from stage 3</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>forecaster.fit(</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span>data_with_exog[target].loc[:end_validation].squeeze(),</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span>data_with_exog[exog_features].loc[:end_validation],</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note that the fit uses <code>:end_validation</code>, not the end of the full dataset — the test portion is held out so a downstream evaluation step can score the model on truly unseen data.</p>
-<p>After training, <code>save_forecasters(forecasters, model_dir)</code> serialises each fitted object with joblib, one file per target column. Because <code>WeightFunction</code> is a regular class (not a closure), it survives the pickle/unpickle round trip together with the rest of the model.</p>
-<p>A <code>show_progress=True</code> flag wraps the per-target loop in a <code>tqdm</code> progress bar — useful for runs with many target columns.</p>
-<div id="1bd559ea" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>estimator <span class="op">=</span> LGBMRegressor(random_state<span class="op">=</span><span class="dv">1234</span>, verbose<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"random_state : </span><span class="sc">{</span>estimator<span class="sc">.</span>random_state<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"verbose      : </span><span class="sc">{</span>estimator<span class="sc">.</span>verbose<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"n_estimators : </span><span class="sc">{</span>estimator<span class="sc">.</span>n_estimators<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>random_state : 1234
-verbose      : -1
-n_estimators : 100</code></pre>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-What a recursive forecaster does, one step at a time
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>At step 1, the forecaster sees the most recent <code>lags</code> values of the target plus the exogenous features for step 1 and predicts the value for step 1. At step 2, it shifts the lag window by one — using the <em>just-predicted</em> step-1 value as the most recent lag — and predicts step 2. It keeps doing this for <code>forecast_horizon</code> steps. That is why the exogenous matrix for the future window must be fully known <em>before</em> prediction starts: the forecaster cannot ask “what will the temperature be at step 5?” mid-way through.</p>
-</div>
-</div>
-</section>
-<section id="stage-10-prediction" class="level2">
-<h2 class="anchored" data-anchor-id="stage-10-prediction">Stage 10 — Prediction</h2>
-<p><em>Why this step exists.</em> This is the payoff: turn the trained forecasters and the future exogenous matrix into actual forecasts.</p>
-<p><code>predict_multivariate(recursive_forecasters, steps_ahead=forecast_horizon,exog=exo_pred[exog_features],show_progress=show_progress)</code> iterates over the trained forecasters dictionary and calls <code>.predict(steps=horizon,exog=...)</code> on each. The exogenous matrix passed to every forecaster is the same slice <code>exo_pred[exog_features]</code> covering exactly <code>forecast_horizon</code> steps after <code>end_validation</code>. The result is assembled into a <code>predictions</code> DataFrame with one column per target and <code>forecast_horizon</code> rows.</p>
-<div id="23058c44" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>forecast_horizon <span class="op">=</span> <span class="dv">24</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>n_targets <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>pred_index <span class="op">=</span> pd.date_range(<span class="st">"2023-01-02"</span>, periods<span class="op">=</span>forecast_horizon, freq<span class="op">=</span><span class="st">"h"</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    rng.standard_normal((forecast_horizon, n_targets)),</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>pred_index,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="ss">f"col_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_targets)],</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Predictions shape : </span><span class="sc">{</span>predictions<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"First timestamp   : </span><span class="sc">{</span>predictions<span class="sc">.</span>index[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Last  timestamp   : </span><span class="sc">{</span>predictions<span class="sc">.</span>index[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>predictions.head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Predictions shape : (24, 11)
-First timestamp   : 2023-01-02 00:00:00
-Last  timestamp   : 2023-01-02 23:00:00</code></pre>
+<pre><code>weather_features shape : (17545, 105)
+weather_aligned shape  : (17545, 15)
+aligned columns        : ['temperature_2m', 'relative_humidity_2m', 'precipitation', 'rain', 'snowfall', 'weather_code', 'pressure_msl', 'surface_pressure', 'cloud_cover', 'cloud_cover_low', 'cloud_cover_mid', 'cloud_cover_high', 'wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m']</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
@@ -1953,61 +1854,59 @@ Last  timestamp   : 2023-01-02 23:00:00</code></pre>
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">col_1</th>
-<th data-quarto-table-cell-role="th">col_2</th>
-<th data-quarto-table-cell-role="th">col_3</th>
-<th data-quarto-table-cell-role="th">col_4</th>
-<th data-quarto-table-cell-role="th">col_5</th>
-<th data-quarto-table-cell-role="th">col_6</th>
-<th data-quarto-table-cell-role="th">col_7</th>
-<th data-quarto-table-cell-role="th">col_8</th>
-<th data-quarto-table-cell-role="th">col_9</th>
-<th data-quarto-table-cell-role="th">col_10</th>
-<th data-quarto-table-cell-role="th">col_11</th>
+<th data-quarto-table-cell-role="th">temperature_2m</th>
+<th data-quarto-table-cell-role="th">relative_humidity_2m</th>
+<th data-quarto-table-cell-role="th">precipitation</th>
+<th data-quarto-table-cell-role="th">rain</th>
+<th data-quarto-table-cell-role="th">snowfall</th>
+<th data-quarto-table-cell-role="th">weather_code</th>
+<th data-quarto-table-cell-role="th">pressure_msl</th>
+<th data-quarto-table-cell-role="th">surface_pressure</th>
+<th data-quarto-table-cell-role="th">cloud_cover</th>
+<th data-quarto-table-cell-role="th">cloud_cover_low</th>
+<th data-quarto-table-cell-role="th">cloud_cover_mid</th>
+<th data-quarto-table-cell-role="th">cloud_cover_high</th>
+<th data-quarto-table-cell-role="th">wind_speed_10m</th>
+<th data-quarto-table-cell-role="th">wind_direction_10m</th>
+<th data-quarto-table-cell-role="th">wind_gusts_10m</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-02 00:00:00</td>
-<td>0.3047</td>
-<td>-1.0400</td>
-<td>0.7505</td>
-<td>0.9406</td>
-<td>-1.9510</td>
-<td>-1.3022</td>
-<td>0.1278</td>
-<td>-0.3162</td>
-<td>-0.0168</td>
-<td>-0.8530</td>
-<td>0.8794</td>
+<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
+<td>4.4</td>
+<td>98</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>2</td>
+<td>1025.5</td>
+<td>1012.6</td>
+<td>63</td>
+<td>63</td>
+<td>1</td>
+<td>0</td>
+<td>9.4</td>
+<td>252</td>
+<td>18.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2023-01-02 01:00:00</td>
-<td>0.7778</td>
-<td>0.0660</td>
-<td>1.1272</td>
-<td>0.4675</td>
-<td>-0.8593</td>
-<td>0.3688</td>
-<td>-0.9589</td>
-<td>0.8785</td>
-<td>-0.0499</td>
-<td>-0.1849</td>
-<td>-0.6809</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2023-01-02 02:00:00</td>
-<td>1.2225</td>
-<td>-0.1545</td>
-<td>-0.4283</td>
-<td>-0.3521</td>
-<td>0.5323</td>
-<td>0.3654</td>
-<td>0.4127</td>
-<td>0.4308</td>
-<td>2.1416</td>
-<td>-0.4064</td>
-<td>-0.5122</td>
+<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td>4.6</td>
+<td>98</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>3</td>
+<td>1025.7</td>
+<td>1012.8</td>
+<td>100</td>
+<td>100</td>
+<td>1</td>
+<td>0</td>
+<td>8.4</td>
+<td>250</td>
+<td>17.6</td>
 </tr>
 </tbody>
 </table>
@@ -2015,60 +1914,343 @@ Last  timestamp   : 2023-01-02 23:00:00</code></pre>
 </div>
 </div>
 </div>
+</div>
+<p><code>weather_aligned</code> carries the raw weather columns aligned to the extended timeline. <code>weather_features</code> carries the same plus rolling one-day and seven-day mean/min/max windows for each numeric weather column. Whether the windows survive into the final feature matrix is decided by the <code>include_weather_windows</code> flag in Stage 6.</p>
 </section>
-<section id="metadata-and-return-values" class="level2">
-<h2 class="anchored" data-anchor-id="metadata-and-return-values">Metadata and return values</h2>
-<p>The function returns a three-element tuple. The first element is the <code>predictions</code> DataFrame described above. The second element is a <code>metadata</code> dictionary that records every parameter and intermediate shape of the run:</p>
-<ul>
-<li><code>forecast_horizon</code></li>
-<li><code>target_columns</code></li>
-<li><code>exog_features</code></li>
-<li><code>n_exog_features</code></li>
-<li><code>train_size</code>, <code>val_size</code>, <code>test_size</code></li>
-<li><code>data_shape_original</code>, <code>data_shape_merged</code></li>
-<li><code>training_end</code></li>
-<li><code>prediction_start</code>, <code>prediction_end</code></li>
-<li><code>lags</code>, <code>window_size</code>, <code>contamination</code></li>
-<li><code>n_outliers</code> (computed as <code>outliers.sum()</code> for the Series case, or <code>len(outliers)</code> otherwise)</li>
-</ul>
-<p>This dictionary is a self-contained audit record — it lets a future reader reconstruct the run’s configuration without rerunning the pipeline.</p>
-<p>The third element is the <code>recursive_forecasters</code> dictionary keyed by target column name. Returning the fitted objects lets the caller inspect internal state (feature names, lag matrices, fitted estimator parameters) or call <code>.predict</code> again with a different horizon, without retraining.</p>
-</section>
-<section id="sec-end-to-end" class="level2">
-<h2 class="anchored" data-anchor-id="sec-end-to-end">End-to-end example</h2>
-<p>The cell below runs the entire pipeline with very small parameters (<code>forecast_horizon=2</code>, <code>lags=4</code>, <code>window_size=8</code>), using <code>tempfile.mkdtemp()</code> as the model directory so the run does not pollute the user’s persistent cache.</p>
-<div id="exm-end-to-end" class="theorem example">
-<p><span class="theorem-title"><strong>Example 6 (Full pipeline on small parameters)</strong></span> &nbsp;</p>
-<div id="7a4a485f" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.n2n_predict_with_covariates <span class="im">import</span> (</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    n2n_predict_with_covariates,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>predictions, metadata, forecasters <span class="op">=</span> n2n_predict_with_covariates(</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">8</span>,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    force_train<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    model_dir<span class="op">=</span>tempfile.mkdtemp(),</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"predictions shape : </span><span class="sc">{</span>predictions<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"target columns    : </span><span class="sc">{</span>metadata[<span class="st">'target_columns'</span>][:<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> ..."</span>)</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"# exog features   : </span><span class="sc">{</span>metadata[<span class="st">'n_exog_features'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"training_end      : </span><span class="sc">{</span>metadata[<span class="st">'training_end'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"prediction window : </span><span class="sc">{</span>metadata[<span class="st">'prediction_start'</span>]<span class="sc">}</span><span class="ss"> → </span><span class="sc">{</span>metadata[<span class="st">'prediction_end'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>predictions.head().<span class="bu">round</span>(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="stage-4d-holiday-features" class="level3">
+<h3 class="anchored" data-anchor-id="stage-4d-holiday-features">Stage 4d — Holiday features</h3>
+<div id="exm-s4d-holidays" class="theorem example">
+<p><span class="theorem-title"><strong>Example 8 (German public holidays for North Rhine-Westphalia)</strong></span> &nbsp;</p>
+<div id="4cf9ceab" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_holiday_features</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>holiday_features <span class="op">=</span> get_holiday_features(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>imputed_data,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>start,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span>cov_end,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span>forecast_horizon,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    tz<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">"h"</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">"NW"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape                :"</span>, holiday_features.shape)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"flagged holiday hours:"</span>, <span class="bu">int</span>(holiday_features[<span class="st">"is_holiday"</span>].<span class="bu">sum</span>()))</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>holiday_features.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>predictions shape : (2, 11)
-target columns    : ['A', 'B', 'C'] ...
-# exog features   : 27
-training_end      : 2021-12-24 21:00:00+00:00
-prediction window : 2021-12-24 22:00:00+00:00 → 2021-12-24 23:00:00+00:00</code></pre>
+<pre><code>shape                : (17545, 1)
+flagged holiday hours: 529</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">is_holiday</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>For two years of NRW the expected count is roughly eleven holidays per year × twenty-four hours ≈ five hundred flagged hours. The model sees a clean binary column with no <code>NaN</code>.</p>
+</section>
+</section>
+<section id="stage-5-combining-and-encoding-exogenous-features" class="level2">
+<h2 class="anchored" data-anchor-id="stage-5-combining-and-encoding-exogenous-features">Stage 5 — Combining and encoding exogenous features</h2>
+<p>The four feature DataFrames are concatenated column-wise in a fixed order: calendar, day/night, weather, holidays. Any <code>NaN</code> that survived into the concatenated matrix would be a bug — Stage 5 raises before any further work happens. Then <code>apply_cyclical_encoding</code> replaces every periodic integer column (<code>month</code>, <code>week</code>, <code>day_of_week</code>, <code>hour</code>, <code>sunrise_hour</code>, <code>sunset_hour</code>) with its sine and cosine on a unit circle, keeping the original integers alongside, and <code>create_interaction_features</code> emits pairwise products of cyclical, weather, and holiday columns prefixed with <code>poly_</code>.</p>
+<div id="exm-s5-concat-encode" class="theorem example">
+<p><span class="theorem-title"><strong>Example 9 (Concat, NaN guard, cyclical encoding, interactions)</strong></span> &nbsp;</p>
+<div id="8a69a34d" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> (</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    apply_cyclical_encoding,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    create_interaction_features,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>exogenous_features <span class="op">=</span> pd.concat(</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    [calendar_features, sun_light_features, weather_features, holiday_features],</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>missing_count <span class="op">=</span> <span class="bu">int</span>(exogenous_features.isnull().<span class="bu">sum</span>().<span class="bu">sum</span>())</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"missing entries in concat :"</span>, missing_count)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape after concat        :"</span>, exogenous_features.shape)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>exogenous_features <span class="op">=</span> apply_cyclical_encoding(</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>exogenous_features,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    drop_original<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>sin_cos_cols <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> exogenous_features.columns <span class="cf">if</span> c.endswith(<span class="st">"_sin"</span>) <span class="kw">or</span> c.endswith(<span class="st">"_cos"</span>)]</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape after cyclical enc  :"</span>, exogenous_features.shape)</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"number of sin/cos columns :"</span>, <span class="bu">len</span>(sin_cos_cols))</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>exogenous_features <span class="op">=</span> create_interaction_features(</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    exogenous_features<span class="op">=</span>exogenous_features,</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    weather_aligned<span class="op">=</span>weather_aligned,</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>poly_cols <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> exogenous_features.columns <span class="cf">if</span> c.startswith(<span class="st">"poly_"</span>)]</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape after interactions  :"</span>, exogenous_features.shape)</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"number of poly_ columns   :"</span>, <span class="bu">len</span>(poly_cols))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>missing entries in concat : 0
+shape after concat        : (17545, 114)
+shape after cyclical enc  : (17545, 126)
+number of sin/cos columns : 12
+shape after interactions  : (17545, 126)
+number of poly_ columns   : 0</code></pre>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why sine and cosine
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Feeding the integer hour 0–23 directly to a tree-based model makes hour 23 and hour 0 look very far apart numerically, even though they are neighbours on a clock. Sine and cosine wrap the integer onto a unit circle, so adjacent hours stay adjacent in the encoded space. See <code>@def-cyclical-encoding</code> in the sibling page.</p>
+</div>
+</div>
+</section>
+<section id="stage-6-feature-selection" class="level2">
+<h2 class="anchored" data-anchor-id="stage-6-feature-selection">Stage 6 — Feature selection</h2>
+<p><code>select_exogenous_features</code> returns the final list of column names that will be passed to the forecaster as <code>exog</code>. With the three include flags set to <code>False</code> (the package defaults), the selection keeps only the cyclical sine/cosine columns and the raw weather columns; rolling weather windows, the holiday column, and the polynomial interactions are filtered out.</p>
+<div id="exm-s6-select" class="theorem example">
+<p><span class="theorem-title"><strong>Example 10 (Final exogenous column list)</strong></span> &nbsp;</p>
+<div id="c445c07d" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> select_exogenous_features</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>exog_features <span class="op">=</span> select_exogenous_features(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    exogenous_features<span class="op">=</span>exogenous_features,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    weather_aligned<span class="op">=</span>weather_aligned,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    include_poly_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"number of exog features :"</span>, <span class="bu">len</span>(exog_features))</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"first 6                 :"</span>, exog_features[:<span class="dv">6</span>])</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"last 3                  :"</span>, exog_features[<span class="op">-</span><span class="dv">3</span>:])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>number of exog features : 27
+first 6                 : ['month_sin', 'month_cos', 'week_sin', 'week_cos', 'day_of_week_sin', 'day_of_week_cos']
+last 3                  : ['wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m']</code></pre>
+</div>
+</div>
+</div>
+<p>To experiment with the other flags, re-run this cell with one or more of the <code>include_*</code> arguments set to <code>True</code> and observe how <code>len(exog_features)</code> grows.</p>
+</section>
+<section id="stage-7-merging-target-and-exogenous-data" class="level2">
+<h2 class="anchored" data-anchor-id="stage-7-merging-target-and-exogenous-data">Stage 7 — Merging target and exogenous data</h2>
+<p><code>merge_data_and_covariates</code> performs an inner join of the target columns and the selected exogenous columns over <code>[start, end]</code>, casts every column to <code>float32</code> to halve the memory footprint of the lag matrix, and also returns the slice of the exogenous matrix that covers the future prediction window <code>(end, cov_end]</code>.</p>
+<div id="exm-s7-merge" class="theorem example">
+<p><span class="theorem-title"><strong>Example 11 (Merged training matrix and the future-window slice)</strong></span> &nbsp;</p>
+<div id="a76d18da" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> merge_data_and_covariates</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>data_with_exog, exo_tmp, exo_pred <span class="op">=</span> merge_data_and_covariates(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>imputed_data,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    exogenous_features<span class="op">=</span>exogenous_features,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    target_columns<span class="op">=</span>target_columns,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    exog_features<span class="op">=</span>exog_features,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span>start,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span>end,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span>cov_end,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span>forecast_horizon,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    cast_dtype<span class="op">=</span><span class="st">"float32"</span>,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"data_with_exog shape :"</span>, data_with_exog.shape)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"exo_pred       shape :"</span>, exo_pred.shape)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"dtypes count         :"</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data_with_exog.dtypes.value_counts())</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>data_with_exog.head(<span class="dv">2</span>).iloc[:, :<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>data_with_exog shape : (17521, 38)
+exo_pred       shape : (24, 126)
+dtypes count         :
+float32    38
+Name: count, dtype: int64</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">A</th>
+<th data-quarto-table-cell-role="th">B</th>
+<th data-quarto-table-cell-role="th">C</th>
+<th data-quarto-table-cell-role="th">D</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">DateTime</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
+<td>1782.828003</td>
+<td>2238.445801</td>
+<td>240.210419</td>
+<td>270.929291</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td>1589.476196</td>
+<td>2238.445801</td>
+<td>240.210419</td>
+<td>270.929291</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p><code>exo_pred</code> has exactly <code>forecast_horizon</code> rows; it is the matrix passed to every forecaster at prediction time. Every column of <code>data_with_exog</code> is <code>float32</code>, including the eleven target columns.</p>
+</section>
+<section id="stage-8-train-validation-test-split" class="level2">
+<h2 class="anchored" data-anchor-id="stage-8-train-validation-test-split">Stage 8 — Train / validation / test split</h2>
+<p>The split is purely temporal: the first <code>train_ratio=0.8</code> fraction of rows is training data, and the remaining twenty percent is split evenly into validation and test. <code>end_validation</code> is the cutoff timestamp used by <code>forecaster.fit(...)</code> — the test segment stays unseen during training.</p>
+<div id="exm-s8-split" class="theorem example">
+<p><span class="theorem-title"><strong>Example 12 (Temporal split and the validation cutoff)</strong></span> &nbsp;</p>
+<div id="2b9678b5" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.splitter.split <span class="im">import</span> split_rel_train_val_test</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>train_ratio <span class="op">=</span> <span class="fl">0.8</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>data_train, data_val, data_test <span class="op">=</span> split_rel_train_val_test(</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    data_with_exog,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    perc_train<span class="op">=</span>train_ratio,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    perc_val<span class="op">=</span><span class="fl">1.0</span> <span class="op">-</span> train_ratio,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>end_validation <span class="op">=</span> pd.concat([data_train, data_val]).index[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"train rows    :"</span>, <span class="bu">len</span>(data_train))</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"val   rows    :"</span>, <span class="bu">len</span>(data_val))</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"test  rows    :"</span>, <span class="bu">len</span>(data_test))</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"end_validation:"</span>, end_validation)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train rows    : 14017
+val   rows    : 3504
+test  rows    : 0
+end_validation: 2021-12-24 21:00:00+00:00</code></pre>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why temporal, not random
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Random shuffling before a time-series split lets the model “see the future”: its training set could include hour 14 of a day on which the test set asks it to predict hour 13. A temporal split forces a real future-from-past forecast. See <code>@def-train-val-test</code> in the sibling page.</p>
+</div>
+</div>
+</section>
+<section id="stage-9-training-recursive-forecasters" class="level2">
+<h2 class="anchored" data-anchor-id="stage-9-training-recursive-forecasters">Stage 9 — Training recursive forecasters</h2>
+<p>For each of the eleven target columns Stage 9 builds a fresh <code>ForecasterRecursive</code>, configured identically: <code>lags=24</code>, <code>RollingFeatures(stats=["mean"], window_sizes=72)</code>, the shared <code>weight_func</code>, and an <code>LGBMRegressor</code> with <code>random_state=1234</code>. Every fit uses data up to and including <code>end_validation</code>, so the test segment is held out for any downstream evaluation step.</p>
+<p>This is the most expensive cell on the page — eleven LightGBM models on roughly fourteen thousand training rows each. Expect a few minutes on a modern laptop.</p>
+<div id="exm-s9-train" class="theorem example">
+<p><span class="theorem-title"><strong>Example 13 (Eleven forecasters, one shared configuration)</strong></span> &nbsp;</p>
+<div id="dde4cf51" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> RollingFeatures</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>estimator <span class="op">=</span> LGBMRegressor(random_state<span class="op">=</span><span class="dv">1234</span>, verbose<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>window_features <span class="op">=</span> RollingFeatures(stats<span class="op">=</span>[<span class="st">"mean"</span>], window_sizes<span class="op">=</span><span class="dv">72</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>recursive_forecasters <span class="op">=</span> {}</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> target <span class="kw">in</span> target_columns:</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    forecaster <span class="op">=</span> ForecasterRecursive(</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        estimator<span class="op">=</span>estimator,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        lags<span class="op">=</span><span class="dv">24</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        window_features<span class="op">=</span>window_features,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>        weight_func<span class="op">=</span>weight_func,</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    forecaster.fit(</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>        y<span class="op">=</span>data_with_exog[target].loc[:end_validation].squeeze(),</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>        exog<span class="op">=</span>data_with_exog[exog_features].loc[:end_validation],</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    recursive_forecasters[target] <span class="op">=</span> forecaster</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>sample_target <span class="op">=</span> target_columns[<span class="dv">0</span>]</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>sample_fit <span class="op">=</span> recursive_forecasters[sample_target].regressor</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"forecasters trained        :"</span>, <span class="bu">len</span>(recursive_forecasters))</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sample target              :"</span>, sample_target)</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sample regressor type      :"</span>, <span class="bu">type</span>(sample_fit).<span class="va">__name__</span>)</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sample n_features_in_      :"</span>, <span class="bu">getattr</span>(sample_fit, <span class="st">"n_features_in_"</span>, <span class="st">"—"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>forecasters trained        : 11
+sample target              : A
+sample regressor type      : LGBMRegressor
+sample n_features_in_      : 52</code></pre>
+</div>
+</div>
+</div>
+<p>All eleven forecasters share the same hyperparameters and <code>random_state=1234</code>, so two renders on identical input produce byte- identical models — the determinism guarantee underpins reproducible reporting.</p>
+</section>
+<section id="stage-10-prediction" class="level2">
+<h2 class="anchored" data-anchor-id="stage-10-prediction">Stage 10 — Prediction</h2>
+<p><code>predict_multivariate</code> iterates over the trained forecasters and calls <code>.predict(steps=forecast_horizon, exog=exo_pred[exog_features])</code> on each. The result is a single DataFrame with one column per target and <code>forecast_horizon</code> rows.</p>
+<div id="exm-s10-predict" class="theorem example">
+<p><span class="theorem-title"><strong>Example 14 (Twenty-four-hour multi-target forecast)</strong></span> &nbsp;</p>
+<div id="8f169608" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.utils <span class="im">import</span> predict_multivariate</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> predict_multivariate(</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    recursive_forecasters,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    steps_ahead<span class="op">=</span>forecast_horizon,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    exog<span class="op">=</span>exo_pred[exog_features],</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    show_progress<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"predictions shape :"</span>, predictions.shape)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"first timestamp   :"</span>, predictions.index[<span class="dv">0</span>])</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"last  timestamp   :"</span>, predictions.index[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>predictions.head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>predictions shape : (24, 11)
+first timestamp   : 2021-12-24 22:00:00+00:00
+last  timestamp   : 2021-12-25 21:00:00+00:00</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div>
 
 
@@ -2092,31 +2274,45 @@ prediction window : 2021-12-24 22:00:00+00:00 → 2021-12-24 23:00:00+00:00</cod
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2021-12-24 22:00:00+00:00</td>
-<td>1653.9953</td>
-<td>4102.8461</td>
-<td>-302.3690</td>
-<td>96.2377</td>
-<td>825.5979</td>
-<td>-67.9630</td>
-<td>40.6380</td>
-<td>11864.5059</td>
-<td>32.5165</td>
-<td>132.1288</td>
-<td>454.1211</td>
+<td>16.49</td>
+<td>4324.76</td>
+<td>291.56</td>
+<td>86.01</td>
+<td>725.48</td>
+<td>44.69</td>
+<td>39.55</td>
+<td>12205.69</td>
+<td>33.40</td>
+<td>128.74</td>
+<td>444.67</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">2021-12-24 23:00:00+00:00</td>
-<td>-1389.3385</td>
-<td>3810.9111</td>
-<td>-297.1465</td>
-<td>40.7004</td>
-<td>883.8951</td>
-<td>-165.9625</td>
-<td>44.0671</td>
-<td>11765.7503</td>
-<td>-13.8699</td>
-<td>299.2599</td>
-<td>489.9649</td>
+<td>-3104.58</td>
+<td>5141.05</td>
+<td>-28.22</td>
+<td>-28.29</td>
+<td>767.70</td>
+<td>47.86</td>
+<td>40.49</td>
+<td>11575.42</td>
+<td>-65.75</td>
+<td>255.18</td>
+<td>280.14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2021-12-25 00:00:00+00:00</td>
+<td>-1699.92</td>
+<td>4413.22</td>
+<td>172.86</td>
+<td>-94.26</td>
+<td>945.57</td>
+<td>10.70</td>
+<td>42.83</td>
+<td>9886.57</td>
+<td>25.07</td>
+<td>-46.34</td>
+<td>308.82</td>
 </tr>
 </tbody>
 </table>
@@ -2125,25 +2321,168 @@ prediction window : 2021-12-24 22:00:00+00:00 → 2021-12-24 23:00:00+00:00</cod
 </div>
 </div>
 </div>
-<p>The same call with <code>force_train=False</code> and the same <code>model_dir</code> would load the just-trained forecasters from disk instead of retraining — the core caching mechanism behind the pipeline’s speedup on repeated runs.</p>
+<p><code>predictions.shape</code> is <code>(24, 11)</code>: twenty-four forecast hours, eleven target columns. The index is exactly <code>exo_pred.index</code>, which is exactly <code>forecast_horizon</code> hours starting one step after <code>end_validation</code>.</p>
 </section>
-<section id="the-complete-execution-flow" class="level2">
-<h2 class="anchored" data-anchor-id="the-complete-execution-flow">The complete execution flow</h2>
-<p>A single call to <code>n2n_predict_with_covariates</code> follows this invariant sequence:</p>
-<ol type="1">
-<li>Input validation runs first.</li>
-<li>The target data is loaded and cleaned (Stage 1).</li>
-<li>Outlier positions are replaced with <code>NaN</code> (Stage 2).</li>
-<li>Missing values are imputed and sample weights are computed (Stage 3).</li>
-<li>Four categories of exogenous features are constructed over the full extended time window (Stage 4).</li>
-<li>The features are concatenated, validated for completeness, cyclically encoded, and augmented with interaction terms (Stage 5).</li>
-<li>A feature-selection step reduces the matrix to the columns relevant to the configured pipeline variant (Stage 6).</li>
-<li>The selected features are merged with the target data over the historical window (Stage 7).</li>
-<li>The merged data is split temporally into train, validation, and test segments (Stage 8).</li>
-<li>Forecasters are either loaded from disk or trained from scratch and then persisted (Stage 9).</li>
-<li>Predictions are generated for the <code>forecast_horizon</code> steps beyond the training end (Stage 10).</li>
-</ol>
-<p>Every public parameter is validated at entry, every exogenous feature matrix is checked for completeness before it enters the model, and every fitted object is serialised in a form that survives process boundaries. These invariants make the pipeline safe to embed in automated batch jobs where a silent failure would not be discovered until long after the prediction window has closed.</p>
+<section id="metadata" class="level2">
+<h2 class="anchored" data-anchor-id="metadata">Metadata</h2>
+<p>The orchestrator emits a metadata dictionary that records every configuration knob and every shape it just produced — a self-contained audit record. Building the same dictionary by hand is a useful integration check that nothing was lost along the way.</p>
+<div id="exm-meta" class="theorem example">
+<p><span class="theorem-title"><strong>Example 15 (Reconstructing the orchestrator’s metadata)</strong></span> &nbsp;</p>
+<div id="13ee93f5" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="op">=</span> {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"forecast_horizon"</span>: forecast_horizon,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_columns"</span>: target_columns,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"exog_features"</span>: exog_features,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_exog_features"</span>: <span class="bu">len</span>(exog_features),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"train_size"</span>: <span class="bu">len</span>(data_train),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"val_size"</span>: <span class="bu">len</span>(data_val),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"test_size"</span>: <span class="bu">len</span>(data_test),</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data_shape_original"</span>: data_sliced.shape,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data_shape_merged"</span>: data_with_exog.shape,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"training_end"</span>: end_validation,</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"prediction_start"</span>: exo_pred.index[<span class="dv">0</span>],</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"prediction_end"</span>: exo_pred.index[<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lags"</span>: <span class="dv">24</span>,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"window_size"</span>: <span class="dv">72</span>,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"contamination"</span>: <span class="fl">0.01</span>,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_outliers"</span>: <span class="bu">int</span>((outliers <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>()) <span class="cf">if</span> <span class="bu">hasattr</span>(outliers, <span class="st">"__iter__"</span>) <span class="cf">else</span> <span class="dv">0</span>,</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"metadata keys :"</span>, <span class="bu">sorted</span>(metadata.keys()))</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"training_end  :"</span>, metadata[<span class="st">"training_end"</span>])</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"prediction    :"</span>, metadata[<span class="st">"prediction_start"</span>], <span class="st">"→"</span>, metadata[<span class="st">"prediction_end"</span>])</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n_exog_features:"</span>, metadata[<span class="st">"n_exog_features"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>metadata keys : ['contamination', 'data_shape_merged', 'data_shape_original', 'exog_features', 'forecast_horizon', 'lags', 'n_exog_features', 'n_outliers', 'prediction_end', 'prediction_start', 'target_columns', 'test_size', 'train_size', 'training_end', 'val_size', 'window_size']
+training_end  : 2021-12-24 21:00:00+00:00
+prediction    : 2021-12-24 22:00:00+00:00 → 2021-12-25 21:00:00+00:00
+n_exog_features: 27</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="cross-check-against-the-orchestrator" class="level2">
+<h2 class="anchored" data-anchor-id="cross-check-against-the-orchestrator">Cross-check against the orchestrator</h2>
+<p>The pipeline above is exactly what <code>n2n_predict_with_covariates</code> does internally. Calling the orchestrator on the same sliced data with the same parameters should yield the same shapes and (modulo any change in Open-Meteo’s historical data between the two calls) the same numerical predictions.</p>
+<div id="exm-end-to-end" class="theorem example">
+<p><span class="theorem-title"><strong>Example 16 (Single-call equivalence)</strong></span> &nbsp;</p>
+<div id="afc57b3d" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.n2n_predict_with_covariates <span class="im">import</span> (</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    n2n_predict_with_covariates,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>predictions_full, metadata_full, forecasters_full <span class="op">=</span> n2n_predict_with_covariates(</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data_sliced,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span><span class="dv">24</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">24</span>,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.01</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    train_ratio<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">"NW"</span>,</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    force_train<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    model_dir<span class="op">=</span><span class="bu">str</span>(cache_home <span class="op">/</span> <span class="st">"demo100_forecasters"</span>),</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    show_progress<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> predictions_full.shape <span class="op">==</span> predictions.shape</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"step-by-step shape :"</span>, predictions.shape)</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"orchestrator shape :"</span>, predictions_full.shape)</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n_exog (manual)    :"</span>, metadata[<span class="st">"n_exog_features"</span>])</span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n_exog (orch)      :"</span>, metadata_full[<span class="st">"n_exog_features"</span>])</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>predictions_full.head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>step-by-step shape : (24, 11)
+orchestrator shape : (24, 11)
+n_exog (manual)    : 27
+n_exog (orch)      : 27</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">A</th>
+<th data-quarto-table-cell-role="th">B</th>
+<th data-quarto-table-cell-role="th">C</th>
+<th data-quarto-table-cell-role="th">D</th>
+<th data-quarto-table-cell-role="th">E</th>
+<th data-quarto-table-cell-role="th">F</th>
+<th data-quarto-table-cell-role="th">G</th>
+<th data-quarto-table-cell-role="th">H</th>
+<th data-quarto-table-cell-role="th">I</th>
+<th data-quarto-table-cell-role="th">J</th>
+<th data-quarto-table-cell-role="th">K</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2021-12-24 22:00:00+00:00</td>
+<td>16.49</td>
+<td>4324.76</td>
+<td>291.56</td>
+<td>86.01</td>
+<td>725.48</td>
+<td>44.69</td>
+<td>39.55</td>
+<td>12205.69</td>
+<td>33.40</td>
+<td>128.74</td>
+<td>444.67</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2021-12-24 23:00:00+00:00</td>
+<td>-3104.58</td>
+<td>5141.05</td>
+<td>-28.22</td>
+<td>-28.29</td>
+<td>767.70</td>
+<td>47.86</td>
+<td>40.49</td>
+<td>11575.42</td>
+<td>-65.75</td>
+<td>255.18</td>
+<td>280.14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2021-12-25 00:00:00+00:00</td>
+<td>-1699.92</td>
+<td>4413.22</td>
+<td>172.86</td>
+<td>-94.26</td>
+<td>945.57</td>
+<td>10.70</td>
+<td>42.83</td>
+<td>9886.57</td>
+<td>25.07</td>
+<td>-46.34</td>
+<td>308.82</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>Numerical equality of the two prediction matrices depends on Open-Meteo returning identical historical values between the two render passes; sharing the same <code>cache_home</code> is what makes that the common case rather than a rare one.</p>
+</section>
+<section id="what-to-take-away" class="level2">
+<h2 class="anchored" data-anchor-id="what-to-take-away">What to take away</h2>
+<ul>
+<li>Each stage of <code>n2n_predict_with_covariates</code> produces a checkable intermediate artefact: the boundary timestamps, the outlier mask, the weight series, the four exogenous DataFrames, the merged matrix, the three split DataFrames, the dictionary of fitted forecasters, and finally the predictions DataFrame.</li>
+<li>The orchestrator is exactly the composition of these calls. There is no hidden state — the cross-check cell above proves it.</li>
+<li>The only network-dependent stage is 4c. <code>freeze: true</code> keeps local iteration cheap, and <code>cache_home</code> keeps the network round-trip amortised across renders.</li>
+<li>The same configuration on the same input yields byte-identical forecasters, predictions, and metadata. That determinism is the foundation that makes <code>n2n_predict_with_covariates</code> safe to embed in an automated batch job.</li>
+</ul>
 
 
 </section>
@@ -2576,7 +2915,7 @@ prediction window : 2021-12-24 22:00:00+00:00 → 2021-12-24 23:00:00+00:00</cod
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_explained.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/n2n_predict_with_covariates_demo100.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
