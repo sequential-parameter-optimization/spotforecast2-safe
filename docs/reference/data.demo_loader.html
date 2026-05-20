@@ -305,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.demo_loader.html">demo_loader</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data_classes.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.demo_loader.html">demo_loader</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -355,8 +355,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.data.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">data</span></a>
+  <a href="../../docs/reference/data.data_classes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">data_classes</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -405,12 +405,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">load_timeseries_forecast</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.demo_data.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">demo_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -901,6 +895,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/configurator.config_demo.ConfigDemo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ConfigDemo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../docs/reference/configurator.config_entsoe.ConfigEntsoe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ConfigEntsoe</span></a>
   </div>
@@ -1383,7 +1383,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.demo_loader.html">demo_loader</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data_classes.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.demo_loader.html">demo_loader</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">data.demo_loader</h1>
 </div>
@@ -1446,7 +1446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>config</td>
-<td><a href="../../docs/reference/data.demo_data.html#spotforecast2_safe.data.demo_data.DemoConfig">DemoConfig</a></td>
+<td><code>ConfigDemo</code></td>
 <td>Configuration object containing default paths and parameters.</td>
 <td><em>required</em></td>
 </tr>
@@ -1523,13 +1523,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
 <p>Basic usage with explicit forecast horizon and weights:</p>
-<div id="2920e7c2" class="cell" data-execution_count="1">
+<div id="45ee3a11" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.demo_data <span class="im">import</span> DemoConfig</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator <span class="im">import</span> ConfigDemo</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.demo_loader <span class="im">import</span> load_actual_combined</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">3</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
@@ -1539,7 +1539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(data_path<span class="op">=</span>temp_path)</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    config, columns<span class="op">=</span>[<span class="st">"col1"</span>, <span class="st">"col2"</span>], forecast_horizon<span class="op">=</span><span class="dv">2</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>]</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1552,7 +1552,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Override forecast horizon and weights:</p>
-<div id="69488f36" class="cell" data-execution_count="2">
+<div id="40f3a4da" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"col1"</span>: [<span class="bu">float</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)], <span class="st">"col2"</span>: [<span class="bu">float</span>(i <span class="op">*</span> <span class="dv">2</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]},</span>
@@ -1563,7 +1563,7 @@ First value: 3.0</code></pre>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path, forecast_horizon<span class="op">=</span><span class="dv">24</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(data_path<span class="op">=</span>temp_path, forecast_horizon<span class="op">=</span><span class="dv">24</span>)</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    config, columns<span class="op">=</span>[<span class="st">"col1"</span>, <span class="st">"col2"</span>], forecast_horizon<span class="op">=</span><span class="dv">5</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">0.5</span>]</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1574,7 +1574,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Override <code>data_path</code> while keeping the rest of the config:</p>
-<div id="9ef0c55b" class="cell" data-execution_count="3">
+<div id="29049c43" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"X"</span>: [<span class="fl">100.0</span>], <span class="st">"Y"</span>: [<span class="fl">200.0</span>]}, index<span class="op">=</span>idx)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1582,7 +1582,7 @@ First value: 3.0</code></pre>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    custom_path <span class="op">=</span> Path(f.name)</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig()  <span class="co"># default data_path</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo()  <span class="co"># default data_path</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    config,</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"X"</span>, <span class="st">"Y"</span>],</span>
@@ -1597,8 +1597,8 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Error handling — missing file:</p>
-<div id="c2074122" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>Path(<span class="st">"/nonexistent/file.csv"</span>))</span>
+<div id="2d7a7dae" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(data_path<span class="op">=</span>Path(<span class="st">"/nonexistent/file.csv"</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    load_actual_combined(</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        config, columns<span class="op">=</span>[<span class="st">"A"</span>], forecast_horizon<span class="op">=</span><span class="dv">1</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>]</span>
@@ -1610,7 +1610,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Error handling — missing columns:</p>
-<div id="c44383e5" class="cell" data-execution_count="5">
+<div id="bc1f15c9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"col1"</span>: [<span class="fl">1.0</span>]}, index<span class="op">=</span>idx)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1618,7 +1618,7 @@ First value: 3.0</code></pre>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>temp_path)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(data_path<span class="op">=</span>temp_path)</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    load_actual_combined(</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        config,</span>
@@ -1634,7 +1634,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Production usage with horizon and weights drawn from the config:</p>
-<div id="225a26a0" class="cell" data-execution_count="6">
+<div id="88f0237a" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">30</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -1649,7 +1649,7 @@ First value: 3.0</code></pre>
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    sample_df.to_csv(f.name)</span>
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    temp_path <span class="op">=</span> Path(f.name)</span>
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(</span>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    data_path<span class="op">=</span>temp_path, forecast_horizon<span class="op">=</span><span class="dv">24</span>, weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>]</span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> load_actual_combined(config, columns<span class="op">=</span>[<span class="st">"load"</span>, <span class="st">"solar"</span>, <span class="st">"wind"</span>])</span>
