@@ -1,3 +1,22 @@
+## [13.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v12.0.0...v13.0.0) (2026-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* `spotforecast2_safe.manager._parse_bool` is removed.
+Import `parse_bool` from `spotforecast2_safe.utils.parse` instead.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Documentation
+
+* **utils:** convert convert_to_utc + cpe Examples to live {python} cells ([1095ded](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1095dedfa22a79509b9ab30cdebe02d4caa20b33))
+
+
+### Code Refactoring
+
+* move manager/tools.py → utils/parse.py and make parse_bool public ([8b52c0b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8b52c0bcc472ca40a26d21e74d883dd8b49fcdab))
+
 ## [12.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v11.0.0...v12.0.0) (2026-05-19)
 
 
