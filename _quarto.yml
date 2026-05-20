@@ -30,6 +30,9 @@ project:
     - "docs/**/*.qmd"  # all hand-written docs
     - "docs/**/*.md"   # any remaining markdown in docs/
     - "!docs/index.qmd" # excluded: content moved to root index.qmd
+    # Private tutorial that depends on /Users/bartz/spotforecast2_data/demo10.csv;
+    # the file is gitignored and absent from CI, so rendering it would fail.
+    - "!docs/tutorials/n2n_predict_with_covariates_demo10.qmd"
 
   # Pre-render hook: extracts version from pyproject.toml → _variables.yml
   # so that {{< var version >}} works in any .qmd file.
