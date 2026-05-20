@@ -580,12 +580,10 @@ for target in target_columns:
     )
     recursive_forecasters[target] = forecaster
 
-sample_target = target_columns[0]
-sample_fit = recursive_forecasters[sample_target].estimator
+feature_counts = {t: recursive_forecasters[t].estimator.n_features_in_ for t in target_columns}
 print("forecasters trained        :", len(recursive_forecasters))
-print("sample target              :", sample_target)
-print("sample estimator type      :", type(sample_fit).__name__)
-print("sample n_features_in_      :", getattr(sample_fit, "n_features_in_", "—"))
+print("estimator type             :", type(recursive_forecasters[target_columns[0]].estimator).__name__)
+print("n_features_in_ across all  :", set(feature_counts.values()))
 ```
 
 :::

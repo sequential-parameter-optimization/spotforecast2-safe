@@ -564,12 +564,10 @@ for target in target_columns:
     )
     recursive_forecasters[target] = forecaster
 
-sample_target = target_columns[0]
-sample_fit = recursive_forecasters[sample_target].estimator
+feature_counts = {t: recursive_forecasters[t].estimator.n_features_in_ for t in target_columns}
 print("forecasters trained        :", len(recursive_forecasters))
-print("sample target              :", sample_target)
-print("sample estimator type      :", type(sample_fit).__name__)
-print("sample n_features_in_      :", getattr(sample_fit, "n_features_in_", "—"))
+print("estimator type             :", type(recursive_forecasters[target_columns[0]].estimator).__name__)
+print("n_features_in_ across all  :", set(feature_counts.values()))
 ```
 
 :::
@@ -612,6 +610,126 @@ predictions.head(3).round(2)
 target columns. The index is exactly `exo_pred.index`, which is exactly
 `forecast_horizon` hours starting one step after `end_validation`.
 
+## Testing using actual data
+
+Stage 10 produced a 24-row × 11-column prediction matrix. The companion
+dataset `demo11.csv` contains the actual measurements for the same future
+window (its index starts exactly at `predictions.index[0]`), so a clean
+per-target evaluation is one row-index intersection away. The column
+ordering of `demo11.csv` is identical to the target ordering of
+`predictions`, so no realignment beyond the index slice is needed.
+
+::: {#exm-actual-metrics}
+
+## Per-target error metrics against demo11.csv
+
+```{python}
+import numpy as np
+import pandas as pd
+
+actual = pd.read_csv(
+    "/Users/bartz/spotforecast2_data/demo11.csv",
+    index_col=0,
+    parse_dates=True,
+)
+actual_pred = actual.loc[predictions.index]
+assert list(actual_pred.columns) == list(predictions.columns), "column mismatch"
+
+
+def per_target_metrics(y_true: pd.Series, y_pred: pd.Series) -> dict:
+    err = y_true - y_pred
+    nonzero = y_true.abs() > 1e-12
+    mse = float((err ** 2).mean())
+    return {
+        "MAE": float(err.abs().mean()),
+        "MSE": mse,
+        "RMSE": float(np.sqrt(mse)),
+        "MAPE_%": (
+            float((err[nonzero] / y_true[nonzero]).abs().mean() * 100)
+            if nonzero.any()
+            else float("nan")
+        ),
+    }
+
+
+metrics_table = pd.DataFrame(
+    {col: per_target_metrics(actual_pred[col], predictions[col])
+     for col in predictions.columns}
+).T
+metrics_table.round(4)
+```
+
+:::
+
+The table shows one row per target column with the four headline
+metrics. RMSE is in the same units as the target and is the easiest to
+read for a sanity check; MAPE is dimensionless and useful when targets
+live on very different numeric scales (note the guard for near-zero
+denominators).
+
+::: {.callout-note}
+## matplotlib is imported in the cell, not added to the package
+
+The `spotforecast2-safe` package itself does not depend on matplotlib —
+plotting libraries are explicitly excluded from the safety-critical
+dependency set (see `MODEL_CARD.md`). The import below lives in this
+tutorial cell only; it does not enter `pyproject.toml` and the wheel
+ships unchanged. To render this page locally, install matplotlib into
+the active environment with `uv pip install matplotlib` — no project
+file is modified.
+:::
+
+::: {#exm-actual-plot}
+
+## 48-hour view: 24 h history + 24 h forecast vs. actual
+
+```{python}
+import matplotlib.pyplot as plt
+
+forecast_start = predictions.index[0]
+hist_window = imputed_data.loc[
+    forecast_start - pd.Timedelta(hours=24) : forecast_start - pd.Timedelta(hours=1)
+]
+
+fig, axes = plt.subplots(4, 3, figsize=(14, 10), sharex=False)
+axes = axes.flatten()
+for i, col in enumerate(predictions.columns):
+    ax = axes[i]
+    ax.plot(hist_window.index, hist_window[col],
+            color="steelblue", label="actual (history)")
+    ax.plot(actual_pred.index, actual_pred[col],
+            color="navy", label="actual (target)")
+    ax.plot(predictions.index, predictions[col],
+            color="orange", linestyle="--", label="predicted")
+    ax.axvline(forecast_start, color="gray", linewidth=0.8, linestyle=":")
+    ax.set_title(col, fontsize=9)
+    ax.tick_params(axis="x", rotation=30, labelsize=7)
+    ax.tick_params(axis="y", labelsize=7)
+
+for j in range(len(predictions.columns), len(axes)):
+    axes[j].axis("off")
+
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="lower center", ncol=3,
+           bbox_to_anchor=(0.5, -0.01))
+fig.suptitle(
+    f"Actual vs. predicted — 24 h before {forecast_start:%Y-%m-%d %H:%M %Z}"
+    " + 24 h forecast",
+    fontsize=12,
+)
+fig.tight_layout(rect=[0, 0.03, 1, 0.97])
+plt.show()
+```
+
+:::
+
+Each subplot covers the 48-hour window: the 24 hours of imputed actuals
+immediately before `forecast_start`, the 24 forecast-window actuals from
+`demo11.csv` (in dark blue), and the 24 model predictions in orange. The
+vertical dotted line at `forecast_start` separates history from
+forecast.
+
+
 ## Aggregation
 
 Stage 10 produced one forecast column per target. The production task closes
@@ -648,6 +766,69 @@ seventh, eighth, ninth, and eleventh columns are added and the remainder are
 subtracted — and the call mirrors what the production task
 [`docs/tasks/task_safe_n21_cov_df.qmd`](../tasks/task_safe_n21_cov_df.qmd)
 executes after its own Stage 10.
+
+## Testing the aggregated forecast
+
+The single Series `combined_prediction` collapses the eleven target
+forecasts into one net quantity using the signed `weights` vector.
+Applying the same weighted aggregation to the eleven *actual* columns
+from `demo11.csv` produces the matching ground truth, and aggregating
+the 24-hour `hist_window` slice gives the immediately preceding history.
+
+::: {#exm-agg-metrics}
+
+## Headline metrics for the aggregated series
+
+```{python}
+from spotforecast2_safe.processing.agg_predict import agg_predict
+
+actual_combined = agg_predict(actual_pred, weights=weights)
+agg_metrics = pd.DataFrame(
+    [per_target_metrics(actual_combined, combined_prediction)],
+    index=["combined"],
+)
+agg_metrics.round(4)
+```
+
+:::
+
+A single row of MAE / MSE / RMSE / MAPE summarises the whole forecast in
+the same units the production task reports — convenient for a go /
+no-go threshold check.
+
+::: {#exm-agg-plot}
+
+## 48-hour view of the aggregated forecast
+
+```{python}
+hist_combined = agg_predict(hist_window, weights=weights)
+
+fig, ax = plt.subplots(figsize=(11, 4))
+ax.plot(hist_combined.index, hist_combined.values,
+        color="steelblue", label="actual (history)")
+ax.plot(actual_combined.index, actual_combined.values,
+        color="navy", label="actual (target)")
+ax.plot(combined_prediction.index, combined_prediction.values,
+        color="orange", linestyle="--", label="predicted")
+ax.axvline(forecast_start, color="gray", linewidth=0.8, linestyle=":")
+ax.set_title(
+    f"Aggregated actual vs. predicted — 24 h before "
+    f"{forecast_start:%Y-%m-%d %H:%M %Z} + 24 h forecast"
+)
+ax.set_xlabel("time")
+ax.set_ylabel("weighted aggregate")
+ax.legend(loc="best")
+fig.autofmt_xdate(rotation=30)
+fig.tight_layout()
+plt.show()
+```
+
+:::
+
+The dotted vertical line at `forecast_start` again separates the 24
+hours of historical aggregate from the 24-hour forecast window. A tight
+visual fit between the dashed orange and the navy actual in the right
+half corresponds to a small RMSE in the metrics table above.
 
 ## Metadata
 
