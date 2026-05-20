@@ -508,13 +508,13 @@ seen. Random shuffling is dangerous in time series — it lets the model
 
 `split_rel_train_val_test(data_with_exog, perc_train=train_ratio,
 perc_val=1.0 - train_ratio)` slices the rows in order: the first
-`train_ratio` fraction goes to training, the next half of the remainder to
-validation, the rest to test. With the default `train_ratio=0.8`, that is
-roughly 80 % training and 10 % each for validation and test.
+`train_ratio` fraction goes to training, and the remainder goes to
+validation. With the default `train_ratio=0.8`, that is 80 % training and
+20 % validation — the test set is empty because `perc_val = 1 - train_ratio`
+consumes all remaining rows.
 
 The boundary timestamp `end_validation` — the last index of the combined
-train + validation segment — is the cutoff used for `forecaster.fit(...)`,
-so the test set stays genuinely unseen during training.
+train + validation segment — is the cutoff used for `forecaster.fit(...)`.
 
 ::: {#exm-split-ratios}
 
@@ -529,13 +529,14 @@ idx = pd.date_range("2020-01-01", periods=n, freq="h")
 y   = pd.Series(np.arange(n, dtype=float), index=idx)
 
 train_ratio = 0.8
-n_train = int(n * train_ratio)
-n_val   = int(n * (1 - train_ratio) / 2)
+perc_val = 1.0 - train_ratio
+n_train = int(round(n * train_ratio))
+n_val   = int(round(n * perc_val))
 n_test  = n - n_train - n_val
 
 print(f"Total rows : {n}")
 print(f"Train rows : {n_train}  ({train_ratio:.0%})")
-print(f"Val rows   : {n_val}")
+print(f"Val rows   : {n_val}   ({perc_val:.0%})")
 print(f"Test rows  : {n_test}")
 print(f"Train ends : {y.index[n_train - 1]}")
 ```

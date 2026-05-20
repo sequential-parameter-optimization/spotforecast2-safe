@@ -1,3 +1,107 @@
+## [13.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v12.0.0...v13.0.0) (2026-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* `spotforecast2_safe.manager._parse_bool` is removed.
+Import `parse_bool` from `spotforecast2_safe.utils.parse` instead.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Documentation
+
+* **utils:** convert convert_to_utc + cpe Examples to live {python} cells ([1095ded](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1095dedfa22a79509b9ab30cdebe02d4caa20b33))
+
+
+### Code Refactoring
+
+* move manager/tools.py → utils/parse.py and make parse_bool public ([8b52c0b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8b52c0bcc472ca40a26d21e74d883dd8b49fcdab))
+
+## [12.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v11.0.0...v12.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* move utils/data_transform + utils/forecaster_config into preprocessing/
+
+### Code Refactoring
+
+* move utils/data_transform + utils/forecaster_config into preprocessing/ ([8276463](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/82764636010823b5c88bb40730a9d0f61a2b953f))
+
+## [11.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v10.0.0...v11.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* promote RollingFeatures module from _rolling to rolling
+
+### Code Refactoring
+
+* promote RollingFeatures module from _rolling to rolling ([2fea5d7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2fea5d75e104ac43345ac3ba41116067c67eac7d))
+
+## [10.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v9.0.0...v10.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* move utils/validation.py → preprocessing/checking.py
+* split model_selection into splitter + backtesting, relocate preprocessing/split
+
+### Code Refactoring
+
+* move utils/validation.py → preprocessing/checking.py ([9ce56cf](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9ce56cfc07c1bfff20ea80605a0331a6e3224d1e))
+* split model_selection into splitter + backtesting, relocate preprocessing/split ([750e73a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/750e73a724794b6f07e841e54577f9108373d331))
+
+## [9.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v8.0.0...v9.0.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **configurator:** `spotforecast2_safe.manager.configurator` no longer
+exists. Use `spotforecast2_safe.configurator` instead. The package-root
+`spotforecast2_safe.Config` alias is unchanged.
+
+The sibling `spotforecast2` repo ships its parallel import updates in a
+separate coordinated PR.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Documentation
+
+* **preprocessing:** convert curate_data Examples to {python} cells and fix types ([190e176](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/190e176425e01e2a05af30e181a383768a6dae81))
+* **preprocessing:** convert imputation Examples to self-contained {python} cells ([2d3a4b6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2d3a4b65a95740026a0b13eb289bfc0074a785d0))
+* **preprocessing:** convert outlier Examples to self-contained {python} cells ([c1a1f19](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c1a1f191931804ff19fda7a5a03e7fd868e1be5b))
+
+
+### Code Refactoring
+
+* **configurator:** promote configurator out of manager subpackage ([9ff97c3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9ff97c36dfcf73954779d5866e621f7e75e5f6fc))
+
+## [9.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v8.0.0...v9.0.0-rc.1) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **configurator:** `spotforecast2_safe.manager.configurator` no longer
+exists. Use `spotforecast2_safe.configurator` instead. The package-root
+`spotforecast2_safe.Config` alias is unchanged.
+
+The sibling `spotforecast2` repo ships its parallel import updates in a
+separate coordinated PR.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Documentation
+
+* **preprocessing:** convert curate_data Examples to {python} cells and fix types ([190e176](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/190e176425e01e2a05af30e181a383768a6dae81))
+* **preprocessing:** convert imputation Examples to self-contained {python} cells ([2d3a4b6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2d3a4b65a95740026a0b13eb289bfc0074a785d0))
+* **preprocessing:** convert outlier Examples to self-contained {python} cells ([c1a1f19](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c1a1f191931804ff19fda7a5a03e7fd868e1be5b))
+
+
+### Code Refactoring
+
+* **configurator:** promote configurator out of manager subpackage ([9ff97c3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9ff97c36dfcf73954779d5866e621f7e75e5f6fc))
+
 ## [8.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v7.0.2...v8.0.0) (2026-05-19)
 
 
