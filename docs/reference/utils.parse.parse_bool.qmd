@@ -1,0 +1,70 @@
+# utils.parse.parse_bool { #spotforecast2_safe.utils.parse.parse_bool }
+
+```python
+utils.parse.parse_bool(value)
+```
+
+Parse case-insensitive boolean strings for CLI arguments.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type         | Description                               | Default    |
+|--------|--------------|-------------------------------------------|------------|
+| value  | [str](`str`) | String representation of a boolean value. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type           | Description                                                              |
+|--------|----------------|--------------------------------------------------------------------------|
+| bool   | [bool](`bool`) | True for {'true', 't', 'yes', '1'}, False for {'false', 'f', 'no', '0'}. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                     | Description                           |
+|--------|--------------------------------------------------------------------------|---------------------------------------|
+|        | [argparse](`argparse`).[ArgumentTypeError](`argparse.ArgumentTypeError`) | If value cannot be parsed as boolean. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import argparse
+
+from spotforecast2_safe.utils.parse import parse_bool
+
+# True values (case-insensitive, whitespace-tolerant)
+assert parse_bool("true") is True
+assert parse_bool("TRUE") is True
+assert parse_bool("t") is True
+assert parse_bool("yes") is True
+assert parse_bool("1") is True
+assert parse_bool("  true  ") is True
+
+# False values
+assert parse_bool("false") is False
+assert parse_bool("FALSE") is False
+assert parse_bool("f") is False
+assert parse_bool("no") is False
+assert parse_bool("0") is False
+assert parse_bool("  false  ") is False
+
+print("All true/false/whitespace cases pass.")
+```
+
+```{python}
+import argparse
+
+from spotforecast2_safe.utils.parse import parse_bool
+
+# Invalid values raise ArgumentTypeError
+try:
+    parse_bool("invalid")
+except argparse.ArgumentTypeError:
+    print("ArgumentTypeError raised as expected.")
+
+# Use as type= in an ArgumentParser
+parser = argparse.ArgumentParser()
+_ = parser.add_argument("--enable", type=parse_bool, default=True)
+args = parser.parse_args(["--enable", "yes"])
+assert args.enable is True
+print(f"Parsed --enable yes → {args.enable}")
+```

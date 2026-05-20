@@ -45,7 +45,7 @@ import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
 from spotforecast2_safe.manager.logger import setup_logging
-from spotforecast2_safe.manager.tools import _parse_bool
+from spotforecast2_safe.utils.parse import parse_bool
 from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     n2n_predict_with_covariates,
@@ -579,19 +579,19 @@ if __name__ == "__main__":
     # Feature Engineering Flags
     parser.add_argument(
         "--include_weather_windows",
-        type=_parse_bool,
+        type=parse_bool,
         default=False,
         help="Enable rolling weather statistics.",
     )
     parser.add_argument(
         "--include_holiday_features",
-        type=_parse_bool,
+        type=parse_bool,
         default=False,
         help="Enable holiday binary indicators.",
     )
     parser.add_argument(
         "--include_poly_features",
-        type=_parse_bool,
+        type=parse_bool,
         default=False,
         help="Enable polynomial interaction terms.",
     )
@@ -599,7 +599,7 @@ if __name__ == "__main__":
     # Execution Controls
     parser.add_argument(
         "--verbose",
-        type=_parse_bool,
+        type=parse_bool,
         default=False,
         help="Enable verbose mission-critical logging.",
     )
@@ -612,7 +612,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--logging",
-        type=_parse_bool,
+        type=parse_bool,
         default=False,
         help="Enable overall logging (console and file).",
     )

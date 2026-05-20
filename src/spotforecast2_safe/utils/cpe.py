@@ -26,20 +26,33 @@ def get_cpe_identifier(version: str = "*") -> str:
         TypeError: If version is not a string.
 
     Examples:
-        Generate a CPE identifier for all versions of spotforecast2-safe:
+        ```{python}
+        from spotforecast2_safe.utils.cpe import get_cpe_identifier
 
-        >>> get_cpe_identifier()
-        'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*'
+        result = get_cpe_identifier()
+        print(result)
+        assert result == "cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*"
+        ```
 
         Generate a CPE identifier for a specific release version:
 
-        >>> get_cpe_identifier("0.8.0")
-        'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0:*:*:*:*:*:*:*'
+        ```{python}
+        from spotforecast2_safe.utils.cpe import get_cpe_identifier
+
+        result = get_cpe_identifier("0.8.0")
+        print(result)
+        assert result == "cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0:*:*:*:*:*:*:*"
+        ```
 
         Generate a CPE identifier for a release candidate version:
 
-        >>> get_cpe_identifier("0.8.0-rc.1")
-        'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:*:*:*:*:*:*:*'
+        ```{python}
+        from spotforecast2_safe.utils.cpe import get_cpe_identifier
+
+        result = get_cpe_identifier("0.8.0-rc.1")
+        print(result)
+        assert result == "cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:*:*:*:*:*:*:*"
+        ```
 
     Note:
         This function is used in compliance documentation, SBOM (Software Bill of

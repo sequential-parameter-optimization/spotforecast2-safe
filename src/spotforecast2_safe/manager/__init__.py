@@ -10,7 +10,6 @@ This module provides utilities for:
 - Model prediction management
 - Model training and retraining workflows
 - Model evaluation metrics
-- CLI argument parsing utilities
 """
 
 from spotforecast2_safe.manager.features import (
@@ -34,7 +33,6 @@ from spotforecast2_safe.manager.predictor import (
     build_prediction_package,
     get_model_prediction,
 )
-from spotforecast2_safe.manager.tools import _parse_bool
 from spotforecast2_safe.manager.trainer import get_last_model
 
 __all__ = [
@@ -54,8 +52,6 @@ __all__ = [
     "get_model_prediction",
     # Trainer
     "get_last_model",
-    # Tools
-    "_parse_bool",
     # Feature engineering helpers
     "apply_cyclical_encoding",
     "create_interaction_features",

@@ -24,19 +24,6 @@ def test_docstring_examples_logger():
     assert results.failed == 0, f"Docstring examples failed: {results.failed} failures"
 
 
-def test_docstring_examples_tools():
-    """Test all docstring examples in manager.tools module."""
-    import spotforecast2_safe.manager.tools as tools_module
-
-    results = doctest.testmod(
-        tools_module,
-        verbose=True,
-        optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
-    )
-
-    assert results.failed == 0, f"Docstring examples failed: {results.failed} failures"
-
-
 def test_docstring_examples_persistence():
     """Test all docstring examples in manager.persistence module."""
     import spotforecast2_safe.manager.persistence as persistence_module
@@ -95,11 +82,6 @@ if __name__ == "__main__":
     print("Testing manager.logger docstring examples...")
     print("=" * 70)
     test_docstring_examples_logger()
-
-    print("\n" + "=" * 70)
-    print("Testing manager.tools docstring examples...")
-    print("=" * 70)
-    test_docstring_examples_tools()
 
     print("\n" + "=" * 70)
     print("Testing manager.persistence docstring examples...")
