@@ -1321,31 +1321,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tasks.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/tasks/tasks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Demo Tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/task_safe_demo_explained.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/tasks/task_safe_demo_explained.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Safe Demo Explained</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/tasks/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Safe n-to-1 Explained</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-29" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/n2n_predict_with_covariates_explained.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">n2n_predict_with_covariates Explained</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/n2n_predict_with_covariates_demo100.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/tutorials/n2n_predict_with_covariates_demo100.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">n2n_predict_with_covariates on demo100</span></a>
   </div>
 </li>
@@ -1512,7 +1523,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
 <p>Basic usage with explicit forecast horizon and weights:</p>
-<div id="6393d3ec" class="cell" data-execution_count="1">
+<div id="cfd7feb4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1541,7 +1552,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Override forecast horizon and weights:</p>
-<div id="769d9cfb" class="cell" data-execution_count="2">
+<div id="34ed5c7c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"col1"</span>: [<span class="bu">float</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)], <span class="st">"col2"</span>: [<span class="bu">float</span>(i <span class="op">*</span> <span class="dv">2</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]},</span>
@@ -1563,7 +1574,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Override <code>data_path</code> while keeping the rest of the config:</p>
-<div id="0170dfc7" class="cell" data-execution_count="3">
+<div id="296dea0d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"X"</span>: [<span class="fl">100.0</span>], <span class="st">"Y"</span>: [<span class="fl">200.0</span>]}, index<span class="op">=</span>idx)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1586,7 +1597,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Error handling — missing file:</p>
-<div id="4a9bfcb7" class="cell" data-execution_count="4">
+<div id="84b55511" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> DemoConfig(data_path<span class="op">=</span>Path(<span class="st">"/nonexistent/file.csv"</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    load_actual_combined(</span>
@@ -1599,7 +1610,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Error handling — missing columns:</p>
-<div id="63e307c8" class="cell" data-execution_count="5">
+<div id="33e6faa0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"col1"</span>: [<span class="fl">1.0</span>]}, index<span class="op">=</span>idx)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1623,7 +1634,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Production usage with horizon and weights drawn from the config:</p>
-<div id="f7a401e1" class="cell" data-execution_count="6">
+<div id="9c6cd5af" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">30</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    {</span>
