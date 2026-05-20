@@ -952,12 +952,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">persistence</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.tools.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">tools</span></a>
-  </div>
-</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
@@ -1055,6 +1049,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/utils.convert_to_utc.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">convert_to_utc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/utils.parse.parse_bool.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parse_bool</span></a>
   </div>
 </li>
       </ul>
@@ -1355,26 +1355,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.utils.convert_to_utc" id="toc-spotforecast2_safe.utils.convert_to_utc" class="nav-link active" data-scroll-target="#spotforecast2_safe.utils.convert_to_utc">utils.convert_to_utc</a>
-  <ul class="collapse">
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <li><a href="#functions" id="toc-functions" class="nav-link active" data-scroll-target="#functions">Functions</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.utils.convert_to_utc.convert_to_utc" id="toc-spotforecast2_safe.utils.convert_to_utc.convert_to_utc" class="nav-link" data-scroll-target="#spotforecast2_safe.utils.convert_to_utc.convert_to_utc">convert_to_utc</a></li>
   <li><a href="#spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp" id="toc-spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp" class="nav-link" data-scroll-target="#spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp">to_utc_timestamp</a></li>
-  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/utils.convert_to_utc.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.html">Utils</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.convert_to_utc.html">convert_to_utc</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.html">Utils</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.convert_to_utc.html">convert_to_utc</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">utils.convert_to_utc</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.utils.convert_to_utc" class="level1">
-<h1>utils.convert_to_utc</h1>
+</header>
+
+
 <p><code>utils.convert_to_utc</code></p>
 <p>Utility functions for timezone conversion.</p>
 <section id="functions" class="level2">
@@ -1468,18 +1479,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> convert_to_utc</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df <span class="op">=</span> pd.DataFrame({<span class="st">"value"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]}, index<span class="op">=</span>pd.to_datetime([<span class="st">"2022-01-01"</span>, <span class="st">"2022-01-02"</span>, <span class="st">"2022-01-03"</span>]))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> convert_to_utc(df, <span class="st">"Europe/Berlin"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>           value</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2022</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span> <span class="dv">00</span>:<span class="dv">00</span>:<span class="dv">00</span><span class="op">+</span><span class="dv">0</span><span class="er">1</span>:<span class="dv">00</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2022</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">0</span><span class="er">2</span> <span class="dv">00</span>:<span class="dv">00</span>:<span class="dv">00</span><span class="op">+</span><span class="dv">0</span><span class="er">1</span>:<span class="dv">00</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2022</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">0</span><span class="er">3</span> <span class="dv">00</span>:<span class="dv">00</span>:<span class="dv">00</span><span class="op">+</span><span class="dv">0</span><span class="er">1</span>:<span class="dv">00</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="46c76a63" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> convert_to_utc</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"value"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]},</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>pd.to_datetime([<span class="st">"2022-01-01"</span>, <span class="st">"2022-01-02"</span>, <span class="st">"2022-01-03"</span>]),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> convert_to_utc(df, <span class="st">"Europe/Berlin"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">str</span>(result.index.tz) <span class="op">==</span> <span class="st">"UTC"</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result.index[<span class="dv">0</span>] <span class="op">==</span> pd.Timestamp(<span class="st">"2021-12-31 23:00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                           value
+2021-12-31 23:00:00+00:00      1
+2022-01-01 23:00:00+00:00      2
+2022-01-02 23:00:00+00:00      3</code></pre>
+</div>
+</div>
 </section>
 </section>
 <section id="spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.utils.convert_to_utc.to_utc_timestamp">to_utc_timestamp</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>utils.convert_to_utc.to_utc_timestamp(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>utils.convert_to_utc.to_utc_timestamp(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Coerce a string or Timestamp to a UTC-aware <code>pandas.Timestamp</code>.</p>
 <p>Strings are parsed with <code>utc=True</code>; existing Timestamps are returned unchanged. This deduplicates the same three-line pattern repeated across public feature builders in this package.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
@@ -1524,16 +1548,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> to_utc_timestamp</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> to_utc_timestamp(<span class="st">"2024-01-01"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Timestamp(<span class="st">'2024-01-01 00:00:00+0000'</span>, tz<span class="op">=</span><span class="st">'UTC'</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-06-15"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> to_utc_timestamp(ts) <span class="kw">is</span> ts</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d2421da9" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.convert_to_utc <span class="im">import</span> to_utc_timestamp</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> to_utc_timestamp(<span class="st">"2024-01-01"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> pd.Timestamp(<span class="st">"2024-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-06-15"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> to_utc_timestamp(ts) <span class="kw">is</span> ts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2024-01-01 00:00:00+00:00</code></pre>
+</div>
+</div>
 
 
-</section>
 </section>
 </section>
 </section>

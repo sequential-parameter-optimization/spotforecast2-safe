@@ -952,12 +952,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">persistence</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.tools.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">tools</span></a>
-  </div>
-</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
@@ -1055,6 +1049,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/utils.convert_to_utc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">convert_to_utc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/utils.parse.parse_bool.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parse_bool</span></a>
   </div>
 </li>
       </ul>
@@ -1419,7 +1419,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="596a109c" class="cell" data-execution_count="1">
+<div id="433375b2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
@@ -1530,7 +1530,7 @@ datetime
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="161d2645" class="cell" data-execution_count="2">
+<div id="21dd3809" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
@@ -1616,7 +1616,7 @@ datetime
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="1817a360" class="cell" data-execution_count="3">
+<div id="5e2fe1af" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherClient</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherClient(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.fetch_forecast(days_ahead<span class="op">=</span><span class="dv">7</span>)</span>
@@ -1624,43 +1624,43 @@ datetime
 <div class="cell-output cell-output-stdout">
 <pre><code>                     temperature_2m  relative_humidity_2m  precipitation  \
 datetime                                                                   
-2026-05-19 00:00:00            11.1                    71            0.0   
-2026-05-19 01:00:00            10.5                    75            0.0   
-2026-05-19 02:00:00            10.2                    76            0.0   
-2026-05-19 03:00:00            10.1                    75            0.0   
-2026-05-19 04:00:00            10.1                    75            0.0   
+2026-05-20 00:00:00            14.7                    65            0.0   
+2026-05-20 01:00:00            14.5                    66            0.0   
+2026-05-20 02:00:00            14.4                    66            0.1   
+2026-05-20 03:00:00            14.1                    71            0.0   
+2026-05-20 04:00:00            14.2                    71            0.0   
 
                      rain  snowfall  weather_code  pressure_msl  \
 datetime                                                          
-2026-05-19 00:00:00   0.0       0.0             1        1016.4   
-2026-05-19 01:00:00   0.0       0.0             1        1015.9   
-2026-05-19 02:00:00   0.0       0.0             3        1016.2   
-2026-05-19 03:00:00   0.0       0.0             3        1016.2   
-2026-05-19 04:00:00   0.0       0.0             3        1016.4   
+2026-05-20 00:00:00   0.0       0.0             3        1018.9   
+2026-05-20 01:00:00   0.0       0.0            61        1019.0   
+2026-05-20 02:00:00   0.1       0.0            80        1018.7   
+2026-05-20 03:00:00   0.0       0.0             3        1018.8   
+2026-05-20 04:00:00   0.0       0.0             3        1018.9   
 
                      surface_pressure  cloud_cover  cloud_cover_low  \
 datetime                                                              
-2026-05-19 00:00:00            1011.9           29                0   
-2026-05-19 01:00:00            1011.4           40                0   
-2026-05-19 02:00:00            1011.7           91                0   
-2026-05-19 03:00:00            1011.7           93                5   
-2026-05-19 04:00:00            1011.9           93               13   
+2026-05-20 00:00:00            1014.4           99                9   
+2026-05-20 01:00:00            1014.5           98               48   
+2026-05-20 02:00:00            1014.2          100               32   
+2026-05-20 03:00:00            1014.3          100               53   
+2026-05-20 04:00:00            1014.4          100               25   
 
                      cloud_cover_mid  cloud_cover_high  wind_speed_10m  \
 datetime                                                                 
-2026-05-19 00:00:00               29                 0             6.6   
-2026-05-19 01:00:00               40                 0             6.9   
-2026-05-19 02:00:00               91                 0             5.5   
-2026-05-19 03:00:00               90                 0             6.5   
-2026-05-19 04:00:00               88                 0             2.3   
+2026-05-20 00:00:00               97                52             4.6   
+2026-05-20 01:00:00               96                28             4.3   
+2026-05-20 02:00:00              100               100             6.9   
+2026-05-20 03:00:00              100                94             4.0   
+2026-05-20 04:00:00              100               100             5.4   
 
                      wind_direction_10m  wind_gusts_10m  
 datetime                                                 
-2026-05-19 00:00:00                 112            19.4  
-2026-05-19 01:00:00                  99            14.4  
-2026-05-19 02:00:00                 113            14.4  
-2026-05-19 03:00:00                 109            13.7  
-2026-05-19 04:00:00                 162            13.7  </code></pre>
+2026-05-20 00:00:00                 141             9.7  
+2026-05-20 01:00:00                 180             9.7  
+2026-05-20 02:00:00                 133            14.8  
+2026-05-20 03:00:00                 153            14.4  
+2026-05-20 04:00:00                 138            12.6  </code></pre>
 </div>
 </div>
 

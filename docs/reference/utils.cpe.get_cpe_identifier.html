@@ -952,12 +952,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">persistence</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/manager.tools.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">tools</span></a>
-  </div>
-</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
@@ -1055,6 +1049,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/utils.convert_to_utc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">convert_to_utc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/utils.parse.parse_bool.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parse_bool</span></a>
   </div>
 </li>
       </ul>
@@ -1355,28 +1355,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.utils.cpe.get_cpe_identifier" id="toc-spotforecast2_safe.utils.cpe.get_cpe_identifier" class="nav-link active" data-scroll-target="#spotforecast2_safe.utils.cpe.get_cpe_identifier">utils.cpe.get_cpe_identifier</a>
-  <ul class="collapse">
-  <li><a href="#the-returned-cpe-follows-the-format" id="toc-the-returned-cpe-follows-the-format" class="nav-link" data-scroll-target="#the-returned-cpe-follows-the-format">The returned CPE follows the format</a></li>
+  <li><a href="#the-returned-cpe-follows-the-format" id="toc-the-returned-cpe-follows-the-format" class="nav-link active" data-scroll-target="#the-returned-cpe-follows-the-format">The returned CPE follows the format</a></li>
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#note" id="toc-note" class="nav-link" data-scroll-target="#note">Note</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/utils.cpe.get_cpe_identifier.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.html">Utils</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.cpe.get_cpe_identifier.html">get_cpe_identifier</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.html">Utils</a></li><li class="breadcrumb-item"><a href="../../docs/reference/utils.cpe.get_cpe_identifier.html">get_cpe_identifier</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">utils.cpe.get_cpe_identifier</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.utils.cpe.get_cpe_identifier" class="level1">
-<h1>utils.cpe.get_cpe_identifier</h1>
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>utils.cpe.get_cpe_identifier(version<span class="op">=</span><span class="st">'*'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Generates the CPE 2.3 identifier for the spotforecast2-safe project.</p>
 <p>This function constructs a Common Platform Enumeration (CPE) 2.3 formatted string that uniquely identifies the spotforecast2-safe software. CPE identifiers are standardized by NIST and are essential for vulnerability tracking, software inventory management, and compliance documentation (e.g., EU AI Act, SBOM generation).</p>
@@ -1445,15 +1456,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Generate a CPE identifier for all versions of spotforecast2-safe:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> get_cpe_identifier()</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="15c40c53" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.cpe <span class="im">import</span> get_cpe_identifier</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> get_cpe_identifier()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> <span class="st">"cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*</code></pre>
+</div>
+</div>
 <p>Generate a CPE identifier for a specific release version:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> get_cpe_identifier(<span class="st">"0.8.0"</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0:*:*:*:*:*:*:*'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8a899647" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.cpe <span class="im">import</span> get_cpe_identifier</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> get_cpe_identifier(<span class="st">"0.8.0"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> <span class="st">"cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0:*:*:*:*:*:*:*"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0:*:*:*:*:*:*:*</code></pre>
+</div>
+</div>
 <p>Generate a CPE identifier for a release candidate version:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> get_cpe_identifier(<span class="st">"0.8.0-rc.1"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">'cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:*:*:*:*:*:*:*'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="0c75a3f5" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.cpe <span class="im">import</span> get_cpe_identifier</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> get_cpe_identifier(<span class="st">"0.8.0-rc.1"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> <span class="st">"cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:*:*:*:*:*:*:*"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:0.8.0-rc.1:*:*:*:*:*:*:*</code></pre>
+</div>
+</div>
 </section>
 <section id="note" class="level2 doc-section doc-section-note">
 <h2 class="doc-section doc-section-note anchored" data-anchor-id="note">Note</h2>
@@ -1464,7 +1498,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For more information on CPE 2.3 specification, visit: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-188.pdf</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
