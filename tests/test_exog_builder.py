@@ -1,6 +1,6 @@
 import pandas as pd
 
-from spotforecast2_safe.data.data import Period
+from spotforecast2_safe.data.data_classes import Period
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 
 

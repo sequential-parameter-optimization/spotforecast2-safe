@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 """
-Demo dataset configuration for safety-critical forecasting tasks.
+Demo task configuration for safety-critical forecasting workflows.
 
 This module provides a flexible configuration dataclass for managing
 parameters in demonstration and production forecasting workflows.
@@ -16,7 +16,7 @@ from spotforecast2_safe.data.fetch_data import get_package_data_home
 
 
 @dataclass(frozen=True)
-class DemoConfig:
+class ConfigDemo:
     """
     Configuration for the safety-critical demo task.
 
@@ -41,9 +41,9 @@ class DemoConfig:
         Default configuration:
 
         ```{python}
-        from spotforecast2_safe.data.demo_data import DemoConfig
+        from spotforecast2_safe.configurator import ConfigDemo
 
-        config = DemoConfig()
+        config = ConfigDemo()
         print(f"Forecast horizon: {config.forecast_horizon}")
         print(f"Window size: {config.window_size}")
         print(f"Random seed: {config.random_seed}")
@@ -52,7 +52,9 @@ class DemoConfig:
         Override specific parameters:
 
         ```{python}
-        config = DemoConfig(forecast_horizon=48, contamination=0.05, random_seed=123)
+        from spotforecast2_safe.configurator import ConfigDemo
+
+        config = ConfigDemo(forecast_horizon=48, contamination=0.05, random_seed=123)
         print(f"Forecast horizon: {config.forecast_horizon}")
         print(f"Contamination: {config.contamination}")
         ```
@@ -63,8 +65,10 @@ class DemoConfig:
         import tempfile
         from pathlib import Path
 
+        from spotforecast2_safe.configurator import ConfigDemo
+
         with tempfile.TemporaryDirectory() as tmpdir:
-            custom_config = DemoConfig(
+            custom_config = ConfigDemo(
                 data_path=Path(tmpdir) / "my_data.csv",
                 model_root=Path(tmpdir) / "models",
                 log_root=Path(tmpdir) / "logs",
@@ -76,14 +80,18 @@ class DemoConfig:
         Custom weights for multi-variable aggregation:
 
         ```{python}
-        config = DemoConfig(weights=[1.0, 1.0, -1.0, 1.0, 1.0])
+        from spotforecast2_safe.configurator import ConfigDemo
+
+        config = ConfigDemo(weights=[1.0, 1.0, -1.0, 1.0, 1.0])
         print(f"Number of weights: {len(config.weights)}")
         ```
 
         Immutability check (frozen dataclass):
 
         ```{python}
-        config = DemoConfig()
+        from spotforecast2_safe.configurator import ConfigDemo
+
+        config = ConfigDemo()
         try:
             config.forecast_horizon = 100
         except AttributeError:
@@ -93,7 +101,9 @@ class DemoConfig:
         Production configuration with a long horizon:
 
         ```{python}
-        prod_config = DemoConfig(
+        from spotforecast2_safe.configurator import ConfigDemo
+
+        prod_config = ConfigDemo(
             forecast_horizon=168,  # 1 week
             window_size=336,       # 2 weeks
             lags=48,
