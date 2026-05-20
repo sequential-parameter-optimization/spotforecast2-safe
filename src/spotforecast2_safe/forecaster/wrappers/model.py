@@ -11,7 +11,7 @@ import pandas as pd
 from joblib import dump
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
-from spotforecast2_safe.data.data import Period
+from spotforecast2_safe.data.data_classes import Period
 from spotforecast2_safe.data.fetch_data import load_timeseries, load_timeseries_forecast
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.splitter import TimeSeriesFold

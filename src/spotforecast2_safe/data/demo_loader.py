@@ -13,12 +13,12 @@ from typing import List, Optional
 
 import pandas as pd
 
-from spotforecast2_safe.data.demo_data import DemoConfig
+from spotforecast2_safe.configurator import ConfigDemo
 from spotforecast2_safe.processing.agg_predict import agg_predict
 
 
 def load_actual_combined(
-    config: DemoConfig,
+    config: ConfigDemo,
     columns: List[str],
     forecast_horizon: Optional[int] = None,
     weights: Optional[List[float]] = None,
@@ -58,7 +58,7 @@ def load_actual_combined(
 
         import pandas as pd
 
-        from spotforecast2_safe.data.demo_data import DemoConfig
+        from spotforecast2_safe.configurator import ConfigDemo
         from spotforecast2_safe.data.demo_loader import load_actual_combined
 
         idx = pd.date_range("2020-01-01", periods=3, freq="h", name="timestamp")
@@ -68,7 +68,7 @@ def load_actual_combined(
             sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
-        config = DemoConfig(data_path=temp_path)
+        config = ConfigDemo(data_path=temp_path)
         result = load_actual_combined(
             config, columns=["col1", "col2"], forecast_horizon=2, weights=[1.0, 1.0]
         )
@@ -90,7 +90,7 @@ def load_actual_combined(
             sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
-        config = DemoConfig(data_path=temp_path, forecast_horizon=24)
+        config = ConfigDemo(data_path=temp_path, forecast_horizon=24)
         result = load_actual_combined(
             config, columns=["col1", "col2"], forecast_horizon=5, weights=[1.0, 0.5]
         )
@@ -108,7 +108,7 @@ def load_actual_combined(
             sample_df.to_csv(f.name)
             custom_path = Path(f.name)
 
-        config = DemoConfig()  # default data_path
+        config = ConfigDemo()  # default data_path
         result = load_actual_combined(
             config,
             columns=["X", "Y"],
@@ -123,7 +123,7 @@ def load_actual_combined(
         Error handling — missing file:
 
         ```{python}
-        config = DemoConfig(data_path=Path("/nonexistent/file.csv"))
+        config = ConfigDemo(data_path=Path("/nonexistent/file.csv"))
         try:
             load_actual_combined(
                 config, columns=["A"], forecast_horizon=1, weights=[1.0]
@@ -142,7 +142,7 @@ def load_actual_combined(
             sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
-        config = DemoConfig(data_path=temp_path)
+        config = ConfigDemo(data_path=temp_path)
         try:
             load_actual_combined(
                 config,
@@ -172,7 +172,7 @@ def load_actual_combined(
             sample_df.to_csv(f.name)
             temp_path = Path(f.name)
 
-        config = DemoConfig(
+        config = ConfigDemo(
             data_path=temp_path, forecast_horizon=24, weights=[1.0, -0.5, -0.5]
         )
         result = load_actual_combined(config, columns=["load", "solar", "wind"])

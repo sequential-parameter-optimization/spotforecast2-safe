@@ -4,9 +4,9 @@
 """Pytest coverage for previously-untested branches in spotforecast2_safe.data.
 
 Targets coverage gaps left after migrating the docstring examples in
-`demo_data.py`, `demo_loader.py`, and `fetch_data.py` from doctest-style
-blocks to Quarto `{python}` blocks (so `doctest.testmod` no longer exercises
-them).
+`configurator/config_demo.py`, `demo_loader.py`, and `fetch_data.py` from
+doctest-style blocks to Quarto `{python}` blocks (so `doctest.testmod` no
+longer exercises them).
 """
 
 from __future__ import annotations
@@ -16,9 +16,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from spotforecast2_safe.configurator import ConfigDemo
 from spotforecast2_safe.data import (
     Data,
-    DemoConfig,
     Period,
     fetch_data,
     load_actual_combined,
@@ -234,7 +234,7 @@ def _write_demo_csv(path: Path) -> None:
 
 class TestLoadActualCombined:
     def test_raises_when_file_missing(self, tmp_path):
-        config = DemoConfig(data_path=tmp_path / "missing.csv")
+        config = ConfigDemo(data_path=tmp_path / "missing.csv")
         with pytest.raises(FileNotFoundError, match="Ground truth file not found"):
             load_actual_combined(
                 config, columns=["load"], forecast_horizon=1, weights=[1.0]
@@ -243,7 +243,7 @@ class TestLoadActualCombined:
     def test_raises_when_columns_missing(self, tmp_path):
         csv_path = tmp_path / "demo.csv"
         _write_demo_csv(csv_path)
-        config = DemoConfig(data_path=csv_path)
+        config = ConfigDemo(data_path=csv_path)
         with pytest.raises(ValueError, match="Missing columns"):
             load_actual_combined(
                 config,
@@ -255,7 +255,7 @@ class TestLoadActualCombined:
     def test_defaults_pulled_from_config_when_args_none(self, tmp_path):
         csv_path = tmp_path / "demo.csv"
         _write_demo_csv(csv_path)
-        config = DemoConfig(
+        config = ConfigDemo(
             data_path=csv_path, forecast_horizon=3, weights=[1.0, -1.0]
         )
         result = load_actual_combined(config, columns=["load", "solar"])

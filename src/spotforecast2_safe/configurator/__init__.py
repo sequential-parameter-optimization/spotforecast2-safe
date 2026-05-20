@@ -3,6 +3,7 @@
 
 """Configurator utilities for task-level configuration."""
 
+from .config_demo import ConfigDemo
 from .config_entsoe import ConfigEntsoe
 
-__all__ = ["ConfigEntsoe"]
+__all__ = ["ConfigDemo", "ConfigEntsoe"]

@@ -16,11 +16,11 @@ from lightgbm import LGBMRegressor
 from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 
 
-class TestDemoConfig:
-    """Test DemoConfig dataclass and initialization."""
+class TestConfigDemo:
+    """Test ConfigDemo dataclass and initialization."""
 
     def test_default_config_initialization(self):
-        """Verify DemoConfig initializes with sensible defaults."""
+        """Verify ConfigDemo initializes with sensible defaults."""
         from spotforecast2_safe.data.fetch_data import get_package_data_home
 
         config_data = {
