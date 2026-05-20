@@ -81,14 +81,29 @@ class LinearlyInterpolateTS(BaseEstimator, TransformerMixin):
     on_missing: OnMissing = "raise"
 
     def fit(self, X: Any, y: Any = None) -> "LinearlyInterpolateTS":
-        """Fitted transformer (no-op).
+        """Fit the transformer (no-op; satisfies the sklearn fit contract).
 
         Args:
-            X: Input data.
+            X: Input data (ignored — this transformer is stateless).
             y: Ignored.
 
         Returns:
-            self: The fitted transformer.
+            LinearlyInterpolateTS: The fitted transformer (``self``).
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
+
+            idx = pd.date_range("2024-01-01", periods=4, freq="h")
+            df = pd.DataFrame({"load_mw": [100.0, np.nan, 120.0, 130.0]}, index=idx)
+
+            interp = LinearlyInterpolateTS()
+            result = interp.fit(df)
+            assert result is interp, "fit() must return self"
+            print(f"fit() returned self: {result is interp}")
+            ```
         """
         return self
 
@@ -97,12 +112,34 @@ class LinearlyInterpolateTS(BaseEstimator, TransformerMixin):
     ) -> Union[pd.Series, pd.DataFrame]:
         """Transform the input data by applying linear interpolation.
 
+        Delegates to `LinearlyInterpolateTS.apply()` after the sklearn
+        ``fit`` → ``transform`` contract is satisfied by `fit()`.
+
         Args:
-            X: Input Series or DataFrame to interpolate.
+            X (Union[pd.Series, pd.DataFrame]): Input Series or DataFrame
+                to interpolate.
 
         Returns:
             Union[pd.Series, pd.DataFrame]: Interpolated data, with
             residual NaN handled according to ``self.on_missing``.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.linearly_interpolate_ts import LinearlyInterpolateTS
+
+            # Fit-then-transform mirrors the canonical sklearn workflow.
+            idx = pd.date_range("2024-01-01", periods=4, freq="h")
+            df = pd.DataFrame({"load_mw": [100.0, np.nan, 120.0, 130.0]}, index=idx)
+
+            interp = LinearlyInterpolateTS()
+            interp.fit(df)
+            df_out = interp.transform(df)
+            print(df_out)
+            assert df_out["load_mw"].iloc[1] == 110.0, "interior NaN must be filled"
+            assert not df_out.isna().any().any(), "no NaN must remain"
+            ```
         """
         return self.apply(X)
 
