@@ -1,3 +1,21 @@
+## [13.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.0...v13.0.1) (2026-05-20)
+
+
+### Bug Fixes
+
+* DemoConfig -> ConfigDemo, Data_classes, demo10 ([85ecf74](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/85ecf74b5b838f54461f1dea2b53d874ab8da7c3))
+
+
+### Documentation
+
+* add aggregation to n2n_explained and demo_100 ([ab46277](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ab462770cf65898b67fb648e0e077d67b3e3fbe0))
+* add demo100 step-by-step walkthrough of n2n_predict_with_covariates ([1b51e3f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1b51e3f69e7df5d7979e0e89f0aa157056a7e25c))
+* all n2n ([ef897e1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ef897e16b995eaacc10ca9d2889720f4accc9023))
+* cleanup tutorials and tasks ([b3e712e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b3e712e68ba98de35b3e239cd55a69258450c48e))
+* completed Examples: ([4465045](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/44650456ad629f97b65b9e90391a68a4ce36cf09))
+* **manager:** convert manager/logger.py Examples to live {python} cells ([aba3204](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/aba32043dadc96446bc6541c4061eb1957b74d98))
+* update introductions ([e72a7b9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e72a7b919c7d690af30c2fa753d2b5683936b592))
+
 ## [13.0.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.0...v13.0.1-rc.1) (2026-05-20)
 
 
