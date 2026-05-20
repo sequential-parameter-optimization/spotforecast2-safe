@@ -628,6 +628,43 @@ predictions.head(3).round(2)
 target columns. The index is exactly `exo_pred.index`, which is exactly
 `forecast_horizon` hours starting one step after `end_validation`.
 
+## Aggregation
+
+Stage 10 produced one forecast column per target. The production task closes
+the pipeline with a weighted aggregation: `agg_predict(predictions,
+weights=weights)` reduces the eleven columns to a single Series sharing the
+`DatetimeIndex` of `exo_pred`. The conceptual sibling page explains the
+helper's `list` / `np.ndarray` / `dict` accepted forms and the signed-weights
+convention in its
+[Aggregation section](n2n_predict_with_covariates_explained.qmd#aggregation).
+
+::: {#exm-aggregation}
+
+## Aggregating the eleven per-target forecasts
+
+```{python}
+from spotforecast2_safe.processing.agg_predict import agg_predict
+
+weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+combined_prediction = agg_predict(predictions, weights=weights)
+
+print("combined shape   :", combined_prediction.shape)
+print("first timestamp  :", combined_prediction.index[0])
+print("last  timestamp  :", combined_prediction.index[-1])
+combined_prediction.head(3).round(4)
+```
+
+:::
+
+The sign pattern of `weights` is identical to the module-level
+`DEFAULT_WEIGHTS` constant in
+`tasks/task_safe_n_to_1_with_covariates_and_dataframe.py`. With this signed
+choice the aggregate behaves as a net position — the first, second, fifth,
+seventh, eighth, ninth, and eleventh columns are added and the remainder are
+subtracted — and the call mirrors what the production task
+[`docs/tasks/task_safe_n21_cov_df.qmd`](../tasks/task_safe_n21_cov_df.qmd)
+executes after its own Stage 10.
+
 ## Metadata
 
 The orchestrator emits a metadata dictionary that records every

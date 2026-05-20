@@ -46,61 +46,61 @@ supplied, ground-truth test values are injected and future metrics
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **validation_passed** (``bool``) — always ``True``; field reserved for downstream safety checks.                                                |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **test_actual** (``pd.Series``, optional) — present only when ``df_test`` contains matching rows for the forecast horizon.                      |
 
-Examples:
+## Examples {.doc-section .doc-section-examples}
 
-    ```{python}
-    import numpy as np
-    import pandas as pd
-    from sklearn.linear_model import Ridge
-    from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-    from spotforecast2_safe.manager.predictor import build_prediction_package
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.manager.predictor import build_prediction_package
 
-    rng = np.random.default_rng(42)
-    idx = pd.date_range("2024-01-01", periods=200, freq="h", tz="UTC")
-    y_train = pd.Series(rng.normal(100, 10, 200), index=idx, name="load")
+rng = np.random.default_rng(42)
+idx = pd.date_range("2024-01-01", periods=200, freq="h", tz="UTC")
+y_train = pd.Series(rng.normal(100, 10, 200), index=idx, name="load")
 
-    forecaster = ForecasterRecursive(estimator=Ridge(), lags=24)
-    forecaster.fit(y=y_train)
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=24)
+forecaster.fit(y=y_train)
 
-    pkg = build_prediction_package(
-        forecaster=forecaster,
-        target="load",
-        y_train=y_train,
-        predict_size=24,
-    )
-    print(f"Keys: {sorted(pkg.keys())}")
-    print(f"Future predictions: {len(pkg['future_pred'])} steps")
-    print(f"Validation passed: {pkg['validation_passed']}")
-    ```
+pkg = build_prediction_package(
+    forecaster=forecaster,
+    target="load",
+    y_train=y_train,
+    predict_size=24,
+)
+print(f"Keys: {sorted(pkg.keys())}")
+print(f"Future predictions: {len(pkg['future_pred'])} steps")
+print(f"Validation passed: {pkg['validation_passed']}")
+```
 
-    ```{python}
-    import numpy as np
-    import pandas as pd
-    from sklearn.linear_model import Ridge
-    from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-    from spotforecast2_safe.manager.predictor import build_prediction_package
+```{python}
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.manager.predictor import build_prediction_package
 
-    rng = np.random.default_rng(0)
-    idx = pd.date_range("2024-01-01", periods=200, freq="h", tz="UTC")
-    y_train = pd.Series(rng.normal(50, 5, 200), index=idx, name="power")
+rng = np.random.default_rng(0)
+idx = pd.date_range("2024-01-01", periods=200, freq="h", tz="UTC")
+y_train = pd.Series(rng.normal(50, 5, 200), index=idx, name="power")
 
-    forecaster = ForecasterRecursive(estimator=Ridge(), lags=24)
-    forecaster.fit(y=y_train)
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=24)
+forecaster.fit(y=y_train)
 
-    # Test DataFrame covering the 24-hour forecast horizon
-    df_test = pd.DataFrame({
-        "DateTime": pd.date_range("2024-01-09 08:00", periods=24, freq="h"),
-        "power": rng.normal(50, 5, 24),
-    })
+# Test DataFrame covering the 24-hour forecast horizon
+df_test = pd.DataFrame({
+    "DateTime": pd.date_range("2024-01-09 08:00", periods=24, freq="h"),
+    "power": rng.normal(50, 5, 24),
+})
 
-    pkg = build_prediction_package(
-        forecaster=forecaster,
-        target="power",
-        y_train=y_train,
-        predict_size=24,
-        df_test=df_test,
-    )
-    print(f"test_actual present: {'test_actual' in pkg}")
-    print(f"metrics_future keys: {list(pkg['metrics_future'].keys())}")
-    print(f"MAE on future: {pkg['metrics_future']['mae']:.4f}")
-    ```
+pkg = build_prediction_package(
+    forecaster=forecaster,
+    target="power",
+    y_train=y_train,
+    predict_size=24,
+    df_test=df_test,
+)
+print(f"test_actual present: {'test_actual' in pkg}")
+print(f"metrics_future keys: {list(pkg['metrics_future'].keys())}")
+print(f"MAE on future: {pkg['metrics_future']['mae']:.4f}")
+```

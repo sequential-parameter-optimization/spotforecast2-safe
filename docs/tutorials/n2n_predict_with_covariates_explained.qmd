@@ -687,6 +687,50 @@ target column name. Returning the fitted objects lets the caller inspect
 internal state (feature names, lag matrices, fitted estimator parameters)
 or call `.predict` again with a different horizon, without retraining.
 
+## Aggregation
+
+Stage 10 returns one forecast Series per target column — eleven independent
+trajectories for the bundled demo data. Operational consumers often need a
+single scalar trajectory instead: a regional net position, a portfolio-level
+load forecast, or a balancing-zone aggregate. The helper
+`agg_predict(predictions, weights=weights)` performs exactly that reduction.
+It takes the prediction DataFrame from Stage 10 and returns a Series with the
+same `DatetimeIndex`, computed as the weighted sum of the per-column
+forecasts.
+
+The `weights` argument accepts three forms:
+
+- a `list` or `numpy.ndarray` matched *positionally* against the columns of
+  `predictions` (length must equal the column count),
+- a `dict` of `{column_name: weight}` matched *by name*, useful when the
+  caller wants to be explicit about which column carries which weight,
+- `None`, which falls back to the package default.
+
+A list or array entry may be negative. A positive weight adds that column's
+forecast to the aggregate; a negative weight subtracts it. The production
+task `tasks/task_safe_n_to_1_with_covariates_and_dataframe.py` uses this
+signed convention with the eleven-element vector
+`[+1, +1, -1, -1, +1, -1, +1, +1, +1, -1, +1]` (its module-level
+`DEFAULT_WEIGHTS`) to express a net-position aggregation in which the first,
+second, fifth, seventh, eighth, ninth, and eleventh columns are added and the
+remaining columns are subtracted. The same call is the closing step of
+[`docs/tasks/task_safe_n21_cov_df.qmd`](../tasks/task_safe_n21_cov_df.qmd)
+at the line `combined_prediction = agg_predict(predictions, weights=weights)`.
+
+```{python}
+from spotforecast2_safe.processing.agg_predict import agg_predict
+
+weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+combined_prediction = agg_predict(predictions, weights=weights)
+
+print(f"combined shape    : {combined_prediction.shape}")
+print(f"first timestamp   : {combined_prediction.index[0]}")
+print(f"last  timestamp   : {combined_prediction.index[-1]}")
+combined_prediction.head(3).round(4)
+```
+
+
+
 ## End-to-end example {#sec-end-to-end}
 
 The cell below runs the entire pipeline with very small parameters
@@ -701,6 +745,7 @@ the user's persistent cache.
 ```{python}
 import tempfile
 
+from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     n2n_predict_with_covariates,
 )
@@ -720,6 +765,12 @@ print(f"# exog features   : {metadata['n_exog_features']}")
 print(f"training_end      : {metadata['training_end']}")
 print(f"prediction window : {metadata['prediction_start']} → {metadata['prediction_end']}")
 predictions.head().round(4)
+
+weights = [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+combined_prediction = agg_predict(predictions, weights=weights)
+
+print(f"combined shape  : {combined_prediction.shape}")
+combined_prediction.head(3).round(4)
 ```
 
 :::

@@ -82,7 +82,6 @@ def build_prediction_package(
             ``df_test`` contains matching rows for the forecast horizon.
 
     Examples:
-
         ```{python}
         import numpy as np
         import pandas as pd
