@@ -8,7 +8,7 @@ from typing import List, Optional
 import holidays
 import pandas as pd
 
-from spotforecast2_safe.data.data import Period
+from spotforecast2_safe.data.data_classes import Period
 from spotforecast2_safe.preprocessing.repeating_basis_function import (
     RepeatingBasisFunction,
 )
@@ -29,7 +29,7 @@ class ExogBuilder:
 
     Examples:
         >>> import pandas as pd
-        >>> from spotforecast2_safe.data.data import Period
+        >>> from spotforecast2_safe.data.data_classes import Period
         >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
         >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
         >>> builder = ExogBuilder(periods=periods, country_code="DE")
@@ -92,7 +92,7 @@ class ExogBuilder:
 
         Examples:
             >>> import pandas as pd
-            >>> from spotforecast2_safe.data.data import Period
+            >>> from spotforecast2_safe.data.data_classes import Period
             >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
             >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
             >>> builder = ExogBuilder(periods=periods, country_code="DE")

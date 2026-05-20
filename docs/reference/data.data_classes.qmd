@@ -1,6 +1,6 @@
-# data.data { #spotforecast2_safe.data.data }
+# data.data_classes { #spotforecast2_safe.data.data_classes }
 
-`data.data`
+`data.data_classes`
 
 Data structures for input and processed data.
 
@@ -8,13 +8,13 @@ Data structures for input and processed data.
 
 | Name | Description |
 | --- | --- |
-| [Data](#spotforecast2_safe.data.data.Data) | Container for input time series data. |
-| [Period](#spotforecast2_safe.data.data.Period) | Class abstraction for the information required to encode a period. |
+| [Data](#spotforecast2_safe.data.data_classes.Data) | Container for input time series data. |
+| [Period](#spotforecast2_safe.data.data_classes.Period) | Class abstraction for the information required to encode a period. |
 
-### Data { #spotforecast2_safe.data.data.Data }
+### Data { #spotforecast2_safe.data.data_classes.Data }
 
 ```python
-data.data.Data(data)
+data.data_classes.Data(data)
 ```
 
 Container for input time series data.
@@ -29,13 +29,13 @@ Container for input time series data.
 
 | Name | Description |
 | --- | --- |
-| [from_csv](#spotforecast2_safe.data.data.Data.from_csv) | Load data from a CSV file. |
-| [from_dataframe](#spotforecast2_safe.data.data.Data.from_dataframe) | Create a new Data instance from an existing DataFrame. |
+| [from_csv](#spotforecast2_safe.data.data_classes.Data.from_csv) | Load data from a CSV file. |
+| [from_dataframe](#spotforecast2_safe.data.data_classes.Data.from_dataframe) | Create a new Data instance from an existing DataFrame. |
 
-##### from_csv { #spotforecast2_safe.data.data.Data.from_csv }
+##### from_csv { #spotforecast2_safe.data.data_classes.Data.from_csv }
 
 ```python
-data.data.Data.from_csv(
+data.data_classes.Data.from_csv(
     csv_path,
     timezone,
     columns=None,
@@ -64,9 +64,9 @@ converted to UTC.
 
 ###### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                        | Description                               |
-|--------|---------------------------------------------|-------------------------------------------|
-| Data   | [Data](`spotforecast2_safe.data.data.Data`) | Instance containing the loaded DataFrame. |
+| Name   | Type                                                | Description                               |
+|--------|-----------------------------------------------------|-------------------------------------------|
+| Data   | [Data](`spotforecast2_safe.data.data_classes.Data`) | Instance containing the loaded DataFrame. |
 
 ###### Raises {.doc-section .doc-section-raises}
 
@@ -90,10 +90,10 @@ data = Data.from_csv(
 )
 ```
 
-##### from_dataframe { #spotforecast2_safe.data.data.Data.from_dataframe }
+##### from_dataframe { #spotforecast2_safe.data.data_classes.Data.from_dataframe }
 
 ```python
-data.data.Data.from_dataframe(df, timezone, columns=None)
+data.data_classes.Data.from_dataframe(df, timezone, columns=None)
 ```
 
 Create a new Data instance from an existing DataFrame.
@@ -111,9 +111,9 @@ provided timezone if it is naive, and then converted to UTC.
 
 ###### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                        | Description                                 |
-|--------|---------------------------------------------|---------------------------------------------|
-| Data   | [Data](`spotforecast2_safe.data.data.Data`) | Instance containing the provided DataFrame. |
+| Name   | Type                                                | Description                                 |
+|--------|-----------------------------------------------------|---------------------------------------------|
+| Data   | [Data](`spotforecast2_safe.data.data_classes.Data`) | Instance containing the provided DataFrame. |
 
 ###### Raises {.doc-section .doc-section-raises}
 
@@ -122,10 +122,10 @@ provided timezone if it is naive, and then converted to UTC.
 |        | [ValueError](`ValueError`) | If the DataFrame index is not a DatetimeIndex.              |
 |        | [ValueError](`ValueError`) | If the index is timezone-naive and no timezone is provided. |
 
-### Period { #spotforecast2_safe.data.data.Period }
+### Period { #spotforecast2_safe.data.data_classes.Period }
 
 ```python
-data.data.Period(name, n_periods, column, input_range)
+data.data_classes.Period(name, n_periods, column, input_range)
 ```
 
 Class abstraction for the information required to encode a period.

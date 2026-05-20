@@ -104,7 +104,7 @@ No training step runs inside `spotforecast2-safe` itself, so classical "accuracy
 
 - Docstring examples in `src/` (executed via `tests/test_docstring_examples_*.py`).
 - Unit fixtures and integration data in `tests/` and `src/spotforecast2_safe/datasets/csv/`.
-- The bundled ENTSO-E demo set (`DemoConfig.data_path`) for end-to-end task tests.
+- The bundled ENTSO-E demo set (`ConfigDemo.data_path`) for end-to-end task tests.
 
 ### Factors
 

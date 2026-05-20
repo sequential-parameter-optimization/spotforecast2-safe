@@ -1,6 +1,6 @@
 import pytest
 
-from spotforecast2_safe.data.data import Period
+from spotforecast2_safe.data.data_classes import Period
 
 
 def test_period_instantiation():

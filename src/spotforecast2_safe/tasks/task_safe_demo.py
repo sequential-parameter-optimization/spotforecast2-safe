@@ -48,7 +48,8 @@ from typing import Optional
 
 from lightgbm import LGBMRegressor
 
-from spotforecast2_safe.data import DemoConfig, load_actual_combined
+from spotforecast2_safe.configurator import ConfigDemo
+from spotforecast2_safe.data import load_actual_combined
 from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 from spotforecast2_safe.utils.parse import parse_bool
@@ -69,8 +70,8 @@ def main(
     Returns 0 on success, non-zero on failure.
     """
     # Initialize configuration first to get log path
-    default_config = DemoConfig()
-    config = DemoConfig(
+    default_config = ConfigDemo()
+    config = ConfigDemo(
         data_path=data_path if data_path else default_config.data_path,
         model_root=default_config.model_root,
         log_root=default_config.log_root,

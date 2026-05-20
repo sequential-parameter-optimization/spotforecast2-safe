@@ -7,16 +7,16 @@ The `task_safe_demo` script is the canonical end-to-end demonstration of the `sp
 
 ## The Configuration Contract
 
-Before any computation begins, `task_safe_demo` constructs a `DemoConfig` object. `DemoConfig` is a frozen dataclass, which means its fields cannot be modified after creation. This immutability is intentional: in safety-critical systems a configuration that can be silently overwritten mid-run is a liability, not a convenience.
+Before any computation begins, `task_safe_demo` constructs a `ConfigDemo` object. `ConfigDemo` is a frozen dataclass, which means its fields cannot be modified after creation. This immutability is intentional: in safety-critical systems a configuration that can be silently overwritten mid-run is a liability, not a convenience.
 
-The `TestDemoConfig` class verifies that the defaults are meaningful. A `forecast_horizon` of 24 corresponds to a 24-step-ahead prediction, typically one full day of hourly data. A `contamination` of 0.01 tells the outlier detector to treat roughly 1% of the training set as anomalous. The `window_size` of 72 defines how many timesteps are used in the rolling feature window, and `random_seed=42` pins all stochastic operations to a reproducible state.
+The `TestConfigDemo` class verifies that the defaults are meaningful. A `forecast_horizon` of 24 corresponds to a 24-step-ahead prediction, typically one full day of hourly data. A `contamination` of 0.01 tells the outlier detector to treat roughly 1% of the training set as anomalous. The `window_size` of 72 defines how many timesteps are used in the rolling feature window, and `random_seed=42` pins all stochastic operations to a reproducible state.
 
 The 11-element `weights` list is equally deliberate. The task aggregates predictions from 11 time series columns into a single combined forecast using a signed weighted average. Some weights are negative, which means those columns enter the combination with reversed sign. The test confirms there are exactly 7 positive weights and 4 negative weights — a contract that must hold for the aggregation arithmetic to produce the intended result.
 
 ```{python}
-from spotforecast2_safe.data.demo_data import DemoConfig
+from spotforecast2_safe.configurator import ConfigDemo
 
-config = DemoConfig()
+config = ConfigDemo()
 print(f"forecast_horizon : {config.forecast_horizon}")
 print(f"contamination    : {config.contamination}")
 print(f"window_size      : {config.window_size}")
@@ -155,6 +155,6 @@ pd.DataFrame(results).T.round(4)
 
 ## The Complete Execution Flow
 
-Putting all pieces together, a single invocation of `task_safe_demo` follows this sequence. First, `DemoConfig` is constructed and its fields are used throughout. The ground truth file is validated before any model training begins. The baseline pipeline trains on the raw series without covariates. The covariate pipeline repeats this with weather, holiday, and calendar features included as exogenous inputs. The custom LightGBM pipeline reuses the covariate pipeline but substitutes the default estimator with a specifically tuned regressor. Each pipeline's 11-column output is collapsed to a single Series by `agg_predict` using the signed weight vector. Finally, all three combined forecasts are evaluated against the ground truth and their metrics are written to the log.
+Putting all pieces together, a single invocation of `task_safe_demo` follows this sequence. First, `ConfigDemo` is constructed and its fields are used throughout. The ground truth file is validated before any model training begins. The baseline pipeline trains on the raw series without covariates. The covariate pipeline repeats this with weather, holiday, and calendar features included as exogenous inputs. The custom LightGBM pipeline reuses the covariate pipeline but substitutes the default estimator with a specifically tuned regressor. Each pipeline's 11-column output is collapsed to a single Series by `agg_predict` using the signed weight vector. Finally, all three combined forecasts are evaluated against the ground truth and their metrics are written to the log.
 
 The test suite mirrors this flow by testing each building block independently, ensuring that a failure in any component surfaces as a specific, attributable test failure rather than a cryptic runtime error at the end of a long training run.

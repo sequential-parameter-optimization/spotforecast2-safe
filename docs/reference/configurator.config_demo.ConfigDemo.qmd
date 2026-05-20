@@ -1,22 +1,7 @@
-# data.demo_data { #spotforecast2_safe.data.demo_data }
-
-`data.demo_data`
-
-Demo dataset configuration for safety-critical forecasting tasks.
-
-This module provides a flexible configuration dataclass for managing
-parameters in demonstration and production forecasting workflows.
-
-## Classes
-
-| Name | Description |
-| --- | --- |
-| [DemoConfig](#spotforecast2_safe.data.demo_data.DemoConfig) | Configuration for the safety-critical demo task. |
-
-### DemoConfig { #spotforecast2_safe.data.demo_data.DemoConfig }
+# configurator.config_demo.ConfigDemo { #spotforecast2_safe.configurator.config_demo.ConfigDemo }
 
 ```python
-data.demo_data.DemoConfig(
+configurator.config_demo.ConfigDemo(
     data_path=(lambda: get_package_data_home() / 'demo11.csv')(),
     model_root=(lambda: Path.home() / 'spotforecast2_safe_models')(),
     log_root=(lambda: Path.home() / 'spotforecast2_safe_models' / 'logs')(),
@@ -37,7 +22,7 @@ forecasting demonstrations, including data paths, model directories,
 and hyperparameters. All fields have sensible defaults but can be
 overridden during initialization.
 
-#### Attributes {.doc-section .doc-section-attributes}
+## Attributes {.doc-section .doc-section-attributes}
 
 | Name             | Type                                      | Description                                           |
 |------------------|-------------------------------------------|-------------------------------------------------------|
@@ -52,14 +37,14 @@ overridden during initialization.
 | random_seed      | [int](`int`)                              | Random seed for reproducibility.                      |
 | weights          | [List](`typing.List`)\[[float](`float`)\] | Weights for aggregating multi-variable predictions.   |
 
-#### Examples {.doc-section .doc-section-examples}
+## Examples {.doc-section .doc-section-examples}
 
 Default configuration:
 
 ```{python}
-from spotforecast2_safe.data.demo_data import DemoConfig
+from spotforecast2_safe.configurator import ConfigDemo
 
-config = DemoConfig()
+config = ConfigDemo()
 print(f"Forecast horizon: {config.forecast_horizon}")
 print(f"Window size: {config.window_size}")
 print(f"Random seed: {config.random_seed}")
@@ -68,7 +53,9 @@ print(f"Random seed: {config.random_seed}")
 Override specific parameters:
 
 ```{python}
-config = DemoConfig(forecast_horizon=48, contamination=0.05, random_seed=123)
+from spotforecast2_safe.configurator import ConfigDemo
+
+config = ConfigDemo(forecast_horizon=48, contamination=0.05, random_seed=123)
 print(f"Forecast horizon: {config.forecast_horizon}")
 print(f"Contamination: {config.contamination}")
 ```
@@ -79,8 +66,10 @@ Customize paths for a specific environment:
 import tempfile
 from pathlib import Path
 
+from spotforecast2_safe.configurator import ConfigDemo
+
 with tempfile.TemporaryDirectory() as tmpdir:
-    custom_config = DemoConfig(
+    custom_config = ConfigDemo(
         data_path=Path(tmpdir) / "my_data.csv",
         model_root=Path(tmpdir) / "models",
         log_root=Path(tmpdir) / "logs",
@@ -92,14 +81,18 @@ with tempfile.TemporaryDirectory() as tmpdir:
 Custom weights for multi-variable aggregation:
 
 ```{python}
-config = DemoConfig(weights=[1.0, 1.0, -1.0, 1.0, 1.0])
+from spotforecast2_safe.configurator import ConfigDemo
+
+config = ConfigDemo(weights=[1.0, 1.0, -1.0, 1.0, 1.0])
 print(f"Number of weights: {len(config.weights)}")
 ```
 
 Immutability check (frozen dataclass):
 
 ```{python}
-config = DemoConfig()
+from spotforecast2_safe.configurator import ConfigDemo
+
+config = ConfigDemo()
 try:
     config.forecast_horizon = 100
 except AttributeError:
@@ -109,7 +102,9 @@ except AttributeError:
 Production configuration with a long horizon:
 
 ```{python}
-prod_config = DemoConfig(
+from spotforecast2_safe.configurator import ConfigDemo
+
+prod_config = ConfigDemo(
     forecast_horizon=168,  # 1 week
     window_size=336,       # 2 weeks
     lags=48,

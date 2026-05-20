@@ -14,7 +14,7 @@ holiday indicators.
 
 | Name          | Type                                                                                          | Description                                 |
 |---------------|-----------------------------------------------------------------------------------------------|---------------------------------------------|
-| periods       | [List](`typing.List`)\[[Period](`spotforecast2_safe.data.data.Period`)\]                      | List of periodic features to encode.        |
+| periods       | [List](`typing.List`)\[[Period](`spotforecast2_safe.data.data_classes.Period`)\]              | List of periodic features to encode.        |
 | country_code  | [Optional](`typing.Optional`)\[[str](`str`)\]                                                 | Country code for holiday lookups.           |
 | holidays_list | [Optional](`typing.Optional`)\[[holidays](`holidays`).[HolidayBase](`holidays.HolidayBase`)\] | List of holidays for the specified country. |
 
@@ -22,7 +22,7 @@ holiday indicators.
 
 ```python
 >>> import pandas as pd
->>> from spotforecast2_safe.data.data import Period
+>>> from spotforecast2_safe.data.data_classes import Period
 >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
 >>> builder = ExogBuilder(periods=periods, country_code="DE")
@@ -72,7 +72,7 @@ The generated DataFrame has an hourly frequency.
 
 ```python
 >>> import pandas as pd
->>> from spotforecast2_safe.data.data import Period
+>>> from spotforecast2_safe.data.data_classes import Period
 >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
 >>> builder = ExogBuilder(periods=periods, country_code="DE")
