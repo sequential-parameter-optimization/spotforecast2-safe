@@ -18,3 +18,31 @@ Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None.
 | Name   | Type                 | Description                                                              |
 |--------|----------------------|--------------------------------------------------------------------------|
 |        | [str](`str`) \| None | The device that was set on the estimator before the function was called. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from lightgbm import LGBMRegressor
+from sklearn.linear_model import LinearRegression
+
+from spotforecast2_safe.preprocessing.checking import set_cpu_gpu_device
+
+# LGBMRegressor: device parameter is set; original value returned
+lgbm = LGBMRegressor()
+original_device = set_cpu_gpu_device(lgbm, device="cpu")
+print(f"Original device was: {repr(original_device)}")
+print(f"Device after set: {repr(lgbm.device)}")
+assert lgbm.device == "cpu"
+
+# LinearRegression: unsupported estimator — returns None, no-op
+lr = LinearRegression()
+result = set_cpu_gpu_device(lr, device="cpu")
+assert result is None
+print(f"LinearRegression result (no-op): {result}")
+
+# Invalid device raises ValueError
+try:
+    set_cpu_gpu_device(lgbm, device="tpu")
+except ValueError as e:
+    print(f"ValueError (bad device): {type(e).__name__}")
+```

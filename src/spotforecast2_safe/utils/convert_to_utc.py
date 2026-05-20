@@ -27,12 +27,23 @@ def to_utc_timestamp(value: Union[str, pd.Timestamp]) -> pd.Timestamp:
 
         from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
 
+        # Date-only string → UTC-aware Timestamp
         result = to_utc_timestamp("2024-01-01")
         print(result)
+        assert result.tz is not None
+        assert str(result.tz) == "UTC"
         assert result == pd.Timestamp("2024-01-01", tz="UTC")
 
+        # Datetime string with offset → UTC-aware Timestamp
+        result2 = to_utc_timestamp("2024-06-15 12:00:00+02:00")
+        print(result2)
+        assert str(result2.tz) == "UTC"
+        assert result2 == pd.Timestamp("2024-06-15 10:00:00", tz="UTC")
+
+        # Pre-existing UTC Timestamp → returned unchanged (identity)
         ts = pd.Timestamp("2024-06-15", tz="UTC")
         assert to_utc_timestamp(ts) is ts
+        print("pass-through identity: ok")
         ```
     """
     if isinstance(value, str):
@@ -60,14 +71,33 @@ def convert_to_utc(df: pd.DataFrame, timezone: Optional[str]) -> pd.DataFrame:
 
         from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
 
-        df = pd.DataFrame(
+        # Scenario 1: tz-naive index → localise to Europe/Berlin then convert to UTC
+        df_naive = pd.DataFrame(
             {"value": [1, 2, 3]},
             index=pd.to_datetime(["2022-01-01", "2022-01-02", "2022-01-03"]),
         )
-        result = convert_to_utc(df, "Europe/Berlin")
-        print(result)
-        assert str(result.index.tz) == "UTC"
-        assert result.index[0] == pd.Timestamp("2021-12-31 23:00:00", tz="UTC")
+        result_naive = convert_to_utc(df_naive, "Europe/Berlin")
+        print("tz-naive result:")
+        print(result_naive)
+        assert str(result_naive.index.tz) == "UTC"
+        # 2022-01-01 CET = UTC+1, so midnight Berlin = 23:00 UTC previous day
+        assert result_naive.index[0] == pd.Timestamp("2021-12-31 23:00:00", tz="UTC")
+        ```
+
+        ```{python}
+        import pandas as pd
+
+        from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
+
+        # Scenario 2: non-UTC tz-aware index (US/Eastern) → converted to UTC
+        idx = pd.date_range("2022-06-01", periods=3, freq="h", tz="US/Eastern")
+        df_eastern = pd.DataFrame({"value": [10, 20, 30]}, index=idx)
+        result_eastern = convert_to_utc(df_eastern, timezone=None)
+        print("US/Eastern → UTC result:")
+        print(result_eastern)
+        assert str(result_eastern.index.tz) == "UTC"
+        # US/Eastern is UTC-4 in June (EDT), so 00:00 Eastern = 04:00 UTC
+        assert result_eastern.index[0] == pd.Timestamp("2022-06-01 04:00:00", tz="UTC")
         ```
     """
     if not isinstance(df.index, pd.DatetimeIndex):

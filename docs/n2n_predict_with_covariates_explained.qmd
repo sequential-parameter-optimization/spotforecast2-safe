@@ -757,3 +757,141 @@ fitted object is serialised in a form that survives process boundaries.
 These invariants make the pipeline safe to embed in automated batch jobs
 where a silent failure would not be discovered until long after the
 prediction window has closed.
+
+## sf2-safe API surface used in this walkthrough
+
+The first table below lists every `spotforecast2_safe` symbol referenced
+**directly** by the orchestrator or named in this page's prose. The
+second table extends that set with the **transitive** symbols that the
+direct dependencies themselves import from `spotforecast2_safe` — these
+are the classes and helpers a reader will encounter as soon as they
+open one of the level-1 modules. Third-party dependencies (pandas,
+numpy, scikit-learn, lightgbm, astral, holidays, feature-engine,
+joblib, tqdm) are deliberately omitted from both tables.
+
+### Direct (orchestrator + prose)
+
+| Symbol | Kind | sf2-safe module | Stage |
+| --- | --- | --- | --- |
+| [`n2n_predict_with_covariates`](`spotforecast2_safe.processing.n2n_predict_with_covariates.n2n_predict_with_covariates`) | function | `spotforecast2_safe.processing.n2n_predict_with_covariates` | orchestrator |
+| [`fetch_data`](`spotforecast2_safe.data.fetch_data.fetch_data`) | function | `spotforecast2_safe.data.fetch_data` | Stage 1 |
+| [`get_package_data_home`](`spotforecast2_safe.data.fetch_data.get_package_data_home`) | function | `spotforecast2_safe.data.fetch_data` | Stage 1 |
+| [`get_cache_home`](`spotforecast2_safe.data.fetch_data.get_cache_home`) | function | `spotforecast2_safe.data.fetch_data` | Stage 9 |
+| `get_start_end` | function | `spotforecast2_safe.preprocessing.curate_data` | Stage 1 |
+| `basic_ts_checks` | function | `spotforecast2_safe.preprocessing.curate_data` | Stage 1 |
+| `agg_and_resample_data` | function | `spotforecast2_safe.preprocessing.curate_data` | Stage 1 |
+| `mark_outliers` | function | `spotforecast2_safe.preprocessing.outlier` | Stage 2 |
+| `get_missing_weights` | function | `spotforecast2_safe.preprocessing.imputation` | Stage 3 |
+| `WeightFunction` | class | `spotforecast2_safe.preprocessing` (re-export of `.imputation.WeightFunction`) | Stage 3 |
+| `get_calendar_features` | function | `spotforecast2_safe.calendar` | Stage 4 |
+| `get_day_night_features` | function | `spotforecast2_safe.calendar` | Stage 4 |
+| `get_holiday_features` | function | `spotforecast2_safe.calendar` | Stage 4 |
+| `get_weather_features` | function | `spotforecast2_safe.weather` | Stage 4 |
+| `apply_cyclical_encoding` | function | `spotforecast2_safe.manager.features` | Stage 5 |
+| `create_interaction_features` | function | `spotforecast2_safe.manager.features` | Stage 5 |
+| `select_exogenous_features` | function | `spotforecast2_safe.manager.features` | Stage 6 |
+| `merge_data_and_covariates` | function | `spotforecast2_safe.manager.features` | Stage 7 |
+| `split_rel_train_val_test` | function | `spotforecast2_safe.splitter.split` | Stage 8 |
+| [`ForecasterRecursive`](`spotforecast2_safe.forecaster.recursive.ForecasterRecursive`) | class | `spotforecast2_safe.forecaster.recursive` | Stage 9 |
+| `ForecasterRecursive._create_train_X_y` | method | `spotforecast2_safe.forecaster.recursive.ForecasterRecursive` | Stage 3 (referenced) |
+| `RollingFeatures` | class | `spotforecast2_safe.preprocessing` (re-export of `.rolling.RollingFeatures`) | Stage 9 |
+| `load_forecasters` | function | `spotforecast2_safe.manager.persistence` | Stage 9 |
+| `save_forecasters` | function | `spotforecast2_safe.manager.persistence` | Stage 9 |
+| `predict_multivariate` | function | `spotforecast2_safe.forecaster.utils` | Stage 10 |
+
+### Transitive (imported by the direct dependencies)
+
+These symbols are not invoked from the orchestrator or named in the
+prose above, but the direct dependencies pull them in from
+`spotforecast2_safe`. A reader who opens any of the level-1 modules
+will land on these next, so they are part of the same internal
+contract.
+
+| Symbol | Kind | sf2-safe module | Surfaces in |
+| --- | --- | --- | --- |
+| `QuantileBinner` | class | `spotforecast2_safe.preprocessing` (re-export of `._binner.QuantileBinner`) | `ForecasterRecursive` internals (residual-binning) |
+| `TimeSeriesDifferentiator` | class | `spotforecast2_safe.preprocessing` (re-export of `._differentiator.TimeSeriesDifferentiator`) | `ForecasterRecursive` internals (differentiation) |
+| `LinearlyInterpolateTS` | class | `spotforecast2_safe.preprocessing.linearly_interpolate_ts` | `get_missing_weights` imputation path |
+| `WeatherService` | class | `spotforecast2_safe.weather` | `fetch_data` weather-fetch helper |
+| `create_holiday_df` | function | `spotforecast2_safe.calendar` (re-export of `.holiday.create_holiday_df`) | `fetch_data.fetch_holiday_data` |
+| `curate_weather` | function | `spotforecast2_safe.preprocessing.curate_data` | `get_weather_features` post-fetch curation |
+| `convert_to_utc` | function | `spotforecast2_safe.utils.convert_to_utc` | `fetch_data` index normalisation |
+| `to_utc_timestamp` | function | `spotforecast2_safe.utils.convert_to_utc` | calendar + weather range-boundary normalisation |
+| `ForecasterBase` | class | `spotforecast2_safe.forecaster.base` | base class of `ForecasterRecursive` |
+| `check_y`, `check_exog`, `check_exog_dtypes`, `check_interval`, `check_predict_input`, `check_residuals_input`, `get_exog_dtypes`, `set_cpu_gpu_device` | functions | `spotforecast2_safe.preprocessing.checking` | fail-safe input validation in `ForecasterRecursive.fit` / `predict` and in `forecaster.utils` |
+| `expand_index`, `input_to_frame`, `transform_dataframe`, `date_to_index_position` | functions | `spotforecast2_safe.preprocessing.data_transform` | index / frame coercion in `forecaster.utils` and `ForecasterRecursive` |
+| `check_select_fit_kwargs`, `initialize_lags`, `initialize_weights` | functions | `spotforecast2_safe.preprocessing.forecaster_config` | constructor + fit-time configuration for `ForecasterRecursive` |
+| `check_extract_values_and_index`, `get_style_repr_html`, `initialize_estimator`, `initialize_window_features`, `transform_numpy` | functions | `spotforecast2_safe.forecaster.utils` | helpers consumed by `ForecasterRecursive` (already exported by the module table above) |
+| `DataTransformationWarning`, `NotFittedError`, `ResidualsUsageWarning`, `IgnoredArgumentWarning`, `InputTypeWarning`, `MissingValuesWarning`, `UnknownLevelWarning`, `set_skforecast_warnings` | exceptions / warnings | `spotforecast2_safe.exceptions` | raised across `ForecasterRecursive`, `forecaster.utils`, and the preprocessing layer |
+
+## sf2-safe internal dependencies
+
+The walkthrough touches the following `spotforecast2_safe` subpackages.
+Each line collapses the symbols listed above into the module they live
+in, so the dependency footprint of this page is visible at a glance.
+
+- `spotforecast2_safe.processing.n2n_predict_with_covariates` — the
+  orchestrator entry point exercised by the end-to-end cell.
+- `spotforecast2_safe.data.fetch_data` — `fetch_data`,
+  `get_package_data_home`, `get_cache_home`.
+- `spotforecast2_safe.preprocessing.curate_data` — `get_start_end`,
+  `basic_ts_checks`, `agg_and_resample_data`.
+- `spotforecast2_safe.preprocessing.outlier` — `mark_outliers`.
+- `spotforecast2_safe.preprocessing.imputation` — `get_missing_weights`,
+  `WeightFunction` (re-exported one level up at
+  `spotforecast2_safe.preprocessing.WeightFunction`).
+- `spotforecast2_safe.preprocessing.rolling` — `RollingFeatures`
+  (re-exported one level up at
+  `spotforecast2_safe.preprocessing.RollingFeatures`).
+- `spotforecast2_safe.calendar` — `get_calendar_features`,
+  `get_day_night_features`, `get_holiday_features`.
+- `spotforecast2_safe.weather` — `get_weather_features`.
+- `spotforecast2_safe.manager.features` — `apply_cyclical_encoding`,
+  `create_interaction_features`, `select_exogenous_features`,
+  `merge_data_and_covariates`.
+- `spotforecast2_safe.manager.persistence` — `load_forecasters`,
+  `save_forecasters` (and the orchestrator additionally calls
+  `model_directory_exists`).
+- `spotforecast2_safe.splitter.split` — `split_rel_train_val_test`.
+- `spotforecast2_safe.forecaster.recursive` — `ForecasterRecursive`
+  (and its internal `_create_train_X_y` referenced in Stage 3).
+- `spotforecast2_safe.forecaster.utils` — `predict_multivariate` (and
+  the helpers `check_extract_values_and_index`, `get_style_repr_html`,
+  `initialize_estimator`, `initialize_window_features`, `transform_numpy`
+  consumed by `ForecasterRecursive`).
+
+The following modules are not imported by the orchestrator directly,
+but the level-1 dependencies above pull them in. Any change to a
+public symbol in one of these modules can therefore propagate up into
+this walkthrough's pipeline.
+
+- `spotforecast2_safe.forecaster.base` — `ForecasterBase` (base class
+  of `ForecasterRecursive`).
+- `spotforecast2_safe.preprocessing._binner` — `QuantileBinner`
+  (re-exported at `spotforecast2_safe.preprocessing.QuantileBinner`,
+  used by `ForecasterRecursive` for residual binning).
+- `spotforecast2_safe.preprocessing._differentiator` —
+  `TimeSeriesDifferentiator` (re-exported at
+  `spotforecast2_safe.preprocessing.TimeSeriesDifferentiator`, used by
+  `ForecasterRecursive` for differentiation).
+- `spotforecast2_safe.preprocessing.linearly_interpolate_ts` —
+  `LinearlyInterpolateTS`, used by the imputation path of
+  `get_missing_weights`.
+- `spotforecast2_safe.preprocessing.checking` — `check_y`, `check_exog`,
+  `check_exog_dtypes`, `check_interval`, `check_predict_input`,
+  `check_residuals_input`, `get_exog_dtypes`, `set_cpu_gpu_device`
+  (fail-safe input validation throughout `ForecasterRecursive` and
+  `forecaster.utils`).
+- `spotforecast2_safe.preprocessing.data_transform` — `expand_index`,
+  `input_to_frame`, `transform_dataframe`, `date_to_index_position`
+  (index and frame coercion).
+- `spotforecast2_safe.preprocessing.forecaster_config` —
+  `check_select_fit_kwargs`, `initialize_lags`, `initialize_weights`
+  (constructor and fit-time configuration).
+- `spotforecast2_safe.utils.convert_to_utc` — `convert_to_utc`,
+  `to_utc_timestamp` (timezone normalisation used by `fetch_data`,
+  `calendar.*`, and `weather.features`).
+- `spotforecast2_safe.exceptions` — `DataTransformationWarning`,
+  `NotFittedError`, `ResidualsUsageWarning`, `IgnoredArgumentWarning`,
+  `InputTypeWarning`, `MissingValuesWarning`, `UnknownLevelWarning`,
+  `set_skforecast_warnings` (raised across the pipeline).

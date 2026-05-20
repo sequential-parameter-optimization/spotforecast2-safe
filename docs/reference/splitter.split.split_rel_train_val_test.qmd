@@ -38,17 +38,30 @@ import pandas as pd
 from spotforecast2_safe.splitter.split import split_rel_train_val_test
 
 rng = np.random.default_rng(0)
-idx = pd.date_range("2022-01-01", periods=100, freq="D")
+idx = pd.date_range("2020-01-01", periods=100, freq="h")
 data = pd.DataFrame({"value": rng.standard_normal(100)}, index=idx)
 
 data_train, data_val, data_test = split_rel_train_val_test(
     data,
-    perc_train=0.7,
-    perc_val=0.2,
-    verbose=True,
+    perc_train=0.8,
+    perc_val=0.1,
+    verbose=False,
 )
-assert len(data_train) == 70
-assert len(data_val) == 20
+
+# Sizes
+assert len(data_train) == 80
+assert len(data_val) == 10
 assert len(data_test) == 10
 print(f"Train: {len(data_train)}, Val: {len(data_val)}, Test: {len(data_test)}")
+
+# Full index coverage: union of the three splits equals the original index
+combined_index = data_train.index.append(data_val.index).append(data_test.index)
+assert combined_index.equals(data.index), "Union of splits must equal original index"
+
+# Temporal ordering: train ends before val, val ends before test
+assert data_train.index.max() < data_val.index.min()
+assert data_val.index.max() < data_test.index.min()
+print(f"Train ends: {data_train.index.max()}")
+print(f"Val  starts: {data_val.index.min()}, ends: {data_val.index.max()}")
+print(f"Test starts: {data_test.index.min()}")
 ```

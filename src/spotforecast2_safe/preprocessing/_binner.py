@@ -55,28 +55,39 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
         intervals_ (dict): Mapping from bin index to (lower, upper) interval bounds.
 
     Examples:
-        >>> import numpy as np
-        >>> from spotforecast2_safe.preprocessing import QuantileBinner
-        >>>
-        >>> # Basic usage: create 3 quantile bins
-        >>> X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        >>> binner = QuantileBinner(n_bins=3)
-        >>> _ = binner.fit(X)
-        >>> result = binner.transform(np.array([1.5, 5.5, 9.5]))
-        >>> print(result)
-        [0. 1. 2.]
-        >>>
-        >>> # Check bin intervals
-        >>> print(binner.n_bins_)
-        3
-        >>> assert len(binner.intervals_) == 3
-        >>>
-        >>> # Use fit_transform for one-step operation
-        >>> X2 = np.array([10, 20, 30, 40, 50])
-        >>> binner2 = QuantileBinner(n_bins=2)
-        >>> bins = binner2.fit_transform(X2)
-        >>> print(bins)
-        [0. 0. 1. 1. 1.]
+        ```{python}
+        import warnings
+        import numpy as np
+        from spotforecast2_safe.preprocessing import QuantileBinner
+
+        # Basic usage: create 3 quantile bins
+        X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=float)
+        binner = QuantileBinner(n_bins=3)
+        binner.fit(X)
+        result = binner.transform(np.array([1.5, 5.5, 9.5]))
+        print(result)
+        assert result.shape == (3,)
+
+        # Check bin intervals
+        print(binner.n_bins_)
+        assert binner.n_bins_ == 3
+        assert len(binner.intervals_) == 3
+        ```
+
+        ```{python}
+        import warnings
+        import numpy as np
+        from spotforecast2_safe.preprocessing import QuantileBinner
+
+        # Use fit_transform for one-step operation
+        X2 = np.array([10, 20, 30, 40, 50], dtype=float)
+        binner2 = QuantileBinner(n_bins=2)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            bins = binner2.fit_transform(X2)
+        print(bins)
+        assert bins.shape == (5,)
+        ```
     """
 
     def __init__(
@@ -118,24 +129,28 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
                 random_state < 0, or dtype is not a valid type.
 
         Examples:
-            >>> import numpy as np
-            >>> from spotforecast2_safe.preprocessing import QuantileBinner
-            >>>
-            >>> # Valid parameters work fine
-            >>> binner = QuantileBinner(n_bins=5, method='linear')
-            >>> assert binner.n_bins == 5
-            >>>
-            >>> # Invalid n_bins raises ValueError
-            >>> try:
-            ...     binner = QuantileBinner(n_bins=1)
-            ... except ValueError as e:
-            ...     assert 'greater than 1' in str(e)
-            >>>
-            >>> # Invalid method raises ValueError
-            >>> try:
-            ...     binner = QuantileBinner(n_bins=3, method='invalid')
-            ... except ValueError as e:
-            ...     assert 'must be one of' in str(e)
+            ```{python}
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
+
+            # Valid parameters work fine
+            binner = QuantileBinner(n_bins=5, method='linear')
+            assert binner.n_bins == 5
+
+            # Invalid n_bins raises ValueError
+            try:
+                binner = QuantileBinner(n_bins=1)
+            except ValueError as e:
+                assert 'greater than 1' in str(e)
+                print(f"Caught expected error: {e}")
+
+            # Invalid method raises ValueError
+            try:
+                binner = QuantileBinner(n_bins=3, method='invalid')
+            except ValueError as e:
+                assert 'must be one of' in str(e)
+                print(f"Caught expected error: {e}")
+            ```
         """
 
         if not isinstance(n_bins, int) or n_bins < 2:
@@ -186,24 +201,35 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
             ValueError: If input data X is empty.
 
         Examples:
-            >>> import numpy as np
-            >>> from spotforecast2_safe.preprocessing import QuantileBinner
-            >>>
-            >>> # Fit with basic data
-            >>> X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-            >>> binner = QuantileBinner(n_bins=3)
-            >>> _ = binner.fit(X)
-            >>> print(binner.n_bins_)
-            3
-            >>> print(len(binner.bin_edges_))
-            4
-            >>>
-            >>> # Fit with repeated values (may reduce number of bins)
-            >>> X_repeated = np.array([1, 1, 1, 2, 2, 2, 3, 3, 3])
-            >>> binner2 = QuantileBinner(n_bins=5)
-            >>> _ = binner2.fit(X_repeated)
-            >>> # n_bins_ may be less than 5 due to duplicates
-            >>> assert binner2.n_bins_ <= 5
+            ```{python}
+            import warnings
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
+
+            # Fit with basic data
+            X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=float)
+            binner = QuantileBinner(n_bins=3)
+            binner.fit(X)
+            print(binner.n_bins_)
+            assert binner.n_bins_ == 3
+            assert len(binner.bin_edges_) == 4
+            ```
+
+            ```{python}
+            import warnings
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
+
+            # Fit with repeated values (may reduce number of bins)
+            X_repeated = np.array([1, 1, 1, 2, 2, 2, 3, 3, 3], dtype=float)
+            binner2 = QuantileBinner(n_bins=5)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                binner2.fit(X_repeated)
+            # n_bins_ may be less than 5 due to duplicates
+            print(f"Actual bins after dedup: {binner2.n_bins_}")
+            assert binner2.n_bins_ <= 5
+            ```
         """
         # Note: Original implementation expects X, but sklearn TransformerMixin passes y=None.
         # Adjusted signature to (self, X: np.ndarray, y: object = None)
@@ -265,24 +291,27 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
             NotFittedError: If fit() has not been called yet.
 
         Examples:
-            >>> import numpy as np
-            >>> from spotforecast2_safe.preprocessing import QuantileBinner
-            >>>
-            >>> # Fit and transform
-            >>> X_train = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-            >>> binner = QuantileBinner(n_bins=3)
-            >>> _ = binner.fit(X_train)
-            >>>
-            >>> X_test = np.array([1.5, 5.5, 9.5])
-            >>> result = binner.transform(X_test)
-            >>> print(result)
-            [0. 1. 2.]
-            >>>
-            >>> # Values outside range are clipped
-            >>> X_extreme = np.array([0, 100])
-            >>> result_extreme = binner.transform(X_extreme)
-            >>> print(result_extreme)  # Both clipped to valid bin indices
-            [0. 2.]
+            ```{python}
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
+
+            # Fit and transform
+            X_train = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=float)
+            binner = QuantileBinner(n_bins=3)
+            binner.fit(X_train)
+
+            X_test = np.array([1.5, 5.5, 9.5])
+            result = binner.transform(X_test)
+            print(result)
+            assert list(result) == [0.0, 1.0, 2.0]
+
+            # Values outside range are clipped to valid bin indices
+            X_extreme = np.array([0.0, 100.0])
+            result_extreme = binner.transform(X_extreme)
+            print(result_extreme)
+            assert result_extreme[0] == 0.0
+            assert result_extreme[1] == float(binner.n_bins_ - 1)
+            ```
         """
 
         if self.bin_edges_ is None:
@@ -300,25 +329,32 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
         """
         Fit to data, then transform it.
 
-        Fits transformer to X and y with optional parameters fit_params
-        and returns a transformed version of X.
+        Fits the binner on X to learn quantile-based bin edges, then assigns
+        each value in X to a bin and returns the bin indices.
 
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input samples.
+        Args:
+            X (np.ndarray): 1D array of training samples.
+            y: Ignored.
+            **fit_params: Additional fit parameters (unused).
 
-        y :  array-like of shape (n_samples,) or (n_samples, n_outputs), \
-                default=None
-            Target values (None for unsupervised transformations).
+        Returns:
+            np.ndarray: Bin indices with dtype specified in __init__.
 
-        **fit_params : dict
-            Additional fit parameters.
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
 
-        Returns
-        -------
-        X_new : ndarray array of shape (n_samples, n_features_new)
-            Transformed array.
+            X = np.array([10.0, 20.0, 30.0, 40.0, 50.0])
+            binner = QuantileBinner(n_bins=2)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                bins = binner.fit_transform(X)
+            print(bins)
+            assert bins.shape == (5,)
+            assert bins.dtype == np.float64
+            ```
         """
         # fit_transform is usually provided by TransformerMixin but we can implement it
         # or rely on inheritance. The original implementation had it explicitly.
@@ -335,17 +371,19 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
             random_state parameters.
 
         Examples:
-            >>> import numpy as np
-            >>> from spotforecast2_safe.preprocessing import QuantileBinner
-            >>>
-            >>> binner = QuantileBinner(n_bins=5, method='median_unbiased', subsample=1000)
-            >>> params = binner.get_params()
-            >>> print(params['n_bins'])
-            5
-            >>> print(params['method'])
-            median_unbiased
-            >>> print(params['subsample'])
-            1000
+            ```{python}
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
+
+            binner = QuantileBinner(n_bins=5, method='median_unbiased', subsample=1000)
+            params = binner.get_params()
+            print(params['n_bins'])
+            print(params['method'])
+            print(params['subsample'])
+            assert params['n_bins'] == 5
+            assert params['method'] == 'median_unbiased'
+            assert params['subsample'] == 1000
+            ```
         """
 
         return {
@@ -367,17 +405,18 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
             self: Returns the updated QuantileBinner instance.
 
         Examples:
-            >>> import numpy as np
-            >>> from spotforecast2_safe.preprocessing import QuantileBinner
-            >>>
-            >>> binner = QuantileBinner(n_bins=3)
-            >>> print(binner.n_bins)
-            3
-            >>> binner.set_params(n_bins=5, method='weibull')
-            >>> print(binner.n_bins)
-            5
-            >>> print(binner.method)
-            weibull
+            ```{python}
+            import numpy as np
+            from spotforecast2_safe.preprocessing import QuantileBinner
+
+            binner = QuantileBinner(n_bins=3)
+            print(binner.n_bins)
+            binner.set_params(n_bins=5, method='weibull')
+            print(binner.n_bins)
+            print(binner.method)
+            assert binner.n_bins == 5
+            assert binner.method == 'weibull'
+            ```
         """
 
         for param, value in params.items():

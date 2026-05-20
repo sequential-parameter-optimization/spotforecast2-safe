@@ -21,13 +21,40 @@ ForecasterRecursive specialization using LightGBM.
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
-from spotforecast2_safe.forecaster.wrappers import (
-    ForecasterRecursiveLGBM,
-    ForecasterRecursiveModel,
-)
+import warnings
+import numpy as np
+import pandas as pd
+from lightgbm import LGBMRegressor
 
-model = ForecasterRecursiveLGBM(iteration=0)
-print(model.name)
-print(isinstance(model, ForecasterRecursiveModel))
-print(model.forecaster is not None)
+from spotforecast2_safe.exceptions import IgnoredArgumentWarning
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
+
+warnings.simplefilter("ignore", IgnoredArgumentWarning)
+
+rng = np.random.default_rng(0)
+n = 50
+idx = pd.date_range("2023-01-01", periods=n, freq="h")
+vals = 100 + 10 * np.sin(np.linspace(0, 4 * np.pi, n)) + rng.normal(0, 1, n)
+y = pd.Series(vals, index=idx)
+
+# Use a fast, small estimator for the example
+model = ForecasterRecursiveLGBM(iteration=0, lags=3)
+model.forecaster = ForecasterRecursive(
+    estimator=LGBMRegressor(
+        n_estimators=10, n_jobs=1, verbose=-1, random_state=0,
+        deterministic=True, force_col_wise=True,
+    ),
+    lags=3,
+)
+model.fit(y=y)
+pred = model.forecaster.predict(steps=2)
+
+assert model.name == "lgbm"
+assert model.forecaster.is_fitted
+assert len(pred) == 2
+assert pred.dtype == float
+print(f"model.name: {model.name}")
+print(f"is_fitted: {model.forecaster.is_fitted}")
+print(f"prediction steps: {len(pred)}")
 ```

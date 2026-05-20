@@ -59,48 +59,83 @@ By default, models are retrained (force_train=True). Set force_train=False to re
 
 ## Examples {.doc-section .doc-section-examples}
 
-Basic usage with automatic model caching:
+```{python}
+import tempfile
 
-```python
->>> predictions, forecasters = n2n_predict(
-...     forecast_horizon=24,
-...     verbose=True
-... )
->>> print(predictions.shape)
-(24, 11)
+from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+predictions, forecasters = n2n_predict(
+    forecast_horizon=2,
+    force_train=True,
+    model_dir=tempfile.mkdtemp(),
+    verbose=False,
+    show_progress=False,
+)
+print(predictions.shape)
+assert predictions.shape == (2, 11)
 ```
 
 Load cached models (if available):
 
-```python
->>> predictions, forecasters = n2n_predict(
-...     forecast_horizon=24,
-...     force_train=False,
-...     model_dir="./saved_models",
-...     verbose=True
-... )
+```{python}
+import tempfile
+
+from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+model_dir = tempfile.mkdtemp()
+n2n_predict(
+    forecast_horizon=2,
+    force_train=True,
+    model_dir=model_dir,
+    verbose=False,
+    show_progress=False,
+)
+predictions, forecasters = n2n_predict(
+    forecast_horizon=2,
+    force_train=False,
+    model_dir=model_dir,
+    verbose=False,
+    show_progress=False,
+)
+print(predictions.shape)
+assert len(forecasters) == 11
 ```
 
 Force retraining and update cache:
 
-```python
->>> predictions, forecasters = n2n_predict(
-...     forecast_horizon=24,
-...     force_train=True,
-...     model_dir="./saved_models",
-...     verbose=True
-... )
+```{python}
+import tempfile
+
+from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+predictions, forecasters = n2n_predict(
+    forecast_horizon=2,
+    force_train=True,
+    model_dir=tempfile.mkdtemp(),
+    verbose=False,
+    show_progress=False,
+)
+print(sorted(forecasters.keys())[:3])
+assert "A" in forecasters
 ```
 
 With specific target columns:
 
-```python
->>> predictions, forecasters = n2n_predict(
-...     columns=["power", "energy"],
-...     forecast_horizon=48,
-...     force_train=False,
-...     verbose=True
-... )
+```{python}
+import tempfile
+
+from spotforecast2_safe.processing.n2n_predict import n2n_predict
+
+predictions, forecasters = n2n_predict(
+    columns=["A", "B"],
+    forecast_horizon=2,
+    force_train=True,
+    model_dir=tempfile.mkdtemp(),
+    verbose=False,
+    show_progress=False,
+)
+print(predictions.shape)
+assert list(predictions.columns) == ["A", "B"]
 ```
 
 ## Notes {.doc-section .doc-section-notes}

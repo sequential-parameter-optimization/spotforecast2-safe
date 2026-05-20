@@ -63,7 +63,7 @@ def get_calendar_features(
         from spotforecast2_safe.calendar import get_calendar_features
 
         start = pd.Timestamp("2024-01-01", tz="UTC")
-        cov_end = pd.Timestamp("2024-01-07 23:00", tz="UTC")
+        cov_end = pd.Timestamp("2024-01-02 23:00", tz="UTC")  # 48 hours
 
         features = get_calendar_features(
             start=start,
@@ -74,6 +74,8 @@ def get_calendar_features(
         print("shape:", features.shape)
         print("columns:", features.columns.tolist())
         print(features.head(3))
+        assert features.shape == (48, 4)
+        assert features.columns.tolist() == ["month", "week", "day_of_week", "hour"]
         ```
     """
     if features_to_extract is None:
@@ -139,8 +141,10 @@ def get_day_night_features(
         from astral import LocationInfo
         from spotforecast2_safe.calendar import get_day_night_features
 
-        start = pd.Timestamp("2024-06-01", tz="UTC")
-        cov_end = pd.Timestamp("2024-06-07 23:00", tz="UTC")
+        # Use a two-week window around the autumn equinox so that
+        # is_daylight.mean() is close to 0.5 (daylight ~12 h / 24 h).
+        start = pd.Timestamp("2024-09-15", tz="UTC")
+        cov_end = pd.Timestamp("2024-09-28 23:00", tz="UTC")
 
         location = LocationInfo(
             latitude=51.5136,
@@ -156,7 +160,16 @@ def get_day_night_features(
         )
         print("shape:", features.shape)
         print("columns:", features.columns.tolist())
+        print("is_daylight mean:", round(features["is_daylight"].mean(), 3))
         print(features.head(3))
+        assert features.shape == (336, 4)
+        assert features.columns.tolist() == [
+            "sunrise_hour",
+            "sunset_hour",
+            "daylight_hours",
+            "is_daylight",
+        ]
+        assert 0.4 < features["is_daylight"].mean() < 0.65
         ```
     """
     start = to_utc_timestamp(start)

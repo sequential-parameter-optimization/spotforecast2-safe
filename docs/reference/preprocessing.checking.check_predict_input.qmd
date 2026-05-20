@@ -55,3 +55,76 @@ trained.
 | Name   | Type   | Description   |
 |--------|--------|---------------|
 |        | None   | None          |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+import numpy as np
+
+from spotforecast2_safe.preprocessing.checking import check_predict_input
+
+last_window = pd.Series(
+    [1.0, 2.0, 3.0],
+    index=pd.date_range("2020-01-01", periods=3, freq="h"),
+)
+
+# Success path: fitted forecaster, no exog
+check_predict_input(
+    forecaster_name="ForecasterRecursive",
+    steps=2,
+    is_fitted=True,
+    exog_in_=False,
+    index_type_=pd.DatetimeIndex,
+    index_freq_="h",
+    window_size=3,
+    last_window=last_window,
+)
+print("Success: valid predict inputs accepted.")
+
+# Failure path: not fitted
+try:
+    check_predict_input(
+        forecaster_name="ForecasterRecursive",
+        steps=2,
+        is_fitted=False,
+        exog_in_=False,
+        index_type_=pd.DatetimeIndex,
+        index_freq_="h",
+        window_size=3,
+        last_window=last_window,
+    )
+except RuntimeError as e:
+    print(f"RuntimeError (not fitted): {type(e).__name__}")
+
+# Failure path: steps < 1
+try:
+    check_predict_input(
+        forecaster_name="ForecasterRecursive",
+        steps=0,
+        is_fitted=True,
+        exog_in_=False,
+        index_type_=pd.DatetimeIndex,
+        index_freq_="h",
+        window_size=3,
+        last_window=last_window,
+    )
+except ValueError as e:
+    print(f"ValueError (steps=0): {type(e).__name__}")
+
+# Failure path: exog required but not provided
+try:
+    check_predict_input(
+        forecaster_name="ForecasterRecursive",
+        steps=2,
+        is_fitted=True,
+        exog_in_=True,
+        index_type_=pd.DatetimeIndex,
+        index_freq_="h",
+        window_size=3,
+        last_window=last_window,
+        exog=None,
+    )
+except ValueError as e:
+    print(f"ValueError (missing exog): {type(e).__name__}")
+```
