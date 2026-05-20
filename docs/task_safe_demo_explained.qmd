@@ -55,7 +55,7 @@ The second test confirms that the formatter string `%(name)s` is present in the 
 
 ## Boolean Argument Parsing
 
-Command-line scripts receive all arguments as strings. The `--force_train` and `--logging` flags therefore need a parser that converts user-supplied tokens like `"true"`, `"True"`, `"t"`, `"yes"`, or `"1"` to the Python boolean `True`. The `_parse_bool` function handles this by normalising the input to lowercase before matching against known sets.
+Command-line scripts receive all arguments as strings. The `--force_train` and `--logging` flags therefore need a parser that converts user-supplied tokens like `"true"`, `"True"`, `"t"`, `"yes"`, or `"1"` to the Python boolean `True`. The `parse_bool` function (in `spotforecast2_safe.utils.parse`) handles this by normalising the input to lowercase before matching against known sets.
 
 The `TestBooleanParsing` class checks that all eight canonical true-like strings produce `True`, all eight false-like strings produce `False`, and that an unrecognised input like `"maybe"` raises a `ValueError` rather than silently defaulting. Silent defaulting is precisely the class of failure that safety-critical code must eliminate: if a user miskeys `--force_train mabye`, the process should stop immediately with an informative error rather than silently choosing a default that may trigger unintended retraining.
 
