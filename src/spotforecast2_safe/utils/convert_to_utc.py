@@ -22,13 +22,18 @@ def to_utc_timestamp(value: Union[str, pd.Timestamp]) -> pd.Timestamp:
         A UTC-aware `pandas.Timestamp`.
 
     Examples:
-        >>> from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
-        >>> to_utc_timestamp("2024-01-01")
-        Timestamp('2024-01-01 00:00:00+0000', tz='UTC')
-        >>> import pandas as pd
-        >>> ts = pd.Timestamp("2024-06-15", tz="UTC")
-        >>> to_utc_timestamp(ts) is ts
-        True
+        ```{python}
+        import pandas as pd
+
+        from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
+
+        result = to_utc_timestamp("2024-01-01")
+        print(result)
+        assert result == pd.Timestamp("2024-01-01", tz="UTC")
+
+        ts = pd.Timestamp("2024-06-15", tz="UTC")
+        assert to_utc_timestamp(ts) is ts
+        ```
     """
     if isinstance(value, str):
         return pd.to_datetime(value, utc=True)
@@ -50,13 +55,20 @@ def convert_to_utc(df: pd.DataFrame, timezone: Optional[str]) -> pd.DataFrame:
             timezone is None.
 
     Examples:
-        >>> from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
-        >>> df = pd.DataFrame({"value": [1, 2, 3]}, index=pd.to_datetime(["2022-01-01", "2022-01-02", "2022-01-03"]))
-        >>> convert_to_utc(df, "Europe/Berlin")
-                   value
-        2022-01-01 00:00:00+01:00
-        2022-01-02 00:00:00+01:00
-        2022-01-03 00:00:00+01:00
+        ```{python}
+        import pandas as pd
+
+        from spotforecast2_safe.utils.convert_to_utc import convert_to_utc
+
+        df = pd.DataFrame(
+            {"value": [1, 2, 3]},
+            index=pd.to_datetime(["2022-01-01", "2022-01-02", "2022-01-03"]),
+        )
+        result = convert_to_utc(df, "Europe/Berlin")
+        print(result)
+        assert str(result.index.tz) == "UTC"
+        assert result.index[0] == pd.Timestamp("2021-12-31 23:00:00", tz="UTC")
+        ```
     """
     if not isinstance(df.index, pd.DatetimeIndex):
         raise ValueError(
