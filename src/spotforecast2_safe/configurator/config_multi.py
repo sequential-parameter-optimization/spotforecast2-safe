@@ -263,6 +263,10 @@ class ConfigMulti:
         task: str = "lazy",
         # Aggregation weights (one per target, in target order)
         agg_weights: Optional[List[float]] = None,
+        # Forecaster factory hook (consumed by spotforecast2.multitask.base)
+        forecaster_factory: Optional[Any] = None,
+        # Data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
+        data_loader: Optional[Any] = None,
     ):
         """Initialize ConfigMulti with specified or default parameters."""
         # country_code is the single source of truth for the ISO country code.
@@ -354,6 +358,17 @@ class ConfigMulti:
         self.task = task
         # Aggregation weights (one per target, in target order)
         self.agg_weights = agg_weights
+        # Optional callable consumed by ``spotforecast2.multitask.base``:
+        # ``factory(config, *, weight_func, target) -> forecaster``.  When
+        # ``None``, ``BaseTask.create_forecaster`` falls back to
+        # ``default_lgbm_forecaster_factory``.
+        self.forecaster_factory = forecaster_factory
+        # Optional callable consumed by ``BaseTask.prepare_data``:
+        # ``data_loader(config) -> pd.DataFrame``.  When set, it is invoked iff
+        # no DataFrame is supplied via the constructor or ``prepare_data``.
+        # Enables data-acquisition extensions (e.g. the ENTSO-E API download)
+        # without subclassing ``BaseTask``.
+        self.data_loader = data_loader
 
     @property
     def API_COUNTRY_CODE(self) -> str:
@@ -447,6 +462,10 @@ class ConfigMulti:
             "task": self.task,
             # Aggregation weights
             "agg_weights": self.agg_weights,
+            # Optional forecaster factory hook
+            "forecaster_factory": self.forecaster_factory,
+            # Optional data-loader hook
+            "data_loader": self.data_loader,
         }
 
         # Expose period sub-objects via the '__' notation if deep=True
