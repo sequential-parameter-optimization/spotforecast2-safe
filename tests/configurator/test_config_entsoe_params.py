@@ -7,10 +7,10 @@ from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 
 def test_config_entsoe_get_params():
     """Test get_params returns all expected parameters."""
-    config = ConfigEntsoe(api_country_code="ES", predict_size=12)
+    config = ConfigEntsoe(country_code="ES", predict_size=12)
     params = config.get_params()
 
-    assert params["api_country_code"] == "ES"
+    assert params["country_code"] == "ES"
     assert params["predict_size"] == 12
     assert "random_state" in params
     assert "periods" in params
@@ -26,28 +26,28 @@ def test_config_entsoe_get_params():
 def test_config_entsoe_set_params_kwargs():
     """Test set_params with keyword arguments."""
     config = ConfigEntsoe()
-    config.set_params(api_country_code="FR", predict_size=48)
+    config.set_params(country_code="FR", predict_size=48)
 
-    assert config.API_COUNTRY_CODE == "FR"
+    assert config.country_code == "FR"
     assert config.predict_size == 48
 
 
 def test_config_entsoe_set_params_dict():
     """Test set_params with a dictionary."""
     config = ConfigEntsoe()
-    config.set_params({"api_country_code": "IT", "random_state": 123})
+    config.set_params({"country_code": "IT", "random_state": 123})
 
-    assert config.API_COUNTRY_CODE == "IT"
+    assert config.country_code == "IT"
     assert config.random_state == 123
 
 
 def test_config_entsoe_set_params_chaining():
     """Test set_params supports method chaining."""
     config = (
-        ConfigEntsoe().set_params(api_country_code="GB").set_params(predict_size=72)
+        ConfigEntsoe().set_params(country_code="GB").set_params(predict_size=72)
     )
 
-    assert config.API_COUNTRY_CODE == "GB"
+    assert config.country_code == "GB"
     assert config.predict_size == 72
 
 

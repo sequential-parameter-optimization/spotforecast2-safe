@@ -18,16 +18,12 @@ class ConfigEntsoe:
     (``spotforecast2.tasks.task_entsoe``) and any other single-target pipeline
     routed through ``spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)``.
 
-    ``api_country_code`` is preserved as a constructor keyword and as the
-    ``API_COUNTRY_CODE`` attribute for back-compat with existing CLI scripts;
-    ``country_code`` is the canonical attribute used by the multitask
-    ``PipelineConfig`` protocol, exposed here as a property alias so both
-    names resolve to the same value.
+    ``country_code`` is the canonical ISO 3166-1 alpha-2 country-code
+    attribute used by both API queries and the multitask ``PipelineConfig``
+    protocol.
 
     Args:
-        api_country_code (str): ISO 3166-1 alpha-2 country code (e.g. ``"DE"``).
-            Read via ``config.country_code`` (property alias) or
-            ``config.API_COUNTRY_CODE`` (legacy attribute name).
+        country_code (str): ISO 3166-1 alpha-2 country code (e.g. ``"DE"``).
         periods (Optional[List[Period]]): Cyclical feature encodings.
         lags_consider (Optional[List[int]]): Lag values for autoregressive features.
         train_size (Optional[pd.Timedelta]): Training window.
@@ -85,8 +81,8 @@ class ConfigEntsoe:
             ``download_new_data`` / ``merge_build_manual``.
 
     Attributes:
-        API_COUNTRY_CODE (str): Legacy attribute name; equal to ``country_code``.
-        country_code (str): Canonical country-code attribute (property alias).
+        country_code (str): ISO country code used for API queries and
+            holiday feature generation.
 
     Examples:
         ```{python}
@@ -96,18 +92,16 @@ class ConfigEntsoe:
 
         # Use default configuration
         config = ConfigEntsoe()
-        print(config.API_COUNTRY_CODE)
         print(config.country_code)
         print(config.predict_size)
         print(config.random_state)
 
         # Create custom configuration
         custom_config = ConfigEntsoe(
-            api_country_code="FR",
+            country_code="FR",
             predict_size=48,
             random_state=42,
         )
-        print(custom_config.API_COUNTRY_CODE)
         print(custom_config.country_code)
         print(custom_config.predict_size)
 
@@ -122,7 +116,7 @@ class ConfigEntsoe:
 
     def __init__(
         self,
-        api_country_code: str = "DE",
+        country_code: str = "DE",
         periods: Optional[List[Period]] = None,
         lags_consider: Optional[List[int]] = None,
         train_size: Optional[pd.Timedelta] = None,
@@ -181,10 +175,7 @@ class ConfigEntsoe:
         data_loader: Optional[Any] = None,
     ):
         """Initialize ConfigEntsoe with specified or default parameters."""
-        # API_COUNTRY_CODE is the legacy attribute name; country_code is the
-        # property alias added so the PipelineConfig protocol (which reads
-        # ``country_code``) resolves correctly.
-        self.API_COUNTRY_CODE = api_country_code
+        self.country_code = country_code
 
         # Default periods use deliberate n_periods choices:
         # - daily: n_periods=12 for 24 hours (2:1 ratio) provides 2-hour resolution,
@@ -277,20 +268,6 @@ class ConfigEntsoe:
         # by ``BaseTask.prepare_data`` when no DataFrame is supplied.
         self.data_loader = data_loader
 
-    @property
-    def country_code(self) -> str:
-        """Canonical country-code attribute (alias for ``API_COUNTRY_CODE``).
-
-        Added so the ``PipelineConfig`` protocol consumed by
-        ``spotforecast2.multitask.base.BaseTask`` resolves cleanly against
-        ``ConfigEntsoe``.  Reads and writes flow through ``API_COUNTRY_CODE``.
-        """
-        return self.API_COUNTRY_CODE
-
-    @country_code.setter
-    def country_code(self, value: str) -> None:
-        self.API_COUNTRY_CODE = value
-
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
         Get parameters for this configuration object.
@@ -306,16 +283,16 @@ class ConfigEntsoe:
             ```{python}
             from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 
-            config = ConfigEntsoe(api_country_code="FR")
+            config = ConfigEntsoe(country_code="FR")
             p = config.get_params()
-            print(p["api_country_code"])
+            print(p["country_code"])
             print(p["predict_size"])
-            assert p["api_country_code"] == "FR"
+            assert p["country_code"] == "FR"
             assert p["predict_size"] == 24
             ```
         """
         params = {
-            "api_country_code": self.API_COUNTRY_CODE,
+            "country_code": self.country_code,
             "periods": self.periods,
             "lags_consider": self.lags_consider,
             "train_size": self.train_size,
@@ -407,10 +384,10 @@ class ConfigEntsoe:
             config = ConfigEntsoe()
 
             # Flat parameter setting
-            config.set_params(api_country_code="FR", predict_size=48)
-            print(config.API_COUNTRY_CODE)
+            config.set_params(country_code="FR", predict_size=48)
+            print(config.country_code)
             print(config.predict_size)
-            assert config.API_COUNTRY_CODE == "FR"
+            assert config.country_code == "FR"
             assert config.predict_size == 48
 
             # Deep parameter setting for nested Period objects
@@ -450,9 +427,7 @@ class ConfigEntsoe:
 
         # Set standard parameters first
         for key, value in flat_params.items():
-            if key == "api_country_code":
-                self.API_COUNTRY_CODE = value
-            elif hasattr(self, key):
+            if hasattr(self, key):
                 setattr(self, key, value)
             else:
                 raise ValueError(
