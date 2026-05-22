@@ -13,55 +13,107 @@ configurator.config_entsoe.ConfigEntsoe(
     random_state=314159,
     n_hyperparameters_trials=20,
     data_filename='interim/energy_load.csv',
+    targets=None,
+    use_outlier_detection=True,
+    contamination=0.01,
+    imputation_method='weighted',
+    window_size=72,
+    use_exogenous_features=True,
+    latitude=51.5136,
+    longitude=7.4653,
+    timezone='UTC',
+    state='NW',
+    include_weather_windows=False,
+    include_holiday_features=False,
+    include_poly_features=False,
+    index_name='Time (UTC)',
+    start_download=None,
+    end_download=None,
+    data_start=None,
+    data_end=None,
+    cov_start=None,
+    cov_end=None,
+    bounds=None,
+    verbose=False,
+    cache_home=None,
+    end_train_ts=None,
+    start_train_ts=None,
+    n_trials_optuna=15,
+    n_trials_spotoptim=10,
+    n_initial_spotoptim=5,
+    task='lazy',
+    agg_weights=None,
+    forecaster_factory=None,
+    data_loader=None,
 )
 ```
 
 Configuration for the ENTSO-E forecasting pipeline.
 
-This class manages all configuration parameters for the ENTSO-E task,
-including API settings, training/prediction intervals, and feature
-engineering specifications. All parameters can be customized during
-initialization or used with sensible defaults.
+Single-target counterpart to ``ConfigMulti``.  Used by the ENTSO-E CLI
+(``spotforecast2.tasks.task_entsoe``) and any other single-target pipeline
+routed through ``spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)``.
+
+``api_country_code`` is preserved as a constructor keyword and as the
+``API_COUNTRY_CODE`` attribute for back-compat with existing CLI scripts;
+``country_code`` is the canonical attribute used by the multitask
+``PipelineConfig`` protocol, exposed here as a property alias so both
+names resolve to the same value.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name                     | Type                                                                                                 | Description                                                      | Default                     |
-|--------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|-----------------------------|
-| api_country_code         | [str](`str`)                                                                                         | ISO country code for ENTSO-E API queries.                        | `'DE'`                      |
-| periods                  | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[Period](`spotforecast2_safe.data.Period`)\]\] | List of Period objects defining cyclical feature encodings.      | `None`                      |
-| lags_consider            | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[int](`int`)\]\]                               | List of lag values to consider for feature selection.            | `None`                      |
-| train_size               | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timedelta](`pandas.Timedelta`)\]                      | Time window for training data.                                   | `None`                      |
-| end_train_default        | [str](`str`)                                                                                         | Default end date for training period (ISO format with timezone). | `'2025-12-31 00:00+00:00'`  |
-| delta_val                | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timedelta](`pandas.Timedelta`)\]                      | Validation window size.                                          | `None`                      |
-| predict_size             | [int](`int`)                                                                                         | Number of hours to predict ahead.                                | `24`                        |
-| refit_size               | [int](`int`)                                                                                         | Number of days between model refits.                             | `7`                         |
-| random_state             | [int](`int`)                                                                                         | Random seed for reproducibility.                                 | `314159`                    |
-| n_hyperparameters_trials | [int](`int`)                                                                                         | Number of trials for hyperparameter optimization.                | `20`                        |
-| data_filename            | [str](`str`)                                                                                         | Path to the interim merged data file.                            | `'interim/energy_load.csv'` |
+| Name                     | Type                                                                                                 | Description                                                                                                                                                                                                        | Default                     |
+|--------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| api_country_code         | [str](`str`)                                                                                         | ISO 3166-1 alpha-2 country code (e.g. ``"DE"``). Read via ``config.country_code`` (property alias) or ``config.API_COUNTRY_CODE`` (legacy attribute name).                                                         | `'DE'`                      |
+| periods                  | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[Period](`spotforecast2_safe.data.Period`)\]\] | Cyclical feature encodings.                                                                                                                                                                                        | `None`                      |
+| lags_consider            | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[int](`int`)\]\]                               | Lag values for autoregressive features.                                                                                                                                                                            | `None`                      |
+| train_size               | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timedelta](`pandas.Timedelta`)\]                      | Training window.                                                                                                                                                                                                   | `None`                      |
+| end_train_default        | [str](`str`)                                                                                         | Default end-of-training timestamp (ISO).                                                                                                                                                                           | `'2025-12-31 00:00+00:00'`  |
+| delta_val                | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timedelta](`pandas.Timedelta`)\]                      | Validation window.                                                                                                                                                                                                 | `None`                      |
+| predict_size             | [int](`int`)                                                                                         | Prediction horizon in hours.                                                                                                                                                                                       | `24`                        |
+| refit_size               | [int](`int`)                                                                                         | Refit cadence in days.                                                                                                                                                                                             | `7`                         |
+| random_state             | [int](`int`)                                                                                         | Random seed.                                                                                                                                                                                                       | `314159`                    |
+| n_hyperparameters_trials | [int](`int`)                                                                                         | Hyperparameter-tuning trial budget.                                                                                                                                                                                | `20`                        |
+| data_filename            | [str](`str`)                                                                                         | Path to the merged interim CSV.                                                                                                                                                                                    | `'interim/energy_load.csv'` |
+| targets                  | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[str](`str`)\]\]                               | Active target column names.  ``None`` until set after data loading.  For ENTSO-E this is typically ``["Actual Load"]``.                                                                                            | `None`                      |
+| use_outlier_detection    | [bool](`bool`)                                                                                       | Apply IsolationForest-based outlier removal.  Defaults to ``True``.                                                                                                                                                | `True`                      |
+| contamination            | [float](`float`)                                                                                     | IsolationForest contamination fraction.                                                                                                                                                                            | `0.01`                      |
+| imputation_method        | [str](`str`)                                                                                         | Gap-filling strategy.                                                                                                                                                                                              | `'weighted'`                |
+| window_size              | [int](`int`)                                                                                         | Rolling window for weighted imputation.                                                                                                                                                                            | `72`                        |
+| use_exogenous_features   | [bool](`bool`)                                                                                       | Build weather/calendar/holiday features.                                                                                                                                                                           | `True`                      |
+| latitude                 | [float](`float`)                                                                                     | Location latitude.                                                                                                                                                                                                 | `51.5136`                   |
+| longitude                | [float](`float`)                                                                                     | Location longitude.                                                                                                                                                                                                | `7.4653`                    |
+| timezone                 | [str](`str`)                                                                                         | IANA timezone string.                                                                                                                                                                                              | `'UTC'`                     |
+| state                    | [str](`str`)                                                                                         | Subdivision code for regional holidays.                                                                                                                                                                            | `'NW'`                      |
+| include_weather_windows  | [bool](`bool`)                                                                                       | Weather-window feature toggle.                                                                                                                                                                                     | `False`                     |
+| include_holiday_features | [bool](`bool`)                                                                                       | Holiday feature toggle.                                                                                                                                                                                            | `False`                     |
+| include_poly_features    | [bool](`bool`)                                                                                       | Polynomial-interaction feature toggle.                                                                                                                                                                             | `False`                     |
+| index_name               | [str](`str`)                                                                                         | Datetime column name when the DataFrame index is reset.  ENTSO-E CSVs use ``"Time (UTC)"``; defaults to that.                                                                                                      | `'Time (UTC)'`              |
+| start_download           | [Optional](`typing.Optional`)\[[str](`str`)\]                                                        | Start of the data download range.                                                                                                                                                                                  | `None`                      |
+| end_download             | [Optional](`typing.Optional`)\[[str](`str`)\]                                                        | End of the data download range.                                                                                                                                                                                    | `None`                      |
+| data_start               | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]                      | First pipeline-data timestamp.                                                                                                                                                                                     | `None`                      |
+| data_end                 | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]                      | Last pipeline-data timestamp.                                                                                                                                                                                      | `None`                      |
+| cov_start                | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]                      | Start of the covariate range.                                                                                                                                                                                      | `None`                      |
+| cov_end                  | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]                      | End of the covariate range.                                                                                                                                                                                        | `None`                      |
+| bounds                   | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[tuple](`tuple`)\]\]                           | Per-column outlier bounds.  For single-target ENTSO-E this is typically ``None`` or a single ``[(lower, upper)]`` entry.                                                                                           | `None`                      |
+| verbose                  | [bool](`bool`)                                                                                       | Verbose pipeline output.                                                                                                                                                                                           | `False`                     |
+| cache_home               | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                 | Cache directory override.                                                                                                                                                                                          | `None`                      |
+| end_train_ts             | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]                      | Derived end-of-training.                                                                                                                                                                                           | `None`                      |
+| start_train_ts           | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]                      | Derived start-of-training.                                                                                                                                                                                         | `None`                      |
+| n_trials_optuna          | [int](`int`)                                                                                         | Optuna Bayesian-search trial budget.                                                                                                                                                                               | `15`                        |
+| n_trials_spotoptim       | [int](`int`)                                                                                         | SpotOptim surrogate-search trial budget.                                                                                                                                                                           | `10`                        |
+| n_initial_spotoptim      | [int](`int`)                                                                                         | SpotOptim initial random evaluations.                                                                                                                                                                              | `5`                         |
+| task                     | [str](`str`)                                                                                         | Active prediction task name.                                                                                                                                                                                       | `'lazy'`                    |
+| agg_weights              | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\]                           | Per-target aggregation weights. For single-target use this is typically ``[1.0]`` or ``None``.                                                                                                                     | `None`                      |
+| forecaster_factory       | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                 | Callable ``factory(config, *, weight_func, target) -> forecaster`` consumed by ``BaseTask.create_forecaster``.  ``None`` falls back to the default LightGBM factory.                                               | `None`                      |
+| data_loader              | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                 | Callable ``data_loader(config)`` returning a pandas DataFrame.  Invoked by ``BaseTask.prepare_data`` when no DataFrame is supplied — the ENTSO-E pipeline hook for ``download_new_data`` / ``merge_build_manual``. | `None`                      |
 
 ## Attributes {.doc-section .doc-section-attributes}
 
-| Name                     | Type                                                                | Description                               |
-|--------------------------|---------------------------------------------------------------------|-------------------------------------------|
-| API_COUNTRY_CODE         | [str](`str`)                                                        | ISO country code for API queries.         |
-| periods                  | [List](`typing.List`)\[[Period](`spotforecast2_safe.data.Period`)\] | Cyclical feature encoding specifications. |
-| lags_consider            | [List](`typing.List`)\[[int](`int`)\]                               | Lag values for autoregressive features.   |
-| train_size               | [pd](`pandas`).[Timedelta](`pandas.Timedelta`)                      | Training data window.                     |
-| end_train_default        | [str](`str`)                                                        | Default training end date.                |
-| delta_val                | [pd](`pandas`).[Timedelta](`pandas.Timedelta`)                      | Validation window.                        |
-| predict_size             | [int](`int`)                                                        | Prediction horizon in hours.              |
-| refit_size               | [int](`int`)                                                        | Refit interval in days.                   |
-| random_state             | [int](`int`)                                                        | Random seed.                              |
-| n_hyperparameters_trials | [int](`int`)                                                        | Hyperparameter tuning trials.             |
-
-## Notes {.doc-section .doc-section-notes}
-
-The default period configurations use specific `n_periods` to balance resolution and smoothing:
-- **Daily**: `n_periods=12` (24h) provides ~2h resolution, smoothing hourly noise and halving dimensionality.
-- **Weekly**: `n_periods` typically matches range (1:1) to distinguish day-of-week patterns.
-- **Yearly**: `n_periods=12` (365d) provides ~1 month resolution, capturing broad seasonal trends without overfitting.
-
-See `docs/PERIOD_CONFIGURATION_RATIONALE.md` for a detailed analysis.
+| Name             | Type         | Description                                        |
+|------------------|--------------|----------------------------------------------------|
+| API_COUNTRY_CODE | [str](`str`) | Legacy attribute name; equal to ``country_code``.  |
+| country_code     | [str](`str`) | Canonical country-code attribute (property alias). |
 
 ## Examples {.doc-section .doc-section-examples}
 
@@ -73,6 +125,7 @@ from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 # Use default configuration
 config = ConfigEntsoe()
 print(config.API_COUNTRY_CODE)
+print(config.country_code)
 print(config.predict_size)
 print(config.random_state)
 
@@ -83,6 +136,7 @@ custom_config = ConfigEntsoe(
     random_state=42,
 )
 print(custom_config.API_COUNTRY_CODE)
+print(custom_config.country_code)
 print(custom_config.predict_size)
 
 # Verify training window

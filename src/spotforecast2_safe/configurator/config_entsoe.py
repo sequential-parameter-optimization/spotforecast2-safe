@@ -4,7 +4,7 @@
 """Configuration for ENTSO-E task pipeline."""
 
 from dataclasses import replace
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -14,43 +14,79 @@ from spotforecast2_safe.data import Period
 class ConfigEntsoe:
     """Configuration for the ENTSO-E forecasting pipeline.
 
-    This class manages all configuration parameters for the ENTSO-E task,
-    including API settings, training/prediction intervals, and feature
-    engineering specifications. All parameters can be customized during
-    initialization or used with sensible defaults.
+    Single-target counterpart to ``ConfigMulti``.  Used by the ENTSO-E CLI
+    (``spotforecast2.tasks.task_entsoe``) and any other single-target pipeline
+    routed through ``spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)``.
+
+    ``api_country_code`` is preserved as a constructor keyword and as the
+    ``API_COUNTRY_CODE`` attribute for back-compat with existing CLI scripts;
+    ``country_code`` is the canonical attribute used by the multitask
+    ``PipelineConfig`` protocol, exposed here as a property alias so both
+    names resolve to the same value.
 
     Args:
-        api_country_code (str): ISO country code for ENTSO-E API queries.
-        periods (Optional[List[Period]]): List of Period objects defining cyclical feature encodings.
-        lags_consider (Optional[List[int]]): List of lag values to consider for feature selection.
-        train_size (Optional[pd.Timedelta]): Time window for training data.
-        end_train_default (str): Default end date for training period (ISO format with timezone).
-        delta_val (Optional[pd.Timedelta]): Validation window size.
-        predict_size (int): Number of hours to predict ahead.
-        refit_size (int): Number of days between model refits.
-        random_state (int): Random seed for reproducibility.
-        n_hyperparameters_trials (int): Number of trials for hyperparameter optimization.
-        data_filename (str): Path to the interim merged data file.
+        api_country_code (str): ISO 3166-1 alpha-2 country code (e.g. ``"DE"``).
+            Read via ``config.country_code`` (property alias) or
+            ``config.API_COUNTRY_CODE`` (legacy attribute name).
+        periods (Optional[List[Period]]): Cyclical feature encodings.
+        lags_consider (Optional[List[int]]): Lag values for autoregressive features.
+        train_size (Optional[pd.Timedelta]): Training window.
+        end_train_default (str): Default end-of-training timestamp (ISO).
+        delta_val (Optional[pd.Timedelta]): Validation window.
+        predict_size (int): Prediction horizon in hours.
+        refit_size (int): Refit cadence in days.
+        random_state (int): Random seed.
+        n_hyperparameters_trials (int): Hyperparameter-tuning trial budget.
+        data_filename (str): Path to the merged interim CSV.
+        targets (Optional[List[str]]): Active target column names.  ``None``
+            until set after data loading.  For ENTSO-E this is typically
+            ``["Actual Load"]``.
+        use_outlier_detection (bool): Apply IsolationForest-based outlier
+            removal.  Defaults to ``True``.
+        contamination (float): IsolationForest contamination fraction.
+        imputation_method (str): Gap-filling strategy.
+        window_size (int): Rolling window for weighted imputation.
+        use_exogenous_features (bool): Build weather/calendar/holiday features.
+        latitude (float): Location latitude.
+        longitude (float): Location longitude.
+        timezone (str): IANA timezone string.
+        state (str): Subdivision code for regional holidays.
+        include_weather_windows (bool): Weather-window feature toggle.
+        include_holiday_features (bool): Holiday feature toggle.
+        include_poly_features (bool): Polynomial-interaction feature toggle.
+        index_name (str): Datetime column name when the DataFrame index is
+            reset.  ENTSO-E CSVs use ``"Time (UTC)"``; defaults to that.
+        start_download (Optional[str]): Start of the data download range.
+        end_download (Optional[str]): End of the data download range.
+        data_start (Optional[pd.Timestamp]): First pipeline-data timestamp.
+        data_end (Optional[pd.Timestamp]): Last pipeline-data timestamp.
+        cov_start (Optional[pd.Timestamp]): Start of the covariate range.
+        cov_end (Optional[pd.Timestamp]): End of the covariate range.
+        bounds (Optional[List[tuple]]): Per-column outlier bounds.  For
+            single-target ENTSO-E this is typically ``None`` or a single
+            ``[(lower, upper)]`` entry.
+        verbose (bool): Verbose pipeline output.
+        cache_home (Optional[Any]): Cache directory override.
+        end_train_ts (Optional[pd.Timestamp]): Derived end-of-training.
+        start_train_ts (Optional[pd.Timestamp]): Derived start-of-training.
+        n_trials_optuna (int): Optuna Bayesian-search trial budget.
+        n_trials_spotoptim (int): SpotOptim surrogate-search trial budget.
+        n_initial_spotoptim (int): SpotOptim initial random evaluations.
+        task (str): Active prediction task name.
+        agg_weights (Optional[List[float]]): Per-target aggregation weights.
+            For single-target use this is typically ``[1.0]`` or ``None``.
+        forecaster_factory (Optional[Any]): Callable
+            ``factory(config, *, weight_func, target) -> forecaster``
+            consumed by ``BaseTask.create_forecaster``.  ``None`` falls back
+            to the default LightGBM factory.
+        data_loader (Optional[Any]): Callable ``data_loader(config)`` returning
+            a pandas DataFrame.  Invoked by ``BaseTask.prepare_data`` when no
+            DataFrame is supplied — the ENTSO-E pipeline hook for
+            ``download_new_data`` / ``merge_build_manual``.
 
     Attributes:
-        API_COUNTRY_CODE (str): ISO country code for API queries.
-        periods (List[Period]): Cyclical feature encoding specifications.
-        lags_consider (List[int]): Lag values for autoregressive features.
-        train_size (pd.Timedelta): Training data window.
-        end_train_default (str): Default training end date.
-        delta_val (pd.Timedelta): Validation window.
-        predict_size (int): Prediction horizon in hours.
-        refit_size (int): Refit interval in days.
-        random_state (int): Random seed.
-        n_hyperparameters_trials (int): Hyperparameter tuning trials.
-
-    Notes:
-        The default period configurations use specific `n_periods` to balance resolution and smoothing:
-        - **Daily**: `n_periods=12` (24h) provides ~2h resolution, smoothing hourly noise and halving dimensionality.
-        - **Weekly**: `n_periods` typically matches range (1:1) to distinguish day-of-week patterns.
-        - **Yearly**: `n_periods=12` (365d) provides ~1 month resolution, capturing broad seasonal trends without overfitting.
-
-        See `docs/PERIOD_CONFIGURATION_RATIONALE.md` for a detailed analysis.
+        API_COUNTRY_CODE (str): Legacy attribute name; equal to ``country_code``.
+        country_code (str): Canonical country-code attribute (property alias).
 
     Examples:
         ```{python}
@@ -61,6 +97,7 @@ class ConfigEntsoe:
         # Use default configuration
         config = ConfigEntsoe()
         print(config.API_COUNTRY_CODE)
+        print(config.country_code)
         print(config.predict_size)
         print(config.random_state)
 
@@ -71,6 +108,7 @@ class ConfigEntsoe:
             random_state=42,
         )
         print(custom_config.API_COUNTRY_CODE)
+        print(custom_config.country_code)
         print(custom_config.predict_size)
 
         # Verify training window
@@ -95,8 +133,57 @@ class ConfigEntsoe:
         random_state: int = 314159,
         n_hyperparameters_trials: int = 20,
         data_filename: str = "interim/energy_load.csv",
+        targets: Optional[List[str]] = None,
+        # Outlier detection
+        use_outlier_detection: bool = True,
+        contamination: float = 0.01,
+        # Imputation
+        imputation_method: str = "weighted",
+        window_size: int = 72,
+        # Exogenous features
+        use_exogenous_features: bool = True,
+        latitude: float = 51.5136,
+        longitude: float = 7.4653,
+        timezone: str = "UTC",
+        state: str = "NW",
+        # Feature selection toggles
+        include_weather_windows: bool = False,
+        include_holiday_features: bool = False,
+        include_poly_features: bool = False,
+        # Data source and index
+        index_name: str = "Time (UTC)",
+        start_download: Optional[str] = None,
+        end_download: Optional[str] = None,
+        # Derived date ranges (set after data loading via get_start_end())
+        data_start: Optional[pd.Timestamp] = None,
+        data_end: Optional[pd.Timestamp] = None,
+        cov_start: Optional[pd.Timestamp] = None,
+        cov_end: Optional[pd.Timestamp] = None,
+        # Per-column outlier bounds
+        bounds: Optional[List[tuple]] = None,
+        # Verbosity and caching
+        verbose: bool = False,
+        cache_home: Optional[Any] = None,
+        # Derived training window
+        end_train_ts: Optional[pd.Timestamp] = None,
+        start_train_ts: Optional[pd.Timestamp] = None,
+        # Hyperparameter tuning trial budgets
+        n_trials_optuna: int = 15,
+        n_trials_spotoptim: int = 10,
+        n_initial_spotoptim: int = 5,
+        # Active task
+        task: str = "lazy",
+        # Aggregation weights (single-target uses [1.0] or None)
+        agg_weights: Optional[List[float]] = None,
+        # Forecaster factory hook (consumed by spotforecast2.multitask.base)
+        forecaster_factory: Optional[Any] = None,
+        # Data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
+        data_loader: Optional[Any] = None,
     ):
         """Initialize ConfigEntsoe with specified or default parameters."""
+        # API_COUNTRY_CODE is the legacy attribute name; country_code is the
+        # property alias added so the PipelineConfig protocol (which reads
+        # ``country_code``) resolves correctly.
         self.API_COUNTRY_CODE = api_country_code
 
         # Default periods use deliberate n_periods choices:
@@ -142,6 +229,67 @@ class ConfigEntsoe:
         self.random_state = random_state
         self.n_hyperparameters_trials = n_hyperparameters_trials
         self.data_filename = data_filename
+        self.targets = targets
+        # Outlier detection
+        self.use_outlier_detection = use_outlier_detection
+        self.contamination = contamination
+        # Imputation
+        self.imputation_method = imputation_method
+        self.window_size = window_size
+        # Exogenous features
+        self.use_exogenous_features = use_exogenous_features
+        self.latitude = latitude
+        self.longitude = longitude
+        self.timezone = timezone
+        self.state = state
+        # Feature selection toggles
+        self.include_weather_windows = include_weather_windows
+        self.include_holiday_features = include_holiday_features
+        self.include_poly_features = include_poly_features
+        # Data source and index
+        self.index_name = index_name
+        self.start_download = start_download
+        self.end_download = end_download
+        # Derived date ranges (set after data loading via get_start_end())
+        self.data_start = data_start
+        self.data_end = data_end
+        self.cov_start = cov_start
+        self.cov_end = cov_end
+        # Per-column outlier bounds
+        self.bounds = bounds
+        # Verbosity and caching
+        self.verbose = verbose
+        self.cache_home = cache_home
+        # Derived training window
+        self.end_train_ts = end_train_ts
+        self.start_train_ts = start_train_ts
+        # Hyperparameter tuning trial budgets
+        self.n_trials_optuna = n_trials_optuna
+        self.n_trials_spotoptim = n_trials_spotoptim
+        self.n_initial_spotoptim = n_initial_spotoptim
+        # Active task
+        self.task = task
+        # Aggregation weights
+        self.agg_weights = agg_weights
+        # Optional callable ``factory(config, *, weight_func, target) -> forecaster``.
+        self.forecaster_factory = forecaster_factory
+        # Optional callable ``data_loader(config) -> pd.DataFrame`` invoked
+        # by ``BaseTask.prepare_data`` when no DataFrame is supplied.
+        self.data_loader = data_loader
+
+    @property
+    def country_code(self) -> str:
+        """Canonical country-code attribute (alias for ``API_COUNTRY_CODE``).
+
+        Added so the ``PipelineConfig`` protocol consumed by
+        ``spotforecast2.multitask.base.BaseTask`` resolves cleanly against
+        ``ConfigEntsoe``.  Reads and writes flow through ``API_COUNTRY_CODE``.
+        """
+        return self.API_COUNTRY_CODE
+
+    @country_code.setter
+    def country_code(self, value: str) -> None:
+        self.API_COUNTRY_CODE = value
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
@@ -178,6 +326,51 @@ class ConfigEntsoe:
             "random_state": self.random_state,
             "n_hyperparameters_trials": self.n_hyperparameters_trials,
             "data_filename": self.data_filename,
+            "targets": self.targets,
+            # Outlier detection
+            "use_outlier_detection": self.use_outlier_detection,
+            "contamination": self.contamination,
+            # Imputation
+            "imputation_method": self.imputation_method,
+            "window_size": self.window_size,
+            # Exogenous features
+            "use_exogenous_features": self.use_exogenous_features,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "timezone": self.timezone,
+            "state": self.state,
+            # Feature selection toggles
+            "include_weather_windows": self.include_weather_windows,
+            "include_holiday_features": self.include_holiday_features,
+            "include_poly_features": self.include_poly_features,
+            # Data source and index
+            "index_name": self.index_name,
+            "start_download": self.start_download,
+            "end_download": self.end_download,
+            # Derived date ranges
+            "data_start": self.data_start,
+            "data_end": self.data_end,
+            "cov_start": self.cov_start,
+            "cov_end": self.cov_end,
+            # Per-column outlier bounds
+            "bounds": self.bounds,
+            # Verbosity and caching
+            "verbose": self.verbose,
+            "cache_home": self.cache_home,
+            # Derived training window
+            "end_train_ts": self.end_train_ts,
+            "start_train_ts": self.start_train_ts,
+            # Hyperparameter tuning trial budgets
+            "n_trials_optuna": self.n_trials_optuna,
+            "n_trials_spotoptim": self.n_trials_spotoptim,
+            "n_initial_spotoptim": self.n_initial_spotoptim,
+            # Active task
+            "task": self.task,
+            # Aggregation weights
+            "agg_weights": self.agg_weights,
+            # Optional hooks
+            "forecaster_factory": self.forecaster_factory,
+            "data_loader": self.data_loader,
         }
 
         # Expose period sub-objects via the '__' notation if deep=True
