@@ -7,7 +7,7 @@ from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 def test_config_entsoe_defaults():
     """Test that ConfigEntsoe initializes with correct defaults."""
     config = ConfigEntsoe()
-    assert config.API_COUNTRY_CODE == "DE"
+    assert config.country_code == "DE"
     assert config.predict_size == 24
     assert config.refit_size == 7
     assert config.random_state == 314159
@@ -22,9 +22,9 @@ def test_config_entsoe_custom():
         Period(name="test", n_periods=1, column="col", input_range=(0, 1))
     ]
     config = ConfigEntsoe(
-        api_country_code="FR", predict_size=48, random_state=42, periods=custom_periods
+        country_code="FR", predict_size=48, random_state=42, periods=custom_periods
     )
-    assert config.API_COUNTRY_CODE == "FR"
+    assert config.country_code == "FR"
     assert config.predict_size == 48
     assert config.random_state == 42
     assert config.periods == custom_periods

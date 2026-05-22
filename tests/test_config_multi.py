@@ -40,10 +40,6 @@ class TestConfigMultiDefaults:
     def test_country_code_default(self):
         assert _default().country_code == "DE"
 
-    def test_api_country_code_property_returns_country_code(self):
-        """API_COUNTRY_CODE is a read-only property aliasing country_code."""
-        assert _default().API_COUNTRY_CODE == "DE"
-
     def test_predict_size_default(self):
         assert _default().predict_size == 24
 
@@ -108,10 +104,6 @@ class TestConfigMultiCustomInit:
     def test_custom_country_code(self):
         cfg = ConfigMulti(country_code="FR")
         assert cfg.country_code == "FR"
-
-    def test_api_country_code_reflects_country_code(self):
-        cfg = ConfigMulti(country_code="FR")
-        assert cfg.API_COUNTRY_CODE == "FR"
 
     def test_custom_predict_size(self):
         cfg = ConfigMulti(predict_size=48)
@@ -235,7 +227,6 @@ class TestConfigMultiSetParamsFlat:
         cfg = _default()
         cfg.set_params(country_code="PL")
         assert cfg.country_code == "PL"
-        assert cfg.API_COUNTRY_CODE == "PL"
 
     def test_set_predict_size_via_kwargs(self):
         cfg = _default()
@@ -471,46 +462,30 @@ class TestConfigMultiTargets:
 
 
 # ---------------------------------------------------------------------------
-# country_code / API_COUNTRY_CODE
+# country_code
 # ---------------------------------------------------------------------------
 
 
 class TestConfigMultiCountryCode:
-    """Verify country_code is the single source of truth; API_COUNTRY_CODE is a property alias."""
+    """``country_code`` is the single canonical attribute (no API_COUNTRY_CODE alias)."""
 
     def test_country_code_default(self):
         assert _default().country_code == "DE"
 
-    def test_api_country_code_property_matches_country_code(self):
-        assert _default().API_COUNTRY_CODE == _default().country_code
-
-    def test_custom_country_code_reflected_in_property(self):
-        cfg = ConfigMulti(country_code="FR")
-        assert cfg.API_COUNTRY_CODE == "FR"
-
-    def test_api_country_code_is_property(self):
-        """API_COUNTRY_CODE must be a property, not a mutable instance attribute."""
-        assert isinstance(type(_default()).__dict__["API_COUNTRY_CODE"], property)
-
-    def test_api_country_code_cannot_be_set_directly(self):
-        """Setting API_COUNTRY_CODE directly must raise AttributeError (read-only property)."""
-        cfg = _default()
-        with pytest.raises(AttributeError):
-            cfg.API_COUNTRY_CODE = "ES"
-
-    def test_set_params_country_code_updates_property(self):
+    def test_set_params_country_code(self):
         cfg = _default()
         cfg.set_params(country_code="IT")
-        assert cfg.API_COUNTRY_CODE == "IT"
+        assert cfg.country_code == "IT"
 
     def test_country_code_in_get_params(self):
         cfg = ConfigMulti(country_code="ES")
         assert cfg.get_params()["country_code"] == "ES"
 
-    def test_api_country_code_not_in_get_params(self):
-        """api_country_code was removed; only country_code should appear."""
-        p = _default().get_params()
-        assert "api_country_code" not in p
+    def test_api_country_code_alias_removed(self):
+        """API_COUNTRY_CODE was removed in Step 1.5; only country_code remains."""
+        cfg = _default()
+        assert not hasattr(cfg, "API_COUNTRY_CODE")
+        assert "api_country_code" not in cfg.get_params()
 
 
 # ---------------------------------------------------------------------------

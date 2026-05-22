@@ -140,7 +140,6 @@ class ForecasterRecursiveModel:
     # Only entries where the names differ need to be listed; identical
     # names are forwarded as-is by from_config().
     _CONFIG_ATTR_MAP: Dict[str, str] = {
-        "API_COUNTRY_CODE": "country_code",
         "end_train_default": "end_dev",
     }
 
@@ -151,9 +150,8 @@ class ForecasterRecursiveModel:
         """Create a model instance with defaults drawn from a config object.
 
         Extracts every ``__init__`` parameter that exists as a config
-        attribute, translating the two known name mismatches
-        (``API_COUNTRY_CODE`` → ``country_code``,
-        ``end_train_default`` → ``end_dev``).  Caller-supplied
+        attribute, translating the one known name mismatch
+        (``end_train_default`` → ``end_dev``).  Caller-supplied
         *overrides* take precedence over config values.
 
         Args:

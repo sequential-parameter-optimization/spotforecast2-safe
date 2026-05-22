@@ -73,19 +73,13 @@ def test_pipeline_protocol_field_default(field, default):
     )
 
 
-def test_country_code_property_aliases_api_country_code():
-    """The ``country_code`` property mirrors ``API_COUNTRY_CODE`` in both
-    directions (PipelineConfig reads ``country_code``; legacy callers read
-    ``API_COUNTRY_CODE``)."""
-    config = ConfigEntsoe(api_country_code="FR")
+def test_country_code_constructor_kwarg_and_attribute():
+    """``country_code`` is the single canonical attribute."""
+    config = ConfigEntsoe(country_code="FR")
     assert config.country_code == "FR"
-    assert config.API_COUNTRY_CODE == "FR"
 
     config.country_code = "ES"
-    assert config.API_COUNTRY_CODE == "ES"
-
-    config.API_COUNTRY_CODE = "IT"
-    assert config.country_code == "IT"
+    assert config.country_code == "ES"
 
 
 def test_forecaster_factory_stores_callable_verbatim():

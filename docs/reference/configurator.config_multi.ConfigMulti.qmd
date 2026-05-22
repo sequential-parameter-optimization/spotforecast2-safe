@@ -56,8 +56,7 @@ engineering specifications. All parameters can be customized during
 initialization or used with sensible defaults.
 
 ``country_code`` serves as the single ISO country code used for both
-API queries (exposed via the ``API_COUNTRY_CODE`` property for backward
-compatibility) and holiday feature generation.
+API queries and holiday feature generation.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
@@ -109,7 +108,6 @@ compatibility) and holiday feature generation.
 
 | Name                     | Type                                                                            | Description                                                                                                                                                     |
 |--------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| API_COUNTRY_CODE         | [str](`str`)                                                                    | Read-only property — returns ``country_code``. Preserved for backward compatibility with ``ForecasterRecursiveModel``.                                          |
 | country_code             | [str](`str`)                                                                    | ISO country code for API queries and holiday generation.                                                                                                        |
 | periods                  | [List](`typing.List`)\[[Period](`spotforecast2_safe.data.Period`)\]             | Cyclical feature encoding specifications.                                                                                                                       |
 | lags_consider            | [List](`typing.List`)\[[int](`int`)\]                                           | Lag values for autoregressive features.                                                                                                                         |
@@ -167,7 +165,6 @@ import pandas as pd
 from spotforecast2_safe.configurator.config_multi import ConfigMulti
 config = ConfigMulti()
 print(f"country_code: {config.country_code}")
-print(f"API_COUNTRY_CODE: {config.API_COUNTRY_CODE}")
 print(f"Predict size: {config.predict_size}")
 print(f"Random state: {config.random_state}")
 print(f"Targets (default): {config.targets}")
@@ -204,7 +201,6 @@ custom_config = ConfigMulti(
     index_name="DateTime",
 )
 print(f"country_code: {custom_config.country_code}")
-print(f"API_COUNTRY_CODE: {custom_config.API_COUNTRY_CODE}")
 print(f"Predict size: {custom_config.predict_size}")
 print(f"Random state: {custom_config.random_state}")
 print(f"Targets: {custom_config.targets}")
@@ -290,7 +286,6 @@ from spotforecast2_safe.configurator.config_multi import ConfigMulti
 config = ConfigMulti()
 _ = config.set_params(country_code="FR", predict_size=48)
 print(f"country_code: {config.country_code}")
-print(f"API_COUNTRY_CODE: {config.API_COUNTRY_CODE}")
 print(f"Predict size: {config.predict_size}")
 print(f"Random state: {config.random_state}")
 

@@ -20,8 +20,7 @@ class ConfigMulti:
     initialization or used with sensible defaults.
 
     ``country_code`` serves as the single ISO country code used for both
-    API queries (exposed via the ``API_COUNTRY_CODE`` property for backward
-    compatibility) and holiday feature generation.
+    API queries and holiday feature generation.
 
     Args:
         country_code (str): ISO 3166-1 alpha-2 country code (e.g. ``"DE"``).
@@ -96,8 +95,6 @@ class ConfigMulti:
             pre-defined; set after loading the dataset).
 
     Attributes:
-        API_COUNTRY_CODE (str): Read-only property — returns ``country_code``.
-            Preserved for backward compatibility with ``ForecasterRecursiveModel``.
         country_code (str): ISO country code for API queries and holiday generation.
         periods (List[Period]): Cyclical feature encoding specifications.
         lags_consider (List[int]): Lag values for autoregressive features.
@@ -157,7 +154,6 @@ class ConfigMulti:
         from spotforecast2_safe.configurator.config_multi import ConfigMulti
         config = ConfigMulti()
         print(f"country_code: {config.country_code}")
-        print(f"API_COUNTRY_CODE: {config.API_COUNTRY_CODE}")
         print(f"Predict size: {config.predict_size}")
         print(f"Random state: {config.random_state}")
         print(f"Targets (default): {config.targets}")
@@ -194,7 +190,6 @@ class ConfigMulti:
             index_name="DateTime",
         )
         print(f"country_code: {custom_config.country_code}")
-        print(f"API_COUNTRY_CODE: {custom_config.API_COUNTRY_CODE}")
         print(f"Predict size: {custom_config.predict_size}")
         print(f"Random state: {custom_config.random_state}")
         print(f"Targets: {custom_config.targets}")
@@ -269,8 +264,6 @@ class ConfigMulti:
         data_loader: Optional[Any] = None,
     ):
         """Initialize ConfigMulti with specified or default parameters."""
-        # country_code is the single source of truth for the ISO country code.
-        # API_COUNTRY_CODE is a property alias for backward compatibility.
         self.country_code = country_code
 
         # Default periods use deliberate n_periods choices:
@@ -369,16 +362,6 @@ class ConfigMulti:
         # Enables data-acquisition extensions (e.g. the ENTSO-E API download)
         # without subclassing ``BaseTask``.
         self.data_loader = data_loader
-
-    @property
-    def API_COUNTRY_CODE(self) -> str:
-        """Read-only alias for ``country_code``.
-
-        Preserved for backward compatibility with ``ForecasterRecursiveModel``,
-        which reads ``config.API_COUNTRY_CODE`` via its ``_CONFIG_ATTR_MAP``.
-        Use ``country_code`` for all new code.
-        """
-        return self.country_code
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
@@ -501,7 +484,6 @@ class ConfigMulti:
             config = ConfigMulti()
             _ = config.set_params(country_code="FR", predict_size=48)
             print(f"country_code: {config.country_code}")
-            print(f"API_COUNTRY_CODE: {config.API_COUNTRY_CODE}")
             print(f"Predict size: {config.predict_size}")
             print(f"Random state: {config.random_state}")
 
