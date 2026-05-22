@@ -1374,7 +1374,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
@@ -1419,9 +1418,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">314159</span>,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    n_hyperparameters_trials<span class="op">=</span><span class="dv">20</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    data_filename<span class="op">=</span><span class="st">'interim/energy_load.csv'</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    targets<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    use_outlier_detection<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.01</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    imputation_method<span class="op">=</span><span class="st">'weighted'</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    use_exogenous_features<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">'NW'</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    include_poly_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    index_name<span class="op">=</span><span class="st">'Time (UTC)'</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    start_download<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    end_download<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    data_start<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    data_end<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the ENTSO-E forecasting pipeline.</p>
-<p>This class manages all configuration parameters for the ENTSO-E task, including API settings, training/prediction intervals, and feature engineering specifications. All parameters can be customized during initialization or used with sensible defaults.</p>
+<p>Single-target counterpart to <code>ConfigMulti</code>. Used by the ENTSO-E CLI (<code>spotforecast2.tasks.task_entsoe</code>) and any other single-target pipeline routed through <code>spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)</code>.</p>
+<p><code>api_country_code</code> is preserved as a constructor keyword and as the <code>API_COUNTRY_CODE</code> attribute for back-compat with existing CLI scripts; <code>country_code</code> is the canonical attribute used by the multitask <code>PipelineConfig</code> protocol, exposed here as a property alias so both names resolve to the same value.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1437,68 +1469,260 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>api_country_code</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>ISO country code for ENTSO-E API queries.</td>
+<td>ISO 3166-1 alpha-2 country code (e.g.&nbsp;<code>"DE"</code>). Read via <code>config.country_code</code> (property alias) or <code>config.API_COUNTRY_CODE</code> (legacy attribute name).</td>
 <td><code>'DE'</code></td>
 </tr>
 <tr class="even">
 <td>periods</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<code>Period</code>]]</td>
-<td>List of Period objects defining cyclical feature encodings.</td>
+<td>Cyclical feature encodings.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>lags_consider</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]]</td>
-<td>List of lag values to consider for feature selection.</td>
+<td>Lag values for autoregressive features.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>train_size</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a>]</td>
-<td>Time window for training data.</td>
+<td>Training window.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>end_train_default</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Default end date for training period (ISO format with timezone).</td>
+<td>Default end-of-training timestamp (ISO).</td>
 <td><code>'2025-12-31 00:00+00:00'</code></td>
 </tr>
 <tr class="even">
 <td>delta_val</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a>]</td>
-<td>Validation window size.</td>
+<td>Validation window.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>predict_size</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Number of hours to predict ahead.</td>
+<td>Prediction horizon in hours.</td>
 <td><code>24</code></td>
 </tr>
 <tr class="even">
 <td>refit_size</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Number of days between model refits.</td>
+<td>Refit cadence in days.</td>
 <td><code>7</code></td>
 </tr>
 <tr class="odd">
 <td>random_state</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Random seed for reproducibility.</td>
+<td>Random seed.</td>
 <td><code>314159</code></td>
 </tr>
 <tr class="even">
 <td>n_hyperparameters_trials</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Number of trials for hyperparameter optimization.</td>
+<td>Hyperparameter-tuning trial budget.</td>
 <td><code>20</code></td>
 </tr>
 <tr class="odd">
 <td>data_filename</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Path to the interim merged data file.</td>
+<td>Path to the merged interim CSV.</td>
 <td><code>'interim/energy_load.csv'</code></td>
+</tr>
+<tr class="even">
+<td>targets</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]]</td>
+<td>Active target column names. <code>None</code> until set after data loading. For ENTSO-E this is typically <code>["Actual Load"]</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>use_outlier_detection</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Apply IsolationForest-based outlier removal. Defaults to <code>True</code>.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>contamination</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>IsolationForest contamination fraction.</td>
+<td><code>0.01</code></td>
+</tr>
+<tr class="odd">
+<td>imputation_method</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Gap-filling strategy.</td>
+<td><code>'weighted'</code></td>
+</tr>
+<tr class="even">
+<td>window_size</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Rolling window for weighted imputation.</td>
+<td><code>72</code></td>
+</tr>
+<tr class="odd">
+<td>use_exogenous_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Build weather/calendar/holiday features.</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td>latitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Location latitude.</td>
+<td><code>51.5136</code></td>
+</tr>
+<tr class="odd">
+<td>longitude</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>Location longitude.</td>
+<td><code>7.4653</code></td>
+</tr>
+<tr class="even">
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>IANA timezone string.</td>
+<td><code>'UTC'</code></td>
+</tr>
+<tr class="odd">
+<td>state</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Subdivision code for regional holidays.</td>
+<td><code>'NW'</code></td>
+</tr>
+<tr class="even">
+<td>include_weather_windows</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Weather-window feature toggle.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>include_holiday_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Holiday feature toggle.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>include_poly_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Polynomial-interaction feature toggle.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>index_name</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Datetime column name when the DataFrame index is reset. ENTSO-E CSVs use <code>"Time (UTC)"</code>; defaults to that.</td>
+<td><code>'Time (UTC)'</code></td>
+</tr>
+<tr class="even">
+<td>start_download</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
+<td>Start of the data download range.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>end_download</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
+<td>End of the data download range.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>data_start</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>First pipeline-data timestamp.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>data_end</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Last pipeline-data timestamp.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>cov_start</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Start of the covariate range.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>cov_end</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>End of the covariate range.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>bounds</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>]]</td>
+<td>Per-column outlier bounds. For single-target ENTSO-E this is typically <code>None</code> or a single <code>[(lower, upper)]</code> entry.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>Verbose pipeline output.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>cache_home</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Cache directory override.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>end_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Derived end-of-training.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>start_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Derived start-of-training.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>n_trials_optuna</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Optuna Bayesian-search trial budget.</td>
+<td><code>15</code></td>
+</tr>
+<tr class="even">
+<td>n_trials_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>SpotOptim surrogate-search trial budget.</td>
+<td><code>10</code></td>
+</tr>
+<tr class="odd">
+<td>n_initial_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>SpotOptim initial random evaluations.</td>
+<td><code>5</code></td>
+</tr>
+<tr class="even">
+<td>task</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Active prediction task name.</td>
+<td><code>'lazy'</code></td>
+</tr>
+<tr class="odd">
+<td>agg_weights</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]]</td>
+<td>Per-target aggregation weights. For single-target use this is typically <code>[1.0]</code> or <code>None</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>forecaster_factory</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Callable <code>factory(config, *, weight_func, target) -&gt; forecaster</code> consumed by <code>BaseTask.create_forecaster</code>. <code>None</code> falls back to the default LightGBM factory.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>data_loader</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
+<td>Callable <code>data_loader(config)</code> returning a pandas DataFrame. Invoked by <code>BaseTask.prepare_data</code> when no DataFrame is supplied — the ENTSO-E pipeline hook for <code>download_new_data</code> / <code>merge_build_manual</code>.</td>
+<td><code>None</code></td>
 </tr>
 </tbody>
 </table>
@@ -1517,64 +1741,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>API_COUNTRY_CODE</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>ISO country code for API queries.</td>
+<td>Legacy attribute name; equal to <code>country_code</code>.</td>
 </tr>
 <tr class="even">
-<td>periods</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<code>Period</code>]</td>
-<td>Cyclical feature encoding specifications.</td>
-</tr>
-<tr class="odd">
-<td>lags_consider</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]</td>
-<td>Lag values for autoregressive features.</td>
-</tr>
-<tr class="even">
-<td>train_size</td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a></td>
-<td>Training data window.</td>
-</tr>
-<tr class="odd">
-<td>end_train_default</td>
+<td>country_code</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Default training end date.</td>
-</tr>
-<tr class="even">
-<td>delta_val</td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a></td>
-<td>Validation window.</td>
-</tr>
-<tr class="odd">
-<td>predict_size</td>
-<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Prediction horizon in hours.</td>
-</tr>
-<tr class="even">
-<td>refit_size</td>
-<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Refit interval in days.</td>
-</tr>
-<tr class="odd">
-<td>random_state</td>
-<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Random seed.</td>
-</tr>
-<tr class="even">
-<td>n_hyperparameters_trials</td>
-<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
-<td>Hyperparameter tuning trials.</td>
+<td>Canonical country-code attribute (property alias).</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="notes" class="level2 doc-section doc-section-notes">
-<h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
-<p>The default period configurations use specific <code>n_periods</code> to balance resolution and smoothing: - <strong>Daily</strong>: <code>n_periods=12</code> (24h) provides ~2h resolution, smoothing hourly noise and halving dimensionality. - <strong>Weekly</strong>: <code>n_periods</code> typically matches range (1:1) to distinguish day-of-week patterns. - <strong>Yearly</strong>: <code>n_periods=12</code> (365d) provides ~1 month resolution, capturing broad seasonal trends without overfitting.</p>
-<p>See <code>docs/PERIOD_CONFIGURATION_RATIONALE.md</code> for a detailed analysis.</p>
-</section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="075d4231" class="cell" data-execution_count="1">
+<div id="bf9e3f3b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
@@ -1582,28 +1761,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use default configuration</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.API_COUNTRY_CODE)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.predict_size)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.random_state)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create custom configuration</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>custom_config <span class="op">=</span> ConfigEntsoe(</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    api_country_code<span class="op">=</span><span class="st">"FR"</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">48</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.API_COUNTRY_CODE)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.predict_size)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify training window</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.train_size <span class="op">==</span> pd.Timedelta(days<span class="op">=</span><span class="dv">3</span> <span class="op">*</span> <span class="dv">365</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Check default periods</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(config.periods))</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.periods[<span class="dv">0</span>].name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.country_code)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.predict_size)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.random_state)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create custom configuration</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>custom_config <span class="op">=</span> ConfigEntsoe(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    api_country_code<span class="op">=</span><span class="st">"FR"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">48</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.API_COUNTRY_CODE)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.country_code)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.predict_size)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify training window</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.train_size <span class="op">==</span> pd.Timedelta(days<span class="op">=</span><span class="dv">3</span> <span class="op">*</span> <span class="dv">365</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Check default periods</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(config.periods))</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.periods[<span class="dv">0</span>].name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DE
+DE
 24
 314159
+FR
 FR
 48
 5
@@ -1677,7 +1860,7 @@ daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="3f67fe16" class="cell" data-execution_count="2">
+<div id="bc2dccf3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe(api_country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
@@ -1745,7 +1928,7 @@ daily</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="efe8d7db" class="cell" data-execution_count="3">
+<div id="00e22672" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
