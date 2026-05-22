@@ -1,3 +1,10 @@
+## [13.0.3-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.2...v13.0.3-rc.1) (2026-05-22)
+
+
+### Code Refactoring
+
+* step 1.5 ([600b9cc](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/600b9cc8d06afd728eb3dbc6d970aeeb4afd6c69))
+
 ## [13.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.1...v13.0.2) (2026-05-22)
 
 
