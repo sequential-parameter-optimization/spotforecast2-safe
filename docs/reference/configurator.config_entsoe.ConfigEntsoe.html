@@ -1407,7 +1407,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>configurator.config_entsoe.ConfigEntsoe(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    api_country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    lags_consider<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    train_size<span class="op">=</span><span class="va">None</span>,</span>
@@ -1453,7 +1453,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the ENTSO-E forecasting pipeline.</p>
 <p>Single-target counterpart to <code>ConfigMulti</code>. Used by the ENTSO-E CLI (<code>spotforecast2.tasks.task_entsoe</code>) and any other single-target pipeline routed through <code>spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)</code>.</p>
-<p><code>api_country_code</code> is preserved as a constructor keyword and as the <code>API_COUNTRY_CODE</code> attribute for back-compat with existing CLI scripts; <code>country_code</code> is the canonical attribute used by the multitask <code>PipelineConfig</code> protocol, exposed here as a property alias so both names resolve to the same value.</p>
+<p><code>country_code</code> is the canonical ISO 3166-1 alpha-2 country-code attribute used by both API queries and the multitask <code>PipelineConfig</code> protocol.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1467,9 +1467,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>api_country_code</td>
+<td>country_code</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>ISO 3166-1 alpha-2 country code (e.g.&nbsp;<code>"DE"</code>). Read via <code>config.country_code</code> (property alias) or <code>config.API_COUNTRY_CODE</code> (legacy attribute name).</td>
+<td>ISO 3166-1 alpha-2 country code (e.g.&nbsp;<code>"DE"</code>).</td>
 <td><code>'DE'</code></td>
 </tr>
 <tr class="even">
@@ -1739,54 +1739,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>API_COUNTRY_CODE</td>
-<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Legacy attribute name; equal to <code>country_code</code>.</td>
-</tr>
-<tr class="even">
 <td>country_code</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Canonical country-code attribute (property alias).</td>
+<td>ISO country code used for API queries and holiday feature generation.</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="38a8e299" class="cell" data-execution_count="1">
+<div id="9a278d17" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use default configuration</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.API_COUNTRY_CODE)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.country_code)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.predict_size)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.random_state)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create custom configuration</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>custom_config <span class="op">=</span> ConfigEntsoe(</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    api_country_code<span class="op">=</span><span class="st">"FR"</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">48</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.API_COUNTRY_CODE)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.country_code)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.predict_size)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify training window</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.train_size <span class="op">==</span> pd.Timedelta(days<span class="op">=</span><span class="dv">3</span> <span class="op">*</span> <span class="dv">365</span>)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Check default periods</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(config.periods))</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.periods[<span class="dv">0</span>].name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.country_code)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.predict_size)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.random_state)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create custom configuration</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>custom_config <span class="op">=</span> ConfigEntsoe(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"FR"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">48</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.country_code)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(custom_config.predict_size)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify training window</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.train_size <span class="op">==</span> pd.Timedelta(days<span class="op">=</span><span class="dv">3</span> <span class="op">*</span> <span class="dv">365</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Check default periods</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(config.periods))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.periods[<span class="dv">0</span>].name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DE
-DE
 24
 314159
-FR
 FR
 48
 5
@@ -1860,14 +1851,14 @@ daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="275a9c62" class="cell" data-execution_count="2">
+<div id="d017b97f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe(api_country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(p[<span class="st">"api_country_code"</span>])</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(p[<span class="st">"country_code"</span>])</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(p[<span class="st">"predict_size"</span>])</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> p[<span class="st">"api_country_code"</span>] <span class="op">==</span> <span class="st">"FR"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> p[<span class="st">"country_code"</span>] <span class="op">==</span> <span class="st">"FR"</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> p[<span class="st">"predict_size"</span>] <span class="op">==</span> <span class="dv">24</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>FR
@@ -1928,16 +1919,16 @@ daily</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="131a0727" class="cell" data-execution_count="3">
+<div id="d11c9b81" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Flat parameter setting</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>config.set_params(api_country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.API_COUNTRY_CODE)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.country_code)</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(config.predict_size)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.API_COUNTRY_CODE <span class="op">==</span> <span class="st">"FR"</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.country_code <span class="op">==</span> <span class="st">"FR"</span></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> config.predict_size <span class="op">==</span> <span class="dv">48</span></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Deep parameter setting for nested Period objects</span></span>
