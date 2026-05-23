@@ -1,3 +1,10 @@
+## [13.1.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.1.0-rc.1...v13.1.0-rc.2) (2026-05-23)
+
+
+### Features
+
+* opt-in fail-safe handling for Open-Meteo failures ([70e310d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/70e310d5bf8cfcca0e594489fc1aa5a5d91df35c))
+
 ## [13.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.3-rc.1...v13.1.0-rc.1) (2026-05-23)
 
 
