@@ -4,7 +4,7 @@
 """Configuration for ENTSO-E task pipeline."""
 
 from dataclasses import replace
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 import pandas as pd
 
@@ -88,6 +88,13 @@ class ConfigEntsoe:
         number_folds (int): Number of folds used by ``BaseTask.cv_ts`` when
             building the ``TimeSeriesSplit`` cross-validation splitter for
             tuning tasks.  Defaults to ``10``.
+        on_weather_failure (Literal["raise", "skip"]): Policy for handling
+            Open-Meteo fetch failures inside
+            ``BaseTask.build_exogenous_features``.  ``"raise"`` (default)
+            aborts the pipeline with a ``WeatherFetchError`` and preserves
+            the safety-critical fail-safe semantics.  ``"skip"`` logs a
+            warning and continues with empty weather features so the rest
+            of the pipeline can run without the Open-Meteo dependency.
 
     Attributes:
         country_code (str): ISO country code used for API queries and
@@ -97,6 +104,8 @@ class ConfigEntsoe:
         data_frame_name (str): Active-dataset identifier used for cache and
             log-file naming.
         number_folds (int): Cross-validation fold count for tuning tasks.
+        on_weather_failure (Literal["raise", "skip"]): Open-Meteo fetch-failure
+            policy: ``"raise"`` aborts, ``"skip"`` continues without weather.
 
     Examples:
         ```{python}
@@ -192,6 +201,8 @@ class ConfigEntsoe:
         data_frame_name: str = "default",
         # Cross-validation fold count (consumed by spotforecast2.multitask.base.cv_ts)
         number_folds: int = 10,
+        # Weather-fetch failure policy (consumed by spotforecast2.multitask.base.build_exogenous_features)
+        on_weather_failure: Literal["raise", "skip"] = "raise",
     ):
         """Initialize ConfigEntsoe with specified or default parameters."""
         self.country_code = country_code
@@ -297,6 +308,11 @@ class ConfigEntsoe:
         # Number of TimeSeriesSplit folds used by ``BaseTask.cv_ts`` when
         # building cross-validation splitters for tuning tasks.
         self.number_folds = number_folds
+        # Policy for Open-Meteo fetch failures consumed by
+        # ``BaseTask.build_exogenous_features``: ``"raise"`` aborts the
+        # pipeline (default, preserves fail-safe semantics); ``"skip"``
+        # logs a warning and continues without weather features.
+        self.on_weather_failure = on_weather_failure
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
@@ -383,6 +399,8 @@ class ConfigEntsoe:
             "data_frame_name": self.data_frame_name,
             # Cross-validation fold count
             "number_folds": self.number_folds,
+            # Weather-fetch failure policy
+            "on_weather_failure": self.on_weather_failure,
         }
 
         # Expose period sub-objects via the '__' notation if deep=True

@@ -55,7 +55,12 @@ Threat model (STRIDE).
       whose threat model is owned by the host operating system.
 """
 
-from .client import WeatherClient, WeatherService
+from .client import WeatherClient, WeatherFetchError, WeatherService
 from .features import get_weather_features
 
-__all__ = ["WeatherClient", "WeatherService", "get_weather_features"]
+__all__ = [
+    "WeatherClient",
+    "WeatherFetchError",
+    "WeatherService",
+    "get_weather_features",
+]

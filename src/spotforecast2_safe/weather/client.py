@@ -11,6 +11,19 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 
+class WeatherFetchError(ValueError):
+    """Raised when Open-Meteo cannot be reached or returns no usable data.
+
+    Distinguishes a transient external-API failure (network outage,
+    rate-limit exhaustion, both the archive and forecast endpoints
+    returning errors) from a real data-validity problem.  Subclasses
+    ``ValueError`` so existing callers that catch ``ValueError`` keep
+    working; consumers that want to react specifically to weather-API
+    failures (e.g. ``spotforecast2.multitask.base.BaseTask`` with
+    ``config.on_weather_failure="skip"``) catch this class instead.
+    """
+
+
 class WeatherClient:
     """Client for fetching weather data from Open-Meteo API.
     Handles the low-level API interactions, parameter building, and response parsing.
@@ -343,7 +356,9 @@ class WeatherService(WeatherClient):
                 self.logger.warning(f"Forecast fetch warning: {e}")
 
         if not dfs:
-            raise ValueError("Could not fetch data from Archive or Forecast.")
+            raise WeatherFetchError(
+                "Could not fetch data from Archive or Forecast."
+            )
 
         full_df = pd.concat(dfs)
         full_df = full_df[~full_df.index.duplicated(keep="first")].sort_index()
