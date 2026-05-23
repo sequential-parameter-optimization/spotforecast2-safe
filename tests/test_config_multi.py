@@ -1091,3 +1091,26 @@ class TestConfigMultiAggWeights:
         assert cfg.country_code == "FR"
         assert cfg.predict_size == 48
         assert cfg.agg_weights == _WEIGHTS
+
+
+# ---------------------------------------------------------------------------
+# on_weather_failure policy
+# ---------------------------------------------------------------------------
+
+
+class TestConfigMultiOnWeatherFailure:
+    """``on_weather_failure`` selects the policy for Open-Meteo fetch failures."""
+
+    def test_default_is_raise(self):
+        assert _default().on_weather_failure == "raise"
+
+    def test_can_be_set_to_skip(self):
+        assert ConfigMulti(on_weather_failure="skip").on_weather_failure == "skip"
+
+    def test_set_params_updates_policy(self):
+        cfg = _default()
+        cfg.set_params(on_weather_failure="skip")
+        assert cfg.on_weather_failure == "skip"
+
+    def test_in_get_params(self):
+        assert "on_weather_failure" in _default().get_params()

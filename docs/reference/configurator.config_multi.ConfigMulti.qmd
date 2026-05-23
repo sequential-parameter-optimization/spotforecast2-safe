@@ -47,6 +47,8 @@ configurator.config_multi.ConfigMulti(
     data_loader=None,
     auto_save_models=True,
     data_frame_name='default',
+    number_folds=10,
+    on_weather_failure='raise',
 )
 ```
 
@@ -107,6 +109,7 @@ API queries and holiday feature generation.
 | agg_weights              | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\]                           | Per-target aggregation weights used when combining individual target forecasts into a single weighted sum. The list must contain one weight per entry in ``targets`` (in the same order). Positive values add the target's contribution; negative values invert it. Slice the list to ``agg_weights[:len(targets)]`` when only a subset of targets is active. Defaults to ``None`` (no weights pre-defined; set after loading the dataset). | `None`                      |
 | auto_save_models         | [bool](`bool`)                                                                                       | Whether ``BaseTask._run_strategy`` should persist fitted forecasters to ``<cache_home>/models/`` after every training run.  Defaults to ``True`` so that saved models are immediately available for ``PredictTask`` without an explicit ``save_models()`` call.                                                                                                                                                                             | `True`                      |
 | data_frame_name          | [str](`str`)                                                                                         | Identifier for the active dataset.  Used by ``BaseTask`` to name cache subdirectories, model files, and the per-dataset log file.  Defaults to ``"default"``.                                                                                                                                                                                                                                                                               | `'default'`                 |
+| on_weather_failure       | [Literal](`typing.Literal`)\[\'raise\', \'skip\'\]                                                   | Policy for handling Open-Meteo fetch failures inside ``BaseTask.build_exogenous_features``.  ``"raise"`` (default) aborts the pipeline with a ``WeatherFetchError`` and preserves the safety-critical fail-safe semantics.  ``"skip"`` logs a warning and continues with empty weather features so the rest of the pipeline can run without the Open-Meteo dependency.                                                                      | `'raise'`                   |
 
 ## Attributes {.doc-section .doc-section-attributes}
 
@@ -154,6 +157,8 @@ API queries and holiday feature generation.
 | agg_weights              | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\]      | Per-target aggregation weights. One weight per entry in ``targets``; positive values add, negative values invert the target's contribution. ``None`` until set. |
 | auto_save_models         | [bool](`bool`)                                                                  | Whether to auto-persist fitted forecasters after each training run.                                                                                             |
 | data_frame_name          | [str](`str`)                                                                    | Active-dataset identifier used for cache and log-file naming.                                                                                                   |
+| number_folds             | [int](`int`)                                                                    | Cross-validation fold count for tuning tasks.                                                                                                                   |
+| on_weather_failure       | [Literal](`typing.Literal`)\[\'raise\', \'skip\'\]                              | Open-Meteo fetch-failure policy: ``"raise"`` aborts, ``"skip"`` continues without weather.                                                                      |
 
 ## Notes {.doc-section .doc-section-notes}
 

@@ -567,6 +567,43 @@ class TestWeatherServiceFetchHybrid:
         ), "WARNING for forecast leg should be logged"
 
 
+class TestWeatherFetchError:
+    """``_fetch_hybrid`` raises ``WeatherFetchError`` when both legs fail."""
+
+    def test_raises_weather_fetch_error_when_both_legs_fail(self):
+        """When archive and forecast both raise, ``_fetch_hybrid`` raises
+        ``WeatherFetchError``."""
+        from spotforecast2_safe.weather import WeatherFetchError, WeatherService
+
+        svc = WeatherService(latitude=51.0, longitude=7.0)
+        now = pd.Timestamp.now(tz="UTC")
+        start = now - pd.Timedelta(days=10)
+        end = now + pd.Timedelta(days=1)
+
+        with patch.object(
+            WeatherService, "fetch_archive", side_effect=RuntimeError("archive 504")
+        ), patch.object(
+            WeatherService, "fetch_forecast", side_effect=RuntimeError("forecast 504")
+        ):
+            with pytest.raises(
+                WeatherFetchError, match="Could not fetch data from Archive or Forecast"
+            ):
+                svc._fetch_hybrid(start, end, "UTC")
+
+    def test_weather_fetch_error_is_value_error(self):
+        """``WeatherFetchError`` subclasses ``ValueError`` so existing
+        ``except ValueError`` callers keep working."""
+        from spotforecast2_safe.weather import WeatherFetchError
+
+        assert issubclass(WeatherFetchError, ValueError)
+
+    def test_weather_fetch_error_in_dunder_all(self):
+        """``WeatherFetchError`` is exported from ``spotforecast2_safe.weather``."""
+        from spotforecast2_safe.weather import __all__ as weather_all
+
+        assert "WeatherFetchError" in weather_all
+
+
 class TestWeatherServiceFinalize:
     """WeatherService._finalize_df resamples, and raises or fills gaps."""
 
