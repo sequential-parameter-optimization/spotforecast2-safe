@@ -1,9 +1,9 @@
-## [13.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.1.0...v13.2.0) (2026-05-23)
+## [13.2.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.2.0-rc.1...v13.2.0-rc.2) (2026-05-23)
 
 
 ### Features
 
-* opt-in fail-safe handling for Open-Meteo failures ([70e310d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/70e310d5bf8cfcca0e594489fc1aa5a5d91df35c))
+* **configurator:** add test_data_loader hook for ground-truth test data ([25f18b1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/25f18b1e11715dc3299605aae76822eddec793d2))
 
 ## [13.2.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.1.0...v13.2.0-rc.1) (2026-05-23)
 
