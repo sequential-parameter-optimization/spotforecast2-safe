@@ -284,6 +284,8 @@ class ConfigMulti:
         forecaster_factory: Optional[Any] = None,
         # Data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
         data_loader: Optional[Any] = None,
+        # Test-data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
+        test_data_loader: Optional[Any] = None,
         # Persistence policy and active-dataset name (consumed by spotforecast2.multitask.base)
         auto_save_models: bool = True,
         data_frame_name: str = "default",
@@ -391,6 +393,13 @@ class ConfigMulti:
         # Enables data-acquisition extensions (e.g. the ENTSO-E API download)
         # without subclassing ``BaseTask``.
         self.data_loader = data_loader
+        # Optional callable consumed by ``BaseTask.prepare_data``:
+        # ``test_data_loader(config) -> pd.DataFrame``.  Mirrors ``data_loader``
+        # for the test/ground-truth slice — invoked iff no test DataFrame is
+        # supplied via the constructor or ``prepare_data``.  When set, the
+        # returned frame is used to populate ``test_actual`` and
+        # ``metrics_future`` in the prediction package.
+        self.test_data_loader = test_data_loader
         # Whether ``BaseTask._run_strategy`` should persist fitted models to
         # the cache directory after every training run.  Defaults to ``True``
         # so that saved models are immediately available for ``PredictTask``.
@@ -494,6 +503,8 @@ class ConfigMulti:
             "forecaster_factory": self.forecaster_factory,
             # Optional data-loader hook
             "data_loader": self.data_loader,
+            # Optional test-data-loader hook
+            "test_data_loader": self.test_data_loader,
             # Persistence policy and active-dataset identifier
             "auto_save_models": self.auto_save_models,
             "data_frame_name": self.data_frame_name,

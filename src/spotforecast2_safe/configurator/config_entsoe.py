@@ -79,6 +79,11 @@ class ConfigEntsoe:
             a pandas DataFrame.  Invoked by ``BaseTask.prepare_data`` when no
             DataFrame is supplied — the ENTSO-E pipeline hook for
             ``download_new_data`` / ``merge_build_manual``.
+        test_data_loader (Optional[Any]): Callable ``test_data_loader(config)``
+            returning a pandas DataFrame with ground-truth values for the
+            prediction horizon.  Invoked by ``BaseTask.prepare_data`` when no
+            test DataFrame is supplied; the returned frame populates
+            ``test_actual`` and ``metrics_future`` in the prediction package.
         auto_save_models (bool): Whether ``BaseTask._run_strategy`` should
             persist fitted forecasters to ``<cache_home>/models/`` after every
             training run.  Defaults to ``True``.
@@ -196,6 +201,8 @@ class ConfigEntsoe:
         forecaster_factory: Optional[Any] = None,
         # Data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
         data_loader: Optional[Any] = None,
+        # Test-data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
+        test_data_loader: Optional[Any] = None,
         # Persistence policy and active-dataset name (consumed by spotforecast2.multitask.base)
         auto_save_models: bool = True,
         data_frame_name: str = "default",
@@ -297,6 +304,11 @@ class ConfigEntsoe:
         # Optional callable ``data_loader(config) -> pd.DataFrame`` invoked
         # by ``BaseTask.prepare_data`` when no DataFrame is supplied.
         self.data_loader = data_loader
+        # Optional callable ``test_data_loader(config) -> pd.DataFrame`` invoked
+        # by ``BaseTask.prepare_data`` when no test DataFrame is supplied.
+        # Returned frame populates ``test_actual`` and ``metrics_future`` in
+        # the prediction package; mirrors ``data_loader`` for the test slice.
+        self.test_data_loader = test_data_loader
         # Whether ``BaseTask._run_strategy`` should persist fitted models to
         # the cache directory after every training run.  Defaults to ``True``
         # so that saved models are immediately available for ``PredictTask``.
@@ -394,6 +406,7 @@ class ConfigEntsoe:
             # Optional hooks
             "forecaster_factory": self.forecaster_factory,
             "data_loader": self.data_loader,
+            "test_data_loader": self.test_data_loader,
             # Persistence policy and active-dataset identifier
             "auto_save_models": self.auto_save_models,
             "data_frame_name": self.data_frame_name,
