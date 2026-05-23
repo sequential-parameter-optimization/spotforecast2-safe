@@ -1,3 +1,10 @@
+## [13.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.2.0...v13.3.0) (2026-05-23)
+
+
+### Features
+
+* **configurator:** add test_data_loader hook for ground-truth test data ([25f18b1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/25f18b1e11715dc3299605aae76822eddec793d2))
+
 ## [13.2.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.2.0-rc.1...v13.2.0-rc.2) (2026-05-23)
 
 
