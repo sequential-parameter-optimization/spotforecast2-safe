@@ -93,6 +93,14 @@ class ConfigMulti:
             invert it. Slice the list to ``agg_weights[:len(targets)]`` when only
             a subset of targets is active. Defaults to ``None`` (no weights
             pre-defined; set after loading the dataset).
+        auto_save_models (bool): Whether ``BaseTask._run_strategy`` should
+            persist fitted forecasters to ``<cache_home>/models/`` after every
+            training run.  Defaults to ``True`` so that saved models are
+            immediately available for ``PredictTask`` without an explicit
+            ``save_models()`` call.
+        data_frame_name (str): Identifier for the active dataset.  Used by
+            ``BaseTask`` to name cache subdirectories, model files, and the
+            per-dataset log file.  Defaults to ``"default"``.
 
     Attributes:
         country_code (str): ISO country code for API queries and holiday generation.
@@ -139,6 +147,11 @@ class ConfigMulti:
         agg_weights (Optional[List[float]]): Per-target aggregation weights.
             One weight per entry in ``targets``; positive values add, negative
             values invert the target's contribution. ``None`` until set.
+        auto_save_models (bool): Whether to auto-persist fitted forecasters
+            after each training run.
+        data_frame_name (str): Active-dataset identifier used for cache and
+            log-file naming.
+        number_folds (int): Cross-validation fold count for tuning tasks.
 
     Notes:
         The default period configurations use specific `n_periods` to balance resolution and smoothing:
@@ -262,6 +275,11 @@ class ConfigMulti:
         forecaster_factory: Optional[Any] = None,
         # Data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
         data_loader: Optional[Any] = None,
+        # Persistence policy and active-dataset name (consumed by spotforecast2.multitask.base)
+        auto_save_models: bool = True,
+        data_frame_name: str = "default",
+        # Cross-validation fold count (consumed by spotforecast2.multitask.base.cv_ts)
+        number_folds: int = 10,
     ):
         """Initialize ConfigMulti with specified or default parameters."""
         self.country_code = country_code
@@ -362,6 +380,17 @@ class ConfigMulti:
         # Enables data-acquisition extensions (e.g. the ENTSO-E API download)
         # without subclassing ``BaseTask``.
         self.data_loader = data_loader
+        # Whether ``BaseTask._run_strategy`` should persist fitted models to
+        # the cache directory after every training run.  Defaults to ``True``
+        # so that saved models are immediately available for ``PredictTask``.
+        self.auto_save_models = auto_save_models
+        # Identifier for the active dataset, used by ``BaseTask`` for
+        # cache-subdirectory naming, model-file naming, and per-dataset
+        # log-file routing.
+        self.data_frame_name = data_frame_name
+        # Number of TimeSeriesSplit folds used by ``BaseTask.cv_ts`` when
+        # building cross-validation splitters for tuning tasks.
+        self.number_folds = number_folds
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
@@ -449,6 +478,11 @@ class ConfigMulti:
             "forecaster_factory": self.forecaster_factory,
             # Optional data-loader hook
             "data_loader": self.data_loader,
+            # Persistence policy and active-dataset identifier
+            "auto_save_models": self.auto_save_models,
+            "data_frame_name": self.data_frame_name,
+            # Cross-validation fold count
+            "number_folds": self.number_folds,
         }
 
         # Expose period sub-objects via the '__' notation if deep=True
