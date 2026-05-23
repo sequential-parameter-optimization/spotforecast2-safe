@@ -45,6 +45,8 @@ configurator.config_entsoe.ConfigEntsoe(
     agg_weights=None,
     forecaster_factory=None,
     data_loader=None,
+    auto_save_models=True,
+    data_frame_name='default',
 )
 ```
 
@@ -105,6 +107,8 @@ protocol.
 | agg_weights              | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\]                           | Per-target aggregation weights. For single-target use this is typically ``[1.0]`` or ``None``.                                                                                                                     | `None`                      |
 | forecaster_factory       | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                 | Callable ``factory(config, *, weight_func, target) -> forecaster`` consumed by ``BaseTask.create_forecaster``.  ``None`` falls back to the default LightGBM factory.                                               | `None`                      |
 | data_loader              | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                 | Callable ``data_loader(config)`` returning a pandas DataFrame.  Invoked by ``BaseTask.prepare_data`` when no DataFrame is supplied — the ENTSO-E pipeline hook for ``download_new_data`` / ``merge_build_manual``. | `None`                      |
+| auto_save_models         | [bool](`bool`)                                                                                       | Whether ``BaseTask._run_strategy`` should persist fitted forecasters to ``<cache_home>/models/`` after every training run.  Defaults to ``True``.                                                                  | `True`                      |
+| data_frame_name          | [str](`str`)                                                                                         | Identifier for the active dataset.  Used by ``BaseTask`` to name cache subdirectories, model files, and the per-dataset log file.  Defaults to ``"default"``.                                                      | `'default'`                 |
 
 ## Attributes {.doc-section .doc-section-attributes}
 
