@@ -1,3 +1,10 @@
+## [13.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.3-rc.1...v13.1.0-rc.1) (2026-05-23)
+
+
+### Features
+
+* **configurator:** add auto_save_models, data_frame_name, number_folds ([0d439fa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/0d439facaf583dd8e4dcf2cd8b6d1c671ebc6e3d))
+
 ## [13.0.3-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.0.2...v13.0.3-rc.1) (2026-05-22)
 
 
