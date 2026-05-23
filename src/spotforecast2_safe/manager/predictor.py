@@ -32,6 +32,7 @@ def build_prediction_package(
     exog_train: Optional[pd.DataFrame] = None,
     exog_future: Optional[pd.DataFrame] = None,
     df_test: Optional[pd.DataFrame] = None,
+    index_name: str = "DateTime",
 ) -> Dict[str, Any]:
     """Build a prediction package compatible with PredictionFigure.
 
@@ -53,10 +54,15 @@ def build_prediction_package(
             Pass ``None`` when no exogenous features are used.
         exog_future: Exogenous feature DataFrame covering the forecast horizon.
             Pass ``None`` when no exogenous features are used.
-        df_test: Optional test DataFrame that must contain a ``"DateTime"``
+        df_test: Optional test DataFrame that must contain an ``index_name``
             column and a column named ``target``. When supplied, the matching
             ground-truth slice is injected into the returned package and future
             metrics are computed.
+        index_name: Name of the timestamp column in ``df_test`` to use as the
+            index when aligning ground-truth values. Defaults to ``"DateTime"``
+            for backward compatibility; callers using a different timestamp
+            column (e.g. ENTSO-E's ``"Time (UTC)"``) should pass the matching
+            name — typically ``config.index_name``.
 
     Returns:
         A dictionary with the following keys:
@@ -169,7 +175,7 @@ def build_prediction_package(
 
     # Inject test ground truth if available
     if df_test is not None and target in df_test.columns:
-        ts = df_test.set_index("DateTime")[target]
+        ts = df_test.set_index(index_name)[target]
         if ts.index.tzinfo is None:
             ts.index = ts.index.tz_localize("UTC")
         test_actual = ts.reindex(future_pred.index).dropna()
