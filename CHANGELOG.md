@@ -1,3 +1,10 @@
+## [13.4.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.3.1-rc.1...v13.4.0-rc.1) (2026-05-24)
+
+
+### Features
+
+* **stats,manager,preprocessing:** port chag25a primitives (ADF, periodogram, deterministic process, retrain cadence) ([a038202](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a038202ae8cf5f817fd47c6073bf2cc69cba41f0))
+
 ## [13.3.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.3.0...v13.3.1-rc.1) (2026-05-23)
 
 
