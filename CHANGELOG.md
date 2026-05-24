@@ -1,3 +1,10 @@
+## [13.4.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.0...v13.4.1) (2026-05-24)
+
+
+### Bug Fixes
+
+* **predictor:** populate metrics_future_one_day in build_prediction_package ([e733388](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e7333886fa6345047b98f5a647269f71cd9f24c8))
+
 ## [13.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.3.0...v13.4.0) (2026-05-24)
 
 
