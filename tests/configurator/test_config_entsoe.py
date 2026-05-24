@@ -48,3 +48,22 @@ def test_config_entsoe_root_import():
 
     config = Config()
     assert isinstance(config, CE)
+
+
+def test_config_entsoe_retrain_max_age_defaults_to_seven_days():
+    """retrain_max_age defaults to 7 days for the cadence gate."""
+    config = ConfigEntsoe()
+    assert config.retrain_max_age == pd.Timedelta(days=7)
+
+
+def test_config_entsoe_retrain_max_age_override():
+    """retrain_max_age can be overridden via the constructor."""
+    config = ConfigEntsoe(retrain_max_age=pd.Timedelta(days=3))
+    assert config.retrain_max_age == pd.Timedelta(days=3)
+
+
+def test_config_entsoe_retrain_max_age_in_get_params():
+    """retrain_max_age is exposed via get_params() for serialization."""
+    config = ConfigEntsoe()
+    params = config.get_params()
+    assert params["retrain_max_age"] == pd.Timedelta(days=7)
