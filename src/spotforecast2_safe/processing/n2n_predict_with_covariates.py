@@ -27,6 +27,7 @@ Examples:
         force_train=True,
         model_dir=tempfile.mkdtemp(),
         verbose=False,
+        on_weather_failure="skip",
     )
     print(predictions.shape)
     print(sorted(metadata.keys())[:5])
@@ -47,6 +48,7 @@ Examples:
         force_train=True,
         model_dir=cache_dir,
         verbose=False,
+        on_weather_failure="skip",
     )
     preds_cached, _, _ = n2n_predict_with_covariates(
         forecast_horizon=2,
@@ -55,18 +57,22 @@ Examples:
         force_train=False,
         model_dir=cache_dir,
         verbose=False,
+        on_weather_failure="skip",
     )
     assert preds_first.shape == preds_cached.shape
     print(preds_cached.shape)
     ```
 """
 
+import logging
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Literal, Optional, Tuple, Union
 
 import pandas as pd
 from astral import LocationInfo
 from lightgbm import LGBMRegressor
+
+logger = logging.getLogger(__name__)
 
 try:
     from tqdm.auto import tqdm
@@ -82,6 +88,7 @@ from spotforecast2_safe.calendar import (
     get_holiday_features,
 )
 from spotforecast2_safe.weather import get_weather_features
+from spotforecast2_safe.weather.client import WeatherFetchError
 from spotforecast2_safe.manager.features import (
     apply_cyclical_encoding,
     create_interaction_features,
@@ -124,6 +131,7 @@ def n2n_predict_with_covariates(
     model_dir: Optional[Union[str, Path]] = None,
     verbose: bool = True,
     show_progress: bool = False,
+    on_weather_failure: Literal["raise", "skip"] = "raise",
 ) -> Tuple[pd.DataFrame, Dict, Dict]:
     """End-to-end recursive forecasting with exogenous covariates.
 
@@ -166,6 +174,15 @@ def n2n_predict_with_covariates(
             SPOTFORECAST2_CACHE environment variable). Default: None.
         verbose: Print progress messages. Default: True.
         show_progress: Show progress bar during training. Default: False.
+        on_weather_failure: Policy for handling Open-Meteo fetch failures.
+            ``"raise"`` (default) propagates `WeatherFetchError` and aborts
+            the pipeline — preserves the safety-critical fail-safe
+            semantics matching `ConfigEntsoe.on_weather_failure`.
+            ``"skip"`` logs a warning and continues with empty weather
+            features so the rest of the pipeline (calendar, holidays,
+            day/night) can run without the Open-Meteo dependency.  Pass
+            ``"skip"`` from offline / CI environments and docstring
+            examples that must remain network-resilient.
 
     Returns:
         Tuple containing:
@@ -213,6 +230,7 @@ def n2n_predict_with_covariates(
             force_train=True,
             model_dir=tempfile.mkdtemp(),
             verbose=False,
+            on_weather_failure="skip",
         )
         print(predictions.shape)
         print(metadata["forecast_horizon"])
@@ -359,18 +377,32 @@ def n2n_predict_with_covariates(
         state=state,
     )
 
-    # Weather
-    weather_features, weather_aligned = get_weather_features(
-        data=imputed_data,
-        start=start,
-        cov_end=cov_end,
-        forecast_horizon=forecast_horizon,
-        latitude=latitude,
-        longitude=longitude,
-        timezone=timezone,
-        freq="h",
-        verbose=verbose,
-    )
+    # Weather — honour the `on_weather_failure` policy.  ``"skip"`` swaps in
+    # empty DataFrames aligned to the [start, cov_end] hourly grid so the
+    # rest of the pipeline (calendar, holidays, day/night) can still run.
+    try:
+        weather_features, weather_aligned = get_weather_features(
+            data=imputed_data,
+            start=start,
+            cov_end=cov_end,
+            forecast_horizon=forecast_horizon,
+            latitude=latitude,
+            longitude=longitude,
+            timezone=timezone,
+            freq="h",
+            verbose=verbose,
+        )
+    except WeatherFetchError as exc:
+        if on_weather_failure != "skip":
+            raise
+        logger.warning(
+            "Open-Meteo unreachable; continuing without weather features "
+            "(on_weather_failure='skip'). Root cause: %s",
+            exc,
+        )
+        empty_index = pd.date_range(start=start, end=cov_end, freq="h", tz=timezone)
+        weather_features = pd.DataFrame(index=empty_index)
+        weather_aligned = pd.DataFrame(index=empty_index)
 
     # Calendar
     calendar_features = get_calendar_features(
