@@ -1,3 +1,16 @@
+## [13.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.3.0...v13.4.0) (2026-05-24)
+
+
+### Features
+
+* **processing:** honour on_weather_failure='skip' in n2n_predict_with_covariates ([e6517ea](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e6517eaddaa2e6f9860278e8ce4d613de5057579))
+* **stats,manager,preprocessing:** port chag25a primitives (ADF, periodogram, deterministic process, retrain cadence) ([a038202](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a038202ae8cf5f817fd47c6073bf2cc69cba41f0))
+
+
+### Bug Fixes
+
+* DateTime ([f6f45ba](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f6f45ba2df36b064e2a372915d6e1b6e78f51594))
+
 ## [13.4.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.0-rc.1...v13.4.0-rc.2) (2026-05-24)
 
 
