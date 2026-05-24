@@ -4,7 +4,6 @@
 """Tests for the Fourier deterministic-process primitive."""
 
 import pandas as pd
-import pytest
 
 from spotforecast2_safe.preprocessing.deterministic import (
     build_deterministic_process,
