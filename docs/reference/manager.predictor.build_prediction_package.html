@@ -1409,7 +1409,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    exog_train<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    exog_future<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    df_test<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    index_name<span class="op">=</span><span class="st">'DateTime'</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Build a prediction package compatible with PredictionFigure.</p>
 <p>Computes true in-sample predictions via the fitted estimator and generates a genuine future forecast of <code>predict_size</code> steps. If <code>df_test</code> is supplied, ground-truth test values are injected and future metrics (MAE, MAPE) are computed.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1463,8 +1464,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>df_test</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>Optional test DataFrame that must contain a <code>"DateTime"</code> column and a column named <code>target</code>. When supplied, the matching ground-truth slice is injected into the returned package and future metrics are computed.</td>
+<td>Optional test DataFrame that must contain an <code>index_name</code> column and a column named <code>target</code>. When supplied, the matching ground-truth slice is injected into the returned package and future metrics are computed.</td>
 <td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>index_name</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Name of the timestamp column in <code>df_test</code> to use as the index when aligning ground-truth values. Defaults to <code>"DateTime"</code> for backward compatibility; callers using a different timestamp column (e.g.&nbsp;ENTSO-E’s <code>"Time (UTC)"</code>) should pass the matching name — typically <code>config.index_name</code>.</td>
+<td><code>'DateTime'</code></td>
 </tr>
 </tbody>
 </table>
@@ -1535,7 +1542,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="d2a3882b" class="cell" data-execution_count="1">
+<div id="a0bb234f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
@@ -1564,7 +1571,7 @@ Future predictions: 24 steps
 Validation passed: True</code></pre>
 </div>
 </div>
-<div id="056943d1" class="cell" data-execution_count="2">
+<div id="0e8d95a6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
