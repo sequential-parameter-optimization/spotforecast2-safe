@@ -1,3 +1,10 @@
+## [13.4.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.0-rc.1...v13.4.0-rc.2) (2026-05-24)
+
+
+### Features
+
+* **processing:** honour on_weather_failure='skip' in n2n_predict_with_covariates ([e6517ea](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e6517eaddaa2e6f9860278e8ce4d613de5057579))
+
 ## [13.4.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.3.1-rc.1...v13.4.0-rc.1) (2026-05-24)
 
 
