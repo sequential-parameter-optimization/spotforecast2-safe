@@ -191,6 +191,22 @@ def build_prediction_package(
                     )
                 ),
             }
+            test_actual_24h = test_actual.iloc[:24]
+            if len(test_actual_24h) > 0:
+                pred_pkg["metrics_future_one_day"] = {
+                    "mae": float(
+                        mean_absolute_error(
+                            test_actual_24h,
+                            future_pred.loc[test_actual_24h.index],
+                        )
+                    ),
+                    "mape": float(
+                        mean_absolute_percentage_error(
+                            test_actual_24h,
+                            future_pred.loc[test_actual_24h.index],
+                        )
+                    ),
+                }
 
     return pred_pkg
 
