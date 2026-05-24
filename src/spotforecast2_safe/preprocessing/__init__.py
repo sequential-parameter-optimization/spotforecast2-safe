@@ -3,6 +3,7 @@
 
 from ._binner import QuantileBinner
 from ._differentiator import TimeSeriesDifferentiator
+from .deterministic import build_deterministic_process
 from .rolling import RollingFeatures
 from .curate_data import (
     agg_and_resample_data,
@@ -47,4 +48,5 @@ __all__ = [
     "RepeatingBasisFunction",
     "ExogBuilder",
     "LinearlyInterpolateTS",
+    "build_deterministic_process",
 ]

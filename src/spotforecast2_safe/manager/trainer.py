@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 from typing import Any, Optional, Union
 
+import pandas as pd
 from joblib import load
 
 from spotforecast2_safe.data.fetch_data import get_cache_home
@@ -130,3 +131,71 @@ def get_last_model(
     except Exception as e:
         logger.error("Failed to load model from %s: %s", file_path, e)
         return -1, None
+
+
+def should_retrain(
+    last_end_dev: Optional[pd.Timestamp],
+    *,
+    max_age: pd.Timedelta,
+    force: bool = False,
+    now: Optional[pd.Timestamp] = None,
+) -> bool:
+    """Decide whether a forecaster should be retrained.
+
+    The cadence policy lives in `ConfigEntsoe.retrain_max_age`.  Callers
+    pass `max_age` in explicitly so the policy stays in config, not in
+    code.
+
+    Args:
+        last_end_dev: End-of-development-window timestamp of the last
+            trained model.  ``None`` indicates no previous model.
+        max_age: Maximum allowed age before retraining is required.
+        force: Bypass the cadence gate and always return ``True``.
+        now: Override "now" — used for deterministic tests.  Defaults
+            to ``pd.Timestamp.now(tz="UTC")``.
+
+    Returns:
+        ``True`` when retraining should proceed (no previous model,
+        ``force``, or age above ``max_age``); ``False`` otherwise.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+
+        from spotforecast2_safe.manager.trainer import should_retrain
+
+        now = pd.Timestamp("2026-05-24 12:00", tz="UTC")
+        max_age = pd.Timedelta(days=7)
+
+        # No previous model -> retrain.
+        print(should_retrain(None, max_age=max_age, now=now))
+
+        # Recent model -> skip.
+        recent = now - pd.Timedelta(days=2)
+        print(should_retrain(recent, max_age=max_age, now=now))
+
+        # Old model -> retrain.
+        old = now - pd.Timedelta(days=10)
+        print(should_retrain(old, max_age=max_age, now=now))
+        ```
+    """
+    if force or last_end_dev is None:
+        return True
+
+    current = now if now is not None else pd.Timestamp.now(tz="UTC")
+    if last_end_dev.tzinfo is None:
+        last_end_dev = last_end_dev.tz_localize("UTC")
+    if current.tzinfo is None:
+        current = current.tz_localize("UTC")
+
+    age = current - last_end_dev
+    if age >= max_age:
+        return True
+
+    hours = age.total_seconds() / 3600.0
+    logger.info(
+        "Last model trained %.0f h ago (max_age=%s); no retraining necessary.",
+        hours,
+        max_age,
+    )
+    return False

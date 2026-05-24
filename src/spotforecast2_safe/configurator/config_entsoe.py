@@ -100,6 +100,10 @@ class ConfigEntsoe:
             the safety-critical fail-safe semantics.  ``"skip"`` logs a
             warning and continues with empty weather features so the rest
             of the pipeline can run without the Open-Meteo dependency.
+        retrain_max_age (pd.Timedelta): Maximum age of a previously trained
+            model before retraining is required.  Consumed by
+            ``spotforecast2_safe.manager.trainer.should_retrain`` to gate
+            scheduled retraining workflows.  Defaults to ``Timedelta(days=7)``.
 
     Attributes:
         country_code (str): ISO country code used for API queries and
@@ -210,6 +214,8 @@ class ConfigEntsoe:
         number_folds: int = 10,
         # Weather-fetch failure policy (consumed by spotforecast2.multitask.base.build_exogenous_features)
         on_weather_failure: Literal["raise", "skip"] = "raise",
+        # Retraining cadence (consumed by spotforecast2_safe.manager.trainer.should_retrain)
+        retrain_max_age: Optional[pd.Timedelta] = None,
     ):
         """Initialize ConfigEntsoe with specified or default parameters."""
         self.country_code = country_code
@@ -325,6 +331,14 @@ class ConfigEntsoe:
         # pipeline (default, preserves fail-safe semantics); ``"skip"``
         # logs a warning and continues without weather features.
         self.on_weather_failure = on_weather_failure
+        # Maximum age of a previously trained model before retraining is
+        # required.  Consumed by
+        # ``spotforecast2_safe.manager.trainer.should_retrain``.
+        self.retrain_max_age = (
+            retrain_max_age
+            if retrain_max_age is not None
+            else pd.Timedelta(days=7)
+        )
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
@@ -414,6 +428,8 @@ class ConfigEntsoe:
             "number_folds": self.number_folds,
             # Weather-fetch failure policy
             "on_weather_failure": self.on_weather_failure,
+            # Retraining cadence
+            "retrain_max_age": self.retrain_max_age,
         }
 
         # Expose period sub-objects via the '__' notation if deep=True

@@ -33,7 +33,7 @@ from spotforecast2_safe.manager.predictor import (
     build_prediction_package,
     get_model_prediction,
 )
-from spotforecast2_safe.manager.trainer import get_last_model
+from spotforecast2_safe.manager.trainer import get_last_model, should_retrain
 
 __all__ = [
     # Logger
@@ -52,6 +52,7 @@ __all__ = [
     "get_model_prediction",
     # Trainer
     "get_last_model",
+    "should_retrain",
     # Feature engineering helpers
     "apply_cyclical_encoding",
     "create_interaction_features",
