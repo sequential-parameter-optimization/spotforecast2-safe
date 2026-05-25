@@ -154,6 +154,14 @@ def get_weather_features(
         cache_home=cache_home,
     )
 
+    # Open-Meteo returns whole-day forecast blocks aligned to its own clock,
+    # so the raw payload can extend a few hours past ``cov_end``. Trim to the
+    # exact ``[start, cov_end]`` window before ``curate_weather`` so the
+    # row-count assertion compares against the window actually used by the
+    # downstream reindex; otherwise it prints a spurious "wrong shape"
+    # warning even though alignment will repair the count.
+    weather_df = weather_df.loc[start:cov_end]
+
     curate_weather(weather_df, data, forecast_horizon=forecast_horizon)
 
     if verbose:
