@@ -1444,7 +1444,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <div id="exm-setup" class="theorem example">
 <p><span class="theorem-title"><strong>Example 1 (Loading and slicing demo100)</strong></span> &nbsp;</p>
-<div id="194526ad" class="cell" data-execution_count="1">
+<div id="ae95f616" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -1493,7 +1493,7 @@ dtype: int64</code></pre>
 <p>A forecasting model needs a clean, regularly spaced time series with a known time zone. Stage 1 turns whatever the caller supplied into exactly that. <code>get_start_end</code> returns four boundary timestamps: <code>start</code> and <code>end</code> delimit the historical window used for training, and <code>cov_start</code> / <code>cov_end</code> are the same window extended forward by <code>forecast_horizon</code> steps — that extension is the future window for which covariates must be constructed in Stage 4.</p>
 <div id="exm-s1-fetch" class="theorem example">
 <p><span class="theorem-title"><strong>Example 2 (Boundary timestamps, hourly resample)</strong></span> &nbsp;</p>
-<div id="9ba15b3d" class="cell" data-execution_count="2">
+<div id="6caa8aa4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    agg_and_resample_data,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    basic_ts_checks,</span>
@@ -1620,7 +1620,7 @@ Why a strict, gap-free hourly index matters
 <p>Stage 2 replaces likely sensor glitches with <code>NaN</code> so Stage 3 can treat them the same way it treats genuine gaps. An Isolation Forest is applied per column with <code>contamination=0.01</code>, meaning about one percent of rows per column should be flagged. The <code>random_state=1234</code> is fixed so two runs on identical input produce identical outlier flags.</p>
 <div id="exm-s2-outliers" class="theorem example">
 <p><span class="theorem-title"><strong>Example 3 (Marking outliers with Isolation Forest)</strong></span> &nbsp;</p>
-<div id="4ca0aeed" class="cell" data-execution_count="3">
+<div id="53be63fc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.outlier <span class="im">import</span> mark_outliers</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>data, outliers <span class="op">=</span> mark_outliers(</span>
@@ -1658,7 +1658,7 @@ dtype: int64</code></pre>
 <p><code>get_missing_weights</code> forward- and backward-fills every <code>NaN</code>, then builds a per-row weight series: rows whose <code>window_size=72</code> neighbourhood touched an imputed cell receive weight <code>0</code>; all other rows receive <code>1</code>. The weights are wrapped in a <code>WeightFunction</code>, which is a picklable class that the forecaster can carry into a <code>joblib</code> dump alongside the model itself — a closure would survive <code>pickle.dumps</code> but not a <code>pickle.load</code> in a fresh process.</p>
 <div id="exm-s3-weights" class="theorem example">
 <p><span class="theorem-title"><strong>Example 4 (Imputation count and the weight distribution)</strong></span> &nbsp;</p>
-<div id="230df3a3" class="cell" data-execution_count="4">
+<div id="1f2e1e97" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> WeightFunction</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> get_missing_weights</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1693,7 +1693,7 @@ weight_func on first 5 timestamps : None</code></pre>
 <h3 class="anchored" data-anchor-id="stage-4a-calendar-features">Stage 4a — Calendar features</h3>
 <div id="exm-s4a-calendar" class="theorem example">
 <p><span class="theorem-title"><strong>Example 5 (Calendar features from the index alone)</strong></span> &nbsp;</p>
-<div id="af35aaa8" class="cell" data-execution_count="5">
+<div id="369ad9f0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_calendar_features</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>calendar_features <span class="op">=</span> get_calendar_features(</span>
@@ -1752,7 +1752,7 @@ columns : ['month', 'week', 'day_of_week', 'hour']</code></pre>
 <h3 class="anchored" data-anchor-id="stage-4b-daynight-features">Stage 4b — Day/night features</h3>
 <div id="exm-s4b-daynight" class="theorem example">
 <p><span class="theorem-title"><strong>Example 6 (Sunrise, sunset, and the daylight flag)</strong></span> &nbsp;</p>
-<div id="019d3af5" class="cell" data-execution_count="6">
+<div id="70e82f2d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> astral <span class="im">import</span> LocationInfo</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_day_night_features</span>
@@ -1833,7 +1833,7 @@ First render needs network
 </div>
 <div id="exm-s4c-weather" class="theorem example">
 <p><span class="theorem-title"><strong>Example 7 (Open-Meteo fetch and rolling weather windows)</strong></span> &nbsp;</p>
-<div id="8b626287" class="cell" data-execution_count="7">
+<div id="03eda39d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> get_weather_features</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>weather_features, weather_aligned <span class="op">=</span> get_weather_features(</span>
@@ -1933,7 +1933,7 @@ aligned columns        : ['temperature_2m', 'relative_humidity_2m', 'precipitati
 <h3 class="anchored" data-anchor-id="stage-4d-holiday-features">Stage 4d — Holiday features</h3>
 <div id="exm-s4d-holidays" class="theorem example">
 <p><span class="theorem-title"><strong>Example 8 (German public holidays for North Rhine-Westphalia)</strong></span> &nbsp;</p>
-<div id="6bc33f99" class="cell" data-execution_count="8">
+<div id="6650630e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_holiday_features</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>holiday_features <span class="op">=</span> get_holiday_features(</span>
@@ -1989,7 +1989,7 @@ flagged holiday hours: 529</code></pre>
 <p>The four feature DataFrames are concatenated column-wise in a fixed order: calendar, day/night, weather, holidays. Any <code>NaN</code> that survived into the concatenated matrix would be a bug — Stage 5 raises before any further work happens. Then <code>apply_cyclical_encoding</code> replaces every periodic integer column (<code>month</code>, <code>week</code>, <code>day_of_week</code>, <code>hour</code>, <code>sunrise_hour</code>, <code>sunset_hour</code>) with its sine and cosine on a unit circle, keeping the original integers alongside, and <code>create_interaction_features</code> emits pairwise products of cyclical, weather, and holiday columns prefixed with <code>poly_</code>.</p>
 <div id="exm-s5-concat-encode" class="theorem example">
 <p><span class="theorem-title"><strong>Example 9 (Concat, NaN guard, cyclical encoding, interactions)</strong></span> &nbsp;</p>
-<div id="a03260e9" class="cell" data-execution_count="9">
+<div id="fafb5701" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> (</span>
@@ -2050,7 +2050,7 @@ Why sine and cosine
 <p><code>select_exogenous_features</code> returns the final list of column names that will be passed to the forecaster as <code>exog</code>. With the three include flags set to <code>False</code> (the package defaults), the selection keeps only the cyclical sine/cosine columns and the raw weather columns; rolling weather windows, the holiday column, and the polynomial interactions are filtered out.</p>
 <div id="exm-s6-select" class="theorem example">
 <p><span class="theorem-title"><strong>Example 10 (Final exogenous column list)</strong></span> &nbsp;</p>
-<div id="cdf485da" class="cell" data-execution_count="10">
+<div id="67f8929e" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> select_exogenous_features</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>exog_features <span class="op">=</span> select_exogenous_features(</span>
@@ -2078,7 +2078,7 @@ last 3                  : ['wind_speed_10m', 'wind_direction_10m', 'wind_gusts_1
 <p><code>merge_data_and_covariates</code> performs an inner join of the target columns and the selected exogenous columns over <code>[start, end]</code>, casts every column to <code>float32</code> to halve the memory footprint of the lag matrix, and also returns the slice of the exogenous matrix that covers the future prediction window <code>(end, cov_end]</code>.</p>
 <div id="exm-s7-merge" class="theorem example">
 <p><span class="theorem-title"><strong>Example 11 (Merged training matrix and the future-window slice)</strong></span> &nbsp;</p>
-<div id="319f6733" class="cell" data-execution_count="11">
+<div id="4b763048" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> merge_data_and_covariates</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>data_with_exog, exo_tmp, exo_pred <span class="op">=</span> merge_data_and_covariates(</span>
@@ -2155,7 +2155,7 @@ Name: count, dtype: int64</code></pre>
 <p>The split is purely temporal: the first <code>train_ratio=0.8</code> fraction of rows is training data, and the remaining twenty percent goes to validation. The test segment is empty because <code>perc_val = 1 - train_ratio</code> consumes all remaining rows. <code>end_validation</code> is the cutoff timestamp used by <code>forecaster.fit(...)</code>.</p>
 <div id="exm-s8-split" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12 (Temporal split and the validation cutoff)</strong></span> &nbsp;</p>
-<div id="9e297e7d" class="cell" data-execution_count="12">
+<div id="11ed3aaa" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.splitter.split <span class="im">import</span> split_rel_train_val_test</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>train_ratio <span class="op">=</span> <span class="fl">0.8</span></span>
@@ -2199,7 +2199,7 @@ Why temporal, not random
 <p>This is the most expensive cell on the page — eleven LightGBM models on roughly fourteen thousand training rows each. Expect a few minutes on a modern laptop.</p>
 <div id="exm-s9-train" class="theorem example">
 <p><span class="theorem-title"><strong>Example 13 (Eleven forecasters, one shared configuration)</strong></span> &nbsp;</p>
-<div id="a11e0261" class="cell" data-execution_count="13">
+<div id="dac318ff" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
@@ -2240,7 +2240,7 @@ n_features_in_ across all  : {52}</code></pre>
 <p><code>predict_multivariate</code> iterates over the trained forecasters and calls <code>.predict(steps=forecast_horizon, exog=exo_pred[exog_features])</code> on each. The result is a single DataFrame with one column per target and <code>forecast_horizon</code> rows.</p>
 <div id="exm-s10-predict" class="theorem example">
 <p><span class="theorem-title"><strong>Example 14 (Twenty-four-hour multi-target forecast)</strong></span> &nbsp;</p>
-<div id="2d6323a9" class="cell" data-execution_count="14">
+<div id="ce2d9834" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.utils <span class="im">import</span> predict_multivariate</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> predict_multivariate(</span>
@@ -2337,7 +2337,7 @@ last  timestamp   : 2021-12-25 21:00:00+00:00</code></pre>
 <p>Stage 10 produced one forecast column per target. The production task closes the pipeline with a weighted aggregation: <code>agg_predict(predictions, weights=weights)</code> reduces the eleven columns to a single Series sharing the <code>DatetimeIndex</code> of <code>exo_pred</code>. The conceptual sibling page explains the helper’s <code>list</code> / <code>np.ndarray</code> / <code>dict</code> accepted forms and the signed-weights convention in its <a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html#aggregation">Aggregation section</a>.</p>
 <div id="exm-aggregation" class="theorem example">
 <p><span class="theorem-title"><strong>Example 15 (Aggregating the eleven per-target forecasts)</strong></span> &nbsp;</p>
-<div id="091ec0b5" class="cell" data-execution_count="15">
+<div id="e79e34d4" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.agg_predict <span class="im">import</span> agg_predict</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>]</span>
@@ -2367,7 +2367,7 @@ Freq: h, dtype: float64</code></pre>
 <p>The orchestrator emits a metadata dictionary that records every configuration knob and every shape it just produced — a self-contained audit record. Building the same dictionary by hand is a useful integration check that nothing was lost along the way.</p>
 <div id="exm-meta" class="theorem example">
 <p><span class="theorem-title"><strong>Example 16 (Reconstructing the orchestrator’s metadata)</strong></span> &nbsp;</p>
-<div id="db592fc2" class="cell" data-execution_count="16">
+<div id="59c1768e" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="op">=</span> {</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"forecast_horizon"</span>: forecast_horizon,</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_columns"</span>: target_columns,</span>
@@ -2405,7 +2405,7 @@ n_exog_features: 27</code></pre>
 <p>The pipeline above is exactly what <code>n2n_predict_with_covariates</code> does internally. Calling the orchestrator on the same sliced data with the same parameters should yield the same shapes and (modulo any change in Open-Meteo’s historical data between the two calls) the same numerical predictions.</p>
 <div id="exm-end-to-end" class="theorem example">
 <p><span class="theorem-title"><strong>Example 17 (Single-call equivalence)</strong></span> &nbsp;</p>
-<div id="2b722d53" class="cell" data-execution_count="17">
+<div id="6102a4f2" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.n2n_predict_with_covariates <span class="im">import</span> (</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    n2n_predict_with_covariates,</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>)</span>
