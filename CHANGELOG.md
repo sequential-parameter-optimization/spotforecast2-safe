@@ -1,3 +1,10 @@
+## [13.4.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.1...v13.4.2-rc.1) (2026-05-25)
+
+
+### Bug Fixes
+
+* **weather:** trim raw weather_df to [start, cov_end] before curate_weather ([98ecd4f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/98ecd4f7540f46328ff7232f3e2d05dde21b31d8))
+
 ## [13.4.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.0...v13.4.1) (2026-05-24)
 
 
