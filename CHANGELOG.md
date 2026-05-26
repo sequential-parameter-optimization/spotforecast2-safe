@@ -1,3 +1,10 @@
+## [13.4.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.2...v13.4.3) (2026-05-26)
+
+
+### Bug Fixes
+
+* **curate_weather:** include gap size and index range in shape warning ([75a70b5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/75a70b50e1d65fcab95335265a0ab2a1cf35a451))
+
 ## [13.4.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.1...v13.4.2) (2026-05-25)
 
 

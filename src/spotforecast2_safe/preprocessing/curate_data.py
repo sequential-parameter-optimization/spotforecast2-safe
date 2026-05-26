@@ -146,10 +146,22 @@ def curate_weather(weather_df: pd.DataFrame, data: pd.DataFrame, forecast_horizo
         AssertionError:
             If the weather dataframe does not have the correct number of rows.
     """
-    try:
-        assert weather_df.shape[0] == data.shape[0] + forecast_horizon
-    except AssertionError:
-        print("Weather dataframe has wrong shape.")
+    expected = data.shape[0] + forecast_horizon
+    actual = weather_df.shape[0]
+    if actual == expected:
+        return
+    if weather_df.empty:
+        coverage = "<empty>"
+    else:
+        coverage = f"[{weather_df.index.min()}, {weather_df.index.max()}]"
+    diff = expected - actual
+    direction = "short by" if diff > 0 else "long by"
+    print(
+        f"Weather dataframe has wrong shape. "
+        f"Expected {expected} rows (data {data.shape[0]} + forecast_horizon "
+        f"{forecast_horizon}); got {actual} ({direction} {abs(diff)}) "
+        f"covering {coverage}."
+    )
 
 
 def basic_ts_checks(data: pd.DataFrame, verbose: bool = False) -> bool:
