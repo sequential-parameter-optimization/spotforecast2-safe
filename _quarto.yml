@@ -522,7 +522,6 @@ quartodoc:
         - forecaster.recursive._forecaster_recursive.ForecasterRecursive
         - forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate
         - forecaster.recursive._forecaster_recursive_multiseries
-        - forecaster.utils
         - forecaster.metrics.add_y_train_argument
         - forecaster.metrics.calculate_coverage
         - forecaster.metrics.create_mean_pinball_loss
@@ -594,6 +593,16 @@ quartodoc:
         - utils.cpe.get_cpe_identifier
         - utils.convert_to_utc
         - utils.parse.parse_bool
+
+    # ── Stats ─────────────────────────────────────────────────────────────────
+    - title: "Stats"
+      desc: |
+        Statistical primitives for time-series diagnostics. Pure compute,
+        no plotting dependencies — safety-critical-friendly.
+      contents:
+        - stats.stationarity.augmented_dickey_fuller
+        - stats.spectral.compute_periodogram
+        - stats.spectral.PeriodogramResult
 
     # ── Security ──────────────────────────────────────────────────────────────
     - title: "Security"

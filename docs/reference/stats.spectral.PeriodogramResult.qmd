@@ -1,0 +1,14 @@
+# stats.spectral.PeriodogramResult { #spotforecast2_safe.stats.spectral.PeriodogramResult }
+
+```python
+stats.spectral.PeriodogramResult(spectrum, top_periods)
+```
+
+Container for the output of `compute_periodogram()`.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name        | Type                                           | Description                                                                                                                                                                     |
+|-------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| spectrum    | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``pd.DataFrame`` indexed by frequency with one column ``"power"``.  Frequency is expressed in units of "cycles per sample" (the convention used by `scipy.signal.periodogram`). |
+| top_periods | [pd](`pandas`).[Series](`pandas.Series`)       | ``pd.Series`` of the top-k periods (1 / frequency) indexed by their spectral power, sorted from strongest to weakest peak.                                                      |

@@ -1,0 +1,53 @@
+# stats.spectral.compute_periodogram { #spotforecast2_safe.stats.spectral.compute_periodogram }
+
+```python
+stats.spectral.compute_periodogram(
+    y,
+    *,
+    max_peaks=5,
+    scaling='spectrum',
+    fs=None,
+)
+```
+
+Compute the periodogram of a time series.
+
+Wraps `scipy.signal.periodogram` with a ``boxcar`` window to match
+the reference implementation.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                              | Description                                                                                             | Default      |
+|-----------|---------------------------------------------------|---------------------------------------------------------------------------------------------------------|--------------|
+| y         | [pd](`pandas`).[Series](`pandas.Series`)          | Series to analyse.  Must be a non-empty pandas Series without missing values (validated via `check_y`). | _required_   |
+| max_peaks | [int](`int`)                                      | Number of top peaks to surface.                                                                         | `5`          |
+| scaling   | [str](`str`)                                      | Spectrum scaling forwarded to ``scipy``.                                                                | `'spectrum'` |
+| fs        | [Optional](`typing.Optional`)\[[float](`float`)\] | Sampling frequency.  Defaults to ``1.0`` (cycles per sample).                                           | `None`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                       | Description                                          |
+|--------|----------------------------------------------------------------------------|------------------------------------------------------|
+|        | [PeriodogramResult](`spotforecast2_safe.stats.spectral.PeriodogramResult`) | A `PeriodogramResult` with the full spectrum and the |
+|        | [PeriodogramResult](`spotforecast2_safe.stats.spectral.PeriodogramResult`) | top-``max_peaks`` periods.                           |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                       |
+|--------|----------------------------|-----------------------------------|
+|        | [TypeError](`TypeError`)   | If ``y`` is not a pandas Series.  |
+|        | [ValueError](`ValueError`) | If ``y`` contains missing values. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.stats.spectral import compute_periodogram
+
+t = np.arange(512)
+y = pd.Series(np.sin(2 * np.pi * t / 32))
+result = compute_periodogram(y, max_peaks=1)
+print(int(round(result.top_periods.index[0])))
+```
