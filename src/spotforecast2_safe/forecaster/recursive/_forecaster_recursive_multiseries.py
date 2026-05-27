@@ -26,41 +26,45 @@ from spotforecast2_safe.exceptions import (
     MissingValuesWarning,
     ResidualsUsageWarning,
     UnknownLevelWarning,
+    set_skforecast_warnings,
 )
 
 # from spotforecast2_safe import __version__ as spotforecast_version
 from spotforecast2_safe.forecaster.base import ForecasterBase
 from spotforecast2_safe.forecaster.utils import (
     align_series_and_exog_multiseries,
+    check_preprocess_exog_multiseries,
+    check_preprocess_series,
+    check_residuals_input,
+    get_style_repr_html,
+    initialize_differentiator_multiseries,
+    initialize_estimator,
+    initialize_transformer_series,
+    initialize_window_features,
+    prepare_levels_multiseries,
+    preprocess_levels_self_last_window_multiseries,
+    set_cpu_gpu_device,
+    transform_numpy,
+)
+from spotforecast2_safe.preprocessing import QuantileBinner, TimeSeriesDifferentiator
+from spotforecast2_safe.preprocessing.checking import (
     check_exog,
     check_exog_dtypes,
     check_interval,
     check_predict_input,
-    check_preprocess_exog_multiseries,
-    check_preprocess_series,
-    check_residuals_input,
-    check_select_fit_kwargs,
-    expand_index,
     get_exog_dtypes,
-    get_style_repr_html,
-    initialize_differentiator_multiseries,
-    initialize_estimator,
-    initialize_lags,
-    initialize_transformer_series,
-    initialize_weights,
-    initialize_window_features,
+)
+from spotforecast2_safe.preprocessing.data_transform import (
+    expand_index,
     input_to_frame,
-    prepare_levels_multiseries,
-    preprocess_levels_self_last_window_multiseries,
-    set_cpu_gpu_device,
-    set_skforecast_warnings,
     transform_dataframe,
-    transform_numpy,
 )
-from spotforecast2_safe.splitter.utils_common import (
-    _extract_data_folds_multiseries,
+from spotforecast2_safe.preprocessing.forecaster_config import (
+    check_select_fit_kwargs,
+    initialize_lags,
+    initialize_weights,
 )
-from spotforecast2_safe.preprocessing import QuantileBinner, TimeSeriesDifferentiator
+from spotforecast2_safe.splitter.utils_common import _extract_data_folds_multiseries
 
 
 class ForecasterRecursiveMultiSeries(ForecasterBase):

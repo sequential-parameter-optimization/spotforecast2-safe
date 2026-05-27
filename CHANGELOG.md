@@ -1,3 +1,11 @@
+## [13.4.4-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.4-rc.1...v13.4.4-rc.2) (2026-05-27)
+
+
+### Code Refactoring
+
+* **forecaster:** clean up utils.py code smells ([4467cb2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4467cb2c93e7e0ee10be9782af74f436586b2e6c))
+* **forecaster:** demote utils.py to internal aggregator ([b1ddd8d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b1ddd8d9df2b16767a645eb2a2f8d05ca25f7b6b))
+
 ## [13.4.4-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.3...v13.4.4-rc.1) (2026-05-27)
 
 
