@@ -16,7 +16,8 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model._base import LinearClassifierMixin, LinearModel
 from sklearn.pipeline import Pipeline
 
-from spotforecast2_safe.forecaster.utils import check_interval, date_to_index_position
+from spotforecast2_safe.forecaster.utils import date_to_index_position
+from spotforecast2_safe.preprocessing.checking import check_interval
 
 
 def _extract_data_folds_multiseries(
