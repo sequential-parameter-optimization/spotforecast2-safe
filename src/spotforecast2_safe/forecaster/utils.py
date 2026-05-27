@@ -2,14 +2,17 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later AND BSD-3-Clause
 
+import os
 import uuid
 import warnings
 from copy import copy, deepcopy
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
+from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
+from tqdm.auto import tqdm
 
 from spotforecast2_safe.exceptions import (
     IgnoredArgumentWarning,
@@ -36,11 +39,6 @@ from spotforecast2_safe.preprocessing.forecaster_config import (
     initialize_lags,
     initialize_weights,
 )
-
-try:
-    from tqdm.auto import tqdm
-except ImportError:  # pragma: no cover - fallback when tqdm is not installed
-    tqdm = None
 
 
 __all__ = [
@@ -561,8 +559,8 @@ def transform_numpy(
         raise TypeError(f"`array` argument must be a numpy ndarray. Got {type(array)}")
 
     original_ndim = array.ndim
-    original_shape = array.shape
     reshaped_for_inverse = False
+    original_shape: tuple[int, ...] | None = None
 
     if original_ndim == 1:
         array = array.reshape(-1, 1)
@@ -588,6 +586,7 @@ def transform_numpy(
             # Reshape to single column, transform, and reshape back.
             # This is faster than applying the transformer column by column.
             if array.shape[1] > 1:
+                original_shape = array.shape
                 array = array.reshape(-1, 1)
                 reshaped_for_inverse = True
             array_transformed = transformer.inverse_transform(array)
@@ -639,14 +638,12 @@ def select_n_jobs_fit_forecaster(forecaster_name: str, estimator: object) -> int
         assert n_jobs >= 1
         ```
     """
-    import os
-
     return os.cpu_count() or 1
 
 
 def initialize_window_features(
     window_features: Any,
-) -> Tuple[Optional[List[object]], Optional[List[str]], Optional[int]]:
+) -> tuple[list[object] | None, list[str] | None, int | None]:
     """Check window_features argument input and generate the corresponding list.
 
     This function validates window feature objects and extracts their metadata,
@@ -785,11 +782,11 @@ def initialize_window_features(
 
 
 def check_extract_values_and_index(
-    data: Union[pd.Series, pd.DataFrame],
+    data: pd.Series | pd.DataFrame,
     data_label: str = "`y`",
     ignore_freq: bool = False,
     return_values: bool = True,
-) -> Tuple[Optional[np.ndarray], pd.Index]:
+) -> tuple[np.ndarray | None, pd.Index]:
     """Extract values and index from a pandas Series or DataFrame, ensuring they are valid.
 
     Validates that the input data has a proper DatetimeIndex or RangeIndex and extracts
@@ -862,7 +859,7 @@ def check_extract_values_and_index(
     return values, data.index
 
 
-def get_style_repr_html(is_fitted: bool = False) -> Tuple[str, str]:
+def get_style_repr_html(is_fitted: bool = False) -> tuple[str, str]:
     """Generate CSS style for HTML representation of the Forecaster.
 
     Creates a unique CSS style block with a container ID for rendering
@@ -913,15 +910,25 @@ def align_series_and_exog_multiseries(
     Heading and trailing NaNs are removed from all series in `series_dict`.
     If needed, reindexing is applied to `exog_dict`.
 
+    Note:
+        This function mutates `series_dict` and `exog_dict` in place. The
+        returned dictionaries are the same objects passed in, not copies.
+        Callers that need to preserve the originals must deep-copy them
+        before calling.
+
     Args:
         series_dict (dict): Dictionary with the series used during training.
+            **Mutated in place** — values may be trimmed of leading/trailing
+            NaNs.
         exog_dict (dict, None): Dictionary with the exogenous variable/s used
-            during training. Defaults to `None`.
+            during training. **Mutated in place** when not `None` — values
+            may be re-sliced, reindexed, or replaced with `None`.
+            Defaults to `None`.
 
     Returns:
         tuple: A tuple containing:
-            - series_dict (dict): Dictionary with the aligned series.
-            - exog_dict (dict): Dictionary with the aligned exogenous variables.
+            - series_dict (dict): The same `series_dict` object, with aligned series.
+            - exog_dict (dict): The same `exog_dict` object, with aligned exog.
 
     Examples:
         ```{python}
@@ -1688,12 +1695,6 @@ def initialize_transformer_series(
         print(isinstance(result['series2'], MinMaxScaler))
         ```
     """
-    from copy import deepcopy
-
-    from sklearn.base import clone
-
-    from spotforecast2_safe.exceptions import IgnoredArgumentWarning
-
     if forecaster_name == "ForecasterRecursiveMultiSeries":
         if encoding is None:
             series_names_in_ = ["_unknown_level"]
