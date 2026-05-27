@@ -50,6 +50,7 @@ configurator.config_entsoe.ConfigEntsoe(
     data_frame_name='default',
     number_folds=10,
     on_weather_failure='raise',
+    retrain_max_age=None,
 )
 ```
 
@@ -115,6 +116,7 @@ protocol.
 | data_frame_name          | [str](`str`)                                                                                         | Identifier for the active dataset.  Used by ``BaseTask`` to name cache subdirectories, model files, and the per-dataset log file.  Defaults to ``"default"``.                                                                                                                                                                                                          | `'default'`                 |
 | number_folds             | [int](`int`)                                                                                         | Number of folds used by ``BaseTask.cv_ts`` when building the ``TimeSeriesSplit`` cross-validation splitter for tuning tasks.  Defaults to ``10``.                                                                                                                                                                                                                      | `10`                        |
 | on_weather_failure       | [Literal](`typing.Literal`)\[\'raise\', \'skip\'\]                                                   | Policy for handling Open-Meteo fetch failures inside ``BaseTask.build_exogenous_features``.  ``"raise"`` (default) aborts the pipeline with a ``WeatherFetchError`` and preserves the safety-critical fail-safe semantics.  ``"skip"`` logs a warning and continues with empty weather features so the rest of the pipeline can run without the Open-Meteo dependency. | `'raise'`                   |
+| retrain_max_age          | [pd](`pandas`).[Timedelta](`pandas.Timedelta`)                                                       | Maximum age of a previously trained model before retraining is required.  Consumed by ``spotforecast2_safe.manager.trainer.should_retrain`` to gate scheduled retraining workflows.  Defaults to ``Timedelta(days=7)``.                                                                                                                                                | `None`                      |
 
 ## Attributes {.doc-section .doc-section-attributes}
 
