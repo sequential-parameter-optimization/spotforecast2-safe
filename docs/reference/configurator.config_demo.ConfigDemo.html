@@ -1481,7 +1481,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Default configuration:</p>
-<div id="9cc83328" class="cell" data-execution_count="1">
+<div id="2fb17e3a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator <span class="im">import</span> ConfigDemo</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo()</span>
@@ -1495,7 +1495,7 @@ Random seed: 42</code></pre>
 </div>
 </div>
 <p>Override specific parameters:</p>
-<div id="6238b140" class="cell" data-execution_count="2">
+<div id="d2fd261c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator <span class="im">import</span> ConfigDemo</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(forecast_horizon<span class="op">=</span><span class="dv">48</span>, contamination<span class="op">=</span><span class="fl">0.05</span>, random_seed<span class="op">=</span><span class="dv">123</span>)</span>
@@ -1507,7 +1507,7 @@ Contamination: 0.05</code></pre>
 </div>
 </div>
 <p>Customize paths for a specific environment:</p>
-<div id="e2115154" class="cell" data-execution_count="3">
+<div id="8bde297a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1527,7 +1527,7 @@ Model root name: models</code></pre>
 </div>
 </div>
 <p>Custom weights for multi-variable aggregation:</p>
-<div id="cfd88e83" class="cell" data-execution_count="4">
+<div id="9aabb8f9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator <span class="im">import</span> ConfigDemo</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
@@ -1537,7 +1537,7 @@ Model root name: models</code></pre>
 </div>
 </div>
 <p>Immutability check (frozen dataclass):</p>
-<div id="fad5f305" class="cell" data-execution_count="5">
+<div id="a3ec84d4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator <span class="im">import</span> ConfigDemo</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo()</span>
@@ -1550,7 +1550,7 @@ Model root name: models</code></pre>
 </div>
 </div>
 <p>Production configuration with a long horizon:</p>
-<div id="7a9f0a20" class="cell" data-execution_count="6">
+<div id="943f7551" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator <span class="im">import</span> ConfigDemo</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>prod_config <span class="op">=</span> ConfigDemo(</span>
