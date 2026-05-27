@@ -1,9 +1,13 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# isort: skip_file
+# `data` MUST be imported before `configurator`; the configurator subpackage
+# transitively depends on data classes, and alphabetical ordering reintroduces
+# a circular import (CI failure on PR #252).
 
-from spotforecast2_safe.configurator import ConfigEntsoe
 from spotforecast2_safe.data import Period
+from spotforecast2_safe.configurator import ConfigEntsoe
 from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
