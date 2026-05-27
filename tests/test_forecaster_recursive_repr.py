@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from sklearn.linear_model import LinearRegression
 
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive

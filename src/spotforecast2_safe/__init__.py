@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 
-from spotforecast2_safe.data import Period
 from spotforecast2_safe.configurator import ConfigEntsoe
+from spotforecast2_safe.data import Period
 from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
@@ -34,13 +34,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-def hello() -> str:
-    return "Hello from spotforecast2-safe!"
-
-
 __all__ = [
-    "__version__",
-    "hello",
     "Period",
     "RepeatingBasisFunction",
     "ExogBuilder",

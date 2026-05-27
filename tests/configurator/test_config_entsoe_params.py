@@ -1,8 +1,11 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.data import Period
 from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
+from spotforecast2_safe.data import Period
 
 
 def test_config_entsoe_get_params():
@@ -43,9 +46,7 @@ def test_config_entsoe_set_params_dict():
 
 def test_config_entsoe_set_params_chaining():
     """Test set_params supports method chaining."""
-    config = (
-        ConfigEntsoe().set_params(country_code="GB").set_params(predict_size=72)
-    )
+    config = ConfigEntsoe().set_params(country_code="GB").set_params(predict_size=72)
 
     assert config.country_code == "GB"
     assert config.predict_size == 72
