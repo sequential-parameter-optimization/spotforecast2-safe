@@ -40,18 +40,25 @@ Align series and exog according to their index.
 Heading and trailing NaNs are removed from all series in `series_dict`.
 If needed, reindexing is applied to `exog_dict`.
 
+#### Note {.doc-section .doc-section-note}
+
+This function mutates `series_dict` and `exog_dict` in place. The
+returned dictionaries are the same objects passed in, not copies.
+Callers that need to preserve the originals must deep-copy them
+before calling.
+
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                   | Description                                                                        | Default    |
-|-------------|------------------------|------------------------------------------------------------------------------------|------------|
-| series_dict | [dict](`dict`)         | Dictionary with the series used during training.                                   | _required_ |
-| exog_dict   | ([dict](`dict`), None) | Dictionary with the exogenous variable/s used during training. Defaults to `None`. | `None`     |
+| Name        | Type                   | Description                                                                                                                                                                            | Default    |
+|-------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| series_dict | [dict](`dict`)         | Dictionary with the series used during training. **Mutated in place** — values may be trimmed of leading/trailing NaNs.                                                                | _required_ |
+| exog_dict   | ([dict](`dict`), None) | Dictionary with the exogenous variable/s used during training. **Mutated in place** when not `None` — values may be re-sliced, reindexed, or replaced with `None`. Defaults to `None`. | `None`     |
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                                                                                                                                                 | Description                                                                                                                                        |
-|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| tuple  | [tuple](`tuple`)\[[dict](`dict`)\[[str](`str`), [pd](`pandas`).[Series](`pandas.Series`)\], [dict](`dict`)\[[str](`str`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`) \| None\]\] | A tuple containing: - series_dict (dict): Dictionary with the aligned series. - exog_dict (dict): Dictionary with the aligned exogenous variables. |
+| Name   | Type                                                                                                                                                                                 | Description                                                                                                                                                       |
+|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| tuple  | [tuple](`tuple`)\[[dict](`dict`)\[[str](`str`), [pd](`pandas`).[Series](`pandas.Series`)\], [dict](`dict`)\[[str](`str`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`) \| None\]\] | A tuple containing: - series_dict (dict): The same `series_dict` object, with aligned series. - exog_dict (dict): The same `exog_dict` object, with aligned exog. |
 
 #### Examples {.doc-section .doc-section-examples}
 
@@ -90,18 +97,18 @@ index frequency consistency.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name          | Type                                                                                                                | Description                                                                     | Default    |
-|---------------|---------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|------------|
-| data          | [Union](`typing.Union`)\[[pd](`pandas`).[Series](`pandas.Series`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | Input data (pandas Series or DataFrame) to extract values and index from.       | _required_ |
-| data_label    | [str](`str`)                                                                                                        | Label used in exception messages for better error reporting. Defaults to "`y`". | `'`y`'`    |
-| ignore_freq   | [bool](`bool`)                                                                                                      | If True, the frequency of the index is not checked. Defaults to False.          | `False`    |
-| return_values | [bool](`bool`)                                                                                                      | If True, the values of the data are returned. Defaults to True.                 | `True`     |
+| Name          | Type                                                                                       | Description                                                                     | Default    |
+|---------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|------------|
+| data          | [pd](`pandas`).[Series](`pandas.Series`) \| [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | Input data (pandas Series or DataFrame) to extract values and index from.       | _required_ |
+| data_label    | [str](`str`)                                                                               | Label used in exception messages for better error reporting. Defaults to "`y`". | `'`y`'`    |
+| ignore_freq   | [bool](`bool`)                                                                             | If True, the frequency of the index is not checked. Defaults to False.          | `False`    |
+| return_values | [bool](`bool`)                                                                             | If True, the values of the data are returned. Defaults to True.                 | `True`     |
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                                                                                                         | Description                                                                                                                                                              |
-|--------|----------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| tuple  | [Tuple](`typing.Tuple`)\[[Optional](`typing.Optional`)\[[np](`numpy`).[ndarray](`numpy.ndarray`)\], [pd](`pandas`).[Index](`pandas.Index`)\] | A tuple containing: - values (numpy.ndarray or None): Values of the data as numpy array,   or None if return_values is False. - index (pandas.Index): Index of the data. |
+| Name   | Type                                                                                                         | Description                                                                                                                                                              |
+|--------|--------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| tuple  | [tuple](`tuple`)\[[np](`numpy`).[ndarray](`numpy.ndarray`) \| None, [pd](`pandas`).[Index](`pandas.Index`)\] | A tuple containing: - values (numpy.ndarray or None): Values of the data as numpy array,   or None if return_values is False. - index (pandas.Index): Index of the data. |
 
 #### Raises {.doc-section .doc-section-raises}
 
@@ -505,9 +512,9 @@ provides a clean, monospace display with a light gray background.
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                  | Description                                                                                                                                                     |
-|--------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| tuple  | [Tuple](`typing.Tuple`)\[[str](`str`), [str](`str`)\] | A tuple containing: - style (str): CSS style block as a string with unique container class. - unique_id (str): Unique 8-character ID for the container element. |
+| Name   | Type                                           | Description                                                                                                                                                     |
+|--------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| tuple  | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] | A tuple containing: - style (str): CSS style block as a string with unique container class. - unique_id (str): Unique 8-character ID for the container element. |
 
 #### Examples {.doc-section .doc-section-examples}
 
@@ -712,9 +719,9 @@ methods (transform_batch, transform) for proper forecasting operations.
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                                                                                                                                                                                           | Description                                                                                                                                                                                                                                                                                                    |
-|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| tuple  | [Tuple](`typing.Tuple`)\[[Optional](`typing.Optional`)\[[List](`typing.List`)\[[object](`object`)\]\], [Optional](`typing.Optional`)\[[List](`typing.List`)\[[str](`str`)\]\], [Optional](`typing.Optional`)\[[int](`int`)\]\] | A tuple containing: - window_features (list or None): List of classes used to create window features. - window_features_names (list or None): List with all the features names of the window features. - max_size_window_features (int or None): Maximum value of the `window_sizes` attribute of all classes. |
+| Name   | Type                                                                                                                           | Description                                                                                                                                                                                                                                                                                                    |
+|--------|--------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| tuple  | [tuple](`tuple`)\[[list](`list`)\[[object](`object`)\] \| None, [list](`list`)\[[str](`str`)\] \| None, [int](`int`) \| None\] | A tuple containing: - window_features (list or None): List of classes used to create window features. - window_features_names (list or None): List with all the features names of the window features. - max_size_window_features (int or None): Maximum value of the `window_sizes` attribute of all classes. |
 
 #### Raises {.doc-section .doc-section-raises}
 

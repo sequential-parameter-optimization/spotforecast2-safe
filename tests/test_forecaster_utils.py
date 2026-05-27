@@ -305,13 +305,33 @@ class TestDateToIndexPosition:
 class TestPredictMultivariate:
     """Test suite for predict_multivariate function."""
 
-    def test_predict_multivariate_works(self):
-        """Test that it combines predictions correctly."""
-        # from spotforecast2_safe.forecaster.utils import predict_multivariate
-        # Assuming predict_multivariate is also in utils.py?
-        # If not, this test might need adjustment or moving.
-        # But 'test_skforecast_utils.py' says 'from spotforecast.skforecast.utils import predict_multivariate'
-        pass
+    def test_predict_multivariate_combines_predictions(self):
+        """Multiple forecasters produce one DataFrame keyed by target name."""
+        from sklearn.linear_model import LinearRegression
+
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+        from spotforecast2_safe.forecaster.utils import predict_multivariate
+
+        y1 = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
+        y2 = pd.Series([2.0, 4.0, 6.0, 8.0, 10.0])
+        f1 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
+        f2 = ForecasterRecursive(estimator=LinearRegression(), lags=2)
+        f1.fit(y=y1)
+        f2.fit(y=y2)
+
+        preds = predict_multivariate({"a": f1, "b": f2}, steps_ahead=3)
+
+        assert isinstance(preds, pd.DataFrame)
+        assert preds.shape[0] == 3
+        assert {"a", "b"}.issubset({lvl[0] for lvl in preds.columns})
+
+    def test_predict_multivariate_empty_returns_empty_frame(self):
+        """Empty forecaster dict returns an empty DataFrame, not an error."""
+        from spotforecast2_safe.forecaster.utils import predict_multivariate
+
+        result = predict_multivariate({}, steps_ahead=5)
+        assert isinstance(result, pd.DataFrame)
+        assert result.empty
 
 
 if __name__ == "__main__":
