@@ -88,6 +88,11 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
         ValueError: If no valid CSV files are found for merging.
 
     Notes:
+        Individual raw CSV files that fail to parse are logged at ERROR
+        level and skipped; the merge continues with the remaining files.
+        When zero files parse successfully the function returns early
+        without writing an output file.
+
         Logging information can be selected by setting the log level for the
         `spotforecast2_safe.downloader.entsoe` logger. Common levels are
         `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell
@@ -271,9 +276,7 @@ def download_new_data(
     else:
         start_date = pd.to_datetime(start, utc=True, errors="coerce")
         if pd.isna(start_date):
-            raise ValueError(
-                f"start={start!r} did not parse to a valid timestamp"
-            )
+            raise ValueError(f"start={start!r} did not parse to a valid timestamp")
         logger.info("Using provided start date: %s", start_date)
 
     # Determine end date
@@ -283,9 +286,7 @@ def download_new_data(
     else:
         end_date = pd.to_datetime(end, utc=True, errors="coerce")
         if pd.isna(end_date):
-            raise ValueError(
-                f"end={end!r} did not parse to a valid timestamp"
-            )
+            raise ValueError(f"end={end!r} did not parse to a valid timestamp")
         logger.info("Using provided end date: %s", end_date)
 
     # Safety check: avoid redundant small downloads

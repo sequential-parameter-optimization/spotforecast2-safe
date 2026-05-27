@@ -11,13 +11,14 @@ import pandas as pd
 from joblib import dump
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
+from spotforecast2_safe.backtesting import backtesting_forecaster
 from spotforecast2_safe.data.data_classes import Period
 from spotforecast2_safe.data.fetch_data import load_timeseries, load_timeseries_forecast
+from spotforecast2_safe.exceptions import NotFittedError, PredictionPackageError
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.splitter import TimeSeriesFold
-from spotforecast2_safe.backtesting import backtesting_forecaster
 from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
+from spotforecast2_safe.splitter import TimeSeriesFold
 
 logger = logging.getLogger(__name__)
 
@@ -1188,6 +1189,13 @@ class ForecasterRecursiveModel:
             Dict[str, Any]: A result package containing actual values,
                 predictions, and calculated metrics (MAE, MAPE).
 
+        Raises:
+            NotFittedError: If the wrapper has no fitted forecaster (i.e. `fit`
+                was never called and no forecaster was assigned).
+            PredictionPackageError: If the underlying prediction pipeline
+                fails for any other reason. The original exception is chained
+                via `__cause__`.
+
         Examples:
             ```{python}
             import os
@@ -1234,8 +1242,10 @@ class ForecasterRecursiveModel:
             ```
         """
         if self.forecaster is None:
-            logger.error("Forecaster not initialized")
-            return {}
+            raise NotFittedError(
+                "Forecaster not initialized; call `.fit()` or assign "
+                "`.forecaster` before `package_prediction()`."
+            )
 
         try:
             y = load_timeseries(on_missing="passthrough")
@@ -1366,4 +1376,6 @@ class ForecasterRecursiveModel:
 
         except Exception as e:
             logger.error("Error generating prediction package: %s", e, exc_info=True)
-            return {}
+            raise PredictionPackageError(
+                f"Failed to build prediction package: {e}"
+            ) from e

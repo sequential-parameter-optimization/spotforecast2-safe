@@ -639,6 +639,30 @@ class NotFittedError(ValueError, AttributeError):
     """
 
 
+class PredictionPackageError(RuntimeError):
+    """Exception raised when building a prediction package fails.
+
+    Raised by `ForecasterRecursiveModel.package_prediction()` (and propagated
+    by callers such as `manager.predictor.get_model_prediction()`) when the
+    underlying prediction pipeline cannot produce a complete result.
+    Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+    working; the dedicated class lets safety-critical callers distinguish a
+    prediction-pipeline failure from generic runtime errors.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.exceptions import PredictionPackageError
+
+        try:
+            raise PredictionPackageError("Predict step returned no rows")
+        except PredictionPackageError as e:
+            print(type(e).__name__, str(e))
+
+        assert issubclass(PredictionPackageError, RuntimeError)
+        ```
+    """
+
+
 warn_skforecast_categories = [
     DataTypeWarning,
     DataTransformationWarning,

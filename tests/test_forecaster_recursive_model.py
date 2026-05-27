@@ -3,6 +3,7 @@ import pytest
 from lightgbm import LGBMRegressor
 from sklearn.linear_model import LinearRegression
 
+from spotforecast2_safe.exceptions import NotFittedError, PredictionPackageError
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
@@ -74,13 +75,15 @@ def test_forecaster_recursive_model_fit_uninitialized():
 
 
 def test_package_prediction_no_forecaster():
-    """Test package_prediction returns empty dict if forecaster is None."""
+    """Test package_prediction raises NotFittedError if forecaster is None."""
     model = ForecasterRecursiveModel(iteration=0)
-    assert model.package_prediction() == {}
+    with pytest.raises(NotFittedError, match="Forecaster not initialized"):
+        model.package_prediction()
 
 
 def test_package_prediction_missing_file(tmp_path, monkeypatch):
-    """Test package_prediction handling of missing data file."""
+    """Test package_prediction surfaces underlying failures as
+    PredictionPackageError (chains the original exception via __cause__)."""
     model = ForecasterRecursiveModel(iteration=0)
     model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=1)
 
@@ -88,10 +91,11 @@ def test_package_prediction_missing_file(tmp_path, monkeypatch):
     import sys
 
     fd_mod = sys.modules["spotforecast2_safe.data.fetch_data"]
-    monkeypatch.setattr(fd_mod, "get_data_home", lambda: tmp_path)
+    monkeypatch.setattr(fd_mod, "get_data_home", lambda *args, **kwargs: tmp_path)
 
-    result = model.package_prediction()
-    assert result == {}
+    with pytest.raises(PredictionPackageError) as exc_info:
+        model.package_prediction()
+    assert isinstance(exc_info.value.__cause__, FileNotFoundError)
 
 
 def test_forecaster_recursive_model_repr():
