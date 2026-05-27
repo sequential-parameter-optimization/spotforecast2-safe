@@ -1,3 +1,10 @@
+## [13.4.4-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.3...v13.4.4-rc.1) (2026-05-27)
+
+
+### Bug Fixes
+
+* **forecaster:** tighten utils.py bugs, dedupe __all__, move to top ([ceb00e2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ceb00e24bc9c82322a8dfe1f425156390e70f4bc))
+
 ## [13.4.3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.2...v13.4.3) (2026-05-26)
 
 

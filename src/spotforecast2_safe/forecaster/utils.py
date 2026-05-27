@@ -43,6 +43,43 @@ except ImportError:  # pragma: no cover - fallback when tqdm is not installed
     tqdm = None
 
 
+__all__ = [
+    "initialize_lags",
+    "initialize_weights",
+    "check_select_fit_kwargs",
+    "check_y",
+    "check_exog",
+    "get_exog_dtypes",
+    "check_exog_dtypes",
+    "check_predict_input",
+    "check_interval",
+    "input_to_frame",
+    "expand_index",
+    "transform_dataframe",
+    "check_preprocess_series",
+    "check_preprocess_exog_multiseries",
+    "set_skforecast_warnings",
+    "set_cpu_gpu_device",
+    "initialize_window_features",
+    "initialize_transformer_series",
+    "check_extract_values_and_index",
+    "get_style_repr_html",
+    "initialize_estimator",
+    "check_residuals_input",
+    "date_to_index_position",
+    "prepare_steps_direct",
+    "exog_to_direct",
+    "exog_to_direct_numpy",
+    "transform_numpy",
+    "select_n_jobs_fit_forecaster",
+    "predict_multivariate",
+    "align_series_and_exog_multiseries",
+    "prepare_levels_multiseries",
+    "preprocess_levels_self_last_window_multiseries",
+    "initialize_differentiator_multiseries",
+]
+
+
 def check_preprocess_series(
     series: pd.DataFrame | dict[str, pd.Series | pd.DataFrame],
 ) -> tuple[dict[str, pd.Series], dict[str, pd.Index]]:
@@ -268,23 +305,30 @@ def check_preprocess_series(
 def check_preprocess_exog_multiseries(exog):
     """Check and preprocess `exog` argument in `ForecasterRecursiveMultiSeries`.
 
-    Currently a placeholder; returns None for all inputs.
+    Not yet implemented. Raises `NotImplementedError` on every call so that
+    callers receive an explicit failure rather than a silently-passing
+    validation step (fail-safe over silent failure).
 
     Args:
         exog: Exogenous variables (any type accepted by the multiseries forecaster).
 
-    Returns:
-        None
+    Raises:
+        NotImplementedError: Always.
 
     Examples:
         ```{python}
         from spotforecast2_safe.forecaster.utils import check_preprocess_exog_multiseries
 
-        result = check_preprocess_exog_multiseries(None)
-        print(result)
+        try:
+            check_preprocess_exog_multiseries(None)
+        except NotImplementedError as exc:
+            print(type(exc).__name__)
         ```
     """
-    pass
+    raise NotImplementedError(
+        "`check_preprocess_exog_multiseries` is not yet implemented. "
+        "Multiseries exog validation is not available in spotforecast2-safe."
+    )
 
 
 def exog_to_direct(
@@ -452,6 +496,11 @@ def prepare_steps_direct(
                     f"Got {type(steps)}."
                 )
             steps_direct.append(int(step))
+    else:
+        raise TypeError(
+            f"`steps` argument must be an int, a list of ints or `None`. "
+            f"Got {type(steps)}."
+        )
 
     return steps_direct
 
@@ -593,44 +642,6 @@ def select_n_jobs_fit_forecaster(forecaster_name: str, estimator: object) -> int
     import os
 
     return os.cpu_count() or 1
-
-
-__all__ = [
-    "initialize_lags",
-    "initialize_weights",
-    "check_select_fit_kwargs",
-    "check_y",
-    "check_exog",
-    "get_exog_dtypes",
-    "check_exog_dtypes",
-    "check_predict_input",
-    "check_interval",
-    "input_to_frame",
-    "expand_index",
-    "transform_dataframe",
-    "check_preprocess_series",
-    "check_preprocess_exog_multiseries",
-    "set_skforecast_warnings",
-    "set_cpu_gpu_device",
-    "initialize_window_features",
-    "initialize_transformer_series",
-    "check_extract_values_and_index",
-    "get_style_repr_html",
-    "initialize_estimator",
-    "check_residuals_input",
-    "date_to_index_position",
-    "prepare_steps_direct",
-    "exog_to_direct",
-    "exog_to_direct_numpy",
-    "transform_numpy",
-    "select_n_jobs_fit_forecaster",
-    "select_n_jobs_fit_forecaster",
-    "predict_multivariate",
-    "align_series_and_exog_multiseries",
-    "prepare_levels_multiseries",
-    "preprocess_levels_self_last_window_multiseries",
-    "initialize_differentiator_multiseries",
-]
 
 
 def initialize_window_features(
@@ -1396,7 +1407,7 @@ def date_to_index_position(
     date_input: int | str | pd.Timestamp,
     method: str = "prediction",
     date_literal: str = "steps",
-    kwargs_pd_to_datetime: dict = {},
+    kwargs_pd_to_datetime: dict | None = None,
 ) -> int:
     """
     Transform a datetime string or pandas Timestamp to an integer position.
@@ -1436,6 +1447,9 @@ def date_to_index_position(
 
     if method not in ["prediction", "validation"]:
         raise ValueError("`method` must be 'prediction' or 'validation'.")
+
+    if kwargs_pd_to_datetime is None:
+        kwargs_pd_to_datetime = {}
 
     # Initialize output; will be set in all valid code paths below
     output: int = 0
@@ -1485,7 +1499,7 @@ def date_to_index_position(
 
 def initialize_estimator(
     estimator: object | None = None, regressor: object | None = None
-) -> None:
+) -> object | None:
     """
     Handle the deprecation of 'regressor' in favor of 'estimator'.
 

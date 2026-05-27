@@ -147,7 +147,9 @@ forecaster.utils.check_preprocess_exog_multiseries(exog)
 
 Check and preprocess `exog` argument in `ForecasterRecursiveMultiSeries`.
 
-Currently a placeholder; returns None for all inputs.
+Not yet implemented. Raises `NotImplementedError` on every call so that
+callers receive an explicit failure rather than a silently-passing
+validation step (fail-safe over silent failure).
 
 #### Parameters {.doc-section .doc-section-parameters}
 
@@ -155,19 +157,21 @@ Currently a placeholder; returns None for all inputs.
 |--------|--------|------------------------------------------------------------------------|------------|
 | exog   |        | Exogenous variables (any type accepted by the multiseries forecaster). | _required_ |
 
-#### Returns {.doc-section .doc-section-returns}
+#### Raises {.doc-section .doc-section-raises}
 
-| Name   | Type   | Description   |
-|--------|--------|---------------|
-|        |        | None          |
+| Name   | Type                                         | Description   |
+|--------|----------------------------------------------|---------------|
+|        | [NotImplementedError](`NotImplementedError`) | Always.       |
 
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
 from spotforecast2_safe.forecaster.utils import check_preprocess_exog_multiseries
 
-result = check_preprocess_exog_multiseries(None)
-print(result)
+try:
+    check_preprocess_exog_multiseries(None)
+except NotImplementedError as exc:
+    print(type(exc).__name__)
 ```
 
 ### check_preprocess_series { #spotforecast2_safe.forecaster.utils.check_preprocess_series }
@@ -354,7 +358,7 @@ forecaster.utils.date_to_index_position(
     date_input,
     method='prediction',
     date_literal='steps',
-    kwargs_pd_to_datetime={},
+    kwargs_pd_to_datetime=None,
 )
 ```
 
@@ -370,7 +374,7 @@ The integer represents the position of the datetime in the index.
 | date_input            | ([int](`int`), [str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)) | Datetime to transform.                                                            | _required_     |
 | method                | [str](`str`)                                                                 | Strategy to use. Options: 'prediction', 'validation'. Defaults to `'prediction'`. | `'prediction'` |
 | date_literal          | [str](`str`)                                                                 | Variable name used in error messages. Defaults to `'steps'`.                      | `'steps'`      |
-| kwargs_pd_to_datetime | [dict](`dict`)                                                               | Keyword arguments for `pd.to_datetime()`. Defaults to `{}`.                       | `{}`           |
+| kwargs_pd_to_datetime | [dict](`dict`)                                                               | Keyword arguments for `pd.to_datetime()`. Defaults to `{}`.                       | `None`         |
 
 #### Returns {.doc-section .doc-section-returns}
 
@@ -583,9 +587,9 @@ Handle the deprecation of 'regressor' in favor of 'estimator'.
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type   | Description                 |
-|--------|--------|-----------------------------|
-| object | None   | The valid estimator object. |
+| Name   | Type                       | Description                 |
+|--------|----------------------------|-----------------------------|
+| object | [object](`object`) \| None | The valid estimator object. |
 
 #### Raises {.doc-section .doc-section-raises}
 
