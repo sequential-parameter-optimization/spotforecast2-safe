@@ -20,6 +20,12 @@ Load a saved model at a given iteration.
 |--------|------------------------------------------------------|------------------------------------------------------------------|
 |        | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\] | The loaded model instance, or *None* if the file does not exist. |
 
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                 | Description                                                                                                                                                                             |
+|--------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [OSError](`OSError`) | If the model file exists on disk but cannot be deserialised (corrupt joblib, version mismatch, etc.). A missing file returns `None` instead — that's a legitimate "no model yet" state. |
+
 ## Examples {.doc-section .doc-section-examples}
 
 ```python
