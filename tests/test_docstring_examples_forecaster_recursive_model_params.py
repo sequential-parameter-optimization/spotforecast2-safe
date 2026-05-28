@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Pytest tests validating docstring examples for get_params/set_params.
 
 These tests mirror the Examples in

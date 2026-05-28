@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from unittest.mock import patch
 
 from spotforecast2_safe.forecaster.utils import select_n_jobs_fit_forecaster

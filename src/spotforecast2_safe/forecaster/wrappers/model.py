@@ -357,11 +357,10 @@ class ForecasterRecursiveModel:
         """Simulate hyperparameter tuning.
 
         In ``spotforecast2-safe`` this is a simulated stub that marks the
-        model as tuned without performing an actual Bayesian search.  A
-        full implementation using ``bayesian_search_forecaster`` will be
-        provided in the ``spotforecast2`` package.
-
-        #TODO: Implement real Bayesian search in spotforecast2
+        model as tuned without performing an actual Bayesian search.  The
+        real implementation (using ``bayesian_search_forecaster``) belongs
+        in the sibling package ``spotforecast2``; sf2-safe deliberately
+        excludes auto-tuning per ``MODEL_CARD.md``.
 
         Examples:
             ```{python}
@@ -1142,11 +1141,10 @@ class ForecasterRecursiveModel:
 
         .. note::
 
-            This is a stub.  The full implementation using
-            ``shap.TreeExplainer`` will be provided in the
-            ``spotforecast2`` package.
-
-        #TODO: Implement shap feature importance in spotforecast2
+            This is a stub. The real implementation (using
+            ``shap.TreeExplainer``) belongs in the sibling package
+            ``spotforecast2``; ``shap`` is not on sf2-safe's allowed
+            dependency list per ``MODEL_CARD.md``.
 
         Args:
             frac: Fraction of training data to use for SHAP values.

@@ -1,6 +1,10 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# isort: skip_file
+# `data` MUST be imported before `configurator`; the configurator subpackage
+# transitively depends on data classes, and alphabetical ordering reintroduces
+# a circular import (CI failure on PR #252).
 
 from spotforecast2_safe.data import Period
 from spotforecast2_safe.configurator import ConfigEntsoe
@@ -34,13 +38,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-def hello() -> str:
-    return "Hello from spotforecast2-safe!"
-
-
 __all__ = [
-    "__version__",
-    "hello",
     "Period",
     "RepeatingBasisFunction",
     "ExogBuilder",
