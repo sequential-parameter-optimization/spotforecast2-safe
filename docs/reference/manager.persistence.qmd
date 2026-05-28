@@ -118,11 +118,17 @@ are indicated in the return value for selective retraining.
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                                                                                        | Description                                                                        |
-|--------|-----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-|        | [Dict](`typing.Dict`)\[[str](`str`), [object](`object`)\]                                                                   | Tuple[Dict[str, object], List[str]]:                                               |
-|        | [List](`typing.List`)\[[str](`str`)\]                                                                                       | - forecasters: Dictionary of successfully loaded ForecasterEquivalentDate objects. |
-|        | [Tuple](`typing.Tuple`)\[[Dict](`typing.Dict`)\[[str](`str`), [object](`object`)\], [List](`typing.List`)\[[str](`str`)\]\] | - missing_targets: List of target names without saved models.                      |
+| Name   | Type                                                                                                                        | Description                                                                                                                                                                                   |
+|--------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [object](`object`)\]                                                                   | Tuple[Dict[str, object], List[str]]:                                                                                                                                                          |
+|        | [List](`typing.List`)\[[str](`str`)\]                                                                                       | - forecasters: Dictionary of successfully loaded forecaster objects.                                                                                                                          |
+|        | [Tuple](`typing.Tuple`)\[[Dict](`typing.Dict`)\[[str](`str`), [object](`object`)\], [List](`typing.List`)\[[str](`str`)\]\] | - missing_targets: List of target names with **no saved model file on disk** (eligible for first-time training). A model whose file exists but fails to deserialise raises `OSError` instead. |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                 | Description                                                                                                                                                                                             |
+|--------|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [OSError](`OSError`) | If a model file exists on disk but cannot be deserialised (corrupt joblib, version mismatch, etc.). The caller cannot silently retrain over a corrupt model — they must observe the failure and decide. |
 
 #### Examples {.doc-section .doc-section-examples}
 

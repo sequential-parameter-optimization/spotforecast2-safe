@@ -15,7 +15,15 @@ Get the latest trained model from the cache.
 
 ## Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                | Description                                                |
-|--------|---------------------|------------------------------------------------------------|
-|        | [int](`int`)        | A tuple (iteration, model_instance). If no model is found, |
-|        | [Any](`typing.Any`) | returns (-1, None).                                        |
+| Name   | Type                                                  | Description                                                       |
+|--------|-------------------------------------------------------|-------------------------------------------------------------------|
+|        | [int](`int`)                                          | A tuple (iteration, model_instance). If no model is found on disk |
+|        | [Any](`typing.Any`)                                   | (cache directory missing, no matching files, or no parseable      |
+|        | [tuple](`tuple`)\[[int](`int`), [Any](`typing.Any`)\] | iteration numbers), returns (-1, None) — a legitimate             |
+|        | [tuple](`tuple`)\[[int](`int`), [Any](`typing.Any`)\] | "fresh install, no model yet" state.                              |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                 | Description                                                                                                  |
+|--------|----------------------|--------------------------------------------------------------------------------------------------------------|
+|        | [OSError](`OSError`) | If the latest model file exists on disk but cannot be deserialised (corrupt joblib, version mismatch, etc.). |

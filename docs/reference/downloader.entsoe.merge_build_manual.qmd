@@ -25,6 +25,11 @@ sorts them by time index, and saves the unique combined data to
 
 ## Notes {.doc-section .doc-section-notes}
 
+Individual raw CSV files that fail to parse are logged at ERROR
+level and skipped; the merge continues with the remaining files.
+When zero files parse successfully the function returns early
+without writing an output file.
+
 Logging information can be selected by setting the log level for the
 `spotforecast2_safe.downloader.entsoe` logger. Common levels are
 `DEBUG`, `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. The cell

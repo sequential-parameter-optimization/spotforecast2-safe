@@ -536,11 +536,10 @@ Return global SHAP-based feature importances.
 
 .. note::
 
-    This is a stub.  The full implementation using
-    ``shap.TreeExplainer`` will be provided in the
-    ``spotforecast2`` package.
-
-#TODO: Implement shap feature importance in spotforecast2
+    This is a stub. The real implementation (using
+    ``shap.TreeExplainer``) belongs in the sibling package
+    ``spotforecast2``; ``shap`` is not on sf2-safe's allowed
+    dependency list per ``MODEL_CARD.md``.
 
 ###### Parameters {.doc-section .doc-section-parameters}
 
@@ -644,6 +643,13 @@ and `get_error_forecast()`.
 | Name   | Type                                                       | Description                                                                                                 |
 |--------|------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Dict[str, Any]: A result package containing actual values, predictions, and calculated metrics (MAE, MAPE). |
+
+###### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                             | Description                                                                                                          |
+|--------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+|        | [NotFittedError](`spotforecast2_safe.exceptions.NotFittedError`)                 | If the wrapper has no fitted forecaster (i.e. `fit` was never called and no forecaster was assigned).                |
+|        | [PredictionPackageError](`spotforecast2_safe.exceptions.PredictionPackageError`) | If the underlying prediction pipeline fails for any other reason. The original exception is chained via `__cause__`. |
 
 ###### Examples {.doc-section .doc-section-examples}
 
@@ -865,11 +871,10 @@ forecaster.wrappers.model.ForecasterRecursiveModel.tune()
 Simulate hyperparameter tuning.
 
 In ``spotforecast2-safe`` this is a simulated stub that marks the
-model as tuned without performing an actual Bayesian search.  A
-full implementation using ``bayesian_search_forecaster`` will be
-provided in the ``spotforecast2`` package.
-
-#TODO: Implement real Bayesian search in spotforecast2
+model as tuned without performing an actual Bayesian search.  The
+real implementation (using ``bayesian_search_forecaster``) belongs
+in the sibling package ``spotforecast2``; sf2-safe deliberately
+excludes auto-tuning per ``MODEL_CARD.md``.
 
 ###### Examples {.doc-section .doc-section-examples}
 

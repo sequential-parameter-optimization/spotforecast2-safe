@@ -167,6 +167,12 @@ even when the operator silences the console.
 |        | [logging](`logging`).[Logger](`logging.Logger`)         | Tuple of the configured logger and the audit log file path (or |
 |        | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | ``None`` if ``log_dir`` was omitted).                          |
 
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                 | Description                                                                                                                                                                                                                                                              |
+|--------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [OSError](`OSError`) | If ``log_dir`` is provided but the directory cannot be created or the audit log file cannot be opened. In a safety-critical workflow a missing audit trail is not recoverable — the failure surfaces immediately rather than degrading silently to console-only logging. |
+
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
