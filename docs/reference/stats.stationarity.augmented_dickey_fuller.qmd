@@ -1,0 +1,48 @@
+# stats.stationarity.augmented_dickey_fuller { #spotforecast2_safe.stats.stationarity.augmented_dickey_fuller }
+
+```python
+stats.stationarity.augmented_dickey_fuller(y, *, autolag='AIC')
+```
+
+Run an Augmented Dickey-Fuller test on a time series.
+
+Returns a structured ``pd.Series`` instead of printing — callers
+decide how to display the result.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                     | Description                                                                                          | Default    |
+|---------|------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| y       | [pd](`pandas`).[Series](`pandas.Series`) | Series to test.  Must be a non-empty pandas Series without missing values (validated via `check_y`). | _required_ |
+| autolag | [str](`str`)                             | Lag-selection criterion forwarded to `statsmodels.tsa.stattools.adfuller`.  Defaults to ``"AIC"``.   | `'AIC'`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                  |
+|--------|------------------------------------------|--------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | ``pd.Series`` with the index                                 |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | ``["statistic", "p_value", "n_lags", "n_obs", "critical_1%", |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | "critical_5%", "critical_10%"]``.                            |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                       |
+|--------|----------------------------|-----------------------------------|
+|        | [TypeError](`TypeError`)   | If ``y`` is not a pandas Series.  |
+|        | [ValueError](`ValueError`) | If ``y`` contains missing values. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+
+from spotforecast2_safe.stats.stationarity import (
+    augmented_dickey_fuller,
+)
+
+rng = np.random.default_rng(0)
+y = pd.Series(rng.standard_normal(500))
+out = augmented_dickey_fuller(y)
+print(out["p_value"] < 0.05)
+```
