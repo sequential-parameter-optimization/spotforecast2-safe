@@ -20,6 +20,7 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LinearRegression
 
+from spotforecast2_safe.exceptions import PredictionPackageError
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
 
@@ -89,17 +90,16 @@ def test_package_prediction_no_forecast_column(tmp_data_extra):
 
 
 def test_package_prediction_missing_actual_load(tmp_data_extra, caplog):
-    """Verify package_prediction returns {} and logs error if Actual Load is missing."""
+    """Missing 'Actual Load' column surfaces as PredictionPackageError
+    (chains the underlying KeyError); the error is also logged."""
     create_mock_data(tmp_data_extra, columns=["Wrong Column"])
 
     model = ForecasterRecursiveModel(iteration=0)
     model.forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
 
     with caplog.at_level("ERROR"):
-        result = model.package_prediction()
-
-    assert result == {}
-    # load_timeseries raises KeyError which is caught by package_prediction's except
+        with pytest.raises(PredictionPackageError):
+            model.package_prediction()
     assert "Error generating prediction package" in caplog.text
 
 
@@ -122,7 +122,8 @@ def test_package_prediction_custom_predict_size(tmp_data_extra):
 
 
 def test_package_prediction_exception_handling(tmp_data_extra, monkeypatch, caplog):
-    """Verify that exceptions during processing return {} and log the error."""
+    """Underlying exceptions during processing surface as
+    PredictionPackageError and are logged at ERROR level."""
     create_mock_data(tmp_data_extra)
 
     model = ForecasterRecursiveModel(iteration=0)
@@ -134,9 +135,8 @@ def test_package_prediction_exception_handling(tmp_data_extra, monkeypatch, capl
     os.remove(tmp_data_extra / "energy_load.csv")
 
     with caplog.at_level("ERROR"):
-        result = model.package_prediction()
-
-    assert result == {}
+        with pytest.raises(PredictionPackageError):
+            model.package_prediction()
     assert "Error generating prediction package" in caplog.text
 
 

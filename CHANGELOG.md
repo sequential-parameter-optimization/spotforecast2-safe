@@ -1,3 +1,21 @@
+## [14.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.4-rc.2...v14.0.0-rc.1) (2026-05-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **manager:** package_prediction(), get_model_prediction(),
+load_iteration(), get_last_model(), load_forecasters(), and setup_logging()
+now raise typed exceptions on failure instead of returning sentinel values.
+The corresponding test assertions and docstring examples are updated.
+
+Full suite: 1574 passed, 1 skipped (unchanged from baseline).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Bug Fixes
+
+* **manager:** raise typed exceptions instead of silent returns ([53c9f8f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/53c9f8fb0c9646ded11fcaed16ad580c51802131))
+
 ## [13.4.4-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.4-rc.1...v13.4.4-rc.2) (2026-05-27)
 
 

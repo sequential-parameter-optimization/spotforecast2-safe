@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Tests for spotforecast2_safe.forecaster.utils module.
 
 This module contains comprehensive tests for utility functions used in

@@ -173,6 +173,13 @@ def setup_logging(
         Tuple of the configured logger and the audit log file path (or
         ``None`` if ``log_dir`` was omitted).
 
+    Raises:
+        OSError: If ``log_dir`` is provided but the directory cannot be
+            created or the audit log file cannot be opened. In a
+            safety-critical workflow a missing audit trail is not
+            recoverable — the failure surfaces immediately rather than
+            degrading silently to console-only logging.
+
     Examples:
         ```{python}
         import json
@@ -240,7 +247,7 @@ def setup_logging(
                 f"Persistent logging initialized at: {log_file_path}",
                 extra={"event": "audit_log_init"},
             )
-        except Exception as e:
-            logger.warning(f"Failed to initialize file logging in {log_dir}: {e}")
+        except OSError as e:
+            raise OSError(f"Failed to initialize audit log in {log_dir}: {e}") from e
 
     return logger, log_file_path

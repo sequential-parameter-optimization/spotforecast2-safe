@@ -67,6 +67,11 @@ def load_iteration(
     Returns:
         The loaded model instance, or *None* if the file does not exist.
 
+    Raises:
+        OSError: If the model file exists on disk but cannot be deserialised
+            (corrupt joblib, version mismatch, etc.). A missing file returns
+            `None` instead — that's a legitimate "no model yet" state.
+
     Examples:
         >>> import tempfile
         >>> from spotforecast2_safe.manager.trainer import load_iteration
@@ -80,11 +85,9 @@ def load_iteration(
         logger.error("Iteration %d does not exist at %s!", iteration, path_file)
         return None
     try:
-        model = load(path_file)
-        return model
+        return load(path_file)
     except Exception as e:
-        logger.error("Failed to load model from %s: %s", path_file, e)
-        return None
+        raise OSError(f"Failed to load model from {path_file}: {e}") from e
 
 
 def get_last_model(
@@ -99,8 +102,14 @@ def get_last_model(
             the library's cache home.
 
     Returns:
-        A tuple (iteration, model_instance). If no model is found,
-        returns (-1, None).
+        A tuple (iteration, model_instance). If no model is found on disk
+        (cache directory missing, no matching files, or no parseable
+        iteration numbers), returns (-1, None) — a legitimate
+        "fresh install, no model yet" state.
+
+    Raises:
+        OSError: If the latest model file exists on disk but cannot be
+            deserialised (corrupt joblib, version mismatch, etc.).
     """
     if model_dir is None:
         model_dir = get_cache_home()
@@ -126,11 +135,9 @@ def get_last_model(
     file_path = model_dir / f"{model_name}_forecaster_{max_iter}.joblib"
 
     try:
-        model = load(file_path)
-        return max_iter, model
+        return max_iter, load(file_path)
     except Exception as e:
-        logger.error("Failed to load model from %s: %s", file_path, e)
-        return -1, None
+        raise OSError(f"Failed to load latest model {file_path}: {e}") from e
 
 
 def should_retrain(

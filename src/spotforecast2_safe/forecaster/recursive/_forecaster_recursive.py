@@ -315,9 +315,7 @@ class ForecasterRecursive(ForecasterBase):
             self.differentiation = differentiation
             self.differentiation_max = differentiation
             self.window_size += differentiation
-            self.differentiator = TimeSeriesDifferentiator(
-                order=differentiation  # , window_size=self.window_size # TODO: TimeSeriesDifferentiator in preprocessing created only takes order, add window_size if needed
-            )
+            self.differentiator = TimeSeriesDifferentiator(order=differentiation)
 
         self.fit_kwargs = check_select_fit_kwargs(
             estimator=estimator, fit_kwargs=fit_kwargs

@@ -11,13 +11,14 @@ import pandas as pd
 from joblib import dump
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
+from spotforecast2_safe.backtesting import backtesting_forecaster
 from spotforecast2_safe.data.data_classes import Period
 from spotforecast2_safe.data.fetch_data import load_timeseries, load_timeseries_forecast
+from spotforecast2_safe.exceptions import NotFittedError, PredictionPackageError
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.splitter import TimeSeriesFold
-from spotforecast2_safe.backtesting import backtesting_forecaster
 from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
+from spotforecast2_safe.splitter import TimeSeriesFold
 
 logger = logging.getLogger(__name__)
 
@@ -356,11 +357,10 @@ class ForecasterRecursiveModel:
         """Simulate hyperparameter tuning.
 
         In ``spotforecast2-safe`` this is a simulated stub that marks the
-        model as tuned without performing an actual Bayesian search.  A
-        full implementation using ``bayesian_search_forecaster`` will be
-        provided in the ``spotforecast2`` package.
-
-        #TODO: Implement real Bayesian search in spotforecast2
+        model as tuned without performing an actual Bayesian search.  The
+        real implementation (using ``bayesian_search_forecaster``) belongs
+        in the sibling package ``spotforecast2``; sf2-safe deliberately
+        excludes auto-tuning per ``MODEL_CARD.md``.
 
         Examples:
             ```{python}
@@ -1141,11 +1141,10 @@ class ForecasterRecursiveModel:
 
         .. note::
 
-            This is a stub.  The full implementation using
-            ``shap.TreeExplainer`` will be provided in the
-            ``spotforecast2`` package.
-
-        #TODO: Implement shap feature importance in spotforecast2
+            This is a stub. The real implementation (using
+            ``shap.TreeExplainer``) belongs in the sibling package
+            ``spotforecast2``; ``shap`` is not on sf2-safe's allowed
+            dependency list per ``MODEL_CARD.md``.
 
         Args:
             frac: Fraction of training data to use for SHAP values.
@@ -1187,6 +1186,13 @@ class ForecasterRecursiveModel:
         Returns:
             Dict[str, Any]: A result package containing actual values,
                 predictions, and calculated metrics (MAE, MAPE).
+
+        Raises:
+            NotFittedError: If the wrapper has no fitted forecaster (i.e. `fit`
+                was never called and no forecaster was assigned).
+            PredictionPackageError: If the underlying prediction pipeline
+                fails for any other reason. The original exception is chained
+                via `__cause__`.
 
         Examples:
             ```{python}
@@ -1234,8 +1240,10 @@ class ForecasterRecursiveModel:
             ```
         """
         if self.forecaster is None:
-            logger.error("Forecaster not initialized")
-            return {}
+            raise NotFittedError(
+                "Forecaster not initialized; call `.fit()` or assign "
+                "`.forecaster` before `package_prediction()`."
+            )
 
         try:
             y = load_timeseries(on_missing="passthrough")
@@ -1366,4 +1374,6 @@ class ForecasterRecursiveModel:
 
         except Exception as e:
             logger.error("Error generating prediction package: %s", e, exc_info=True)
-            return {}
+            raise PredictionPackageError(
+                f"Failed to build prediction package: {e}"
+            ) from e

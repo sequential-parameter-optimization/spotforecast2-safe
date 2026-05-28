@@ -1142,7 +1142,11 @@ def set_cpu_gpu_device(
             Defaults to 'cpu'.
 
     Returns:
-        str, None: The original device of the estimator.
+        str, None: The original device of the estimator. If
+            ``estimator.set_params`` fails (e.g. because the installed
+            estimator version no longer recognises the device parameter),
+            a ``RuntimeWarning`` is emitted and the *original* device value
+            is returned — the estimator is left unmodified.
 
     Examples:
         ```{python}
