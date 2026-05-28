@@ -37,6 +37,7 @@ print(caught[0].category.__name__)
 | [MissingValuesWarning](#spotforecast2_safe.exceptions.MissingValuesWarning) | Warning for missing values in data. |
 | [NotFittedError](#spotforecast2_safe.exceptions.NotFittedError) | Exception class to raise if estimator is used before fitting. |
 | [OneStepAheadValidationWarning](#spotforecast2_safe.exceptions.OneStepAheadValidationWarning) | Warning for one-step-ahead validation usage. |
+| [PredictionPackageError](#spotforecast2_safe.exceptions.PredictionPackageError) | Exception raised when building a prediction package fails. |
 | [ResidualsUsageWarning](#spotforecast2_safe.exceptions.ResidualsUsageWarning) | Warning for incorrect residuals usage. |
 | [SaveLoadSkforecastWarning](#spotforecast2_safe.exceptions.SaveLoadSkforecastWarning) | Warning for save/load operations. |
 | [SpotforecastVersionWarning](#spotforecast2_safe.exceptions.SpotforecastVersionWarning) | Warning for version mismatch. |
@@ -339,6 +340,34 @@ with warnings.catch_warnings(record=True) as caught:
 assert len(caught) == 1
 assert issubclass(caught[0].category, OneStepAheadValidationWarning)
 print(caught[0].category.__name__)
+```
+
+### PredictionPackageError { #spotforecast2_safe.exceptions.PredictionPackageError }
+
+```python
+exceptions.PredictionPackageError()
+```
+
+Exception raised when building a prediction package fails.
+
+Raised by `ForecasterRecursiveModel.package_prediction()` (and propagated
+by callers such as `manager.predictor.get_model_prediction()`) when the
+underlying prediction pipeline cannot produce a complete result.
+Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+working; the dedicated class lets safety-critical callers distinguish a
+prediction-pipeline failure from generic runtime errors.
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.exceptions import PredictionPackageError
+
+try:
+    raise PredictionPackageError("Predict step returned no rows")
+except PredictionPackageError as e:
+    print(type(e).__name__, str(e))
+
+assert issubclass(PredictionPackageError, RuntimeError)
 ```
 
 ### ResidualsUsageWarning { #spotforecast2_safe.exceptions.ResidualsUsageWarning }
