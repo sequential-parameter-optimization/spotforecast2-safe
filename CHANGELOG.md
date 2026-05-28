@@ -1,3 +1,35 @@
+## [14.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.3...v14.0.0) (2026-05-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **manager:** package_prediction(), get_model_prediction(),
+load_iteration(), get_last_model(), load_forecasters(), and setup_logging()
+now raise typed exceptions on failure instead of returning sentinel values.
+The corresponding test assertions and docstring examples are updated.
+
+Full suite: 1574 passed, 1 skipped (unchanged from baseline).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Bug Fixes
+
+* **forecaster:** tighten utils.py bugs, dedupe __all__, move to top ([ceb00e2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ceb00e24bc9c82322a8dfe1f425156390e70f4bc))
+* keep data before configurator in root __init__.py ([7e14322](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7e14322849b093d272b9b8c50c160f890540c59a)), closes [#252](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/252)
+* **manager:** raise typed exceptions instead of silent returns ([53c9f8f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/53c9f8fb0c9646ded11fcaed16ad580c51802131))
+
+
+### Documentation
+
+* **stats:** add reference pages for stats.stationarity and stats.spectral ([55ea780](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/55ea780f779340edcef4bd17a0b8d428d0023695)), closes [#248](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/248)
+* **stats:** add Stats section to sidebar navigation ([1771ca1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1771ca19d68d1ee2123339730b102b7edd950fda))
+
+
+### Code Refactoring
+
+* **forecaster:** clean up utils.py code smells ([4467cb2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4467cb2c93e7e0ee10be9782af74f436586b2e6c))
+* **forecaster:** demote utils.py to internal aggregator ([b1ddd8d](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b1ddd8d9df2b16767a645eb2a2f8d05ca25f7b6b))
+
 ## [14.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v13.4.4-rc.2...v14.0.0-rc.1) (2026-05-28)
 
 
