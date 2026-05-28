@@ -163,8 +163,16 @@ def load_forecasters(
 
     Returns:
         Tuple[Dict[str, object], List[str]]:
-        - forecasters: Dictionary of successfully loaded ForecasterEquivalentDate objects.
-        - missing_targets: List of target names without saved models.
+        - forecasters: Dictionary of successfully loaded forecaster objects.
+        - missing_targets: List of target names with **no saved model file on
+          disk** (eligible for first-time training). A model whose file
+          exists but fails to deserialise raises `OSError` instead.
+
+    Raises:
+        OSError: If a model file exists on disk but cannot be deserialised
+            (corrupt joblib, version mismatch, etc.). The caller cannot
+            silently retrain over a corrupt model — they must observe the
+            failure and decide.
 
     Examples:
         ```{python}
@@ -218,12 +226,12 @@ def load_forecasters(
         if filepath.exists():
             try:
                 forecasters[target] = load(filepath)
-                if verbose:
-                    print(f"  ✓ Loaded forecaster for {target} from {filepath}")
             except Exception as e:
-                if verbose:
-                    print(f"  ✗ Failed to load {target}: {e}")
-                missing_targets.append(target)
+                raise OSError(
+                    f"Failed to load forecaster for {target!r} from {filepath}: {e}"
+                ) from e
+            if verbose:
+                print(f"  ✓ Loaded forecaster for {target} from {filepath}")
         else:
             missing_targets.append(target)
 

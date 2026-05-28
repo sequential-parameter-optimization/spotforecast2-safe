@@ -45,33 +45,30 @@ class TestPredictor(unittest.TestCase):
 
     @patch("spotforecast2_safe.manager.predictor.get_last_model")
     def test_get_model_prediction_no_model(self, mock_get_last):
-        """Test handling when no model is found."""
+        """Missing model raises FileNotFoundError."""
         mock_get_last.return_value = (-1, None)
 
-        result = get_model_prediction("lgbm")
-
-        self.assertIsNone(result)
+        with self.assertRaises(FileNotFoundError):
+            get_model_prediction("lgbm")
 
     @patch("spotforecast2_safe.manager.predictor.get_last_model")
     def test_get_model_prediction_missing_method(self, mock_get_last):
-        """Test handling when model lacks package_prediction method."""
+        """Model without package_prediction raises AttributeError."""
         mock_model = MagicMock(spec=[])  # No methods
         mock_get_last.return_value = (5, mock_model)
 
-        result = get_model_prediction("lgbm")
-
-        self.assertIsNone(result)
+        with self.assertRaises(AttributeError):
+            get_model_prediction("lgbm")
 
     @patch("spotforecast2_safe.manager.predictor.get_last_model")
     def test_get_model_prediction_exception(self, mock_get_last):
-        """Test handling when package_prediction raises an exception."""
+        """Exception from package_prediction propagates to the caller."""
         mock_model = MagicMock()
-        mock_model.package_prediction.side_effect = Exception("Prediction failed")
+        mock_model.package_prediction.side_effect = RuntimeError("Prediction failed")
         mock_get_last.return_value = (5, mock_model)
 
-        result = get_model_prediction("lgbm")
-
-        self.assertIsNone(result)
+        with self.assertRaisesRegex(RuntimeError, "Prediction failed"):
+            get_model_prediction("lgbm")
 
 
 # =============================================================================
