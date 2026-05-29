@@ -458,7 +458,7 @@ columns the caller may not want. Stage 6 builds the final list of column
 names that will be passed as `exog` to the forecaster.
 
 `select_exogenous_features(exogenous_features, weather_aligned,
-include_weather_windows, include_holiday_features, include_poly_features)`
+include_weather_windows, include_holiday_features, poly_features_degree)`
 applies these rules:
 
 - Always included: the cyclical sine/cosine columns (matched by the
@@ -468,8 +468,9 @@ applies these rules:
   weather features.
 - Included only if `include_holiday_features=True`: the binary
   `is_holiday` column.
-- Included only if `include_poly_features=True`: the `poly_`-prefixed
-  interaction features.
+- Included only if `poly_features_degree >= 2`: the `poly_`-prefixed
+  interaction features (capped to `max_poly_features` by mutual
+  information).
 
 The final list is deduplicated with the order-preserving idiom
 `list(dict.fromkeys(exog_features))` so that no column name appears twice

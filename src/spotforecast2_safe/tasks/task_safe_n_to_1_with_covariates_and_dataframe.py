@@ -98,7 +98,8 @@ def n_to_1_with_covariates(
     estimator: Optional[Union[str, object]] = None,
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
-    include_poly_features: bool = False,
+    poly_features_degree: int = 1,
+    max_poly_features: int = 10,
     weights: Optional[Union[Dict[str, float], List[float], np.ndarray]] = None,
     verbose: bool = True,
     show_progress: bool = True,
@@ -179,10 +180,12 @@ def n_to_1_with_covariates(
             Useful for capturing demand patterns around holidays.
             Default: False.
 
-        include_poly_features (bool): Add polynomial interactions.
-            Creates 2nd-order interaction terms between selected features.
-            Useful for capturing non-linear relationships.
-            Default: False.
+        poly_features_degree (int): Polynomial-interaction degree. 1 (default)
+            adds no interactions; 2 adds pairwise bilinear terms between
+            selected features; 3+ higher order.
+        max_poly_features (int): Cap on kept polynomial interaction columns;
+            only the top-K ranked by mutual information with the target
+            survive (<= 0 disables). Default: 10.
 
         weights (Optional[Union[Dict[str, float], List[float], np.ndarray]]):
             Weights for combining multi-output predictions.
@@ -249,7 +252,7 @@ def n_to_1_with_covariates(
         ...     forecast_horizon=24,
         ...     include_weather_windows=True,
         ...     include_holiday_features=True,
-        ...     include_poly_features=True,
+        ...     poly_features_degree=2,
         ...     verbose=True
         ... )
 
@@ -284,7 +287,7 @@ def n_to_1_with_covariates(
         ...     state="HE",
         ...     include_weather_windows=True,
         ...     include_holiday_features=True,
-        ...     include_poly_features=True,
+        ...     poly_features_degree=2,
         ...     weights={"power": 1.0, "demand": 0.8},
         ...     verbose=True,
         ...     freq="h",
@@ -325,7 +328,8 @@ def n_to_1_with_covariates(
         logger.info("  Feature Engineering:")
         logger.info(f"    - Weather Windows: {include_weather_windows}")
         logger.info(f"    - Holiday Features: {include_holiday_features}")
-        logger.info(f"    - Polynomial Features: {include_poly_features}")
+        logger.info(f"    - Polynomial Degree: {poly_features_degree}")
+        logger.info(f"    - Max Polynomial Features: {max_poly_features}")
         logger.info(f"  Weights Type: {type(weights).__name__}")
         logger.info(f"{'=' * 80}")
 
@@ -360,7 +364,8 @@ def n_to_1_with_covariates(
         "estimator": estimator,
         "include_weather_windows": include_weather_windows,
         "include_holiday_features": include_holiday_features,
-        "include_poly_features": include_poly_features,
+        "poly_features_degree": poly_features_degree,
+        "max_poly_features": max_poly_features,
         "verbose": verbose,
         "show_progress": show_progress,
     }
@@ -423,7 +428,8 @@ def main(
     state: str = "NW",
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
-    include_poly_features: bool = False,
+    poly_features_degree: int = 1,
+    max_poly_features: int = 10,
     verbose: bool = False,
     weights: Optional[List[float]] = None,
     log_dir: Optional[Path] = None,
@@ -444,7 +450,8 @@ def main(
         state (str): Holiday state code. Default: "NW".
         include_weather_windows (bool): Toggle weather window features. Default: False.
         include_holiday_features (bool): Toggle holiday features. Default: False.
-        include_poly_features (bool): Toggle polynomial features. Default: False.
+        poly_features_degree (int): Polynomial-interaction degree (1 = off). Default: 1.
+        max_poly_features (int): Cap on kept poly columns (top-K by MI). Default: 10.
         verbose (bool): Toggle detailed logging. Default: False.
         weights (Optional[List[float]]): List of weights for prediction aggregation.
             Default: DEFAULT_WEIGHTS.
@@ -492,7 +499,8 @@ def main(
                 estimator=None,
                 include_weather_windows=include_weather_windows,
                 include_holiday_features=include_holiday_features,
-                include_poly_features=include_poly_features,
+                poly_features_degree=poly_features_degree,
+                max_poly_features=max_poly_features,
                 weights=weights,
                 verbose=verbose,
             )
@@ -590,10 +598,16 @@ if __name__ == "__main__":
         help="Enable holiday binary indicators.",
     )
     parser.add_argument(
-        "--include_poly_features",
-        type=parse_bool,
-        default=False,
-        help="Enable polynomial interaction terms.",
+        "--poly_features_degree",
+        type=int,
+        default=1,
+        help="Polynomial-interaction degree (1 = off, 2 = pairwise bilinear).",
+    )
+    parser.add_argument(
+        "--max_poly_features",
+        type=int,
+        default=10,
+        help="Cap on kept polynomial interaction columns (top-K by mutual information).",
     )
 
     # Execution Controls

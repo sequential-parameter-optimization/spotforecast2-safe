@@ -58,7 +58,8 @@ tasks.task_safe_n_to_1_with_covariates_and_dataframe.main(
     state='NW',
     include_weather_windows=False,
     include_holiday_features=False,
-    include_poly_features=False,
+    poly_features_degree=1,
+    max_poly_features=10,
     verbose=False,
     weights=None,
     log_dir=None,
@@ -84,7 +85,8 @@ Execute the complete N-to-1 forecasting pipeline with configurable parameters.
 | state                    | [str](`str`)                                                               | Holiday state code. Default: "NW".                                    | `'NW'`    |
 | include_weather_windows  | [bool](`bool`)                                                             | Toggle weather window features. Default: False.                       | `False`   |
 | include_holiday_features | [bool](`bool`)                                                             | Toggle holiday features. Default: False.                              | `False`   |
-| include_poly_features    | [bool](`bool`)                                                             | Toggle polynomial features. Default: False.                           | `False`   |
+| poly_features_degree     | [int](`int`)                                                               | Polynomial-interaction degree (1 = off). Default: 1.                  | `1`       |
+| max_poly_features        | [int](`int`)                                                               | Cap on kept poly columns (top-K by MI). Default: 10.                  | `10`      |
 | verbose                  | [bool](`bool`)                                                             | Toggle detailed logging. Default: False.                              | `False`   |
 | weights                  | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\] | List of weights for prediction aggregation. Default: DEFAULT_WEIGHTS. | `None`    |
 | log_dir                  | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]                    | Directory to save log files. If None, uses default path.              | `None`    |
@@ -108,7 +110,8 @@ tasks.task_safe_n_to_1_with_covariates_and_dataframe.n_to_1_with_covariates(
     estimator=None,
     include_weather_windows=False,
     include_holiday_features=False,
-    include_poly_features=False,
+    poly_features_degree=1,
+    max_poly_features=10,
     weights=None,
     verbose=True,
     show_progress=True,
@@ -150,7 +153,8 @@ are never logged at any log level, including DEBUG.
 | estimator                | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [object](`object`)\]\]                                                                                                             | Forecaster model. Can be: - None: Uses LGBMRegressor(n_estimators=100, verbose=-1). - "ForecasterRecursive": References default estimator (same as None). - LGBMRegressor(...): Custom pre-configured estimator. - Any sklearn-compatible regressor. Default: None.                               | `None`    |
 | include_weather_windows  | [bool](`bool`)                                                                                                                                                                                           | Add rolling weather statistics. Creates moving averages, min, max of weather features over multiple windows (1D, 7D). Increases feature count significantly. Default: False.                                                                                                                      | `False`   |
 | include_holiday_features | [bool](`bool`)                                                                                                                                                                                           | Add holiday binary indicators. Creates features indicating holidays and special dates. Useful for capturing demand patterns around holidays. Default: False.                                                                                                                                      | `False`   |
-| include_poly_features    | [bool](`bool`)                                                                                                                                                                                           | Add polynomial interactions. Creates 2nd-order interaction terms between selected features. Useful for capturing non-linear relationships. Default: False.                                                                                                                                        | `False`   |
+| poly_features_degree     | [int](`int`)                                                                                                                                                                                             | Polynomial-interaction degree. 1 (default) adds no interactions; 2 adds pairwise bilinear terms between selected features; 3+ higher order.                                                                                                                                                       | `1`       |
+| max_poly_features        | [int](`int`)                                                                                                                                                                                             | Cap on kept polynomial interaction columns; only the top-K ranked by mutual information with the target survive (<= 0 disables). Default: 10.                                                                                                                                                     | `10`      |
 | weights                  | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[Dict](`typing.Dict`)\[[str](`str`), [float](`float`)\], [List](`typing.List`)\[[float](`float`)\], [np](`numpy`).[ndarray](`numpy.ndarray`)\]\] | Weights for combining multi-output predictions. Can be: - None: Uses DEFAULT_WEIGHTS (see module-level constant for values) - Dict: {"col_name": weight, ...} for specific columns - List: [w1, w2, ...] in column order - np.ndarray: Same as list Default: None (uses DEFAULT_WEIGHTS).         | `None`    |
 | verbose                  | [bool](`bool`)                                                                                                                                                                                           | Enable progress logging. Prints intermediate results and timestamps. Default: True.                                                                                                                                                                                                               | `True`    |
 | show_progress            | [bool](`bool`)                                                                                                                                                                                           | Show a progress bar for major pipeline steps. Default: True.                                                                                                                                                                                                                                      | `True`    |
@@ -200,7 +204,7 @@ With feature engineering enabled:
 ...     forecast_horizon=24,
 ...     include_weather_windows=True,
 ...     include_holiday_features=True,
-...     include_poly_features=True,
+...     poly_features_degree=2,
 ...     verbose=True
 ... )
 ```
@@ -239,7 +243,7 @@ With all advanced options:
 ...     state="HE",
 ...     include_weather_windows=True,
 ...     include_holiday_features=True,
-...     include_poly_features=True,
+...     poly_features_degree=2,
 ...     weights={"power": 1.0, "demand": 0.8},
 ...     verbose=True,
 ...     freq="h",
