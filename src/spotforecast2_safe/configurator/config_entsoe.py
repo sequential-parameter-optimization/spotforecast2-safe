@@ -74,6 +74,7 @@ class ConfigEntsoe:
         n_trials_optuna (int): Optuna Bayesian-search trial budget.
         n_trials_spotoptim (int): SpotOptim surrogate-search trial budget.
         n_initial_spotoptim (int): SpotOptim initial random evaluations.
+        warm_start_lags (bool): Seed the SpotOptim search with ``lags_consider``.
         task (str): Active prediction task name.
         agg_weights (Optional[List[float]]): Per-target aggregation weights.
             For single-target use this is typically ``[1.0]`` or ``None``.
@@ -204,6 +205,9 @@ class ConfigEntsoe:
         n_trials_optuna: int = 15,
         n_trials_spotoptim: int = 10,
         n_initial_spotoptim: int = 5,
+        # Seed the SpotOptim search with ``lags_consider`` (consumed by
+        # spotforecast2.multitask.strategies.SpotOptimStrategy)
+        warm_start_lags: bool = False,
         # Active task
         task: str = "lazy",
         # Aggregation weights (single-target uses [1.0] or None)
@@ -313,6 +317,11 @@ class ConfigEntsoe:
         self.n_trials_optuna = n_trials_optuna
         self.n_trials_spotoptim = n_trials_spotoptim
         self.n_initial_spotoptim = n_initial_spotoptim
+        # When True, ``SpotOptimStrategy`` injects ``lags_consider`` as a
+        # candidate lag set and seeds the optimizer's first evaluation with
+        # it (via SpotOptim's ``x0``).  Pure data here; the behaviour lives
+        # in the sibling ``spotforecast2`` package.
+        self.warm_start_lags = warm_start_lags
         # Active task
         self.task = task
         # Aggregation weights
@@ -426,6 +435,7 @@ class ConfigEntsoe:
             "n_trials_optuna": self.n_trials_optuna,
             "n_trials_spotoptim": self.n_trials_spotoptim,
             "n_initial_spotoptim": self.n_initial_spotoptim,
+            "warm_start_lags": self.warm_start_lags,
             # Active task
             "task": self.task,
             # Aggregation weights
