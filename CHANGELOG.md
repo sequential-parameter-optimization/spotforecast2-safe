@@ -1,3 +1,25 @@
+## [15.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v14.0.0...v15.0.0) (2026-05-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* The `include_poly_features` config field and the
+`select_exogenous_features(..., include_poly_features=...)` parameter are
+removed. Use `poly_features_degree` (>= 2 to enable interactions) plus the
+new `max_poly_features` cap instead.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* replace include_poly_features with poly_features_degree + MI-capped interactions ([53b2de1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/53b2de102fa7daf266fa95d890a9ef10da607ef6))
+
+
+### Documentation
+
+* regenerate reference pages to match current source ([b1d2813](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b1d2813f3d3d9aec211bbc6ec53760a57f487d17))
+* remove orphaned forecaster.utils sidebar nav entry ([cde60bd](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cde60bd1066b8ddef59c6c626525667b47f38ced))
+
 ## [15.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v14.0.0...v15.0.0-rc.1) (2026-05-29)
 
 
