@@ -123,6 +123,12 @@ class TestConfigMultiCustomInit:
         cfg = ConfigMulti(lags_consider=lags)
         assert cfg.lags_consider == lags
 
+    def test_warm_start_lags_default_and_override(self):
+        assert ConfigMulti().warm_start_lags is False
+        cfg = ConfigMulti(warm_start_lags=True)
+        assert cfg.warm_start_lags is True
+        assert cfg.get_params()["warm_start_lags"] is True
+
     def test_custom_periods(self):
         custom = [
             Period(name="daily", n_periods=24, column="hour", input_range=(1, 24))

@@ -26,6 +26,17 @@ def test_config_entsoe_get_params():
     assert "data_filename" in params
 
 
+def test_config_entsoe_warm_start_lags():
+    """warm_start_lags defaults to False and round-trips through get_params."""
+    default = ConfigEntsoe()
+    assert default.warm_start_lags is False
+    assert default.get_params()["warm_start_lags"] is False
+
+    enabled = ConfigEntsoe(warm_start_lags=True)
+    assert enabled.warm_start_lags is True
+    assert enabled.get_params()["warm_start_lags"] is True
+
+
 def test_config_entsoe_set_params_kwargs():
     """Test set_params with keyword arguments."""
     config = ConfigEntsoe()

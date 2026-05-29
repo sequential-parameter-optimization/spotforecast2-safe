@@ -89,6 +89,9 @@ class ConfigMulti:
             Defaults to ``10``.
         n_initial_spotoptim (int): Number of initial random evaluations for SpotOptim
             (task 4). Defaults to ``5``.
+        warm_start_lags (bool): When True, the SpotOptim task injects
+            ``lags_consider`` as a candidate lag set and seeds the optimizer's
+            first evaluation with it. Defaults to ``False``.
         task (str): Active prediction task — one of ``"lazy"``, ``"training"``,
             ``"optuna"``, or ``"spotoptim"``. Defaults to ``"lazy"``.
         agg_weights (Optional[List[float]]): Per-target aggregation weights used
@@ -155,6 +158,7 @@ class ConfigMulti:
         n_trials_optuna (int): Number of Optuna hyperparameter-search trials.
         n_trials_spotoptim (int): Number of SpotOptim search trials.
         n_initial_spotoptim (int): Number of initial SpotOptim evaluations.
+        warm_start_lags (bool): Seed the SpotOptim search with ``lags_consider``.
         task (str): Active prediction task (``"lazy"``, ``"training"``,
             ``"optuna"``, or ``"spotoptim"``).
         agg_weights (Optional[List[float]]): Per-target aggregation weights.
@@ -283,6 +287,9 @@ class ConfigMulti:
         n_trials_optuna: int = 15,
         n_trials_spotoptim: int = 10,
         n_initial_spotoptim: int = 5,
+        # Seed the SpotOptim search with ``lags_consider`` (consumed by
+        # spotforecast2.multitask.strategies.SpotOptimStrategy)
+        warm_start_lags: bool = False,
         # Active task
         task: str = "lazy",
         # Aggregation weights (one per target, in target order)
@@ -390,6 +397,11 @@ class ConfigMulti:
         self.n_trials_optuna = n_trials_optuna
         self.n_trials_spotoptim = n_trials_spotoptim
         self.n_initial_spotoptim = n_initial_spotoptim
+        # When True, ``SpotOptimStrategy`` injects ``lags_consider`` as a
+        # candidate lag set and seeds the optimizer's first evaluation with
+        # it (via SpotOptim's ``x0``).  Pure data here; the behaviour lives
+        # in the sibling ``spotforecast2`` package.
+        self.warm_start_lags = warm_start_lags
         # Active task
         self.task = task
         # Aggregation weights (one per target, in target order)
@@ -508,6 +520,7 @@ class ConfigMulti:
             "n_trials_optuna": self.n_trials_optuna,
             "n_trials_spotoptim": self.n_trials_spotoptim,
             "n_initial_spotoptim": self.n_initial_spotoptim,
+            "warm_start_lags": self.warm_start_lags,
             # Active task
             "task": self.task,
             # Aggregation weights
