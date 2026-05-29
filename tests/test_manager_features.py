@@ -492,6 +492,34 @@ class TestMergeDataAndCovariates:
         assert "hour_sin" in merged.columns
         assert "hour_cos" in merged.columns
 
+    def test_non_target_non_exog_columns_are_dropped(self, hourly_idx, base_exog):
+        """Leakage guard: a column that is neither a target nor a selected
+        exogenous feature --- e.g. ENTSO-E's own ``Forecasted Load`` --- must
+        never reach the merged training frame. Only ``target_columns`` and
+        ``exog_features`` survive the merge, so an external forecast carried
+        alongside the actuals can never leak into training or prediction.
+        """
+        rng = np.random.default_rng(7)
+        data = pd.DataFrame(
+            {
+                "load": rng.normal(100, 10, 48),
+                "Forecasted Load": rng.normal(100, 10, 48),  # external forecast
+            },
+            index=hourly_idx,
+        )
+        merged, _, _ = merge_data_and_covariates(
+            data=data,
+            exogenous_features=base_exog,
+            target_columns=["load"],
+            exog_features=["hour_sin", "hour_cos"],
+            start="2024-01-01 00:00",
+            end="2024-01-01 23:00",
+            cov_end="2024-01-02 23:00",
+            forecast_horizon=24,
+        )
+        assert "Forecasted Load" not in merged.columns
+        assert set(merged.columns) == {"load", "hour_sin", "hour_cos"}
+
 
 # =============================================================================
 # Package-level imports
