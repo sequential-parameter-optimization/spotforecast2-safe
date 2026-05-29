@@ -1,3 +1,10 @@
+## [15.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.0.0...v15.1.0-rc.1) (2026-05-29)
+
+
+### Features
+
+* **config:** add warm_start_lags flag to ConfigMulti and ConfigEntsoe ([3a80cec](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3a80cec84198d67ee4d4be7d41dcdc379a7b4059))
+
 ## [15.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v14.0.0...v15.0.0) (2026-05-29)
 
 
