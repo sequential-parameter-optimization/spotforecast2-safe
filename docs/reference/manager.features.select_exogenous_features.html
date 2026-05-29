@@ -1430,7 +1430,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    cyclical_regex<span class="op">=</span><span class="st">'_sin$|_cos$'</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    include_poly_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    poly_features_degree<span class="op">=</span><span class="dv">1</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Select and deduplicate exogenous feature columns for model training.</p>
 <p>Builds a prioritised, deduplicated list of column names from <em>exogenous_features</em> suitable for passing as <code>exog</code> to a recursive forecaster. The selection order is:</p>
@@ -1439,7 +1439,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Weather rolling-window columns (optional, <code>include_weather_windows</code>).</li>
 <li>Raw weather columns shared with <em>weather_aligned</em>.</li>
 <li>Holiday-related columns starting with <code>"holiday"</code> (optional).</li>
-<li>Polynomial interaction columns starting with <code>"poly_"</code> (optional).</li>
+<li>Polynomial interaction columns starting with <code>"poly_"</code> (included when <code>poly_features_degree &gt;= 2</code>).</li>
 </ol>
 <p>Duplicates are removed while preserving insertion order.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1485,10 +1485,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>False</code></td>
 </tr>
 <tr class="even">
-<td>include_poly_features</td>
-<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>If <code>True</code>, include polynomial interaction columns whose names start with <code>"poly_"</code>. Defaults to <code>False</code>.</td>
-<td><code>False</code></td>
+<td>poly_features_degree</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Polynomial-interaction degree. Interaction columns (names starting with <code>"poly_"</code>) are included only when this is <code>&gt;= 2</code>; at <code>1</code> no interactions exist. Defaults to <code>1</code>.</td>
+<td><code>1</code></td>
 </tr>
 </tbody>
 </table>
@@ -1520,7 +1520,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Select cyclical and raw weather columns from a feature matrix:</p>
-<div id="913ff3a1" class="cell" data-execution_count="1">
+<div id="566c7ac9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> select_exogenous_features</span>
