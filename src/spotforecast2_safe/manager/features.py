@@ -14,6 +14,8 @@ exogenous inputs into model-ready feature matrices:
   `PolynomialFeatures`.
 - `select_exogenous_features()` — filter and deduplicate the column list
   that should be passed as ``exog`` to a recursive forecaster.
+- `select_top_poly_features()` — cap the polynomial interaction columns to
+  the top ``max_poly_features`` ranked by mutual information with the target.
 - `merge_data_and_covariates()` — inner-join target data with exogenous
   features and produce separate train and prediction covariate slices.
 - `get_target_data()` — extract the training series and exogenous
@@ -27,6 +29,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
+from sklearn.feature_selection import mutual_info_regression
 from sklearn.preprocessing import PolynomialFeatures
 
 if TYPE_CHECKING:
@@ -277,7 +280,7 @@ def select_exogenous_features(
     cyclical_regex: str = "_sin$|_cos$",
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
-    include_poly_features: bool = False,
+    poly_features_degree: int = 1,
 ) -> List[str]:
     """Select and deduplicate exogenous feature columns for model training.
 
@@ -289,7 +292,8 @@ def select_exogenous_features(
     2. Weather rolling-window columns (optional, ``include_weather_windows``).
     3. Raw weather columns shared with *weather_aligned*.
     4. Holiday-related columns starting with ``"holiday"`` (optional).
-    5. Polynomial interaction columns starting with ``"poly_"`` (optional).
+    5. Polynomial interaction columns starting with ``"poly_"`` (included
+       when ``poly_features_degree >= 2``).
 
     Duplicates are removed while preserving insertion order.
 
@@ -306,9 +310,10 @@ def select_exogenous_features(
             ``"_min"``, or ``"_max"``).  Defaults to ``False``.
         include_holiday_features: If ``True``, include columns whose names
             start with ``"holiday"``.  Defaults to ``False``.
-        include_poly_features: If ``True``, include polynomial interaction
-            columns whose names start with ``"poly_"``.  Defaults to
-            ``False``.
+        poly_features_degree: Polynomial-interaction degree. Interaction
+            columns (names starting with ``"poly_"``) are included only when
+            this is ``>= 2``; at ``1`` no interactions exist. Defaults to
+            ``1``.
 
     Returns:
         List[str]: Deduplicated list of selected column names in priority
@@ -367,13 +372,98 @@ def select_exogenous_features(
         ]
         exog_list.extend(holiday_related)
 
-    if include_poly_features:
+    if poly_features_degree >= 2:
         poly_features_list = [
             col for col in exogenous_features.columns if col.startswith("poly_")
         ]
         exog_list.extend(poly_features_list)
 
     return list(dict.fromkeys(exog_list))
+
+
+# =============================================================================
+# select_top_poly_features
+# =============================================================================
+
+
+def select_top_poly_features(
+    poly_features: pd.DataFrame,
+    y: pd.Series,
+    max_poly_features: int = 10,
+    random_state: int = 123,
+) -> List[str]:
+    """Rank polynomial interaction columns by mutual information, keep the top K.
+
+    Polynomial expansion (`create_interaction_features` with ``degree >= 2``)
+    can emit hundreds or thousands of ``poly_*`` columns. This helper caps that
+    set: it scores each candidate column by its mutual information with the
+    target and returns the names of the ``max_poly_features`` highest-scoring
+    columns. Mutual information is estimated with `mutual_info_regression`,
+    seeded by *random_state* so the selection is reproducible.
+
+    Args:
+        poly_features: DataFrame containing only the candidate ``poly_*``
+            interaction columns to rank.
+        y: Target series. It is inner-joined to *poly_features* on the index
+            and rows with missing values are dropped before scoring.
+        max_poly_features: Maximum number of columns to keep. When this is
+            ``<= 0`` or the candidate count does not exceed it, all columns are
+            returned unchanged. Defaults to ``10``.
+        random_state: Seed forwarded to `mutual_info_regression` for a
+            deterministic estimate. Defaults to ``123``.
+
+    Returns:
+        List[str]: Names of the selected ``poly_*`` columns, ordered from
+        highest to lowest mutual information. Returns every input column (in its
+        original order) when no capping is required.
+
+    Raises:
+        ValueError: If *poly_features* and *y* share no overlapping,
+            non-missing rows.
+
+    Examples:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.manager.features import select_top_poly_features
+
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2024-01-01", periods=500, freq="h", tz="UTC")
+        signal = rng.normal(0, 1, 500)
+        y = pd.Series(signal, index=idx, name="target")
+        poly = pd.DataFrame(
+            {
+                "poly_a": signal + rng.normal(0, 0.01, 500),  # informative
+                "poly_b": signal * 0.5 + rng.normal(0, 0.1, 500),
+                "poly_c": rng.normal(0, 1, 500),  # noise
+                "poly_d": rng.normal(0, 1, 500),  # noise
+            },
+            index=idx,
+        )
+        top = select_top_poly_features(poly, y, max_poly_features=2)
+        print("kept:", top)
+        assert top[0] == "poly_a"
+        assert len(top) == 2
+        ```
+    """
+    columns = list(poly_features.columns)
+    if max_poly_features is None or max_poly_features <= 0:
+        return columns
+    if len(columns) <= max_poly_features:
+        return columns
+
+    joined = poly_features.join(y.rename("__target__"), how="inner").dropna()
+    if joined.empty:
+        raise ValueError(
+            "poly_features and y share no overlapping non-missing rows; "
+            "cannot rank polynomial features by mutual information."
+        )
+
+    scores = mutual_info_regression(
+        joined[columns], joined["__target__"], random_state=random_state
+    )
+    ranked = pd.Series(scores, index=columns).sort_values(ascending=False)
+    return ranked.head(max_poly_features).index.tolist()
 
 
 # =============================================================================

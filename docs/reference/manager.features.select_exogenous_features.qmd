@@ -7,7 +7,7 @@ manager.features.select_exogenous_features(
     cyclical_regex='_sin$|_cos$',
     include_weather_windows=False,
     include_holiday_features=False,
-    include_poly_features=False,
+    poly_features_degree=1,
 )
 ```
 
@@ -21,20 +21,21 @@ forecaster.  The selection order is:
 2. Weather rolling-window columns (optional, ``include_weather_windows``).
 3. Raw weather columns shared with *weather_aligned*.
 4. Holiday-related columns starting with ``"holiday"`` (optional).
-5. Polynomial interaction columns starting with ``"poly_"`` (optional).
+5. Polynomial interaction columns starting with ``"poly_"`` (included
+   when ``poly_features_degree >= 2``).
 
 Duplicates are removed while preserving insertion order.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name                     | Type                                           | Description                                                                                                                                                | Default         |
-|--------------------------|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
-| exogenous_features       | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame containing the full set of candidate feature columns.                                                                                            | _required_      |
-| weather_aligned          | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame whose column names identify the raw ( non-window, non-polynomial) weather variables.                                                             | _required_      |
-| cyclical_regex           | [str](`str`)                                   | Regular expression matched against column names to detect cyclical sine/cosine features.  Defaults to ``"_sin$\|_cos$"``.                                  | `'_sin$|_cos$'` |
-| include_weather_windows  | [bool](`bool`)                                 | If ``True``, include rolling-window weather columns (those containing ``"_window_"`` plus ``"_mean"``, ``"_min"``, or ``"_max"``).  Defaults to ``False``. | `False`         |
-| include_holiday_features | [bool](`bool`)                                 | If ``True``, include columns whose names start with ``"holiday"``.  Defaults to ``False``.                                                                 | `False`         |
-| include_poly_features    | [bool](`bool`)                                 | If ``True``, include polynomial interaction columns whose names start with ``"poly_"``.  Defaults to ``False``.                                            | `False`         |
+| Name                     | Type                                           | Description                                                                                                                                                                      | Default         |
+|--------------------------|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
+| exogenous_features       | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame containing the full set of candidate feature columns.                                                                                                                  | _required_      |
+| weather_aligned          | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame whose column names identify the raw ( non-window, non-polynomial) weather variables.                                                                                   | _required_      |
+| cyclical_regex           | [str](`str`)                                   | Regular expression matched against column names to detect cyclical sine/cosine features.  Defaults to ``"_sin$\|_cos$"``.                                                        | `'_sin$|_cos$'` |
+| include_weather_windows  | [bool](`bool`)                                 | If ``True``, include rolling-window weather columns (those containing ``"_window_"`` plus ``"_mean"``, ``"_min"``, or ``"_max"``).  Defaults to ``False``.                       | `False`         |
+| include_holiday_features | [bool](`bool`)                                 | If ``True``, include columns whose names start with ``"holiday"``.  Defaults to ``False``.                                                                                       | `False`         |
+| poly_features_degree     | [int](`int`)                                   | Polynomial-interaction degree. Interaction columns (names starting with ``"poly_"``) are included only when this is ``>= 2``; at ``1`` no interactions exist. Defaults to ``1``. | `1`             |
 
 ## Returns {.doc-section .doc-section-returns}
 

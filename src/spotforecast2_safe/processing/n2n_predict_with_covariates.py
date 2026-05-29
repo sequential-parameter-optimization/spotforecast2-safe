@@ -94,6 +94,7 @@ from spotforecast2_safe.manager.features import (
     create_interaction_features,
     merge_data_and_covariates,
     select_exogenous_features,
+    select_top_poly_features,
 )
 from spotforecast2_safe.manager.persistence import (
     load_forecasters,
@@ -126,7 +127,8 @@ def n2n_predict_with_covariates(
     estimator: Optional[object] = None,
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
-    include_poly_features: bool = False,
+    poly_features_degree: int = 1,
+    max_poly_features: int = 10,
     force_train: bool = True,
     model_dir: Optional[Union[str, Path]] = None,
     verbose: bool = True,
@@ -166,7 +168,11 @@ def n2n_predict_with_covariates(
             If None, uses LGBMRegressor. Default: None.
         include_weather_windows: Include weather window features. Default: False.
         include_holiday_features: Include holiday features. Default: False.
-        include_poly_features: Include polynomial interaction features. Default: False.
+        poly_features_degree: Polynomial-interaction degree. 1 (default) = no
+            interactions; 2 = pairwise bilinear; 3+ = higher order.
+        max_poly_features: Cap on kept polynomial interaction columns; only the
+            top-K ranked by mutual information with the target survive
+            (<= 0 disables). Default: 10.
         force_train: Force retraining of all models, ignoring cached models.
             Default: True.
         model_dir: Directory for saving/loading trained models. If None, uses the
@@ -454,7 +460,26 @@ def n2n_predict_with_covariates(
     exogenous_features = create_interaction_features(
         exogenous_features=exogenous_features,
         weather_aligned=weather_aligned,
+        degree=poly_features_degree,
     )
+
+    # Cap polynomial interactions to the top max_poly_features by mutual
+    # information with the (primary) target, then drop the rest.
+    if poly_features_degree >= 2:
+        poly_cols = [c for c in exogenous_features.columns if c.startswith("poly_")]
+        if poly_cols and max_poly_features and 0 < max_poly_features < len(poly_cols):
+            keep = select_top_poly_features(
+                exogenous_features[poly_cols],
+                imputed_data[target_columns[0]],
+                max_poly_features=max_poly_features,
+            )
+            drop = [c for c in poly_cols if c not in keep]
+            if verbose:
+                print(
+                    f"  Capped polynomial features: kept {len(keep)} of "
+                    f"{len(poly_cols)} (dropped {len(drop)})."
+                )
+            exogenous_features = exogenous_features.drop(columns=drop)
 
     # ========================================================================
     # 6. SELECT EXOGENOUS FEATURES
@@ -468,7 +493,7 @@ def n2n_predict_with_covariates(
         weather_aligned=weather_aligned,
         include_weather_windows=include_weather_windows,
         include_holiday_features=include_holiday_features,
-        include_poly_features=include_poly_features,
+        poly_features_degree=poly_features_degree,
     )
 
     if verbose:

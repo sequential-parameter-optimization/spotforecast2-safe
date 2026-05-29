@@ -23,6 +23,7 @@ from spotforecast2_safe.manager.features import (
     get_target_data,
     merge_data_and_covariates,
     select_exogenous_features,
+    select_top_poly_features,
 )
 
 # =============================================================================
@@ -177,6 +178,16 @@ class TestCreateInteractionFeatures:
         poly_cols = [c for c in result.columns if c.startswith("poly_")]
         assert len(poly_cols) > 0
 
+    def test_degree_1_creates_no_poly_columns(self, cyclical_exog, weather_df):
+        exog = pd.concat([cyclical_exog, weather_df], axis=1)
+        result = create_interaction_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            degree=1,
+        )
+        poly_cols = [c for c in result.columns if c.startswith("poly_")]
+        assert poly_cols == []
+
     def test_original_columns_preserved(self, cyclical_exog, weather_df):
         exog = pd.concat([cyclical_exog, weather_df], axis=1)
         result = create_interaction_features(
@@ -277,7 +288,7 @@ class TestSelectExogenousFeatures:
             weather_aligned=weather_df,
             include_weather_windows=True,
             include_holiday_features=True,
-            include_poly_features=True,
+            poly_features_degree=2,
         )
         assert len(selected) == len(set(selected))
 
@@ -313,7 +324,7 @@ class TestSelectExogenousFeatures:
         assert "temperature_window_mean" in selected
         assert "temperature_window_min" in selected
 
-    def test_poly_features_selected_when_flag_set(self, hourly_idx, weather_df):
+    def test_poly_features_selected_when_degree_ge_2(self, hourly_idx, weather_df):
         exog = pd.DataFrame(
             {
                 "hour_sin": np.sin(2 * np.pi * hourly_idx.hour / 24),
@@ -325,9 +336,25 @@ class TestSelectExogenousFeatures:
         selected = select_exogenous_features(
             exogenous_features=exog,
             weather_aligned=weather_df,
-            include_poly_features=True,
+            poly_features_degree=2,
         )
         assert "poly_hour_sin__temperature" in selected
+
+    def test_poly_features_excluded_at_degree_1(self, hourly_idx, weather_df):
+        exog = pd.DataFrame(
+            {
+                "hour_sin": np.sin(2 * np.pi * hourly_idx.hour / 24),
+                "temperature": weather_df["temperature"].values,
+                "poly_hour_sin__temperature": np.ones(48),
+            },
+            index=hourly_idx,
+        )
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            poly_features_degree=1,
+        )
+        assert "poly_hour_sin__temperature" not in selected
 
 
 # =============================================================================
@@ -857,3 +884,57 @@ class TestGetTargetDataDocstringExamples:
         assert exog_train.shape == (168, 2)
         assert exog_future.shape == (24, 2)
         assert (exog_train.dtypes == "float32").all()
+
+
+# =============================================================================
+# select_top_poly_features
+# =============================================================================
+
+
+class TestSelectTopPolyFeatures:
+    @pytest.fixture
+    def poly_and_target(self):
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2024-01-01", periods=600, freq="h", tz="UTC")
+        signal = rng.normal(0, 1, 600)
+        y = pd.Series(signal, index=idx, name="target")
+        poly = pd.DataFrame(
+            {
+                "poly_a": signal + rng.normal(0, 0.01, 600),  # most informative
+                "poly_b": signal * 0.5 + rng.normal(0, 0.2, 600),
+                "poly_c": rng.normal(0, 1, 600),  # noise
+                "poly_d": rng.normal(0, 1, 600),  # noise
+                "poly_e": rng.normal(0, 1, 600),  # noise
+            },
+            index=idx,
+        )
+        return poly, y
+
+    def test_caps_to_max(self, poly_and_target):
+        poly, y = poly_and_target
+        top = select_top_poly_features(poly, y, max_poly_features=2)
+        assert len(top) == 2
+        assert top[0] == "poly_a"  # highest mutual information ranks first
+
+    def test_returns_all_when_count_not_above_max(self, poly_and_target):
+        poly, y = poly_and_target
+        top = select_top_poly_features(poly, y, max_poly_features=10)
+        assert set(top) == set(poly.columns)
+
+    def test_no_cap_when_max_non_positive(self, poly_and_target):
+        poly, y = poly_and_target
+        top = select_top_poly_features(poly, y, max_poly_features=0)
+        assert top == list(poly.columns)
+
+    def test_deterministic(self, poly_and_target):
+        poly, y = poly_and_target
+        first = select_top_poly_features(poly, y, max_poly_features=3)
+        second = select_top_poly_features(poly, y, max_poly_features=3)
+        assert first == second
+
+    def test_raises_on_no_overlap(self, poly_and_target):
+        poly, y = poly_and_target
+        disjoint = y.copy()
+        disjoint.index = disjoint.index + pd.Timedelta(days=3650)
+        with pytest.raises(ValueError):
+            select_top_poly_features(poly, disjoint, max_poly_features=2)
