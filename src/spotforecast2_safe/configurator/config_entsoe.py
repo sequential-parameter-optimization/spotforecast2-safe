@@ -49,7 +49,13 @@ class ConfigEntsoe:
         state (str): Subdivision code for regional holidays.
         include_weather_windows (bool): Weather-window feature toggle.
         include_holiday_features (bool): Holiday feature toggle.
-        include_poly_features (bool): Polynomial-interaction feature toggle.
+        poly_features_degree (int): Polynomial-interaction degree passed to
+            the feature builder. ``1`` (default) generates no interactions;
+            ``2`` adds pairwise bilinear terms; ``3+`` higher order.
+        max_poly_features (int): Cap on polynomial interaction columns. When
+            more than this many ``poly_*`` columns are generated, only the
+            top ``max_poly_features`` ranked by mutual information with the
+            target are kept (``<= 0`` disables the cap). Defaults to ``10``.
         index_name (str): Datetime column name when the DataFrame index is
             reset.  ENTSO-E CSVs use ``"Time (UTC)"``; defaults to that.
         start_download (Optional[str]): Start of the data download range.
@@ -175,7 +181,8 @@ class ConfigEntsoe:
         # Feature selection toggles
         include_weather_windows: bool = False,
         include_holiday_features: bool = False,
-        include_poly_features: bool = False,
+        poly_features_degree: int = 1,
+        max_poly_features: int = 10,
         # Data source and index
         index_name: str = "Time (UTC)",
         start_download: Optional[str] = None,
@@ -279,7 +286,12 @@ class ConfigEntsoe:
         # Feature selection toggles
         self.include_weather_windows = include_weather_windows
         self.include_holiday_features = include_holiday_features
-        self.include_poly_features = include_poly_features
+        if poly_features_degree < 1:
+            raise ValueError(
+                f"poly_features_degree must be >= 1, got {poly_features_degree}."
+            )
+        self.poly_features_degree = poly_features_degree
+        self.max_poly_features = max_poly_features
         # Data source and index
         self.index_name = index_name
         self.start_download = start_download
@@ -391,7 +403,8 @@ class ConfigEntsoe:
             # Feature selection toggles
             "include_weather_windows": self.include_weather_windows,
             "include_holiday_features": self.include_holiday_features,
-            "include_poly_features": self.include_poly_features,
+            "poly_features_degree": self.poly_features_degree,
+            "max_poly_features": self.max_poly_features,
             # Data source and index
             "index_name": self.index_name,
             "start_download": self.start_download,

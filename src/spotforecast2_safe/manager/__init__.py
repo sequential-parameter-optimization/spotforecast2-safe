@@ -18,6 +18,7 @@ from spotforecast2_safe.manager.features import (
     get_target_data,
     merge_data_and_covariates,
     select_exogenous_features,
+    select_top_poly_features,
 )
 from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.demo_metrics import calculate_metrics
@@ -59,4 +60,5 @@ __all__ = [
     "get_target_data",
     "merge_data_and_covariates",
     "select_exogenous_features",
+    "select_top_poly_features",
 ]
