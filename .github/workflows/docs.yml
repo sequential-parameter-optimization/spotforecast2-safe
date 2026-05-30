@@ -33,16 +33,20 @@ on:
   workflow_dispatch:
 
 # ---------------------------------------------------------------------------
-# Serialise gh-pages publishers across workflows.
+# Serialise gh-pages publishers across workflows, scoped per branch.
 # Both this workflow and release.yml push to gh-pages via
 # quarto-actions/publish.  Without a shared concurrency group they race
 # on a push to main and the loser fails non-fast-forward
 # ("cannot lock ref 'refs/heads/gh-pages'").  cancel-in-progress: false
 # is mandatory: cancelling release.yml mid-run would skip the PyPI
 # publish step.
+# The group is keyed by branch (github.ref) to match release.yml: this
+# workflow only runs on main, so it shares the main group with the main
+# release run (still serialised), while a develop release run lives in a
+# separate group and can no longer evict the main release run.
 # ---------------------------------------------------------------------------
 concurrency:
-  group: gh-pages-deploy
+  group: gh-pages-deploy-${{ github.ref }}
   cancel-in-progress: false
 
 # ---------------------------------------------------------------------------
