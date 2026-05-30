@@ -1,3 +1,15 @@
+## [15.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.0.0...v15.1.0) (2026-05-30)
+
+
+### Features
+
+* **config:** add warm_start_lags flag to ConfigMulti and ConfigEntsoe ([3a80cec](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3a80cec84198d67ee4d4be7d41dcdc379a7b4059))
+
+
+### Bug Fixes
+
+* **weather:** cover recent window and refuse silent LOCF over long gaps ([9431b21](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9431b21a3f05f259017b93ec767ae61ba69d6fb0))
+
 ## [15.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.0.0...v15.1.0-rc.1) (2026-05-29)
 
 
