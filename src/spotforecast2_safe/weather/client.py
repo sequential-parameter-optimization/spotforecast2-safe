@@ -160,12 +160,20 @@ class WeatherClient:
         }
         return self._fetch(self.ARCHIVE_BASE_URL, params)
 
-    def fetch_forecast(self, days_ahead: int, timezone: str = "UTC") -> pd.DataFrame:
+    def fetch_forecast(
+        self, days_ahead: int, timezone: str = "UTC", past_days: int = 0
+    ) -> pd.DataFrame:
         """Fetch forecast data from Forecast API.
 
         Args:
             days_ahead: Number of days ahead for the forecast.
             timezone: Timezone for the data (default "UTC").
+            past_days: Recent past days to also request from the forecast
+                endpoint via Open-Meteo's ``past_days`` parameter (0--92).
+                The archive endpoint lags several days, so ``past_days`` lets
+                the forecast endpoint backfill that recent window; without it
+                the ``[now - archive_lag, today]`` range is fetched by neither
+                endpoint and is later carried forward as a flat line.
 
         Examples:
             ```{python}
@@ -182,6 +190,8 @@ class WeatherClient:
             "timezone": timezone,
             "forecast_days": days_ahead,
         }
+        if past_days:
+            params["past_days"] = past_days
         return self._fetch(self.FORECAST_BASE_URL, params)
 
 
@@ -344,12 +354,19 @@ class WeatherService(WeatherClient):
             except Exception as e:
                 self.logger.warning(f"Archive fetch warning: {e}")
 
-        # Forecast part
-        if end > now and self.use_forecast:
+        # Forecast part. The forecast endpoint also backfills the recent window
+        # the archive endpoint does not yet publish (archive lags ~5 days): pass
+        # ``past_days`` so ``[archive_cutoff, today]`` is covered and never left
+        # as a hole that downstream alignment would carry forward as a flat
+        # line. Fire whenever the requested range reaches into that window.
+        if end > archive_cutoff and self.use_forecast:
             days = (end - now).days + 2
             days = min(max(1, days), 16)
+            earliest_needed = max(start, archive_cutoff)
+            past_days = (now.normalize() - earliest_needed.normalize()).days + 1
+            past_days = min(max(0, past_days), 92)
             try:
-                df_fore = self.fetch_forecast(days, timezone)
+                df_fore = self.fetch_forecast(days, timezone, past_days=past_days)
                 # Filter forecast to needed range to avoid overlap issues
                 dfs.append(df_fore)
             except Exception as e:
@@ -485,6 +502,15 @@ class WeatherService(WeatherClient):
         """
         if freq != "h":
             df = df.resample(freq).ffill()
+        elif not df.empty:
+            # Reindex onto the complete hourly grid so that *absent* rows (a
+            # real fetch hole) surface as NaN and are governed by the same gap
+            # policy as NaN-valued rows below. Previously absent hourly rows
+            # slipped past the gap check entirely (the reindex only ran for
+            # ``freq != "h"``), so a fetch hole was silently returned.
+            df = df.sort_index()
+            full_index = pd.date_range(df.index.min(), df.index.max(), freq=freq)
+            df = df.reindex(full_index)
 
         if fill_missing:
             return df.ffill().bfill()

@@ -18,6 +18,28 @@ from feature_engine.timeseries.forecasting import WindowFeatures
 
 from spotforecast2_safe.preprocessing.curate_data import curate_weather
 from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
+from spotforecast2_safe.weather.client import WeatherFetchError
+
+# Longest run of consecutive missing ``freq`` steps that ``get_weather_features``
+# will forward-fill during alignment. A longer gap (e.g. the recent window the
+# Open-Meteo archive endpoint has not yet published, with the forecast leg also
+# missing it) is refused rather than silently carried forward as a flat line.
+MAX_FFILL_GAP_PERIODS = 24
+
+
+def _longest_consecutive_run(index: pd.DatetimeIndex, freq: str) -> int:
+    """Length of the longest run of consecutive ``freq``-spaced timestamps."""
+    if len(index) == 0:
+        return 0
+    index = index.sort_values()
+    step = pd.Timedelta(pd.tseries.frequencies.to_offset(freq))
+    best = run = 1
+    prev = index[0]
+    for ts in index[1:]:
+        run = run + 1 if (ts - prev) == step else 1
+        best = max(best, run)
+        prev = ts
+    return best
 
 
 def get_weather_features(
@@ -168,6 +190,25 @@ def get_weather_features(
         print("Processing weather features...")
 
     extended_index = pd.date_range(start=start, end=cov_end, freq=freq, tz=timezone)
+
+    # Refuse to silently carry the last observation forward across a long gap.
+    # If the fetch returned no data for a stretch of the requested window (e.g.
+    # the archive endpoint lags and the forecast leg failed), masking it as a
+    # flat line of repeated values would inject synthetic "measurements". Short
+    # benign gaps (<= MAX_FFILL_GAP_PERIODS, e.g. whole-day-block boundaries)
+    # are still forward-filled below.
+    missing = extended_index.difference(weather_df.index)
+    if len(missing) > 0:
+        longest_gap = _longest_consecutive_run(missing, freq)
+        if longest_gap > MAX_FFILL_GAP_PERIODS:
+            raise WeatherFetchError(
+                f"Weather coverage gap of {longest_gap} consecutive '{freq}' "
+                f"steps within [{start}, {cov_end}] exceeds the "
+                f"{MAX_FFILL_GAP_PERIODS}-step fill tolerance; refusing to carry "
+                "the last observation forward. The Open-Meteo fetch likely did "
+                "not return recent data for this window."
+            )
+
     weather_aligned = weather_df.reindex(extended_index, method="ffill")
 
     weather_columns = weather_aligned.select_dtypes(
