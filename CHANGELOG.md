@@ -1,3 +1,10 @@
+## [15.1.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.1.0-rc.1...v15.1.0-rc.2) (2026-05-30)
+
+
+### Bug Fixes
+
+* **weather:** cover recent window and refuse silent LOCF over long gaps ([9431b21](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9431b21a3f05f259017b93ec767ae61ba69d6fb0))
+
 ## [15.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.0.0...v15.1.0-rc.1) (2026-05-29)
 
 
