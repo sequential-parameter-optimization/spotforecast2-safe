@@ -1,4 +1,4 @@
-## [15.4.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.3.0...v15.4.0-rc.1) (2026-05-31)
+## [15.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.3.0...v15.4.0) (2026-05-31)
 
 
 ### Features
