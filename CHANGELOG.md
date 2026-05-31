@@ -1,3 +1,10 @@
+## [15.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.2.0...v15.3.0) (2026-05-31)
+
+
+### Features
+
+* **downloader:** add keep_forecast_future to retain ENTSO-E day-ahead forecast ([7cc7156](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7cc7156529ef8965fb6c5b7eaef69c61796a0b25))
+
 ## [15.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.1.0...v15.2.0) (2026-05-31)
 
 
