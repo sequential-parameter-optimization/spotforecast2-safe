@@ -70,3 +70,22 @@ def test_config_entsoe_retrain_max_age_in_get_params():
     config = ConfigEntsoe()
     params = config.get_params()
     assert params["retrain_max_age"] == pd.Timedelta(days=7)
+
+
+def test_config_entsoe_imputation_window_size_default_none():
+    """imputation_window_size defaults to None (falls back to window_size)."""
+    config = ConfigEntsoe()
+    assert config.imputation_window_size is None
+
+
+def test_config_entsoe_imputation_window_size_custom():
+    """imputation_window_size is stored when set and is independent of window_size."""
+    config = ConfigEntsoe(window_size=72, imputation_window_size=6)
+    assert config.window_size == 72
+    assert config.imputation_window_size == 6
+
+
+def test_config_entsoe_imputation_window_size_in_get_params():
+    """imputation_window_size is exposed via get_params()."""
+    params = ConfigEntsoe(imputation_window_size=6).get_params()
+    assert params["imputation_window_size"] == 6

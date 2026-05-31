@@ -264,8 +264,12 @@ def apply_imputation(
 
     - ``"weighted"``: forward-fill then backward-fill gaps, then build a
       `WeightFunction` that down-weights training rows near any gap.
-      Rows inside a gap receive weight 0; the rolling window
-      ``config.window_size`` controls how far the penalty extends.
+      Rows inside a gap receive weight 0; the penalty window controls how
+      far the zero-weight zone extends. By default the penalty window is
+      ``config.window_size``; if ``config.imputation_window_size`` is set
+      (not ``None``) it overrides ``window_size`` for the penalty zone only,
+      so the gap-penalty width can be tuned independently of any rolling
+      feature window.
     - ``"linear"``: apply `LinearlyInterpolateTS` column-by-column.
 
     A diagnostic summary (NaN count before **and** after imputation) is
@@ -338,9 +342,14 @@ def apply_imputation(
 
     if config.imputation_method == "weighted":
         logger.info("Applying weighted imputation (n2n style)...")
+        penalty_window = (
+            config.imputation_window_size
+            if getattr(config, "imputation_window_size", None) is not None
+            else config.window_size
+        )
         df_pipeline, weights_series = get_missing_weights(
             df_pipeline,
-            window_size=config.window_size,
+            window_size=penalty_window,
             verbose=verbose,
         )
         weight_func = WeightFunction(weights_series)

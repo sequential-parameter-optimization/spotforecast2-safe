@@ -264,3 +264,58 @@ class TestApplyImputationLogging:
             )
         warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
         assert not warnings
+
+
+# ---------------------------------------------------------------------------
+# Decoupled gap-penalty window (imputation_window_size)
+# ---------------------------------------------------------------------------
+
+
+def _cfg_iws(
+    window_size: int,
+    imputation_window_size: int | None,
+    cols: list[str] | None = None,
+) -> SimpleNamespace:
+    if cols is None:
+        cols = ["A", "B"]
+    return SimpleNamespace(
+        imputation_method="weighted",
+        targets=cols,
+        window_size=window_size,
+        imputation_window_size=imputation_window_size,
+    )
+
+
+class TestImputationWindowSizeDecoupling:
+    """``imputation_window_size`` overrides ``window_size`` for the penalty zone."""
+
+    def test_iws_narrows_penalty_zone(self, df_gap, log):
+        """A small imputation_window_size yields fewer zero-weight rows than
+        a large window_size would."""
+        _, wf_small = apply_imputation(
+            df_gap.copy(), _cfg_iws(window_size=40, imputation_window_size=3), log
+        )
+        _, wf_big = apply_imputation(
+            df_gap.copy(), _cfg_iws(window_size=40, imputation_window_size=None), log
+        )
+        zeros_small = int((wf_small.weights_series == 0.0).sum())
+        zeros_big = int((wf_big.weights_series == 0.0).sum())
+        assert zeros_small < zeros_big
+
+    def test_iws_none_falls_back_to_window_size(self, df_gap, log):
+        """imputation_window_size=None reproduces plain window_size behaviour."""
+        _, wf_none = apply_imputation(
+            df_gap.copy(), _cfg_iws(window_size=5, imputation_window_size=None), log
+        )
+        _, wf_ref = apply_imputation(df_gap.copy(), _cfg("weighted", window_size=5), log)
+        assert (wf_none.weights_series == wf_ref.weights_series).all()
+
+    def test_iws_exact_penalty_width(self, log):
+        """With one gap, the zero span is 1 (gap) + imputation_window_size."""
+        idx = pd.date_range("2024-01-01", periods=120, freq="h")
+        df = pd.DataFrame({"A": np.arange(120, dtype=float)}, index=idx)
+        df.iloc[50, 0] = np.nan
+        _, wf = apply_imputation(
+            df, _cfg_iws(window_size=72, imputation_window_size=6, cols=["A"]), log
+        )
+        assert int((wf.weights_series == 0.0).sum()) == 7

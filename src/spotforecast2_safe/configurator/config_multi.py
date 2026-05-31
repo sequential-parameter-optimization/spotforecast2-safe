@@ -255,6 +255,7 @@ class ConfigMulti:
         # Imputation
         imputation_method: str = "weighted",
         window_size: int = 72,
+        imputation_window_size: Optional[int] = None,
         # Exogenous features
         use_exogenous_features: bool = True,
         latitude: float = 51.5136,
@@ -361,6 +362,7 @@ class ConfigMulti:
         # Imputation
         self.imputation_method = imputation_method
         self.window_size = window_size
+        self.imputation_window_size = imputation_window_size
         # Exogenous features
         self.use_exogenous_features = use_exogenous_features
         self.latitude = latitude
@@ -488,6 +490,7 @@ class ConfigMulti:
             # Imputation
             "imputation_method": self.imputation_method,
             "window_size": self.window_size,
+        "imputation_window_size": self.imputation_window_size,
             # Exogenous features
             "use_exogenous_features": self.use_exogenous_features,
             "latitude": self.latitude,
