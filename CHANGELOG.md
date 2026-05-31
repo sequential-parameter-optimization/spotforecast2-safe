@@ -1,3 +1,10 @@
+## [15.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.1.0...v15.2.0) (2026-05-31)
+
+
+### Features
+
+* **config:** add imputation_window_size to decouple gap-penalty zone ([fb10dee](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/fb10deedb563f8db9ddc97ebc77bfa9210753a9e))
+
 ## [15.2.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.1.0...v15.2.0-rc.1) (2026-05-31)
 
 
