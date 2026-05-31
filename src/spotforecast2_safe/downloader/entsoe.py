@@ -71,7 +71,10 @@ _RETRY_BACKOFF_SECONDS = 5
 _COOLDOWN_HOURS = 24
 
 
-def merge_build_manual(output_file: str = "energy_load.csv") -> None:
+def merge_build_manual(
+    output_file: str = "energy_load.csv",
+    keep_forecast_future: bool = False,
+) -> None:
     """
     Merge all raw CSV files from the 'raw' directory into a single interim file.
 
@@ -82,6 +85,14 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
     Args:
         output_file: The name of the combined output file.
             Defaults to "energy_load.csv".
+        keep_forecast_future: If False (the default), rows with a timestamp
+            after the current UTC moment are dropped, so the interim file
+            holds only data that is "actual" up to now -- the correct,
+            leakage-free input for model training. If True, those future rows
+            are retained, which preserves ENTSO-E's day-ahead `Forecasted Load`
+            for tomorrow (future `Actual Load` is still NaN, so no future
+            target leaks). Use True only for forecast-baseline / comparison
+            workflows that need the published day-ahead forecast.
 
     Raises:
         FileNotFoundError: If the raw directory does not exist.
@@ -114,6 +125,10 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
 
         # Or merge with a custom output filename
         merge_build_manual(output_file="custom_energy_load.csv")
+
+        # Retain future rows so tomorrow's day-ahead `Forecasted Load`
+        # survives (forecast-baseline workflows only; not for training)
+        merge_build_manual(keep_forecast_future=True)
         ```
     """
     data_home = get_data_home()
@@ -162,8 +177,12 @@ def merge_build_manual(output_file: str = "energy_load.csv") -> None:
     merged_df = pd.concat(list_dfs)
     merged_df = merged_df[~merged_df.index.duplicated(keep="last")].sort_index()
 
-    # Filter out future data points if any (only keep what's theoretically "actual" up to now)
-    merged_df = merged_df.loc[merged_df.index <= pd.Timestamp.now(tz="UTC")]
+    # Filter out future data points if any (only keep what's theoretically
+    # "actual" up to now). Skipped when keep_forecast_future is True, so the
+    # day-ahead `Forecasted Load` for tomorrow survives -- future `Actual Load`
+    # is still NaN, so no future target leaks into a training read.
+    if not keep_forecast_future:
+        merged_df = merged_df.loc[merged_df.index <= pd.Timestamp.now(tz="UTC")]
 
     interim_dir.mkdir(parents=True, exist_ok=True)
     output_path = interim_dir / output_file
@@ -177,6 +196,7 @@ def download_new_data(
     start: str | None = None,
     end: str | None = None,
     force: bool = False,
+    keep_forecast_future: bool = False,
 ) -> None:
     """
     Download new load and forecast data from ENTSO-E.
@@ -192,6 +212,13 @@ def download_new_data(
         start: Start date in 'YYYYMMDDHH00' format.
         end: End date in 'YYYYMMDDHH00' format.
         force: If True, bypass the 24h cooldown check.
+        keep_forecast_future: If True, retain rows after the current UTC
+            moment when building the interim file, preserving ENTSO-E's
+            day-ahead `Forecasted Load` for tomorrow. Defaults to False (future
+            rows are dropped, the leakage-free input for training). The flag
+            only keeps rows the query window already covers, so pass an ``end``
+            that reaches into the target day (e.g. tomorrow) as well. See
+            `merge_build_manual` for details.
 
     Raises:
         ImportError:
@@ -236,6 +263,17 @@ def download_new_data(
             country_code="DE",
             force=True,
         )
+
+        # Retain tomorrow's day-ahead `Forecasted Load` (forecast baseline);
+        # `end` must reach into the target day for the rows to exist
+        download_new_data(
+            api_key="YOUR_API_KEY",
+            country_code="DE",
+            start="202301010000",
+            end="202301030000",
+            force=True,
+            keep_forecast_future=True,
+        )
         ```
     """
 
@@ -248,7 +286,7 @@ def download_new_data(
         ) from e
 
     # First merge existing files to get the latest index
-    merge_build_manual()
+    merge_build_manual(keep_forecast_future=keep_forecast_future)
 
     logger.info("Initiating data download from ENTSO-E...")
 
@@ -256,7 +294,14 @@ def download_new_data(
     if start is None:
         try:
             current_data = fetch_data()  # This might look at interim or a specific file
-            start_date = current_data.index[-1] + pd.Timedelta(hours=1)
+            # Resume from the last row at or before now, not the raw index max:
+            # with keep_forecast_future=True the interim can carry future
+            # forecast rows, and resuming from those would skip real history.
+            observed = current_data.loc[
+                current_data.index <= pd.Timestamp.now(tz="UTC")
+            ]
+            last_observed = observed.index[-1] if not observed.empty else current_data.index[-1]
+            start_date = last_observed + pd.Timedelta(hours=1)
             logger.info(
                 "No start date provided. Resuming from last data point: %s", start_date
             )
@@ -347,4 +392,4 @@ def download_new_data(
     logger.info("Downloaded data saved to %s", output_path)
 
     # Final merge to integrate new data
-    merge_build_manual()
+    merge_build_manual(keep_forecast_future=keep_forecast_future)
