@@ -1,3 +1,18 @@
+## [15.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.3.0...v15.4.0) (2026-05-31)
+
+
+### Features
+
+* **config:** add cv_block_size to decouple CV block from live predict_size ([cfc49b9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cfc49b97369c954c6f2915608efb8545888abdef))
+
+
+### Documentation
+
+* **downloader:** note where to get the ENTSO-E Web API Security Token ([f20ea30](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f20ea30d08611424c65630df4efd2318097c4c9f))
+* **model-card:** expand operational, ODD, lifecycle, and interface disclosure ([0007d99](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/0007d997279e1f1270070fd79a76b6894068d1ca))
+* regenerate stale reference pages to match current docstrings ([ce98573](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ce985739c3eab1b43040ebe62689cb941b920fbb)), closes [#274](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/274)
+* sync model-card version from pyproject and repair update_version.py ([aec9372](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/aec93724773e02612cd44bde895dc8c5aaf53282))
+
 ## [15.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.2.0...v15.3.0) (2026-05-31)
 
 
