@@ -1425,7 +1425,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>downloader.entsoe.merge_build_manual(output_file<span class="op">=</span><span class="st">'energy_load.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>downloader.entsoe.merge_build_manual(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    output_file<span class="op">=</span><span class="st">'energy_load.csv'</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    keep_forecast_future<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Merge all raw CSV files from the ‘raw’ directory into a single interim file.</p>
 <p>This function looks for all <code>.csv</code> files in <code>get_data_home() / "raw"</code>, sorts them by time index, and saves the unique combined data to <code>get_data_home() / "interim" / output_file</code>.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1445,6 +1448,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>The name of the combined output file. Defaults to “energy_load.csv”.</td>
 <td><code>'energy_load.csv'</code></td>
+</tr>
+<tr class="even">
+<td>keep_forecast_future</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If False (the default), rows with a timestamp after the current UTC moment are dropped, so the interim file holds only data that is “actual” up to now – the correct, leakage-free input for model training. If True, those future rows are retained, which preserves ENTSO-E’s day-ahead <code>Forecasted Load</code> for tomorrow (future <code>Actual Load</code> is still NaN, so no future target leaks). Use True only for forecast-baseline / comparison workflows that need the published day-ahead forecast.</td>
+<td><code>False</code></td>
 </tr>
 </tbody>
 </table>
@@ -1477,21 +1486,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
 <p>Individual raw CSV files that fail to parse are logged at ERROR level and skipped; the merge continues with the remaining files. When zero files parse successfully the function returns early without writing an output file.</p>
 <p>Logging information can be selected by setting the log level for the <code>spotforecast2_safe.downloader.entsoe</code> logger. Common levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, and <code>CRITICAL</code>. The cell below shows the default (WARNING); change the level to <code>INFO</code> or <code>DEBUG</code> for more verbose output.</p>
-<div id="11321c16" class="cell" data-execution_count="1">
+<div id="02253842" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">"spotforecast2_safe.downloader.entsoe"</span>).setLevel(logging.WARNING)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="758883ef" class="cell" data-execution_count="2">
+<div id="8f71e3a8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> merge_build_manual</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge with the default output filename</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>merge_build_manual()</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Or merge with a custom output filename</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>merge_build_manual(output_file<span class="op">=</span><span class="st">"custom_energy_load.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>merge_build_manual(output_file<span class="op">=</span><span class="st">"custom_energy_load.csv"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Retain future rows so tomorrow's day-ahead `Forecasted Load`</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># survives (forecast-baseline workflows only; not for training)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>merge_build_manual(keep_forecast_future<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
