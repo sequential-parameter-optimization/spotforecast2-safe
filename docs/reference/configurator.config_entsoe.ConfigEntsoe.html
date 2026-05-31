@@ -1472,18 +1472,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    test_data_loader<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    data_frame_name<span class="op">=</span><span class="st">'default'</span>,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    retrain_max_age<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    n_jobs_spotoptim<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    test_data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    data_frame_name<span class="op">=</span><span class="st">'default'</span>,</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    retrain_max_age<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the ENTSO-E forecasting pipeline.</p>
 <p>Single-target counterpart to <code>ConfigMulti</code>. Used by the ENTSO-E CLI (<code>spotforecast2.tasks.task_entsoe</code>) and any other single-target pipeline routed through <code>spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)</code>.</p>
 <p><code>country_code</code> is the canonical ISO 3166-1 alpha-2 country-code attribute used by both API queries and the multitask <code>PipelineConfig</code> protocol.</p>
@@ -1752,66 +1753,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>5</code></td>
 </tr>
 <tr class="odd">
+<td>n_jobs_spotoptim</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]</td>
+<td>Worker count for SpotOptim’s parallel (steady-state) evaluation. <code>None</code> (default) runs sequentially; <code>-1</code> uses all CPU cores; a positive integer pins the worker count. Parallel tuning is faster but, being steady-state, changes the search trajectory, so the tuned result is not bit-identical to a sequential run even with a fixed <code>random_state</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
 <td>warm_start_lags</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Seed the SpotOptim search with <code>lags_consider</code>.</td>
 <td><code>False</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>task</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Active prediction task name.</td>
 <td><code>'lazy'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>agg_weights</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]]</td>
 <td>Per-target aggregation weights. For single-target use this is typically <code>[1.0]</code> or <code>None</code>.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>forecaster_factory</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
 <td>Callable <code>factory(config, *, weight_func, target) -&gt; forecaster</code> consumed by <code>BaseTask.create_forecaster</code>. <code>None</code> falls back to the default LightGBM factory.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>data_loader</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
 <td>Callable <code>data_loader(config)</code> returning a pandas DataFrame. Invoked by <code>BaseTask.prepare_data</code> when no DataFrame is supplied — the ENTSO-E pipeline hook for <code>download_new_data</code> / <code>merge_build_manual</code>.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>test_data_loader</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
 <td>Callable <code>test_data_loader(config)</code> returning a pandas DataFrame with ground-truth values for the prediction horizon. Invoked by <code>BaseTask.prepare_data</code> when no test DataFrame is supplied; the returned frame populates <code>test_actual</code> and <code>metrics_future</code> in the prediction package.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>auto_save_models</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether <code>BaseTask._run_strategy</code> should persist fitted forecasters to <code>&lt;cache_home&gt;/models/</code> after every training run. Defaults to <code>True</code>.</td>
 <td><code>True</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>data_frame_name</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Identifier for the active dataset. Used by <code>BaseTask</code> to name cache subdirectories, model files, and the per-dataset log file. Defaults to <code>"default"</code>.</td>
 <td><code>'default'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>number_folds</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of folds used by <code>BaseTask.cv_ts</code> when building the <code>TimeSeriesSplit</code> cross-validation splitter for tuning tasks. Defaults to <code>10</code>.</td>
 <td><code>10</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>on_weather_failure</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>['raise', 'skip']</td>
 <td>Policy for handling Open-Meteo fetch failures inside <code>BaseTask.build_exogenous_features</code>. <code>"raise"</code> (default) aborts the pipeline with a <code>WeatherFetchError</code> and preserves the safety-critical fail-safe semantics. <code>"skip"</code> logs a warning and continues with empty weather features so the rest of the pipeline can run without the Open-Meteo dependency.</td>
 <td><code>'raise'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>retrain_max_age</td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a></td>
 <td>Maximum age of a previously trained model before retraining is required. Consumed by <code>spotforecast2_safe.manager.trainer.should_retrain</code> to gate scheduled retraining workflows. Defaults to <code>Timedelta(days=7)</code>.</td>
@@ -1861,7 +1868,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="24068ff7" class="cell" data-execution_count="1">
+<div id="063e03ce" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
@@ -1967,7 +1974,7 @@ daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="9f2f6ce7" class="cell" data-execution_count="2">
+<div id="c170cd3a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
@@ -2036,7 +2043,7 @@ daily</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="6dc19364" class="cell" data-execution_count="3">
+<div id="d1b24619" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>

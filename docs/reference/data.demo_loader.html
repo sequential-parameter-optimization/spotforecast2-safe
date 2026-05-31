@@ -1546,7 +1546,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
 <p>Basic usage with explicit forecast horizon and weights:</p>
-<div id="8421a3bf" class="cell" data-execution_count="1">
+<div id="ccb55b4f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1575,7 +1575,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Override forecast horizon and weights:</p>
-<div id="670f9b6b" class="cell" data-execution_count="2">
+<div id="d0b81286" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"col1"</span>: [<span class="bu">float</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)], <span class="st">"col2"</span>: [<span class="bu">float</span>(i <span class="op">*</span> <span class="dv">2</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]},</span>
@@ -1597,7 +1597,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Override <code>data_path</code> while keeping the rest of the config:</p>
-<div id="18859205" class="cell" data-execution_count="3">
+<div id="45ad889a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"X"</span>: [<span class="fl">100.0</span>], <span class="st">"Y"</span>: [<span class="fl">200.0</span>]}, index<span class="op">=</span>idx)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1620,7 +1620,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Error handling — missing file:</p>
-<div id="0d0b2961" class="cell" data-execution_count="4">
+<div id="b7c9eab9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigDemo(data_path<span class="op">=</span>Path(<span class="st">"/nonexistent/file.csv"</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    load_actual_combined(</span>
@@ -1633,7 +1633,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Error handling — missing columns:</p>
-<div id="4d56e60b" class="cell" data-execution_count="5">
+<div id="0587af57" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">1</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame({<span class="st">"col1"</span>: [<span class="fl">1.0</span>]}, index<span class="op">=</span>idx)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1657,7 +1657,7 @@ First value: 3.0</code></pre>
 </div>
 </div>
 <p>Production usage with horizon and weights drawn from the config:</p>
-<div id="132b6e4a" class="cell" data-execution_count="6">
+<div id="77839c58" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">30</span>, freq<span class="op">=</span><span class="st">"h"</span>, name<span class="op">=</span><span class="st">"timestamp"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sample_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    {</span>
