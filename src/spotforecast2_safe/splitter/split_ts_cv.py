@@ -657,6 +657,33 @@ class TimeSeriesFold(BaseFold):
 
         return folds
 
+    def n_folds(self, X: pd.Series | pd.DataFrame | pd.Index | dict) -> int:
+        """Return the number of folds this splitter produces for ``X``.
+
+        Convenience wrapper around ``len(self.split(X))``. Use it to report the
+        true fold count, which is distinct from ``len(metrics_df)`` returned by
+        ``backtesting_forecaster`` (that frame holds a single aggregated row).
+
+        Args:
+            X: The series, frame, index, or dict of series the backtest runs on.
+
+        Returns:
+            The number of folds.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.splitter import TimeSeriesFold
+
+            y = pd.Series(
+                range(120), index=pd.date_range("2025-01-01", periods=120, freq="h")
+            )
+            cv = TimeSeriesFold(steps=24, initial_train_size=48, verbose=False)
+            print(cv.n_folds(y))
+            ```
+        """
+        return len(self.split(X, as_pandas=False))
+
     def _print_info(
         self,
         index: pd.Index,

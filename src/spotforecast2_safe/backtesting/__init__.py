@@ -9,9 +9,11 @@ forecaster over a sequence of folds produced by
 `spotforecast2_safe.splitter` and reports out-of-sample metrics.
 """
 
+from .per_fold import metrics_per_fold
 from .validation import _backtesting_forecaster, backtesting_forecaster
 
 __all__ = [
     "_backtesting_forecaster",
     "backtesting_forecaster",
+    "metrics_per_fold",
 ]
