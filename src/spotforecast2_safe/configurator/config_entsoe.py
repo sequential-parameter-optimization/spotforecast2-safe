@@ -30,6 +30,11 @@ class ConfigEntsoe:
         end_train_default (str): Default end-of-training timestamp (ISO).
         delta_val (Optional[pd.Timedelta]): Validation window.
         predict_size (int): Prediction horizon in hours.
+        cv_block_size (int | None): Cross-validation test-block width in
+            hours.  Defaults to ``None``, meaning the CV uses
+            ``predict_size``.  Set to a fixed value (e.g. ``24``) to
+            decouple the cross-validation horizon from a render-dependent
+            live ``predict_size``.
         refit_size (int): Refit cadence in days.
         random_state (int): Random seed.
         n_hyperparameters_trials (int): Hyperparameter-tuning trial budget.
@@ -145,10 +150,12 @@ class ConfigEntsoe:
         custom_config = ConfigEntsoe(
             country_code="FR",
             predict_size=48,
+            cv_block_size=24,
             random_state=42,
         )
         print(custom_config.country_code)
         print(custom_config.predict_size)
+        print(custom_config.cv_block_size)
 
         # Verify training window
         assert config.train_size == pd.Timedelta(days=3 * 365)
@@ -168,6 +175,7 @@ class ConfigEntsoe:
         end_train_default: str = "2025-12-31 00:00+00:00",
         delta_val: Optional[pd.Timedelta] = None,
         predict_size: int = 24,
+        cv_block_size: Optional[int] = None,
         refit_size: int = 7,
         random_state: int = 314159,
         n_hyperparameters_trials: int = 20,
@@ -277,6 +285,10 @@ class ConfigEntsoe:
             delta_val if delta_val is not None else pd.Timedelta(hours=24 * 7 * 10)
         )
         self.predict_size = predict_size
+        # Cross-validation test-block width (hours).  ``None`` defers to
+        # ``predict_size``; the actual CV-split logic lives in the sibling
+        # ``spotforecast2`` package (``BaseTask.cv_ts``).
+        self.cv_block_size = cv_block_size
         self.refit_size = refit_size
         self.random_state = random_state
         self.n_hyperparameters_trials = n_hyperparameters_trials
@@ -390,6 +402,7 @@ class ConfigEntsoe:
             print(p["predict_size"])
             assert p["country_code"] == "FR"
             assert p["predict_size"] == 24
+            assert p["cv_block_size"] is None
             ```
         """
         params = {
@@ -400,6 +413,7 @@ class ConfigEntsoe:
             "end_train_default": self.end_train_default,
             "delta_val": self.delta_val,
             "predict_size": self.predict_size,
+            "cv_block_size": self.cv_block_size,
             "refit_size": self.refit_size,
             "random_state": self.random_state,
             "n_hyperparameters_trials": self.n_hyperparameters_trials,
