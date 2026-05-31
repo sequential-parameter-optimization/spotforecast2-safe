@@ -15,8 +15,12 @@ Supports two strategies:
 
 - ``"weighted"``: forward-fill then backward-fill gaps, then build a
   `WeightFunction` that down-weights training rows near any gap.
-  Rows inside a gap receive weight 0; the rolling window
-  ``config.window_size`` controls how far the penalty extends.
+  Rows inside a gap receive weight 0; the penalty window controls how
+  far the zero-weight zone extends. By default the penalty window is
+  ``config.window_size``; if ``config.imputation_window_size`` is set
+  (not ``None``) it overrides ``window_size`` for the penalty zone only,
+  so the gap-penalty width can be tuned independently of any rolling
+  feature window.
 - ``"linear"``: apply `LinearlyInterpolateTS` column-by-column.
 
 A diagnostic summary (NaN count before **and** after imputation) is
