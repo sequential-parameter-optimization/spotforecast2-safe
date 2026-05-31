@@ -56,8 +56,8 @@ def get_version_from_model_card() -> str:
     
     content = model_card.read_text()
     
-    # Match: - **Version**: X.Y.Z (description)
-    match = re.search(r'-\s*\*\*Version\*\*:\s*([^\s]+)', content)
+    # Match the version table row:  | Version | X.Y.Z |
+    match = re.search(r"\|\s*Version\s*\|\s*([0-9][^\s|]*)", content)
     if match:
         return match.group(1)
     
@@ -91,18 +91,29 @@ def update_model_card(version: str, dry_run: bool = False) -> bool:
     
     content = model_card.read_text()
     
-    # Pattern to match: - **Version**: X.Y.Z (description)
-    old_pattern = r'(-\s*\*\*Version\*\*:\s*)([^\s]+)'
-    new_content = re.sub(old_pattern, rf'\g<1>{version}', content)
+    # The release version appears in several places in the card; all derive
+    # from pyproject.toml.  The wildcard CPE (``:*:``) is intentionally left
+    # untouched -- only the current-release CPE carries a concrete version.
+    patterns = [
+        # Version table row:        | Version | X.Y.Z |
+        (r"(\|\s*Version\s*\|\s*)([0-9][^\s|]*)", rf"\g<1>{version}"),
+        # Current-release CPE:      spotforecast2_safe:X.Y.Z:
+        (r"(spotforecast2_safe:)([0-9][^:]*)(:)", rf"\g<1>{version}\g<3>"),
+        # Citation reference:       (Version X.Y.Z)
+        (r"(\(Version\s+)([0-9][^)]*)(\))", rf"\g<1>{version}\g<3>"),
+        # Lifecycle sentence:       current release is X.Y.Z
+        (r"(current release is\s+)([0-9][^\s,]*)", rf"\g<1>{version}"),
+    ]
+    new_content = content
+    for pattern, replacement in patterns:
+        new_content = re.sub(pattern, replacement, new_content)
     
     if new_content == content:
         print(f"ℹ No changes needed: MODEL_CARD.md already has version {version}")
         return False
     
     if dry_run:
-        print(f"[DRY RUN] Would update MODEL_CARD.md:")
-        print(f"  Old pattern: - **Version**: {get_version_from_model_card()}")
-        print(f"  New pattern: - **Version**: {version}")
+        print(f"[DRY RUN] Would update MODEL_CARD.md to version {version}")
         return True
     
     model_card.write_text(new_content)
@@ -115,7 +126,7 @@ def update_docs_index(version: str, dry_run: bool = False) -> bool:
     index_path = Path(__file__).parent.parent / "docs" / "index.md"
 
     if not index_path.exists():
-        print(f"⚠ index.md not found at {index_path}")
+        # docs/index.md is optional; skip silently when it is absent.
         return False
 
     content = index_path.read_text()
@@ -154,12 +165,22 @@ def verify_consistency() -> Tuple[bool, str]:
         print(f"  MODEL_CARD.md:   {model_card_version}")
         print(f"  docs/index.md:   {docs_index_version}")
         
-        if pyproject_version == model_card_version == docs_index_version:
-            print(f"✓ Versions are in sync!")
+        # Only compare artifacts that exist; a missing optional file
+        # (value ``None``) must not by itself count as a mismatch.
+        present = {
+            "MODEL_CARD.md": model_card_version,
+            "docs/index.md": docs_index_version,
+        }
+        mismatches = [
+            name
+            for name, found in present.items()
+            if found is not None and found != pyproject_version
+        ]
+        if not mismatches:
+            print("✓ Versions are in sync!")
             return True, pyproject_version
-        else:
-            print(f"⚠ Version mismatch detected!")
-            return False, pyproject_version
+        print(f"⚠ Version mismatch detected in: {', '.join(mismatches)}")
+        return False, pyproject_version
     
     except Exception as e:
         print(f"❌ Error checking versions: {e}")

@@ -89,3 +89,22 @@ def test_config_entsoe_imputation_window_size_in_get_params():
     """imputation_window_size is exposed via get_params()."""
     params = ConfigEntsoe(imputation_window_size=6).get_params()
     assert params["imputation_window_size"] == 6
+
+
+def test_config_entsoe_cv_block_size_default_none():
+    """cv_block_size defaults to None (CV falls back to predict_size)."""
+    config = ConfigEntsoe()
+    assert config.cv_block_size is None
+
+
+def test_config_entsoe_cv_block_size_custom():
+    """cv_block_size is stored when set and is independent of predict_size."""
+    config = ConfigEntsoe(predict_size=48, cv_block_size=24)
+    assert config.predict_size == 48
+    assert config.cv_block_size == 24
+
+
+def test_config_entsoe_cv_block_size_in_get_params():
+    """cv_block_size is exposed via get_params() and round-trips."""
+    assert ConfigEntsoe().get_params()["cv_block_size"] is None
+    assert ConfigEntsoe(cv_block_size=24).get_params()["cv_block_size"] == 24

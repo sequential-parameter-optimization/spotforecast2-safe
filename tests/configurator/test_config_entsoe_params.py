@@ -37,6 +37,21 @@ def test_config_entsoe_warm_start_lags():
     assert enabled.get_params()["warm_start_lags"] is True
 
 
+def test_config_entsoe_cv_block_size():
+    """cv_block_size defaults to None, round-trips, and is settable."""
+    default = ConfigEntsoe()
+    assert default.cv_block_size is None
+    assert default.get_params()["cv_block_size"] is None
+
+    config = ConfigEntsoe(cv_block_size=24)
+    assert config.cv_block_size == 24
+    assert config.get_params()["cv_block_size"] == 24
+
+    config.set_params(cv_block_size=48)
+    assert config.cv_block_size == 48
+    assert config.get_params()["cv_block_size"] == 48
+
+
 def test_config_entsoe_set_params_kwargs():
     """Test set_params with keyword arguments."""
     config = ConfigEntsoe()
