@@ -241,6 +241,13 @@ def download_new_data(
         ```
 
     Examples:
+        Replace ``YOUR_API_KEY`` below with your ENTSO-E Web API Security
+        Token (free registration at https://transparency.entsoe.eu, then
+        "My Account Settings" → "Web API Security Token"). Prefer reading
+        the token from an environment variable rather than hard-coding it
+        in source — see the Information-Disclosure note in the module
+        STRIDE table above.
+
         ```{python}
         #| eval: false
         from spotforecast2_safe.downloader.entsoe import download_new_data

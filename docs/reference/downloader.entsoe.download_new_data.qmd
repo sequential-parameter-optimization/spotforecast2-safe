@@ -7,6 +7,7 @@ downloader.entsoe.download_new_data(
     start=None,
     end=None,
     force=False,
+    keep_forecast_future=False,
 )
 ```
 
@@ -18,13 +19,14 @@ available data point.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type                 | Description                                                     | Default    |
-|--------------|----------------------|-----------------------------------------------------------------|------------|
-| api_key      | [str](`str`)         | The ENTSO-E API key.                                            | _required_ |
-| country_code | [str](`str`)         | The country code to query (e.g., 'FR', 'DE'). Defaults to "FR". | `'FR'`     |
-| start        | [str](`str`) \| None | Start date in 'YYYYMMDDHH00' format.                            | `None`     |
-| end          | [str](`str`) \| None | End date in 'YYYYMMDDHH00' format.                              | `None`     |
-| force        | [bool](`bool`)       | If True, bypass the 24h cooldown check.                         | `False`    |
+| Name                 | Type                 | Description                                                                                                                                                                                                                                                                                                                                                                                                     | Default    |
+|----------------------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| api_key              | [str](`str`)         | The ENTSO-E API key.                                                                                                                                                                                                                                                                                                                                                                                            | _required_ |
+| country_code         | [str](`str`)         | The country code to query (e.g., 'FR', 'DE'). Defaults to "FR".                                                                                                                                                                                                                                                                                                                                                 | `'FR'`     |
+| start                | [str](`str`) \| None | Start date in 'YYYYMMDDHH00' format.                                                                                                                                                                                                                                                                                                                                                                            | `None`     |
+| end                  | [str](`str`) \| None | End date in 'YYYYMMDDHH00' format.                                                                                                                                                                                                                                                                                                                                                                              | `None`     |
+| force                | [bool](`bool`)       | If True, bypass the 24h cooldown check.                                                                                                                                                                                                                                                                                                                                                                         | `False`    |
+| keep_forecast_future | [bool](`bool`)       | If True, retain rows after the current UTC moment when building the interim file, preserving ENTSO-E's day-ahead `Forecasted Load` for tomorrow. Defaults to False (future rows are dropped, the leakage-free input for training). The flag only keeps rows the query window already covers, so pass an ``end`` that reaches into the target day (e.g. tomorrow) as well. See `merge_build_manual` for details. | `False`    |
 
 ## Raises {.doc-section .doc-section-raises}
 
@@ -49,6 +51,13 @@ logging.getLogger("spotforecast2_safe.downloader.entsoe").setLevel(logging.WARNI
 
 ## Examples {.doc-section .doc-section-examples}
 
+Replace ``YOUR_API_KEY`` below with your ENTSO-E Web API Security
+Token (free registration at https://transparency.entsoe.eu, then
+"My Account Settings" → "Web API Security Token"). Prefer reading
+the token from an environment variable rather than hard-coding it
+in source — see the Information-Disclosure note in the module
+STRIDE table above.
+
 ```{python}
 #| eval: false
 from spotforecast2_safe.downloader.entsoe import download_new_data
@@ -70,5 +79,16 @@ download_new_data(
     api_key="YOUR_API_KEY",
     country_code="DE",
     force=True,
+)
+
+# Retain tomorrow's day-ahead `Forecasted Load` (forecast baseline);
+# `end` must reach into the target day for the rows to exist
+download_new_data(
+    api_key="YOUR_API_KEY",
+    country_code="DE",
+    start="202301010000",
+    end="202301030000",
+    force=True,
+    keep_forecast_future=True,
 )
 ```

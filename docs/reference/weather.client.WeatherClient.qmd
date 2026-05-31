@@ -66,17 +66,22 @@ print(df.head())
 ### fetch_forecast { #spotforecast2_safe.weather.client.WeatherClient.fetch_forecast }
 
 ```python
-weather.client.WeatherClient.fetch_forecast(days_ahead, timezone='UTC')
+weather.client.WeatherClient.fetch_forecast(
+    days_ahead,
+    timezone='UTC',
+    past_days=0,
+)
 ```
 
 Fetch forecast data from Forecast API.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name       | Type         | Description                            | Default    |
-|------------|--------------|----------------------------------------|------------|
-| days_ahead | [int](`int`) | Number of days ahead for the forecast. | _required_ |
-| timezone   | [str](`str`) | Timezone for the data (default "UTC"). | `'UTC'`    |
+| Name       | Type         | Description                                                                                                                                                                                                                                                                                                                                                    | Default    |
+|------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| days_ahead | [int](`int`) | Number of days ahead for the forecast.                                                                                                                                                                                                                                                                                                                         | _required_ |
+| timezone   | [str](`str`) | Timezone for the data (default "UTC").                                                                                                                                                                                                                                                                                                                         | `'UTC'`    |
+| past_days  | [int](`int`) | Recent past days to also request from the forecast endpoint via Open-Meteo's ``past_days`` parameter (0--92). The archive endpoint lags several days, so ``past_days`` lets the forecast endpoint backfill that recent window; without it the ``[now - archive_lag, today]`` range is fetched by neither endpoint and is later carried forward as a flat line. | `0`        |
 
 #### Examples {.doc-section .doc-section-examples}
 
