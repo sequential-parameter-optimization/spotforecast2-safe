@@ -1139,3 +1139,19 @@ def test_config_multi_imputation_window_size_in_get_params():
     """imputation_window_size is exposed via get_params()."""
     params = ConfigMulti(imputation_window_size=6).get_params()
     assert params["imputation_window_size"] == 6
+
+
+def test_config_multi_n_jobs_spotoptim_default_none():
+    """n_jobs_spotoptim defaults to None (serial SpotOptim)."""
+    config = ConfigMulti()
+    assert config.n_jobs_spotoptim is None
+    assert config.get_params()["n_jobs_spotoptim"] is None
+
+
+def test_config_multi_n_jobs_spotoptim_round_trip():
+    """n_jobs_spotoptim is stored and round-trips through get_params/set_params."""
+    config = ConfigMulti(n_jobs_spotoptim=-1)
+    assert config.n_jobs_spotoptim == -1
+    assert config.get_params()["n_jobs_spotoptim"] == -1
+    config.set_params(n_jobs_spotoptim=2)
+    assert config.n_jobs_spotoptim == 2
