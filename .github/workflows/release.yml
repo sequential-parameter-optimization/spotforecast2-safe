@@ -11,14 +11,20 @@ on:
   # which then ends up in the merge commit body).
   workflow_dispatch:
 
-# Serialise gh-pages publishers across workflows.
+# Serialise gh-pages publishers across workflows, scoped per branch.
 # Both this workflow and docs.yml push to gh-pages via
 # quarto-actions/publish.  Without a shared concurrency group they race
 # on a push to main and the loser fails non-fast-forward
 # ("cannot lock ref 'refs/heads/gh-pages'").  cancel-in-progress: false
 # is mandatory: cancelling release mid-run would skip the PyPI publish.
+# The group is keyed by branch (github.ref): a global group let a develop
+# pre-release run sit in the same queue as the main release run, and a
+# third entrant (the main Documentation run) then evicted the queued main
+# release run -- so main releases were silently cancelled (e.g. PR #264).
+# Branch-scoping keeps same-branch release/docs runs serialised on
+# gh-pages while letting develop and main release independently.
 concurrency:
-  group: gh-pages-deploy
+  group: gh-pages-deploy-${{ github.ref }}
   cancel-in-progress: false
 
 # Principle of Least Privilege: Base permissions are read-only
