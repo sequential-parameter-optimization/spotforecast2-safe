@@ -89,6 +89,12 @@ class ConfigMulti:
             Defaults to ``10``.
         n_initial_spotoptim (int): Number of initial random evaluations for SpotOptim
             (task 4). Defaults to ``5``.
+        n_jobs_spotoptim (Optional[int]): Worker count for SpotOptim's parallel
+            (steady-state) evaluation. ``None`` (default) runs sequentially;
+            ``-1`` uses all CPU cores; a positive integer pins the worker count.
+            Parallel tuning is faster but, being steady-state, changes the search
+            trajectory, so the tuned result is not bit-identical to a sequential
+            run even with a fixed ``random_state``.
         warm_start_lags (bool): When True, the SpotOptim task injects
             ``lags_consider`` as a candidate lag set and seeds the optimizer's
             first evaluation with it. Defaults to ``False``.
@@ -158,6 +164,8 @@ class ConfigMulti:
         n_trials_optuna (int): Number of Optuna hyperparameter-search trials.
         n_trials_spotoptim (int): Number of SpotOptim search trials.
         n_initial_spotoptim (int): Number of initial SpotOptim evaluations.
+        n_jobs_spotoptim (Optional[int]): Worker count for SpotOptim's parallel
+            (steady-state) evaluation (``None`` = sequential, ``-1`` = all cores).
         warm_start_lags (bool): Seed the SpotOptim search with ``lags_consider``.
         task (str): Active prediction task (``"lazy"``, ``"training"``,
             ``"optuna"``, or ``"spotoptim"``).
@@ -288,6 +296,9 @@ class ConfigMulti:
         n_trials_optuna: int = 15,
         n_trials_spotoptim: int = 10,
         n_initial_spotoptim: int = 5,
+        # SpotOptim parallel-evaluation worker count (None=serial, -1=all cores);
+        # consumed by spotforecast2.multitask.strategies.SpotOptimStrategy
+        n_jobs_spotoptim: Optional[int] = None,
         # Seed the SpotOptim search with ``lags_consider`` (consumed by
         # spotforecast2.multitask.strategies.SpotOptimStrategy)
         warm_start_lags: bool = False,
@@ -399,6 +410,7 @@ class ConfigMulti:
         self.n_trials_optuna = n_trials_optuna
         self.n_trials_spotoptim = n_trials_spotoptim
         self.n_initial_spotoptim = n_initial_spotoptim
+        self.n_jobs_spotoptim = n_jobs_spotoptim
         # When True, ``SpotOptimStrategy`` injects ``lags_consider`` as a
         # candidate lag set and seeds the optimizer's first evaluation with
         # it (via SpotOptim's ``x0``).  Pure data here; the behaviour lives
@@ -523,6 +535,7 @@ class ConfigMulti:
             "n_trials_optuna": self.n_trials_optuna,
             "n_trials_spotoptim": self.n_trials_spotoptim,
             "n_initial_spotoptim": self.n_initial_spotoptim,
+            "n_jobs_spotoptim": self.n_jobs_spotoptim,
             "warm_start_lags": self.warm_start_lags,
             # Active task
             "task": self.task,
