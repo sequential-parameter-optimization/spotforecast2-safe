@@ -1120,3 +1120,22 @@ class TestConfigMultiOnWeatherFailure:
 
     def test_in_get_params(self):
         assert "on_weather_failure" in _default().get_params()
+
+
+def test_config_multi_imputation_window_size_default_none():
+    """imputation_window_size defaults to None (falls back to window_size)."""
+    config = ConfigMulti()
+    assert config.imputation_window_size is None
+
+
+def test_config_multi_imputation_window_size_custom():
+    """imputation_window_size is stored and independent of window_size."""
+    config = ConfigMulti(window_size=72, imputation_window_size=6)
+    assert config.window_size == 72
+    assert config.imputation_window_size == 6
+
+
+def test_config_multi_imputation_window_size_in_get_params():
+    """imputation_window_size is exposed via get_params()."""
+    params = ConfigMulti(imputation_window_size=6).get_params()
+    assert params["imputation_window_size"] == 6

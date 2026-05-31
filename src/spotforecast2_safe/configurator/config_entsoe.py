@@ -41,7 +41,13 @@ class ConfigEntsoe:
             removal.  Defaults to ``True``.
         contamination (float): IsolationForest contamination fraction.
         imputation_method (str): Gap-filling strategy.
-        window_size (int): Rolling window for weighted imputation.
+        window_size (int): Rolling window for weighted imputation. Also the
+            LightGBM rolling-mean feature window in the ENTSO-E factories.
+        imputation_window_size (Optional[int]): Width of the gap-penalty zone
+            (in hours) around each imputed value for the ``"weighted"``
+            strategy. When ``None`` (default), falls back to ``window_size``,
+            so existing behaviour is unchanged. Set this to decouple the
+            imputation penalty zone from the rolling-feature window.
         use_exogenous_features (bool): Build weather/calendar/holiday features.
         latitude (float): Location latitude.
         longitude (float): Location longitude.
@@ -173,6 +179,7 @@ class ConfigEntsoe:
         # Imputation
         imputation_method: str = "weighted",
         window_size: int = 72,
+        imputation_window_size: Optional[int] = None,
         # Exogenous features
         use_exogenous_features: bool = True,
         latitude: float = 51.5136,
@@ -281,6 +288,7 @@ class ConfigEntsoe:
         # Imputation
         self.imputation_method = imputation_method
         self.window_size = window_size
+        self.imputation_window_size = imputation_window_size
         # Exogenous features
         self.use_exogenous_features = use_exogenous_features
         self.latitude = latitude
@@ -403,6 +411,7 @@ class ConfigEntsoe:
             # Imputation
             "imputation_method": self.imputation_method,
             "window_size": self.window_size,
+            "imputation_window_size": self.imputation_window_size,
             # Exogenous features
             "use_exogenous_features": self.use_exogenous_features,
             "latitude": self.latitude,
