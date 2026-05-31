@@ -1,3 +1,11 @@
+## [15.5.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.4.0...v15.5.0) (2026-05-31)
+
+
+### Features
+
+* **backtesting:** add metrics_per_fold and TimeSeriesFold.n_folds ([3b8d92a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3b8d92ac0a70c6d7c59c88da0a5c1fee11824697))
+* **config:** add n_jobs_spotoptim for parallel SpotOptim tuning ([4882ecc](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4882ecc078ab0a8a43017d082c68281df56a2df2))
+
 ## [15.5.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.4.0...v15.5.0-rc.1) (2026-05-31)
 
 
