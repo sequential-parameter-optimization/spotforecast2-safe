@@ -1,7 +1,10 @@
 # downloader.entsoe.merge_build_manual { #spotforecast2_safe.downloader.entsoe.merge_build_manual }
 
 ```python
-downloader.entsoe.merge_build_manual(output_file='energy_load.csv')
+downloader.entsoe.merge_build_manual(
+    output_file='energy_load.csv',
+    keep_forecast_future=False,
+)
 ```
 
 Merge all raw CSV files from the 'raw' directory into a single interim file.
@@ -12,9 +15,10 @@ sorts them by time index, and saves the unique combined data to
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type         | Description                                                          | Default             |
-|-------------|--------------|----------------------------------------------------------------------|---------------------|
-| output_file | [str](`str`) | The name of the combined output file. Defaults to "energy_load.csv". | `'energy_load.csv'` |
+| Name                 | Type           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default             |
+|----------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| output_file          | [str](`str`)   | The name of the combined output file. Defaults to "energy_load.csv".                                                                                                                                                                                                                                                                                                                                                                                                                             | `'energy_load.csv'` |
+| keep_forecast_future | [bool](`bool`) | If False (the default), rows with a timestamp after the current UTC moment are dropped, so the interim file holds only data that is "actual" up to now -- the correct, leakage-free input for model training. If True, those future rows are retained, which preserves ENTSO-E's day-ahead `Forecasted Load` for tomorrow (future `Actual Load` is still NaN, so no future target leaks). Use True only for forecast-baseline / comparison workflows that need the published day-ahead forecast. | `False`             |
 
 ## Raises {.doc-section .doc-section-raises}
 
@@ -52,4 +56,8 @@ merge_build_manual()
 
 # Or merge with a custom output filename
 merge_build_manual(output_file="custom_energy_load.csv")
+
+# Retain future rows so tomorrow's day-ahead `Forecasted Load`
+# survives (forecast-baseline workflows only; not for training)
+merge_build_manual(keep_forecast_future=True)
 ```
