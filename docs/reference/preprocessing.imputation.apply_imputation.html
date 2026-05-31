@@ -1434,7 +1434,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Apply imputation to a DataFrame based on the method specified in config.</p>
 <p>Supports two strategies:</p>
 <ul>
-<li><code>"weighted"</code>: forward-fill then backward-fill gaps, then build a <code>WeightFunction</code> that down-weights training rows near any gap. Rows inside a gap receive weight 0; the rolling window <code>config.window_size</code> controls how far the penalty extends.</li>
+<li><code>"weighted"</code>: forward-fill then backward-fill gaps, then build a <code>WeightFunction</code> that down-weights training rows near any gap. Rows inside a gap receive weight 0; the penalty window controls how far the zero-weight zone extends. By default the penalty window is <code>config.window_size</code>; if <code>config.imputation_window_size</code> is set (not <code>None</code>) it overrides <code>window_size</code> for the penalty zone only, so the gap-penalty width can be tuned independently of any rolling feature window.</li>
 <li><code>"linear"</code>: apply <code>LinearlyInterpolateTS</code> column-by-column.</li>
 </ul>
 <p>A diagnostic summary (NaN count before <strong>and</strong> after imputation) is always written to the logger.</p>
@@ -1527,7 +1527,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="9a5f30e8" class="cell" data-execution_count="1">
+<div id="146dc95f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
