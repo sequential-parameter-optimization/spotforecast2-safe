@@ -1,3 +1,10 @@
+## [15.6.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.5.0...v15.6.0-rc.1) (2026-06-01)
+
+
+### Features
+
+* **backtesting:** add optional progress_desc to _backtesting_forecaster ([b945aa3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b945aa3e565c60d85147cb522aa4dab3c344caa3))
+
 ## [15.5.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.4.0...v15.5.0) (2026-05-31)
 
 
