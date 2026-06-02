@@ -1,0 +1,68 @@
+# manager.features.select_top_poly_features { #spotforecast2_safe.manager.features.select_top_poly_features }
+
+```python
+manager.features.select_top_poly_features(
+    poly_features,
+    y,
+    max_poly_features=10,
+    random_state=123,
+)
+```
+
+Rank polynomial interaction columns by mutual information, keep the top K.
+
+Polynomial expansion (`create_interaction_features` with ``degree >= 2``)
+can emit hundreds or thousands of ``poly_*`` columns. This helper caps that
+set: it scores each candidate column by its mutual information with the
+target and returns the names of the ``max_poly_features`` highest-scoring
+columns. Mutual information is estimated with `mutual_info_regression`,
+seeded by *random_state* so the selection is reproducible.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                           | Description                                                                                                                                                 | Default    |
+|-------------------|------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| poly_features     | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame containing only the candidate ``poly_*`` interaction columns to rank.                                                                             | _required_ |
+| y                 | [pd](`pandas`).[Series](`pandas.Series`)       | Target series. It is inner-joined to *poly_features* on the index and rows with missing values are dropped before scoring.                                  | _required_ |
+| max_poly_features | [int](`int`)                                   | Maximum number of columns to keep. When this is ``<= 0`` or the candidate count does not exceed it, all columns are returned unchanged. Defaults to ``10``. | `10`       |
+| random_state      | [int](`int`)                                   | Seed forwarded to `mutual_info_regression` for a deterministic estimate. Defaults to ``123``.                                                               | `123`      |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                  | Description                                                              |
+|--------|---------------------------------------|--------------------------------------------------------------------------|
+|        | [List](`typing.List`)\[[str](`str`)\] | List[str]: Names of the selected ``poly_*`` columns, ordered from        |
+|        | [List](`typing.List`)\[[str](`str`)\] | highest to lowest mutual information. Returns every input column (in its |
+|        | [List](`typing.List`)\[[str](`str`)\] | original order) when no capping is required.                             |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                        |
+|--------|----------------------------|--------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *poly_features* and *y* share no overlapping, non-missing rows. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.manager.features import select_top_poly_features
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2024-01-01", periods=500, freq="h", tz="UTC")
+signal = rng.normal(0, 1, 500)
+y = pd.Series(signal, index=idx, name="target")
+poly = pd.DataFrame(
+    {
+        "poly_a": signal + rng.normal(0, 0.01, 500),  # informative
+        "poly_b": signal * 0.5 + rng.normal(0, 0.1, 500),
+        "poly_c": rng.normal(0, 1, 500),  # noise
+        "poly_d": rng.normal(0, 1, 500),  # noise
+    },
+    index=idx,
+)
+top = select_top_poly_features(poly, y, max_poly_features=2)
+print("kept:", top)
+assert top[0] == "poly_a"
+assert len(top) == 2
+```

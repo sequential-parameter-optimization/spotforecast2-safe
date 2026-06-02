@@ -34,7 +34,7 @@ def build_prediction_package(
     df_test: Optional[pd.DataFrame] = None,
     index_name: str = "DateTime",
 ) -> Dict[str, Any]:
-    """Build a prediction package compatible with PredictionFigure.
+    """Build a prediction package for downstream plotting/reporting consumers.
 
     Computes true in-sample predictions via the fitted estimator and generates
     a genuine future forecast of ``predict_size`` steps. If ``df_test`` is
@@ -73,7 +73,7 @@ def build_prediction_package(
             underlying estimator.
         - **future_actual** (``pd.Series``) — always an empty ``float64``
             Series; the field exists for interface compatibility with
-            ``PredictionFigure``.
+            downstream plotting consumers.
         - **future_pred** (``pd.Series``) — ``predict_size``-step-ahead
             forecast.
         - **metrics_train** (``dict``) — ``{"mae": float, "mape": float}``

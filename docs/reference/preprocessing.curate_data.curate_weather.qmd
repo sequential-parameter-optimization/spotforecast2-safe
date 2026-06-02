@@ -37,8 +37,8 @@ assert weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON
 print("weather_df shape is correct:", weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON)
 ```
 
-## Raises {.doc-section .doc-section-raises}
+## Notes {.doc-section .doc-section-notes}
 
-| Name   | Type                               | Description                                                        |
-|--------|------------------------------------|--------------------------------------------------------------------|
-|        | [AssertionError](`AssertionError`) | If the weather dataframe does not have the correct number of rows. |
+If the weather dataframe does not have the expected number of rows, a
+diagnostic message describing the mismatch is logged via ``print`` and
+the function returns ``None`` without raising.

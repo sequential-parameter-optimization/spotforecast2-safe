@@ -99,9 +99,10 @@ def curate_holidays(
         print("holiday_df shape is correct:", holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON)
         ```
 
-    Raises:
-        AssertionError:
-            If the holiday dataframe does not have the correct number of rows.
+    Notes:
+        If the holiday dataframe does not have the expected number of rows, a
+        diagnostic message is logged via ``print`` and the function returns
+        ``None`` without raising.
     """
     try:
         assert holiday_df.shape[0] == data.shape[0] + forecast_horizon
@@ -142,9 +143,10 @@ def curate_weather(weather_df: pd.DataFrame, data: pd.DataFrame, forecast_horizo
         print("weather_df shape is correct:", weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON)
         ```
 
-    Raises:
-        AssertionError:
-            If the weather dataframe does not have the correct number of rows.
+    Notes:
+        If the weather dataframe does not have the expected number of rows, a
+        diagnostic message describing the mismatch is logged via ``print`` and
+        the function returns ``None`` without raising.
     """
     expected = data.shape[0] + forecast_horizon
     actual = weather_df.shape[0]

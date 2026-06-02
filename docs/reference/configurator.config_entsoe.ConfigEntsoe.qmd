@@ -9,6 +9,7 @@ configurator.config_entsoe.ConfigEntsoe(
     end_train_default='2025-12-31 00:00+00:00',
     delta_val=None,
     predict_size=24,
+    cv_block_size=None,
     refit_size=7,
     random_state=314159,
     n_hyperparameters_trials=20,
@@ -43,6 +44,7 @@ configurator.config_entsoe.ConfigEntsoe(
     n_trials_optuna=15,
     n_trials_spotoptim=10,
     n_initial_spotoptim=5,
+    n_jobs_spotoptim=None,
     warm_start_lags=False,
     task='lazy',
     agg_weights=None,
@@ -78,6 +80,7 @@ protocol.
 | end_train_default        | [str](`str`)                                                                                         | Default end-of-training timestamp (ISO).                                                                                                                                                                                                                                                                                                                               | `'2025-12-31 00:00+00:00'`  |
 | delta_val                | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timedelta](`pandas.Timedelta`)\]                      | Validation window.                                                                                                                                                                                                                                                                                                                                                     | `None`                      |
 | predict_size             | [int](`int`)                                                                                         | Prediction horizon in hours.                                                                                                                                                                                                                                                                                                                                           | `24`                        |
+| cv_block_size            | [int](`int`) \| None                                                                                 | Cross-validation test-block width in hours.  Defaults to ``None``, meaning the CV uses ``predict_size``.  Set to a fixed value (e.g. ``24``) to decouple the cross-validation horizon from a render-dependent live ``predict_size``.                                                                                                                                   | `None`                      |
 | refit_size               | [int](`int`)                                                                                         | Refit cadence in days.                                                                                                                                                                                                                                                                                                                                                 | `7`                         |
 | random_state             | [int](`int`)                                                                                         | Random seed.                                                                                                                                                                                                                                                                                                                                                           | `314159`                    |
 | n_hyperparameters_trials | [int](`int`)                                                                                         | Hyperparameter-tuning trial budget.                                                                                                                                                                                                                                                                                                                                    | `20`                        |
@@ -112,6 +115,7 @@ protocol.
 | n_trials_optuna          | [int](`int`)                                                                                         | Optuna Bayesian-search trial budget.                                                                                                                                                                                                                                                                                                                                   | `15`                        |
 | n_trials_spotoptim       | [int](`int`)                                                                                         | SpotOptim surrogate-search trial budget.                                                                                                                                                                                                                                                                                                                               | `10`                        |
 | n_initial_spotoptim      | [int](`int`)                                                                                         | SpotOptim initial random evaluations.                                                                                                                                                                                                                                                                                                                                  | `5`                         |
+| n_jobs_spotoptim         | [Optional](`typing.Optional`)\[[int](`int`)\]                                                        | Worker count for SpotOptim's parallel (steady-state) evaluation. ``None`` (default) runs sequentially; ``-1`` uses all CPU cores; a positive integer pins the worker count. Parallel tuning is faster but, being steady-state, changes the search trajectory, so the tuned result is not bit-identical to a sequential run even with a fixed ``random_state``.         | `None`                      |
 | warm_start_lags          | [bool](`bool`)                                                                                       | Seed the SpotOptim search with ``lags_consider``.                                                                                                                                                                                                                                                                                                                      | `False`                     |
 | task                     | [str](`str`)                                                                                         | Active prediction task name.                                                                                                                                                                                                                                                                                                                                           | `'lazy'`                    |
 | agg_weights              | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[float](`float`)\]\]                           | Per-target aggregation weights. For single-target use this is typically ``[1.0]`` or ``None``.                                                                                                                                                                                                                                                                         | `None`                      |
@@ -151,10 +155,12 @@ print(config.random_state)
 custom_config = ConfigEntsoe(
     country_code="FR",
     predict_size=48,
+    cv_block_size=24,
     random_state=42,
 )
 print(custom_config.country_code)
 print(custom_config.predict_size)
+print(custom_config.cv_block_size)
 
 # Verify training window
 assert config.train_size == pd.Timedelta(days=3 * 365)
@@ -202,6 +208,7 @@ print(p["country_code"])
 print(p["predict_size"])
 assert p["country_code"] == "FR"
 assert p["predict_size"] == 24
+assert p["cv_block_size"] is None
 ```
 
 ### set_params { #spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe.set_params }

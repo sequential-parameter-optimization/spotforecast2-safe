@@ -216,6 +216,7 @@ def n2n_predict_with_covariates(
             force_train=True,
             model_dir=tempfile.mkdtemp(),
             verbose=False,
+            on_weather_failure="skip",
         )
         print(predictions.shape)
         ```

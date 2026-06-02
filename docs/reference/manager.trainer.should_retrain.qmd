@@ -1,0 +1,49 @@
+# manager.trainer.should_retrain { #spotforecast2_safe.manager.trainer.should_retrain }
+
+```python
+manager.trainer.should_retrain(last_end_dev, *, max_age, force=False, now=None)
+```
+
+Decide whether a forecaster should be retrained.
+
+The cadence policy lives in `ConfigEntsoe.retrain_max_age`.  Callers
+pass `max_age` in explicitly so the policy stays in config, not in
+code.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                                            | Description                                                                                           | Default    |
+|--------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|------------|
+| last_end_dev | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | End-of-development-window timestamp of the last trained model.  ``None`` indicates no previous model. | _required_ |
+| max_age      | [pd](`pandas`).[Timedelta](`pandas.Timedelta`)                                  | Maximum allowed age before retraining is required.                                                    | _required_ |
+| force        | [bool](`bool`)                                                                  | Bypass the cadence gate and always return ``True``.                                                   | `False`    |
+| now          | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Override "now" — used for deterministic tests.  Defaults to ``pd.Timestamp.now(tz="UTC")``.           | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type           | Description                                                 |
+|--------|----------------|-------------------------------------------------------------|
+|        | [bool](`bool`) | ``True`` when retraining should proceed (no previous model, |
+|        | [bool](`bool`) | ``force``, or age above ``max_age``); ``False`` otherwise.  |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+
+from spotforecast2_safe.manager.trainer import should_retrain
+
+now = pd.Timestamp("2026-05-24 12:00", tz="UTC")
+max_age = pd.Timedelta(days=7)
+
+# No previous model -> retrain.
+print(should_retrain(None, max_age=max_age, now=now))
+
+# Recent model -> skip.
+recent = now - pd.Timedelta(days=2)
+print(should_retrain(recent, max_age=max_age, now=now))
+
+# Old model -> retrain.
+old = now - pd.Timedelta(days=10)
+print(should_retrain(old, max_age=max_age, now=now))
+```
