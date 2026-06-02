@@ -1,3 +1,15 @@
+## [15.6.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.6.1...v15.6.2-rc.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* sign and publish the version-bumped release artifact ([c76edc4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c76edc40a671de7ede96365be89daf65623eda9d))
+
+
+### Documentation
+
+* rename n2n_predict_with_covariates tutorial to demo10 ([d5bf448](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d5bf4489e3b70f0b460ecc39accc9f4db2e3614a))
+
 ## [15.6.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.6.0...v15.6.1) (2026-06-02)
 
 
