@@ -1,0 +1,12 @@
+{
+  "hash": "1a542ab1df09f911936c84a967f37556",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.curate_data.curate_holidays\n---\n\n\n\n```python\npreprocessing.curate_data.curate_holidays(holiday_df, data, forecast_horizon)\n```\n\nChecks if the holiday dataframe has the correct shape.\nArgs:\n    holiday_df (pd.DataFrame):\n        DataFrame containing holiday information.\n    data (pd.DataFrame):\n        The main dataset.\n    forecast_horizon (int):\n        The forecast horizon in hours.\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#7dc40fcb .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.curate_data import curate_holidays\n\nFORECAST_HORIZON = 24\nn_data = 48\ndata = pd.DataFrame(\n    {\"load\": range(n_data)},\n    index=pd.date_range(\"2023-01-01\", periods=n_data, freq=\"h\", tz=\"UTC\"),\n)\nholiday_df = pd.DataFrame(\n    {\"holiday\": range(n_data + FORECAST_HORIZON)},\n    index=pd.date_range(\n        \"2023-01-01\", periods=n_data + FORECAST_HORIZON, freq=\"h\", tz=\"UTC\"\n    ),\n)\ncurate_holidays(holiday_df, data, forecast_horizon=FORECAST_HORIZON)\nassert holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON\nprint(\"holiday_df shape is correct:\", holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nholiday_df shape is correct: True\n```\n:::\n:::\n\n\n## Notes {.doc-section .doc-section-notes}\n\nIf the holiday dataframe does not have the expected number of rows, a\ndiagnostic message is logged via ``print`` and the function returns\n``None`` without raising.\n\n",
+    "supporting": [
+      "preprocessing.curate_data.curate_holidays_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "hash": "a3bdbdda8af601dcd8b5055aeef951e6",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.metrics.symmetric_mean_absolute_percentage_error\n---\n\n\n\n```python\nforecaster.metrics.symmetric_mean_absolute_percentage_error(y_true, y_pred)\n```\n\nCompute the Symmetric Mean Absolute Percentage Error (SMAPE).\n\nSMAPE is a relative error metric used to measure the accuracy\nof forecasts. Unlike MAPE, it is symmetric and prevents division\nby zero by averaging the absolute values of actual and predicted values.\n\nThe result is expressed as a percentage and ranges from 0%\n(perfect prediction) to 200% (maximum error).\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name   | Type                                                                                 | Description                              | Default    |\n|--------|--------------------------------------------------------------------------------------|------------------------------------------|------------|\n| y_true | [np](`numpy`).[ndarray](`numpy.ndarray`) \\| [pd](`pandas`).[Series](`pandas.Series`) | True values of the target variable.      | _required_ |\n| y_pred | [np](`numpy`).[ndarray](`numpy.ndarray`) \\| [pd](`pandas`).[Series](`pandas.Series`) | Predicted values of the target variable. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type             | Description                  |\n|--------|------------------|------------------------------|\n|        | [float](`float`) | SMAPE value as a percentage. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#eb3e3b09 .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nfrom spotforecast2_safe.forecaster.metrics import (\n    symmetric_mean_absolute_percentage_error,\n)\n\ny_true = np.array([100, 200, 0])\ny_pred = np.array([110, 180, 10])\nresult = symmetric_mean_absolute_percentage_error(y_true, y_pred)\nprint(0 <= result <= 200)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTrue\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.metrics.symmetric_mean_absolute_percentage_error_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

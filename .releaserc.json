@@ -135,7 +135,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "sed -i 's/^version = .*/version = \"${nextRelease.version}\"/' pyproject.toml && python scripts/update_version.py"
+        "prepareCmd": "sed -i 's/^version = .*/version = \"${nextRelease.version}\"/' pyproject.toml && python scripts/update_version.py && printf '%s' \"${nextRelease.gitTag}\" > .released-tag"
       }
     ],
     [
@@ -158,14 +158,6 @@
           {
             "path": "dist/*.tar.gz",
             "label": "Source Distribution"
-          },
-          {
-            "path": "dist/sbom.cdx.json",
-            "label": "CycloneDX 1.5 SBOM"
-          },
-          {
-            "path": "dist/*.sigstore*",
-            "label": "Sigstore signature bundle (keyless OIDC, Rekor)"
           }
         ]
       }

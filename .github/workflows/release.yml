@@ -89,50 +89,13 @@ jobs:
           grep -q "name = \"spotforecast2-safe\"" pyproject.toml || (echo "ERROR: Package name mismatch in pyproject.toml" && exit 1)
           echo "✓ Package name verified: spotforecast2-safe"
       
-      - name: Build distribution packages
-        run: |
-          python -m build
-          echo "Build artifacts created:"
-          ls -lah dist/
-
-      - name: Generate CycloneDX SBOM from uv.lock
-        if: success()
-        run: |
-          # uv exports a CycloneDX 1.5 SBOM of the resolved production
-          # dependency graph directly from uv.lock. No external tool is
-          # installed into the build environment, so the SBOM describes
-          # exactly the closure that ships in the wheel. sbom-export is
-          # still a uv preview feature; the explicit --preview-features
-          # flag makes that opt-in visible in the workflow log.
-          uv export --preview-features sbom-export \
-            --format cyclonedx1.5 --no-dev \
-            -o dist/sbom.cdx.json
-          echo "CycloneDX 1.5 SBOM generated:"
-          ls -lah dist/sbom.cdx.json
-
-      - name: Inject project CPE on SBOM root component
-        if: success()
-        # The SBOM uv emits keys components on PURL. NVD-backed vulnerability
-        # scanners (CISA KEV, several VM-aaS products) resolve via CPE 2.3.
-        # This step injects the project's own CPE, produced by
-        # spotforecast2_safe.utils.cpe.get_cpe_identifier, onto the root
-        # component so the CPE actually ships in the signed artefact.
-        # Must run before Sigstore so the signature covers the enriched file.
-        run: |
-          python scripts/enrich_sbom_with_cpe.py --sbom dist/sbom.cdx.json
-
-      - name: Sign wheel, sdist, and SBOM with Sigstore
-        if: success()
-        # Keyless OIDC signing backed by the job's id-token: write
-        # permission; no long-lived secrets. Signature bundles land in the
-        # public Rekor transparency log and are written next to each input
-        # as ``<input>.sigstore`` (or ``.sigstore.json`` in v3+).
-        uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46  # v3.0.0
-        with:
-          inputs: |
-            ./dist/*.whl
-            ./dist/*.tar.gz
-            ./dist/sbom.cdx.json
+      # NOTE: the distribution is built exactly once — by semantic-release's
+      # `python -m build` prepare step below, AFTER the version bump — so the
+      # wheel and sdist carry the released version. SBOM generation, CPE
+      # injection and Sigstore signing therefore run AFTER semantic-release
+      # (see "Sign and publish the released artifact" below), operating on that
+      # single, correct artifact. Building and signing here (before the bump)
+      # produced a stale pre-bump wheel that was signed but never published.
 
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e  # v6.4.0
@@ -152,50 +115,117 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
         run: npx semantic-release
 
+      # ── Sign and publish the released artifact ────────────────────────────
+      # Everything below runs only when semantic-release actually cut a release:
+      # its version-bump prepare step writes `.released-tag` with the git tag
+      # (see .releaserc.json), so `hashFiles('.released-tag')` is non-empty
+      # exactly when a release happened. By this point semantic-release has
+      # bumped the version, built the wheel + sdist via `python -m build`, and
+      # created the GitHub Release with those artifacts attached. We now build
+      # the SBOM, sign the *released* artifacts, and attach the SBOM +
+      # signatures to that same release.
+      - name: Generate CycloneDX SBOM from uv.lock
+        if: success() && hashFiles('.released-tag') != ''
+        run: |
+          # CycloneDX 1.5 SBOM of the resolved production dependency graph,
+          # exported directly from uv.lock (no extra tool in the build env).
+          uv export --preview-features sbom-export \
+            --format cyclonedx1.5 --no-dev \
+            -o dist/sbom.cdx.json
+          echo "CycloneDX 1.5 SBOM generated:"
+          ls -lah dist/sbom.cdx.json
+
+      - name: Inject project CPE on SBOM root component
+        if: success() && hashFiles('.released-tag') != ''
+        # NVD-backed scanners (CISA KEV, several VM-aaS products) resolve via
+        # CPE 2.3. Inject the project's own CPE (spotforecast2_safe.utils.cpe.
+        # get_cpe_identifier) onto the root component before signing so the CPE
+        # ships inside the signed artefact.
+        run: |
+          python scripts/enrich_sbom_with_cpe.py --sbom dist/sbom.cdx.json
+
+      - name: Sign wheel, sdist, and SBOM with Sigstore
+        if: success() && hashFiles('.released-tag') != ''
+        # Keyless OIDC signing backed by the job's id-token: write permission;
+        # no long-lived secrets. Bundles land in the public Rekor transparency
+        # log, written next to each input as ``<input>.sigstore.json`` (v3+).
+        # These are the released-version artifacts built by semantic-release.
+        uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46  # v3.0.0
+        with:
+          inputs: |
+            ./dist/*.whl
+            ./dist/*.tar.gz
+            ./dist/sbom.cdx.json
+
+      - name: Attach SBOM and signatures to the GitHub Release
+        if: success() && hashFiles('.released-tag') != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # semantic-release already attached the wheel + sdist. Add the SBOM and
+        # the Sigstore bundles to the same release; the wheel/sdist they cover
+        # are byte-identical to the attached ones. --clobber keeps re-runs idempotent.
+        run: |
+          gh release upload "$(cat .released-tag)" \
+            dist/sbom.cdx.json dist/*.sigstore* --clobber
+
       - name: Prune non-distribution artefacts from dist/
-        if: success()
-        # semantic-release has already attached SBOM and sigstore bundles
-        # to the GitHub Release above. PyPI's upload path rejects anything
-        # twine can't recognise as a wheel or sdist, so remove them before
-        # pypa/gh-action-pypi-publish runs twine check.
+        if: success() && hashFiles('.released-tag') != ''
+        # PyPI's upload path rejects anything twine can't recognise as a wheel
+        # or sdist, so remove the SBOM and sigstore bundles before publishing.
         run: |
           rm -f dist/sbom.cdx.json dist/*.sigstore dist/*.sigstore.json
           ls -lah dist/
 
       - name: Publish to PyPI
-        if: success()
+        if: success() && hashFiles('.released-tag') != ''
         uses: pypa/gh-action-pypi-publish@f7600683efdcb7656dec5b29656edb7bc586e597  # release/v1
         with:
           packages-dir: dist/
           skip-existing: true
           # Note: No token needed with Trusted Publishers (OIDC)
-      
+
+      # ── Documentation (main only) ─────────────────────────────────────────
+      # Docs reflect the released (main) version and must NOT be rebuilt or
+      # deployed from develop rc releases: that wasted ~18 min on every develop
+      # merge and overwrote the production docs on gh-pages with rc content.
+      # PyPI publish above has already happened, so gating the doc render here
+      # never delays package availability. The freeze cache (see _quarto.yml)
+      # turns the ~18 min render into seconds when documents are unchanged.
+      - name: Restore Quarto freeze cache
+        if: success() && github.ref == 'refs/heads/main'
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        with:
+          path: _freeze
+          key: quarto-freeze-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            quarto-freeze-${{ runner.os }}-
+
       - name: Install Quarto CLI
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         uses: quarto-dev/quarto-actions/setup@8a96df13519ee81fd526f2dfca5962811136661b  # v2.2.0
         with:
           version: "1.7.29"
-      
+
       - name: Generate API reference stubs
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         run: |
           uv run python docs/quartodoc_build.py
           uv run quartodoc interlinks
 
       - name: Build documentation
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         run: |
           uv run quarto render --no-cache
-      
+
       - name: Setup Git Credentials for Publish
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
 
       - name: Deploy documentation
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         uses: quarto-dev/quarto-actions/publish@8a96df13519ee81fd526f2dfca5962811136661b  # v2.2.0
         with:
           target: gh-pages

@@ -1,0 +1,12 @@
+{
+  "hash": "470eec84bf9f3666518964e52d63816e",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: data.fetch_data.get_data_home\n---\n\n\n\n```python\ndata.fetch_data.get_data_home(data_home=None)\n```\n\nReturn the location where datasets are to be stored.\nBy default the data directory is set to a folder named 'spotforecast2_data' in the\nuser home folder. Alternatively, it can be set by the 'SPOTFORECAST2_DATA' environment\nvariable or programmatically by giving an explicit folder path. The '~'\nsymbol is expanded to the user home folder.\nIf the folder does not already exist, it is automatically created.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                                                        | Description                                                                                     | Default   |\n|-----------|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------|-----------|\n| data_home | [str](`str`) or [pathlib](`pathlib`).[Path](`pathlib.Path`) | The path to spotforecast data directory. If `None`, the default path is `~/spotforecast2_data`. | `None`    |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name      | Type                                        | Description                                  |\n|-----------|---------------------------------------------|----------------------------------------------|\n| data_home | [pathlib](`pathlib`).[Path](`pathlib.Path`) | The path to the spotforecast data directory. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#a05cfadd .cell execution_count=1}\n``` {.python .cell-code}\nimport tempfile\nfrom pathlib import Path\nfrom spotforecast2_safe.data.fetch_data import get_data_home\n\nwith tempfile.TemporaryDirectory() as tmp:\n    p = get_data_home(Path(tmp) / \"spotforecast2_data\")\n    print(p.exists())\n    assert p.is_dir()\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTrue\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "data.fetch_data.get_data_home_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

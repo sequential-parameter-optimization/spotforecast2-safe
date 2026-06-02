@@ -1,0 +1,12 @@
+{
+  "hash": "3106fbe8e109591ae6bb08105671e514",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.imputation.custom_weights\n---\n\n\n\n```python\npreprocessing.imputation.custom_weights(index, weights_series)\n```\n\nReturn 0 if index is in or near any gap.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name           | Type                                     | Description                | Default    |\n|----------------|------------------------------------------|----------------------------|------------|\n| index          | [pd](`pandas`).[Index](`pandas.Index`)   | The index to check.        | _required_ |\n| weights_series | [pd](`pandas`).[Series](`pandas.Series`) | Series containing weights. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type             | Description                            |\n|--------|------------------|----------------------------------------|\n| float  | [float](`float`) | The weight corresponding to the index. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#87f61dc4 .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.imputation import custom_weights\n\n# Build a small synthetic weights Series with a DatetimeIndex\nidx = pd.date_range(\"2024-01-01\", periods=5, freq=\"h\")\nweights_series = pd.Series([1.0, 1.0, 0.0, 0.0, 1.0], index=idx)\n\n# Single-index scalar lookup\nw = custom_weights(idx[0], weights_series)\nprint(f\"Index: {idx[0]}, Weight: {w}\")\nassert w == 1.0\n\n# pd.Index slice lookup returns a numpy array\nresult = custom_weights(idx[:3], weights_series)\nprint(result)\nassert np.allclose(result, [1.0, 1.0, 0.0])\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nIndex: 2024-01-01 00:00:00, Weight: 1.0\n[1. 1. 0.]\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "preprocessing.imputation.custom_weights_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

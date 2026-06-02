@@ -1,0 +1,12 @@
+{
+  "hash": "7093310dc6bd7961af3fe8e949301316",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.curate_data.basic_ts_checks\n---\n\n\n\n```python\npreprocessing.curate_data.basic_ts_checks(data, verbose=False)\n```\n\nChecks if the time series data has a datetime index and is sorted.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name    | Type                                           | Description                              | Default    |\n|---------|------------------------------------------------|------------------------------------------|------------|\n| data    | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | The main dataset.                        | _required_ |\n| verbose | [bool](`bool`)                                 | Whether to print additional information. | `False`    |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#dafd8013 .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.curate_data import basic_ts_checks\n\ndate_rng = pd.date_range(start=\"2023-01-01\", periods=5, freq=\"h\", tz=\"UTC\")\ndata = pd.DataFrame({\"value\": range(5)}, index=date_rng)\nresult = basic_ts_checks(data, verbose=True)\nassert result is True\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nThe time series data has a valid datetime index that is sorted and complete.\n```\n:::\n:::\n\n\n## Raises {.doc-section .doc-section-raises}\n\n| Name   | Type                       | Description                                                               |\n|--------|----------------------------|---------------------------------------------------------------------------|\n|        | [TypeError](`TypeError`)   | If the index is not a datetime index.                                     |\n|        | [ValueError](`ValueError`) | If the datetime index is not sorted in increasing order or is incomplete. |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type           | Description                                                |\n|--------|----------------|------------------------------------------------------------|\n| bool   | [bool](`bool`) | True if the datetime index is valid, sorted, and complete. |\n\n",
+    "supporting": [
+      "preprocessing.curate_data.basic_ts_checks_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
