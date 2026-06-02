@@ -6,8 +6,10 @@ import pandas as pd
 import pytest
 from lightgbm import LGBMRegressor
 
-from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
-from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
+from spotforecast2_safe.forecaster.wrappers import (
+    ForecasterRecursiveLGBM,
+    ForecasterRecursiveModel,
+)
 
 
 def test_forecaster_recursive_lgbm_initialization():

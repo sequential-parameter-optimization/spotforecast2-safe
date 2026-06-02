@@ -502,7 +502,7 @@ class ConfigMulti:
             # Imputation
             "imputation_method": self.imputation_method,
             "window_size": self.window_size,
-        "imputation_window_size": self.imputation_window_size,
+            "imputation_window_size": self.imputation_window_size,
             # Exogenous features
             "use_exogenous_features": self.use_exogenous_features,
             "latitude": self.latitude,

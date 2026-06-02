@@ -292,9 +292,7 @@ class TestDownloadNewDataRetrySuccess(unittest.TestCase):
             )
 
         self.assertEqual(mock_client.query_load_and_forecast.call_count, 3)
-        warning_count = sum(
-            1 for msg in cm.output if "Download failed" in msg
-        )
+        warning_count = sum(1 for msg in cm.output if "Download failed" in msg)
         self.assertEqual(warning_count, 2)
         raw_files = list((self.test_dir / "raw").glob("entsoe_load_*.csv"))
         self.assertEqual(len(raw_files), 1)

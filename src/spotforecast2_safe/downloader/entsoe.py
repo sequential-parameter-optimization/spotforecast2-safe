@@ -307,7 +307,9 @@ def download_new_data(
             observed = current_data.loc[
                 current_data.index <= pd.Timestamp.now(tz="UTC")
             ]
-            last_observed = observed.index[-1] if not observed.empty else current_data.index[-1]
+            last_observed = (
+                observed.index[-1] if not observed.empty else current_data.index[-1]
+            )
             start_date = last_observed + pd.Timedelta(hours=1)
             logger.info(
                 "No start date provided. Resuming from last data point: %s", start_date

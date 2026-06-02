@@ -36,7 +36,6 @@ import pytest
 
 from spotforecast2_safe.weather import WeatherFetchError
 
-
 HOURLY_INDEX = pd.date_range("2024-01-01", periods=48, freq="h", tz="UTC")
 
 
@@ -139,12 +138,8 @@ class TestS5InvalidCoordinatesRaiseAtLeaf:
 
         # Lat 89.999 sits inside the polar circle in mid-summer; astral
         # is then unable to compute civil twilight and raises ValueError.
-        location = LocationInfo(
-            latitude=89.999, longitude=0.0, timezone="UTC"
-        )
-        summer_idx = pd.date_range(
-            "2024-06-20", periods=48, freq="h", tz="UTC"
-        )
+        location = LocationInfo(latitude=89.999, longitude=0.0, timezone="UTC")
+        summer_idx = pd.date_range("2024-06-20", periods=48, freq="h", tz="UTC")
         with pytest.raises(ValueError):
             get_day_night_features(
                 start=summer_idx[0],

@@ -41,9 +41,9 @@ class TestProhibitedDependencies:
     """Verify that no blocklisted dependency is pinned in ``uv.lock``."""
 
     def test_lockfile_exists(self) -> None:
-        assert LOCKFILE.is_file(), (
-            f"Lockfile not found at {LOCKFILE}; run `uv lock` first."
-        )
+        assert (
+            LOCKFILE.is_file()
+        ), f"Lockfile not found at {LOCKFILE}; run `uv lock` first."
 
     @pytest.mark.parametrize("pkg", PROHIBITED_DEPENDENCIES)
     def test_prohibited_dependency_absent(self, pkg: str) -> None:

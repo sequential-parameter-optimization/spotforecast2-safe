@@ -61,9 +61,7 @@ def test_skip_continues_when_weather_fetch_fails(caplog):
     assert predictions.shape[0] == 2
     assert "forecast_horizon" in metadata
     assert len(forecasters) >= 1
-    assert any(
-        "on_weather_failure='skip'" in rec.message for rec in caplog.records
-    )
+    assert any("on_weather_failure='skip'" in rec.message for rec in caplog.records)
 
 
 def test_skip_only_swallows_weather_fetch_error():

@@ -547,17 +547,17 @@ class TestWeatherServiceFetchHybrid:
         end = now + pd.Timedelta(days=1)
 
         archive_idx = pd.date_range(start, periods=24, freq="h", tz="UTC")
-        archive_df = pd.DataFrame(
-            {"temperature_2m": [1.0] * 24}, index=archive_idx
-        )
+        archive_df = pd.DataFrame({"temperature_2m": [1.0] * 24}, index=archive_idx)
 
-        with patch.object(
-            WeatherService, "fetch_archive", return_value=archive_df
-        ), patch.object(
-            WeatherService,
-            "fetch_forecast",
-            side_effect=RuntimeError("forecast api boom"),
-        ), caplog.at_level(logging.WARNING):
+        with (
+            patch.object(WeatherService, "fetch_archive", return_value=archive_df),
+            patch.object(
+                WeatherService,
+                "fetch_forecast",
+                side_effect=RuntimeError("forecast api boom"),
+            ),
+            caplog.at_level(logging.WARNING),
+        ):
             result = svc._fetch_hybrid(start, end, "UTC")
 
         assert not result.empty
@@ -580,10 +580,15 @@ class TestWeatherFetchError:
         start = now - pd.Timedelta(days=10)
         end = now + pd.Timedelta(days=1)
 
-        with patch.object(
-            WeatherService, "fetch_archive", side_effect=RuntimeError("archive 504")
-        ), patch.object(
-            WeatherService, "fetch_forecast", side_effect=RuntimeError("forecast 504")
+        with (
+            patch.object(
+                WeatherService, "fetch_archive", side_effect=RuntimeError("archive 504")
+            ),
+            patch.object(
+                WeatherService,
+                "fetch_forecast",
+                side_effect=RuntimeError("forecast 504"),
+            ),
         ):
             with pytest.raises(
                 WeatherFetchError, match="Could not fetch data from Archive or Forecast"

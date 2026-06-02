@@ -72,23 +72,19 @@ import pandas as pd
 from astral import LocationInfo
 from lightgbm import LGBMRegressor
 
-logger = logging.getLogger(__name__)
-
 try:
     from tqdm.auto import tqdm
 except ImportError:  # pragma: no cover - fallback when tqdm is not installed
     tqdm = None
 
-from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.forecaster.utils import predict_multivariate
 from spotforecast2_safe.calendar import (
     get_calendar_features,
     get_day_night_features,
     get_holiday_features,
 )
-from spotforecast2_safe.weather import get_weather_features
-from spotforecast2_safe.weather.client import WeatherFetchError
+from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.forecaster.utils import predict_multivariate
 from spotforecast2_safe.manager.features import (
     apply_cyclical_encoding,
     create_interaction_features,
@@ -110,6 +106,10 @@ from spotforecast2_safe.preprocessing.curate_data import (
 from spotforecast2_safe.preprocessing.imputation import get_missing_weights
 from spotforecast2_safe.preprocessing.outlier import mark_outliers
 from spotforecast2_safe.splitter.split import split_rel_train_val_test
+from spotforecast2_safe.weather import get_weather_features
+from spotforecast2_safe.weather.client import WeatherFetchError
+
+logger = logging.getLogger(__name__)
 
 
 def n2n_predict_with_covariates(

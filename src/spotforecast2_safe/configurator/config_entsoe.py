@@ -386,9 +386,7 @@ class ConfigEntsoe:
         # required.  Consumed by
         # ``spotforecast2_safe.manager.trainer.should_retrain``.
         self.retrain_max_age = (
-            retrain_max_age
-            if retrain_max_age is not None
-            else pd.Timedelta(days=7)
+            retrain_max_age if retrain_max_age is not None else pd.Timedelta(days=7)
         )
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:

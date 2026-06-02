@@ -3,13 +3,13 @@
 
 from .base import ForecasterBase
 from .recursive import (
+    ForecasterEquivalentDate,
     ForecasterRecursive,
     ForecasterRecursiveMultiSeries,
-    ForecasterEquivalentDate,
 )
 from .wrappers import (
-    ForecasterRecursiveModel,
     ForecasterRecursiveLGBM,
+    ForecasterRecursiveModel,
     ForecasterRecursiveXGB,
 )
 

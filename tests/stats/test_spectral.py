@@ -7,10 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.stats.spectral import (
-    PeriodogramResult,
-    compute_periodogram,
-)
+from spotforecast2_safe.stats.spectral import PeriodogramResult, compute_periodogram
 
 
 def test_compute_periodogram_returns_periodogram_result():

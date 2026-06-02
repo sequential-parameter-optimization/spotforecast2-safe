@@ -25,18 +25,24 @@ def backtest_result():
     )
     forecaster = ForecasterRecursive(
         estimator=LGBMRegressor(
-            n_estimators=20, n_jobs=1, verbose=-1, random_state=0,
-            deterministic=True, force_col_wise=True,
+            n_estimators=20,
+            n_jobs=1,
+            verbose=-1,
+            random_state=0,
+            deterministic=True,
+            force_col_wise=True,
         ),
         lags=24,
     )
     forecaster.fit(y=y.iloc[:200])
-    cv = TimeSeriesFold(
-        steps=24, initial_train_size=200, refit=False, verbose=False
-    )
+    cv = TimeSeriesFold(steps=24, initial_train_size=200, refit=False, verbose=False)
     metrics_df, predictions_df = backtesting_forecaster(
-        forecaster=forecaster, y=y, cv=cv, metric="mean_absolute_error",
-        show_progress=False, verbose=False,
+        forecaster=forecaster,
+        y=y,
+        cv=cv,
+        metric="mean_absolute_error",
+        show_progress=False,
+        verbose=False,
     )
     return y, cv, metrics_df, predictions_df
 

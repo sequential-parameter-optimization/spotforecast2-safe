@@ -45,12 +45,12 @@ import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
 from spotforecast2_safe.manager.logger import setup_logging
-from spotforecast2_safe.utils.parse import parse_bool
 from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     n2n_predict_with_covariates,
 )
 from spotforecast2_safe.security.masking import mask_estimator
+from spotforecast2_safe.utils.parse import parse_bool
 
 # Default aggregation weights for the N-to-1 forecasting task.
 #

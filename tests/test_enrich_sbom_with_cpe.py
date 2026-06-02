@@ -27,9 +27,7 @@ SCRIPT_PATH = (
 
 
 def _load_module() -> Any:
-    spec = importlib.util.spec_from_file_location(
-        "enrich_sbom_with_cpe", SCRIPT_PATH
-    )
+    spec = importlib.util.spec_from_file_location("enrich_sbom_with_cpe", SCRIPT_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules["enrich_sbom_with_cpe"] = module

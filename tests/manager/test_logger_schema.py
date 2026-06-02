@@ -77,7 +77,11 @@ def _validate(record: dict[str, Any], schema: dict[str, Any]) -> list[str]:
             errors.append(f"{field}: expected const {spec['const']!r}, got {value!r}")
         if "enum" in spec and value not in spec["enum"]:
             errors.append(f"{field}: {value!r} not in enum {spec['enum']}")
-        if "minLength" in spec and isinstance(value, str) and len(value) < spec["minLength"]:
+        if (
+            "minLength" in spec
+            and isinstance(value, str)
+            and len(value) < spec["minLength"]
+        ):
             errors.append(f"{field}: shorter than minLength {spec['minLength']}")
     return errors
 
@@ -161,7 +165,13 @@ class TestJsonAuditFormatter:
         assert parsed["schema_version"] == SCHEMA_VERSION
 
     def test_level_is_enum_member(self, schema: dict[str, Any]) -> None:
-        for lvl in (logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL):
+        for lvl in (
+            logging.DEBUG,
+            logging.INFO,
+            logging.WARNING,
+            logging.ERROR,
+            logging.CRITICAL,
+        ):
             parsed = json.loads(JsonAuditFormatter().format(_make_record(level=lvl)))
             assert parsed["level"] in schema["properties"]["level"]["enum"]
 
