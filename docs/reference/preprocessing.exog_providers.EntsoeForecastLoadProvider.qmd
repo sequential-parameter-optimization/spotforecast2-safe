@@ -1,0 +1,47 @@
+# preprocessing.exog_providers.EntsoeForecastLoadProvider { #spotforecast2_safe.preprocessing.exog_providers.EntsoeForecastLoadProvider }
+
+```python
+preprocessing.exog_providers.EntsoeForecastLoadProvider(data_home=None)
+```
+
+ENTSO-E day-ahead Forecasted Load as an exogenous near-oracle prior.
+
+Wraps `spotforecast2_safe.data.fetch_data.load_timeseries_forecast`, which
+reads the ``Forecasted Load`` column already merged into
+``interim/energy_load.csv``. The day-ahead forecast is published on D-1 and
+is therefore genuinely available at forecast time (leakage-clean, CR-3).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                   | Description                                                                             | Default   |
+|-----------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|-----------|
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loader. ``None`` resolves via ``get_data_home()``. | `None`    |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os
+import shutil
+import tempfile
+
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.exog_providers import (
+    EntsoeForecastLoadProvider,
+)
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+interim = os.path.join(tmp, "interim")
+os.makedirs(interim, exist_ok=True)
+idx = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
+pd.DataFrame(
+    {"Actual Load": 100.0, "Forecasted Load": 99.0}, index=idx
+).rename_axis("Time (UTC)").to_csv(os.path.join(interim, "energy_load.csv"))
+
+out = EntsoeForecastLoadProvider().build(idx)
+print(out.columns.tolist(), out.shape)
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
+```

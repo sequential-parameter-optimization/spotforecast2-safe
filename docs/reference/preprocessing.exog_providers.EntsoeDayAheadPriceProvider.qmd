@@ -1,0 +1,18 @@
+# preprocessing.exog_providers.EntsoeDayAheadPriceProvider { #spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider }
+
+```python
+preprocessing.exog_providers.EntsoeDayAheadPriceProvider(data_home=None)
+```
+
+ENTSO-E day-ahead spot price (DE/LU) as an exogenous input.
+
+Reads ``interim/day_ahead_price.csv`` via
+`spotforecast2_safe.data.fetch_data.load_day_ahead_price`. The day-ahead
+auction price is published on D-1 and is leakage-clean at forecast time;
+the realised price must never be used.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                   | Description                                  | Default   |
+|-----------|------------------------------------------------------------------------|----------------------------------------------|-----------|
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loader. | `None`    |

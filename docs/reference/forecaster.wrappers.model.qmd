@@ -22,6 +22,12 @@ forecaster.wrappers.model.ForecasterRecursiveModel(
     random_state=123456789,
     predict_size=24,
     refit_size=7,
+    include_covid_infection_rate=False,
+    include_entsoe_forecast_load=False,
+    include_entsoe_renewable_forecast=False,
+    include_entsoe_net_load=False,
+    include_entsoe_day_ahead_price=False,
+    on_exog_provider_failure='raise',
     name='base',
     **kwargs,
 )

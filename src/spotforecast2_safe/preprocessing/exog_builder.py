@@ -3,15 +3,22 @@
 
 """Exogenous feature builder for time series forecasting."""
 
+import logging
 from typing import List, Optional
 
 import holidays
 import pandas as pd
 
 from spotforecast2_safe.data.data_classes import Period
+from spotforecast2_safe.preprocessing.exog_providers import (
+    ExogFeatureProvider,
+    ExogProviderError,
+)
 from spotforecast2_safe.preprocessing.repeating_basis_function import (
     RepeatingBasisFunction,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ExogBuilder:
@@ -22,10 +29,22 @@ class ExogBuilder:
     with cyclical features encoded via RepeatingBasisFunctions and optional
     holiday indicators.
 
+    Optional :class:`~spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`
+    objects extend the built frame with additional drivers (e.g. ENTSO-E
+    day-ahead forecasts, COVID infection rate). Each provider returns numeric,
+    NaN-free columns aligned to the same hourly index; a provider that cannot
+    cover the range is either re-raised or skipped according to
+    *on_provider_failure*.
+
     Attributes:
         periods (List[Period]): List of periodic features to encode.
         country_code (Optional[str]): Country code for holiday lookups.
         holidays_list (Optional[holidays.HolidayBase]): List of holidays for the specified country.
+        providers (List[ExogFeatureProvider]): Extra exogenous-feature providers
+            appended to every built frame.
+        on_provider_failure (str): ``"raise"`` (default) to propagate an
+            ``ExogProviderError`` from a provider, or ``"skip"`` to log and omit
+            that provider's columns.
 
     Examples:
         >>> import pandas as pd
@@ -41,7 +60,11 @@ class ExogBuilder:
     """
 
     def __init__(
-        self, periods: Optional[List[Period]] = None, country_code: Optional[str] = None
+        self,
+        periods: Optional[List[Period]] = None,
+        country_code: Optional[str] = None,
+        providers: Optional[List[ExogFeatureProvider]] = None,
+        on_provider_failure: str = "raise",
     ):
         """
         Initialize the ExogBuilder.
@@ -49,9 +72,22 @@ class ExogBuilder:
         Args:
             periods: List of Period objects defining cyclical features.
             country_code: country code (ISO) for holiday detection.
+            providers: Optional extra exogenous-feature providers whose columns
+                are appended to every built frame. Defaults to ``None`` (no
+                providers; behaviour is unchanged).
+            on_provider_failure: ``"raise"`` (default) to propagate an
+                ``ExogProviderError`` from a provider, or ``"skip"`` to log a
+                warning and omit that provider's columns.
         """
+        if on_provider_failure not in ("raise", "skip"):
+            raise ValueError(
+                "on_provider_failure must be 'raise' or 'skip'; got "
+                f"{on_provider_failure!r}."
+            )
         self.periods = periods or []
         self.country_code = country_code
+        self.providers = providers or []
+        self.on_provider_failure = on_provider_failure
         self.holidays_list = (
             holidays.country_holidays(country_code) if country_code else None
         )
@@ -127,4 +163,18 @@ class ExogBuilder:
             X_["holidays"] = [int(d in self.holidays_list) for d in X_.index]
 
         X_["is_weekend"] = X_.index.dayofweek.isin([5, 6]).astype(int)
+
+        for provider in self.providers:
+            provider_name = getattr(provider, "name", provider.__class__.__name__)
+            try:
+                extra = provider.build(X_.index)
+            except ExogProviderError as exc:
+                if self.on_provider_failure == "raise":
+                    raise
+                logger.warning("Skipping exog provider %r: %s", provider_name, exc)
+                continue
+            if not extra.index.equals(X_.index):
+                extra = extra.reindex(X_.index)
+            X_ = pd.concat([X_, extra], axis=1)
+
         return X_

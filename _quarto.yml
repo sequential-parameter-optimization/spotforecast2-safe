@@ -500,6 +500,8 @@ quartodoc:
         - data.fetch_data.get_package_data_home
         - data.fetch_data.load_timeseries
         - data.fetch_data.load_timeseries_forecast
+        - data.fetch_data.load_renewable_forecast
+        - data.fetch_data.load_day_ahead_price
         - data.data_classes
         - data.demo_loader
 
@@ -528,6 +530,14 @@ quartodoc:
         - preprocessing.checking.get_exog_dtypes
         - preprocessing.checking.set_cpu_gpu_device
         - preprocessing.exog_builder.ExogBuilder
+        - preprocessing.exog_providers.ExogFeatureProvider
+        - preprocessing.exog_providers.CovidInfectionRateProvider
+        - preprocessing.exog_providers.EntsoeForecastLoadProvider
+        - preprocessing.exog_providers.EntsoeRenewableForecastProvider
+        - preprocessing.exog_providers.EntsoeNetLoadProvider
+        - preprocessing.exog_providers.EntsoeDayAheadPriceProvider
+        - preprocessing.exog_providers.build_providers
+        - preprocessing.exog_providers.build_providers_from_config
         - preprocessing.imputation.apply_imputation
         - preprocessing.imputation.WeightFunction
         - preprocessing.imputation.custom_weights
@@ -674,6 +684,8 @@ quartodoc:
         Data downloaders for external data sources (e.g. ENTSO-E).
       contents:
         - downloader.entsoe.download_new_data
+        - downloader.entsoe.download_renewable_forecast
+        - downloader.entsoe.download_day_ahead_price
         - downloader.entsoe.merge_build_manual
 
     # ── Exceptions ────────────────────────────────────────────────────────────

@@ -4,21 +4,29 @@
 downloader.entsoe.merge_build_manual(
     output_file='energy_load.csv',
     keep_forecast_future=False,
+    raw_subdir=None,
 )
 ```
 
 Merge all raw CSV files from the 'raw' directory into a single interim file.
 
-This function looks for all `.csv` files in `get_data_home() / "raw"`,
+This function looks for all `.csv` files in `get_data_home() / "raw"`
+(or, when *raw_subdir* is given, in `get_data_home() / "raw" / raw_subdir`),
 sorts them by time index, and saves the unique combined data to
 `get_data_home() / "interim" / output_file`.
 
+Namespacing raw files by *raw_subdir* keeps the day-ahead side-tables
+(``renewable_forecast.csv``, ``day_ahead_price.csv``) from clobbering the
+load schema in ``energy_load.csv``: the default glob is non-recursive, so
+load files in ``raw/`` and renewable files in ``raw/renewable/`` never mix.
+
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name                 | Type           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default             |
-|----------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| output_file          | [str](`str`)   | The name of the combined output file. Defaults to "energy_load.csv".                                                                                                                                                                                                                                                                                                                                                                                                                             | `'energy_load.csv'` |
-| keep_forecast_future | [bool](`bool`) | If False (the default), rows with a timestamp after the current UTC moment are dropped, so the interim file holds only data that is "actual" up to now -- the correct, leakage-free input for model training. If True, those future rows are retained, which preserves ENTSO-E's day-ahead `Forecasted Load` for tomorrow (future `Actual Load` is still NaN, so no future target leaks). Use True only for forecast-baseline / comparison workflows that need the published day-ahead forecast. | `False`             |
+| Name                 | Type                                          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default             |
+|----------------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| output_file          | [str](`str`)                                  | The name of the combined output file. Defaults to "energy_load.csv".                                                                                                                                                                                                                                                                                                                                                                                                                             | `'energy_load.csv'` |
+| keep_forecast_future | [bool](`bool`)                                | If False (the default), rows with a timestamp after the current UTC moment are dropped, so the interim file holds only data that is "actual" up to now -- the correct, leakage-free input for model training. If True, those future rows are retained, which preserves ENTSO-E's day-ahead `Forecasted Load` for tomorrow (future `Actual Load` is still NaN, so no future target leaks). Use True only for forecast-baseline / comparison workflows that need the published day-ahead forecast. | `False`             |
+| raw_subdir           | [Optional](`typing.Optional`)\[[str](`str`)\] | Optional sub-directory under ``raw/`` to merge instead of ``raw/`` itself. Used by the day-ahead side-table downloaders (e.g. ``"renewable"``, ``"price"``). Defaults to ``None``.                                                                                                                                                                                                                                                                                                               | `None`              |
 
 ## Raises {.doc-section .doc-section-raises}
 

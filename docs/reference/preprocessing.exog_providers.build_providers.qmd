@@ -1,0 +1,30 @@
+# preprocessing.exog_providers.build_providers { #spotforecast2_safe.preprocessing.exog_providers.build_providers }
+
+```python
+preprocessing.exog_providers.build_providers(flags, *, data_home=None)
+```
+
+Construct the providers whose flags are truthy, in registry order.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                   | Description                                                                                                    | Default    |
+|-----------|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|------------|
+| flags     | [Mapping](`typing.Mapping`)\[[str](`str`), [bool](`bool`)\]            | Mapping from registry flag name to a boolean. Unknown keys are ignored; missing keys are treated as ``False``. | _required_ |
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to each provider.                                                                | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                  | Description                                                              |
+|--------|-----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+|        | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | List[ExogFeatureProvider]: Providers for the enabled flags, in the fixed |
+|        | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | order of :data:`EXOG_PROVIDER_REGISTRY` (deterministic column ordering). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.preprocessing.exog_providers import build_providers
+
+providers = build_providers({"include_entsoe_forecast_load": True})
+print([p.name for p in providers])
+```

@@ -1,7 +1,12 @@
 # preprocessing.exog_builder.ExogBuilder { #spotforecast2_safe.preprocessing.exog_builder.ExogBuilder }
 
 ```python
-preprocessing.exog_builder.ExogBuilder(periods=None, country_code=None)
+preprocessing.exog_builder.ExogBuilder(
+    periods=None,
+    country_code=None,
+    providers=None,
+    on_provider_failure='raise',
+)
 ```
 
 Builds a set of exogenous features for a given date range.
@@ -10,13 +15,22 @@ This builder combines temporal features (day of year, day of week, hour, etc.)
 with cyclical features encoded via RepeatingBasisFunctions and optional
 holiday indicators.
 
+Optional :class:`~spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`
+objects extend the built frame with additional drivers (e.g. ENTSO-E
+day-ahead forecasts, COVID infection rate). Each provider returns numeric,
+NaN-free columns aligned to the same hourly index; a provider that cannot
+cover the range is either re-raised or skipped according to
+*on_provider_failure*.
+
 ## Attributes {.doc-section .doc-section-attributes}
 
-| Name          | Type                                                                                          | Description                                 |
-|---------------|-----------------------------------------------------------------------------------------------|---------------------------------------------|
-| periods       | [List](`typing.List`)\[[Period](`spotforecast2_safe.data.data_classes.Period`)\]              | List of periodic features to encode.        |
-| country_code  | [Optional](`typing.Optional`)\[[str](`str`)\]                                                 | Country code for holiday lookups.           |
-| holidays_list | [Optional](`typing.Optional`)\[[holidays](`holidays`).[HolidayBase](`holidays.HolidayBase`)\] | List of holidays for the specified country. |
+| Name                | Type                                                                                                                  | Description                                                                                                                         |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| periods             | [List](`typing.List`)\[[Period](`spotforecast2_safe.data.data_classes.Period`)\]                                      | List of periodic features to encode.                                                                                                |
+| country_code        | [Optional](`typing.Optional`)\[[str](`str`)\]                                                                         | Country code for holiday lookups.                                                                                                   |
+| holidays_list       | [Optional](`typing.Optional`)\[[holidays](`holidays`).[HolidayBase](`holidays.HolidayBase`)\]                         | List of holidays for the specified country.                                                                                         |
+| providers           | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | Extra exogenous-feature providers appended to every built frame.                                                                    |
+| on_provider_failure | [str](`str`)                                                                                                          | ``"raise"`` (default) to propagate an ``ExogProviderError`` from a provider, or ``"skip"`` to log and omit that provider's columns. |
 
 ## Examples {.doc-section .doc-section-examples}
 
