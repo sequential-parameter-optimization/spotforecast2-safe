@@ -1428,9 +1428,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="spotforecast2_safe.preprocessing.exog_builder.ExogBuilder" class="level1">
 <h1>preprocessing.exog_builder.ExogBuilder</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.exog_builder.ExogBuilder(periods<span class="op">=</span><span class="va">None</span>, country_code<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.exog_builder.ExogBuilder(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    providers<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    on_provider_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Builds a set of exogenous features for a given date range.</p>
 <p>This builder combines temporal features (day of year, day of week, hour, etc.) with cyclical features encoded via RepeatingBasisFunctions and optional holiday indicators.</p>
+<p>Optional :class:<code>~spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider</code> objects extend the built frame with additional drivers (e.g.&nbsp;ENTSO-E day-ahead forecasts, COVID infection rate). Each provider returns numeric, NaN-free columns aligned to the same hourly index; a provider that cannot cover the range is either re-raised or skipped according to <em>on_provider_failure</em>.</p>
 <section id="attributes" class="level2 doc-section doc-section-attributes">
 <h2 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
@@ -1456,6 +1462,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>holidays_list</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<code>holidays</code>.<code>HolidayBase</code>]</td>
 <td>List of holidays for the specified country.</td>
+</tr>
+<tr class="even">
+<td>providers</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="../../docs/reference/preprocessing.exog_providers.ExogFeatureProvider.html#spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider">ExogFeatureProvider</a>]</td>
+<td>Extra exogenous-feature providers appended to every built frame.</td>
+</tr>
+<tr class="odd">
+<td>on_provider_failure</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td><code>"raise"</code> (default) to propagate an <code>ExogProviderError</code> from a provider, or <code>"skip"</code> to log and omit that provider’s columns.</td>
 </tr>
 </tbody>
 </table>
