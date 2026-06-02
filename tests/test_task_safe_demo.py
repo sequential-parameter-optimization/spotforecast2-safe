@@ -344,12 +344,6 @@ class TestErrorHandling:
 
         with pytest.raises(ValueError):
             n2n_predict_with_covariates(forecast_horizon=0)
-        """Test handling of unexpected prediction shapes."""
-        expected_shape = (24, 11)
-        actual_shape = (24, 10)  # Missing one column
-
-        assert expected_shape[0] == actual_shape[0]  # Same horizon
-        assert expected_shape[1] != actual_shape[1]  # Different dimensions
 
 
 class TestMemoryAndPerformance:
