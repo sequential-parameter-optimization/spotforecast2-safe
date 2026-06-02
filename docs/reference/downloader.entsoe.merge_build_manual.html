@@ -1498,14 +1498,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
 <p>Individual raw CSV files that fail to parse are logged at ERROR level and skipped; the merge continues with the remaining files. When zero files parse successfully the function returns early without writing an output file.</p>
 <p>Logging information can be selected by setting the log level for the <code>spotforecast2_safe.downloader.entsoe</code> logger. Common levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, and <code>CRITICAL</code>. The cell below shows the default (WARNING); change the level to <code>INFO</code> or <code>DEBUG</code> for more verbose output.</p>
-<div id="64e9dac9" class="cell" data-execution_count="1">
+<div id="07d663bc" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">"spotforecast2_safe.downloader.entsoe"</span>).setLevel(logging.WARNING)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="84fca705" class="cell" data-execution_count="2">
+<div id="de5d8e9e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> merge_build_manual</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge with the default output filename</span></span>
