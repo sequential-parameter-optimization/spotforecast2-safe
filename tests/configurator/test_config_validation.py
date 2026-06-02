@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""Fail-safe hyperparameter validation for the pipeline config classes.
+
+Clearly-invalid values must raise at construction AND via set_params (the latter
+previously bypassed the one existing poly_features_degree check). Validation is
+deliberately conservative — only unambiguously-invalid values are rejected.
+"""
+
+import pytest
+
+from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+CLASSES = [ConfigEntsoe, ConfigMulti]
+
+
+@pytest.mark.parametrize("cls", CLASSES)
+class TestConstructorValidation:
+    def test_predict_size_non_positive(self, cls):
+        with pytest.raises(ValueError, match="predict_size must be positive"):
+            cls(predict_size=0)
+
+    def test_contamination_out_of_range(self, cls):
+        with pytest.raises(ValueError, match="contamination must be"):
+            cls(contamination=0.6)
+
+    def test_poly_features_degree_below_one(self, cls):
+        with pytest.raises(ValueError, match="poly_features_degree must be"):
+            cls(poly_features_degree=0)
+
+    def test_on_weather_failure_invalid(self, cls):
+        with pytest.raises(ValueError, match="on_weather_failure must be"):
+            cls(on_weather_failure="bogus")
+
+    def test_valid_boundaries_accepted(self, cls):
+        cfg = cls(
+            predict_size=1,
+            contamination=0.0,
+            poly_features_degree=1,
+            on_weather_failure="skip",
+        )
+        assert cfg.predict_size == 1
+        assert cfg.contamination == 0.0
+
+
+@pytest.mark.parametrize("cls", CLASSES)
+class TestSetParamsValidation:
+    def test_rejects_invalid_predict_size(self, cls):
+        with pytest.raises(ValueError, match="predict_size must be positive"):
+            cls().set_params(predict_size=-1)
+
+    def test_rejects_invalid_poly_degree(self, cls):
+        # set_params previously bypassed this guard entirely.
+        with pytest.raises(ValueError, match="poly_features_degree must be"):
+            cls().set_params(poly_features_degree=0)
+
+    def test_rejects_invalid_on_weather_failure(self, cls):
+        with pytest.raises(ValueError, match="on_weather_failure must be"):
+            cls().set_params(on_weather_failure="nope")
+
+    def test_valid_set_params_still_works(self, cls):
+        cfg = cls().set_params(predict_size=48, contamination=0.05)
+        assert cfg.predict_size == 48
+        assert cfg.contamination == 0.05

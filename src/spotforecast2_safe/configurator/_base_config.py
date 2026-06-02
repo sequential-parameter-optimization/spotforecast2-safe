@@ -137,4 +137,42 @@ def apply_set_params(
                 new_periods.append(period)
         config.periods = new_periods
 
+    validate_config(config)
     return config
+
+
+def validate_config(config: object) -> None:
+    """Reject clearly-invalid hyperparameter values (fail-safe).
+
+    Conservative on purpose: only values that are unambiguously invalid are
+    rejected, so a configuration a caller legitimately builds is never refused.
+    Invoked by both ``__init__`` and ``set_params`` so the guard cannot be
+    bypassed by mutating an instance after construction.
+
+    Raises:
+        ValueError: For a non-positive ``predict_size``, a ``contamination``
+            outside ``[0, 0.5]``, a ``poly_features_degree`` below 1, or an
+            ``on_weather_failure`` that is not ``"raise"`` or ``"skip"``.
+    """
+    predict_size = getattr(config, "predict_size", None)
+    if predict_size is not None and predict_size <= 0:
+        raise ValueError(f"predict_size must be positive; got {predict_size}.")
+
+    contamination = getattr(config, "contamination", None)
+    if contamination is not None and not 0 <= contamination <= 0.5:
+        raise ValueError(
+            f"contamination must be between 0 and 0.5; got {contamination}."
+        )
+
+    poly_features_degree = getattr(config, "poly_features_degree", None)
+    if poly_features_degree is not None and poly_features_degree < 1:
+        raise ValueError(
+            f"poly_features_degree must be >= 1; got {poly_features_degree}."
+        )
+
+    on_weather_failure = getattr(config, "on_weather_failure", None)
+    if on_weather_failure is not None and on_weather_failure not in ("raise", "skip"):
+        raise ValueError(
+            "on_weather_failure must be 'raise' or 'skip'; got "
+            f"{on_weather_failure!r}."
+        )

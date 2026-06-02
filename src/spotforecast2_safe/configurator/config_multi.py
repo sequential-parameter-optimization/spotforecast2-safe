@@ -11,6 +11,7 @@ from spotforecast2_safe.configurator._base_config import (
     apply_set_params,
     build_get_params,
     default_periods,
+    validate_config,
 )
 from spotforecast2_safe.data import Period
 
@@ -425,10 +426,6 @@ class ConfigMulti:
         # Feature selection toggles
         self.include_weather_windows = include_weather_windows
         self.include_holiday_features = include_holiday_features
-        if poly_features_degree < 1:
-            raise ValueError(
-                f"poly_features_degree must be >= 1, got {poly_features_degree}."
-            )
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
         # Data source and index
@@ -496,6 +493,7 @@ class ConfigMulti:
         # pipeline (default, preserves fail-safe semantics); ``"skip"``
         # logs a warning and continues without weather features.
         self.on_weather_failure = on_weather_failure
+        validate_config(self)
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """

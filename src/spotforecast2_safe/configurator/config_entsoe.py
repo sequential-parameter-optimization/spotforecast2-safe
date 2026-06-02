@@ -11,6 +11,7 @@ from spotforecast2_safe.configurator._base_config import (
     apply_set_params,
     build_get_params,
     default_periods,
+    validate_config,
 )
 from spotforecast2_safe.data import Period
 
@@ -353,10 +354,6 @@ class ConfigEntsoe:
         # Feature selection toggles
         self.include_weather_windows = include_weather_windows
         self.include_holiday_features = include_holiday_features
-        if poly_features_degree < 1:
-            raise ValueError(
-                f"poly_features_degree must be >= 1, got {poly_features_degree}."
-            )
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
         # Data source and index
@@ -422,6 +419,7 @@ class ConfigEntsoe:
         self.retrain_max_age = (
             retrain_max_age if retrain_max_age is not None else pd.Timedelta(days=7)
         )
+        validate_config(self)
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
         """
