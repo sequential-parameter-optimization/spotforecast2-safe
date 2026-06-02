@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import pickle
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
@@ -140,8 +141,12 @@ def save_forecasters(
             saved_paths[target] = filepath
             if verbose:
                 print(f"  ✓ Saved forecaster for {target} to {filepath}")
-        except Exception as e:
-            raise OSError(f"Failed to save model for {target}: {e}")
+        except OSError as e:
+            raise OSError(
+                f"Failed to write model for {target} to {filepath}: {e}"
+            ) from e
+        except (pickle.PicklingError, TypeError, AttributeError) as e:
+            raise TypeError(f"Forecaster for {target} is not serializable: {e}") from e
 
     return saved_paths
 
@@ -322,6 +327,8 @@ def save_forecaster(
         dump(forecaster, filepath, compress=3)
         if verbose:
             print(f"  ✓ Saved forecaster for {target} to {filepath}")
-    except Exception as e:
-        raise OSError(f"Failed to save model for {target}: {e}")
+    except OSError as e:
+        raise OSError(f"Failed to write model for {target} to {filepath}: {e}") from e
+    except (pickle.PicklingError, TypeError, AttributeError) as e:
+        raise TypeError(f"Forecaster for {target} is not serializable: {e}") from e
     return filepath

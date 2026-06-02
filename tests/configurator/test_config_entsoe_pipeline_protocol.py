@@ -13,7 +13,6 @@ import pytest
 
 from spotforecast2_safe.configurator.config_entsoe import ConfigEntsoe
 
-
 PIPELINE_PROTOCOL_FIELDS = [
     # Targets and aggregation
     ("targets", None),

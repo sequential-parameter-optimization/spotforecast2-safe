@@ -131,9 +131,10 @@ class TestHybridFetchCoverage:
             f_end = now.normalize() + pd.Timedelta(days=days_ahead)
             return _hourly_frame(f_start, f_end)
 
-        with patch.object(
-            service, "fetch_archive", side_effect=fake_archive
-        ), patch.object(service, "fetch_forecast", side_effect=fake_forecast):
+        with (
+            patch.object(service, "fetch_archive", side_effect=fake_archive),
+            patch.object(service, "fetch_forecast", side_effect=fake_forecast),
+        ):
             merged = service._fetch_hybrid(start, end, "UTC")
 
         recent = pd.date_range(archive_cutoff, now, freq="h")
@@ -191,7 +192,9 @@ class TestWeatherFeaturesNoSilentLOCF:
         # Reference target frame (used by curate_weather for shape validation only).
         data = pd.DataFrame(
             {"load": 1.0},
-            index=pd.date_range(start, cov_end - pd.Timedelta(hours=24), freq="h", tz="UTC"),
+            index=pd.date_range(
+                start, cov_end - pd.Timedelta(hours=24), freq="h", tz="UTC"
+            ),
         )
 
         with patch(
@@ -219,7 +222,9 @@ class TestWeatherFeaturesNoSilentLOCF:
 
         data = pd.DataFrame(
             {"load": 1.0},
-            index=pd.date_range(start, cov_end - pd.Timedelta(hours=24), freq="h", tz="UTC"),
+            index=pd.date_range(
+                start, cov_end - pd.Timedelta(hours=24), freq="h", tz="UTC"
+            ),
         )
         with patch(
             "spotforecast2_safe.data.fetch_data.fetch_weather_data",

@@ -36,8 +36,8 @@ assert holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON
 print("holiday_df shape is correct:", holiday_df.shape[0] == data.shape[0] + FORECAST_HORIZON)
 ```
 
-## Raises {.doc-section .doc-section-raises}
+## Notes {.doc-section .doc-section-notes}
 
-| Name   | Type                               | Description                                                        |
-|--------|------------------------------------|--------------------------------------------------------------------|
-|        | [AssertionError](`AssertionError`) | If the holiday dataframe does not have the correct number of rows. |
+If the holiday dataframe does not have the expected number of rows, a
+diagnostic message is logged via ``print`` and the function returns
+``None`` without raising.

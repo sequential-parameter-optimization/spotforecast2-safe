@@ -53,3 +53,17 @@ class TestAggPredict:
 
         result = agg_predict(df, weights=weights)
         assert result.iloc[0] == 3.0
+
+    def test_agg_predict_list_weights(self):
+        """List weights map to columns in positional order."""
+        df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+
+        result = agg_predict(df, weights=[0.5, 2.0])
+        assert result.tolist() == [6.5, 9.0]
+
+    def test_agg_predict_list_length_mismatch(self):
+        """ValueError when a list/array weight length != number of columns."""
+        df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+
+        with pytest.raises(ValueError, match="does not match number of columns"):
+            agg_predict(df, weights=[1.0])

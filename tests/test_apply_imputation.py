@@ -307,7 +307,9 @@ class TestImputationWindowSizeDecoupling:
         _, wf_none = apply_imputation(
             df_gap.copy(), _cfg_iws(window_size=5, imputation_window_size=None), log
         )
-        _, wf_ref = apply_imputation(df_gap.copy(), _cfg("weighted", window_size=5), log)
+        _, wf_ref = apply_imputation(
+            df_gap.copy(), _cfg("weighted", window_size=5), log
+        )
         assert (wf_none.weights_series == wf_ref.weights_series).all()
 
     def test_iws_exact_penalty_width(self, log):

@@ -89,7 +89,7 @@ def _write_past_future_raw(raw_dir):
     df = pd.DataFrame(
         {
             "Time (UTC)": [past.isoformat(), future.isoformat()],
-            "Actual Load": [42000.0, "-"],          # future actual not yet published
+            "Actual Load": [42000.0, "-"],  # future actual not yet published
             "Forecasted Load": [41000.0, 39000.0],  # day-ahead forecast covers future
         }
     )

@@ -3,7 +3,7 @@
 
 """Feature engineering helpers for exogenous variable pipelines.
 
-This module provides five public helper functions used to transform raw
+This module provides six public helper functions used to transform raw
 exogenous inputs into model-ready feature matrices:
 
 - `apply_cyclical_encoding()` — convert periodic integer features (hour,

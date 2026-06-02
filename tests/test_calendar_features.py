@@ -17,13 +17,11 @@ import pandas as pd
 import pytest
 from astral import LocationInfo
 
-from spotforecast2_safe.calendar import (
-    get_calendar_features,
-    get_day_night_features,
-    get_holiday_features,
-)
+from spotforecast2_safe.calendar import get_calendar_features
 from spotforecast2_safe.calendar import get_calendar_features as _cal
+from spotforecast2_safe.calendar import get_day_night_features
 from spotforecast2_safe.calendar import get_day_night_features as _dn
+from spotforecast2_safe.calendar import get_holiday_features
 from spotforecast2_safe.calendar import get_holiday_features as _hol
 
 # =============================================================================
@@ -349,5 +347,3 @@ class TestCalendarPackageImports:
             "get_holiday_features",
         ):
             assert removed not in manager_module.__all__
-
-

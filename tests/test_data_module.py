@@ -17,12 +17,7 @@ import pandas as pd
 import pytest
 
 from spotforecast2_safe.configurator import ConfigDemo
-from spotforecast2_safe.data import (
-    Data,
-    Period,
-    fetch_data,
-    load_actual_combined,
-)
+from spotforecast2_safe.data import Data, Period, fetch_data, load_actual_combined
 from spotforecast2_safe.data.fetch_data import (
     _apply_on_missing,
     load_timeseries,
@@ -70,9 +65,7 @@ class TestDataFromCsv:
     def test_unparseable_freq_logs_and_keeps_none(self, tmp_path):
         irregular = pd.DataFrame(
             {"y": [1, 2, 3]},
-            index=pd.to_datetime(
-                ["2024-01-01", "2024-01-02", "2024-01-05"]
-            ),
+            index=pd.to_datetime(["2024-01-01", "2024-01-02", "2024-01-05"]),
         )
         csv_path = tmp_path / "irregular.csv"
         irregular.to_csv(csv_path)
@@ -192,7 +185,10 @@ def energy_load_dir(tmp_path, monkeypatch):
     interim.mkdir()
     idx = pd.date_range("2024-01-01", periods=4, freq="h", tz="UTC")
     df = pd.DataFrame(
-        {"Actual Load": [10.0, 11.0, 12.0, 13.0], "Forecasted Load": [9.5, 11.2, 12.4, 12.9]},
+        {
+            "Actual Load": [10.0, 11.0, 12.0, 13.0],
+            "Forecasted Load": [9.5, 11.2, 12.4, 12.9],
+        },
         index=idx,
     )
     df.index.name = "Time (UTC)"
@@ -255,8 +251,6 @@ class TestLoadActualCombined:
     def test_defaults_pulled_from_config_when_args_none(self, tmp_path):
         csv_path = tmp_path / "demo.csv"
         _write_demo_csv(csv_path)
-        config = ConfigDemo(
-            data_path=csv_path, forecast_horizon=3, weights=[1.0, -1.0]
-        )
+        config = ConfigDemo(data_path=csv_path, forecast_horizon=3, weights=[1.0, -1.0])
         result = load_actual_combined(config, columns=["load", "solar"])
         assert len(result) == 3

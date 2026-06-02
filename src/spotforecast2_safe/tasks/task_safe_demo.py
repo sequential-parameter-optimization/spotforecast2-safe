@@ -50,14 +50,14 @@ from lightgbm import LGBMRegressor
 
 from spotforecast2_safe.configurator import ConfigDemo
 from spotforecast2_safe.data import load_actual_combined
-from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.manager.demo_metrics import calculate_metrics
-from spotforecast2_safe.utils.parse import parse_bool
+from spotforecast2_safe.manager.logger import setup_logging
 from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.processing.n2n_predict import n2n_predict
 from spotforecast2_safe.processing.n2n_predict_with_covariates import (
     n2n_predict_with_covariates,
 )
+from spotforecast2_safe.utils.parse import parse_bool
 
 
 def main(

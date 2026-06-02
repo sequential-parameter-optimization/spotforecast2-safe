@@ -5,5 +5,6 @@
 
 from .config_demo import ConfigDemo
 from .config_entsoe import ConfigEntsoe
+from .config_multi import ConfigMulti
 
-__all__ = ["ConfigDemo", "ConfigEntsoe"]
+__all__ = ["ConfigDemo", "ConfigEntsoe", "ConfigMulti"]

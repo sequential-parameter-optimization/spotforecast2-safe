@@ -16,6 +16,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model._base import LinearClassifierMixin, LinearModel
 from sklearn.pipeline import Pipeline
 
+from spotforecast2_safe.exceptions import OneStepAheadValidationWarning
 from spotforecast2_safe.forecaster.utils import date_to_index_position
 from spotforecast2_safe.preprocessing.checking import check_interval
 
@@ -164,42 +165,6 @@ def _extract_data_folds_multiseries(
             exog_test = None
 
         yield series_train, series_last_window, levels_last_window, exog_train, exog_test, fold
-
-
-class OneStepAheadValidationWarning(UserWarning):
-    """
-    Warning used to notify that the one-step-ahead validation is being used.
-
-    Args:
-        message (str): The warning message to be displayed.
-
-    Examples:
-        ```{python}
-        import warnings
-        from spotforecast2_safe.splitter.utils_common import OneStepAheadValidationWarning
-
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            warnings.warn(
-                "This is a one-step-ahead validation warning.",
-                OneStepAheadValidationWarning,
-            )
-
-        assert len(caught) == 1
-        assert issubclass(caught[0].category, OneStepAheadValidationWarning)
-        print(str(caught[0].message))
-        ```
-    """
-
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        extra_message = (
-            "You can suppress this warning using: "
-            "warnings.simplefilter('ignore', category=OneStepAheadValidationWarning)"
-        )
-        return self.message + "\n" + extra_message
 
 
 def initialize_lags_grid(
