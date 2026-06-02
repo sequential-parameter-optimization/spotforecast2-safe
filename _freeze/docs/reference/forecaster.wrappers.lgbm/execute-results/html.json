@@ -1,0 +1,12 @@
+{
+  "hash": "bcf40487514d9ada94ff5880c80006be",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.wrappers.lgbm\n---\n\n\n\n`forecaster.wrappers.lgbm`\n\nRecursive forecaster wrapper using LightGBM.\n\n## Classes\n\n| Name | Description |\n| --- | --- |\n| [ForecasterRecursiveLGBM](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM) | ForecasterRecursive specialization using LightGBM. |\n\n### ForecasterRecursiveLGBM { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM }\n\n```python\nforecaster.wrappers.lgbm.ForecasterRecursiveLGBM(iteration, lags=12, **kwargs)\n```\n\nForecasterRecursive specialization using LightGBM.\n\n#### Examples {.doc-section .doc-section-examples}\n\n\n::: {#dc5f95e6 .cell execution_count=1}\n``` {.python .cell-code}\nimport warnings\nimport numpy as np\nimport pandas as pd\nfrom lightgbm import LGBMRegressor\n\nfrom spotforecast2_safe.exceptions import IgnoredArgumentWarning\nfrom spotforecast2_safe.forecaster.recursive import ForecasterRecursive\nfrom spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM\n\nwarnings.simplefilter(\"ignore\", IgnoredArgumentWarning)\n\nrng = np.random.default_rng(0)\nn = 50\nidx = pd.date_range(\"2023-01-01\", periods=n, freq=\"h\")\nvals = 100 + 10 * np.sin(np.linspace(0, 4 * np.pi, n)) + rng.normal(0, 1, n)\ny = pd.Series(vals, index=idx)\n\n# Use a fast, small estimator for the example\nmodel = ForecasterRecursiveLGBM(iteration=0, lags=3)\nmodel.forecaster = ForecasterRecursive(\n    estimator=LGBMRegressor(\n        n_estimators=10, n_jobs=1, verbose=-1, random_state=0,\n        deterministic=True, force_col_wise=True,\n    ),\n    lags=3,\n)\nmodel.fit(y=y)\npred = model.forecaster.predict(steps=2)\n\nassert model.name == \"lgbm\"\nassert model.forecaster.is_fitted\nassert len(pred) == 2\nassert pred.dtype == float\nprint(f\"model.name: {model.name}\")\nprint(f\"is_fitted: {model.forecaster.is_fitted}\")\nprint(f\"prediction steps: {len(pred)}\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nmodel.name: lgbm\nis_fitted: True\nprediction steps: 2\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.wrappers.lgbm_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

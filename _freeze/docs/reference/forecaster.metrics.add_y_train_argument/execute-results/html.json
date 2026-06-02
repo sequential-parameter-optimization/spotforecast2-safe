@@ -1,0 +1,12 @@
+{
+  "hash": "d464b348cd528b680fecf2e15043b8fe",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.metrics.add_y_train_argument\n---\n\n\n\n```python\nforecaster.metrics.add_y_train_argument(func)\n```\n\nAdd `y_train` argument to a function if it is not already present.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name   | Type                          | Description                              | Default    |\n|--------|-------------------------------|------------------------------------------|------------|\n| func   | [Callable](`typing.Callable`) | Function to which the argument is added. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                          | Description                             |\n|--------|-------------------------------|-----------------------------------------|\n|        | [Callable](`typing.Callable`) | Function with `y_train` argument added. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#67e71dce .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nfrom spotforecast2_safe.forecaster.metrics import add_y_train_argument\n\ndef my_metric(y_true, y_pred):\n    return np.mean(np.abs(y_true - y_pred))\n\nenhanced_metric = add_y_train_argument(my_metric)\nresult = enhanced_metric(np.array([1, 2, 3]), np.array([1, 2, 3]), y_train=None)\nprint(result)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n0.0\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.metrics.add_y_train_argument_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

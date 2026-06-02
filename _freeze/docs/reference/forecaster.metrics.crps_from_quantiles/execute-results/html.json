@@ -1,0 +1,12 @@
+{
+  "hash": "811be4b93c72185d030ea8d2bbc5e4d4",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.metrics.crps_from_quantiles\n---\n\n\n\n```python\nforecaster.metrics.crps_from_quantiles(y_true, pred_quantiles, quantile_levels)\n```\n\nCalculate the Continuous Ranked Probability Score (CRPS) from quantiles.\n\nThe empirical cdf is approximated using linear interpolation\nbetween the predicted quantiles.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name            | Type                                     | Description                                                   | Default    |\n|-----------------|------------------------------------------|---------------------------------------------------------------|------------|\n| y_true          | [float](`float`)                         | The true value of the random variable.                        | _required_ |\n| pred_quantiles  | [np](`numpy`).[ndarray](`numpy.ndarray`) | The predicted quantile values.                                | _required_ |\n| quantile_levels | [np](`numpy`).[ndarray](`numpy.ndarray`) | The quantile levels corresponding to the predicted quantiles. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type             | Description     |\n|--------|------------------|-----------------|\n|        | [float](`float`) | The CRPS score. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#8162347b .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nfrom spotforecast2_safe.forecaster.metrics import crps_from_quantiles\n\ny_true = 5.0\npred_quantiles = np.array([4.0, 4.5, 5.0, 5.5, 6.0])\nquantile_levels = np.array([0.1, 0.25, 0.5, 0.75, 0.9])\ncrps = crps_from_quantiles(y_true, pred_quantiles, quantile_levels)\nprint(crps >= 0)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTrue\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.metrics.crps_from_quantiles_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
