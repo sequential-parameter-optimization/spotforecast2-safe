@@ -21,21 +21,30 @@ Threat model (STRIDE).
     (api.entsoe.eu, load and day-ahead forecast endpoints).
 
     - Spoofing: a forged endpoint could serve crafted load data. Mitigated by
-      default TLS certificate verification in ``requests`` and by the pinned
-      host constant inside ``fetch_data``; do not pass ``verify=False``.
+      default TLS certificate verification in ``requests`` (used by the
+      ``entsoe`` client) and by the fixed ENTSO-E endpoint baked into
+      ``EntsoePandasClient`` (the host is not derived from caller input); do
+      not disable TLS verification.
     - Tampering: an on-path attacker could modify the XML payload. Mitigated
       by TLS integrity and by the schema-shaped parser below that rejects any
       record whose index is not a monotonic datetime.
-    - Repudiation: the API token is the only caller identity. Mitigated by
-      the audit log in ``manager/logger.py`` which records the fetch URL,
-      request UTC timestamp, and response-byte hash.
-    - Information Disclosure: the API token must never be logged. Mitigated
-      by reading the token only through the environment and by a logger
-      filter that redacts query strings containing ``securityToken=``.
+    - Repudiation: the API token is the only caller identity. This module
+      emits standard ``logging`` records for each download attempt (dates,
+      country code, attempt count, errors); it keeps no dedicated
+      request-audit log and records no response-byte hash. Operators needing
+      non-repudiation must capture these logs at the host/SIEM level.
+    - Information Disclosure: the API token is read only from the environment
+      or the caller argument and handed to ``EntsoePandasClient``; this module
+      does not log the token or the request URL directly. There is no
+      automatic ``securityToken=`` redaction filter, and an HTTP error raised
+      by the client may embed the request URL in its message (logged at
+      WARNING during retries); deployments that enable third-party HTTP debug
+      logging, or that treat the token as highly sensitive, should add their
+      own redaction.
     - Denial of Service: upstream rate limiting or transient errors could
-      stall the pipeline. Mitigated by a bounded, explicit retry loop (see
-      ``time.sleep`` usage below) that raises after the configured attempt
-      budget rather than looping silently.
+      stall the pipeline. Mitigated by a bounded, explicit retry loop
+      (``_MAX_RETRIES`` / ``_RETRY_BACKOFF_SECONDS``) that raises
+      ``RuntimeError`` after the attempt budget rather than looping silently.
     - Elevation of Privilege: the module runs with the host-process
       privileges; it opens no setuid boundary. Not applicable at module
       scope.
