@@ -1,3 +1,10 @@
+## [15.7.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.6.2...v15.7.0-rc.1) (2026-06-02)
+
+
+### Features
+
+* **preprocessing:** add pluggable exogenous-provider registry ([8c3e399](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8c3e399c1f13b24eace573434b802adc9ddd8868))
+
 ## [15.6.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.6.1...v15.6.2) (2026-06-02)
 
 
