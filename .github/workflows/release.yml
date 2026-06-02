@@ -169,33 +169,49 @@ jobs:
           packages-dir: dist/
           skip-existing: true
           # Note: No token needed with Trusted Publishers (OIDC)
-      
+
+      # ── Documentation (main only) ─────────────────────────────────────────
+      # Docs reflect the released (main) version and must NOT be rebuilt or
+      # deployed from develop rc releases: that wasted ~18 min on every develop
+      # merge and overwrote the production docs on gh-pages with rc content.
+      # PyPI publish above has already happened, so gating the doc render here
+      # never delays package availability. The freeze cache (see _quarto.yml)
+      # turns the ~18 min render into seconds when documents are unchanged.
+      - name: Restore Quarto freeze cache
+        if: success() && github.ref == 'refs/heads/main'
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        with:
+          path: _freeze
+          key: quarto-freeze-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            quarto-freeze-${{ runner.os }}-
+
       - name: Install Quarto CLI
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         uses: quarto-dev/quarto-actions/setup@8a96df13519ee81fd526f2dfca5962811136661b  # v2.2.0
         with:
           version: "1.7.29"
-      
+
       - name: Generate API reference stubs
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         run: |
           uv run python docs/quartodoc_build.py
           uv run quartodoc interlinks
 
       - name: Build documentation
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         run: |
           uv run quarto render --no-cache
-      
+
       - name: Setup Git Credentials for Publish
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
 
       - name: Deploy documentation
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         uses: quarto-dev/quarto-actions/publish@8a96df13519ee81fd526f2dfca5962811136661b  # v2.2.0
         with:
           target: gh-pages

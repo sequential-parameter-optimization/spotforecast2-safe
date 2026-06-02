@@ -96,6 +96,21 @@ jobs:
         run: |
           uv sync --group dev
 
+      # ── 4b. Restore Quarto freeze cache ───────────────────────────────────
+      # _freeze/ holds previously executed cell outputs. With `execute: freeze:
+      # auto` (see _quarto.yml) Quarto re-executes only documents whose source
+      # changed and reuses the rest from here, turning a ~18 min full render
+      # into seconds for unchanged docs. restore-keys falls back to the most
+      # recent freeze so a new commit SHA still benefits from prior runs; the
+      # cache is shared by key prefix with release.yml.
+      - name: Restore Quarto freeze cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        with:
+          path: _freeze
+          key: quarto-freeze-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            quarto-freeze-${{ runner.os }}-
+
       # ── 5. Quarto CLI (pinned) ────────────────────────────────────────────
       - name: Install Quarto CLI ${{ env.QUARTO_VERSION }}
         uses: quarto-dev/quarto-actions/setup@8a96df13519ee81fd526f2dfca5962811136661b  # v2.2.0

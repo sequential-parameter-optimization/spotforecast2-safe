@@ -47,6 +47,29 @@ interlinks:
     numpy:
       url: "https://numpy.org/doc/stable/"
 
+# =============================================================================
+# Execution / freeze policy
+# =============================================================================
+# `freeze: auto` re-executes a document ONLY when its own source (.qmd) changes;
+# otherwise the previously executed output is reused from the _freeze/ directory.
+# This is the project-level execution-reuse mechanism and is INDEPENDENT of the
+# per-cell `cache` feature, so `quarto render --no-cache` does NOT disable it.
+#
+# Why this matters for spotforecast2-safe:
+#   * A full --no-cache render re-executes ~126 documents on every CI run,
+#     including live Open-Meteo weather API calls and full forecasting demos
+#     (~18 min measured). Re-running live network calls on every render is also
+#     NON-deterministic, which works against the "audit-clean" goal.
+#   * freeze makes renders reproducible from stored, reviewable outputs and
+#     skips re-execution of unchanged documents.
+#
+# Audit-clean recommendation: check the _freeze/ directory into version control
+# (the canonical Quarto pattern) so every render is deterministic and performs
+# NO code execution or network I/O. Until that is seeded, CI restores _freeze/
+# from an actions/cache entry (see .github/workflows/docs.yml and release.yml).
+execute:
+  freeze: auto
+
 # Website metadata & navigation
 # =============================================================================
 website:
