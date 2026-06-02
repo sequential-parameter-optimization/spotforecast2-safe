@@ -217,11 +217,25 @@ class TestSaveForecasters:
         assert "Saved forecaster" in captured.out
 
     @patch("spotforecast2_safe.manager.persistence.dump")
-    def test_save_failure_handling(self, mock_dump, temp_model_dir, mock_forecaster):
-        """Test handling of save failures."""
-        mock_dump.side_effect = Exception("Save failed")
+    def test_save_disk_failure_raises_oserror(
+        self, mock_dump, temp_model_dir, mock_forecaster
+    ):
+        """A disk write failure surfaces as OSError."""
+        mock_dump.side_effect = OSError("disk full")
 
-        with pytest.raises(OSError, match="Failed to save model"):
+        with pytest.raises(OSError, match="Failed to write model"):
+            save_forecasters({"power": mock_forecaster}, temp_model_dir)
+
+    @patch("spotforecast2_safe.manager.persistence.dump")
+    def test_save_serialization_failure_raises_typeerror(
+        self, mock_dump, temp_model_dir, mock_forecaster
+    ):
+        """A non-serializable object surfaces as the documented TypeError."""
+        import pickle
+
+        mock_dump.side_effect = pickle.PicklingError("cannot pickle")
+
+        with pytest.raises(TypeError, match="not serializable"):
             save_forecasters({"power": mock_forecaster}, temp_model_dir)
 
     @patch("spotforecast2_safe.manager.persistence.dump")

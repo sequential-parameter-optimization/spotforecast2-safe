@@ -17,6 +17,7 @@ from spotforecast2_safe.manager.persistence import (
     get_model_filepath,
     load_forecasters,
     save_forecaster,
+    save_forecasters,
 )
 
 
@@ -55,3 +56,15 @@ def test_round_trip_save_and_load(tmp_path):
     assert "power" in forecasters
     assert missing == []
     assert isinstance(forecasters["power"], LinearRegression)
+
+
+def test_save_forecaster_non_serializable_raises_typeerror(tmp_path):
+    # A non-serializable object must raise the documented TypeError (distinct
+    # from a disk OSError), not be masked as OSError.
+    with pytest.raises(TypeError, match="not serializable"):
+        save_forecaster(lambda x: x, tmp_path, "power")
+
+
+def test_save_forecasters_non_serializable_raises_typeerror(tmp_path):
+    with pytest.raises(TypeError, match="not serializable"):
+        save_forecasters({"power": lambda x: x}, tmp_path)
