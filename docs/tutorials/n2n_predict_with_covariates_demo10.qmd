@@ -1,6 +1,6 @@
 ---
-title: "n2n_predict_with_covariates on demo100: Step by Step on Real Data"
-description: "Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo100.csv, one helper at a time."
+title: "n2n_predict_with_covariates on demo10: Step by Step on Real Data"
+description: "Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo10.csv, one helper at a time."
 execute:
   freeze: true
   warning: false
@@ -14,7 +14,7 @@ The sibling page introduces the vocabulary and explains the *why* of each
 stage with small synthetic examples. This page does the opposite: every code
 cell executes one real stage of
 `spotforecast2_safe.processing.n2n_predict_with_covariates` against the
-bundled `demo100.csv` dataset, prints the intermediate state, and then
+bundled `demo10.csv` dataset, prints the intermediate state, and then
 discusses what just happened. Refer back to the sibling page for the
 vocabulary — `@def-time-series`, `@def-lag`, `@def-forecast-horizon`,
 `@def-recursive-forecaster`, `@def-train-val-test`, `@def-outlier`,
@@ -25,25 +25,27 @@ The closing section calls `n2n_predict_with_covariates` end-to-end on the
 same input as a sanity check that the per-stage breakdown above is
 equivalent to the orchestrator.
 
-## About `demo100.csv`
+## About `demo10.csv`
 
-`demo100.csv` is bundled in the wheel at
-`spotforecast2_safe/datasets/csv/demo100.csv`. It carries eleven numeric
-columns A–K, indexed by hourly UTC timestamps from late 2010 through
-December 2021 — about 96 000 rows. Column K comes online late and starts
-with a long run of `NaN`, which makes it a useful exercise for the
-imputation step in Stage 3.
+`demo10.csv` is bundled in the wheel at
+`spotforecast2_safe/datasets/csv/demo10.csv`. It carries eleven numeric
+columns A–K, indexed by hourly UTC timestamps from December 2019 through
+December 2021 — about 18 000 rows, roughly two years. Column C comes
+online late (mid-May 2021) and starts with a long run of `NaN` covering
+most of the window, which makes it a useful exercise for the imputation
+step in Stage 3.
 
-To keep render times tractable while still exercising every helper
-faithfully (in particular the 7-day rolling weather window in Stage 4 and
-the 80/20 temporal split in Stage 8) the page slices the data to the last
-two years before Stage 1 begins.
+`demo10.csv` is the compact sibling of the much larger `demo100.csv`
+(about 96 000 rows spanning 2010–2021). Its two-year span already covers
+every helper faithfully — the 7-day rolling weather window in Stage 4 and
+the 80/20 temporal split in Stage 8 both have ample data — while keeping
+render times short, so no row slicing is needed before Stage 1 begins.
 
 ## Setup
 
 ::: {#exm-setup}
 
-## Loading and slicing demo100
+## Loading demo10
 
 ```{python}
 from pathlib import Path
@@ -52,32 +54,27 @@ import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
 
-data_full = fetch_data(
-    filename=get_package_data_home() / "demo100.csv",
+data_demo = fetch_data(
+    filename=get_package_data_home() / "demo10.csv",
     timezone="UTC",
 )
 
-cutoff = data_full.index.max() - pd.Timedelta(days=730)
-data_sliced = data_full.loc[data_full.index >= cutoff].copy()
-
 cache_home = Path.home() / ".spotforecast2_cache"
 
-print("full shape   :", data_full.shape)
-print("sliced shape :", data_sliced.shape)
-print("window       :", data_sliced.index[0], "→", data_sliced.index[-1])
+print("shape        :", data_demo.shape)
+print("window       :", data_demo.index[0], "→", data_demo.index[-1])
 print("NaN per col  :")
-print(data_sliced.isna().sum())
+print(data_demo.isna().sum())
 ```
 
 :::
 
-The slicing is done in user code rather than via `fetch_data` arguments
-because `fetch_data` exposes column selection, not row selection. The
-730-day window is intentionally wider than the longest rolling weather
-window (seven days), so Stage 4 has full lookback at `start`. `cache_home`
-points at the same directory that `get_cache_home()` would resolve to
-(`~/.spotforecast2_cache`); reusing it means subsequent renders read the
-weather parquet cache instead of refetching from Open-Meteo.
+`demo10` is loaded whole — its two-year span is already small enough to
+render quickly, so no row slicing is required and every stage below sees
+the full series. `cache_home` points at the same directory that
+`get_cache_home()` would resolve to (`~/.spotforecast2_cache`); reusing it
+means subsequent renders read the weather parquet cache instead of
+refetching from Open-Meteo.
 
 ## Stage 1 — Loading and preparing the target series
 
@@ -102,7 +99,7 @@ from spotforecast2_safe.preprocessing.curate_data import (
 
 forecast_horizon = 24
 
-data = data_sliced
+data = data_demo
 start, end, cov_start, cov_end = get_start_end(
     data=data,
     forecast_horizon=forecast_horizon,
@@ -171,7 +168,7 @@ print(data.isna().sum())
 :::
 
 The per-column `NaN` counts now combine pre-existing gaps (notably the
-long leading run in column K) with the freshly removed outlier rows.
+long leading run in column C) with the freshly removed outlier rows.
 Stage 3 will not distinguish between the two: imputation closes the gaps,
 and sample weighting penalises the model for paying attention to either
 source.
@@ -213,7 +210,7 @@ print("weight_func on first 5 timestamps :", weight_func(imputed_data.index[:5])
 The `imputed NaN remaining` count is zero — every gap is closed. The
 weight distribution shows how many rows the forecaster will effectively
 ignore; the bulk of the zero-weighted rows are concentrated at the start
-of the window where column K had its leading `NaN` run.
+of the window where column C had its leading `NaN` run.
 
 ## Stage 4 — Exogenous feature engineering
 
@@ -683,7 +680,7 @@ metadata = {
     "train_size": len(data_train),
     "val_size": len(data_val),
     "test_size": len(data_test),
-    "data_shape_original": data_sliced.shape,
+    "data_shape_original": data_demo.shape,
     "data_shape_merged": data_with_exog.shape,
     "training_end": end_validation,
     "prediction_start": exo_pred.index[0],
@@ -705,7 +702,7 @@ print("n_exog_features:", metadata["n_exog_features"])
 ## Cross-check against the orchestrator
 
 The pipeline above is exactly what `n2n_predict_with_covariates` does
-internally. Calling the orchestrator on the same sliced data with the
+internally. Calling the orchestrator on the same data with the
 same parameters should yield the same shapes and (modulo any change in
 Open-Meteo's historical data between the two calls) the same numerical
 predictions.
@@ -720,7 +717,7 @@ from spotforecast2_safe.processing.n2n_predict_with_covariates import (
 )
 
 predictions_full, metadata_full, forecasters_full = n2n_predict_with_covariates(
-    data=data_sliced,
+    data=data_demo,
     forecast_horizon=24,
     lags=24,
     window_size=72,
@@ -732,7 +729,7 @@ predictions_full, metadata_full, forecasters_full = n2n_predict_with_covariates(
     country_code="DE",
     state="NW",
     force_train=True,
-    model_dir=str(cache_home / "demo100_forecasters"),
+    model_dir=str(cache_home / "demo10_forecasters"),
     verbose=False,
     show_progress=False,
 )
