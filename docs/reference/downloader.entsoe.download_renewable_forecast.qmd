@@ -1,0 +1,48 @@
+# downloader.entsoe.download_renewable_forecast { #spotforecast2_safe.downloader.entsoe.download_renewable_forecast }
+
+```python
+downloader.entsoe.download_renewable_forecast(
+    api_key,
+    country_code='DE',
+    start=None,
+    end=None,
+    force=False,
+)
+```
+
+Download the ENTSO-E day-ahead wind/solar generation forecast.
+
+Queries ``query_wind_and_solar_forecast`` and merges the result into
+``interim/renewable_forecast.csv`` (columns such as ``"Solar"``,
+``"Wind Onshore"``, ``"Wind Offshore"``). The day-ahead forecast is
+leakage-clean (published D-1); the realised generation must not be used.
+Consumed downstream by
+`spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider`
+via `spotforecast2_safe.data.fetch_data.load_renewable_forecast`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                          | Description                                                                        | Default    |
+|--------------|-----------------------------------------------|------------------------------------------------------------------------------------|------------|
+| api_key      | [str](`str`)                                  | ENTSO-E Web API security token.                                                    | _required_ |
+| country_code | [str](`str`)                                  | Country / bidding-zone code. Defaults to ``"DE"``.                                 | `'DE'`     |
+| start        | [Optional](`typing.Optional`)\[[str](`str`)\] | Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to seven days ago.      | `None`     |
+| end          | [Optional](`typing.Optional`)\[[str](`str`)\] | End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the start of tomorrow. | `None`     |
+| force        | [bool](`bool`)                                | If True, bypass the small-window cooldown check.                                   | `False`    |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                                            |
+|--------|--------------------------------|--------------------------------------------------------|
+|        | [ImportError](`ImportError`)   | If ``entsoe-py`` is not installed.                     |
+|        | [ValueError](`ValueError`)     | If ``start`` or ``end`` cannot be parsed.              |
+|        | [RuntimeError](`RuntimeError`) | If the download fails after ``_MAX_RETRIES`` attempts. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+from spotforecast2_safe.downloader.entsoe import download_renewable_forecast
+
+download_renewable_forecast(api_key="YOUR_API_KEY", country_code="DE", force=True)
+```

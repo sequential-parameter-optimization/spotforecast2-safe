@@ -18,7 +18,13 @@ Threat model (STRIDE).
     checklist in .github/pull_request_template.md.
 
     Data flow 1: outbound HTTPS request to the ENTSO-E Transparency Platform
-    (api.entsoe.eu, load and day-ahead forecast endpoints).
+    (api.entsoe.eu). Endpoints used: load and day-ahead load forecast
+    (``query_load_and_forecast``); day-ahead wind/solar generation forecast
+    (``query_wind_and_solar_forecast``); and day-ahead spot price
+    (``query_day_ahead_prices``). All three are read-only day-ahead queries
+    that share the same TLS, retry, and schema-validation countermeasures
+    below; the day-ahead side-tables are merged into their own namespaced
+    interim files and never alter the ``energy_load.csv`` schema.
 
     - Spoofing: a forged endpoint could serve crafted load data. Mitigated by
       default TLS certificate verification in ``requests`` (used by the
@@ -67,6 +73,7 @@ Threat model (STRIDE).
 
 import logging
 import time
+from typing import Callable, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -83,13 +90,20 @@ _COOLDOWN_HOURS = 24
 def merge_build_manual(
     output_file: str = "energy_load.csv",
     keep_forecast_future: bool = False,
+    raw_subdir: Optional[str] = None,
 ) -> None:
     """
     Merge all raw CSV files from the 'raw' directory into a single interim file.
 
-    This function looks for all `.csv` files in `get_data_home() / "raw"`,
+    This function looks for all `.csv` files in `get_data_home() / "raw"`
+    (or, when *raw_subdir* is given, in `get_data_home() / "raw" / raw_subdir`),
     sorts them by time index, and saves the unique combined data to
     `get_data_home() / "interim" / output_file`.
+
+    Namespacing raw files by *raw_subdir* keeps the day-ahead side-tables
+    (``renewable_forecast.csv``, ``day_ahead_price.csv``) from clobbering the
+    load schema in ``energy_load.csv``: the default glob is non-recursive, so
+    load files in ``raw/`` and renewable files in ``raw/renewable/`` never mix.
 
     Args:
         output_file: The name of the combined output file.
@@ -102,6 +116,9 @@ def merge_build_manual(
             for tomorrow (future `Actual Load` is still NaN, so no future
             target leaks). Use True only for forecast-baseline / comparison
             workflows that need the published day-ahead forecast.
+        raw_subdir: Optional sub-directory under ``raw/`` to merge instead of
+            ``raw/`` itself. Used by the day-ahead side-table downloaders
+            (e.g. ``"renewable"``, ``"price"``). Defaults to ``None``.
 
     Raises:
         FileNotFoundError: If the raw directory does not exist.
@@ -141,7 +158,7 @@ def merge_build_manual(
         ```
     """
     data_home = get_data_home()
-    raw_dir = data_home / "raw"
+    raw_dir = data_home / "raw" / raw_subdir if raw_subdir else data_home / "raw"
     interim_dir = data_home / "interim"
 
     if not raw_dir.exists():
@@ -411,3 +428,242 @@ def download_new_data(
 
     # Final merge to integrate new data
     merge_build_manual(keep_forecast_future=keep_forecast_future)
+
+
+def _download_entsoe_table(
+    api_key: str,
+    country_code: str,
+    start: Optional[str],
+    end: Optional[str],
+    *,
+    query: Callable[[object, str, pd.Timestamp, pd.Timestamp], object],
+    raw_subdir: str,
+    output_file: str,
+    file_prefix: str,
+    column_name: Optional[str] = None,
+    force: bool = False,
+) -> None:
+    """Download and merge an ENTSO-E day-ahead side-table (shared helper).
+
+    Generic download+merge used by `download_renewable_forecast` and
+    `download_day_ahead_price`. It runs the bounded retry loop, writes the raw
+    response to ``raw/<raw_subdir>/<file_prefix>_<start>_<end>.csv`` and merges
+    it into ``interim/<output_file>`` via `merge_build_manual`. Future rows are
+    retained (``keep_forecast_future=True``) because the day-ahead forecast for
+    tomorrow is exactly the leakage-clean value these tables exist to provide.
+
+    Args:
+        api_key: ENTSO-E Web API security token.
+        country_code: ENTSO-E bidding-zone / country code (e.g. ``"DE"``,
+            ``"DE_LU"``).
+        start: Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to
+            seven days ago.
+        end: End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the
+            start of tomorrow (so the day-ahead horizon is covered).
+        query: Callable ``query(client, country_code, start, end)`` returning a
+            ``pd.DataFrame`` or ``pd.Series`` from the ENTSO-E client.
+        raw_subdir: Sub-directory under ``raw/`` to write into and merge.
+        output_file: Interim filename to write under ``interim/``.
+        file_prefix: Prefix for the raw filename.
+        column_name: If the query returns a ``pd.Series``, the column name to
+            give it in the saved table. Ignored for ``pd.DataFrame`` results.
+        force: If True, bypass the small-window cooldown check.
+
+    Raises:
+        ImportError: If ``entsoe-py`` is not installed.
+        ValueError: If ``start`` or ``end`` cannot be parsed.
+        RuntimeError: If the download fails after ``_MAX_RETRIES`` attempts.
+    """
+    try:
+        from entsoe import EntsoePandasClient
+    except ImportError as e:
+        raise ImportError(
+            "The 'entsoe-py' library is required for this functionality. "
+            "Install it with: pip install entsoe-py"
+        ) from e
+
+    if start is None:
+        start_date = pd.Timestamp.now(tz="UTC").floor("D") - pd.Timedelta(days=7)
+    else:
+        start_date = pd.to_datetime(start, utc=True, errors="coerce")
+        if pd.isna(start_date):
+            raise ValueError(f"start={start!r} did not parse to a valid timestamp")
+
+    if end is None:
+        # Reach into tomorrow so the published day-ahead forecast is included.
+        end_date = pd.Timestamp.now(tz="UTC").floor("D") + pd.Timedelta(days=1)
+    else:
+        end_date = pd.to_datetime(end, utc=True, errors="coerce")
+        if pd.isna(end_date):
+            raise ValueError(f"end={end!r} did not parse to a valid timestamp")
+
+    hours_diff = (end_date - start_date).total_seconds() / 3600
+    if hours_diff < _COOLDOWN_HOURS and not force:
+        logger.info(
+            "Requested window is only %.1f h; skipping (pass force=True).",
+            hours_diff,
+        )
+        return
+
+    client = EntsoePandasClient(api_key=api_key)
+
+    retry_counter = 0
+    downloaded: Optional[Union[pd.DataFrame, pd.Series]] = None
+    while retry_counter < _MAX_RETRIES:
+        try:
+            logger.info(
+                "Downloading %s from %s to %s (attempt %d/%d)...",
+                raw_subdir,
+                start_date,
+                end_date,
+                retry_counter + 1,
+                _MAX_RETRIES,
+            )
+            downloaded = query(client, country_code, start_date, end_date)
+            break
+        except Exception as e:  # noqa: BLE001 - retried, then re-raised below
+            logger.warning(
+                "Download failed: %s. Retrying in %ds...", e, _RETRY_BACKOFF_SECONDS
+            )
+            retry_counter += 1
+            time.sleep(_RETRY_BACKOFF_SECONDS)
+
+    if downloaded is None:
+        raise RuntimeError(
+            f"Failed to download {raw_subdir} from ENTSO-E after "
+            f"{_MAX_RETRIES} attempts."
+        )
+
+    if isinstance(downloaded, pd.Series):
+        downloaded = downloaded.to_frame(column_name or downloaded.name or "value")
+
+    data_home = get_data_home()
+    raw_dir = data_home / "raw" / raw_subdir
+    raw_dir.mkdir(parents=True, exist_ok=True)
+
+    date_format = "%Y%m%d%H00"
+    file_name = (
+        f"{file_prefix}_{start_date.strftime(date_format)}_"
+        f"{end_date.strftime(date_format)}.csv"
+    )
+    output_path = raw_dir / file_name
+
+    downloaded.index.name = "Time (UTC)"
+    downloaded.to_csv(output_path)
+    logger.info("Downloaded data saved to %s", output_path)
+
+    merge_build_manual(
+        output_file=output_file, keep_forecast_future=True, raw_subdir=raw_subdir
+    )
+
+
+def download_renewable_forecast(
+    api_key: str,
+    country_code: str = "DE",
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    force: bool = False,
+) -> None:
+    """Download the ENTSO-E day-ahead wind/solar generation forecast.
+
+    Queries ``query_wind_and_solar_forecast`` and merges the result into
+    ``interim/renewable_forecast.csv`` (columns such as ``"Solar"``,
+    ``"Wind Onshore"``, ``"Wind Offshore"``). The day-ahead forecast is
+    leakage-clean (published D-1); the realised generation must not be used.
+    Consumed downstream by
+    `spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider`
+    via `spotforecast2_safe.data.fetch_data.load_renewable_forecast`.
+
+    Args:
+        api_key: ENTSO-E Web API security token.
+        country_code: Country / bidding-zone code. Defaults to ``"DE"``.
+        start: Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to
+            seven days ago.
+        end: End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the
+            start of tomorrow.
+        force: If True, bypass the small-window cooldown check.
+
+    Raises:
+        ImportError: If ``entsoe-py`` is not installed.
+        ValueError: If ``start`` or ``end`` cannot be parsed.
+        RuntimeError: If the download fails after ``_MAX_RETRIES`` attempts.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import download_renewable_forecast
+
+        download_renewable_forecast(api_key="YOUR_API_KEY", country_code="DE", force=True)
+        ```
+    """
+
+    def query(client, cc, s, e):  # type: ignore[no-untyped-def]
+        return client.query_wind_and_solar_forecast(cc, start=s, end=e)
+
+    _download_entsoe_table(
+        api_key,
+        country_code,
+        start,
+        end,
+        query=query,
+        raw_subdir="renewable",
+        output_file="renewable_forecast.csv",
+        file_prefix="entsoe_renewable",
+        force=force,
+    )
+
+
+def download_day_ahead_price(
+    api_key: str,
+    country_code: str = "DE_LU",
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    force: bool = False,
+) -> None:
+    """Download the ENTSO-E day-ahead spot price (DE/LU).
+
+    Queries ``query_day_ahead_prices`` and merges the result into
+    ``interim/day_ahead_price.csv`` (column ``"Day-ahead Price"``). The
+    day-ahead auction price is leakage-clean (published D-1); the realised
+    price must not be used. Consumed downstream by
+    `spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider`
+    via `spotforecast2_safe.data.fetch_data.load_day_ahead_price`.
+
+    Args:
+        api_key: ENTSO-E Web API security token.
+        country_code: Bidding-zone code. Defaults to ``"DE_LU"``.
+        start: Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to
+            seven days ago.
+        end: End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the
+            start of tomorrow.
+        force: If True, bypass the small-window cooldown check.
+
+    Raises:
+        ImportError: If ``entsoe-py`` is not installed.
+        ValueError: If ``start`` or ``end`` cannot be parsed.
+        RuntimeError: If the download fails after ``_MAX_RETRIES`` attempts.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import download_day_ahead_price
+
+        download_day_ahead_price(api_key="YOUR_API_KEY", country_code="DE_LU", force=True)
+        ```
+    """
+
+    def query(client, cc, s, e):  # type: ignore[no-untyped-def]
+        return client.query_day_ahead_prices(cc, start=s, end=e)
+
+    _download_entsoe_table(
+        api_key,
+        country_code,
+        start,
+        end,
+        query=query,
+        raw_subdir="price",
+        output_file="day_ahead_price.csv",
+        file_prefix="entsoe_price",
+        column_name="Day-ahead Price",
+        force=force,
+    )

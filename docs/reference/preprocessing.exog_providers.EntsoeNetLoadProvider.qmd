@@ -1,0 +1,18 @@
+# preprocessing.exog_providers.EntsoeNetLoadProvider { #spotforecast2_safe.preprocessing.exog_providers.EntsoeNetLoadProvider }
+
+```python
+preprocessing.exog_providers.EntsoeNetLoadProvider(data_home=None)
+```
+
+ENTSO-E day-ahead net load = Forecasted Load − (wind + solar) forecast.
+
+Combines the day-ahead Forecasted Load with the day-ahead renewable
+forecast to form the net-load prior the residual is often modelled against.
+Both inputs are day-ahead (leakage-clean). Raises
+:class:`ExogProviderError` if either input is unavailable.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                   | Description                                   | Default   |
+|-----------|------------------------------------------------------------------------|-----------------------------------------------|-----------|
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loaders. | `None`    |

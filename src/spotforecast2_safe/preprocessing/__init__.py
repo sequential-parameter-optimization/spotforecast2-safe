@@ -14,6 +14,18 @@ from .curate_data import (
 )
 from .deterministic import build_deterministic_process
 from .exog_builder import ExogBuilder
+from .exog_providers import (
+    EXOG_PROVIDER_REGISTRY,
+    CovidInfectionRateProvider,
+    EntsoeDayAheadPriceProvider,
+    EntsoeForecastLoadProvider,
+    EntsoeNetLoadProvider,
+    EntsoeRenewableForecastProvider,
+    ExogFeatureProvider,
+    ExogProviderError,
+    build_providers,
+    build_providers_from_config,
+)
 from .imputation import (
     WeightFunction,
     apply_imputation,
@@ -47,6 +59,16 @@ __all__ = [
     "RollingFeatures",
     "RepeatingBasisFunction",
     "ExogBuilder",
+    "ExogFeatureProvider",
+    "ExogProviderError",
+    "CovidInfectionRateProvider",
+    "EntsoeForecastLoadProvider",
+    "EntsoeRenewableForecastProvider",
+    "EntsoeNetLoadProvider",
+    "EntsoeDayAheadPriceProvider",
+    "EXOG_PROVIDER_REGISTRY",
+    "build_providers",
+    "build_providers_from_config",
     "LinearlyInterpolateTS",
     "build_deterministic_process",
 ]

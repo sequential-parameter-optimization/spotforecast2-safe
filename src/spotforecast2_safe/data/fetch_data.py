@@ -622,3 +622,186 @@ def load_timeseries_forecast(
         ```
     """
     return _load_energy_load_column("Forecasted Load", data_home, on_missing)
+
+
+def _read_interim_frame(
+    filename: str,
+    data_home: Optional[Union[str, Path]],
+    index_col: str = "Time (UTC)",
+) -> pd.DataFrame:
+    """Read an hourly UTC-indexed interim CSV produced by the ENTSO-E downloader.
+
+    Shared low-level reader for the day-ahead forecast side-tables
+    (``renewable_forecast.csv``, ``day_ahead_price.csv``) that the extended
+    ENTSO-E downloader writes next to ``energy_load.csv``. It resolves the
+    file under ``<data_home>/interim/``, parses *index_col* as a UTC
+    ``DatetimeIndex`` and resamples onto a regular hourly grid. NaN handling
+    is deliberately left to the caller via `_apply_on_missing()` so the
+    fail-safe contract stays in one place.
+
+    Args:
+        filename: Name of the CSV inside the ``interim`` sub-directory.
+        data_home: Root data directory. If ``None``, resolved via
+            `get_data_home()`.
+        index_col: Name of the timestamp column. Defaults to ``"Time (UTC)"``.
+
+    Returns:
+        pd.DataFrame: The table indexed by an hourly UTC ``DatetimeIndex``
+        named ``"datetime"``.
+
+    Raises:
+        FileNotFoundError: If the interim file does not exist.
+    """
+    data_dir = get_data_home(data_home)
+    csv_path = data_dir / "interim" / filename
+    if not csv_path.exists():
+        raise FileNotFoundError(
+            f"Data file not found: {csv_path}. Run the matching ENTSO-E "
+            "downloader function first (see "
+            f"spotforecast2_safe.downloader.entsoe) to create {filename}."
+        )
+
+    df = pd.read_csv(csv_path, parse_dates=[index_col])
+    df = df.set_index(index_col)
+    df.index = pd.to_datetime(df.index, utc=True)
+    df.index.name = "datetime"
+    return df.asfreq("h")
+
+
+def load_renewable_forecast(
+    data_home: Optional[Union[str, Path]] = None,
+    on_missing: OnMissing = "raise",
+) -> pd.DataFrame:
+    """Load the ENTSO-E day-ahead wind/solar generation forecast.
+
+    Reads ``interim/renewable_forecast.csv`` (written by
+    `spotforecast2_safe.downloader.entsoe.download_renewable_forecast`) and
+    returns every renewable generation-forecast column it contains (for
+    Germany typically ``"Solar"``, ``"Wind Onshore"`` and ``"Wind
+    Offshore"``) on a regular hourly UTC grid. Each column independently
+    passes through the fail-safe `_apply_on_missing()` contract, so missing
+    values are **rejected** by default rather than silently imputed.
+
+    The day-ahead renewable forecast is a near-oracle, leakage-clean prior:
+    it is published on D-1 and is therefore genuinely available at forecast
+    time (CR-3). Use the day-ahead forecast, never the realised generation.
+
+    Args:
+        data_home: Root data directory. If ``None``, resolved via
+            `get_data_home()`.
+        on_missing: How to handle NaN rows. ``'raise'`` (default) fails fast
+            with the gap timestamps; ``'ffill_bfill'`` forward/back-fills;
+            ``'passthrough'`` returns the raw NaN so an explicit downstream
+            provider can decide.
+
+    Returns:
+        pd.DataFrame: Hourly UTC-indexed day-ahead renewable forecast columns.
+
+    Raises:
+        FileNotFoundError: If ``interim/renewable_forecast.csv`` is absent.
+        ValueError: If ``on_missing='raise'`` and any column has NaNs.
+
+    Examples:
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.data.fetch_data import load_renewable_forecast
+
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        interim = os.path.join(tmp, "interim")
+        os.makedirs(interim, exist_ok=True)
+
+        idx = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
+        pd.DataFrame(
+            {"Solar": 1.0, "Wind Onshore": 2.0}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(
+            os.path.join(interim, "renewable_forecast.csv")
+        )
+
+        df = load_renewable_forecast()
+        print(sorted(df.columns), len(df))
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
+    """
+    df = _read_interim_frame("renewable_forecast.csv", data_home)
+    csv_path = get_data_home(data_home) / "interim" / "renewable_forecast.csv"
+    for col in df.columns:
+        df[col] = _apply_on_missing(df[col], on_missing, col, csv_path)
+    return df
+
+
+def load_day_ahead_price(
+    data_home: Optional[Union[str, Path]] = None,
+    on_missing: OnMissing = "raise",
+    column: str = "Day-ahead Price",
+) -> pd.Series:
+    """Load the ENTSO-E day-ahead spot price (DE/LU) as an hourly series.
+
+    Reads *column* from ``interim/day_ahead_price.csv`` (written by
+    `spotforecast2_safe.downloader.entsoe.download_day_ahead_price`) and
+    converts the index to a UTC ``DatetimeIndex`` with hourly frequency.
+    Missing values are **rejected** by default (fail-safe). The day-ahead
+    auction price is published on D-1 and is leakage-clean at forecast time
+    as long as the day-ahead value (not the realised price) is used.
+
+    Args:
+        data_home: Root data directory. If ``None``, resolved via
+            `get_data_home()`.
+        on_missing: How to handle NaN rows. ``'raise'`` (default) fails fast;
+            ``'ffill_bfill'`` forward/back-fills; ``'passthrough'`` returns
+            raw NaN.
+        column: Name of the price column to read. Defaults to
+            ``"Day-ahead Price"``.
+
+    Returns:
+        pd.Series: Hourly UTC-indexed day-ahead price series.
+
+    Raises:
+        FileNotFoundError: If ``interim/day_ahead_price.csv`` is absent.
+        KeyError: If *column* is not present in the file.
+        ValueError: If ``on_missing='raise'`` and the series has NaNs.
+
+    Examples:
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.data.fetch_data import load_day_ahead_price
+
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        interim = os.path.join(tmp, "interim")
+        os.makedirs(interim, exist_ok=True)
+
+        idx = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
+        pd.DataFrame(
+            {"Day-ahead Price": 95.0}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(
+            os.path.join(interim, "day_ahead_price.csv")
+        )
+
+        s = load_day_ahead_price()
+        print(isinstance(s, pd.Series), len(s))
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
+    """
+    df = _read_interim_frame("day_ahead_price.csv", data_home)
+    csv_path = get_data_home(data_home) / "interim" / "day_ahead_price.csv"
+    if column not in df.columns:
+        raise KeyError(
+            f"Column {column!r} not present in {csv_path}. "
+            f"Available columns: {list(df.columns)}."
+        )
+    return _apply_on_missing(df[column], on_missing, column, csv_path)

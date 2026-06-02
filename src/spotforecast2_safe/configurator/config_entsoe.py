@@ -72,6 +72,18 @@ class ConfigEntsoe:
             more than this many ``poly_*`` columns are generated, only the
             top ``max_poly_features`` ranked by mutual information with the
             target are kept (``<= 0`` disables the cap). Defaults to ``10``.
+        include_covid_infection_rate (bool): Append the bundled German national
+            COVID-19 7-day incidence (RKI) as an exogenous level regressor.
+            Defaults to ``False``.
+        include_entsoe_forecast_load (bool): Append the ENTSO-E day-ahead
+            Forecasted Load as a near-oracle exogenous prior. Defaults to
+            ``False``.
+        include_entsoe_renewable_forecast (bool): Append the ENTSO-E day-ahead
+            wind and solar generation forecast. Defaults to ``False``.
+        include_entsoe_net_load (bool): Append the ENTSO-E day-ahead net load
+            (Forecasted Load minus wind/solar forecast). Defaults to ``False``.
+        include_entsoe_day_ahead_price (bool): Append the ENTSO-E day-ahead
+            spot price (DE/LU). Defaults to ``False``.
         index_name (str): Datetime column name when the DataFrame index is
             reset.  ENTSO-E CSVs use ``"Time (UTC)"``; defaults to that.
         start_download (Optional[str]): Start of the data download range.
@@ -129,6 +141,10 @@ class ConfigEntsoe:
             the safety-critical fail-safe semantics.  ``"skip"`` logs a
             warning and continues with empty weather features so the rest
             of the pipeline can run without the Open-Meteo dependency.
+        on_exog_provider_failure (Literal["raise", "skip"]): Policy for an
+            exogenous-provider failure inside ``ExogBuilder.build``. ``"raise"``
+            (default) propagates the ``ExogProviderError`` (fail-safe);
+            ``"skip"`` logs a warning and omits that provider's columns.
         retrain_max_age (pd.Timedelta): Maximum age of a previously trained
             model before retraining is required.  Consumed by
             ``spotforecast2_safe.manager.trainer.should_retrain`` to gate
@@ -205,6 +221,11 @@ class ConfigEntsoe:
         "include_holiday_features",
         "poly_features_degree",
         "max_poly_features",
+        "include_covid_infection_rate",
+        "include_entsoe_forecast_load",
+        "include_entsoe_renewable_forecast",
+        "include_entsoe_net_load",
+        "include_entsoe_day_ahead_price",
         "index_name",
         "start_download",
         "end_download",
@@ -231,6 +252,7 @@ class ConfigEntsoe:
         "data_frame_name",
         "number_folds",
         "on_weather_failure",
+        "on_exog_provider_failure",
         "retrain_max_age",
     )
 
@@ -267,6 +289,12 @@ class ConfigEntsoe:
         include_holiday_features: bool = False,
         poly_features_degree: int = 1,
         max_poly_features: int = 10,
+        # Provider-based exogenous toggles (preprocessing.exog_providers)
+        include_covid_infection_rate: bool = False,
+        include_entsoe_forecast_load: bool = False,
+        include_entsoe_renewable_forecast: bool = False,
+        include_entsoe_net_load: bool = False,
+        include_entsoe_day_ahead_price: bool = False,
         # Data source and index
         index_name: str = "Time (UTC)",
         start_download: Optional[str] = None,
@@ -311,6 +339,8 @@ class ConfigEntsoe:
         number_folds: int = 10,
         # Weather-fetch failure policy (consumed by spotforecast2.multitask.base.build_exogenous_features)
         on_weather_failure: Literal["raise", "skip"] = "raise",
+        # Exog-provider failure policy (consumed by preprocessing.exog_builder.ExogBuilder)
+        on_exog_provider_failure: Literal["raise", "skip"] = "raise",
         # Retraining cadence (consumed by spotforecast2_safe.manager.trainer.should_retrain)
         retrain_max_age: Optional[pd.Timedelta] = None,
     ):
@@ -356,6 +386,13 @@ class ConfigEntsoe:
         self.include_holiday_features = include_holiday_features
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
+        # Provider-based exogenous toggles, each gated by a registry flag in
+        # ``spotforecast2_safe.preprocessing.exog_providers``.
+        self.include_covid_infection_rate = include_covid_infection_rate
+        self.include_entsoe_forecast_load = include_entsoe_forecast_load
+        self.include_entsoe_renewable_forecast = include_entsoe_renewable_forecast
+        self.include_entsoe_net_load = include_entsoe_net_load
+        self.include_entsoe_day_ahead_price = include_entsoe_day_ahead_price
         # Data source and index
         self.index_name = index_name
         self.start_download = start_download
@@ -413,6 +450,10 @@ class ConfigEntsoe:
         # pipeline (default, preserves fail-safe semantics); ``"skip"``
         # logs a warning and continues without weather features.
         self.on_weather_failure = on_weather_failure
+        # Policy for exog-provider failures consumed by
+        # ``ExogBuilder``: ``"raise"`` aborts (default, fail-safe); ``"skip"``
+        # logs a warning and omits the failing provider's columns.
+        self.on_exog_provider_failure = on_exog_provider_failure
         # Maximum age of a previously trained model before retraining is
         # required.  Consumed by
         # ``spotforecast2_safe.manager.trainer.should_retrain``.

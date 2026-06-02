@@ -1,0 +1,70 @@
+# data.fetch_data.load_day_ahead_price { #spotforecast2_safe.data.fetch_data.load_day_ahead_price }
+
+```python
+data.fetch_data.load_day_ahead_price(
+    data_home=None,
+    on_missing='raise',
+    column='Day-ahead Price',
+)
+```
+
+Load the ENTSO-E day-ahead spot price (DE/LU) as an hourly series.
+
+Reads *column* from ``interim/day_ahead_price.csv`` (written by
+`spotforecast2_safe.downloader.entsoe.download_day_ahead_price`) and
+converts the index to a UTC ``DatetimeIndex`` with hourly frequency.
+Missing values are **rejected** by default (fail-safe). The day-ahead
+auction price is published on D-1 and is leakage-clean at forecast time
+as long as the day-ahead value (not the realised price) is used.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                                                                                             | Description                                                                                                                        | Default             |
+|------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| data_home  | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Root data directory. If ``None``, resolved via `get_data_home()`.                                                                  | `None`              |
+| on_missing | [OnMissing](`spotforecast2_safe.data.fetch_data.OnMissing`)                                      | How to handle NaN rows. ``'raise'`` (default) fails fast; ``'ffill_bfill'`` forward/back-fills; ``'passthrough'`` returns raw NaN. | `'raise'`           |
+| column     | [str](`str`)                                                                                     | Name of the price column to read. Defaults to ``"Day-ahead Price"``.                                                               | `'Day-ahead Price'` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                           |
+|--------|------------------------------------------|-------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: Hourly UTC-indexed day-ahead price series. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                     | Description                                        |
+|--------|------------------------------------------|----------------------------------------------------|
+|        | [FileNotFoundError](`FileNotFoundError`) | If ``interim/day_ahead_price.csv`` is absent.      |
+|        | [KeyError](`KeyError`)                   | If *column* is not present in the file.            |
+|        | [ValueError](`ValueError`)               | If ``on_missing='raise'`` and the series has NaNs. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os
+import shutil
+import tempfile
+
+import pandas as pd
+
+from spotforecast2_safe.data.fetch_data import load_day_ahead_price
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+interim = os.path.join(tmp, "interim")
+os.makedirs(interim, exist_ok=True)
+
+idx = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
+pd.DataFrame(
+    {"Day-ahead Price": 95.0}, index=idx
+).rename_axis("Time (UTC)").to_csv(
+    os.path.join(interim, "day_ahead_price.csv")
+)
+
+s = load_day_ahead_price()
+print(isinstance(s, pd.Series), len(s))
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
+```
