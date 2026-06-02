@@ -3,11 +3,15 @@
 
 """Configuration for ENTSO-E task pipeline."""
 
-from dataclasses import replace
 from typing import Any, Dict, List, Literal, Optional
 
 import pandas as pd
 
+from spotforecast2_safe.configurator._base_config import (
+    apply_set_params,
+    build_get_params,
+    default_periods,
+)
 from spotforecast2_safe.data import Period
 
 
@@ -172,6 +176,63 @@ class ConfigEntsoe:
         ```
     """
 
+    _PARAM_NAMES = (
+        "country_code",
+        "periods",
+        "lags_consider",
+        "train_size",
+        "end_train_default",
+        "delta_val",
+        "predict_size",
+        "cv_block_size",
+        "refit_size",
+        "random_state",
+        "n_hyperparameters_trials",
+        "data_filename",
+        "targets",
+        "use_outlier_detection",
+        "contamination",
+        "imputation_method",
+        "window_size",
+        "imputation_window_size",
+        "use_exogenous_features",
+        "latitude",
+        "longitude",
+        "timezone",
+        "state",
+        "include_weather_windows",
+        "include_holiday_features",
+        "poly_features_degree",
+        "max_poly_features",
+        "index_name",
+        "start_download",
+        "end_download",
+        "data_start",
+        "data_end",
+        "cov_start",
+        "cov_end",
+        "bounds",
+        "verbose",
+        "cache_home",
+        "end_train_ts",
+        "start_train_ts",
+        "n_trials_optuna",
+        "n_trials_spotoptim",
+        "n_initial_spotoptim",
+        "n_jobs_spotoptim",
+        "warm_start_lags",
+        "task",
+        "agg_weights",
+        "forecaster_factory",
+        "data_loader",
+        "test_data_loader",
+        "auto_save_models",
+        "data_frame_name",
+        "number_folds",
+        "on_weather_failure",
+        "retrain_max_age",
+    )
+
     def __init__(
         self,
         country_code: str = "DE",
@@ -255,34 +316,7 @@ class ConfigEntsoe:
         """Initialize ConfigEntsoe with specified or default parameters."""
         self.country_code = country_code
 
-        # Default periods use deliberate n_periods choices:
-        # - daily: n_periods=12 for 24 hours (2:1 ratio) provides 2-hour resolution,
-        #   balancing detail vs overfitting while reducing dimensionality by 50%
-        # - weekly/monthly/quarterly: n_periods matches range_size (1:1 ratio)
-        # - yearly: n_periods=12 for 365 days (30:1 ratio) provides strong smoothing
-        # See docs/PERIOD_CONFIGURATION_RATIONALE.md for detailed analysis
-        self.periods = (
-            periods
-            if periods is not None
-            else [
-                Period(name="daily", n_periods=12, column="hour", input_range=(1, 24)),
-                Period(
-                    name="weekly", n_periods=7, column="dayofweek", input_range=(0, 6)
-                ),
-                Period(
-                    name="monthly", n_periods=12, column="month", input_range=(1, 12)
-                ),
-                Period(
-                    name="quarterly", n_periods=4, column="quarter", input_range=(1, 4)
-                ),
-                Period(
-                    name="yearly",
-                    n_periods=12,
-                    column="dayofyear",
-                    input_range=(1, 365),
-                ),
-            ]
-        )
+        self.periods = periods if periods is not None else default_periods()
         self.lags_consider = (
             lags_consider if lags_consider is not None else list(range(1, 24))
         )
@@ -413,89 +447,7 @@ class ConfigEntsoe:
             assert p["cv_block_size"] is None
             ```
         """
-        params = {
-            "country_code": self.country_code,
-            "periods": self.periods,
-            "lags_consider": self.lags_consider,
-            "train_size": self.train_size,
-            "end_train_default": self.end_train_default,
-            "delta_val": self.delta_val,
-            "predict_size": self.predict_size,
-            "cv_block_size": self.cv_block_size,
-            "refit_size": self.refit_size,
-            "random_state": self.random_state,
-            "n_hyperparameters_trials": self.n_hyperparameters_trials,
-            "data_filename": self.data_filename,
-            "targets": self.targets,
-            # Outlier detection
-            "use_outlier_detection": self.use_outlier_detection,
-            "contamination": self.contamination,
-            # Imputation
-            "imputation_method": self.imputation_method,
-            "window_size": self.window_size,
-            "imputation_window_size": self.imputation_window_size,
-            # Exogenous features
-            "use_exogenous_features": self.use_exogenous_features,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "timezone": self.timezone,
-            "state": self.state,
-            # Feature selection toggles
-            "include_weather_windows": self.include_weather_windows,
-            "include_holiday_features": self.include_holiday_features,
-            "poly_features_degree": self.poly_features_degree,
-            "max_poly_features": self.max_poly_features,
-            # Data source and index
-            "index_name": self.index_name,
-            "start_download": self.start_download,
-            "end_download": self.end_download,
-            # Derived date ranges
-            "data_start": self.data_start,
-            "data_end": self.data_end,
-            "cov_start": self.cov_start,
-            "cov_end": self.cov_end,
-            # Per-column outlier bounds
-            "bounds": self.bounds,
-            # Verbosity and caching
-            "verbose": self.verbose,
-            "cache_home": self.cache_home,
-            # Derived training window
-            "end_train_ts": self.end_train_ts,
-            "start_train_ts": self.start_train_ts,
-            # Hyperparameter tuning trial budgets
-            "n_trials_optuna": self.n_trials_optuna,
-            "n_trials_spotoptim": self.n_trials_spotoptim,
-            "n_initial_spotoptim": self.n_initial_spotoptim,
-            "n_jobs_spotoptim": self.n_jobs_spotoptim,
-            "warm_start_lags": self.warm_start_lags,
-            # Active task
-            "task": self.task,
-            # Aggregation weights
-            "agg_weights": self.agg_weights,
-            # Optional hooks
-            "forecaster_factory": self.forecaster_factory,
-            "data_loader": self.data_loader,
-            "test_data_loader": self.test_data_loader,
-            # Persistence policy and active-dataset identifier
-            "auto_save_models": self.auto_save_models,
-            "data_frame_name": self.data_frame_name,
-            # Cross-validation fold count
-            "number_folds": self.number_folds,
-            # Weather-fetch failure policy
-            "on_weather_failure": self.on_weather_failure,
-            # Retraining cadence
-            "retrain_max_age": self.retrain_max_age,
-        }
-
-        # Expose period sub-objects via the '__' notation if deep=True
-        if deep and self.periods is not None:
-            for period in self.periods:
-                prefix = f"periods__{period.name}"
-                params[f"{prefix}__n_periods"] = period.n_periods
-                params[f"{prefix}__column"] = period.column
-                params[f"{prefix}__input_range"] = period.input_range
-
-        return params
+        return build_get_params(self, self._PARAM_NAMES, deep)
 
     def set_params(
         self, params: Dict[str, object] = None, **kwargs: object
@@ -534,64 +486,4 @@ class ConfigEntsoe:
             assert daily_n == 24
             ```
         """
-        # Merge params dict and kwargs
-        all_params: Dict[str, object] = {}
-        if params is not None:
-            all_params.update(params)
-        all_params.update(kwargs)
-
-        if not all_params:
-            return self
-
-        nested_period_params = {}
-        flat_params = {}
-
-        for key, value in all_params.items():
-            if key.startswith("periods__"):
-                parts = key.split("__")
-                if len(parts) == 3:
-                    _, p_name, p_param = parts
-                    if p_name not in nested_period_params:
-                        nested_period_params[p_name] = {}
-                    nested_period_params[p_name][p_param] = value
-                else:
-                    raise ValueError(
-                        f"Invalid deep parameter format: {key}. "
-                        "Expected format: periods__<name>__<param>"
-                    )
-            else:
-                flat_params[key] = value
-
-        # Set standard parameters first
-        for key, value in flat_params.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-            else:
-                raise ValueError(
-                    f"Invalid parameter {key} for {self.__class__.__name__}. "
-                    "Check the list of available parameters with `get_params()`."
-                )
-
-        # Apply nested parameters to frozen Period dataclasses
-        if nested_period_params and self.periods is not None:
-            existing_names = {p.name for p in self.periods}
-            for p_name in nested_period_params:
-                if p_name not in existing_names:
-                    raise ValueError(
-                        f"Period with name '{p_name}' not found in configuration."
-                    )
-
-            new_periods = []
-            for period in self.periods:
-                if period.name in nested_period_params:
-                    # Period is a frozen dataclass, so we utilize replace() to replicate
-                    # an updated version.
-                    updated_period = replace(
-                        period, **nested_period_params[period.name]
-                    )
-                    new_periods.append(updated_period)
-                else:
-                    new_periods.append(period)
-            self.periods = new_periods
-
-        return self
+        return apply_set_params(self, params, **kwargs)
