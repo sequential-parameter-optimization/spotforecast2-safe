@@ -1,3 +1,25 @@
+## [15.6.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.6.0...v15.6.1-rc.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **configurator:** validate hyperparameters in __init__ and set_params (B3) ([3fa555c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3fa555c6df1614348d6acc2c8185edaa56bfe315))
+* **manager:** split serialization (TypeError) from disk (OSError) on save (B4) ([8f66efb](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8f66efb213d491b5488d83eaaac55a7b84ff041a))
+* **preprocessing:** reject differentiation order > 1 at fit (fail-fast) ([1189aaa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1189aaaf7548c31d266dc9a7f6c59ef9e4cc5012))
+* **splitter:** re-export canonical OneStepAheadValidationWarning ([3f01e7f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3f01e7fe10187dd6f5b7cd1717425b5b24c12306))
+
+
+### Documentation
+
+* fix documentation-integrity issues; drop dead runtime_deprecated ([c80f599](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c80f599bb1afd04a7b84bed32b3b14b97657e4bb))
+* **security:** reword STRIDE tables to the controls that actually exist ([36e6c33](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/36e6c33d3111776ea1986e077943ec4f72e24c37))
+
+
+### Code Refactoring
+
+* **configurator:** share get_params/set_params/periods via helpers ([ea1e9a3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ea1e9a3bf654f9a56d66cc8e81a3ba8f4b776500))
+* remove dead code (unused helpers, no-op branch, stale comment) ([8142e2a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8142e2abbcdd026a7336f954828d744eec2e6785))
+
 ## [15.6.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.5.0...v15.6.0) (2026-06-01)
 
 
