@@ -271,7 +271,6 @@ def n2n_predict(
     if verbose:
         print("Handling outliers...")
 
-    # data_old = data.copy() # kept in notebook, maybe useful for debugging but not used logic-wise here
     data, outliers = mark_outliers(
         data, contamination=contamination, random_state=1234, verbose=verbose
     )
