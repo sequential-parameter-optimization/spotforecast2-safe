@@ -1,0 +1,19 @@
+# preprocessing.exog_providers.EntsoeRenewableForecastProvider { #spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider }
+
+```python
+preprocessing.exog_providers.EntsoeRenewableForecastProvider(data_home=None)
+```
+
+ENTSO-E day-ahead wind and solar generation forecast.
+
+Reads ``interim/renewable_forecast.csv`` via
+`spotforecast2_safe.data.fetch_data.load_renewable_forecast` and emits two
+columns: ``entsoe_wind_forecast`` (sum of all wind columns) and
+``entsoe_solar_forecast`` (sum of all solar columns). Day-ahead forecasts are
+leakage-clean; the realised generation must never be used.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                   | Description                                  | Default   |
+|-----------|------------------------------------------------------------------------|----------------------------------------------|-----------|
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loader. | `None`    |

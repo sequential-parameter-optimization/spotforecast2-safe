@@ -1,0 +1,46 @@
+# preprocessing.exog_providers.CovidInfectionRateProvider { #spotforecast2_safe.preprocessing.exog_providers.CovidInfectionRateProvider }
+
+```python
+preprocessing.exog_providers.CovidInfectionRateProvider(
+    data_home=None,
+    csv_path=None,
+    column='covid_infection_rate',
+    fill_outside=0.0,
+)
+```
+
+German national COVID-19 7-day incidence as an exogenous level regressor.
+
+Reads the bundled, static RKI series
+(``datasets/csv/covid_infection_rate_de.csv``, CC-BY-4.0) and broadcasts the
+daily national 7-day incidence (per 100,000) onto the hourly target index:
+forward-filled within the data's date span and filled with *fill_outside*
+(``0.0`` by default) before the first and after the last observed day, since
+outside the pandemic window there is no signal.
+
+This is a slow socio-economic level input (a lockdown-stringency proxy). It
+carries the CR-3 release-lag caveat: the bundled file is the final published
+vintage, whereas on a true live path only the latest, lagged vintage is
+available. For training over historical data this is the standard treatment.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                                                             | Description                                                                                                           | Default                  |
+|--------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|--------------------------|
+| data_home    | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                           | Unused (kept for a uniform provider signature); the dataset is package data, located via ``get_package_data_home()``. | `None`                   |
+| csv_path     | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional explicit path to the COVID CSV, overriding the bundled location.                                             | `None`                   |
+| column       | [str](`str`)                                                                                     | Output column name. Defaults to ``"covid_infection_rate"``.                                                           | `'covid_infection_rate'` |
+| fill_outside | [float](`float`)                                                                                 | Value used outside the observed date span. Defaults to ``0.0``.                                                       | `0.0`                    |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    CovidInfectionRateProvider,
+)
+
+idx = pd.date_range("2021-12-01", periods=24, freq="h", tz="UTC")
+out = CovidInfectionRateProvider().build(idx)
+print(out.columns.tolist(), out.shape, bool(out.isna().any().any()))
+```

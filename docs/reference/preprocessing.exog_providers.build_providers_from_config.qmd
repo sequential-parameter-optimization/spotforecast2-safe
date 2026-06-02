@@ -1,0 +1,25 @@
+# preprocessing.exog_providers.build_providers_from_config { #spotforecast2_safe.preprocessing.exog_providers.build_providers_from_config }
+
+```python
+preprocessing.exog_providers.build_providers_from_config(
+    config,
+    *,
+    data_home=None,
+)
+```
+
+Construct providers by reading the registry flags off a config object.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                             | Description                                                                                                                       | Default    |
+|-----------|----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|------------|
+| config    | [Union](`typing.Union`)\[\'ConfigEntsoe\', \'ConfigMulti\', [object](`object`)\] | A config object (e.g. ``ConfigEntsoe`` / ``ConfigMulti``) whose attributes include the :data:`EXOG_PROVIDER_REGISTRY` flag names. | _required_ |
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)           | Root data directory forwarded to each provider.                                                                                   | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                  | Description                                                           |
+|--------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+|        | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | List[ExogFeatureProvider]: Providers for the flags set to ``True`` on |
+|        | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | *config*.                                                             |

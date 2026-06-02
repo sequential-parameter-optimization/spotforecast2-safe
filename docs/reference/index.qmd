@@ -15,6 +15,8 @@ Utilities for fetching and loading time series, weather, and holiday data.
 | [data.fetch_data.get_package_data_home](data.fetch_data.get_package_data_home.qmd#spotforecast2_safe.data.fetch_data.get_package_data_home) | Return the location of the internal package datasets. |
 | [data.fetch_data.load_timeseries](data.fetch_data.load_timeseries.qmd#spotforecast2_safe.data.fetch_data.load_timeseries) | Load the actual-load time series from ``interim/energy_load.csv``. |
 | [data.fetch_data.load_timeseries_forecast](data.fetch_data.load_timeseries_forecast.qmd#spotforecast2_safe.data.fetch_data.load_timeseries_forecast) | Load the day-ahead forecast time series from ``interim/energy_load.csv``. |
+| [data.fetch_data.load_renewable_forecast](data.fetch_data.load_renewable_forecast.qmd#spotforecast2_safe.data.fetch_data.load_renewable_forecast) | Load the ENTSO-E day-ahead wind/solar generation forecast. |
+| [data.fetch_data.load_day_ahead_price](data.fetch_data.load_day_ahead_price.qmd#spotforecast2_safe.data.fetch_data.load_day_ahead_price) | Load the ENTSO-E day-ahead spot price (DE/LU) as an hourly series. |
 | [data.data_classes](data.data_classes.qmd#spotforecast2_safe.data.data_classes) | Data structures for input and processed data. |
 | [data.demo_loader](data.demo_loader.qmd#spotforecast2_safe.data.demo_loader) | Demo data loader for safety-critical forecasting tasks. |
 
@@ -45,6 +47,14 @@ feature engineering, and temporal train/test splitting.
 | [preprocessing.checking.get_exog_dtypes](preprocessing.checking.get_exog_dtypes.qmd#spotforecast2_safe.preprocessing.checking.get_exog_dtypes) | Extract and store the data types of exogenous variables. |
 | [preprocessing.checking.set_cpu_gpu_device](preprocessing.checking.set_cpu_gpu_device.qmd#spotforecast2_safe.preprocessing.checking.set_cpu_gpu_device) | Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None. |
 | [preprocessing.exog_builder.ExogBuilder](preprocessing.exog_builder.ExogBuilder.qmd#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder) | Builds a set of exogenous features for a given date range. |
+| [preprocessing.exog_providers.ExogFeatureProvider](preprocessing.exog_providers.ExogFeatureProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider) | Contract for a pluggable exogenous-feature source. |
+| [preprocessing.exog_providers.CovidInfectionRateProvider](preprocessing.exog_providers.CovidInfectionRateProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.CovidInfectionRateProvider) | German national COVID-19 7-day incidence as an exogenous level regressor. |
+| [preprocessing.exog_providers.EntsoeForecastLoadProvider](preprocessing.exog_providers.EntsoeForecastLoadProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.EntsoeForecastLoadProvider) | ENTSO-E day-ahead Forecasted Load as an exogenous near-oracle prior. |
+| [preprocessing.exog_providers.EntsoeRenewableForecastProvider](preprocessing.exog_providers.EntsoeRenewableForecastProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider) | ENTSO-E day-ahead wind and solar generation forecast. |
+| [preprocessing.exog_providers.EntsoeNetLoadProvider](preprocessing.exog_providers.EntsoeNetLoadProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.EntsoeNetLoadProvider) | ENTSO-E day-ahead net load = Forecasted Load − (wind + solar) forecast. |
+| [preprocessing.exog_providers.EntsoeDayAheadPriceProvider](preprocessing.exog_providers.EntsoeDayAheadPriceProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider) | ENTSO-E day-ahead spot price (DE/LU) as an exogenous input. |
+| [preprocessing.exog_providers.build_providers](preprocessing.exog_providers.build_providers.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers) | Construct the providers whose flags are truthy, in registry order. |
+| [preprocessing.exog_providers.build_providers_from_config](preprocessing.exog_providers.build_providers_from_config.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers_from_config) | Construct providers by reading the registry flags off a config object. |
 | [preprocessing.imputation.apply_imputation](preprocessing.imputation.apply_imputation.qmd#spotforecast2_safe.preprocessing.imputation.apply_imputation) | Apply imputation to a DataFrame based on the method specified in config. |
 | [preprocessing.imputation.WeightFunction](preprocessing.imputation.WeightFunction.qmd#spotforecast2_safe.preprocessing.imputation.WeightFunction) | Callable class for sample weights that can be pickled. |
 | [preprocessing.imputation.custom_weights](preprocessing.imputation.custom_weights.qmd#spotforecast2_safe.preprocessing.imputation.custom_weights) | Return 0 if index is in or near any gap. |
@@ -215,6 +225,8 @@ Data downloaders for external data sources (e.g. ENTSO-E).
 | | |
 | --- | --- |
 | [downloader.entsoe.download_new_data](downloader.entsoe.download_new_data.qmd#spotforecast2_safe.downloader.entsoe.download_new_data) | Download new load and forecast data from ENTSO-E. |
+| [downloader.entsoe.download_renewable_forecast](downloader.entsoe.download_renewable_forecast.qmd#spotforecast2_safe.downloader.entsoe.download_renewable_forecast) | Download the ENTSO-E day-ahead wind/solar generation forecast. |
+| [downloader.entsoe.download_day_ahead_price](downloader.entsoe.download_day_ahead_price.qmd#spotforecast2_safe.downloader.entsoe.download_day_ahead_price) | Download the ENTSO-E day-ahead spot price (DE/LU). |
 | [downloader.entsoe.merge_build_manual](downloader.entsoe.merge_build_manual.qmd#spotforecast2_safe.downloader.entsoe.merge_build_manual) | Merge all raw CSV files from the 'raw' directory into a single interim file. |
 
 ## Exceptions

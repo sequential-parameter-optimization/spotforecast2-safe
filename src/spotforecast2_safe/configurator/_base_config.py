@@ -152,7 +152,8 @@ def validate_config(config: object) -> None:
     Raises:
         ValueError: For a non-positive ``predict_size``, a ``contamination``
             outside ``[0, 0.5]``, a ``poly_features_degree`` below 1, or an
-            ``on_weather_failure`` that is not ``"raise"`` or ``"skip"``.
+            ``on_weather_failure`` / ``on_exog_provider_failure`` that is not
+            ``"raise"`` or ``"skip"``.
     """
     predict_size = getattr(config, "predict_size", None)
     if predict_size is not None and predict_size <= 0:
@@ -175,4 +176,14 @@ def validate_config(config: object) -> None:
         raise ValueError(
             "on_weather_failure must be 'raise' or 'skip'; got "
             f"{on_weather_failure!r}."
+        )
+
+    on_exog_provider_failure = getattr(config, "on_exog_provider_failure", None)
+    if on_exog_provider_failure is not None and on_exog_provider_failure not in (
+        "raise",
+        "skip",
+    ):
+        raise ValueError(
+            "on_exog_provider_failure must be 'raise' or 'skip'; got "
+            f"{on_exog_provider_failure!r}."
         )

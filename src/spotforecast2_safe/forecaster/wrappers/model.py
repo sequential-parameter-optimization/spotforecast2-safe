@@ -18,6 +18,7 @@ from spotforecast2_safe.exceptions import NotFittedError, PredictionPackageError
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
 from spotforecast2_safe.preprocessing import LinearlyInterpolateTS
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
+from spotforecast2_safe.preprocessing.exog_providers import build_providers
 from spotforecast2_safe.splitter import TimeSeriesFold
 
 logger = logging.getLogger(__name__)
@@ -68,6 +69,12 @@ class ForecasterRecursiveModel:
         random_state: int = 123456789,
         predict_size: int = 24,
         refit_size: int = 7,
+        include_covid_infection_rate: bool = False,
+        include_entsoe_forecast_load: bool = False,
+        include_entsoe_renewable_forecast: bool = False,
+        include_entsoe_net_load: bool = False,
+        include_entsoe_day_ahead_price: bool = False,
+        on_exog_provider_failure: str = "raise",
         name: str = "base",
         **kwargs: Any,
     ):
@@ -94,6 +101,24 @@ class ForecasterRecursiveModel:
                 Forecast horizon in hours. Defaults to 24.
             refit_size:
                 Retraining frequency in days. Defaults to 7.
+            include_covid_infection_rate:
+                Append the bundled RKI German national COVID-19 7-day incidence
+                as an exogenous regressor. Defaults to False.
+            include_entsoe_forecast_load:
+                Append the ENTSO-E day-ahead Forecasted Load as a near-oracle
+                exogenous prior. Defaults to False.
+            include_entsoe_renewable_forecast:
+                Append the ENTSO-E day-ahead wind/solar generation forecast.
+                Defaults to False.
+            include_entsoe_net_load:
+                Append the ENTSO-E day-ahead net load (Forecasted Load minus
+                wind/solar forecast). Defaults to False.
+            include_entsoe_day_ahead_price:
+                Append the ENTSO-E day-ahead spot price (DE/LU). Defaults to
+                False.
+            on_exog_provider_failure:
+                ``"raise"`` (default) propagates an exogenous-provider failure;
+                ``"skip"`` logs a warning and omits that provider's columns.
             name:
                 Model name identifier. Defaults to "base".
             **kwargs:
@@ -127,7 +152,22 @@ class ForecasterRecursiveModel:
         self.predict_size = predict_size
         self.refit_size = refit_size
 
-        self.preprocessor = ExogBuilder(periods=periods, country_code=country_code)
+        self.preprocessor = ExogBuilder(
+            periods=periods,
+            country_code=country_code,
+            providers=build_providers(
+                {
+                    "include_covid_infection_rate": include_covid_infection_rate,
+                    "include_entsoe_forecast_load": include_entsoe_forecast_load,
+                    "include_entsoe_renewable_forecast": (
+                        include_entsoe_renewable_forecast
+                    ),
+                    "include_entsoe_net_load": include_entsoe_net_load,
+                    "include_entsoe_day_ahead_price": include_entsoe_day_ahead_price,
+                }
+            ),
+            on_provider_failure=on_exog_provider_failure,
+        )
         self.name = name
         self.forecaster: Optional[ForecasterRecursive] = None
         self.is_tuned = False

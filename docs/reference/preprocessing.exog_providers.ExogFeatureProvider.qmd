@@ -1,0 +1,47 @@
+# preprocessing.exog_providers.ExogFeatureProvider { #spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider }
+
+```python
+preprocessing.exog_providers.ExogFeatureProvider()
+```
+
+Contract for a pluggable exogenous-feature source.
+
+A provider maps the hourly target index to a numeric, NaN-free feature
+frame on that exact index. Subclasses set :attr:`name` (a short identifier
+used in logs and as the default column name) and implement :meth:`build`.
+
+Implementations should load their backing data lazily inside :meth:`build`
+and raise :class:`ExogProviderError` when the data is missing or cannot
+cover the requested range, so the fail-safe policy lives in one place.
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [build](#spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider.build) | Return features aligned to *index*. |
+
+### build { #spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider.build }
+
+```python
+preprocessing.exog_providers.ExogFeatureProvider.build(index)
+```
+
+Return features aligned to *index*.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                   | Description                                                                                        | Default    |
+|--------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------|------------|
+| index  | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | Hourly ``DatetimeIndex`` (typically tz-aware UTC) covering the full training-plus-forecast window. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                         |
+|--------|------------------------------------------------|---------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Numeric, NaN-free columns indexed exactly by *index*. |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                                     | Description                           |
+|--------|------------------------------------------------------------------------------------------|---------------------------------------|
+|        | [ExogProviderError](`spotforecast2_safe.preprocessing.exog_providers.ExogProviderError`) | If the provider cannot cover *index*. |

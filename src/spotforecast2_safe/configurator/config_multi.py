@@ -158,6 +158,16 @@ class ConfigMulti:
         include_holiday_features (bool): Holiday feature toggle.
         poly_features_degree (int): Polynomial-interaction degree (1 = off).
         max_poly_features (int): Cap on kept ``poly_*`` columns (top-K by MI).
+        include_covid_infection_rate (bool): Append the bundled RKI German
+            national COVID-19 7-day incidence as an exogenous regressor.
+        include_entsoe_forecast_load (bool): Append the ENTSO-E day-ahead
+            Forecasted Load as a near-oracle exogenous prior.
+        include_entsoe_renewable_forecast (bool): Append the ENTSO-E day-ahead
+            wind/solar generation forecast.
+        include_entsoe_net_load (bool): Append the ENTSO-E day-ahead net load
+            (Forecasted Load minus wind/solar forecast).
+        include_entsoe_day_ahead_price (bool): Append the ENTSO-E day-ahead
+            spot price (DE/LU).
         index_name (str): Datetime column name used when resetting the index.
         start_download (Optional[str]): Start of the data download range.
         end_download (Optional[str]): End of the data download range.
@@ -188,6 +198,10 @@ class ConfigMulti:
         number_folds (int): Cross-validation fold count for tuning tasks.
         on_weather_failure (Literal["raise", "skip"]): Open-Meteo fetch-failure
             policy: ``"raise"`` aborts, ``"skip"`` continues without weather.
+        on_exog_provider_failure (Literal["raise", "skip"]): Exog-provider
+            failure policy in ``ExogBuilder.build``: ``"raise"`` (default)
+            propagates the ``ExogProviderError``; ``"skip"`` logs and omits the
+            failing provider's columns.
 
     Notes:
         The default period configurations use specific `n_periods` to balance resolution and smoothing:
@@ -280,6 +294,11 @@ class ConfigMulti:
         "include_holiday_features",
         "poly_features_degree",
         "max_poly_features",
+        "include_covid_infection_rate",
+        "include_entsoe_forecast_load",
+        "include_entsoe_renewable_forecast",
+        "include_entsoe_net_load",
+        "include_entsoe_day_ahead_price",
         "index_name",
         "start_download",
         "end_download",
@@ -306,6 +325,7 @@ class ConfigMulti:
         "data_frame_name",
         "number_folds",
         "on_weather_failure",
+        "on_exog_provider_failure",
     )
 
     def __init__(
@@ -341,6 +361,12 @@ class ConfigMulti:
         include_holiday_features: bool = False,
         poly_features_degree: int = 1,
         max_poly_features: int = 10,
+        # Provider-based exogenous toggles (preprocessing.exog_providers)
+        include_covid_infection_rate: bool = False,
+        include_entsoe_forecast_load: bool = False,
+        include_entsoe_renewable_forecast: bool = False,
+        include_entsoe_net_load: bool = False,
+        include_entsoe_day_ahead_price: bool = False,
         # Data source and index
         index_name: str = "DateTime",
         start_download: Optional[str] = None,
@@ -385,6 +411,8 @@ class ConfigMulti:
         number_folds: int = 10,
         # Weather-fetch failure policy (consumed by spotforecast2.multitask.base.build_exogenous_features)
         on_weather_failure: Literal["raise", "skip"] = "raise",
+        # Exog-provider failure policy (consumed by preprocessing.exog_builder.ExogBuilder)
+        on_exog_provider_failure: Literal["raise", "skip"] = "raise",
     ):
         """Initialize ConfigMulti with specified or default parameters."""
         self.country_code = country_code
@@ -428,6 +456,13 @@ class ConfigMulti:
         self.include_holiday_features = include_holiday_features
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
+        # Provider-based exogenous toggles, each gated by a registry flag in
+        # ``spotforecast2_safe.preprocessing.exog_providers``.
+        self.include_covid_infection_rate = include_covid_infection_rate
+        self.include_entsoe_forecast_load = include_entsoe_forecast_load
+        self.include_entsoe_renewable_forecast = include_entsoe_renewable_forecast
+        self.include_entsoe_net_load = include_entsoe_net_load
+        self.include_entsoe_day_ahead_price = include_entsoe_day_ahead_price
         # Data source and index
         self.index_name = index_name
         self.start_download = start_download
@@ -493,6 +528,10 @@ class ConfigMulti:
         # pipeline (default, preserves fail-safe semantics); ``"skip"``
         # logs a warning and continues without weather features.
         self.on_weather_failure = on_weather_failure
+        # Policy for exog-provider failures consumed by ``ExogBuilder``:
+        # ``"raise"`` aborts (default, fail-safe); ``"skip"`` logs a warning
+        # and omits the failing provider's columns.
+        self.on_exog_provider_failure = on_exog_provider_failure
         validate_config(self)
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
