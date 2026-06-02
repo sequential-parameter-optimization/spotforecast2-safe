@@ -56,36 +56,26 @@ class TestShouldRetrain(unittest.TestCase):
         self.now = pd.Timestamp("2026-05-24 12:00", tz="UTC")
 
     def test_should_retrain_returns_true_when_no_previous_model(self):
-        self.assertTrue(
-            should_retrain(None, max_age=self.max_age, now=self.now)
-        )
+        self.assertTrue(should_retrain(None, max_age=self.max_age, now=self.now))
 
     def test_should_retrain_returns_false_when_less_than_max_age(self):
         last = self.now - pd.Timedelta(days=2)
-        self.assertFalse(
-            should_retrain(last, max_age=self.max_age, now=self.now)
-        )
+        self.assertFalse(should_retrain(last, max_age=self.max_age, now=self.now))
 
     def test_should_retrain_returns_true_when_at_or_above_max_age(self):
         last = self.now - pd.Timedelta(days=7)
-        self.assertTrue(
-            should_retrain(last, max_age=self.max_age, now=self.now)
-        )
+        self.assertTrue(should_retrain(last, max_age=self.max_age, now=self.now))
 
     def test_should_retrain_returns_true_with_force(self):
         last = self.now - pd.Timedelta(hours=1)
         self.assertTrue(
-            should_retrain(
-                last, max_age=self.max_age, force=True, now=self.now
-            )
+            should_retrain(last, max_age=self.max_age, force=True, now=self.now)
         )
 
     def test_should_retrain_uses_injected_now(self):
         last = pd.Timestamp("2026-05-01 00:00", tz="UTC")
         # 23 days ago — well over max_age
-        self.assertTrue(
-            should_retrain(last, max_age=self.max_age, now=self.now)
-        )
+        self.assertTrue(should_retrain(last, max_age=self.max_age, now=self.now))
 
     def test_should_retrain_handles_naive_timestamps(self):
         last = pd.Timestamp("2026-05-22 12:00")  # tz-naive

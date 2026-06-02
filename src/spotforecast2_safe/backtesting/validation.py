@@ -117,7 +117,7 @@ def _backtesting_forecaster(
             the predictions are also returned. Defaults to False.
         n_jobs (int | str, optional): The number of jobs to run in parallel. If `-1`,
             then the number of jobs is set to the number of cores. If 'auto', `n_jobs`
-            is set using the function `skforecast.utils.select_n_jobs_backtesting`.
+            is set using the function `spotforecast2_safe.splitter.utils_common.select_n_jobs_backtesting`.
             Defaults to 'auto'.
         verbose (bool, optional): Print number of folds and index of training and
             validation sets used for backtesting. Defaults to False.
@@ -781,7 +781,7 @@ def backtesting_forecaster(
             the predictions are also returned. Defaults to False.
         n_jobs (int | str, optional): The number of jobs to run in parallel. If `-1`,
             then the number of jobs is set to the number of cores. If 'auto', `n_jobs`
-            is set using the function `skforecast.utils.select_n_jobs_backtesting`.
+            is set using the function `spotforecast2_safe.splitter.utils_common.select_n_jobs_backtesting`.
             Defaults to 'auto'.
         verbose (bool, optional): Print number of folds and index of training and
             validation sets used for backtesting. Defaults to False.

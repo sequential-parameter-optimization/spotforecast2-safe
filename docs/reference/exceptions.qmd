@@ -482,7 +482,6 @@ print(caught[0].category.__name__)
 | --- | --- |
 | [format_warning_handler](#spotforecast2_safe.exceptions.format_warning_handler) | Custom warning handler to format warnings in a box. |
 | [rich_warning_handler](#spotforecast2_safe.exceptions.rich_warning_handler) | Custom handler for warnings that uses rich to display formatted panels. |
-| [runtime_deprecated](#spotforecast2_safe.exceptions.runtime_deprecated) | Decorator to mark functions or classes as deprecated. |
 | [set_skforecast_warnings](#spotforecast2_safe.exceptions.set_skforecast_warnings) | Suppress or configure spotforecast warning filters. |
 | [set_warnings_style](#spotforecast2_safe.exceptions.set_warnings_style) | Set the warning handler based on the provided style. |
 
@@ -590,58 +589,6 @@ with warnings.catch_warnings(record=True) as caught:
 set_warnings_style("default")
 assert len(caught) == 1
 print("rich handler demo: warning category =", caught[0].category.__name__)
-```
-
-### runtime_deprecated { #spotforecast2_safe.exceptions.runtime_deprecated }
-
-```python
-exceptions.runtime_deprecated(
-    replacement=None,
-    version=None,
-    removal=None,
-    category=FutureWarning,
-)
-```
-
-Decorator to mark functions or classes as deprecated.
-
-Works for both function and class targets, and ensures warnings are visible
-even inside Jupyter notebooks.
-
-#### Parameters {.doc-section .doc-section-parameters}
-
-| Name        | Type                                   | Description                                            | Default         |
-|-------------|----------------------------------------|--------------------------------------------------------|-----------------|
-| replacement | [str](`str`)                           | Name of the replacement function/class to use instead. | `None`          |
-| version     | [str](`str`)                           | Version in which the function/class was deprecated.    | `None`          |
-| removal     | [str](`str`)                           | Version in which the function/class will be removed.   | `None`          |
-| category    | [type](`type`)\[[Warning](`Warning`)\] | Warning category to use. Default is FutureWarning.     | `FutureWarning` |
-
-#### Returns {.doc-section .doc-section-returns}
-
-| Name   | Type               | Description         |
-|--------|--------------------|---------------------|
-|        | [object](`object`) | Decorator function. |
-
-#### Examples {.doc-section .doc-section-examples}
-
-```{python}
-import warnings
-from spotforecast2_safe.exceptions import runtime_deprecated
-
-@runtime_deprecated(replacement='new_function', version='0.5', removal='1.0')
-def old_function():
-    return 42
-
-with warnings.catch_warnings(record=True) as caught:
-    warnings.simplefilter("always")
-    result = old_function()
-
-assert result == 42
-assert len(caught) == 1
-assert issubclass(caught[0].category, FutureWarning)
-assert "0.5" in str(caught[0].message)
-print(type(caught[0].category).__name__, str(caught[0].message)[:60])
 ```
 
 ### set_skforecast_warnings { #spotforecast2_safe.exceptions.set_skforecast_warnings }

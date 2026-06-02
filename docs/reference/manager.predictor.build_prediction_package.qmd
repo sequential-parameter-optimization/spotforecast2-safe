@@ -13,7 +13,7 @@ manager.predictor.build_prediction_package(
 )
 ```
 
-Build a prediction package compatible with PredictionFigure.
+Build a prediction package for downstream plotting/reporting consumers.
 
 Computes true in-sample predictions via the fitted estimator and generates
 a genuine future forecast of ``predict_size`` steps. If ``df_test`` is
@@ -35,18 +35,18 @@ supplied, ground-truth test values are injected and future metrics
 
 ## Returns {.doc-section .doc-section-returns}
 
-| Name   | Type                                                       | Description                                                                                                                                       |
-|--------|------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | A dictionary with the following keys:                                                                                                             |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **train_actual** (``pd.Series``) — observed training values aligned to the in-sample prediction index (lags consumed from the start).           |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **train_pred** (``pd.Series``) — in-sample fitted values from the underlying estimator.                                                         |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **future_actual** (``pd.Series``) — always an empty ``float64`` Series; the field exists for interface compatibility with ``PredictionFigure``. |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **future_pred** (``pd.Series``) — ``predict_size``-step-ahead forecast.                                                                         |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **metrics_train** (``dict``) — ``{"mae": float, "mape": float}`` computed on the aligned in-sample window.                                      |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **metrics_future** (``dict``) — ``{"mae": float, "mape": float}`` computed against test ground truth, or ``{}`` when unavailable.               |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **metrics_future_one_day** (``dict``) — reserved for downstream one-day metrics; always ``{}``.                                                 |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **validation_passed** (``bool``) — always ``True``; field reserved for downstream safety checks.                                                |
-|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **test_actual** (``pd.Series``, optional) — present only when ``df_test`` contains matching rows for the forecast horizon.                      |
+| Name   | Type                                                       | Description                                                                                                                                                |
+|--------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | A dictionary with the following keys:                                                                                                                      |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **train_actual** (``pd.Series``) — observed training values aligned to the in-sample prediction index (lags consumed from the start).                    |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **train_pred** (``pd.Series``) — in-sample fitted values from the underlying estimator.                                                                  |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **future_actual** (``pd.Series``) — always an empty ``float64`` Series; the field exists for interface compatibility with downstream plotting consumers. |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **future_pred** (``pd.Series``) — ``predict_size``-step-ahead forecast.                                                                                  |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **metrics_train** (``dict``) — ``{"mae": float, "mape": float}`` computed on the aligned in-sample window.                                               |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **metrics_future** (``dict``) — ``{"mae": float, "mape": float}`` computed against test ground truth, or ``{}`` when unavailable.                        |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **metrics_future_one_day** (``dict``) — reserved for downstream one-day metrics; always ``{}``.                                                          |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **validation_passed** (``bool``) — always ``True``; field reserved for downstream safety checks.                                                         |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | - **test_actual** (``pd.Series``, optional) — present only when ``df_test`` contains matching rows for the forecast horizon.                               |
 
 ## Examples {.doc-section .doc-section-examples}
 

@@ -23,13 +23,16 @@ Threat model (STRIDE).
       Mitigated by TLS integrity and by the typed pandas coercion below that
       rejects any column whose dtype diverges from the declared schema.
     - Repudiation: Open-Meteo does not require authentication, so there is
-      no caller identity at this module boundary. Downstream audit is
-      provided by ``manager/logger.py``, which records the fetch URL, the
-      request UTC timestamp, and the response-byte hash.
+      no caller identity at this module boundary. This module emits standard
+      ``logging`` records for fetch attempts and errors; it keeps no
+      dedicated audit log of fetch URLs or response hashes.
     - Information Disclosure: the request URL contains latitude and
-      longitude, which reveal the deployment location. Mitigated by the
-      logger's URL filter, which records only the hostname and path (not
-      the query string) at the default log level.
+      longitude, which reveal the deployment location. This module does not
+      deliberately log the request URL, but error messages from the
+      underlying HTTP client may include it, and there is no automatic
+      query-string redaction filter. Coordinate redaction, where required, is
+      the responsibility of the calling task/operator (the bundled tasks log
+      coordinates as ``[REDACTED]``).
     - Denial of Service: upstream outages or rate limiting could stall the
       pipeline. Mitigated by the ``Retry`` adapter configured below, which
       caps retries and raises an explicit exception after the budget is

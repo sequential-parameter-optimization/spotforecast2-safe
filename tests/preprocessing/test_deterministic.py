@@ -5,9 +5,7 @@
 
 import pandas as pd
 
-from spotforecast2_safe.preprocessing.deterministic import (
-    build_deterministic_process,
-)
+from spotforecast2_safe.preprocessing.deterministic import build_deterministic_process
 
 
 def test_build_deterministic_process_returns_DP_with_expected_columns():
@@ -32,9 +30,7 @@ def test_build_deterministic_process_respects_fourier_order():
 def test_build_deterministic_process_multiple_periods():
     """Multiple periods add disjoint Fourier bases."""
     idx = pd.date_range("2026-01-01", periods=168, freq="h")
-    dp = build_deterministic_process(
-        idx, periods=[24, 168], fourier_order=2
-    )
+    dp = build_deterministic_process(idx, periods=[24, 168], fourier_order=2)
     features = dp.in_sample()
     # 1 + 1 + 2*2 + 2*2 = 10
     assert features.shape == (168, 10)
@@ -43,9 +39,7 @@ def test_build_deterministic_process_multiple_periods():
 def test_build_deterministic_process_trend_order_zero():
     """trend_order=0 drops the linear trend column."""
     idx = pd.date_range("2026-01-01", periods=24, freq="h")
-    dp = build_deterministic_process(
-        idx, periods=[24], fourier_order=1, trend_order=0
-    )
+    dp = build_deterministic_process(idx, periods=[24], fourier_order=1, trend_order=0)
     features = dp.in_sample()
     # 1 (constant) + 0 (trend) + 2 (one pair) = 3
     assert features.shape == (24, 3)
@@ -54,9 +48,7 @@ def test_build_deterministic_process_trend_order_zero():
 def test_build_deterministic_process_no_constant():
     """constant=False drops the bias column."""
     idx = pd.date_range("2026-01-01", periods=24, freq="h")
-    dp = build_deterministic_process(
-        idx, periods=[24], fourier_order=1, constant=False
-    )
+    dp = build_deterministic_process(idx, periods=[24], fourier_order=1, constant=False)
     features = dp.in_sample()
     # 0 (constant) + 1 (trend) + 2 = 3
     assert features.shape == (24, 3)

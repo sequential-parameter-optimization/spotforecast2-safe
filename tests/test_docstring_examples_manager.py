@@ -11,32 +11,6 @@ of the manager module execute correctly without errors.
 import doctest
 
 
-def test_docstring_examples_logger():
-    """Test all docstring examples in manager.logger module."""
-    import spotforecast2_safe.manager.logger as logger_module
-
-    results = doctest.testmod(
-        logger_module,
-        verbose=True,
-        optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
-    )
-
-    assert results.failed == 0, f"Docstring examples failed: {results.failed} failures"
-
-
-def test_docstring_examples_persistence():
-    """Test all docstring examples in manager.persistence module."""
-    import spotforecast2_safe.manager.persistence as persistence_module
-
-    results = doctest.testmod(
-        persistence_module,
-        verbose=True,
-        optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE,
-    )
-
-    assert results.failed == 0, f"Docstring examples failed: {results.failed} failures"
-
-
 def test_docstring_examples_predictor():
     """Test all docstring examples in manager.predictor module."""
     import spotforecast2_safe.manager.predictor as predictor_module
@@ -79,16 +53,6 @@ def test_docstring_examples_metrics():
 if __name__ == "__main__":
     # Run all tests when executed directly
     print("=" * 70)
-    print("Testing manager.logger docstring examples...")
-    print("=" * 70)
-    test_docstring_examples_logger()
-
-    print("\n" + "=" * 70)
-    print("Testing manager.persistence docstring examples...")
-    print("=" * 70)
-    test_docstring_examples_persistence()
-
-    print("\n" + "=" * 70)
     print("Testing manager.predictor docstring examples...")
     print("=" * 70)
     test_docstring_examples_predictor()

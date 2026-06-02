@@ -5,8 +5,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveModel
-from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveXGB
+from spotforecast2_safe.forecaster.wrappers import (
+    ForecasterRecursiveModel,
+    ForecasterRecursiveXGB,
+)
 
 
 def test_forecaster_recursive_xgb_initialization():

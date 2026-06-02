@@ -1114,14 +1114,9 @@ class ForecasterRecursive(ForecasterBase):
         if not all_params:
             return self
 
-        valid_params = self.get_params(deep=True)
         nested_params = {}
 
         for key, value in all_params.items():
-            if key not in valid_params and "__" not in key:
-                # Relaxed check for now
-                pass
-
             if "__" in key:
                 obj_name, param_name = key.split("__", 1)
                 if obj_name not in nested_params:

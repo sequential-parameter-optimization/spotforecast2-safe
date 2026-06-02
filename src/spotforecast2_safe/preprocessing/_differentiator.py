@@ -86,6 +86,16 @@ class TimeSeriesDifferentiator(BaseEstimator, TransformerMixin):
         """
         if self.order < 1:
             raise ValueError("`order` must be a positive integer.")
+        if self.order > 1:
+            # Fail fast: only first-order differentiation is implemented in this
+            # port (inverse_transform raises NotImplementedError for order > 1).
+            # Rejecting here, rather than letting fit succeed and crashing during
+            # prediction, honors the fail-safe-over-silent-failure contract.
+            raise NotImplementedError(
+                "Only first-order differentiation (order=1) is supported in "
+                f"spotforecast2-safe; got order={self.order}. Higher orders are "
+                "intentionally unimplemented in this port."
+            )
 
         if self.window_size is not None:
             if not isinstance(self.window_size, int):

@@ -3,8 +3,6 @@
 
 from ._binner import QuantileBinner
 from ._differentiator import TimeSeriesDifferentiator
-from .deterministic import build_deterministic_process
-from .rolling import RollingFeatures
 from .curate_data import (
     agg_and_resample_data,
     basic_ts_checks,
@@ -14,6 +12,7 @@ from .curate_data import (
     remove_duplicate_timestamps,
     reset_index,
 )
+from .deterministic import build_deterministic_process
 from .exog_builder import ExogBuilder
 from .imputation import (
     WeightFunction,
@@ -24,6 +23,7 @@ from .imputation import (
 from .linearly_interpolate_ts import LinearlyInterpolateTS
 from .outlier import get_outliers, manual_outlier_removal, mark_outliers
 from .repeating_basis_function import RepeatingBasisFunction
+from .rolling import RollingFeatures
 
 # No recursive models here anymore
 

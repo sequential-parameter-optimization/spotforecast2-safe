@@ -137,7 +137,8 @@ High-level training, prediction, and model persistence orchestration.
 | [manager.trainer.get_last_model](manager.trainer.get_last_model.qmd#spotforecast2_safe.manager.trainer.get_last_model) | Get the latest trained model from the cache. |
 | [manager.trainer.get_path_model](manager.trainer.get_path_model.qmd#spotforecast2_safe.manager.trainer.get_path_model) | Yield the path to a model file for a given iteration and model name. |
 | [manager.trainer.load_iteration](manager.trainer.load_iteration.qmd#spotforecast2_safe.manager.trainer.load_iteration) | Load a saved model at a given iteration. |
-| [manager.predictor.build_prediction_package](manager.predictor.build_prediction_package.qmd#spotforecast2_safe.manager.predictor.build_prediction_package) | Build a prediction package compatible with PredictionFigure. |
+| [manager.trainer.should_retrain](manager.trainer.should_retrain.qmd#spotforecast2_safe.manager.trainer.should_retrain) | Decide whether a forecaster should be retrained. |
+| [manager.predictor.build_prediction_package](manager.predictor.build_prediction_package.qmd#spotforecast2_safe.manager.predictor.build_prediction_package) | Build a prediction package for downstream plotting/reporting consumers. |
 | [manager.predictor.get_model_prediction](manager.predictor.get_model_prediction.qmd#spotforecast2_safe.manager.predictor.get_model_prediction) | Get the prediction package from the latest trained model. |
 | [manager.logger](manager.logger.qmd#spotforecast2_safe.manager.logger) | Audit-grade logging for spotforecast2-safe. |
 | [manager.persistence](manager.persistence.qmd#spotforecast2_safe.manager.persistence) |  |
@@ -146,6 +147,7 @@ High-level training, prediction, and model persistence orchestration.
 | [manager.features.select_exogenous_features](manager.features.select_exogenous_features.qmd#spotforecast2_safe.manager.features.select_exogenous_features) | Select and deduplicate exogenous feature columns for model training. |
 | [manager.features.merge_data_and_covariates](manager.features.merge_data_and_covariates.qmd#spotforecast2_safe.manager.features.merge_data_and_covariates) | Merge target data with exogenous features and split into train/predict slices. |
 | [manager.features.get_target_data](manager.features.get_target_data.qmd#spotforecast2_safe.manager.features.get_target_data) | Extract the training series and exogenous slices for one target column. |
+| [manager.features.select_top_poly_features](manager.features.select_top_poly_features.qmd#spotforecast2_safe.manager.features.select_top_poly_features) | Rank polynomial interaction columns by mutual information, keep the top K. |
 
 ## Utils
 

@@ -25,18 +25,24 @@ def backtest_result():
     )
     forecaster = ForecasterRecursive(
         estimator=LGBMRegressor(
-            n_estimators=20, n_jobs=1, verbose=-1, random_state=0,
-            deterministic=True, force_col_wise=True,
+            n_estimators=20,
+            n_jobs=1,
+            verbose=-1,
+            random_state=0,
+            deterministic=True,
+            force_col_wise=True,
         ),
         lags=24,
     )
     forecaster.fit(y=y.iloc[:200])
-    cv = TimeSeriesFold(
-        steps=24, initial_train_size=200, refit=False, verbose=False
-    )
+    cv = TimeSeriesFold(steps=24, initial_train_size=200, refit=False, verbose=False)
     metrics_df, predictions_df = backtesting_forecaster(
-        forecaster=forecaster, y=y, cv=cv, metric="mean_absolute_error",
-        show_progress=False, verbose=False,
+        forecaster=forecaster,
+        y=y,
+        cv=cv,
+        metric="mean_absolute_error",
+        show_progress=False,
+        verbose=False,
     )
     return y, cv, metrics_df, predictions_df
 
@@ -79,3 +85,21 @@ def test_uncovered_index_raises(backtest_result):
     y, _, _, predictions_df = backtest_result
     with pytest.raises(ValueError, match="cover"):
         metrics_per_fold(predictions_df, y.iloc[:10])
+
+
+def test_not_a_dataframe_raises():
+    with pytest.raises(ValueError, match="must be a pandas DataFrame"):
+        metrics_per_fold([1, 2, 3], pd.Series([1.0, 2.0, 3.0]))
+
+
+def test_missing_pred_column_raises(backtest_result):
+    y, _, _, predictions_df = backtest_result
+    bad = predictions_df.drop(columns=["pred"])
+    with pytest.raises(ValueError, match="pred"):
+        metrics_per_fold(bad, y)
+
+
+def test_empty_predictions_raises():
+    empty = pd.DataFrame({"fold": [], "pred": []})
+    with pytest.raises(ValueError, match="empty"):
+        metrics_per_fold(empty, pd.Series([1.0], index=pd.RangeIndex(1)))

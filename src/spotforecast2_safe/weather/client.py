@@ -333,9 +333,7 @@ class WeatherService(WeatherClient):
             self._save_cache(df)
 
         # 4. Return slice
-        return self._finalize_df(
-            df.loc[start_utc:end_utc], freq, fill_missing
-        )
+        return self._finalize_df(df.loc[start_utc:end_utc], freq, fill_missing)
 
     def _fetch_hybrid(
         self, start: pd.Timestamp, end: pd.Timestamp, timezone: str
@@ -373,9 +371,7 @@ class WeatherService(WeatherClient):
                 self.logger.warning(f"Forecast fetch warning: {e}")
 
         if not dfs:
-            raise WeatherFetchError(
-                "Could not fetch data from Archive or Forecast."
-            )
+            raise WeatherFetchError("Could not fetch data from Archive or Forecast.")
 
         full_df = pd.concat(dfs)
         full_df = full_df[~full_df.index.duplicated(keep="first")].sort_index()

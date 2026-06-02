@@ -7,10 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from spotforecast2_safe.stats.spectral import (
-    PeriodogramResult,
-    compute_periodogram,
-)
+from spotforecast2_safe.stats.spectral import PeriodogramResult, compute_periodogram
 
 
 def test_compute_periodogram_returns_periodogram_result():
@@ -62,3 +59,10 @@ def test_compute_periodogram_rejects_missing_values():
     y = pd.Series([1.0, np.nan, 3.0])
     with pytest.raises(ValueError):
         compute_periodogram(y)
+
+
+def test_compute_periodogram_empty_spectrum():
+    """A single-sample series has only the DC component -> empty top_periods."""
+    result = compute_periodogram(pd.Series([5.0]))
+    assert isinstance(result, PeriodogramResult)
+    assert result.top_periods.empty

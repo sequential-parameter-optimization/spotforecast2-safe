@@ -12,6 +12,7 @@ This module provides utilities for:
 - Model evaluation metrics
 """
 
+from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 from spotforecast2_safe.manager.features import (
     apply_cyclical_encoding,
     create_interaction_features,
@@ -21,7 +22,6 @@ from spotforecast2_safe.manager.features import (
     select_top_poly_features,
 )
 from spotforecast2_safe.manager.logger import setup_logging
-from spotforecast2_safe.manager.demo_metrics import calculate_metrics
 from spotforecast2_safe.manager.persistence import (
     ensure_model_dir,
     get_model_filepath,
