@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo100.csv, one helper at a time.">
+<meta name="description" content="Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo10.csv, one helper at a time.">
 
-<title>n2n_predict_with_covariates on demo100: Step by Step on Real Data – spotforecast2-safe</title>
+<title>n2n_predict_with_covariates on demo10: Step by Step on Real Data – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -309,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_demo100.html">n2n_predict_with_covariates on demo100</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_demo10.html">n2n_predict_with_covariates on demo10</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1395,8 +1395,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tutorials/n2n_predict_with_covariates_demo100.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">n2n_predict_with_covariates on demo100</span></a>
+  <a href="../../docs/tutorials/n2n_predict_with_covariates_demo10.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">n2n_predict_with_covariates on demo10</span></a>
   </div>
 </li>
       </ul>
@@ -1412,7 +1412,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#what-this-page-does" id="toc-what-this-page-does" class="nav-link active" data-scroll-target="#what-this-page-does">What this page does</a></li>
-  <li><a href="#about-demo100.csv" id="toc-about-demo100.csv" class="nav-link" data-scroll-target="#about-demo100.csv">About <code>demo100.csv</code></a></li>
+  <li><a href="#about-demo10.csv" id="toc-about-demo10.csv" class="nav-link" data-scroll-target="#about-demo10.csv">About <code>demo10.csv</code></a></li>
   <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
   <li><a href="#stage-1-loading-and-preparing-the-target-series" id="toc-stage-1-loading-and-preparing-the-target-series" class="nav-link" data-scroll-target="#stage-1-loading-and-preparing-the-target-series">Stage 1 — Loading and preparing the target series</a></li>
   <li><a href="#stage-2-outlier-detection-and-removal" id="toc-stage-2-outlier-detection-and-removal" class="nav-link" data-scroll-target="#stage-2-outlier-detection-and-removal">Stage 2 — Outlier detection and removal</a></li>
@@ -1435,20 +1435,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#cross-check-against-the-orchestrator" id="toc-cross-check-against-the-orchestrator" class="nav-link" data-scroll-target="#cross-check-against-the-orchestrator">Cross-check against the orchestrator</a></li>
   <li><a href="#what-to-take-away" id="toc-what-to-take-away" class="nav-link" data-scroll-target="#what-to-take-away">What to take away</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tutorials/n2n_predict_with_covariates_demo100.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tutorials/n2n_predict_with_covariates_demo10.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_demo100.html">n2n_predict_with_covariates on demo100</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../docs/tutorials/n2n_predict_with_covariates_demo10.html">n2n_predict_with_covariates on demo10</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">n2n_predict_with_covariates on demo100: Step by Step on Real Data</h1>
+<h1 class="title">n2n_predict_with_covariates on demo10: Step by Step on Real Data</h1>
 </div>
 
 <div>
   <div class="description">
-    Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo100.csv, one helper at a time.
+    Sibling walkthrough that executes each pipeline stage from n2n_predict_with_covariates.py against the bundled demo10.csv, one helper at a time.
   </div>
 </div>
 
@@ -1467,48 +1467,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="what-this-page-does" class="level2">
 <h2 class="anchored" data-anchor-id="what-this-page-does">What this page does</h2>
-<p>This is the executable companion to <a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html"><em>n2n_predict_with_covariates</em>: A Beginner’s Walkthrough</a>. The sibling page introduces the vocabulary and explains the <em>why</em> of each stage with small synthetic examples. This page does the opposite: every code cell executes one real stage of <code>spotforecast2_safe.processing.n2n_predict_with_covariates</code> against the bundled <code>demo100.csv</code> dataset, prints the intermediate state, and then discusses what just happened. Refer back to the sibling page for the vocabulary — <code>@def-time-series</code>, <code>@def-lag</code>, <code>@def-forecast-horizon</code>, <code>@def-recursive-forecaster</code>, <code>@def-train-val-test</code>, <code>@def-outlier</code>, <code>@def-imputation</code>, <code>@def-sample-weight</code>, <code>@def-cyclical-encoding</code>, <code>@def-persistence</code> — all definitions are reused unchanged.</p>
+<p>This is the executable companion to <a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html"><em>n2n_predict_with_covariates</em>: A Beginner’s Walkthrough</a>. The sibling page introduces the vocabulary and explains the <em>why</em> of each stage with small synthetic examples. This page does the opposite: every code cell executes one real stage of <code>spotforecast2_safe.processing.n2n_predict_with_covariates</code> against the bundled <code>demo10.csv</code> dataset, prints the intermediate state, and then discusses what just happened. Refer back to the sibling page for the vocabulary — <code>@def-time-series</code>, <code>@def-lag</code>, <code>@def-forecast-horizon</code>, <code>@def-recursive-forecaster</code>, <code>@def-train-val-test</code>, <code>@def-outlier</code>, <code>@def-imputation</code>, <code>@def-sample-weight</code>, <code>@def-cyclical-encoding</code>, <code>@def-persistence</code> — all definitions are reused unchanged.</p>
 <p>The closing section calls <code>n2n_predict_with_covariates</code> end-to-end on the same input as a sanity check that the per-stage breakdown above is equivalent to the orchestrator.</p>
 </section>
-<section id="about-demo100.csv" class="level2">
-<h2 class="anchored" data-anchor-id="about-demo100.csv">About <code>demo100.csv</code></h2>
-<p><code>demo100.csv</code> is bundled in the wheel at <code>spotforecast2_safe/datasets/csv/demo100.csv</code>. It carries eleven numeric columns A–K, indexed by hourly UTC timestamps from late 2010 through December 2021 — about 96 000 rows. Column K comes online late and starts with a long run of <code>NaN</code>, which makes it a useful exercise for the imputation step in Stage 3.</p>
-<p>To keep render times tractable while still exercising every helper faithfully (in particular the 7-day rolling weather window in Stage 4 and the 80/20 temporal split in Stage 8) the page slices the data to the last two years before Stage 1 begins.</p>
+<section id="about-demo10.csv" class="level2">
+<h2 class="anchored" data-anchor-id="about-demo10.csv">About <code>demo10.csv</code></h2>
+<p><code>demo10.csv</code> is bundled in the wheel at <code>spotforecast2_safe/datasets/csv/demo10.csv</code>. It carries eleven numeric columns A–K, indexed by hourly UTC timestamps from December 2019 through December 2021 — about 18 000 rows, roughly two years. Column C comes online late (mid-May 2021) and starts with a long run of <code>NaN</code> covering most of the window, which makes it a useful exercise for the imputation step in Stage 3.</p>
+<p><code>demo10.csv</code> is the compact sibling of the much larger <code>demo100.csv</code> (about 96 000 rows spanning 2010–2021). Its two-year span already covers every helper faithfully — the 7-day rolling weather window in Stage 4 and the 80/20 temporal split in Stage 8 both have ample data — while keeping render times short, so no row slicing is needed before Stage 1 begins.</p>
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <div id="exm-setup" class="theorem example">
-<p><span class="theorem-title"><strong>Example 1 (Loading and slicing demo100)</strong></span> &nbsp;</p>
-<div id="db7450ef" class="cell" data-execution_count="1">
+<p><span class="theorem-title"><strong>Example 1 (Loading demo10)</strong></span> &nbsp;</p>
+<div id="d2559b0b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_data, get_package_data_home</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_full <span class="op">=</span> fetch_data(</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span>get_package_data_home() <span class="op">/</span> <span class="st">"demo100.csv"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_demo <span class="op">=</span> fetch_data(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span>get_package_data_home() <span class="op">/</span> <span class="st">"demo10.csv"</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">"UTC"</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>cutoff <span class="op">=</span> data_full.index.<span class="bu">max</span>() <span class="op">-</span> pd.Timedelta(days<span class="op">=</span><span class="dv">730</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>data_sliced <span class="op">=</span> data_full.loc[data_full.index <span class="op">&gt;=</span> cutoff].copy()</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>cache_home <span class="op">=</span> Path.home() <span class="op">/</span> <span class="st">".spotforecast2_cache"</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"full shape   :"</span>, data_full.shape)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sliced shape :"</span>, data_sliced.shape)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"window       :"</span>, data_sliced.index[<span class="dv">0</span>], <span class="st">"→"</span>, data_sliced.index[<span class="op">-</span><span class="dv">1</span>])</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NaN per col  :"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data_sliced.isna().<span class="bu">sum</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>cache_home <span class="op">=</span> Path.home() <span class="op">/</span> <span class="st">".spotforecast2_cache"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape        :"</span>, data_demo.shape)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"window       :"</span>, data_demo.index[<span class="dv">0</span>], <span class="st">"→"</span>, data_demo.index[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NaN per col  :"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data_demo.isna().<span class="bu">sum</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>full shape   : (96263, 11)
-sliced shape : (17521, 11)
-window       : 2019-12-25 21:00:00+00:00 → 2021-12-24 21:00:00+00:00
+<pre><code>shape        : (18118, 11)
+window       : 2019-12-01 00:00:00+00:00 → 2021-12-24 21:00:00+00:00
 NaN per col  :
 A        0
 B        0
-C    12110
+C    12707
 D        0
 E        0
 F        0
@@ -1521,14 +1516,14 @@ dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<p>The slicing is done in user code rather than via <code>fetch_data</code> arguments because <code>fetch_data</code> exposes column selection, not row selection. The 730-day window is intentionally wider than the longest rolling weather window (seven days), so Stage 4 has full lookback at <code>start</code>. <code>cache_home</code> points at the same directory that <code>get_cache_home()</code> would resolve to (<code>~/.spotforecast2_cache</code>); reusing it means subsequent renders read the weather parquet cache instead of refetching from Open-Meteo.</p>
+<p><code>demo10</code> is loaded whole — its two-year span is already small enough to render quickly, so no row slicing is required and every stage below sees the full series. <code>cache_home</code> points at the same directory that <code>get_cache_home()</code> would resolve to (<code>~/.spotforecast2_cache</code>); reusing it means subsequent renders read the weather parquet cache instead of refetching from Open-Meteo.</p>
 </section>
 <section id="stage-1-loading-and-preparing-the-target-series" class="level2">
 <h2 class="anchored" data-anchor-id="stage-1-loading-and-preparing-the-target-series">Stage 1 — Loading and preparing the target series</h2>
 <p>A forecasting model needs a clean, regularly spaced time series with a known time zone. Stage 1 turns whatever the caller supplied into exactly that. <code>get_start_end</code> returns four boundary timestamps: <code>start</code> and <code>end</code> delimit the historical window used for training, and <code>cov_start</code> / <code>cov_end</code> are the same window extended forward by <code>forecast_horizon</code> steps — that extension is the future window for which covariates must be constructed in Stage 4.</p>
 <div id="exm-s1-fetch" class="theorem example">
 <p><span class="theorem-title"><strong>Example 2 (Boundary timestamps, hourly resample)</strong></span> &nbsp;</p>
-<div id="16d7c769" class="cell" data-execution_count="2">
+<div id="ee07aa77" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.curate_data <span class="im">import</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    agg_and_resample_data,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    basic_ts_checks,</span>
@@ -1537,7 +1532,7 @@ dtype: int64</code></pre>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>forecast_horizon <span class="op">=</span> <span class="dv">24</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data_sliced</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data_demo</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>start, end, cov_start, cov_end <span class="op">=</span> get_start_end(</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span>forecast_horizon,</span>
@@ -1557,12 +1552,12 @@ dtype: int64</code></pre>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape      :"</span>, data.shape)</span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>data.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>start      : 2019-12-25T21:00
+<pre><code>start      : 2019-12-01T00:00
 end        : 2021-12-24T21:00
-cov_start  : 2019-12-25T21:00
+cov_start  : 2019-12-01T00:00
 cov_end    : 2021-12-25T21:00
 targets    : ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-shape      : (17521, 11)</code></pre>
+shape      : (18118, 11)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
@@ -1601,32 +1596,32 @@ shape      : (17521, 11)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
-<td>1782.828059</td>
-<td>2238.445922</td>
+<td data-quarto-table-cell-role="th">2019-12-01 00:00:00+00:00</td>
+<td>-3559.504086</td>
+<td>3362.121912</td>
 <td>NaN</td>
-<td>-681.484981</td>
-<td>4210.035867</td>
-<td>65.138973</td>
-<td>11.604584</td>
-<td>8886.463967</td>
-<td>541.565142</td>
-<td>-304.380545</td>
-<td>-242.209990</td>
+<td>190.074961</td>
+<td>3021.163333</td>
+<td>-51.981414</td>
+<td>13.823206</td>
+<td>5721.520176</td>
+<td>-151.096582</td>
+<td>291.088031</td>
+<td>-211.710112</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
-<td>1589.476196</td>
-<td>1949.805937</td>
+<td data-quarto-table-cell-role="th">2019-12-01 01:00:00+00:00</td>
+<td>-4847.373651</td>
+<td>3545.130408</td>
 <td>NaN</td>
-<td>270.929304</td>
-<td>3545.350084</td>
-<td>50.165714</td>
-<td>17.353879</td>
-<td>6576.533396</td>
-<td>228.936882</td>
-<td>-272.812188</td>
-<td>246.625979</td>
+<td>-594.834822</td>
+<td>2382.217897</td>
+<td>197.430583</td>
+<td>13.096848</td>
+<td>2824.632073</td>
+<td>90.163097</td>
+<td>247.983128</td>
+<td>-274.333392</td>
 </tr>
 </tbody>
 </table>
@@ -1655,7 +1650,7 @@ Why a strict, gap-free hourly index matters
 <p>Stage 2 replaces likely sensor glitches with <code>NaN</code> so Stage 3 can treat them the same way it treats genuine gaps. An Isolation Forest is applied per column with <code>contamination=0.01</code>, meaning about one percent of rows per column should be flagged. The <code>random_state=1234</code> is fixed so two runs on identical input produce identical outlier flags.</p>
 <div id="exm-s2-outliers" class="theorem example">
 <p><span class="theorem-title"><strong>Example 3 (Marking outliers with Isolation Forest)</strong></span> &nbsp;</p>
-<div id="b48968f8" class="cell" data-execution_count="3">
+<div id="af2d06f6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.outlier <span class="im">import</span> mark_outliers</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>data, outliers <span class="op">=</span> mark_outliers(</span>
@@ -1669,31 +1664,31 @@ Why a strict, gap-free hourly index matters
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NaN per column after outlier removal:"</span>)</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data.isna().<span class="bu">sum</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>outliers flagged    : 176
+<pre><code>outliers flagged    : 181
 NaN per column after outlier removal:
-A      176
-B      176
-C    12286
-D      176
-E      174
-F      169
-G      173
-H      175
-I      174
-J      171
-K      176
+A      182
+B      181
+C    12889
+D      181
+E      177
+F      172
+G      182
+H      177
+I      182
+J      181
+K      181
 dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<p>The per-column <code>NaN</code> counts now combine pre-existing gaps (notably the long leading run in column K) with the freshly removed outlier rows. Stage 3 will not distinguish between the two: imputation closes the gaps, and sample weighting penalises the model for paying attention to either source.</p>
+<p>The per-column <code>NaN</code> counts now combine pre-existing gaps (notably the long leading run in column C) with the freshly removed outlier rows. Stage 3 will not distinguish between the two: imputation closes the gaps, and sample weighting penalises the model for paying attention to either source.</p>
 </section>
 <section id="stage-3-imputation-and-sample-weighting" class="level2">
 <h2 class="anchored" data-anchor-id="stage-3-imputation-and-sample-weighting">Stage 3 — Imputation and sample weighting</h2>
 <p><code>get_missing_weights</code> forward- and backward-fills every <code>NaN</code>, then builds a per-row weight series: rows whose <code>window_size=72</code> neighbourhood touched an imputed cell receive weight <code>0</code>; all other rows receive <code>1</code>. The weights are wrapped in a <code>WeightFunction</code>, which is a picklable class that the forecaster can carry into a <code>joblib</code> dump alongside the model itself — a closure would survive <code>pickle.dumps</code> but not a <code>pickle.load</code> in a fresh process.</p>
 <div id="exm-s3-weights" class="theorem example">
 <p><span class="theorem-title"><strong>Example 4 (Imputation count and the weight distribution)</strong></span> &nbsp;</p>
-<div id="a00a4233" class="cell" data-execution_count="4">
+<div id="0e785357" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing <span class="im">import</span> WeightFunction</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.imputation <span class="im">import</span> get_missing_weights</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1712,14 +1707,14 @@ dtype: int64</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>imputed NaN remaining : 0
 weight distribution   :
-0.0    17503
-1.0       18
+0.0    18055
+1.0       63
 Name: count, dtype: int64
 weight_func on first 5 timestamps : None</code></pre>
 </div>
 </div>
 </div>
-<p>The <code>imputed NaN remaining</code> count is zero — every gap is closed. The weight distribution shows how many rows the forecaster will effectively ignore; the bulk of the zero-weighted rows are concentrated at the start of the window where column K had its leading <code>NaN</code> run.</p>
+<p>The <code>imputed NaN remaining</code> count is zero — every gap is closed. The weight distribution shows how many rows the forecaster will effectively ignore; the bulk of the zero-weighted rows are concentrated at the start of the window where column C had its leading <code>NaN</code> run.</p>
 </section>
 <section id="stage-4-exogenous-feature-engineering" class="level2">
 <h2 class="anchored" data-anchor-id="stage-4-exogenous-feature-engineering">Stage 4 — Exogenous feature engineering</h2>
@@ -1728,7 +1723,7 @@ weight_func on first 5 timestamps : None</code></pre>
 <h3 class="anchored" data-anchor-id="stage-4a-calendar-features">Stage 4a — Calendar features</h3>
 <div id="exm-s4a-calendar" class="theorem example">
 <p><span class="theorem-title"><strong>Example 5 (Calendar features from the index alone)</strong></span> &nbsp;</p>
-<div id="e49b0a98" class="cell" data-execution_count="5">
+<div id="a301f6a9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_calendar_features</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>calendar_features <span class="op">=</span> get_calendar_features(</span>
@@ -1742,7 +1737,7 @@ weight_func on first 5 timestamps : None</code></pre>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"columns :"</span>, calendar_features.columns.tolist())</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>calendar_features.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>shape   : (17545, 4)
+<pre><code>shape   : (18142, 4)
 columns : ['month', 'week', 'day_of_week', 'hour']</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -1761,18 +1756,18 @@ columns : ['month', 'week', 'day_of_week', 'hour']</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
+<td data-quarto-table-cell-role="th">2019-12-01 00:00:00+00:00</td>
 <td>12</td>
-<td>52</td>
-<td>2</td>
-<td>21</td>
+<td>48</td>
+<td>6</td>
+<td>0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
+<td data-quarto-table-cell-role="th">2019-12-01 01:00:00+00:00</td>
 <td>12</td>
-<td>52</td>
-<td>2</td>
-<td>22</td>
+<td>48</td>
+<td>6</td>
+<td>1</td>
 </tr>
 </tbody>
 </table>
@@ -1787,7 +1782,7 @@ columns : ['month', 'week', 'day_of_week', 'hour']</code></pre>
 <h3 class="anchored" data-anchor-id="stage-4b-daynight-features">Stage 4b — Day/night features</h3>
 <div id="exm-s4b-daynight" class="theorem example">
 <p><span class="theorem-title"><strong>Example 6 (Sunrise, sunset, and the daylight flag)</strong></span> &nbsp;</p>
-<div id="7e835192" class="cell" data-execution_count="6">
+<div id="f7480df6" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> astral <span class="im">import</span> LocationInfo</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_day_night_features</span>
@@ -1810,8 +1805,8 @@ columns : ['month', 'week', 'day_of_week', 'hour']</code></pre>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"is_daylight mean:"</span>, <span class="bu">round</span>(<span class="bu">float</span>(sun_light_features[<span class="st">"is_daylight"</span>].mean()), <span class="dv">3</span>))</span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>sun_light_features.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>shape           : (17545, 4)
-is_daylight mean: 0.512</code></pre>
+<pre><code>shape           : (18142, 4)
+is_daylight mean: 0.505</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div>
@@ -1829,17 +1824,17 @@ is_daylight mean: 0.512</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
-<td>8</td>
-<td>15</td>
+<td data-quarto-table-cell-role="th">2019-12-01 00:00:00+00:00</td>
 <td>7</td>
+<td>15</td>
+<td>8</td>
 <td>0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
-<td>8</td>
-<td>15</td>
+<td data-quarto-table-cell-role="th">2019-12-01 01:00:00+00:00</td>
 <td>7</td>
+<td>15</td>
+<td>8</td>
 <td>0</td>
 </tr>
 </tbody>
@@ -1868,7 +1863,7 @@ First render needs network
 </div>
 <div id="exm-s4c-weather" class="theorem example">
 <p><span class="theorem-title"><strong>Example 7 (Open-Meteo fetch and rolling weather windows)</strong></span> &nbsp;</p>
-<div id="c23244f8" class="cell" data-execution_count="7">
+<div id="3641ece3" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> get_weather_features</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>weather_features, weather_aligned <span class="op">=</span> get_weather_features(</span>
@@ -1889,8 +1884,8 @@ First render needs network
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"aligned columns        :"</span>, weather_aligned.columns.tolist())</span>
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>weather_aligned.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>weather_features shape : (17545, 105)
-weather_aligned shape  : (17545, 15)
+<pre><code>weather_features shape : (18142, 105)
+weather_aligned shape  : (18142, 15)
 aligned columns        : ['temperature_2m', 'relative_humidity_2m', 'precipitation', 'rain', 'snowfall', 'weather_code', 'pressure_msl', 'surface_pressure', 'cloud_cover', 'cloud_cover_low', 'cloud_cover_mid', 'cloud_cover_high', 'wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m']</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -1920,40 +1915,40 @@ aligned columns        : ['temperature_2m', 'relative_humidity_2m', 'precipitati
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
-<td>4.4</td>
-<td>98</td>
+<td data-quarto-table-cell-role="th">2019-12-01 00:00:00+00:00</td>
+<td>-1.5</td>
+<td>92</td>
 <td>0.0</td>
 <td>0.0</td>
 <td>0.0</td>
-<td>2</td>
-<td>1025.5</td>
-<td>1012.6</td>
-<td>63</td>
-<td>63</td>
 <td>1</td>
+<td>1023.1</td>
+<td>1009.9</td>
+<td>20</td>
 <td>0</td>
-<td>9.4</td>
-<td>252</td>
-<td>18.0</td>
+<td>0</td>
+<td>96</td>
+<td>8.3</td>
+<td>95</td>
+<td>13.3</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
-<td>4.6</td>
-<td>98</td>
+<td data-quarto-table-cell-role="th">2019-12-01 01:00:00+00:00</td>
+<td>-2.0</td>
+<td>92</td>
 <td>0.0</td>
 <td>0.0</td>
 <td>0.0</td>
 <td>3</td>
-<td>1025.7</td>
-<td>1012.8</td>
-<td>100</td>
-<td>100</td>
-<td>1</td>
+<td>1022.5</td>
+<td>1009.3</td>
+<td>99</td>
 <td>0</td>
-<td>8.4</td>
-<td>250</td>
-<td>17.6</td>
+<td>0</td>
+<td>99</td>
+<td>6.5</td>
+<td>96</td>
+<td>14.4</td>
 </tr>
 </tbody>
 </table>
@@ -1968,7 +1963,7 @@ aligned columns        : ['temperature_2m', 'relative_humidity_2m', 'precipitati
 <h3 class="anchored" data-anchor-id="stage-4d-holiday-features">Stage 4d — Holiday features</h3>
 <div id="exm-s4d-holidays" class="theorem example">
 <p><span class="theorem-title"><strong>Example 8 (German public holidays for North Rhine-Westphalia)</strong></span> &nbsp;</p>
-<div id="182b77e1" class="cell" data-execution_count="8">
+<div id="d66966fd" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_holiday_features</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>holiday_features <span class="op">=</span> get_holiday_features(</span>
@@ -1986,8 +1981,8 @@ aligned columns        : ['temperature_2m', 'relative_humidity_2m', 'precipitati
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"flagged holiday hours:"</span>, <span class="bu">int</span>(holiday_features[<span class="st">"is_holiday"</span>].<span class="bu">sum</span>()))</span>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>holiday_features.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>shape                : (17545, 1)
-flagged holiday hours: 529</code></pre>
+<pre><code>shape                : (18142, 1)
+flagged holiday hours: 550</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div>
@@ -2002,12 +1997,12 @@ flagged holiday hours: 529</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
-<td>1</td>
+<td data-quarto-table-cell-role="th">2019-12-01 00:00:00+00:00</td>
+<td>0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
-<td>1</td>
+<td data-quarto-table-cell-role="th">2019-12-01 01:00:00+00:00</td>
+<td>0</td>
 </tr>
 </tbody>
 </table>
@@ -2024,7 +2019,7 @@ flagged holiday hours: 529</code></pre>
 <p>The four feature DataFrames are concatenated column-wise in a fixed order: calendar, day/night, weather, holidays. Any <code>NaN</code> that survived into the concatenated matrix would be a bug — Stage 5 raises before any further work happens. Then <code>apply_cyclical_encoding</code> replaces every periodic integer column (<code>month</code>, <code>week</code>, <code>day_of_week</code>, <code>hour</code>, <code>sunrise_hour</code>, <code>sunset_hour</code>) with its sine and cosine on a unit circle, keeping the original integers alongside, and <code>create_interaction_features</code> emits pairwise products of cyclical, weather, and holiday columns prefixed with <code>poly_</code>.</p>
 <div id="exm-s5-concat-encode" class="theorem example">
 <p><span class="theorem-title"><strong>Example 9 (Concat, NaN guard, cyclical encoding, interactions)</strong></span> &nbsp;</p>
-<div id="618a363c" class="cell" data-execution_count="9">
+<div id="0ed5bb21" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> (</span>
@@ -2058,10 +2053,10 @@ flagged holiday hours: 529</code></pre>
 <span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"number of poly_ columns   :"</span>, <span class="bu">len</span>(poly_cols))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>missing entries in concat : 0
-shape after concat        : (17545, 114)
-shape after cyclical enc  : (17545, 126)
+shape after concat        : (18142, 114)
+shape after cyclical enc  : (18142, 126)
 number of sin/cos columns : 12
-shape after interactions  : (17545, 126)
+shape after interactions  : (18142, 126)
 number of poly_ columns   : 0</code></pre>
 </div>
 </div>
@@ -2085,7 +2080,7 @@ Why sine and cosine
 <p><code>select_exogenous_features</code> returns the final list of column names that will be passed to the forecaster as <code>exog</code>. With the three include flags set to <code>False</code> (the package defaults), the selection keeps only the cyclical sine/cosine columns and the raw weather columns; rolling weather windows, the holiday column, and the polynomial interactions are filtered out.</p>
 <div id="exm-s6-select" class="theorem example">
 <p><span class="theorem-title"><strong>Example 10 (Final exogenous column list)</strong></span> &nbsp;</p>
-<div id="1605ee0c" class="cell" data-execution_count="10">
+<div id="d430cd94" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> select_exogenous_features</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>exog_features <span class="op">=</span> select_exogenous_features(</span>
@@ -2113,7 +2108,7 @@ last 3                  : ['wind_speed_10m', 'wind_direction_10m', 'wind_gusts_1
 <p><code>merge_data_and_covariates</code> performs an inner join of the target columns and the selected exogenous columns over <code>[start, end]</code>, casts every column to <code>float32</code> to halve the memory footprint of the lag matrix, and also returns the slice of the exogenous matrix that covers the future prediction window <code>(end, cov_end]</code>.</p>
 <div id="exm-s7-merge" class="theorem example">
 <p><span class="theorem-title"><strong>Example 11 (Merged training matrix and the future-window slice)</strong></span> &nbsp;</p>
-<div id="4a50ff75" class="cell" data-execution_count="11">
+<div id="4309dc3f" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> merge_data_and_covariates</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>data_with_exog, exo_tmp, exo_pred <span class="op">=</span> merge_data_and_covariates(</span>
@@ -2134,7 +2129,7 @@ last 3                  : ['wind_speed_10m', 'wind_direction_10m', 'wind_gusts_1
 <span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data_with_exog.dtypes.value_counts())</span>
 <span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>data_with_exog.head(<span class="dv">2</span>).iloc[:, :<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>data_with_exog shape : (17521, 38)
+<pre><code>data_with_exog shape : (18118, 38)
 exo_pred       shape : (24, 126)
 dtypes count         :
 float32    38
@@ -2163,18 +2158,18 @@ Name: count, dtype: int64</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2019-12-25 21:00:00+00:00</td>
-<td>1782.828003</td>
-<td>2238.445801</td>
+<td data-quarto-table-cell-role="th">2019-12-01 00:00:00+00:00</td>
+<td>-3559.504150</td>
+<td>3362.121826</td>
 <td>240.210419</td>
-<td>270.929291</td>
+<td>190.074966</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2019-12-25 22:00:00+00:00</td>
-<td>1589.476196</td>
-<td>2238.445801</td>
+<td data-quarto-table-cell-role="th">2019-12-01 01:00:00+00:00</td>
+<td>-4847.373535</td>
+<td>3545.130371</td>
 <td>240.210419</td>
-<td>270.929291</td>
+<td>190.074966</td>
 </tr>
 </tbody>
 </table>
@@ -2190,7 +2185,7 @@ Name: count, dtype: int64</code></pre>
 <p>The split is purely temporal: the first <code>train_ratio=0.8</code> fraction of rows is training data, and the remaining twenty percent goes to validation. The test segment is empty because <code>perc_val = 1 - train_ratio</code> consumes all remaining rows. <code>end_validation</code> is the cutoff timestamp used by <code>forecaster.fit(...)</code>.</p>
 <div id="exm-s8-split" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12 (Temporal split and the validation cutoff)</strong></span> &nbsp;</p>
-<div id="9eb95aa3" class="cell" data-execution_count="12">
+<div id="6b3c39ad" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.splitter.split <span class="im">import</span> split_rel_train_val_test</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>train_ratio <span class="op">=</span> <span class="fl">0.8</span></span>
@@ -2207,8 +2202,8 @@ Name: count, dtype: int64</code></pre>
 <span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"test  rows    :"</span>, <span class="bu">len</span>(data_test))</span>
 <span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"end_validation:"</span>, end_validation)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train rows    : 14017
-val   rows    : 3504
+<pre><code>train rows    : 14494
+val   rows    : 3624
 test  rows    : 0
 end_validation: 2021-12-24 21:00:00+00:00</code></pre>
 </div>
@@ -2234,7 +2229,7 @@ Why temporal, not random
 <p>This is the most expensive cell on the page — eleven LightGBM models on roughly fourteen thousand training rows each. Expect a few minutes on a modern laptop.</p>
 <div id="exm-s9-train" class="theorem example">
 <p><span class="theorem-title"><strong>Example 13 (Eleven forecasters, one shared configuration)</strong></span> &nbsp;</p>
-<div id="e3565129" class="cell" data-execution_count="13">
+<div id="e3a70461" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
@@ -2261,84 +2256,6 @@ Why temporal, not random
 <span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"forecasters trained        :"</span>, <span class="bu">len</span>(recursive_forecasters))</span>
 <span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"estimator type             :"</span>, <span class="bu">type</span>(recursive_forecasters[target_columns[<span class="dv">0</span>]].estimator).<span class="va">__name__</span>)</span>
 <span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n_features_in_ across all  :"</span>, <span class="bu">set</span>(feature_counts.values()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 8 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 4 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 8 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 8 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
 <div class="cell-output cell-output-stdout">
 <pre><code>forecasters trained        : 11
 estimator type             : LGBMRegressor
@@ -2353,7 +2270,7 @@ n_features_in_ across all  : {52}</code></pre>
 <p><code>predict_multivariate</code> iterates over the trained forecasters and calls <code>.predict(steps=forecast_horizon, exog=exo_pred[exog_features])</code> on each. The result is a single DataFrame with one column per target and <code>forecast_horizon</code> rows.</p>
 <div id="exm-s10-predict" class="theorem example">
 <p><span class="theorem-title"><strong>Example 14 (Twenty-four-hour multi-target forecast)</strong></span> &nbsp;</p>
-<div id="e4036cd8" class="cell" data-execution_count="14">
+<div id="f2812d75" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.utils <span class="im">import</span> predict_multivariate</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> predict_multivariate(</span>
@@ -2396,45 +2313,45 @@ last  timestamp   : 2021-12-25 21:00:00+00:00</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2021-12-24 22:00:00+00:00</td>
-<td>5247.88</td>
-<td>4670.41</td>
-<td>-63.68</td>
-<td>730.38</td>
-<td>155.24</td>
-<td>12.86</td>
-<td>45.12</td>
-<td>10575.48</td>
-<td>-20.43</td>
-<td>-185.82</td>
-<td>-221.11</td>
+<td>-783.34</td>
+<td>4188.96</td>
+<td>-497.04</td>
+<td>72.88</td>
+<td>1460.07</td>
+<td>-35.50</td>
+<td>44.40</td>
+<td>8543.76</td>
+<td>-108.32</td>
+<td>-400.02</td>
+<td>-226.03</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">2021-12-24 23:00:00+00:00</td>
-<td>5762.03</td>
-<td>4171.93</td>
-<td>-96.95</td>
-<td>198.17</td>
-<td>851.55</td>
-<td>56.06</td>
-<td>45.75</td>
-<td>10396.29</td>
-<td>-35.12</td>
-<td>403.18</td>
-<td>299.71</td>
+<td>-1911.23</td>
+<td>3427.85</td>
+<td>-91.57</td>
+<td>-381.16</td>
+<td>1314.43</td>
+<td>129.45</td>
+<td>39.64</td>
+<td>7877.67</td>
+<td>-178.98</td>
+<td>-398.70</td>
+<td>-498.15</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2021-12-25 00:00:00+00:00</td>
-<td>5162.34</td>
-<td>4670.41</td>
-<td>-530.50</td>
-<td>248.08</td>
-<td>909.06</td>
-<td>-29.12</td>
-<td>45.53</td>
-<td>11976.10</td>
-<td>-17.62</td>
-<td>322.47</td>
-<td>299.71</td>
+<td>-1907.70</td>
+<td>4048.50</td>
+<td>-403.56</td>
+<td>-378.69</td>
+<td>1345.64</td>
+<td>122.53</td>
+<td>47.88</td>
+<td>7864.84</td>
+<td>-68.93</td>
+<td>-398.86</td>
+<td>-499.13</td>
 </tr>
 </tbody>
 </table>
@@ -2450,7 +2367,7 @@ last  timestamp   : 2021-12-25 21:00:00+00:00</code></pre>
 <p>Stage 10 produced one forecast column per target. The production task closes the pipeline with a weighted aggregation: <code>agg_predict(predictions, weights=weights)</code> reduces the eleven columns to a single Series sharing the <code>DatetimeIndex</code> of <code>exo_pred</code>. The conceptual sibling page explains the helper’s <code>list</code> / <code>np.ndarray</code> / <code>dict</code> accepted forms and the signed-weights convention in its <a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html#aggregation">Aggregation section</a>.</p>
 <div id="exm-aggregation" class="theorem example">
 <p><span class="theorem-title"><strong>Example 15 (Aggregating the eleven per-target forecasts)</strong></span> &nbsp;</p>
-<div id="64e0dc22" class="cell" data-execution_count="15">
+<div id="84a53e5b" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.agg_predict <span class="im">import</span> agg_predict</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>]</span>
@@ -2466,9 +2383,9 @@ first timestamp  : 2021-12-24 22:00:00+00:00
 last  timestamp  : 2021-12-25 21:00:00+00:00</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-<pre><code>2021-12-24 22:00:00+00:00    19958.8620
-2021-12-24 23:00:00+00:00    20931.6714
-2021-12-25 00:00:00+00:00    23034.5964
+<pre><code>2021-12-24 22:00:00+00:00    13979.1714
+2021-12-24 23:00:00+00:00    10813.2073
+2021-12-25 00:00:00+00:00    11889.6782
 Freq: h, dtype: float64</code></pre>
 </div>
 </div>
@@ -2480,7 +2397,7 @@ Freq: h, dtype: float64</code></pre>
 <p>The orchestrator emits a metadata dictionary that records every configuration knob and every shape it just produced — a self-contained audit record. Building the same dictionary by hand is a useful integration check that nothing was lost along the way.</p>
 <div id="exm-meta" class="theorem example">
 <p><span class="theorem-title"><strong>Example 16 (Reconstructing the orchestrator’s metadata)</strong></span> &nbsp;</p>
-<div id="f1f5a7f6" class="cell" data-execution_count="16">
+<div id="10f66ea0" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="op">=</span> {</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"forecast_horizon"</span>: forecast_horizon,</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_columns"</span>: target_columns,</span>
@@ -2489,7 +2406,7 @@ Freq: h, dtype: float64</code></pre>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"train_size"</span>: <span class="bu">len</span>(data_train),</span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"val_size"</span>: <span class="bu">len</span>(data_val),</span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"test_size"</span>: <span class="bu">len</span>(data_test),</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data_shape_original"</span>: data_sliced.shape,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data_shape_original"</span>: data_demo.shape,</span>
 <span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data_shape_merged"</span>: data_with_exog.shape,</span>
 <span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"training_end"</span>: end_validation,</span>
 <span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"prediction_start"</span>: exo_pred.index[<span class="dv">0</span>],</span>
@@ -2515,16 +2432,16 @@ n_exog_features: 27</code></pre>
 </section>
 <section id="cross-check-against-the-orchestrator" class="level2">
 <h2 class="anchored" data-anchor-id="cross-check-against-the-orchestrator">Cross-check against the orchestrator</h2>
-<p>The pipeline above is exactly what <code>n2n_predict_with_covariates</code> does internally. Calling the orchestrator on the same sliced data with the same parameters should yield the same shapes and (modulo any change in Open-Meteo’s historical data between the two calls) the same numerical predictions.</p>
+<p>The pipeline above is exactly what <code>n2n_predict_with_covariates</code> does internally. Calling the orchestrator on the same data with the same parameters should yield the same shapes and (modulo any change in Open-Meteo’s historical data between the two calls) the same numerical predictions.</p>
 <div id="exm-end-to-end" class="theorem example">
 <p><span class="theorem-title"><strong>Example 17 (Single-call equivalence)</strong></span> &nbsp;</p>
-<div id="c859f15c" class="cell" data-execution_count="17">
+<div id="cc259127" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.n2n_predict_with_covariates <span class="im">import</span> (</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    n2n_predict_with_covariates,</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>predictions_full, metadata_full, forecasters_full <span class="op">=</span> n2n_predict_with_covariates(</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data_sliced,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data_demo,</span>
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    forecast_horizon<span class="op">=</span><span class="dv">24</span>,</span>
 <span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">24</span>,</span>
 <span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
@@ -2536,7 +2453,7 @@ n_exog_features: 27</code></pre>
 <span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
 <span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">"NW"</span>,</span>
 <span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    force_train<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    model_dir<span class="op">=</span><span class="bu">str</span>(cache_home <span class="op">/</span> <span class="st">"demo100_forecasters"</span>),</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    model_dir<span class="op">=</span><span class="bu">str</span>(cache_home <span class="op">/</span> <span class="st">"demo10_forecasters"</span>),</span>
 <span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    show_progress<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -2548,84 +2465,6 @@ n_exog_features: 27</code></pre>
 <span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n_exog (manual)    :"</span>, metadata[<span class="st">"n_exog_features"</span>])</span>
 <span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n_exog (orch)      :"</span>, metadata_full[<span class="st">"n_exog_features"</span>])</span>
 <span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>predictions_full.head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 8 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 4 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 8 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 8 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ffaf00; text-decoration-color: #ffaf00">╭─────────────────────────────── IgnoredArgumentWarning ───────────────────────────────╮</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> The number of bins has been reduced from 10 to 9 due to duplicated edges caused by   <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> repeated predicted values.                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
 <div class="cell-output cell-output-stdout">
 <pre><code>step-by-step shape : (24, 11)
 orchestrator shape : (24, 11)
@@ -2656,45 +2495,45 @@ n_exog (orch)      : 27</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2021-12-24 22:00:00+00:00</td>
-<td>5247.88</td>
-<td>4670.41</td>
-<td>-63.68</td>
-<td>730.38</td>
-<td>155.24</td>
-<td>12.86</td>
-<td>45.12</td>
-<td>10575.48</td>
-<td>-20.43</td>
-<td>-185.82</td>
-<td>-221.11</td>
+<td>-783.34</td>
+<td>4188.96</td>
+<td>-497.04</td>
+<td>72.88</td>
+<td>1460.07</td>
+<td>-35.50</td>
+<td>44.40</td>
+<td>8543.76</td>
+<td>-108.32</td>
+<td>-400.02</td>
+<td>-226.03</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">2021-12-24 23:00:00+00:00</td>
-<td>5762.03</td>
-<td>4171.93</td>
-<td>-96.95</td>
-<td>198.17</td>
-<td>851.55</td>
-<td>56.06</td>
-<td>45.75</td>
-<td>10396.29</td>
-<td>-35.12</td>
-<td>403.18</td>
-<td>299.71</td>
+<td>-1911.23</td>
+<td>3427.85</td>
+<td>-91.57</td>
+<td>-381.16</td>
+<td>1314.43</td>
+<td>129.45</td>
+<td>39.64</td>
+<td>7877.67</td>
+<td>-178.98</td>
+<td>-398.70</td>
+<td>-498.15</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2021-12-25 00:00:00+00:00</td>
-<td>5162.34</td>
-<td>4670.41</td>
-<td>-530.50</td>
-<td>248.08</td>
-<td>909.06</td>
-<td>-29.12</td>
-<td>45.53</td>
-<td>11976.10</td>
-<td>-17.62</td>
-<td>322.47</td>
-<td>299.71</td>
+<td>-1907.70</td>
+<td>4048.50</td>
+<td>-403.56</td>
+<td>-378.69</td>
+<td>1345.64</td>
+<td>122.53</td>
+<td>47.88</td>
+<td>7864.84</td>
+<td>-68.93</td>
+<td>-398.86</td>
+<td>-499.13</td>
 </tr>
 </tbody>
 </table>
@@ -3145,7 +2984,7 @@ n_exog (orch)      : 27</code></pre>
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tutorials/n2n_predict_with_covariates_demo100.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tutorials/n2n_predict_with_covariates_demo10.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
