@@ -85,3 +85,21 @@ def test_uncovered_index_raises(backtest_result):
     y, _, _, predictions_df = backtest_result
     with pytest.raises(ValueError, match="cover"):
         metrics_per_fold(predictions_df, y.iloc[:10])
+
+
+def test_not_a_dataframe_raises():
+    with pytest.raises(ValueError, match="must be a pandas DataFrame"):
+        metrics_per_fold([1, 2, 3], pd.Series([1.0, 2.0, 3.0]))
+
+
+def test_missing_pred_column_raises(backtest_result):
+    y, _, _, predictions_df = backtest_result
+    bad = predictions_df.drop(columns=["pred"])
+    with pytest.raises(ValueError, match="pred"):
+        metrics_per_fold(bad, y)
+
+
+def test_empty_predictions_raises():
+    empty = pd.DataFrame({"fold": [], "pred": []})
+    with pytest.raises(ValueError, match="empty"):
+        metrics_per_fold(empty, pd.Series([1.0], index=pd.RangeIndex(1)))
