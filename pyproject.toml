@@ -52,8 +52,8 @@ dev = [
     "pytest-anyio>=0.0.0,<1.0",
     "pytest-cov>=6.0.0,<7.0",
     # ── Linting / formatting ─────────────────────────────────────────────────
-    "black>=24.1.0,<25.0",
-    "isort>=5.13.0,<6.0",
+    "black>=24.1.0,<27.0",
+    "isort>=5.13.0,<9.0",
     "ruff>=0.3.0,<1.0",
     # ── Security scanning ────────────────────────────────────────────────────
     "safety>=3.0.0,<4.0",
@@ -66,8 +66,8 @@ dev = [
 dev = [
     "pytest>=9.0.2,<10.0",
     "pytest-cov>=6.0.0,<7.0",
-    "black>=24.1.0,<25.0",
-    "isort>=5.13.0,<6.0",
+    "black>=24.1.0,<27.0",
+    "isort>=5.13.0,<9.0",
     "ruff>=0.3.0,<1.0",
     # Documentation — replaces MkDocs stack
     "quartodoc>=0.9.1,<1.0",
@@ -100,3 +100,16 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+
+# Pin black to the project's Python floor so its target-version inference is
+# deterministic. Without this, black >=26 may infer a newer target (e.g. py315)
+# and emit an AST-safety warning when run on the 3.13 CI interpreter.
+[tool.black]
+target-version = ["py313"]
+
+# Make the black profile the default for every isort invocation (CI runs the
+# bare `isort --check-only src/ tests/`). isort >=8 changed its default
+# multi-line output to a backslash style that is incompatible with black; the
+# explicit profile keeps the two formatters in agreement regardless of version.
+[tool.isort]
+profile = "black"
