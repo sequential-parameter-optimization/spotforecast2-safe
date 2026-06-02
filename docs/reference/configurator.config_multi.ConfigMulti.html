@@ -973,6 +973,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">load_iteration</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.trainer.should_retrain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">should_retrain</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1012,6 +1018,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/manager.features.get_target_data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_target_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/manager.features.select_top_poly_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">select_top_poly_features</span></a>
   </div>
 </li>
       </ul>
@@ -1438,52 +1450,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    end_train_default<span class="op">=</span><span class="st">'2025-12-31 00:00+00:00'</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    delta_val<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">24</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    refit_size<span class="op">=</span><span class="dv">7</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">314159</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    n_hyperparameters_trials<span class="op">=</span><span class="dv">20</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    data_filename<span class="op">=</span><span class="st">'interim/energy_load.csv'</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    targets<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    use_outlier_detection<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.01</span>,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    imputation_method<span class="op">=</span><span class="st">'weighted'</span>,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    imputation_window_size<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    use_exogenous_features<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">'NW'</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    poly_features_degree<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    max_poly_features<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    index_name<span class="op">=</span><span class="st">'DateTime'</span>,</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    start_download<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    end_download<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    data_start<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    data_end<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    n_jobs_spotoptim<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    test_data_loader<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    data_frame_name<span class="op">=</span><span class="st">'default'</span>,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    cv_block_size<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    refit_size<span class="op">=</span><span class="dv">7</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">314159</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    n_hyperparameters_trials<span class="op">=</span><span class="dv">20</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    data_filename<span class="op">=</span><span class="st">'interim/energy_load.csv'</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    targets<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    use_outlier_detection<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.01</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    imputation_method<span class="op">=</span><span class="st">'weighted'</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    window_size<span class="op">=</span><span class="dv">72</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    imputation_window_size<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    use_exogenous_features<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.5136</span>,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.4653</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    state<span class="op">=</span><span class="st">'NW'</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    poly_features_degree<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    max_poly_features<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    index_name<span class="op">=</span><span class="st">'DateTime'</span>,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    start_download<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    end_download<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    data_start<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    data_end<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    n_jobs_spotoptim<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    test_data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    data_frame_name<span class="op">=</span><span class="st">'default'</span>,</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the multi-input forecasting pipeline.</p>
 <p>This class manages all configuration parameters for the multi-input task, including training/prediction intervals, data sources, and feature engineering specifications. All parameters can be customized during initialization or used with sensible defaults.</p>
 <p><code>country_code</code> serves as the single ISO country code used for both API queries and holiday feature generation.</p>
@@ -1542,240 +1555,246 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>24</code></td>
 </tr>
 <tr class="even">
+<td>cv_block_size</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> | None</td>
+<td>Cross-validation test-block width in hours. Defaults to <code>None</code>, meaning the CV uses <code>predict_size</code>. Set to a fixed value (e.g.&nbsp;<code>24</code>) to decouple the cross-validation horizon from a render-dependent live <code>predict_size</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
 <td>refit_size</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of days between model refits.</td>
 <td><code>7</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>random_state</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Random seed for reproducibility.</td>
 <td><code>314159</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>n_hyperparameters_trials</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of trials for hyperparameter optimization.</td>
 <td><code>20</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>data_filename</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Path to the interim merged data file.</td>
 <td><code>'interim/energy_load.csv'</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>targets</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]]</td>
 <td>List of target column names to train models for. When <code>None</code> (default), no targets are pre-selected; set this attribute after loading the dataset (e.g.&nbsp;<code>config.targets = df.columns.tolist()</code>). Replaces standalone <code>TARGETS</code> and <code>target_columns</code> variables in pipeline scripts, providing a single source of truth for the active target set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>use_outlier_detection</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If True, apply IsolationForest-based outlier removal.</td>
 <td><code>True</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>contamination</td>
 <td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
 <td>Proportion of outliers for IsolationForest (0 &lt; contamination &lt; 0.5).</td>
 <td><code>0.01</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>imputation_method</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Gap-filling strategy — <code>"weighted"</code> (n2n-style rolling weights) or <code>"linear"</code> (linear interpolation).</td>
 <td><code>'weighted'</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>window_size</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Rolling window size in hours for gap detection (weighted imputation).</td>
 <td><code>72</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>use_exogenous_features</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If True, build weather/calendar/day-night/holiday features.</td>
 <td><code>True</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>latitude</td>
 <td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
 <td>Latitude of the target location in decimal degrees.</td>
 <td><code>51.5136</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>longitude</td>
 <td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
 <td>Longitude of the target location in decimal degrees.</td>
 <td><code>7.4653</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>timezone</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>IANA timezone string for the target location (e.g.&nbsp;<code>"Europe/Berlin"</code>).</td>
 <td><code>'UTC'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>state</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>ISO 3166-2 subdivision code for regional holidays (e.g.&nbsp;<code>"NW"</code>).</td>
 <td><code>'NW'</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>include_weather_windows</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If True, include rolling weather-window features.</td>
 <td><code>False</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>include_holiday_features</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If True, include public-holiday indicator features.</td>
 <td><code>False</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>poly_features_degree</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Polynomial-interaction degree. <code>1</code> (default) generates no interactions; <code>2</code> adds pairwise bilinear terms; <code>3+</code> higher order.</td>
 <td><code>1</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>max_poly_features</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Cap on polynomial interaction columns; only the top <code>max_poly_features</code> ranked by mutual information with the target are kept (<code>&lt;= 0</code> disables). Defaults to <code>10</code>.</td>
 <td><code>10</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>index_name</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Name assigned to the datetime column when the index is reset. Defaults to <code>"DateTime"</code>.</td>
 <td><code>'DateTime'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>start_download</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
 <td>Start of the download/data range as a string (format <code>"YYYYMMDDHHMM"</code>). Derived from the loaded dataset; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>end_download</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
 <td>End of the download/data range as a string (format <code>"YYYYMMDDHHMM"</code>). Derived from the loaded dataset; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>data_start</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
 <td>First timestamp of the pipeline data range. Derived from the loaded dataset via <code>get_start_end()</code>; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>data_end</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
 <td>Last timestamp of the pipeline data range. Derived from the loaded dataset via <code>get_start_end()</code>; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>cov_start</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
 <td>Start of the covariate range (same as <code>data_start</code>). Derived from the loaded dataset via <code>get_start_end()</code>; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>cov_end</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
 <td>End of the covariate range (extends <code>data_end</code> by <code>predict_size</code> hours). Derived via <code>get_start_end()</code>; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>bounds</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>]]</td>
 <td>Per-column outlier bounds as a list of <code>(lower, upper)</code> tuples, one entry per target column. <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>verbose</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, enable verbose output for pipeline steps. Defaults to <code>False</code>.</td>
 <td><code>False</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>cache_home</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
 <td>Path to the cache directory. <code>None</code> means the library default (<code>~/spotforecast2_cache/</code>) is used.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>end_train_ts</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
 <td>End of the training window. Derived from <code>end_train_default</code> after data loading; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>start_train_ts</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
 <td>Start of the training window. Derived as <code>end_train_ts - train_size</code> after data loading; <code>None</code> until set.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>n_trials_optuna</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of Optuna Bayesian-search trials for hyperparameter optimization (task 3). Defaults to <code>15</code>.</td>
 <td><code>15</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>n_trials_spotoptim</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of SpotOptim surrogate-search trials (task 4). Defaults to <code>10</code>.</td>
 <td><code>10</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>n_initial_spotoptim</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Number of initial random evaluations for SpotOptim (task 4). Defaults to <code>5</code>.</td>
 <td><code>5</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>n_jobs_spotoptim</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]</td>
 <td>Worker count for SpotOptim’s parallel (steady-state) evaluation. <code>None</code> (default) runs sequentially; <code>-1</code> uses all CPU cores; a positive integer pins the worker count. Parallel tuning is faster but, being steady-state, changes the search trajectory, so the tuned result is not bit-identical to a sequential run even with a fixed <code>random_state</code>.</td>
 <td><code>None</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>warm_start_lags</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>When True, the SpotOptim task injects <code>lags_consider</code> as a candidate lag set and seeds the optimizer’s first evaluation with it. Defaults to <code>False</code>.</td>
 <td><code>False</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>task</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Active prediction task — one of <code>"lazy"</code>, <code>"training"</code>, <code>"optuna"</code>, or <code>"spotoptim"</code>. Defaults to <code>"lazy"</code>.</td>
 <td><code>'lazy'</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>agg_weights</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]]</td>
 <td>Per-target aggregation weights used when combining individual target forecasts into a single weighted sum. The list must contain one weight per entry in <code>targets</code> (in the same order). Positive values add the target’s contribution; negative values invert it. Slice the list to <code>agg_weights[:len(targets)]</code> when only a subset of targets is active. Defaults to <code>None</code> (no weights pre-defined; set after loading the dataset).</td>
 <td><code>None</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>auto_save_models</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>Whether <code>BaseTask._run_strategy</code> should persist fitted forecasters to <code>&lt;cache_home&gt;/models/</code> after every training run. Defaults to <code>True</code> so that saved models are immediately available for <code>PredictTask</code> without an explicit <code>save_models()</code> call.</td>
 <td><code>True</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>data_frame_name</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
 <td>Identifier for the active dataset. Used by <code>BaseTask</code> to name cache subdirectories, model files, and the per-dataset log file. Defaults to <code>"default"</code>.</td>
 <td><code>'default'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>on_weather_failure</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>['raise', 'skip']</td>
 <td>Policy for handling Open-Meteo fetch failures inside <code>BaseTask.build_exogenous_features</code>. <code>"raise"</code> (default) aborts the pipeline with a <code>WeatherFetchError</code> and preserves the safety-critical fail-safe semantics. <code>"skip"</code> logs a warning and continues with empty weather features so the rest of the pipeline can run without the Open-Meteo dependency.</td>
@@ -2040,7 +2059,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="50c0872b" class="cell" data-execution_count="1">
+<div id="849cdff1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
@@ -2185,7 +2204,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="a3bff267" class="cell" data-execution_count="2">
+<div id="292c4284" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -2266,7 +2285,7 @@ agg_weights: None</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="8cd531b3" class="cell" data-execution_count="3">
+<div id="5e9fd483" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
