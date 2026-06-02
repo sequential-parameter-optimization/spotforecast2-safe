@@ -1,0 +1,12 @@
+{
+  "hash": "bf1926bbc521e93ae7d34196840c9fc0",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.curate_data.curate_weather\n---\n\n\n\n```python\npreprocessing.curate_data.curate_weather(weather_df, data, forecast_horizon)\n```\n\nChecks if the weather dataframe has the correct shape.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name             | Type                                           | Description                               | Default    |\n|------------------|------------------------------------------------|-------------------------------------------|------------|\n| weather_df       | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame containing weather information. | _required_ |\n| data             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | The main dataset.                         | _required_ |\n| forecast_horizon | [int](`int`)                                   | The forecast horizon in hours.            | _required_ |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#a4ecede6 .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.curate_data import curate_weather\n\nFORECAST_HORIZON = 24\nn_data = 48\ndata = pd.DataFrame(\n    {\"load\": range(n_data)},\n    index=pd.date_range(\"2023-01-01\", periods=n_data, freq=\"h\", tz=\"UTC\"),\n)\nweather_df = pd.DataFrame(\n    {\"temp\": range(n_data + FORECAST_HORIZON)},\n    index=pd.date_range(\n        \"2023-01-01\", periods=n_data + FORECAST_HORIZON, freq=\"h\", tz=\"UTC\"\n    ),\n)\ncurate_weather(weather_df, data, forecast_horizon=FORECAST_HORIZON)\nassert weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON\nprint(\"weather_df shape is correct:\", weather_df.shape[0] == data.shape[0] + FORECAST_HORIZON)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nweather_df shape is correct: True\n```\n:::\n:::\n\n\n## Notes {.doc-section .doc-section-notes}\n\nIf the weather dataframe does not have the expected number of rows, a\ndiagnostic message describing the mismatch is logged via ``print`` and\nthe function returns ``None`` without raising.\n\n",
+    "supporting": [
+      "preprocessing.curate_data.curate_weather_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

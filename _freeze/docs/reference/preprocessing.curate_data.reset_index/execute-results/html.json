@@ -1,0 +1,12 @@
+{
+  "hash": "8bdd230e79334d786191ac938687c1f7",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.curate_data.reset_index\n---\n\n\n\n```python\npreprocessing.curate_data.reset_index(df, index_name='DateTime', timezone='UTC')\n```\n\nResets the index of the dataframe and assigns a name to the index column.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name       | Type                                           | Description                                                                    | Default      |\n|------------|------------------------------------------------|--------------------------------------------------------------------------------|--------------|\n| df         | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | The input dataframe with a datetime index.                                     | _required_   |\n| index_name | [str](`str`)                                   | The name to assign to the index column after resetting. Default is \"DateTime\". | `'DateTime'` |\n| timezone   | [str](`str`)                                   | The timezone to localize the index to if it is naive. Default is \"UTC\".        | `'UTC'`      |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                           | Description                                       |\n|--------|------------------------------------------------|---------------------------------------------------|\n|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: The dataframe with the reset index. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#293861da .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.preprocessing.curate_data import reset_index\ndate_rng = pd.date_range(start='2023-01-01', end='2023-01-02', freq='h')\ndata = pd.DataFrame(date_rng, columns=['date'])\ndata.set_index('date', inplace=True)\ndata['value'] = range(len(data))\nreset_data = reset_index(data, index_name='DateTime')\nprint(reset_data.head())\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n                   DateTime  value\n0 2023-01-01 00:00:00+00:00      0\n1 2023-01-01 01:00:00+00:00      1\n2 2023-01-01 02:00:00+00:00      2\n3 2023-01-01 03:00:00+00:00      3\n4 2023-01-01 04:00:00+00:00      4\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "preprocessing.curate_data.reset_index_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

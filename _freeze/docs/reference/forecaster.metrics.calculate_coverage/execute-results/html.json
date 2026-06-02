@@ -1,0 +1,12 @@
+{
+  "hash": "b168d5dd290ee52fe0d8de5057051b27",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.metrics.calculate_coverage\n---\n\n\n\n```python\nforecaster.metrics.calculate_coverage(y_true, lower_bound, upper_bound)\n```\n\nCalculate coverage of a given interval.\n\nCoverage is the proportion of true values that fall within the interval.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name        | Type                                                                                 | Description                         | Default    |\n|-------------|--------------------------------------------------------------------------------------|-------------------------------------|------------|\n| y_true      | [np](`numpy`).[ndarray](`numpy.ndarray`) \\| [pd](`pandas`).[Series](`pandas.Series`) | True values of the target variable. | _required_ |\n| lower_bound | [np](`numpy`).[ndarray](`numpy.ndarray`) \\| [pd](`pandas`).[Series](`pandas.Series`) | Lower bound of the interval.        | _required_ |\n| upper_bound | [np](`numpy`).[ndarray](`numpy.ndarray`) \\| [pd](`pandas`).[Series](`pandas.Series`) | Upper bound of the interval.        | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type             | Description               |\n|--------|------------------|---------------------------|\n|        | [float](`float`) | Coverage of the interval. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#d9748f54 .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nfrom spotforecast2_safe.forecaster.metrics import calculate_coverage\n\ny_true = np.array([1, 2, 3, 4, 5])\nlower_bound = np.array([0.5, 1.5, 2.5, 3.5, 4.5])\nupper_bound = np.array([1.5, 2.5, 3.5, 4.5, 5.5])\ncoverage = calculate_coverage(y_true, lower_bound, upper_bound)\nprint(coverage == 1.0)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTrue\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.metrics.calculate_coverage_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

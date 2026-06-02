@@ -1,0 +1,12 @@
+{
+  "hash": "2d3a3eac3bd6228a3c77003235c51164",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.metrics.crps_from_predictions\n---\n\n\n\n```python\nforecaster.metrics.crps_from_predictions(y_true, y_pred)\n```\n\nCompute the Continuous Ranked Probability Score (CRPS) from predictions.\n\nThe CRPS compares the empirical distribution of a set of forecasted values\nto a scalar observation. The smaller the CRPS, the better.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name   | Type                                     | Description                                                                                                     | Default    |\n|--------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------|------------|\n| y_true | [float](`float`)                         | The true value of the random variable.                                                                          | _required_ |\n| y_pred | [np](`numpy`).[ndarray](`numpy.ndarray`) | The predicted values of the random variable. These are the multiple forecasted values for a single observation. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type             | Description     |\n|--------|------------------|-----------------|\n|        | [float](`float`) | The CRPS score. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#0ab72812 .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nfrom spotforecast2_safe.forecaster.metrics import crps_from_predictions\n\ny_true = 5.0\ny_pred = np.array([4.5, 5.1, 4.9, 5.3, 4.7])\ncrps = crps_from_predictions(y_true, y_pred)\nprint(crps >= 0)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTrue\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.metrics.crps_from_predictions_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

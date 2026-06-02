@@ -1,0 +1,12 @@
+{
+  "hash": "1a8bda839c3c7499b7e8144f5896810a",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: security.masking.mask_estimator\n---\n\n\n\n```python\nsecurity.masking.mask_estimator(estimator)\n```\n\nReturn a non-sensitive string representation of an estimator.\n\nLogs the estimator *type* without exposing its hyperparameters or any other\nconfiguration. This is the safe form to emit at INFO level when the actual\nestimator object may carry tuning details that should not be persisted in\nlog aggregation systems (CWE-532).\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                | Description                                                                                                                     | Default    |\n|-----------|---------------------|---------------------------------------------------------------------------------------------------------------------------------|------------|\n| estimator | [Any](`typing.Any`) | An estimator instance, an estimator name (string), or ``None``. When ``None``, the default project estimator label is returned. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type         | Description                                            |\n|--------|--------------|--------------------------------------------------------|\n|        | [str](`str`) | A short, safe string identifying the estimator family. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#77b419ad .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.security.masking import mask_estimator\n\nmask_estimator(None)\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```\n'LGBMRegressor (default)'\n```\n:::\n:::\n\n\n::: {#6cece626 .cell execution_count=2}\n``` {.python .cell-code}\nmask_estimator(\"ForecasterRecursive\")\n```\n\n::: {.cell-output .cell-output-display execution_count=2}\n```\n'ForecasterRecursive'\n```\n:::\n:::\n\n\n::: {#505f9294 .cell execution_count=3}\n``` {.python .cell-code}\nfrom sklearn.linear_model import Ridge\nmask_estimator(Ridge(alpha=42.0))\n```\n\n::: {.cell-output .cell-output-display execution_count=3}\n```\n'Ridge'\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "security.masking.mask_estimator_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

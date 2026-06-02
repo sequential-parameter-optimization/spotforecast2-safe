@@ -1,0 +1,12 @@
+{
+  "hash": "a8642d744f2f280a7e0b197a5f039227",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.checking.check_y\n---\n\n\n\n```python\npreprocessing.checking.check_y(y, series_id='`y`')\n```\n\nValidate that y is a pandas Series without missing values.\n\nThis function ensures that the input time series meets the basic requirements\nfor forecasting: it must be a pandas Series and must not contain any NaN values.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                | Description                                                         | Default    |\n|-----------|---------------------|---------------------------------------------------------------------|------------|\n| y         | [Any](`typing.Any`) | Time series values to validate.                                     | _required_ |\n| series_id | [str](`str`)        | Identifier of the series used in error messages. Defaults to \"`y`\". | `'`y`'`    |\n\n## Raises {.doc-section .doc-section-raises}\n\n| Name   | Type                       | Description                         |\n|--------|----------------------------|-------------------------------------|\n|        | [TypeError](`TypeError`)   | If y is not a pandas Series.        |\n|        | [ValueError](`ValueError`) | If y contains missing (NaN) values. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#3aefd99a .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nimport pandas as pd\n\nfrom spotforecast2_safe.preprocessing.checking import check_y\n\n# Valid series — no error raised\ny = pd.Series([1, 2, 3, 4, 5])\ncheck_y(y)\n\n# Invalid: not a Series\ntry:\n    check_y([1, 2, 3])\nexcept TypeError as e:\n    print(f\"TypeError: {e}\")\n\n# Invalid: contains NaN\ny_with_nan = pd.Series([1, 2, np.nan, 4])\ntry:\n    check_y(y_with_nan)\nexcept ValueError as e:\n    print(f\"ValueError: {e}\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTypeError: `y` must be a pandas Series with a DatetimeIndex or a RangeIndex. Found <class 'list'>.\nValueError: `y` has missing values.\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "preprocessing.checking.check_y_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

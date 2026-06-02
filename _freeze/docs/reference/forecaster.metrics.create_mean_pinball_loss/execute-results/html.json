@@ -1,0 +1,12 @@
+{
+  "hash": "044f5da441c640f4284f4686fd237ada",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: forecaster.metrics.create_mean_pinball_loss\n---\n\n\n\n```python\nforecaster.metrics.create_mean_pinball_loss(alpha)\n```\n\nCreate pinball loss for a given quantile.\n\nAlso known as quantile loss. Internally, it uses the `mean_pinball_loss`\nfunction from scikit-learn.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name   | Type             | Description                                                                            | Default    |\n|--------|------------------|----------------------------------------------------------------------------------------|------------|\n| alpha  | [float](`float`) | Quantile for which the Pinball loss is calculated. Must be between 0 and 1, inclusive. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                   | Description                                        |\n|--------|------------------------|----------------------------------------------------|\n|        | [callable](`callable`) | Mean Pinball loss function for the given quantile. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#29970d4f .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nfrom spotforecast2_safe.forecaster.metrics import create_mean_pinball_loss\n\npinball_loss_50 = create_mean_pinball_loss(alpha=0.5)\ny_true = np.array([1, 2, 3, 4, 5])\ny_pred = np.array([1.1, 1.9, 3.2, 3.8, 5.1])\nloss = pinball_loss_50(y_true, y_pred)\nprint(loss >= 0)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nTrue\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "forecaster.metrics.create_mean_pinball_loss_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
