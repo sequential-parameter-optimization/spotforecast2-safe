@@ -340,6 +340,7 @@ def main(argv: List[str] | None = None) -> int:
 
     state = build_synthetic_inputs(args.seed, args.weather_vars)
     timings: Dict[str, List[float]] = {}
+    profiler: cProfile.Profile | None = None
 
     if args.profile:
         profiler = cProfile.Profile()
@@ -357,7 +358,7 @@ def main(argv: List[str] | None = None) -> int:
     )
     total = time.perf_counter() - t_total
 
-    if args.profile:
+    if args.profile and profiler is not None:
         profiler.disable()
         stream = io.StringIO()
         pstats.Stats(profiler, stream=stream).sort_stats("cumtime").print_stats(25)
