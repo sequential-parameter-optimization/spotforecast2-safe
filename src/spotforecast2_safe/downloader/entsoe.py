@@ -85,6 +85,11 @@ logger = logging.getLogger(__name__)
 _MAX_RETRIES = 5
 _RETRY_BACKOFF_SECONDS = 5
 _COOLDOWN_HOURS = 24
+# How far an incremental download may reach back to re-fetch hours whose
+# "Actual Load" is still missing in the interim file (late publication /
+# transparency-platform outages). Bounds the heal window so a structurally
+# empty column cannot trigger an unbounded re-pull.
+_MAX_BACKFILL_DAYS = 7
 
 
 def merge_build_manual(
@@ -97,8 +102,15 @@ def merge_build_manual(
 
     This function looks for all `.csv` files in `get_data_home() / "raw"`
     (or, when *raw_subdir* is given, in `get_data_home() / "raw" / raw_subdir`),
-    sorts them by time index, and saves the unique combined data to
+    merges them oldest-download-first (file mtime, filename as tiebreaker),
+    and saves the unique combined data to
     `get_data_home() / "interim" / output_file`.
+
+    Timestamps covered by several raw files are collapsed cell-wise: per
+    column, the newest non-missing value wins. A newer pull therefore
+    revises older values, while a raw file that holds NaN for hours another
+    pull has filled in (e.g. a pull made before ENTSO-E published a day's
+    `Actual Load`) can never mask those values in the interim file.
 
     Namespacing raw files by *raw_subdir* keeps the day-ahead side-tables
     (``renewable_forecast.csv``, ``day_ahead_price.csv``) from clobbering the
@@ -169,8 +181,14 @@ def merge_build_manual(
 
     logger.info("Merging raw files from %s...", raw_dir)
 
+    # Merge oldest pull first so that, for timestamps covered by several raw
+    # files, the most recent download wins below. Path.glob() returns files
+    # in arbitrary filesystem order; sorting by mtime (name as tiebreaker)
+    # makes the merge deterministic and recency-aware.
+    raw_files = sorted(raw_dir.glob("*.csv"), key=lambda p: (p.stat().st_mtime, p.name))
+
     list_dfs = []
-    for csv_file in raw_dir.glob("*.csv"):
+    for csv_file in raw_files:
         try:
             df = pd.read_csv(csv_file)
             # Assuming 'Time (UTC)' is the index name as per spotprivate config
@@ -200,8 +218,16 @@ def merge_build_manual(
         logger.info("No valid raw data files found for merging.")
         return
 
+    # Collapse duplicate timestamps cell-wise: per column, the last (i.e.
+    # newest, given the mtime sort above) non-missing value wins. ENTSO-E
+    # publishes "Actual Load" with a lag and occasionally backfills it days
+    # later, so an early pull can legitimately hold NaN for hours that a
+    # later pull fills in -- and a stale partial pull still sitting in raw/
+    # must never mask values a newer pull already delivered. Revisions stay
+    # possible (a newer non-missing value replaces an older one); only a
+    # regression from value to NaN is ignored.
     merged_df = pd.concat(list_dfs)
-    merged_df = merged_df[~merged_df.index.duplicated(keep="last")].sort_index()
+    merged_df = merged_df.groupby(level=0).last()
 
     # Filter out future data points if any (only keep what's theoretically
     # "actual" up to now). Skipped when keep_forecast_future is True, so the
@@ -229,7 +255,12 @@ def download_new_data(
 
     This function queries the ENTSO-E Transparency Platform for a given period.
     If no start date is provided, it automatically resumes from the last
-    available data point.
+    available data point. Should the trailing rows hold a published
+    day-ahead forecast but no `Actual Load` yet (ENTSO-E publishes actuals
+    with a lag and occasionally backfills them days later), the fetch window
+    is extended back to the first hour whose actuals are still missing,
+    bounded by ``_MAX_BACKFILL_DAYS``, so late-published values heal
+    automatically on the next incremental download.
 
     Args:
         api_key: The ENTSO-E API key.
@@ -337,6 +368,31 @@ def download_new_data(
                 observed.index[-1] if not observed.empty else current_data.index[-1]
             )
             start_date = last_observed + pd.Timedelta(hours=1)
+            # ENTSO-E publishes "Actual Load" with a lag and occasionally
+            # backfills it days later. Rows for those hours already exist in
+            # the interim (the day-ahead forecast is published early), so
+            # resuming strictly from the last row would never re-fetch them.
+            # If actuals are missing at the tail, restart the fetch at the
+            # first missing hour instead, bounded by _MAX_BACKFILL_DAYS.
+            if not observed.empty and "Actual Load" in getattr(
+                observed, "columns", ()
+            ):
+                backfill_floor = start_date - pd.Timedelta(days=_MAX_BACKFILL_DAYS)
+                last_valid_actual = observed["Actual Load"].last_valid_index()
+                backfill_start = (
+                    backfill_floor
+                    if last_valid_actual is None
+                    else max(
+                        last_valid_actual + pd.Timedelta(hours=1), backfill_floor
+                    )
+                )
+                if backfill_start < start_date:
+                    logger.info(
+                        "Actual Load is missing from %s onwards; extending the "
+                        "fetch window to heal it.",
+                        backfill_start,
+                    )
+                    start_date = backfill_start
             logger.info(
                 "No start date provided. Resuming from last data point: %s", start_date
             )
