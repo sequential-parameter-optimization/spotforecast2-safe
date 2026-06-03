@@ -100,6 +100,9 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "slow: long-running performance guards (deselect with -m 'not slow')",
+]
 
 # Pin black to the project's Python floor so its target-version inference is
 # deterministic. Without this, black >=26 may infer a newer target (e.g. py315)

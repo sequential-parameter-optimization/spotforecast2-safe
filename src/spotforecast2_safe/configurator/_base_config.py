@@ -151,7 +151,8 @@ def validate_config(config: object) -> None:
 
     Raises:
         ValueError: For a non-positive ``predict_size``, a ``contamination``
-            outside ``[0, 0.5]``, a ``poly_features_degree`` below 1, or an
+            outside ``[0, 0.5]``, a ``poly_features_degree`` below 1, a
+            ``poly_mi_sample_size`` below 1 (``None`` is allowed), or an
             ``on_weather_failure`` / ``on_exog_provider_failure`` that is not
             ``"raise"`` or ``"skip"``.
     """
@@ -169,6 +170,13 @@ def validate_config(config: object) -> None:
     if poly_features_degree is not None and poly_features_degree < 1:
         raise ValueError(
             f"poly_features_degree must be >= 1; got {poly_features_degree}."
+        )
+
+    poly_mi_sample_size = getattr(config, "poly_mi_sample_size", None)
+    if poly_mi_sample_size is not None and poly_mi_sample_size < 1:
+        raise ValueError(
+            f"poly_mi_sample_size must be a positive integer or None; "
+            f"got {poly_mi_sample_size}."
         )
 
     on_weather_failure = getattr(config, "on_weather_failure", None)
