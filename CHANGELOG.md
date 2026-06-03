@@ -1,3 +1,15 @@
+## [15.8.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.7.0...v15.8.0) (2026-06-03)
+
+
+### Features
+
+* **manager:** parallel + subsampled mutual-information poly cap ([#306](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/306)) ([d70903b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d70903b283d13540c79c00f34e62b0c139446c9b))
+
+
+### Bug Fixes
+
+* **downloader:** stop stale partial pulls from masking newer ENTSO-E data ([#307](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/307)) ([43d6352](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/43d63520a7c76bb4402823c5dc5f059e868a1836))
+
 ## [15.8.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.7.1-rc.1...v15.8.0-rc.1) (2026-06-03)
 
 
