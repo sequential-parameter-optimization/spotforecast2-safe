@@ -72,6 +72,15 @@ class ConfigEntsoe:
             more than this many ``poly_*`` columns are generated, only the
             top ``max_poly_features`` ranked by mutual information with the
             target are kept (``<= 0`` disables the cap). Defaults to ``10``.
+        poly_mi_n_jobs (Optional[int]): Parallel jobs for the
+            mutual-information ranking that enforces ``max_poly_features``.
+            ``-1`` (default) uses all cores; ``None`` runs single-threaded.
+            Parallelism does not change the selection.
+        poly_mi_sample_size (Optional[int]): Row cap for that ranking; longer
+            series are scored on a reproducible random subsample of this size
+            (seeded by ``random_state``), which can change which borderline
+            columns make the top K. ``None`` scores every row (the pre-15.8
+            behaviour). Defaults to ``4000``.
         include_covid_infection_rate (bool): Append the bundled German national
             COVID-19 7-day incidence (RKI) as an exogenous level regressor.
             Defaults to ``False``.
@@ -221,6 +230,8 @@ class ConfigEntsoe:
         "include_holiday_features",
         "poly_features_degree",
         "max_poly_features",
+        "poly_mi_n_jobs",
+        "poly_mi_sample_size",
         "include_covid_infection_rate",
         "include_entsoe_forecast_load",
         "include_entsoe_renewable_forecast",
@@ -289,6 +300,8 @@ class ConfigEntsoe:
         include_holiday_features: bool = False,
         poly_features_degree: int = 1,
         max_poly_features: int = 10,
+        poly_mi_n_jobs: Optional[int] = -1,
+        poly_mi_sample_size: Optional[int] = 4000,
         # Provider-based exogenous toggles (preprocessing.exog_providers)
         include_covid_infection_rate: bool = False,
         include_entsoe_forecast_load: bool = False,
@@ -386,6 +399,8 @@ class ConfigEntsoe:
         self.include_holiday_features = include_holiday_features
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
+        self.poly_mi_n_jobs = poly_mi_n_jobs
+        self.poly_mi_sample_size = poly_mi_sample_size
         # Provider-based exogenous toggles, each gated by a registry flag in
         # ``spotforecast2_safe.preprocessing.exog_providers``.
         self.include_covid_infection_rate = include_covid_infection_rate

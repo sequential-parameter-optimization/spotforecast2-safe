@@ -391,6 +391,8 @@ def select_top_poly_features(
     y: pd.Series,
     max_poly_features: int = 10,
     random_state: int = 123,
+    n_jobs: Optional[int] = -1,
+    mi_sample_size: Optional[int] = 4000,
 ) -> List[str]:
     """Rank polynomial interaction columns by mutual information, keep the top K.
 
@@ -401,6 +403,13 @@ def select_top_poly_features(
     columns. Mutual information is estimated with `mutual_info_regression`,
     seeded by *random_state* so the selection is reproducible.
 
+    The k-nearest-neighbour estimator behind `mutual_info_regression` is the
+    dominant cost of the whole exogenous-feature pipeline on realistic inputs
+    (thousands of candidate columns over years of hourly data). Two knobs keep
+    it fast: the scoring runs in parallel across candidate columns (*n_jobs*),
+    and long series are scored on a reproducible row subsample
+    (*mi_sample_size*) instead of every observation.
+
     Args:
         poly_features: DataFrame containing only the candidate ``poly_*``
             interaction columns to rank.
@@ -409,8 +418,22 @@ def select_top_poly_features(
         max_poly_features: Maximum number of columns to keep. When this is
             ``<= 0`` or the candidate count does not exceed it, all columns are
             returned unchanged. Defaults to ``10``.
-        random_state: Seed forwarded to `mutual_info_regression` for a
-            deterministic estimate. Defaults to ``123``.
+        random_state: Seed forwarded to `mutual_info_regression` (and to the
+            row subsampling, see *mi_sample_size*) for a deterministic
+            estimate. Defaults to ``123``.
+        n_jobs: Number of parallel jobs forwarded to
+            `mutual_info_regression`, which scores candidate columns
+            independently. ``-1`` (the default) uses all cores; ``None`` runs
+            single-threaded. Parallelism does not change the scores, so the
+            selected columns are identical for every *n_jobs* value.
+        mi_sample_size: Maximum number of rows used for the mutual-information
+            estimate. When the joined frame is longer, a uniform random
+            subsample of this size (drawn without replacement, seeded by
+            *random_state*) is scored instead — a large speed-up on multi-year
+            hourly series. The subsampled estimate can rank borderline columns
+            differently from a full-data estimate, so the kept set may differ;
+            pass ``None`` to score every row (the pre-15.8 behaviour). Must be
+            a positive integer or ``None``. Defaults to ``4000``.
 
     Returns:
         List[str]: Names of the selected ``poly_*`` columns, ordered from
@@ -419,7 +442,8 @@ def select_top_poly_features(
 
     Raises:
         ValueError: If *poly_features* and *y* share no overlapping,
-            non-missing rows.
+            non-missing rows, or if *mi_sample_size* is neither ``None`` nor a
+            positive integer.
 
     Examples:
         ```{python}
@@ -446,6 +470,12 @@ def select_top_poly_features(
         assert len(top) == 2
         ```
     """
+    if mi_sample_size is not None and mi_sample_size < 1:
+        raise ValueError(
+            f"mi_sample_size must be a positive integer or None; "
+            f"got {mi_sample_size}."
+        )
+
     columns = list(poly_features.columns)
     if max_poly_features is None or max_poly_features <= 0:
         return columns
@@ -459,8 +489,14 @@ def select_top_poly_features(
             "cannot rank polynomial features by mutual information."
         )
 
+    if mi_sample_size is not None and len(joined) > mi_sample_size:
+        joined = joined.sample(n=mi_sample_size, random_state=random_state)
+
     scores = mutual_info_regression(
-        joined[columns], joined["__target__"], random_state=random_state
+        joined[columns],
+        joined["__target__"],
+        random_state=random_state,
+        n_jobs=n_jobs,
     )
     ranked = pd.Series(scores, index=columns).sort_values(ascending=False)
     return ranked.head(max_poly_features).index.tolist()
