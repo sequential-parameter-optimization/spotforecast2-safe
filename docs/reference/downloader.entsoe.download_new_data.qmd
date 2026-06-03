@@ -15,7 +15,12 @@ Download new load and forecast data from ENTSO-E.
 
 This function queries the ENTSO-E Transparency Platform for a given period.
 If no start date is provided, it automatically resumes from the last
-available data point.
+available data point. Should the trailing rows hold a published
+day-ahead forecast but no `Actual Load` yet (ENTSO-E publishes actuals
+with a lag and occasionally backfills them days later), the fetch window
+is extended back to the first hour whose actuals are still missing,
+bounded by ``_MAX_BACKFILL_DAYS``, so late-published values heal
+automatically on the next incremental download.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
