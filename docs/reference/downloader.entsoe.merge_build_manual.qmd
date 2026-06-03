@@ -12,8 +12,15 @@ Merge all raw CSV files from the 'raw' directory into a single interim file.
 
 This function looks for all `.csv` files in `get_data_home() / "raw"`
 (or, when *raw_subdir* is given, in `get_data_home() / "raw" / raw_subdir`),
-sorts them by time index, and saves the unique combined data to
+merges them oldest-download-first (file mtime, filename as tiebreaker),
+and saves the unique combined data to
 `get_data_home() / "interim" / output_file`.
+
+Timestamps covered by several raw files are collapsed cell-wise: per
+column, the newest non-missing value wins. A newer pull therefore
+revises older values, while a raw file that holds NaN for hours another
+pull has filled in (e.g. a pull made before ENTSO-E published a day's
+`Actual Load`) can never mask those values in the interim file.
 
 Namespacing raw files by *raw_subdir* keeps the day-ahead side-tables
 (``renewable_forecast.csv``, ``day_ahead_price.csv``) from clobbering the
