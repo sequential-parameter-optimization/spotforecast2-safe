@@ -2860,56 +2860,96 @@
     "href": "docs/reference/downloader.entsoe.download_renewable_forecast.html",
     "title": "downloader.entsoe.download_renewable_forecast",
     "section": "",
-    "text": "downloader.entsoe.download_renewable_forecast(\n    api_key,\n    country_code='DE',\n    start=None,\n    end=None,\n    force=False,\n)\nDownload the ENTSO-E day-ahead wind/solar generation forecast.\nQueries query_wind_and_solar_forecast and merges the result into interim/renewable_forecast.csv (columns such as \"Solar\", \"Wind Onshore\", \"Wind Offshore\"). The day-ahead forecast is leakage-clean (published D-1); the realised generation must not be used. Consumed downstream by spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider via spotforecast2_safe.data.fetch_data.load_renewable_forecast."
+    "text": "downloader.entsoe.download_renewable_forecast(\n    api_key,\n    country_code='DE',\n    start=None,\n    end=None,\n    force=False,\n)\nDownload the ENTSO-E day-ahead wind/solar generation forecast.\nQueries query_wind_and_solar_forecast and merges the result into interim/renewable_forecast.csv (columns such as \"Solar\", \"Wind Onshore\", \"Wind Offshore\"). The day-ahead forecast is leakage-clean (published D-1); the realised generation must not be used. Consumed downstream by spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider via spotforecast2_safe.data.fetch_data.load_renewable_forecast.",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_renewable_forecast"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_renewable_forecast.html#parameters",
     "href": "docs/reference/downloader.entsoe.download_renewable_forecast.html#parameters",
     "title": "downloader.entsoe.download_renewable_forecast",
     "section": "Parameters",
-    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\napi_key\nstr\nENTSO-E Web API security token.\nrequired\n\n\ncountry_code\nstr\nCountry / bidding-zone code. Defaults to \"DE\".\n'DE'\n\n\nstart\nOptional[str]\nStart in 'YYYYMMDDHH00' format, or None to default to seven days ago.\nNone\n\n\nend\nOptional[str]\nEnd in 'YYYYMMDDHH00' format, or None to default to the start of tomorrow.\nNone\n\n\nforce\nbool\nIf True, bypass the small-window cooldown check.\nFalse"
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\napi_key\nstr\nENTSO-E Web API security token.\nrequired\n\n\ncountry_code\nstr\nCountry / bidding-zone code. Defaults to \"DE\".\n'DE'\n\n\nstart\nOptional[str]\nStart in 'YYYYMMDDHH00' format, or None to default to seven days ago.\nNone\n\n\nend\nOptional[str]\nEnd in 'YYYYMMDDHH00' format, or None to default to the start of tomorrow.\nNone\n\n\nforce\nbool\nIf True, bypass the small-window cooldown check.\nFalse",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_renewable_forecast"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_renewable_forecast.html#raises",
     "href": "docs/reference/downloader.entsoe.download_renewable_forecast.html#raises",
     "title": "downloader.entsoe.download_renewable_forecast",
     "section": "Raises",
-    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nImportError\nIf entsoe-py is not installed.\n\n\n\nValueError\nIf start or end cannot be parsed.\n\n\n\nRuntimeError\nIf the download fails after _MAX_RETRIES attempts."
+    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nImportError\nIf entsoe-py is not installed.\n\n\n\nValueError\nIf start or end cannot be parsed.\n\n\n\nRuntimeError\nIf the download fails after _MAX_RETRIES attempts.",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_renewable_forecast"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_renewable_forecast.html#examples",
     "href": "docs/reference/downloader.entsoe.download_renewable_forecast.html#examples",
     "title": "downloader.entsoe.download_renewable_forecast",
     "section": "Examples",
-    "text": "Examples\n\nfrom spotforecast2_safe.downloader.entsoe import download_renewable_forecast\n\ndownload_renewable_forecast(api_key=\"YOUR_API_KEY\", country_code=\"DE\", force=True)"
+    "text": "Examples\n\nfrom spotforecast2_safe.downloader.entsoe import download_renewable_forecast\n\ndownload_renewable_forecast(api_key=\"YOUR_API_KEY\", country_code=\"DE\", force=True)",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_renewable_forecast"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_day_ahead_price.html",
     "href": "docs/reference/downloader.entsoe.download_day_ahead_price.html",
     "title": "downloader.entsoe.download_day_ahead_price",
     "section": "",
-    "text": "downloader.entsoe.download_day_ahead_price(\n    api_key,\n    country_code='DE_LU',\n    start=None,\n    end=None,\n    force=False,\n)\nDownload the ENTSO-E day-ahead spot price (DE/LU).\nQueries query_day_ahead_prices and merges the result into interim/day_ahead_price.csv (column \"Day-ahead Price\"). The day-ahead auction price is leakage-clean (published D-1); the realised price must not be used. Consumed downstream by spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider via spotforecast2_safe.data.fetch_data.load_day_ahead_price."
+    "text": "downloader.entsoe.download_day_ahead_price(\n    api_key,\n    country_code='DE_LU',\n    start=None,\n    end=None,\n    force=False,\n)\nDownload the ENTSO-E day-ahead spot price (DE/LU).\nQueries query_day_ahead_prices and merges the result into interim/day_ahead_price.csv (column \"Day-ahead Price\"). The day-ahead auction price is leakage-clean (published D-1); the realised price must not be used. Consumed downstream by spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider via spotforecast2_safe.data.fetch_data.load_day_ahead_price.",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_day_ahead_price"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_day_ahead_price.html#parameters",
     "href": "docs/reference/downloader.entsoe.download_day_ahead_price.html#parameters",
     "title": "downloader.entsoe.download_day_ahead_price",
     "section": "Parameters",
-    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\napi_key\nstr\nENTSO-E Web API security token.\nrequired\n\n\ncountry_code\nstr\nBidding-zone code. Defaults to \"DE_LU\".\n'DE_LU'\n\n\nstart\nOptional[str]\nStart in 'YYYYMMDDHH00' format, or None to default to seven days ago.\nNone\n\n\nend\nOptional[str]\nEnd in 'YYYYMMDDHH00' format, or None to default to the start of tomorrow.\nNone\n\n\nforce\nbool\nIf True, bypass the small-window cooldown check.\nFalse"
+    "text": "Parameters\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\napi_key\nstr\nENTSO-E Web API security token.\nrequired\n\n\ncountry_code\nstr\nBidding-zone code. Defaults to \"DE_LU\".\n'DE_LU'\n\n\nstart\nOptional[str]\nStart in 'YYYYMMDDHH00' format, or None to default to seven days ago.\nNone\n\n\nend\nOptional[str]\nEnd in 'YYYYMMDDHH00' format, or None to default to the start of tomorrow.\nNone\n\n\nforce\nbool\nIf True, bypass the small-window cooldown check.\nFalse",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_day_ahead_price"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_day_ahead_price.html#raises",
     "href": "docs/reference/downloader.entsoe.download_day_ahead_price.html#raises",
     "title": "downloader.entsoe.download_day_ahead_price",
     "section": "Raises",
-    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nImportError\nIf entsoe-py is not installed.\n\n\n\nValueError\nIf start or end cannot be parsed.\n\n\n\nRuntimeError\nIf the download fails after _MAX_RETRIES attempts."
+    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nImportError\nIf entsoe-py is not installed.\n\n\n\nValueError\nIf start or end cannot be parsed.\n\n\n\nRuntimeError\nIf the download fails after _MAX_RETRIES attempts.",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_day_ahead_price"
+    ]
   },
   {
     "objectID": "docs/reference/downloader.entsoe.download_day_ahead_price.html#examples",
     "href": "docs/reference/downloader.entsoe.download_day_ahead_price.html#examples",
     "title": "downloader.entsoe.download_day_ahead_price",
     "section": "Examples",
-    "text": "Examples\n\nfrom spotforecast2_safe.downloader.entsoe import download_day_ahead_price\n\ndownload_day_ahead_price(api_key=\"YOUR_API_KEY\", country_code=\"DE_LU\", force=True)"
+    "text": "Examples\n\nfrom spotforecast2_safe.downloader.entsoe import download_day_ahead_price\n\ndownload_day_ahead_price(api_key=\"YOUR_API_KEY\", country_code=\"DE_LU\", force=True)",
+    "crumbs": [
+      "API Reference",
+      "Downloader",
+      "download_day_ahead_price"
+    ]
   },
   {
     "objectID": "docs/reference/data.fetch_data.load_timeseries.html",
