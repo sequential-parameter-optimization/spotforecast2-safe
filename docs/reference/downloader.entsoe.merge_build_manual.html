@@ -1455,7 +1455,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    raw_subdir<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Merge all raw CSV files from the ‘raw’ directory into a single interim file.</p>
-<p>This function looks for all <code>.csv</code> files in <code>get_data_home() / "raw"</code> (or, when <em>raw_subdir</em> is given, in <code>get_data_home() / "raw" / raw_subdir</code>), sorts them by time index, and saves the unique combined data to <code>get_data_home() / "interim" / output_file</code>.</p>
+<p>This function looks for all <code>.csv</code> files in <code>get_data_home() / "raw"</code> (or, when <em>raw_subdir</em> is given, in <code>get_data_home() / "raw" / raw_subdir</code>), merges them oldest-download-first (file mtime, filename as tiebreaker), and saves the unique combined data to <code>get_data_home() / "interim" / output_file</code>.</p>
+<p>Timestamps covered by several raw files are collapsed cell-wise: per column, the newest non-missing value wins. A newer pull therefore revises older values, while a raw file that holds NaN for hours another pull has filled in (e.g.&nbsp;a pull made before ENTSO-E published a day’s <code>Actual Load</code>) can never mask those values in the interim file.</p>
 <p>Namespacing raw files by <em>raw_subdir</em> keeps the day-ahead side-tables (<code>renewable_forecast.csv</code>, <code>day_ahead_price.csv</code>) from clobbering the load schema in <code>energy_load.csv</code>: the default glob is non-recursive, so load files in <code>raw/</code> and renewable files in <code>raw/renewable/</code> never mix.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -1518,14 +1519,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
 <p>Individual raw CSV files that fail to parse are logged at ERROR level and skipped; the merge continues with the remaining files. When zero files parse successfully the function returns early without writing an output file.</p>
 <p>Logging information can be selected by setting the log level for the <code>spotforecast2_safe.downloader.entsoe</code> logger. Common levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, and <code>CRITICAL</code>. The cell below shows the default (WARNING); change the level to <code>INFO</code> or <code>DEBUG</code> for more verbose output.</p>
-<div id="87202f4a" class="cell" data-execution_count="1">
+<div id="78f8b2ca" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">"spotforecast2_safe.downloader.entsoe"</span>).setLevel(logging.WARNING)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="7cd67e57" class="cell" data-execution_count="2">
+<div id="78c6814d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> merge_build_manual</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge with the default output filename</span></span>
