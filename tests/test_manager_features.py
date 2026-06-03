@@ -966,3 +966,79 @@ class TestSelectTopPolyFeatures:
         disjoint.index = disjoint.index + pd.Timedelta(days=3650)
         with pytest.raises(ValueError):
             select_top_poly_features(poly, disjoint, max_poly_features=2)
+
+    @pytest.fixture
+    def long_poly_and_target(self):
+        """6000-row fixture (above the default mi_sample_size cap of 4000)."""
+        rng = np.random.default_rng(7)
+        n = 6000
+        idx = pd.date_range("2024-01-01", periods=n, freq="h", tz="UTC")
+        signal = rng.normal(0, 1, n)
+        y = pd.Series(signal, index=idx, name="target")
+        cols = {
+            # Graded informativeness: poly_00 strongest, then decaying.
+            f"poly_{i:02d}": signal * (1.0 / (i + 1)) + rng.normal(0, 1, n)
+            for i in range(20)
+        }
+        return pd.DataFrame(cols, index=idx), y
+
+    def test_n_jobs_does_not_change_selection(self, long_poly_and_target):
+        """Parallelism must be ranking-invariant (mi_sample_size pinned)."""
+        poly, y = long_poly_and_target
+        kwargs = {"max_poly_features": 5, "mi_sample_size": None}
+        serial = select_top_poly_features(poly, y, n_jobs=None, **kwargs)
+        parallel = select_top_poly_features(poly, y, n_jobs=-1, **kwargs)
+        two = select_top_poly_features(poly, y, n_jobs=2, **kwargs)
+        assert serial == parallel == two
+
+    def test_subsample_is_deterministic(self, long_poly_and_target):
+        poly, y = long_poly_and_target
+        first = select_top_poly_features(poly, y, max_poly_features=5)
+        second = select_top_poly_features(poly, y, max_poly_features=5)
+        assert first == second
+
+    def test_subsample_seed_controls_draw(self, long_poly_and_target):
+        """Same seed -> same selection even with an explicit small subsample."""
+        poly, y = long_poly_and_target
+        first = select_top_poly_features(
+            poly, y, max_poly_features=5, mi_sample_size=1500, random_state=3
+        )
+        second = select_top_poly_features(
+            poly, y, max_poly_features=5, mi_sample_size=1500, random_state=3
+        )
+        assert first == second
+
+    def test_short_series_unaffected_by_default_subsample(self, poly_and_target):
+        """Below the 4000-row cap the default equals full-data scoring."""
+        poly, y = poly_and_target
+        default = select_top_poly_features(poly, y, max_poly_features=3)
+        full = select_top_poly_features(
+            poly, y, max_poly_features=3, mi_sample_size=None
+        )
+        assert default == full
+
+    def test_subsample_quality_overlap(self, long_poly_and_target):
+        """Subsampled top-10 must overlap the full-data top-10 in >= 8 names."""
+        poly, y = long_poly_and_target
+        full = select_top_poly_features(
+            poly, y, max_poly_features=10, mi_sample_size=None
+        )
+        sampled = select_top_poly_features(
+            poly, y, max_poly_features=10, mi_sample_size=2000
+        )
+        assert len(set(full) & set(sampled)) >= 8
+
+    def test_subsample_recovers_informative_columns(self, long_poly_and_target):
+        """The clearly informative columns survive aggressive subsampling."""
+        poly, y = long_poly_and_target
+        top = select_top_poly_features(
+            poly, y, max_poly_features=3, mi_sample_size=1000
+        )
+        assert "poly_00" in top
+        assert "poly_01" in top
+
+    @pytest.mark.parametrize("bad", [0, -5])
+    def test_invalid_mi_sample_size_raises(self, poly_and_target, bad):
+        poly, y = poly_and_target
+        with pytest.raises(ValueError, match="mi_sample_size"):
+            select_top_poly_features(poly, y, mi_sample_size=bad)

@@ -1,6 +1,6 @@
 [project]
 name = "spotforecast2-safe"
-version = "15.7.1-rc.1"
+version = "15.8.0-rc.1"
 description = "spotforecast2-safe (Core): Safety-critical time series forecasting for production"
 readme = "README.md"
 license = { text = "AGPL-3.0-or-later" }
@@ -100,6 +100,9 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "slow: long-running performance guards (deselect with -m 'not slow')",
+]
 
 # Pin black to the project's Python floor so its target-version inference is
 # deterministic. Without this, black >=26 may infer a newer target (e.g. py315)
