@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import os
 import shutil
 import sys
 import tempfile
@@ -358,6 +359,175 @@ class TestDownloadNewDataFailSafe(unittest.TestCase):
                 force=True,
             )
         self.assertIn("end=", str(ctx.exception))
+
+
+class TestMergeRawFileOrdering(unittest.TestCase):
+    """Regression: a stale partial pull must not clobber newer complete data.
+
+    ENTSO-E publishes "Actual Load" with a lag, so a raw pull made before a
+    day's actuals were published stores NaN rows for that day. Previously
+    ``merge_build_manual`` concatenated raw files in arbitrary filesystem
+    glob order and deduplicated whole rows with ``keep="last"``; a stale
+    partial pull globbed after a newer complete one masked already
+    downloaded values with NaN in the interim file (observed for DE on
+    2026-06-02). The merge now orders files oldest-mtime-first and keeps,
+    per cell, the newest non-missing value.
+    """
+
+    def setUp(self):
+        self.test_dir = Path(tempfile.mkdtemp())
+        self.raw_dir = self.test_dir / "raw"
+        self.raw_dir.mkdir()
+        self.interim_dir = self.test_dir / "interim"
+        self.interim_dir.mkdir()
+        self.times = [
+            "2026-06-02 00:00",
+            "2026-06-02 01:00",
+            "2026-06-02 02:00",
+        ]
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+
+    def _write_raw(self, name, values, mtime):
+        df = pd.DataFrame(
+            {"Time (UTC)": self.times[: len(values)], "Actual Load": values}
+        )
+        path = self.raw_dir / name
+        df.to_csv(path, index=False)
+        os.utime(path, (mtime, mtime))
+        return path
+
+    def _merged(self):
+        merge_build_manual(output_file="merged.csv")
+        merged = pd.read_csv(
+            self.interim_dir / "merged.csv", index_col=0, parse_dates=True
+        )
+        merged.index = pd.to_datetime(merged.index, utc=True)
+        return merged
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    def test_stale_nan_pull_does_not_clobber_complete_pull(self, mock_get_home):
+        """The 2026-06-02 incident shape: stale all-NaN file, newer complete one.
+
+        The stale file's name sorts after the complete one, so under the old
+        glob-order ``keep="last"`` rule its NaN rows used to win.
+        """
+        mock_get_home.return_value = self.test_dir
+        self._write_raw("a_complete.csv", [100.0, 110.0, 120.0], mtime=2_000_000)
+        self._write_raw("z_stale.csv", [None, None, None], mtime=1_000_000)
+
+        merged = self._merged()
+
+        self.assertEqual(len(merged), 3)
+        self.assertEqual(merged["Actual Load"].isna().sum(), 0)
+        self.assertListEqual(
+            merged["Actual Load"].tolist(), [100.0, 110.0, 120.0]
+        )
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    def test_newer_values_revise_but_newer_nan_does_not_erase(self, mock_get_home):
+        """Per-cell rule: a newer pull revises values, its NaN cells do not erase."""
+        mock_get_home.return_value = self.test_dir
+        self._write_raw("older.csv", [100.0, 110.0], mtime=1_000_000)
+        self._write_raw("newer.csv", [None, 115.0, 120.0], mtime=2_000_000)
+
+        merged = self._merged()
+
+        self.assertListEqual(
+            merged["Actual Load"].tolist(), [100.0, 115.0, 120.0]
+        )
+
+
+class TestDownloadNewDataActualLoadBackfill(unittest.TestCase):
+    """Incremental downloads re-fetch hours whose "Actual Load" is missing.
+
+    The interim file carries rows for hours whose day-ahead forecast is
+    already published but whose actuals are not (late publication /
+    transparency-platform outages). Resuming strictly from the last row
+    would never re-fetch those hours; the fetch window now restarts at the
+    first missing actual, bounded by ``_MAX_BACKFILL_DAYS``.
+    """
+
+    def setUp(self):
+        self.test_dir = Path(tempfile.mkdtemp())
+        (self.test_dir / "raw").mkdir()
+        (self.test_dir / "interim").mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+
+    def _run_download(self, mock_fetch, mock_get_home, frame):
+        mock_get_home.return_value = self.test_dir
+        mock_fetch.return_value = frame
+
+        mock_entsoe_mod = MagicMock()
+        mock_client = mock_entsoe_mod.EntsoePandasClient.return_value
+        mock_client.query_load_and_forecast.return_value = pd.DataFrame(
+            {"Actual Load": [1.0]}, index=[frame.index[-1] + pd.Timedelta(hours=1)]
+        )
+        sys.modules["entsoe"] = mock_entsoe_mod
+
+        end = (pd.Timestamp.now(tz="UTC") + pd.Timedelta(days=1)).strftime(
+            "%Y%m%d%H00"
+        )
+        download_new_data(api_key="fake_key", end=end, force=True)
+        return mock_client.query_load_and_forecast.call_args.kwargs["start"]
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_resume_restarts_at_first_missing_actual(self, mock_fetch, mock_get_home):
+        """NaN tail in "Actual Load" pulls the fetch start back to its first hour."""
+        idx = pd.date_range(
+            end=pd.Timestamp.now(tz="UTC").floor("h") - pd.Timedelta(hours=1),
+            periods=72,
+            freq="h",
+        )
+        actual = [float(i) for i in range(42)] + [None] * 30
+        frame = pd.DataFrame(
+            {"Actual Load": actual, "Forecasted Load": [1.0] * 72}, index=idx
+        )
+
+        start = self._run_download(mock_fetch, mock_get_home, frame)
+
+        # First hour whose actuals are missing, not last_row + 1h.
+        self.assertEqual(start, idx[42])
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_backfill_is_bounded_by_max_backfill_days(self, mock_fetch, mock_get_home):
+        """An all-NaN actuals column must not trigger an unbounded re-pull."""
+        idx = pd.date_range(
+            end=pd.Timestamp.now(tz="UTC").floor("h") - pd.Timedelta(hours=1),
+            periods=24 * 30,
+            freq="h",
+        )
+        frame = pd.DataFrame(
+            {"Actual Load": [None] * len(idx), "Forecasted Load": [1.0] * len(idx)},
+            index=idx,
+        )
+
+        start = self._run_download(mock_fetch, mock_get_home, frame)
+
+        expected_floor = idx[-1] + pd.Timedelta(hours=1) - pd.Timedelta(days=7)
+        self.assertEqual(start, expected_floor)
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_complete_actuals_resume_unchanged(self, mock_fetch, mock_get_home):
+        """With no missing actuals the resume point stays last_row + 1h."""
+        idx = pd.date_range(
+            end=pd.Timestamp.now(tz="UTC").floor("h") - pd.Timedelta(hours=1),
+            periods=72,
+            freq="h",
+        )
+        frame = pd.DataFrame(
+            {"Actual Load": [1.0] * 72, "Forecasted Load": [1.0] * 72}, index=idx
+        )
+
+        start = self._run_download(mock_fetch, mock_get_home, frame)
+
+        self.assertEqual(start, idx[-1] + pd.Timedelta(hours=1))
 
 
 if __name__ == "__main__":
