@@ -1,0 +1,12 @@
+{
+  "hash": "54d4bbf18a6fd6d78044bf1057c9b67c",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: preprocessing.exog_providers.EntsoeForecastLoadProvider\n---\n\n\n\n```python\npreprocessing.exog_providers.EntsoeForecastLoadProvider(data_home=None)\n```\n\nENTSO-E day-ahead Forecasted Load as an exogenous near-oracle prior.\n\nWraps `spotforecast2_safe.data.fetch_data.load_timeseries_forecast`, which\nreads the ``Forecasted Load`` column already merged into\n``interim/energy_load.csv``. The day-ahead forecast is published on D-1 and\nis therefore genuinely available at forecast time (leakage-clean, CR-3).\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                                                                   | Description                                                                             | Default   |\n|-----------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|-----------|\n| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loader. ``None`` resolves via ``get_data_home()``. | `None`    |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#9fe622b2 .cell execution_count=1}\n``` {.python .cell-code}\nimport os\nimport shutil\nimport tempfile\n\nimport pandas as pd\n\nfrom spotforecast2_safe.preprocessing.exog_providers import (\n    EntsoeForecastLoadProvider,\n)\n\ntmp = tempfile.mkdtemp()\nos.environ[\"SPOTFORECAST2_DATA\"] = tmp\ninterim = os.path.join(tmp, \"interim\")\nos.makedirs(interim, exist_ok=True)\nidx = pd.date_range(\"2023-01-01\", periods=48, freq=\"h\", tz=\"UTC\")\npd.DataFrame(\n    {\"Actual Load\": 100.0, \"Forecasted Load\": 99.0}, index=idx\n).rename_axis(\"Time (UTC)\").to_csv(os.path.join(interim, \"energy_load.csv\"))\n\nout = EntsoeForecastLoadProvider().build(idx)\nprint(out.columns.tolist(), out.shape)\n\nshutil.rmtree(tmp)\ndel os.environ[\"SPOTFORECAST2_DATA\"]\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n['entsoe_forecasted_load'] (48, 1)\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "preprocessing.exog_providers.EntsoeForecastLoadProvider_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,0 +1,77 @@
+# calendar.holiday.create_holiday_adjacency_df { #spotforecast2_safe.calendar.holiday.create_holiday_adjacency_df }
+
+```python
+calendar.holiday.create_holiday_adjacency_df(
+    start,
+    end,
+    tz='UTC',
+    freq='h',
+    country_code='DE',
+    state='NW',
+)
+```
+
+Create a DataFrame with binary adjacency indicators for public holidays.
+
+Returns three int columns, all disjoint from ``is_holiday``:
+
+- ``is_brueckentag``: 1 when day ``d`` is a working day (Mon–Fri AND not a
+  public holiday) AND both ``d-1`` and ``d+1`` are non-working (public
+  holiday **or** weekend, i.e. ``dayofweek >= 5``).  Saturday, Sunday, and
+  public holidays are always 0.
+- ``is_before_holiday``: 1 when ``d+1`` is a public holiday AND ``d`` is
+  not itself a public holiday.
+- ``is_after_holiday``: 1 when ``d-1`` is a public holiday AND ``d`` is
+  not itself a public holiday.
+
+A day may be flagged by more than one column simultaneously; for example,
+2024-12-27 (Friday after Christmas/Boxing Day, before a long weekend) is
+both ``is_after_holiday`` and ``is_brueckentag``.
+
+Weekend membership is determined by ``dayofweek >= 5``; the ``holidays``
+library knows nothing about weekends, so this rule is applied explicitly.
+
+Boundary rule: the first day of the requested range needs to know the
+holiday/weekend status of the day before ``start``, and the last day needs
+the status of the day after ``end``.  Neighbour-day look-ups (``d ± 1d``)
+are performed directly against the holiday calendar object, which resolves
+any date on demand, so edge rows are never incorrectly zeroed.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                           | Description                                          | Default    |
+|--------------|----------------------------------------------------------------|------------------------------------------------------|------------|
+| start        | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date/datetime.                                 | _required_ |
+| end          | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date/datetime.                                   | _required_ |
+| tz           | [str](`str`)                                                   | Timezone to use if not inferred from start/end.      | `'UTC'`    |
+| freq         | [str](`str`)                                                   | Frequency of the resulting DataFrame.                | `'h'`      |
+| country_code | [str](`str`)                                                   | Country code for holidays (e.g. ``"DE"``, ``"US"``). | `'DE'`     |
+| state        | [str](`str`)                                                   | State code for holidays (e.g. ``"NW"``, ``"CA"``).   | `'NW'`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                            |
+|--------|------------------------------------------------|------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: DataFrame with index covering ``[start, end]`` at *freq* |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | and three integer columns in order: ``is_brueckentag``,                |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``is_before_holiday``, ``is_after_holiday``.  All values are in        |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``{0, 1}``; no NaNs.                                                   |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.calendar import create_holiday_adjacency_df
+
+# Unity Day 2024 (Thu 2024-10-03) is a public holiday in Germany.
+# 2024-10-04 (Fri) is therefore sandwiched between the holiday and the
+# weekend (Sat 2024-10-05, Sun 2024-10-06) → Brückentag.
+df = create_holiday_adjacency_df(
+    "2024-10-02", "2024-10-06", freq="D", country_code="DE", state="NW"
+)
+print(df)
+assert df.loc["2024-10-04", "is_brueckentag"] == 1
+assert df.loc["2024-10-03", "is_brueckentag"] == 0  # is_holiday, not Brückentag
+assert df.loc["2024-10-02", "is_before_holiday"] == 1  # day before Unity Day
+assert df.loc["2024-10-04", "is_after_holiday"] == 1   # day after Unity Day
+```
