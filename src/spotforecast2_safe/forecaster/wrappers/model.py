@@ -75,6 +75,8 @@ class ForecasterRecursiveModel:
         include_entsoe_net_load: bool = False,
         include_entsoe_day_ahead_price: bool = False,
         on_exog_provider_failure: str = "raise",
+        exog_max_gap_hours: int = 0,
+        exog_provider_window: str = "full",
         name: str = "base",
         **kwargs: Any,
     ):
@@ -119,6 +121,16 @@ class ForecasterRecursiveModel:
             on_exog_provider_failure:
                 ``"raise"`` (default) propagates an exogenous-provider failure;
                 ``"skip"`` logs a warning and omits that provider's columns.
+            exog_max_gap_hours:
+                Maximum contiguous missing-value run (hours) that providers will
+                heal before raising. ``0`` (default) keeps the strict fail-safe.
+                See :func:`~spotforecast2_safe.preprocessing.exog_providers._align_to_index`.
+            exog_provider_window:
+                Validation window for providers: ``"full"`` (default) validates
+                the entire request index; ``"train"`` is accepted for API
+                symmetry with :class:`~spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe`
+                but is not yet honoured on this path — use the MultiTask pipeline
+                for window-restricted validation.
             name:
                 Model name identifier. Defaults to "base".
             **kwargs:
@@ -152,6 +164,16 @@ class ForecasterRecursiveModel:
         self.predict_size = predict_size
         self.refit_size = refit_size
 
+        self.exog_max_gap_hours = exog_max_gap_hours
+        self.exog_provider_window = exog_provider_window
+        if exog_provider_window != "full":
+            logger.warning(
+                "exog_provider_window=%r is not honoured on the forecaster-"
+                "wrapper path; providers are validated against the full "
+                "request index. Use the MultiTask pipeline for windowed "
+                "validation.",
+                exog_provider_window,
+            )
         self.preprocessor = ExogBuilder(
             periods=periods,
             country_code=country_code,
@@ -164,7 +186,8 @@ class ForecasterRecursiveModel:
                     ),
                     "include_entsoe_net_load": include_entsoe_net_load,
                     "include_entsoe_day_ahead_price": include_entsoe_day_ahead_price,
-                }
+                },
+                max_gap=exog_max_gap_hours,
             ),
             on_provider_failure=on_exog_provider_failure,
         )
@@ -308,6 +331,8 @@ class ForecasterRecursiveModel:
             "predict_size",
             "refit_size",
             "name",
+            "exog_max_gap_hours",
+            "exog_provider_window",
         ]:
             if hasattr(self, key):
                 params[key] = getattr(self, key)

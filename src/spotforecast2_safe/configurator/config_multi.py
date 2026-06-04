@@ -143,6 +143,20 @@ class ConfigMulti:
             the safety-critical fail-safe semantics.  ``"skip"`` logs a
             warning and continues with empty weather features so the rest
             of the pipeline can run without the Open-Meteo dependency.
+        exog_max_gap_hours (int): Maximum length, in hours, of a contiguous run
+            of missing exogenous-provider values healed before the provider is
+            rejected. Interior gaps are time-interpolated; leading/trailing edge
+            gaps are back-/forward-filled. ``0`` (default) keeps the strict
+            fail-safe (any gap raises). Healed runs are logged with count and
+            span. Only already-published day-ahead vintages are involved, so
+            healing is leakage-clean (CR-3).
+        exog_provider_window (Literal["full", "train"]): Span the exogenous
+            providers are validated against. ``"full"`` (default) requires
+            coverage of the entire ``data_start``→``cov_end`` request, matching
+            prior behaviour. ``"train"`` validates only the consumed window
+            ``[start_train_ts, cov_end]``, tolerating missing values before the
+            training window. Honoured by the MultiTask pipeline; the
+            forecaster-wrapper path currently always validates the full span.
 
     Attributes:
         country_code (str): ISO country code for API queries and holiday generation.
@@ -220,6 +234,10 @@ class ConfigMulti:
             failure policy in ``ExogBuilder.build``: ``"raise"`` (default)
             propagates the ``ExogProviderError``; ``"skip"`` logs and omits the
             failing provider's columns.
+        exog_max_gap_hours (int): Maximum contiguous gap in hours that providers
+            will heal before raising (0 = strict fail-safe).
+        exog_provider_window (Literal["full", "train"]): Validation window for
+            exog providers: ``"full"`` (default) or ``"train"``.
 
     Notes:
         The default period configurations use specific `n_periods` to balance resolution and smoothing:
@@ -347,6 +365,8 @@ class ConfigMulti:
         "number_folds",
         "on_weather_failure",
         "on_exog_provider_failure",
+        "exog_max_gap_hours",
+        "exog_provider_window",
     )
 
     def __init__(
@@ -437,6 +457,10 @@ class ConfigMulti:
         on_weather_failure: Literal["raise", "skip"] = "raise",
         # Exog-provider failure policy (consumed by preprocessing.exog_builder.ExogBuilder)
         on_exog_provider_failure: Literal["raise", "skip"] = "raise",
+        # Gap-healing budget for exog providers (0 = strict fail-safe)
+        exog_max_gap_hours: int = 0,
+        # Validation window for exog providers ("full" or "train")
+        exog_provider_window: Literal["full", "train"] = "full",
     ):
         """Initialize ConfigMulti with specified or default parameters."""
         self.country_code = country_code
@@ -559,6 +583,10 @@ class ConfigMulti:
         # ``"raise"`` aborts (default, fail-safe); ``"skip"`` logs a warning
         # and omits the failing provider's columns.
         self.on_exog_provider_failure = on_exog_provider_failure
+        # Maximum contiguous gap in hours that providers will heal (0 = strict).
+        self.exog_max_gap_hours = exog_max_gap_hours
+        # Validation window for providers: "full" (default) or "train".
+        self.exog_provider_window = exog_provider_window
         validate_config(self)
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:

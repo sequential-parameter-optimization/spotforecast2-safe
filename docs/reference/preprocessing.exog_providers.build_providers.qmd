@@ -1,17 +1,25 @@
 # preprocessing.exog_providers.build_providers { #spotforecast2_safe.preprocessing.exog_providers.build_providers }
 
 ```python
-preprocessing.exog_providers.build_providers(flags, *, data_home=None)
+preprocessing.exog_providers.build_providers(
+    flags,
+    *,
+    data_home=None,
+    max_gap=0,
+    provider_window=None,
+)
 ```
 
 Construct the providers whose flags are truthy, in registry order.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                                   | Description                                                                                                    | Default    |
-|-----------|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|------------|
-| flags     | [Mapping](`typing.Mapping`)\[[str](`str`), [bool](`bool`)\]            | Mapping from registry flag name to a boolean. Unknown keys are ignored; missing keys are treated as ``False``. | _required_ |
-| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to each provider.                                                                | `None`     |
+| Name            | Type                                                                                    | Description                                                                                                          | Default    |
+|-----------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|------------|
+| flags           | [Mapping](`typing.Mapping`)\[[str](`str`), [bool](`bool`)\]                             | Mapping from registry flag name to a boolean. Unknown keys are ignored; missing keys are treated as ``False``.       | _required_ |
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to each provider.                                                                      | `None`     |
+| max_gap         | [int](`int`)                                                                            | Maximum contiguous missing-value run forwarded to each provider. See :func:`_align_to_index`. Defaults to ``0``.     | `0`        |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index forwarded to each provider as *provider_window*. See :func:`_align_to_index`. Defaults to ``None``. | `None`     |
 
 ## Returns {.doc-section .doc-section-returns}
 

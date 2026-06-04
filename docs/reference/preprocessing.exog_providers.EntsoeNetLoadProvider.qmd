@@ -1,7 +1,11 @@
 # preprocessing.exog_providers.EntsoeNetLoadProvider { #spotforecast2_safe.preprocessing.exog_providers.EntsoeNetLoadProvider }
 
 ```python
-preprocessing.exog_providers.EntsoeNetLoadProvider(data_home=None)
+preprocessing.exog_providers.EntsoeNetLoadProvider(
+    data_home=None,
+    max_gap=0,
+    provider_window=None,
+)
 ```
 
 ENTSO-E day-ahead net load = Forecasted Load − (wind + solar) forecast.
@@ -13,6 +17,8 @@ Both inputs are day-ahead (leakage-clean). Raises
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                                   | Description                                   | Default   |
-|-----------|------------------------------------------------------------------------|-----------------------------------------------|-----------|
-| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loaders. | `None`    |
+| Name            | Type                                                                                    | Description                                                                                                                            | Default   |
+|-----------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to the loaders.                                                                                          | `None`    |
+| max_gap         | [int](`int`)                                                                            | Maximum contiguous missing-value run healed by ``_align_to_index``. See :func:`_align_to_index` for full semantics. Defaults to ``0``. | `0`       |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index passed to ``_align_to_index`` as *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.                 | `None`    |

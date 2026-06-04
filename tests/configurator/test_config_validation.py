@@ -64,3 +64,18 @@ class TestSetParamsValidation:
         cfg = cls().set_params(predict_size=48, contamination=0.05)
         assert cfg.predict_size == 48
         assert cfg.contamination == 0.05
+
+    def test_negative_exog_max_gap_rejected(self, cls):
+        with pytest.raises(ValueError, match="exog_max_gap_hours must be >= 0"):
+            cls(exog_max_gap_hours=-1)
+
+    def test_bogus_exog_provider_window_rejected(self, cls):
+        with pytest.raises(ValueError, match="exog_provider_window must be"):
+            cls(exog_provider_window="yesterday")
+
+    def test_valid_exog_gap_accepted(self, cls):
+        cfg = cls(exog_max_gap_hours=0, exog_provider_window="full")
+        assert cfg.exog_max_gap_hours == 0
+        cfg2 = cls(exog_max_gap_hours=12, exog_provider_window="train")
+        assert cfg2.exog_max_gap_hours == 12
+        assert cfg2.exog_provider_window == "train"

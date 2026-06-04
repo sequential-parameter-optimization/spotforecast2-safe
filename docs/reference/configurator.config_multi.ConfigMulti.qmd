@@ -64,6 +64,8 @@ configurator.config_multi.ConfigMulti(
     number_folds=10,
     on_weather_failure='raise',
     on_exog_provider_failure='raise',
+    exog_max_gap_hours=0,
+    exog_provider_window='full',
 )
 ```
 
@@ -132,6 +134,8 @@ API queries and holiday feature generation.
 | auto_save_models                   | [bool](`bool`)                                                                                       | Whether ``BaseTask._run_strategy`` should persist fitted forecasters to ``<cache_home>/models/`` after every training run.  Defaults to ``True`` so that saved models are immediately available for ``PredictTask`` without an explicit ``save_models()`` call.                                                                                                                                                                             | `True`                      |
 | data_frame_name                    | [str](`str`)                                                                                         | Identifier for the active dataset.  Used by ``BaseTask`` to name cache subdirectories, model files, and the per-dataset log file.  Defaults to ``"default"``.                                                                                                                                                                                                                                                                               | `'default'`                 |
 | on_weather_failure                 | [Literal](`typing.Literal`)\[\'raise\', \'skip\'\]                                                   | Policy for handling Open-Meteo fetch failures inside ``BaseTask.build_exogenous_features``.  ``"raise"`` (default) aborts the pipeline with a ``WeatherFetchError`` and preserves the safety-critical fail-safe semantics.  ``"skip"`` logs a warning and continues with empty weather features so the rest of the pipeline can run without the Open-Meteo dependency.                                                                      | `'raise'`                   |
+| exog_max_gap_hours                 | [int](`int`)                                                                                         | Maximum length, in hours, of a contiguous run of missing exogenous-provider values healed before the provider is rejected. Interior gaps are time-interpolated; leading/trailing edge gaps are back-/forward-filled. ``0`` (default) keeps the strict fail-safe (any gap raises). Healed runs are logged with count and span. Only already-published day-ahead vintages are involved, so healing is leakage-clean (CR-3).                   | `0`                         |
+| exog_provider_window               | [Literal](`typing.Literal`)\[\'full\', \'train\'\]                                                   | Span the exogenous providers are validated against. ``"full"`` (default) requires coverage of the entire ``data_start``→``cov_end`` request, matching prior behaviour. ``"train"`` validates only the consumed window ``[start_train_ts, cov_end]``, tolerating missing values before the training window. Honoured by the MultiTask pipeline; the forecaster-wrapper path currently always validates the full span.                        | `'full'`                    |
 
 ## Attributes {.doc-section .doc-section-attributes}
 
@@ -193,6 +197,8 @@ API queries and holiday feature generation.
 | number_folds                       | [int](`int`)                                                                    | Cross-validation fold count for tuning tasks.                                                                                                                                |
 | on_weather_failure                 | [Literal](`typing.Literal`)\[\'raise\', \'skip\'\]                              | Open-Meteo fetch-failure policy: ``"raise"`` aborts, ``"skip"`` continues without weather.                                                                                   |
 | on_exog_provider_failure           | [Literal](`typing.Literal`)\[\'raise\', \'skip\'\]                              | Exog-provider failure policy in ``ExogBuilder.build``: ``"raise"`` (default) propagates the ``ExogProviderError``; ``"skip"`` logs and omits the failing provider's columns. |
+| exog_max_gap_hours                 | [int](`int`)                                                                    | Maximum contiguous gap in hours that providers will heal before raising (0 = strict fail-safe).                                                                              |
+| exog_provider_window               | [Literal](`typing.Literal`)\[\'full\', \'train\'\]                              | Validation window for exog providers: ``"full"`` (default) or ``"train"``.                                                                                                   |
 
 ## Notes {.doc-section .doc-section-notes}
 
