@@ -82,9 +82,6 @@ from spotforecast2_safe.data.fetch_data import fetch_data, get_data_home
 
 logger = logging.getLogger(__name__)
 
-# Warn at most once per process when installed entsoe-py lacks timeout support.
-_TIMEOUT_WARNING_ISSUED = False
-
 
 def _make_client(client_cls: type, api_key: str, timeout: Optional[float]) -> object:
     """Construct an ``EntsoePandasClient`` with optional *timeout*.
@@ -99,25 +96,22 @@ def _make_client(client_cls: type, api_key: str, timeout: Optional[float]) -> ob
             then ``RuntimeError`` after retries are exhausted) without bounding
             long live transfers.  ``None`` disables the timeout.  When the
             installed ``entsoe-py`` does not accept this kwarg (older releases),
-            a single WARNING is logged and the client is constructed without the
+            a WARNING is logged and the client is constructed without the
             timeout argument.
 
     Returns:
         An ``EntsoePandasClient`` instance.
     """
-    global _TIMEOUT_WARNING_ISSUED
     if timeout is not None:
         try:
             return client_cls(api_key=api_key, timeout=timeout)
         except TypeError as e:
             if "timeout" not in str(e):
                 raise
-            if not _TIMEOUT_WARNING_ISSUED:
-                logger.warning(
-                    "installed entsoe-py does not support 'timeout'; "
-                    "downloads are unbounded -- upgrade entsoe-py >= 0.8"
-                )
-                _TIMEOUT_WARNING_ISSUED = True
+            logger.warning(
+                "installed entsoe-py does not support 'timeout'; "
+                "downloads are unbounded -- upgrade entsoe-py >= 0.8"
+            )
     return client_cls(api_key=api_key)
 
 

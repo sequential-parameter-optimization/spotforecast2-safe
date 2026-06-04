@@ -53,7 +53,7 @@ class TestEntsoeDownloader(unittest.TestCase):
         df1.to_csv(self.raw_dir / "file1.csv", index=False)
         df2.to_csv(self.raw_dir / "file2.csv", index=False)
 
-        merge_build_manual(output_file="test_merged.csv")
+        entsoe_mod.merge_build_manual(output_file="test_merged.csv")
 
         # Verify output
         output_path = self.interim_dir / "test_merged.csv"
@@ -86,7 +86,7 @@ class TestEntsoeDownloader(unittest.TestCase):
         mock_client.query_load_and_forecast.return_value = mock_df
         sys.modules["entsoe"] = mock_entsoe_mod
 
-        download_new_data(api_key="fake_key", force=True)
+        entsoe_mod.download_new_data(api_key="fake_key", force=True)
 
         # Verify client call includes the default timeout
         mock_client_class.assert_called_once_with(api_key="fake_key", timeout=60.0)
@@ -112,7 +112,7 @@ class TestEntsoeDownloader(unittest.TestCase):
         mock_client_class = mock_entsoe_mod.EntsoePandasClient
         sys.modules["entsoe"] = mock_entsoe_mod
 
-        download_new_data(api_key="fake_key", force=False)
+        entsoe_mod.download_new_data(api_key="fake_key", force=False)
 
         mock_client_class.assert_not_called()
 
@@ -152,7 +152,7 @@ class TestDownloadNewDataResumeFallback(unittest.TestCase):
         )
         sys.modules["entsoe"] = mock_entsoe_mod
 
-        download_new_data(api_key="fake_key", force=True)
+        entsoe_mod.download_new_data(api_key="fake_key", force=True)
 
         # Client was called; fallback resolved.
         mock_entsoe_mod.EntsoePandasClient.assert_called_once()
@@ -174,7 +174,7 @@ class TestDownloadNewDataResumeFallback(unittest.TestCase):
         )
         sys.modules["entsoe"] = mock_entsoe_mod
 
-        download_new_data(api_key="fake_key", force=True)
+        entsoe_mod.download_new_data(api_key="fake_key", force=True)
 
         mock_entsoe_mod.EntsoePandasClient.assert_called_once()
 
@@ -193,7 +193,7 @@ class TestDownloadNewDataResumeFallback(unittest.TestCase):
         sys.modules["entsoe"] = mock_entsoe_mod
 
         with self.assertRaises(PermissionError):
-            download_new_data(api_key="fake_key", force=True)
+            entsoe_mod.download_new_data(api_key="fake_key", force=True)
 
         mock_entsoe_mod.EntsoePandasClient.assert_not_called()
 
@@ -236,7 +236,7 @@ class TestMergeBuildManualMalformedCSV(unittest.TestCase):
         with self.assertLogs(
             "spotforecast2_safe.downloader.entsoe", level="ERROR"
         ) as cm:
-            merge_build_manual(output_file="merged.csv")
+            entsoe_mod.merge_build_manual(output_file="merged.csv")
 
         output_path = self.interim_dir / "merged.csv"
         self.assertTrue(output_path.exists())
@@ -284,7 +284,7 @@ class TestDownloadNewDataRetrySuccess(unittest.TestCase):
         with self.assertLogs(
             "spotforecast2_safe.downloader.entsoe", level="WARNING"
         ) as cm:
-            download_new_data(
+            entsoe_mod.download_new_data(
                 api_key="fake_key",
                 country_code="DE",
                 start="202301010000",
@@ -326,7 +326,7 @@ class TestDownloadNewDataFailSafe(unittest.TestCase):
         sys.modules["entsoe"] = mock_entsoe_mod
 
         with self.assertRaises(RuntimeError) as ctx:
-            download_new_data(api_key="fake_key", force=True)
+            entsoe_mod.download_new_data(api_key="fake_key", force=True)
 
         self.assertIn("5 attempts", str(ctx.exception))
         # All 5 attempts were made
@@ -338,7 +338,7 @@ class TestDownloadNewDataFailSafe(unittest.TestCase):
         mock_get_home.return_value = self.test_dir
 
         with self.assertRaises(ValueError) as ctx:
-            download_new_data(
+            entsoe_mod.download_new_data(
                 api_key="fake_key",
                 start="not a date",
                 end="202301020000",
@@ -352,7 +352,7 @@ class TestDownloadNewDataFailSafe(unittest.TestCase):
         mock_get_home.return_value = self.test_dir
 
         with self.assertRaises(ValueError) as ctx:
-            download_new_data(
+            entsoe_mod.download_new_data(
                 api_key="fake_key",
                 start="202301010000",
                 end="not a date",
@@ -399,7 +399,7 @@ class TestMergeRawFileOrdering(unittest.TestCase):
         return path
 
     def _merged(self):
-        merge_build_manual(output_file="merged.csv")
+        entsoe_mod.merge_build_manual(output_file="merged.csv")
         merged = pd.read_csv(
             self.interim_dir / "merged.csv", index_col=0, parse_dates=True
         )
@@ -465,7 +465,7 @@ class TestDownloadNewDataActualLoadBackfill(unittest.TestCase):
         sys.modules["entsoe"] = mock_entsoe_mod
 
         end = (pd.Timestamp.now(tz="UTC") + pd.Timedelta(days=1)).strftime("%Y%m%d%H00")
-        download_new_data(api_key="fake_key", end=end, force=True)
+        entsoe_mod.download_new_data(api_key="fake_key", end=end, force=True)
         return mock_client.query_load_and_forecast.call_args.kwargs["start"]
 
     @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
@@ -531,13 +531,9 @@ class TestDownloadTimeoutForwarding(unittest.TestCase):
         self.test_dir = Path(tempfile.mkdtemp())
         (self.test_dir / "raw").mkdir()
         (self.test_dir / "interim").mkdir()
-        self._entsoe_mod = entsoe_mod
-        self._orig_flag = entsoe_mod._TIMEOUT_WARNING_ISSUED
-        entsoe_mod._TIMEOUT_WARNING_ISSUED = False
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
-        self._entsoe_mod._TIMEOUT_WARNING_ISSUED = self._orig_flag
 
     @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
     @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
@@ -557,7 +553,7 @@ class TestDownloadTimeoutForwarding(unittest.TestCase):
         mock_client.query_load_and_forecast.return_value = mock_df
         sys.modules["entsoe"] = mock_entsoe_mod
 
-        download_new_data(api_key="fake_key", force=True, timeout=None)
+        entsoe_mod.download_new_data(api_key="fake_key", force=True, timeout=None)
 
         # With timeout=None _make_client falls through to api_key-only construction
         mock_client_class.assert_called_once_with(api_key="fake_key")
@@ -583,7 +579,7 @@ class TestDownloadTimeoutForwarding(unittest.TestCase):
         sys.modules["entsoe"] = mock_entsoe_mod
 
         with self.assertRaises(RuntimeError) as ctx:
-            download_new_data(api_key="fake_key", force=True, timeout=60.0)
+            entsoe_mod.download_new_data(api_key="fake_key", force=True, timeout=60.0)
 
         self.assertIn("5 attempts", str(ctx.exception))
         self.assertEqual(mock_client.query_load_and_forecast.call_count, 5)
@@ -598,8 +594,6 @@ class TestDownloadTimeoutForwarding(unittest.TestCase):
         mock_get_home.return_value = self.test_dir
         dates = pd.date_range("2026-01-01", periods=5, freq="h", tz="UTC")
         mock_fetch.return_value = pd.DataFrame(index=dates)
-
-        # _TIMEOUT_WARNING_ISSUED is already reset to False by setUp.
 
         class StrictClient:
             """Rejects the 'timeout' keyword to simulate old entsoe-py."""
@@ -620,7 +614,7 @@ class TestDownloadTimeoutForwarding(unittest.TestCase):
         with self.assertLogs(
             "spotforecast2_safe.downloader.entsoe", level="WARNING"
         ) as cm:
-            download_new_data(api_key="fake_key", force=True, timeout=30.0)
+            entsoe_mod.download_new_data(api_key="fake_key", force=True, timeout=30.0)
 
         self.assertTrue(
             any("entsoe-py does not support 'timeout'" in msg for msg in cm.output),
