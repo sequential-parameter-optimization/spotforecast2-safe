@@ -13,7 +13,6 @@ Covers:
 - project_name is forwarded to config.data_frame_name
 """
 
-
 import numpy as np
 import pandas as pd
 import pytest
