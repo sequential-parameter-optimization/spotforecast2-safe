@@ -11,10 +11,13 @@ ordered parameter names (``_PARAM_NAMES``) and its ``__init__``; the
 ``get_params`` / ``set_params`` behaviour and the period defaults live here.
 """
 
+import logging
 from dataclasses import replace
 from typing import Dict, List, Optional, Sequence
 
 from spotforecast2_safe.data import Period
+
+_base_logger = logging.getLogger(__name__)
 
 
 def default_periods() -> List[Period]:
@@ -154,7 +157,8 @@ def validate_config(config: object) -> None:
             outside ``[0, 0.5]``, a ``poly_features_degree`` below 1, a
             ``poly_mi_sample_size`` below 1 (``None`` is allowed), an
             ``on_weather_failure`` / ``on_exog_provider_failure`` that is not
-            ``"raise"`` or ``"skip"``, a negative ``exog_max_gap_hours``, or an
+            ``"raise"`` or ``"skip"``, a negative ``exog_max_gap_hours``, a
+            negative ``exog_max_tail_gap_hours``, or an
             ``exog_provider_window`` that is not ``"full"`` or ``"train"``.
     """
     predict_size = getattr(config, "predict_size", None)
@@ -200,6 +204,23 @@ def validate_config(config: object) -> None:
     exog_max_gap_hours = getattr(config, "exog_max_gap_hours", None)
     if exog_max_gap_hours is not None and exog_max_gap_hours < 0:
         raise ValueError(f"exog_max_gap_hours must be >= 0; got {exog_max_gap_hours}.")
+
+    exog_max_tail_gap_hours = getattr(config, "exog_max_tail_gap_hours", None)
+    if exog_max_tail_gap_hours is not None and exog_max_tail_gap_hours < 0:
+        raise ValueError(
+            f"exog_max_tail_gap_hours must be >= 0; got {exog_max_tail_gap_hours}."
+        )
+    if (
+        exog_max_tail_gap_hours is not None
+        and exog_max_gap_hours is not None
+        and 0 < exog_max_tail_gap_hours <= exog_max_gap_hours
+    ):
+        _base_logger.warning(
+            "exog_max_tail_gap_hours=%d is inert: tail budget subsumed by "
+            "exog_max_gap_hours=%d",
+            exog_max_tail_gap_hours,
+            exog_max_gap_hours,
+        )
 
     exog_provider_window = getattr(config, "exog_provider_window", None)
     if exog_provider_window is not None and exog_provider_window not in (

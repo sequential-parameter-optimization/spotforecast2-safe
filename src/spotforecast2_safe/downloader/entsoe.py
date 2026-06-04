@@ -82,6 +82,39 @@ from spotforecast2_safe.data.fetch_data import fetch_data, get_data_home
 
 logger = logging.getLogger(__name__)
 
+
+def _make_client(client_cls: type, api_key: str, timeout: Optional[float]) -> object:
+    """Construct an ``EntsoePandasClient`` with optional *timeout*.
+
+    Args:
+        client_cls: The ``EntsoePandasClient`` class imported lazily by the
+            calling function.
+        api_key: ENTSO-E Web API security token.
+        timeout: Per-socket-operation read timeout in seconds passed to the
+            client.  Kills stalled connections (raises
+            ``requests.exceptions.Timeout``, caught by the existing retry loop,
+            then ``RuntimeError`` after retries are exhausted) without bounding
+            long live transfers.  ``None`` disables the timeout.  When the
+            installed ``entsoe-py`` does not accept this kwarg (older releases),
+            a WARNING is logged and the client is constructed without the
+            timeout argument.
+
+    Returns:
+        An ``EntsoePandasClient`` instance.
+    """
+    if timeout is not None:
+        try:
+            return client_cls(api_key=api_key, timeout=timeout)
+        except TypeError as e:
+            if "timeout" not in str(e):
+                raise
+            logger.warning(
+                "installed entsoe-py does not support 'timeout'; "
+                "downloads are unbounded -- upgrade entsoe-py >= 0.8"
+            )
+    return client_cls(api_key=api_key)
+
+
 _MAX_RETRIES = 5
 _RETRY_BACKOFF_SECONDS = 5
 _COOLDOWN_HOURS = 24
@@ -249,6 +282,7 @@ def download_new_data(
     end: str | None = None,
     force: bool = False,
     keep_forecast_future: bool = False,
+    timeout: Optional[float] = 60.0,
 ) -> None:
     """
     Download new load and forecast data from ENTSO-E.
@@ -276,6 +310,11 @@ def download_new_data(
             only keeps rows the query window already covers, so pass an ``end``
             that reaches into the target day (e.g. tomorrow) as well. See
             `merge_build_manual` for details.
+        timeout: Per-socket-operation read timeout in seconds passed to the
+            ENTSO-E client.  Kills stalled connections (raises
+            ``requests.exceptions.Timeout``, caught by the existing retry loop,
+            then ``RuntimeError`` after retries) without bounding long live
+            transfers.  ``None`` disables the timeout.  Defaults to ``60.0``.
 
     Raises:
         ImportError:
@@ -430,7 +469,7 @@ def download_new_data(
         )
         return
 
-    client = EntsoePandasClient(api_key=api_key)
+    client = _make_client(EntsoePandasClient, api_key=api_key, timeout=timeout)
 
     # Retry loop
     retry_counter = 0
@@ -494,6 +533,7 @@ def _download_entsoe_table(
     file_prefix: str,
     column_name: Optional[str] = None,
     force: bool = False,
+    timeout: Optional[float] = 60.0,
 ) -> None:
     """Download and merge an ENTSO-E day-ahead side-table (shared helper).
 
@@ -520,6 +560,8 @@ def _download_entsoe_table(
         column_name: If the query returns a ``pd.Series``, the column name to
             give it in the saved table. Ignored for ``pd.DataFrame`` results.
         force: If True, bypass the small-window cooldown check.
+        timeout: Per-socket-operation read timeout in seconds.  ``None``
+            disables the timeout.  Defaults to ``60.0``.
 
     Raises:
         ImportError: If ``entsoe-py`` is not installed.
@@ -557,7 +599,7 @@ def _download_entsoe_table(
         )
         return
 
-    client = EntsoePandasClient(api_key=api_key)
+    client = _make_client(EntsoePandasClient, api_key=api_key, timeout=timeout)
 
     retry_counter = 0
     downloaded: Optional[Union[pd.DataFrame, pd.Series]] = None
@@ -615,6 +657,7 @@ def download_renewable_forecast(
     start: Optional[str] = None,
     end: Optional[str] = None,
     force: bool = False,
+    timeout: Optional[float] = 60.0,
 ) -> None:
     """Download the ENTSO-E day-ahead wind/solar generation forecast.
 
@@ -634,6 +677,8 @@ def download_renewable_forecast(
         end: End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the
             start of tomorrow.
         force: If True, bypass the small-window cooldown check.
+        timeout: Per-socket-operation read timeout in seconds.  ``None``
+            disables the timeout.  Defaults to ``60.0``.
 
     Raises:
         ImportError: If ``entsoe-py`` is not installed.
@@ -662,6 +707,7 @@ def download_renewable_forecast(
         output_file="renewable_forecast.csv",
         file_prefix="entsoe_renewable",
         force=force,
+        timeout=timeout,
     )
 
 
@@ -671,6 +717,7 @@ def download_day_ahead_price(
     start: Optional[str] = None,
     end: Optional[str] = None,
     force: bool = False,
+    timeout: Optional[float] = 60.0,
 ) -> None:
     """Download the ENTSO-E day-ahead spot price (DE/LU).
 
@@ -689,6 +736,8 @@ def download_day_ahead_price(
         end: End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the
             start of tomorrow.
         force: If True, bypass the small-window cooldown check.
+        timeout: Per-socket-operation read timeout in seconds.  ``None``
+            disables the timeout.  Defaults to ``60.0``.
 
     Raises:
         ImportError: If ``entsoe-py`` is not installed.
@@ -718,4 +767,5 @@ def download_day_ahead_price(
         file_prefix="entsoe_price",
         column_name="Day-ahead Price",
         force=force,
+        timeout=timeout,
     )

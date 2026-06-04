@@ -4,6 +4,7 @@
 preprocessing.exog_providers.EntsoeRenewableForecastProvider(
     data_home=None,
     max_gap=0,
+    max_tail_gap=0,
     provider_window=None,
 )
 ```
@@ -22,4 +23,5 @@ leakage-clean; the realised generation must never be used.
 |-----------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------|
 | data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to the loader.                                                                                           | `None`    |
 | max_gap         | [int](`int`)                                                                            | Maximum contiguous missing-value run healed by ``_align_to_index``. See :func:`_align_to_index` for full semantics. Defaults to ``0``. | `0`       |
+| max_tail_gap    | [int](`int`)                                                                            | Extended healing budget for the trailing-edge NaN run. See :func:`_align_to_index`. Defaults to ``0``.                                 | `0`       |
 | provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index passed to ``_align_to_index`` as *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.                 | `None`    |

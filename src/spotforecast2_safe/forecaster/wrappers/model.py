@@ -76,6 +76,7 @@ class ForecasterRecursiveModel:
         include_entsoe_day_ahead_price: bool = False,
         on_exog_provider_failure: str = "raise",
         exog_max_gap_hours: int = 0,
+        exog_max_tail_gap_hours: int = 0,
         exog_provider_window: str = "full",
         name: str = "base",
         **kwargs: Any,
@@ -125,6 +126,11 @@ class ForecasterRecursiveModel:
                 Maximum contiguous missing-value run (hours) that providers will
                 heal before raising. ``0`` (default) keeps the strict fail-safe.
                 See :func:`~spotforecast2_safe.preprocessing.exog_providers._align_to_index`.
+            exog_max_tail_gap_hours:
+                Extended healing budget (hours) for the trailing-edge NaN run.
+                ``0`` (default) leaves the tail budget equal to
+                ``exog_max_gap_hours``.
+                See :func:`~spotforecast2_safe.preprocessing.exog_providers._align_to_index`.
             exog_provider_window:
                 Validation window for providers: ``"full"`` (default) validates
                 the entire request index; ``"train"`` is accepted for API
@@ -165,6 +171,7 @@ class ForecasterRecursiveModel:
         self.refit_size = refit_size
 
         self.exog_max_gap_hours = exog_max_gap_hours
+        self.exog_max_tail_gap_hours = exog_max_tail_gap_hours
         self.exog_provider_window = exog_provider_window
         if exog_provider_window != "full":
             logger.warning(
@@ -188,6 +195,7 @@ class ForecasterRecursiveModel:
                     "include_entsoe_day_ahead_price": include_entsoe_day_ahead_price,
                 },
                 max_gap=exog_max_gap_hours,
+                max_tail_gap=exog_max_tail_gap_hours,
             ),
             on_provider_failure=on_exog_provider_failure,
         )
@@ -332,6 +340,7 @@ class ForecasterRecursiveModel:
             "refit_size",
             "name",
             "exog_max_gap_hours",
+            "exog_max_tail_gap_hours",
             "exog_provider_window",
         ]:
             if hasattr(self, key):

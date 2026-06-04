@@ -150,6 +150,16 @@ class ConfigMulti:
             fail-safe (any gap raises). Healed runs are logged with count and
             span. Only already-published day-ahead vintages are involved, so
             healing is leakage-clean (CR-3).
+        exog_max_tail_gap_hours (int): Extended healing budget, in hours,
+            applied exclusively to the trailing-edge NaN run (the run
+            containing the last index timestamp). The effective tail budget is
+            ``max(exog_max_gap_hours, exog_max_tail_gap_hours)``. The canonical
+            use case is the ENTSO-E day-ahead publication frontier: the last
+            published vintage is zero-order-held forward to the forecast horizon
+            without touching interior gaps (CR-3-clean). When
+            ``exog_max_tail_gap_hours <= exog_max_gap_hours`` the parameter is
+            inert (the interior budget already covers the tail) and a warning is
+            logged. Defaults to ``0``.
         exog_provider_window (Literal["full", "train"]): Span the exogenous
             providers are validated against. ``"full"`` (default) requires
             coverage of the entire ``data_start``→``cov_end`` request, matching
@@ -366,6 +376,7 @@ class ConfigMulti:
         "on_weather_failure",
         "on_exog_provider_failure",
         "exog_max_gap_hours",
+        "exog_max_tail_gap_hours",
         "exog_provider_window",
     )
 
@@ -459,6 +470,8 @@ class ConfigMulti:
         on_exog_provider_failure: Literal["raise", "skip"] = "raise",
         # Gap-healing budget for exog providers (0 = strict fail-safe)
         exog_max_gap_hours: int = 0,
+        # Extended trailing-edge healing budget (0 = same as exog_max_gap_hours)
+        exog_max_tail_gap_hours: int = 0,
         # Validation window for exog providers ("full" or "train")
         exog_provider_window: Literal["full", "train"] = "full",
     ):
@@ -585,6 +598,8 @@ class ConfigMulti:
         self.on_exog_provider_failure = on_exog_provider_failure
         # Maximum contiguous gap in hours that providers will heal (0 = strict).
         self.exog_max_gap_hours = exog_max_gap_hours
+        # Extended trailing-edge healing budget (0 = same as exog_max_gap_hours).
+        self.exog_max_tail_gap_hours = exog_max_tail_gap_hours
         # Validation window for providers: "full" (default) or "train".
         self.exog_provider_window = exog_provider_window
         validate_config(self)

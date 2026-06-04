@@ -520,12 +520,30 @@ class TestMethodChaining:
 # ---------------------------------------------------------------------------
 
 
+def _stub_weather(monkeypatch):
+    """Replace the Open-Meteo fetch with the empty-frame fallback shape.
+
+    These tests only assert on provider wiring; hitting the live
+    archive-api.open-meteo.com endpoint made them slow and flaky in CI.
+    The empty frames mirror exactly what the ``on_weather_failure="skip"``
+    fallback produces, so the downstream pipeline path is identical.
+    """
+    import spotforecast2_safe.multitask.base as mt_base
+
+    def offline_weather(*, data, **kwargs):
+        empty = pd.DataFrame(index=data.index)
+        return empty, empty.copy()
+
+    monkeypatch.setattr(mt_base, "get_weather_features", offline_weather)
+
+
 class TestExogProviderWindow:
     """Verify that exog_provider_window is honoured at the call site."""
 
     def test_train_window_passes_provider_window(self, synth_df, tmp_path, monkeypatch):
         """With exog_provider_window='train', build_providers_from_config receives
         a provider_window covering [start_train_ts, cov_end]."""
+        _stub_weather(monkeypatch)
         captured = {}
 
         import spotforecast2_safe.preprocessing.exog_providers as ep_module
@@ -554,6 +572,7 @@ class TestExogProviderWindow:
 
     def test_default_full_window_passes_none(self, synth_df, tmp_path, monkeypatch):
         """With the default exog_provider_window='full', provider_window is None."""
+        _stub_weather(monkeypatch)
         captured = {}
 
         import spotforecast2_safe.preprocessing.exog_providers as ep_module
