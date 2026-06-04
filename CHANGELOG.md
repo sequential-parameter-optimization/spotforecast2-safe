@@ -1,3 +1,10 @@
+## [16.2.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.2.0-rc.1...v16.2.0-rc.2) (2026-06-04)
+
+
+### Bug Fixes
+
+* **downloader:** repair test module after CodeQL autofix; drop unused warning flag ([31fb32b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/31fb32b244294da55e1f084c644f5f229fad72f8))
+
 ## [16.2.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.1.0...v16.2.0-rc.1) (2026-06-04)
 
 
