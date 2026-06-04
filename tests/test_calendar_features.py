@@ -21,6 +21,8 @@ from spotforecast2_safe.calendar import get_calendar_features
 from spotforecast2_safe.calendar import get_calendar_features as _cal
 from spotforecast2_safe.calendar import get_day_night_features
 from spotforecast2_safe.calendar import get_day_night_features as _dn
+from spotforecast2_safe.calendar import get_holiday_adjacency_features
+from spotforecast2_safe.calendar import get_holiday_adjacency_features as _had
 from spotforecast2_safe.calendar import get_holiday_features
 from spotforecast2_safe.calendar import get_holiday_features as _hol
 
@@ -307,6 +309,113 @@ class TestGetHolidayFeatures:
 
 
 # =============================================================================
+# get_holiday_adjacency_features
+# =============================================================================
+
+
+class TestGetHolidayAdjacencyFeatures:
+    """Mirror the TestGetHolidayFeatures structure for the adjacency variant."""
+
+    def test_shape(self, week_start, week_end, reference_data):
+        result = get_holiday_adjacency_features(
+            data=reference_data,
+            start=week_start,
+            cov_end=week_end,
+            forecast_horizon=24,
+        )
+        # 7 days * 24 hours = 168 rows, 3 columns
+        assert result.shape == (168, 3)
+
+    def test_three_columns(self, week_start, week_end, reference_data):
+        result = get_holiday_adjacency_features(
+            data=reference_data,
+            start=week_start,
+            cov_end=week_end,
+            forecast_horizon=24,
+        )
+        assert list(result.columns) == [
+            "is_brueckentag",
+            "is_before_holiday",
+            "is_after_holiday",
+        ]
+
+    def test_no_nan(self, week_start, week_end, reference_data):
+        result = get_holiday_adjacency_features(
+            data=reference_data,
+            start=week_start,
+            cov_end=week_end,
+            forecast_horizon=24,
+        )
+        assert result.isnull().sum().sum() == 0
+
+    def test_binary_values(self, week_start, week_end, reference_data):
+        result = get_holiday_adjacency_features(
+            data=reference_data,
+            start=week_start,
+            cov_end=week_end,
+            forecast_horizon=24,
+        )
+        for col in result.columns:
+            assert set(result[col].unique()).issubset({0, 1})
+
+    def test_integer_dtype(self, week_start, week_end, reference_data):
+        result = get_holiday_adjacency_features(
+            data=reference_data,
+            start=week_start,
+            cov_end=week_end,
+            forecast_horizon=24,
+        )
+        for col in result.columns:
+            assert result[col].dtype in (np.int64, np.int32, int)
+
+    def test_index_tz_aware(self, week_start, week_end, reference_data):
+        result = get_holiday_adjacency_features(
+            data=reference_data,
+            start=week_start,
+            cov_end=week_end,
+            forecast_horizon=24,
+        )
+        assert result.index.tz is not None
+
+    def test_row_count_equals_data_plus_horizon(self, reference_data):
+        """Row count must equal len(data) + forecast_horizon (curate_holidays contract)."""
+        forecast_horizon = 24
+        n_data = 48
+        idx = pd.date_range("2024-01-01", periods=n_data, freq="h", tz="UTC")
+        data = pd.DataFrame({"load": range(n_data)}, index=idx)
+        start = idx[0]
+        cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
+        result = get_holiday_adjacency_features(
+            data=data,
+            start=start,
+            cov_end=cov_end,
+            forecast_horizon=forecast_horizon,
+        )
+        assert result.shape[0] == n_data + forecast_horizon
+
+    def test_reindex_fill_zero(self, reference_data):
+        """Timestamps not flagged as adjacency days must have value 0 (not NaN)."""
+        forecast_horizon = 24
+        n_data = 48
+        # Use a date range with no German holidays or adjacency days
+        idx = pd.date_range("2024-03-11", periods=n_data, freq="h", tz="UTC")
+        data = pd.DataFrame({"load": range(n_data)}, index=idx)
+        start = idx[0]
+        cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
+        result = get_holiday_adjacency_features(
+            data=data,
+            start=start,
+            cov_end=cov_end,
+            forecast_horizon=forecast_horizon,
+        )
+        # No NaN anywhere
+        assert result.isnull().sum().sum() == 0
+
+    def test_module_level_import_same_function(self):
+        assert get_holiday_adjacency_features is _had
+
+
+# =============================================================================
 # Package-level __init__ imports
 # =============================================================================
 
@@ -314,18 +423,22 @@ class TestGetHolidayFeatures:
 class TestCalendarPackageImports:
     def test_calendar_symbols_importable(self):
         from spotforecast2_safe.calendar import (  # noqa: F401
+            create_holiday_adjacency_df,
             create_holiday_df,
             get_calendar_features,
             get_day_night_features,
+            get_holiday_adjacency_features,
             get_holiday_features,
         )
 
     def test_calendar___all__(self):
         calendar_module = importlib.import_module("spotforecast2_safe.calendar")
         for name in (
+            "create_holiday_adjacency_df",
             "create_holiday_df",
             "get_calendar_features",
             "get_day_night_features",
+            "get_holiday_adjacency_features",
             "get_holiday_features",
         ):
             assert name in calendar_module.__all__

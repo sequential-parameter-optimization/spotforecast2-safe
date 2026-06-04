@@ -1,0 +1,83 @@
+# calendar.holiday.get_holiday_adjacency_features { #spotforecast2_safe.calendar.holiday.get_holiday_adjacency_features }
+
+```python
+calendar.holiday.get_holiday_adjacency_features(
+    data,
+    start,
+    cov_end,
+    forecast_horizon,
+    tz='UTC',
+    freq='h',
+    country_code='DE',
+    state='NW',
+)
+```
+
+Build holiday-adjacency indicators and align them to a regular time grid.
+
+Generates ``is_brueckentag``, ``is_before_holiday``, and
+``is_after_holiday`` indicators via `create_holiday_adjacency_df()`,
+validates temporal coverage with `curate_holidays()`, and reindexes the
+result to a full ``[start, cov_end]`` grid with ``fill_value=0`` so that
+non-flagged timestamps are always zero.
+
+All three columns are disjoint from ``is_holiday``: a public holiday itself
+never receives a non-zero value in any of the three adjacency columns.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                                                    | Description                                                                                                    | Default    |
+|------------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|------------|
+| data             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | Reference time series DataFrame used for temporal coverage validation inside `curate_holidays()`.              | _required_ |
+| start            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start timestamp.  String values are parsed with ``utc=True``.                                                  | _required_ |
+| cov_end          | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end timestamp (should cover the full forecast horizon).  String values are parsed with ``utc=True``. | _required_ |
+| forecast_horizon | [int](`int`)                                                                            | Number of forecast steps ahead; passed to `curate_holidays()`.                                                 | _required_ |
+| tz               | [str](`str`)                                                                            | Timezone applied to the generated index and passed to `create_holiday_adjacency_df()`.  Defaults to ``"UTC"``. | `'UTC'`    |
+| freq             | [str](`str`)                                                                            | Pandas-compatible frequency string for the output index. Defaults to ``"h"`` (hourly).                         | `'h'`      |
+| country_code     | [str](`str`)                                                                            | ISO 3166-1 alpha-2 country code.  Defaults to ``"DE"`` (Germany).                                              | `'DE'`     |
+| state            | [str](`str`)                                                                            | Sub-national state/region code.  Defaults to ``"NW"`` (North Rhine-Westphalia).                                | `'NW'`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                        |
+|--------|------------------------------------------------|--------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: DataFrame with three integer columns                 |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``is_brueckentag``, ``is_before_holiday``, ``is_after_holiday``.   |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | The index is a tz-aware `DatetimeIndex` with the requested *freq*. |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | All values are in ``{0, 1}``; no NaNs.                             |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.calendar import get_holiday_adjacency_features
+
+# Build a minimal synthetic reference DataFrame.
+# curate_holidays requires:
+#   adjacency_df.shape[0] == data.shape[0] + forecast_horizon.
+# With n_data=48 rows and forecast_horizon=24, we need 72 hourly
+# steps total, so cov_end = start + 71 h (inclusive date_range).
+forecast_horizon = 24
+n_data = 48
+data = pd.DataFrame(
+    {"load": range(n_data)},
+    index=pd.date_range("2024-01-01", periods=n_data, freq="h", tz="UTC"),
+)
+start = data.index[0]
+cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
+
+adj = get_holiday_adjacency_features(
+    data=data,
+    start=start,
+    cov_end=cov_end,
+    forecast_horizon=forecast_horizon,
+    country_code="DE",
+    state="NW",
+)
+print("shape:", adj.shape)
+print("columns:", adj.columns.tolist())
+assert adj.shape == (n_data + forecast_horizon, 3)
+assert list(adj.columns) == [
+    "is_brueckentag", "is_before_holiday", "is_after_holiday"
+]
+```

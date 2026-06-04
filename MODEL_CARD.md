@@ -7,7 +7,7 @@ This card describes what spotforecast2-safe is, how to use it safely, the condit
 | Field | Value |
 | --- | --- |
 | Name | spotforecast2-safe |
-| Version | 15.8.0 |
+| Version | 15.9.0-rc.1 |
 | Type | Deterministic Python library for time series feature engineering and recursive multi-step forecasting. It performs no training of its own. |
 | Developed by | Thomas Bartz-Beielstein, ORCID [0000-0002-5938-5158](https://orcid.org/0000-0002-5938-5158) |
 | Distributed by | the `sequential-parameter-optimization` GitHub organization |
@@ -18,7 +18,7 @@ This card describes what spotforecast2-safe is, how to use it safely, the condit
 
 The library depends only on numpy, pandas, scikit-learn, lightgbm, numba, pyarrow, requests, feature-engine, holidays, astral, and tqdm. It deliberately excludes plotly, matplotlib, spotoptim, optuna, torch, and tensorflow, so no plotting or automated-tuning code ships in this package.
 
-Two Common Platform Enumeration (CPE) identifiers let vulnerability-tracking and software bill of materials (SBOM) tools recognize the package. The wildcard identifier `cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*` matches any release; the current release is `cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:15.8.0:*:*:*:*:*:*:*`.
+Two Common Platform Enumeration (CPE) identifiers let vulnerability-tracking and software bill of materials (SBOM) tools recognize the package. The wildcard identifier `cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:*:*:*:*:*:*:*:*` matches any release; the current release is `cpe:2.3:a:sequential_parameter_optimization:spotforecast2_safe:15.9.0-rc.1:*:*:*:*:*:*:*`.
 
 The library itself is a low-risk component: it is deterministic, its source is fully inspectable, and it fails safe on invalid input. It is built to support high-risk AI systems in the sense of the EU AI Act, but it is not itself such a system. When it is embedded in a high-risk deployment, the duties that attach to that system fall on the integrator, not on the library.
 
@@ -30,7 +30,7 @@ Responsibilities are divided as follows.
 | Distribution | sequential-parameter-optimization on GitHub | repository issue tracker |
 | Deployment, operation, and audit | the system integrator | defined per deployment |
 
-The current release is 15.8.0, with a stable public interface pinned in `spotforecast2_safe.__init__.__all__`. The full version history, including release dates, is recorded in `CHANGELOG.md` and on the GitHub Releases page; it is maintained automatically by the release pipeline and is not repeated here.
+The current release is 15.9.0-rc.1, with a stable public interface pinned in `spotforecast2_safe.__init__.__all__`. The full version history, including release dates, is recorded in `CHANGELOG.md` and on the GitHub Releases page; it is maintained automatically by the release pipeline and is not repeated here.
 
 ## 2. Intended Use and Scope
 
@@ -216,7 +216,7 @@ Maintainer: Thomas Bartz-Beielstein, ORCID [0000-0002-5938-5158](https://orcid.o
 }
 ```
 
-Or as a formatted reference: Bartz-Beielstein, T. (2026). *spotforecast2-safe: Safety-critical subset of spotforecast2* (Version 15.8.0) [Computer software]. https://github.com/sequential-parameter-optimization/spotforecast2-safe
+Or as a formatted reference: Bartz-Beielstein, T. (2026). *spotforecast2-safe: Safety-critical subset of spotforecast2* (Version 15.9.0-rc.1) [Computer software]. https://github.com/sequential-parameter-optimization/spotforecast2-safe
 
 The technical report (`bart26h/index.qmd`) is the long-form reference for design rationale, compliance mapping, and evaluation protocol.
 

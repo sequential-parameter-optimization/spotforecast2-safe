@@ -65,6 +65,8 @@ class ConfigEntsoe:
         state (str): Subdivision code for regional holidays.
         include_weather_windows (bool): Weather-window feature toggle.
         include_holiday_features (bool): Holiday feature toggle.
+        include_holiday_adjacency_features (bool): Brückentag and
+            before/after-holiday indicator toggle.  Defaults to ``False``.
         poly_features_degree (int): Polynomial-interaction degree passed to
             the feature builder. ``1`` (default) generates no interactions;
             ``2`` adds pairwise bilinear terms; ``3+`` higher order.
@@ -228,6 +230,7 @@ class ConfigEntsoe:
         "state",
         "include_weather_windows",
         "include_holiday_features",
+        "include_holiday_adjacency_features",
         "poly_features_degree",
         "max_poly_features",
         "poly_mi_n_jobs",
@@ -298,6 +301,7 @@ class ConfigEntsoe:
         # Feature selection toggles
         include_weather_windows: bool = False,
         include_holiday_features: bool = False,
+        include_holiday_adjacency_features: bool = False,
         poly_features_degree: int = 1,
         max_poly_features: int = 10,
         poly_mi_n_jobs: Optional[int] = -1,
@@ -397,6 +401,7 @@ class ConfigEntsoe:
         # Feature selection toggles
         self.include_weather_windows = include_weather_windows
         self.include_holiday_features = include_holiday_features
+        self.include_holiday_adjacency_features = include_holiday_adjacency_features
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
         self.poly_mi_n_jobs = poly_mi_n_jobs

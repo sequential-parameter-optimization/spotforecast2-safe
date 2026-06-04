@@ -421,9 +421,7 @@ class TestMergeRawFileOrdering(unittest.TestCase):
 
         self.assertEqual(len(merged), 3)
         self.assertEqual(merged["Actual Load"].isna().sum(), 0)
-        self.assertListEqual(
-            merged["Actual Load"].tolist(), [100.0, 110.0, 120.0]
-        )
+        self.assertListEqual(merged["Actual Load"].tolist(), [100.0, 110.0, 120.0])
 
     @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
     def test_newer_values_revise_but_newer_nan_does_not_erase(self, mock_get_home):
@@ -434,9 +432,7 @@ class TestMergeRawFileOrdering(unittest.TestCase):
 
         merged = self._merged()
 
-        self.assertListEqual(
-            merged["Actual Load"].tolist(), [100.0, 115.0, 120.0]
-        )
+        self.assertListEqual(merged["Actual Load"].tolist(), [100.0, 115.0, 120.0])
 
 
 class TestDownloadNewDataActualLoadBackfill(unittest.TestCase):
@@ -468,9 +464,7 @@ class TestDownloadNewDataActualLoadBackfill(unittest.TestCase):
         )
         sys.modules["entsoe"] = mock_entsoe_mod
 
-        end = (pd.Timestamp.now(tz="UTC") + pd.Timedelta(days=1)).strftime(
-            "%Y%m%d%H00"
-        )
+        end = (pd.Timestamp.now(tz="UTC") + pd.Timedelta(days=1)).strftime("%Y%m%d%H00")
         download_new_data(api_key="fake_key", end=end, force=True)
         return mock_client.query_load_and_forecast.call_args.kwargs["start"]
 
