@@ -513,3 +513,61 @@ class TestMethodChaining:
         mt = MultiTask(cfg, dataframe=synth_df)
         result = mt.prepare_data().detect_outliers().impute().build_exogenous_features()
         assert result is mt
+
+
+# ---------------------------------------------------------------------------
+# exog_provider_window threading into build_providers_from_config
+# ---------------------------------------------------------------------------
+
+
+class TestExogProviderWindow:
+    """Verify that exog_provider_window is honoured at the call site."""
+
+    def test_train_window_passes_provider_window(self, synth_df, tmp_path, monkeypatch):
+        """With exog_provider_window='train', build_providers_from_config receives
+        a provider_window covering [start_train_ts, cov_end]."""
+        captured = {}
+
+        import spotforecast2_safe.preprocessing.exog_providers as ep_module
+
+        original = ep_module.build_providers_from_config
+
+        def capturing_build(config, **kwargs):
+            captured["provider_window"] = kwargs.get("provider_window")
+            return original(config, **kwargs)
+
+        monkeypatch.setattr(ep_module, "build_providers_from_config", capturing_build)
+
+        cfg = _minimal_cfg(
+            cache_home=tmp_path,
+            use_exogenous_features=True,
+            exog_provider_window="train",
+        )
+        task = LazyTask(cfg, dataframe=synth_df)
+        task.prepare_data().detect_outliers().impute().build_exogenous_features()
+
+        pw = captured.get("provider_window")
+        assert pw is not None, "provider_window should have been passed"
+        assert isinstance(pw, pd.DatetimeIndex)
+        assert pw[0] == cfg.start_train_ts
+        assert pw[-1] == pd.Timestamp(cfg.cov_end, tz="UTC")
+
+    def test_default_full_window_passes_none(self, synth_df, tmp_path, monkeypatch):
+        """With the default exog_provider_window='full', provider_window is None."""
+        captured = {}
+
+        import spotforecast2_safe.preprocessing.exog_providers as ep_module
+
+        original = ep_module.build_providers_from_config
+
+        def capturing_build(config, **kwargs):
+            captured["provider_window"] = kwargs.get("provider_window")
+            return original(config, **kwargs)
+
+        monkeypatch.setattr(ep_module, "build_providers_from_config", capturing_build)
+
+        cfg = _minimal_cfg(cache_home=tmp_path, use_exogenous_features=True)
+        task = LazyTask(cfg, dataframe=synth_df)
+        task.prepare_data().detect_outliers().impute().build_exogenous_features()
+
+        assert captured.get("provider_window") is None
