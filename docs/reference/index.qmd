@@ -159,6 +159,32 @@ High-level training, prediction, and model persistence orchestration.
 | [manager.features.get_target_data](manager.features.get_target_data.qmd#spotforecast2_safe.manager.features.get_target_data) | Extract the training series and exogenous slices for one target column. |
 | [manager.features.select_top_poly_features](manager.features.select_top_poly_features.qmd#spotforecast2_safe.manager.features.select_top_poly_features) | Rank polynomial interaction columns by mutual information, keep the top K. |
 
+## Multitask
+
+Config-driven multi-target forecasting orchestrator.  Tuning-free and
+plotting-free safe subset of the sibling spotforecast2.multitask.
+Provides BaseTask (shared pipeline steps), MultiTask (task dispatcher),
+task-specific classes (LazyTask, DefaultsTask, PredictTask, CleanTask),
+the module-level agg_predictor helper, a LightGBM factory, training
+strategies, and a one-call runner.
+
+
+| | |
+| --- | --- |
+| [multitask.base.BaseTask](multitask.base.BaseTask.qmd#spotforecast2_safe.multitask.base.BaseTask) | Shared base for all multi-target forecasting pipeline tasks. |
+| [multitask.base.agg_predictor](multitask.base.agg_predictor.qmd#spotforecast2_safe.multitask.base.agg_predictor) | Aggregate per-target prediction packages into a weighted forecast. |
+| [multitask.multi.MultiTask](multitask.multi.MultiTask.qmd#spotforecast2_safe.multitask.multi.MultiTask) | Orchestrates a multi-target time-series forecasting pipeline. |
+| [multitask.lazy.LazyTask](multitask.lazy.LazyTask.qmd#spotforecast2_safe.multitask.lazy.LazyTask) | Task 1 — Lazy Fitting with default LightGBM parameters. |
+| [multitask.defaults.DefaultsTask](multitask.defaults.DefaultsTask.qmd#spotforecast2_safe.multitask.defaults.DefaultsTask) | Task 2 — Defaults fitting (no tuning, no cached params). |
+| [multitask.predict.PredictTask](multitask.predict.PredictTask.qmd#spotforecast2_safe.multitask.predict.PredictTask) | Task 5 — Predict-only using previously saved models. |
+| [multitask.clean.CleanTask](multitask.clean.CleanTask.qmd#spotforecast2_safe.multitask.clean.CleanTask) | Cache-cleaning task — removes all cached data from the pipeline cache. |
+| [multitask.factories.default_lgbm_forecaster_factory](multitask.factories.default_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.default_lgbm_forecaster_factory) | Return a fresh, unfitted LightGBM ``ForecasterRecursive``. |
+| [multitask.strategies.TrainingStrategy](multitask.strategies.TrainingStrategy.qmd#spotforecast2_safe.multitask.strategies.TrainingStrategy) | Strategy interface for preparing a forecaster before the final fit. |
+| [multitask.strategies.LazyStrategy](multitask.strategies.LazyStrategy.qmd#spotforecast2_safe.multitask.strategies.LazyStrategy) | Approach 1 — Lazy fitting with optional cached tuning. |
+| [multitask.strategies.DefaultsStrategy](multitask.strategies.DefaultsStrategy.qmd#spotforecast2_safe.multitask.strategies.DefaultsStrategy) | Approach 2 — Train with defaults, no tuning, no cached params. |
+| [multitask.runner.run](multitask.runner.run.qmd#spotforecast2_safe.multitask.runner.run) | Run the MultiTask forecasting pipeline and return predictions. |
+| [multitask.runner.make_demo10_config](multitask.runner.make_demo10_config.qmd#spotforecast2_safe.multitask.runner.make_demo10_config) | Build a ``ConfigMulti`` pre-loaded with the 11-target demo10 presets. |
+
 ## Utils
 
 General-purpose utility functions: CPE generation, validation, and
@@ -248,4 +274,4 @@ Executable tasks for demonstration and production pipelines.
 | | |
 | --- | --- |
 | [tasks.task_safe_demo](tasks.task_safe_demo.qmd#spotforecast2_safe.tasks.task_safe_demo) | Task demo: compare baseline, covariate, and custom LightGBM forecasts against ground truth. |
-| [tasks.task_safe_n_to_1_with_covariates_and_dataframe](tasks.task_safe_n_to_1_with_covariates_and_dataframe.qmd#spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe) | N-to-1 Forecasting with Exogenous Covariates and Prediction Aggregation. |
+| [tasks.task_safe_n_to_1_with_covariates_and_dataframe](tasks.task_safe_n_to_1_with_covariates_and_dataframe.qmd#spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe) | Thin ConfigMulti-driven entry point for N-to-1 forecasting. |

@@ -1,0 +1,12 @@
+{
+  "hash": "55825d0e1c95b6953decbbb0e8ae3ec5",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: multitask.runner.make_demo10_config\n---\n\n\n\n```python\nmultitask.runner.make_demo10_config(**overrides)\n```\n\nBuild a ``ConfigMulti`` pre-loaded with the 11-target demo10 presets.\n\nThe 11-target ENTSO-E demo dataset (``demo10.csv``) ships with the\npackage and is the canonical example dataset for the Quarto docs and\ntutorial notebooks.  Its outlier ``bounds`` and aggregation\n``agg_weights`` are dataset-specific and should not be inherited by\narbitrary callers — this helper makes the opt-in explicit.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name        | Type                | Description                                                                              | Default   |\n|-------------|---------------------|------------------------------------------------------------------------------------------|-----------|\n| **overrides | [Any](`typing.Any`) | Forwarded to ``ConfigMulti.set_params`` to tweak any other field on the returned config. | `{}`      |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                                                      | Description                                                          |\n|--------|---------------------------------------------------------------------------|----------------------------------------------------------------------|\n|        | [ConfigMulti](`spotforecast2_safe.configurator.config_multi.ConfigMulti`) | A new ``ConfigMulti`` with ``bounds`` and ``agg_weights`` set to the |\n|        | [ConfigMulti](`spotforecast2_safe.configurator.config_multi.ConfigMulti`) | demo10 presets, plus any caller-supplied overrides applied.          |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#4cf9894c .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.multitask.runner import make_demo10_config\n\ncfg = make_demo10_config(predict_size=48)\nprint(cfg.predict_size)\nprint(len(cfg.bounds))\nprint(len(cfg.agg_weights))\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n48\n11\n11\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "multitask.runner.make_demo10_config_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

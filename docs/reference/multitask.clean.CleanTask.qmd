@@ -1,0 +1,99 @@
+# multitask.clean.CleanTask { #spotforecast2_safe.multitask.clean.CleanTask }
+
+```python
+multitask.clean.CleanTask(
+    config=None,
+    *,
+    dataframe=None,
+    data_test=None,
+    cache_home=None,
+    log_level=logging.INFO,
+    **overrides,
+)
+```
+
+Cache-cleaning task — removes all cached data from the pipeline cache.
+
+``CleanTask`` deletes the entire cache directory configured for the
+pipeline, including saved models, tuning results, and any other
+cached artefacts written by training tasks.
+
+Unlike training or prediction tasks, ``CleanTask`` does not require
+``prepare_data()`` to be called before ``run()``.  It operates purely on
+the file system and can be used as a standalone reset mechanism
+between experiments or deployments.
+
+Passing ``dry_run=True`` to ``run()`` reports what would be deleted
+without actually removing anything, which is useful for inspecting
+cache contents before committing to removal.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import CleanTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(data_frame_name="demo10", cache_home=Path(tmp))
+    task = CleanTask(cfg)
+    print(f"Task: {task.TASK}")
+    print(f"Task name: {task._task_name}")
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [run](#spotforecast2_safe.multitask.clean.CleanTask.run) | Remove all cached data from the pipeline cache directory. |
+
+### run { #spotforecast2_safe.multitask.clean.CleanTask.run }
+
+```python
+multitask.clean.CleanTask.run(
+    dry_run=False,
+    cache_home=None,
+    show=False,
+    **kwargs,
+)
+```
+
+Remove all cached data from the pipeline cache directory.
+
+Does not require ``prepare_data()`` to be called first.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                                                    | Description                                                                                                                                  | Default   |
+|------------|---------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| dry_run    | [bool](`bool`)                                          | If ``True``, report what would be deleted without actually removing anything.  Useful for inspecting the cache before committing to removal. | `False`   |
+| cache_home | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Override the directory to clean.  ``None`` uses the directory configured on this instance via ``get_cache_home()``.                          | `None`    |
+| show       | [bool](`bool`)                                          | Accepted for API consistency with other tasks.  Not used by the clean task.                                                                  | `False`   |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                                                                                                                                                                                 |
+|--------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Dict with keys: status: ``"success"``, ``"dry_run"``, or ``"empty"``. cache_dir: The Path targeted for cleaning. deleted_items: Names of top-level items removed (or that     would have been removed in ``dry_run`` mode). |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                                                                              |
+|--------|--------------------------------|------------------------------------------------------------------------------------------|
+|        | [RuntimeError](`RuntimeError`) | If the cache directory cannot be removed due to a permissions error or OS-level failure. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import CleanTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(cache_home=Path(tmp) / "test_cache")
+    task = CleanTask(cfg)
+    result = task.run(dry_run=True)
+    print(result["status"])
+```

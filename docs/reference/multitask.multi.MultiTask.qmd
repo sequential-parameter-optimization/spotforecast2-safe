@@ -1,0 +1,232 @@
+# multitask.multi.MultiTask { #spotforecast2_safe.multitask.multi.MultiTask }
+
+```python
+multitask.multi.MultiTask(
+    config=None,
+    *,
+    task='lazy',
+    dataframe=None,
+    data_test=None,
+    cache_home=None,
+    dry_run=False,
+    show_progress=False,
+    log_level=logging.INFO,
+    **overrides,
+)
+```
+
+Orchestrates a multi-target time-series forecasting pipeline.
+
+Data must be provided as a pandas DataFrame via ``dataframe``.
+A test dataset can optionally be provided via ``data_test``.
+
+The typical usage flow is:
+
+1. Instantiate with ``config`` (or omit to auto-construct ``ConfigMulti()``).
+2. Call ``prepare_data`` to load, resample, and validate data.
+3. Call ``detect_outliers`` to apply hard bounds and IsolationForest.
+4. Call ``impute`` to fill gaps.
+5. Call ``build_exogenous_features`` to construct weather / calendar /
+   day-night / holiday covariates.
+6. Call ``run`` (or individual ``run_task_*`` methods) to train,
+   predict, and aggregate.
+
+Available tasks: ``"lazy"``, ``"defaults"``, ``"predict"``, ``"clean"``.
+Tasks requiring auto-tuning (``"optuna"``, ``"spotoptim"``) raise
+``ValueError`` — use the ``spotforecast2`` sibling package for those.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name          | Type                                                                                                  | Description                                                                                                                                                                                                                      | Default        |
+|---------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| config        | [Optional](`typing.Optional`)\[[PipelineConfig](`spotforecast2_safe.multitask.base.PipelineConfig`)\] | A ``PipelineConfig``-conforming object (e.g. ``ConfigMulti``). When ``None``, a fresh ``ConfigMulti()`` is constructed.                                                                                                          | `None`         |
+| task          | [str](`str`)                                                                                          | Pipeline task mode — ``"lazy"``, ``"defaults"``, ``"predict"``, or ``"clean"``.  Defaults to ``"lazy"``.                                                                                                                         | `'lazy'`       |
+| dataframe     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                       | Pre-loaded input DataFrame with training data.  The DataFrame must contain a datetime column matching ``config.index_name`` plus at least one numeric target column. Optional for the ``"clean"`` task, required for all others. | `None`         |
+| data_test     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                       | Pre-loaded input DataFrame with test data.  Optional.                                                                                                                                                                            | `None`         |
+| cache_home    | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]                                               | Cache directory override.  When not ``None``, replaces ``config.cache_home`` for this task instance.                                                                                                                             | `None`         |
+| dry_run       | [bool](`bool`)                                                                                        | If ``True``, do not clean cache or save models.                                                                                                                                                                                  | `False`        |
+| show_progress | [bool](`bool`)                                                                                        | Whether to print progress messages during pipeline execution.                                                                                                                                                                    | `False`        |
+| log_level     | [int](`int`)                                                                                          | Logging level for the pipeline logger.                                                                                                                                                                                           | `logging.INFO` |
+| **overrides   | [Any](`typing.Any`)                                                                                   | Forwarded to ``config.set_params(**overrides)`` — a convenience for one-line tweaks without building a fresh config. Mutates the caller's config object.                                                                         | `{}`           |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import pandas as pd
+import numpy as np
+from spotforecast2_safe.multitask import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(predict_size=6, use_exogenous_features=False, cache_home=tmp)
+    mt = MultiTask(cfg, dataframe=df)
+    print(f"DataFrame stored: {mt._dataframe is not None}")
+    print(f"Task: {mt.TASK}")
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [run](#spotforecast2_safe.multitask.multi.MultiTask.run) | Run the task specified by ``task`` (or ``self.TASK``). |
+| [run_task_clean](#spotforecast2_safe.multitask.multi.MultiTask.run_task_clean) | Remove all cached data from the pipeline cache directory. |
+| [run_task_defaults](#spotforecast2_safe.multitask.multi.MultiTask.run_task_defaults) | Defaults fitting — no tuning, no cached params. |
+| [run_task_lazy](#spotforecast2_safe.multitask.multi.MultiTask.run_task_lazy) | Lazy Fitting with default LightGBM parameters. |
+| [run_task_predict](#spotforecast2_safe.multitask.multi.MultiTask.run_task_predict) | Predict-only using previously saved models. |
+
+### run { #spotforecast2_safe.multitask.multi.MultiTask.run }
+
+```python
+multitask.multi.MultiTask.run(task=None, show=False, **kwargs)
+```
+
+Run the task specified by ``task`` (or ``self.TASK``).
+
+This dispatcher selects a task only; per-task options (for example
+``use_tuned_params`` or ``max_age_days``) must be passed to the
+corresponding ``run_task_*`` method directly.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                          | Description                                           | Default   |
+|--------|-----------------------------------------------|-------------------------------------------------------|-----------|
+| task   | [Optional](`typing.Optional`)\[[str](`str`)\] | Override the task mode.  ``None`` uses ``self.TASK``. | `None`    |
+| show   | [bool](`bool`)                                | If ``True``, invoke the visualisation hooks.          | `False`   |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                  |
+|--------|------------------------------------------------------------|--------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target results are stored |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | on ``self.results[<task_key>]``.                             |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                                                                                                                                        |
+|--------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)       | If unexpected keyword arguments are supplied (fail-safe: they would otherwise be silently ignored).                                                |
+|        | [ValueError](`ValueError`)     | If ``task`` is ``"optuna"`` or ``"spotoptim"`` (auto-tuning not available in this package), or if ``task`` is not one of the supported task names. |
+|        | [RuntimeError](`RuntimeError`) | If ``prepare_data`` has not been called (for training and prediction tasks).                                                                       |
+
+### run_task_clean { #spotforecast2_safe.multitask.multi.MultiTask.run_task_clean }
+
+```python
+multitask.multi.MultiTask.run_task_clean(
+    show=False,
+    dry_run=False,
+    cache_home=None,
+)
+```
+
+Remove all cached data from the pipeline cache directory.
+
+Does not require ``prepare_data()`` to be called first.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                                                    | Description                                                                                      | Default   |
+|------------|---------------------------------------------------------|--------------------------------------------------------------------------------------------------|-----------|
+| show       | [bool](`bool`)                                          | Accepted for API consistency.  Not used by the clean task.                                       | `False`   |
+| dry_run    | [bool](`bool`)                                          | If ``True``, report what would be deleted without actually removing anything.                    | `False`   |
+| cache_home | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Override the directory to clean.  ``None`` uses the cache directory configured on this instance. | `None`    |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                          |
+|--------|------------------------------------------------------------|------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Dict with keys status, cache_dir, and deleted_items. |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                               |
+|--------|--------------------------------|-------------------------------------------|
+|        | [RuntimeError](`RuntimeError`) | If the cache directory cannot be removed. |
+
+### run_task_defaults { #spotforecast2_safe.multitask.multi.MultiTask.run_task_defaults }
+
+```python
+multitask.multi.MultiTask.run_task_defaults(show=False)
+```
+
+Defaults fitting — no tuning, no cached params.
+
+Distinct from ``run_task_lazy`` only in that it never consults the
+tuning-result cache.  Use this for deterministic baselines and for
+ENTSO-E "Approach 2: Training without Tuning".
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type           | Description                                  | Default   |
+|--------|----------------|----------------------------------------------|-----------|
+| show   | [bool](`bool`) | If ``True``, invoke the visualisation hooks. | `False`   |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                          |
+|--------|------------------------------------------------------------|------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target results in |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``self.results["defaults"]``.                        |
+
+### run_task_lazy { #spotforecast2_safe.multitask.multi.MultiTask.run_task_lazy }
+
+```python
+multitask.multi.MultiTask.run_task_lazy(show=False)
+```
+
+Lazy Fitting with default LightGBM parameters.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type           | Description                                  | Default   |
+|--------|----------------|----------------------------------------------|-----------|
+| show   | [bool](`bool`) | If ``True``, invoke the visualisation hooks. | `False`   |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                          |
+|--------|------------------------------------------------------------|------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target results in |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``self.results["lazy"]``.                            |
+
+### run_task_predict { #spotforecast2_safe.multitask.multi.MultiTask.run_task_predict }
+
+```python
+multitask.multi.MultiTask.run_task_predict(
+    show=False,
+    task_name=None,
+    max_age_days=None,
+)
+```
+
+Predict-only using previously saved models.
+
+Loads fitted models from the cache directory and produces
+predictions without any training.  Raises ``RuntimeError``
+if no saved models are found.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                              | Description                                                                                                                                                                  | Default   |
+|--------------|---------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| show         | [bool](`bool`)                                    | If ``True``, invoke the visualisation hooks.                                                                                                                                 | `False`   |
+| task_name    | [Optional](`typing.Optional`)\[[str](`str`)\]     | Restrict model loading to a specific source task (``"lazy"``, ``"defaults"``, ``"optuna"``, or ``"spotoptim"``).  ``None`` loads the most recent model regardless of source. | `None`    |
+| max_age_days | [Optional](`typing.Optional`)\[[float](`float`)\] | Maximum age in days for saved models. ``None`` accepts any age.                                                                                                              | `None`    |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                          |
+|--------|------------------------------------------------------------|------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target results in |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``self.results["predict"]``.                         |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                   |
+|--------|--------------------------------|-------------------------------|
+|        | [RuntimeError](`RuntimeError`) | If no saved models are found. |

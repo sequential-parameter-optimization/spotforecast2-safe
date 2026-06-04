@@ -708,15 +708,17 @@ The `weights` argument accepts three forms:
 - `None`, which falls back to the package default.
 
 A list or array entry may be negative. A positive weight adds that column's
-forecast to the aggregate; a negative weight subtracts it. The production
-task `tasks/task_safe_n_to_1_with_covariates_and_dataframe.py` uses this
-signed convention with the eleven-element vector
-`[+1, +1, -1, -1, +1, -1, +1, +1, +1, -1, +1]` (its module-level
-`DEFAULT_WEIGHTS`) to express a net-position aggregation in which the first,
-second, fifth, seventh, eighth, ninth, and eleventh columns are added and the
-remaining columns are subtracted. The same call is the closing step of
+forecast to the aggregate; a negative weight subtracts it. This signed
+convention is used with the eleven-element vector
+`[+1, +1, -1, -1, +1, -1, +1, +1, +1, -1, +1]` to express a net-position
+aggregation in which the first, second, fifth, seventh, eighth, ninth, and
+eleventh columns are added and the remaining columns are subtracted.
+
+The n2n pipeline remains available and is used by `task_safe_demo`.  The n-to-1
+task (`tasks/task_safe_n_to_1_with_covariates_and_dataframe.py`) now runs on
+`spotforecast2_safe.multitask` — see
 [`docs/tasks/task_safe_n21_cov_df.qmd`](../tasks/task_safe_n21_cov_df.qmd)
-at the line `combined_prediction = agg_predict(predictions, weights=weights)`.
+for its `ConfigMulti`-driven workflow and `agg_weights` configuration.
 
 ```{python}
 from spotforecast2_safe.processing.agg_predict import agg_predict

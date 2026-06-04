@@ -1,0 +1,78 @@
+# multitask.predict.PredictTask { #spotforecast2_safe.multitask.predict.PredictTask }
+
+```python
+multitask.predict.PredictTask(
+    config=None,
+    *,
+    dataframe=None,
+    data_test=None,
+    cache_home=None,
+    log_level=logging.INFO,
+    **overrides,
+)
+```
+
+Task 5 — Predict-only using previously saved models.
+
+Loads fitted forecasters that were persisted by a prior ``LazyTask`` or
+``DefaultsTask`` run (or by any task in the ``spotforecast2`` sibling
+package) and produces predictions for all configured targets.  No
+training or tuning is performed.
+
+If no saved models exist in the cache directory the ``run`` method
+raises ``RuntimeError`` with an informative message.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import PredictTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(data_frame_name="demo10", predict_size=24, cache_home=Path(tmp))
+    task = PredictTask(cfg)
+    print(f"Task: {task.TASK}")
+    print(f"Predict size: {task.config.predict_size}")
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [run](#spotforecast2_safe.multitask.predict.PredictTask.run) | Run prediction using previously saved models. |
+
+### run { #spotforecast2_safe.multitask.predict.PredictTask.run }
+
+```python
+multitask.predict.PredictTask.run(
+    show=False,
+    task_name=None,
+    max_age_days=None,
+    **kwargs,
+)
+```
+
+Run prediction using previously saved models.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                              | Description                                                                                                                                                                  | Default   |
+|--------------|---------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| show         | [bool](`bool`)                                    | If ``True``, invoke the visualisation hooks.                                                                                                                                 | `False`   |
+| task_name    | [Optional](`typing.Optional`)\[[str](`str`)\]     | Restrict model loading to a specific source task (``"lazy"``, ``"defaults"``, ``"optuna"``, or ``"spotoptim"``).  ``None`` loads the most recent model regardless of source. | `None`    |
+| max_age_days | [Optional](`typing.Optional`)\[[float](`float`)\] | Maximum age in days for saved models. Models older than this are ignored.  ``None`` accepts any age.                                                                         | `None`    |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                   |
+|--------|------------------------------------------------------------|---------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target packages are stored |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | on ``self.results["predict"]``.                               |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                                                                                |
+|--------|--------------------------------|--------------------------------------------------------------------------------------------|
+|        | [RuntimeError](`RuntimeError`) | If no saved models are found in the cache directory, or if a target has no matching model. |

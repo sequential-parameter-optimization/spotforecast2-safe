@@ -651,14 +651,13 @@ combined_prediction.head(3).round(4)
 
 :::
 
-The sign pattern of `weights` is identical to the module-level
-`DEFAULT_WEIGHTS` constant in
-`tasks/task_safe_n_to_1_with_covariates_and_dataframe.py`. With this signed
-choice the aggregate behaves as a net position — the first, second, fifth,
-seventh, eighth, ninth, and eleventh columns are added and the remainder are
-subtracted — and the call mirrors what the production task
-[`docs/tasks/task_safe_n21_cov_df.qmd`](../tasks/task_safe_n21_cov_df.qmd)
-executes after its own Stage 10.
+The sign pattern of `weights` expresses the same net-position convention used
+by the production task — the first, second, fifth, seventh, eighth, ninth, and
+eleventh columns are added and the remainder are subtracted.  The n2n pipeline
+demonstrated here is also used by `task_safe_demo`; the n-to-1 task
+([`docs/tasks/task_safe_n21_cov_df.qmd`](../tasks/task_safe_n21_cov_df.qmd))
+now runs on `spotforecast2_safe.multitask` with the same weights carried by
+`ConfigMulti.agg_weights`.
 
 ## Metadata
 

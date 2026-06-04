@@ -1,0 +1,108 @@
+# multitask.runner.run { #spotforecast2_safe.multitask.runner.run }
+
+```python
+multitask.runner.run(
+    config=None,
+    *,
+    task='lazy',
+    dataframe=None,
+    data_test=None,
+    project_name='test_project',
+    cache_home=None,
+    plot_with_outliers=False,
+    show=False,
+    show_progress=False,
+    dry_run=False,
+    log_level=40,
+    **overrides,
+)
+```
+
+Run the MultiTask forecasting pipeline and return predictions.
+
+Wraps the standard pipeline sequence into a single call.  For the
+``"clean"`` task only the cache directory is wiped and an empty
+DataFrame is returned.  For all other tasks the full sequence
+
+    prepare_data -> detect_outliers -> impute ->
+    build_exogenous_features -> run
+
+is executed and the aggregated future predictions are returned as a
+DataFrame.
+
+Available tasks: ``"lazy"``, ``"defaults"``, ``"predict"``,
+``"clean"``.  Passing ``task="optuna"`` or ``task="spotoptim"``
+raises ``ValueError``; use the ``spotforecast2`` sibling package for
+auto-tuning.
+
+When ``plot_with_outliers=True`` the call reaches ``plot_with_outliers()``
+on the ``BaseTask`` instance, which raises ``NotImplementedError`` because
+plotting is not available in ``spotforecast2-safe``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name               | Type                                                                                                  | Description                                                                                                                                                                                                                                             | Default          |
+|--------------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| config             | [Optional](`typing.Optional`)\[[PipelineConfig](`spotforecast2_safe.multitask.base.PipelineConfig`)\] | A ``PipelineConfig``-conforming object (typically ``ConfigMulti``).  When ``None``, a fresh ``ConfigMulti()`` is constructed with default fields.  Use ``make_demo10_config()`` to opt in to the 11-target demo10 ``bounds`` / ``agg_weights`` presets. | `None`           |
+| task               | [str](`str`)                                                                                          | Pipeline mode — one of ``"lazy"``, ``"defaults"``, ``"predict"``, or ``"clean"``.  Defaults to ``"lazy"``.                                                                                                                                              | `'lazy'`         |
+| dataframe          | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                       | Input time-series data.  Must contain a datetime column matching ``config.index_name`` and at least one numeric target column.  Optional for ``"clean"``, required otherwise.                                                                           | `None`           |
+| data_test          | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                       | Ground-truth DataFrame covering the prediction horizon. When supplied, populates ``test_actual`` and ``metrics_future`` in the prediction package.  Optional.                                                                                           | `None`           |
+| project_name       | [str](`str`)                                                                                          | Active-dataset identifier.  Sets ``config.data_frame_name``, which drives cache-subdirectory and model-file naming.                                                                                                                                     | `'test_project'` |
+| cache_home         | [Optional](`typing.Optional`)\[[str](`str`)\]                                                         | Cache directory override.  When ``None``, the package default from ``get_cache_home()`` is used.                                                                                                                                                        | `None`           |
+| plot_with_outliers | [bool](`bool`)                                                                                        | Whether to render the optional outlier-visualisation step.  Calling this will raise ``NotImplementedError`` in ``spotforecast2-safe``; set to ``False`` (the default) to skip it.                                                                       | `False`          |
+| show               | [bool](`bool`)                                                                                        | Whether to invoke the prediction display hooks after the task runs.                                                                                                                                                                                     | `False`          |
+| show_progress      | [bool](`bool`)                                                                                        | Whether to print progress messages during pipeline execution.                                                                                                                                                                                           | `False`          |
+| dry_run            | [bool](`bool`)                                                                                        | Forwarded to ``MultiTask``; only meaningful for the ``"clean"`` task.                                                                                                                                                                                   | `False`          |
+| log_level          | [int](`int`)                                                                                          | Logging level.  Defaults to 40 (ERROR).                                                                                                                                                                                                                 | `40`             |
+| **overrides        | [Any](`typing.Any`)                                                                                   | Forwarded to ``config.set_params(**overrides)``. Mutates the caller's config object.                                                                                                                                                                    | `{}`             |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                       |
+|--------|------------------------------------------------|-------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame whose index is the forecast horizon timestamps and      |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | whose single column ``"forecast"`` contains the aggregated        |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | predicted values.  For the ``"clean"`` task an empty DataFrame is |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | returned.                                                         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                         |
+|--------|----------------------------|-----------------------------------------------------|
+|        | [ValueError](`ValueError`) | If ``task`` is not one of the supported task names. |
+
+## Examples {.doc-section .doc-section-examples}
+
+Run the pipeline using cached or default model parameters
+(``"lazy"`` task):
+
+```{python}
+import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
+from spotforecast2_safe.multitask.runner import run
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+
+data_home = get_package_data_home()
+df = fetch_data(filename=str(data_home / "demo02.csv"))
+
+cfg = ConfigMulti(
+    train_size=pd.Timedelta(days=365),
+    predict_size=24,
+    imputation_method="weighted",
+    use_exogenous_features=False,
+)
+forecast = run(cfg, task="lazy", dataframe=df, project_name="demo02")
+print(forecast)
+```
+
+Remove all cached models and artefacts for a project
+(``"clean"`` task).  Returns an empty DataFrame:
+
+```{python}
+from spotforecast2_safe.multitask.runner import run
+
+result = run(task="clean", project_name="demo02")
+print(result.empty)
+```

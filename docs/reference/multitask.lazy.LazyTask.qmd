@@ -1,0 +1,72 @@
+# multitask.lazy.LazyTask { #spotforecast2_safe.multitask.lazy.LazyTask }
+
+```python
+multitask.lazy.LazyTask(
+    config=None,
+    *,
+    dataframe=None,
+    data_test=None,
+    cache_home=None,
+    log_level=logging.INFO,
+    **overrides,
+)
+```
+
+Task 1 — Lazy Fitting with default LightGBM parameters.
+
+Creates an unfitted forecaster per target and fits with default
+hyperparameters.  No cross-validation or tuning is performed.
+
+When cached tuning results are available (saved by a prior run in the
+``spotforecast2`` sibling package), they are loaded and applied automatically
+so that the lazy task benefits from prior tuning without re-running
+the search.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import LazyTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(data_frame_name="demo10", predict_size=24, cache_home=Path(tmp))
+    task = LazyTask(cfg)
+    print(f"Task: {task.TASK}")
+    print(f"Predict size: {task.config.predict_size}")
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [run](#spotforecast2_safe.multitask.lazy.LazyTask.run) | Run lazy fitting for all targets. |
+
+### run { #spotforecast2_safe.multitask.lazy.LazyTask.run }
+
+```python
+multitask.lazy.LazyTask.run(
+    show=False,
+    use_tuned_params=True,
+    max_age_days=None,
+    **kwargs,
+)
+```
+
+Run lazy fitting for all targets.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                              | Description                                                              | Default   |
+|------------------|---------------------------------------------------|--------------------------------------------------------------------------|-----------|
+| show             | [bool](`bool`)                                    | If ``True``, invoke the visualisation hooks.                             | `False`   |
+| use_tuned_params | [bool](`bool`)                                    | If ``True``, load and apply cached tuning results for each target.       | `True`    |
+| max_age_days     | [Optional](`typing.Optional`)\[[float](`float`)\] | Maximum age in days for cached tuning results. ``None`` accepts any age. | `None`    |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                   |
+|--------|------------------------------------------------------------|---------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target packages are stored |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | on ``self.results["lazy"]``.                                  |
