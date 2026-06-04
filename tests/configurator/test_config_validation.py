@@ -67,7 +67,11 @@ class TestSetParamsValidation:
 
     def test_negative_exog_max_gap_rejected(self, cls):
         with pytest.raises(ValueError, match="exog_max_gap_hours must be >= 0"):
-            cls(exog_max_gap_hours=-1)
+            cls().set_params(exog_max_gap_hours=-1)
+
+    def test_negative_exog_max_tail_gap_rejected(self, cls):
+        with pytest.raises(ValueError, match="exog_max_tail_gap_hours must be >= 0"):
+            cls().set_params(exog_max_tail_gap_hours=-1)
 
     def test_bogus_exog_provider_window_rejected(self, cls):
         with pytest.raises(ValueError, match="exog_provider_window must be"):
@@ -79,3 +83,23 @@ class TestSetParamsValidation:
         cfg2 = cls(exog_max_gap_hours=12, exog_provider_window="train")
         assert cfg2.exog_max_gap_hours == 12
         assert cfg2.exog_provider_window == "train"
+
+    def test_inert_tail_gap_warns(self, cls, caplog):
+        """0 < exog_max_tail_gap_hours <= exog_max_gap_hours triggers a warning."""
+        import logging
+
+        with caplog.at_level(
+            logging.WARNING, logger="spotforecast2_safe.configurator._base_config"
+        ):
+            cfg = cls(exog_max_gap_hours=6, exog_max_tail_gap_hours=3)
+        assert cfg.exog_max_tail_gap_hours == 3
+        assert any(
+            "inert" in r.message for r in caplog.records
+        ), f"Expected 'inert' in warning; got: {caplog.records!r}"
+
+    def test_valid_tail_gap_larger_than_interior_accepted(self, cls):
+        """exog_max_tail_gap_hours=48 with exog_max_gap_hours=3 is valid (no warning)."""
+        # Construct without raising or warning.
+        cfg = cls(exog_max_gap_hours=3, exog_max_tail_gap_hours=48)
+        assert cfg.exog_max_gap_hours == 3
+        assert cfg.exog_max_tail_gap_hours == 48

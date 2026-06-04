@@ -66,3 +66,31 @@ def test_from_config_default_max_gap_is_zero(config_cls):
     model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
     assert model.preprocessor.providers == []
     assert model.exog_max_gap_hours == 0
+
+
+# ---------------------------------------------------------------------------
+# exog_max_tail_gap_hours threading through from_config
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
+def test_from_config_max_tail_gap_forwarded_to_providers(config_cls):
+    """Config with exog_max_tail_gap_hours=48 → providers carry max_tail_gap==48."""
+    cfg = config_cls(
+        include_entsoe_forecast_load=True,
+        exog_max_gap_hours=3,
+        exog_max_tail_gap_hours=48,
+    )
+    model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
+    assert len(model.preprocessor.providers) == 1
+    provider = model.preprocessor.providers[0]
+    assert provider.max_tail_gap == 48
+
+
+@pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
+def test_from_config_default_max_tail_gap_is_zero(config_cls):
+    """Default config → max_tail_gap==0."""
+    cfg = config_cls(include_entsoe_forecast_load=True)
+    model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
+    assert len(model.preprocessor.providers) == 1
+    assert model.preprocessor.providers[0].max_tail_gap == 0

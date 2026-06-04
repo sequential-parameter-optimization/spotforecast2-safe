@@ -403,3 +403,128 @@ class TestAlignToIndexGapHealing:
         assert (result["col"] == 42.0).all()
         assert result.dtypes.iloc[0] == np.dtype("float32")
         assert len(result) == 4
+
+    # -----------------------------------------------------------------------
+    # Split-budget (max_tail_gap) tests — Feature A / issue #319
+    # -----------------------------------------------------------------------
+
+    def test_tail_run_healed_beyond_max_gap_at_tail_budget(self):
+        """40h trailing run fully ffilled when max_gap=3, max_tail_gap=48."""
+        from spotforecast2_safe.preprocessing.exog_providers import _align_to_index
+
+        n_valid = 20
+        n_tail = 40
+        n = n_valid + n_tail
+        full = pd.date_range("2023-01-01", periods=n, freq="h", tz="UTC")
+        values = [100.0] * n_valid + [np.nan] * n_tail
+        frame = pd.DataFrame({"col": values}, index=full)
+        result = _align_to_index(frame, full, provider="p", max_gap=3, max_tail_gap=48)
+        assert not result.isna().any().any()
+        assert result.dtypes.iloc[0] == np.dtype("float32")
+        # trailing NaNs forward-filled from last valid value (100.0)
+        tail = result["col"].iloc[n_valid:].to_numpy(dtype=float)
+        assert np.allclose(tail, 100.0)
+
+    def test_interior_run_unaffected_by_tail_budget(self):
+        """Interior 10h gap still raises when max_gap=3, max_tail_gap=48."""
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            ExogProviderError,
+            _align_to_index,
+        )
+
+        n = 30
+        full = pd.date_range("2023-01-01", periods=n, freq="h", tz="UTC")
+        values = [1.0] * 5 + [np.nan] * 10 + [1.0] * 15  # interior 10h gap
+        frame = pd.DataFrame({"col": values}, index=full)
+        with pytest.raises(ExogProviderError):
+            _align_to_index(frame, full, provider="p", max_gap=3, max_tail_gap=48)
+
+    def test_tail_run_longer_than_tail_budget_voided(self):
+        """60h tail with max_tail_gap=48 raises — all-or-nothing."""
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            ExogProviderError,
+            _align_to_index,
+        )
+
+        n_valid = 20
+        n_tail = 60  # exceeds max_tail_gap=48
+        n = n_valid + n_tail
+        full = pd.date_range("2023-01-01", periods=n, freq="h", tz="UTC")
+        values = [5.0] * n_valid + [np.nan] * n_tail
+        frame = pd.DataFrame({"col": values}, index=full)
+        with pytest.raises(ExogProviderError):
+            _align_to_index(frame, full, provider="p", max_gap=0, max_tail_gap=48)
+
+    def test_tail_budget_only_with_zero_interior(self):
+        """max_gap=0, max_tail_gap=24: interior gap raises, tail-only passes."""
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            ExogProviderError,
+            _align_to_index,
+        )
+
+        n = 30
+        full = pd.date_range("2023-01-01", periods=n, freq="h", tz="UTC")
+
+        # Frame with a 5h tail AND a 1h interior gap — should raise.
+        values_both = [1.0] * 10 + [np.nan] + [1.0] * 14 + [np.nan] * 5
+        frame_both = pd.DataFrame({"col": values_both}, index=full)
+        with pytest.raises(ExogProviderError):
+            _align_to_index(frame_both, full, provider="p", max_gap=0, max_tail_gap=24)
+
+        # Frame with only the 5h tail — should pass NaN-free.
+        values_tail_only = [1.0] * 25 + [np.nan] * 5
+        frame_tail = pd.DataFrame({"col": values_tail_only}, index=full)
+        result = _align_to_index(
+            frame_tail, full, provider="p", max_gap=0, max_tail_gap=24
+        )
+        assert not result.isna().any().any()
+        assert result.dtypes.iloc[0] == np.dtype("float32")
+
+    def test_back_compat_max_gap_alone_heals_tail(self):
+        """Trailing 2h with max_gap=2, max_tail_gap=0 → healed (16.1.x behaviour)."""
+        from spotforecast2_safe.preprocessing.exog_providers import _align_to_index
+
+        full = pd.date_range("2023-01-01", periods=6, freq="h", tz="UTC")
+        values = [1.0, 2.0, 3.0, 4.0, np.nan, np.nan]
+        frame = pd.DataFrame({"col": values}, index=full)
+        result = _align_to_index(frame, full, provider="p", max_gap=2, max_tail_gap=0)
+        assert not result.isna().any().any()
+        assert result["col"].iloc[4] == pytest.approx(4.0)
+        assert result["col"].iloc[5] == pytest.approx(4.0)
+
+    def test_valid_last_cell_interior_gap_not_healed_by_tail_budget(self):
+        """Last cell is valid (no tail run) + 4h interior gap, max_gap=0, max_tail_gap=48.
+
+        The tail budget applies only to the NaN run containing index[-1].  When
+        the last cell is valid there is no tail run, so the interior gap receives
+        budget=max_gap=0 and must not be healed — ExogProviderError is expected.
+        """
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            ExogProviderError,
+            _align_to_index,
+        )
+
+        n = 20
+        full = pd.date_range("2023-01-01", periods=n, freq="h", tz="UTC")
+        # Interior 4h gap at positions 5–8; last cell (position 19) is valid.
+        values = [1.0] * 5 + [np.nan] * 4 + [1.0] * 11
+        frame = pd.DataFrame({"col": values}, index=full)
+        with pytest.raises(ExogProviderError):
+            _align_to_index(frame, full, provider="p", max_gap=0, max_tail_gap=48)
+
+    def test_caplog_warning_includes_tail_budget(self, caplog):
+        """WARNING log contains the max_tail_gap value."""
+        import logging
+
+        from spotforecast2_safe.preprocessing.exog_providers import _align_to_index
+
+        full = pd.date_range("2023-01-01", periods=10, freq="h", tz="UTC")
+        values = [1.0] * 7 + [np.nan] * 3  # 3h trailing run
+        frame = pd.DataFrame({"col": values}, index=full)
+        with caplog.at_level(
+            logging.WARNING, logger="spotforecast2_safe.preprocessing.exog_providers"
+        ):
+            _align_to_index(
+                frame, full, provider="tail_prov", max_gap=0, max_tail_gap=5
+            )
+        assert any("max_tail_gap=5" in r.message for r in caplog.records)
