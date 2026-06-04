@@ -1,3 +1,21 @@
+## [16.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.1.0...v16.2.0) (2026-06-04)
+
+
+### Features
+
+* **downloader:** bound ENTSO-E requests with a 60s default timeout ([b700af9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b700af93d5fc0386e8e0a303bc6b2c29fa37f595)), closes [#320](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/320)
+* **exog:** split interior vs trailing-edge gap-healing budget ([ce30897](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ce30897d4b61e73ffbe21c4ac73a626a1e6f7f5f)), closes [#319](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/319)
+
+
+### Bug Fixes
+
+* **downloader:** repair test module after CodeQL autofix; drop unused warning flag ([31fb32b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/31fb32b244294da55e1f084c644f5f229fad72f8))
+
+
+### Documentation
+
+* **reference:** regenerate API reference for tail budget and download timeout ([bf16b06](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/bf16b06c7d18de2f5898475396922db093a5a4ae))
+
 ## [16.2.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.2.0-rc.1...v16.2.0-rc.2) (2026-06-04)
 
 
