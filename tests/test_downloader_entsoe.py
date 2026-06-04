@@ -88,8 +88,8 @@ class TestEntsoeDownloader(unittest.TestCase):
 
         download_new_data(api_key="fake_key", force=True)
 
-        # Verify client call
-        mock_client_class.assert_called_once_with(api_key="fake_key")
+        # Verify client call includes the default timeout
+        mock_client_class.assert_called_once_with(api_key="fake_key", timeout=60.0)
 
         # Verify file creation in raw
         raw_files = list(self.raw_dir.glob("entsoe_load_*.csv"))
@@ -522,6 +522,112 @@ class TestDownloadNewDataActualLoadBackfill(unittest.TestCase):
         start = self._run_download(mock_fetch, mock_get_home, frame)
 
         self.assertEqual(start, idx[-1] + pd.Timedelta(hours=1))
+
+
+class TestDownloadTimeoutForwarding(unittest.TestCase):
+    """Feature B: timeout is forwarded to the client and triggers retry on Timeout."""
+
+    def setUp(self):
+        self.test_dir = Path(tempfile.mkdtemp())
+        (self.test_dir / "raw").mkdir()
+        (self.test_dir / "interim").mkdir()
+        import spotforecast2_safe.downloader.entsoe as _entsoe_mod
+
+        self._entsoe_mod = _entsoe_mod
+        self._orig_flag = _entsoe_mod._TIMEOUT_WARNING_ISSUED
+        _entsoe_mod._TIMEOUT_WARNING_ISSUED = False
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+        self._entsoe_mod._TIMEOUT_WARNING_ISSUED = self._orig_flag
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_explicit_timeout_none_forwarded(self, mock_fetch, mock_get_home):
+        """timeout=None is passed to the client constructor."""
+        mock_get_home.return_value = self.test_dir
+
+        dates = pd.date_range("2026-01-01", periods=5, freq="h", tz="UTC")
+        mock_fetch.return_value = pd.DataFrame(index=dates)
+
+        mock_entsoe_mod = MagicMock()
+        mock_client_class = mock_entsoe_mod.EntsoePandasClient
+        mock_client = mock_client_class.return_value
+        mock_df = pd.DataFrame(
+            {"Actual": [1.0]}, index=[dates[-1] + pd.Timedelta(hours=1)]
+        )
+        mock_client.query_load_and_forecast.return_value = mock_df
+        sys.modules["entsoe"] = mock_entsoe_mod
+
+        download_new_data(api_key="fake_key", force=True, timeout=None)
+
+        # With timeout=None _make_client falls through to api_key-only construction
+        mock_client_class.assert_called_once_with(api_key="fake_key")
+
+    @patch("spotforecast2_safe.downloader.entsoe.time.sleep", lambda _s: None)
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_requests_timeout_triggers_retry_then_runtimeerror(
+        self, mock_fetch, mock_get_home
+    ):
+        """A requests.exceptions.Timeout on the query method triggers the retry
+        loop and raises RuntimeError after exhausting the budget."""
+        import requests
+
+        mock_get_home.return_value = self.test_dir
+        mock_fetch.side_effect = FileNotFoundError("no prior data")
+
+        mock_entsoe_mod = MagicMock()
+        mock_client = mock_entsoe_mod.EntsoePandasClient.return_value
+        mock_client.query_load_and_forecast.side_effect = requests.exceptions.Timeout(
+            "read timeout"
+        )
+        sys.modules["entsoe"] = mock_entsoe_mod
+
+        with self.assertRaises(RuntimeError) as ctx:
+            download_new_data(api_key="fake_key", force=True, timeout=60.0)
+
+        self.assertIn("5 attempts", str(ctx.exception))
+        self.assertEqual(mock_client.query_load_and_forecast.call_count, 5)
+
+    @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
+    @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
+    def test_typeerror_fallback_logs_warning_and_constructs_without_timeout(
+        self, mock_fetch, mock_get_home
+    ):
+        """When EntsoePandasClient rejects 'timeout', _make_client falls back
+        to api_key-only construction and logs a warning."""
+        mock_get_home.return_value = self.test_dir
+        dates = pd.date_range("2026-01-01", periods=5, freq="h", tz="UTC")
+        mock_fetch.return_value = pd.DataFrame(index=dates)
+
+        # _TIMEOUT_WARNING_ISSUED is already reset to False by setUp.
+
+        class StrictClient:
+            """Rejects the 'timeout' keyword to simulate old entsoe-py."""
+
+            def __init__(self, api_key):
+                self.api_key = api_key
+
+            def query_load_and_forecast(self, country_code, start, end):
+                return pd.DataFrame(
+                    {"Actual": [1.0]},
+                    index=[dates[-1] + pd.Timedelta(hours=1)],
+                )
+
+        mock_entsoe_mod = MagicMock()
+        mock_entsoe_mod.EntsoePandasClient = StrictClient
+        sys.modules["entsoe"] = mock_entsoe_mod
+
+        with self.assertLogs(
+            "spotforecast2_safe.downloader.entsoe", level="WARNING"
+        ) as cm:
+            download_new_data(api_key="fake_key", force=True, timeout=30.0)
+
+        self.assertTrue(
+            any("entsoe-py does not support 'timeout'" in msg for msg in cm.output),
+            f"Expected timeout warning; got: {cm.output!r}",
+        )
 
 
 if __name__ == "__main__":

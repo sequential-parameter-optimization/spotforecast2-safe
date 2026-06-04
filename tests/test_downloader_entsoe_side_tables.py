@@ -29,8 +29,9 @@ def data_home(tmp_path, monkeypatch):
 class _FakeClient:
     """Stand-in for entsoe.EntsoePandasClient returning deterministic frames."""
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, timeout=None):
         self.api_key = api_key
+        self.timeout = timeout
 
     def query_wind_and_solar_forecast(self, country_code, start, end):
         idx = pd.date_range(start, end, freq="h", inclusive="left")
@@ -109,6 +110,61 @@ def test_download_day_ahead_price(data_home, fake_entsoe):
     out = load_day_ahead_price()
     assert (out.dropna() == 50.0).all()
     assert out.name == "Day-ahead Price"
+
+
+def test_download_renewable_default_timeout_reaches_client(data_home, fake_entsoe):
+    """The default timeout=60.0 arrives at _FakeClient.timeout."""
+    # We need a capturing version of _FakeClient to inspect the timeout.
+    captured = {}
+
+    class CapturingFakeClient(_FakeClient):
+        def __init__(self, api_key, timeout=None):
+            super().__init__(api_key, timeout=timeout)
+            captured["timeout"] = timeout
+
+    import types
+
+    module = types.ModuleType("entsoe")
+    module.EntsoePandasClient = CapturingFakeClient
+    import sys
+
+    sys.modules["entsoe"] = module
+
+    download_renewable_forecast(
+        api_key="x",
+        country_code="DE",
+        start="202301010000",
+        end="202301050000",
+        force=True,
+    )
+    assert captured.get("timeout") == 60.0
+
+
+def test_download_price_default_timeout_reaches_client(data_home, fake_entsoe):
+    """The default timeout=60.0 arrives at _FakeClient.timeout for the price table."""
+    captured = {}
+
+    class CapturingFakeClient(_FakeClient):
+        def __init__(self, api_key, timeout=None):
+            super().__init__(api_key, timeout=timeout)
+            captured["timeout"] = timeout
+
+    import types
+
+    module = types.ModuleType("entsoe")
+    module.EntsoePandasClient = CapturingFakeClient
+    import sys
+
+    sys.modules["entsoe"] = module
+
+    download_day_ahead_price(
+        api_key="x",
+        country_code="DE_LU",
+        start="202301010000",
+        end="202301050000",
+        force=True,
+    )
+    assert captured.get("timeout") == 60.0
 
 
 def test_download_missing_entsoe_raises(data_home, monkeypatch):

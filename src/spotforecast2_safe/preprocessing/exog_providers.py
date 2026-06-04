@@ -26,8 +26,12 @@ Design rules (consistent with the safety-critical contract):
   ``ExogBuilder`` then either re-raises (``on_provider_failure="raise"``) or
   logs and skips that provider (``"skip"``). Values are never silently
   fabricated: the only imputation is the opt-in, bounded gap healing
-  (``max_gap``), which is all-or-nothing per gap and logged at WARNING with
-  count and span.
+  (``max_gap`` / ``max_tail_gap``), which is all-or-nothing per gap and logged
+  at WARNING with count and span. The trailing-edge budget ``max_tail_gap``
+  extends the interior budget specifically for the NaN run that touches
+  ``index[-1]``; this matches the ENTSO-E day-ahead publication frontier, where
+  the last published vintage is zero-order-held forward without introducing
+  future leakage (CR-3-clean).
 - **Leakage-aware (CR-3).** Only inputs genuinely available at forecast time are
   admissible: ENTSO-E *day-ahead* forecasts/price (published D-1) and the static
   published COVID vintage — never a realised quantity for the target day.
@@ -70,6 +74,7 @@ def _align_to_index(
     *,
     provider: str,
     max_gap: int = 0,
+    max_tail_gap: int = 0,
     validate_index: Optional[pd.DatetimeIndex] = None,
 ) -> pd.DataFrame:
     """Reindex *frame* onto *index*, optionally healing small gaps (fail-safe).
@@ -81,16 +86,36 @@ def _align_to_index(
     ``float32`` to match the dtype the recursive forecaster expects for
     exogenous columns.
 
+    Gap-healing uses a split budget: the contiguous NaN run that contains
+    ``index[-1]`` (the trailing-edge run) receives
+    ``max(max_gap, max_tail_gap)`` as its budget, while all other runs keep
+    ``max_gap``. Setting ``max_gap=0, max_tail_gap>0`` therefore heals *only*
+    the trailing edge — the canonical use case is zero-order-holding the last
+    published ENTSO-E day-ahead vintage forward to the forecast horizon without
+    touching interior gaps (CR-3-clean, no future leakage). Healing is
+    all-or-nothing per run: a run whose length exceeds its budget is left
+    entirely NaN and will trip the NaN gate if it intersects the validated
+    window.
+
     Args:
         frame: Source feature frame with a ``DatetimeIndex``.
         index: Target hourly index the features must align to.
         provider: Provider name, used in log messages and the error.
-        max_gap: Maximum length, in hours, of a contiguous run of missing
-            values that will be healed before the provider is rejected.
-            Interior gaps are time-interpolated; leading/trailing edge gaps
-            are back-/forward-filled. ``0`` (default) keeps the strict
-            fail-safe (any gap raises). Healed runs are logged at WARNING
-            with count and span.
+        max_gap: Maximum length, in hours, of a contiguous interior (or
+            leading/trailing) NaN run that will be healed. Interior gaps are
+            time-interpolated; leading gaps are back-filled; trailing gaps are
+            forward-filled. ``0`` (default) keeps the strict fail-safe (any
+            gap raises). Healed runs are logged at WARNING with count and span.
+            When ``max_gap=0``, neither interpolation nor back-fill runs
+            regardless of ``max_tail_gap`` — leading gaps cannot be healed
+            in that configuration.
+        max_tail_gap: Extended budget, in hours, applied exclusively to the
+            NaN run containing ``index[-1]`` (the trailing-edge run). The
+            effective tail budget is ``max(max_gap, max_tail_gap)``, so a
+            non-zero ``max_gap`` already heals the tail up to ``max_gap``; set
+            ``max_tail_gap`` higher only when a longer trailing void is
+            acceptable. ``0`` (default) leaves the tail budget equal to
+            ``max_gap``, reproducing 16.1.x behaviour exactly.
         validate_index: If given, the NaN gate checks only the intersection
             of *index* with this index. Timestamps outside the validation
             window may carry NaN and are still returned (as ``float32`` NaN).
@@ -99,8 +124,9 @@ def _align_to_index(
 
     Returns:
         pd.DataFrame: *frame* reindexed onto *index*, ``float32``. NaN-free
-        within the validated window (after healing when ``max_gap > 0``);
-        out-of-window cells remain NaN when *validate_index* is supplied.
+        within the validated window (after healing when ``max_gap > 0`` or
+        ``max_tail_gap > 0``); out-of-window cells remain NaN when
+        *validate_index* is supplied.
 
     Raises:
         ExogProviderError: If *frame* is not datetime-indexed or any requested
@@ -120,27 +146,42 @@ def _align_to_index(
     f = f[~f.index.duplicated(keep="last")].sort_index()
     aligned = f.reindex(index)
 
-    if max_gap > 0 and bool(aligned.isna().any().any()):
-        # Heal bounded gaps, all-or-nothing PER RUN: a contiguous NaN run no
-        # longer than max_gap is healed in full; a longer run is left
-        # entirely NaN (no partial fabrication) and still trips the NaN gate
-        # below if it intersects the validated window. An oversize run
-        # outside the window (e.g. a price series that starts years after
-        # data_start) therefore does not block healing of small in-window
-        # gaps.
+    if (max_gap > 0 or max_tail_gap > 0) and bool(aligned.isna().any().any()):
+        # Heal bounded gaps, all-or-nothing PER RUN with a split budget:
+        # - interior (and leading) runs: budget = max_gap
+        # - the trailing-edge run (the NaN run containing index[-1]):
+        #   budget = max(max_gap, max_tail_gap)
+        # A run whose length exceeds its budget is left entirely NaN (no
+        # partial fabrication) and still trips the NaN gate below if it
+        # intersects the validated window.  An oversize run outside the
+        # window (e.g. a price series that starts years after data_start)
+        # therefore does not block healing of small in-window gaps.
         pre_heal_na = aligned.isna()
-        healed = aligned.interpolate(
-            method="time",
-            limit=max_gap,
-            limit_area="inside",
-            limit_direction="both",
-        )
-        healed = healed.bfill(limit=max_gap)
-        healed = healed.ffill(limit=max_gap)
-        # Re-mask runs longer than max_gap: the interpolate/bfill/ffill
-        # ``limit`` caps fill steps per direction, so an oversize run could
-        # otherwise be partially (or, healed from both sides, even fully)
-        # filled.
+        last_ts = aligned.index[-1]
+
+        # Apply interpolate and bfill only when max_gap > 0 (pandas raises
+        # ValueError when limit=0 is passed to these methods).
+        if max_gap > 0:
+            healed = aligned.interpolate(
+                method="time",
+                limit=max_gap,
+                limit_area="inside",
+                limit_direction="both",
+            )
+            healed = healed.bfill(limit=max_gap)
+        else:
+            healed = aligned.copy()
+
+        # ffill runs with limit=max(max_gap, max_tail_gap) and may fill interior
+        # gaps too, not just the trailing edge.  The re-mask loop below immediately
+        # re-NaNs every run whose length exceeds its per-run budget, so only the
+        # tail run (which gets the elevated budget) survives when max_gap=0.
+        healed = healed.ffill(limit=max(max_gap, max_tail_gap))
+
+        # Re-mask runs whose length exceeds their per-run budget.  The
+        # interpolate/bfill/ffill ``limit`` caps fill steps per direction, so
+        # an oversize run could otherwise be partially (or, healed from both
+        # sides, even fully) filled.
         for col in aligned.columns:
             na = pre_heal_na[col]
             if not bool(na.any()):
@@ -149,7 +190,11 @@ def _align_to_index(
             # derived from the count of preceding non-NaN cells.
             run_id = (~na).cumsum()[na]
             run_len = run_id.groupby(run_id).transform("size")
-            oversize_idx = run_len.index[run_len > max_gap]
+            tail_run_id = run_id.get(last_ts)  # None when last cell is valid
+            budget = pd.Series(max_gap, index=run_len.index)
+            if tail_run_id is not None:
+                budget[run_id == tail_run_id] = max(max_gap, max_tail_gap)
+            oversize_idx = run_len.index[run_len > budget]
             if len(oversize_idx):
                 healed.loc[oversize_idx, col] = float("nan")
         aligned = healed
@@ -171,11 +216,13 @@ def _align_to_index(
             n_gaps = len(gaps)
             spans_str = str([(str(s), str(e)) for s, e in gaps[:3]])
             logger.warning(
-                "%s: healed %d missing cell(s) in %d gap(s) (max_gap=%d); spans: %s",
+                "%s: healed %d missing cell(s) in %d gap(s) "
+                "(max_gap=%d, max_tail_gap=%d); spans: %s",
                 provider,
                 n_healed,
                 n_gaps,
                 max_gap,
+                max_tail_gap,
                 spans_str,
             )
 
@@ -261,6 +308,10 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
             ``0.0``.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
             See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        max_tail_gap: Extended healing budget for the trailing-edge NaN run
+            (the run containing ``index[-1]``). The effective tail budget is
+            ``max(max_gap, max_tail_gap)``. See :func:`_align_to_index`.
+            Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
             *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
 
@@ -287,6 +338,7 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
         column: str = "covid_infection_rate",
         fill_outside: float = 0.0,
         max_gap: int = 0,
+        max_tail_gap: int = 0,
         provider_window: Optional[pd.DatetimeIndex] = None,
     ) -> None:
         self.data_home = data_home
@@ -294,6 +346,7 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
         self.column = column
         self.fill_outside = float(fill_outside)
         self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
         self.provider_window = provider_window
 
     def _load_daily(self) -> pd.Series:
@@ -328,6 +381,7 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
                 index,
                 provider=self.name,
                 max_gap=self.max_gap,
+                max_tail_gap=self.max_tail_gap,
                 validate_index=self.provider_window,
             )
 
@@ -351,6 +405,7 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
             index,
             provider=self.name,
             max_gap=self.max_gap,
+            max_tail_gap=self.max_tail_gap,
             validate_index=self.provider_window,
         )
 
@@ -368,6 +423,8 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
             via ``get_data_home()``.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
             See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        max_tail_gap: Extended healing budget for the trailing-edge NaN run.
+            See :func:`_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
             *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
 
@@ -407,10 +464,12 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
         *,
         data_home: DataHome = None,
         max_gap: int = 0,
+        max_tail_gap: int = 0,
         provider_window: Optional[pd.DatetimeIndex] = None,
     ) -> None:
         self.data_home = data_home
         self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
         self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
@@ -427,6 +486,7 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
             index,
             provider=self.name,
             max_gap=self.max_gap,
+            max_tail_gap=self.max_tail_gap,
             validate_index=self.provider_window,
         )
 
@@ -444,6 +504,8 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
         data_home: Root data directory forwarded to the loader.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
             See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        max_tail_gap: Extended healing budget for the trailing-edge NaN run.
+            See :func:`_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
             *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
     """
@@ -457,10 +519,12 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
         *,
         data_home: DataHome = None,
         max_gap: int = 0,
+        max_tail_gap: int = 0,
         provider_window: Optional[pd.DatetimeIndex] = None,
     ) -> None:
         self.data_home = data_home
         self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
         self.provider_window = provider_window
 
     def _load(self) -> pd.DataFrame:
@@ -491,6 +555,7 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
             index,
             provider=self.name,
             max_gap=self.max_gap,
+            max_tail_gap=self.max_tail_gap,
             validate_index=self.provider_window,
         )
 
@@ -507,6 +572,8 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
         data_home: Root data directory forwarded to the loaders.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
             See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        max_tail_gap: Extended healing budget for the trailing-edge NaN run.
+            See :func:`_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
             *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
     """
@@ -518,10 +585,12 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
         *,
         data_home: DataHome = None,
         max_gap: int = 0,
+        max_tail_gap: int = 0,
         provider_window: Optional[pd.DatetimeIndex] = None,
     ) -> None:
         self.data_home = data_home
         self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
         self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
@@ -547,6 +616,7 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
             index,
             provider=self.name,
             max_gap=self.max_gap,
+            max_tail_gap=self.max_tail_gap,
             validate_index=self.provider_window,
         )
 
@@ -563,6 +633,8 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
         data_home: Root data directory forwarded to the loader.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
             See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        max_tail_gap: Extended healing budget for the trailing-edge NaN run.
+            See :func:`_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
             *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
     """
@@ -574,10 +646,12 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
         *,
         data_home: DataHome = None,
         max_gap: int = 0,
+        max_tail_gap: int = 0,
         provider_window: Optional[pd.DatetimeIndex] = None,
     ) -> None:
         self.data_home = data_home
         self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
         self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
@@ -594,6 +668,7 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
             index,
             provider=self.name,
             max_gap=self.max_gap,
+            max_tail_gap=self.max_tail_gap,
             validate_index=self.provider_window,
         )
 
@@ -615,6 +690,7 @@ def build_providers(
     *,
     data_home: DataHome = None,
     max_gap: int = 0,
+    max_tail_gap: int = 0,
     provider_window: Optional[pd.DatetimeIndex] = None,
 ) -> List[ExogFeatureProvider]:
     """Construct the providers whose flags are truthy, in registry order.
@@ -624,6 +700,8 @@ def build_providers(
             ignored; missing keys are treated as ``False``.
         data_home: Root data directory forwarded to each provider.
         max_gap: Maximum contiguous missing-value run forwarded to each
+            provider. See :func:`_align_to_index`. Defaults to ``0``.
+        max_tail_gap: Extended trailing-edge healing budget forwarded to each
             provider. See :func:`_align_to_index`. Defaults to ``0``.
         provider_window: Validation index forwarded to each provider as
             *provider_window*. See :func:`_align_to_index`. Defaults to ``None``.
@@ -647,6 +725,7 @@ def build_providers(
                 factory(
                     data_home=data_home,
                     max_gap=max_gap,
+                    max_tail_gap=max_tail_gap,
                     provider_window=provider_window,
                 )
             )
@@ -676,9 +755,11 @@ def build_providers_from_config(
         flag: bool(getattr(config, flag, False)) for flag in EXOG_PROVIDER_REGISTRY
     }
     max_gap = int(getattr(config, "exog_max_gap_hours", 0))
+    max_tail_gap = int(getattr(config, "exog_max_tail_gap_hours", 0))
     return build_providers(
         flags,
         data_home=data_home,
         max_gap=max_gap,
+        max_tail_gap=max_tail_gap,
         provider_window=provider_window,
     )

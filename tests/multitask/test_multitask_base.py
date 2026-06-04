@@ -571,3 +571,63 @@ class TestExogProviderWindow:
         task.prepare_data().detect_outliers().impute().build_exogenous_features()
 
         assert captured.get("provider_window") is None
+
+    def test_tail_gap_config_reaches_providers(self, synth_df, tmp_path, monkeypatch):
+        """Config with exog_max_tail_gap_hours=48 yields providers with max_tail_gap==48."""
+        captured = {}
+
+        import spotforecast2_safe.preprocessing.exog_providers as ep_module
+
+        original = ep_module.build_providers_from_config
+
+        def capturing_build(config, **kwargs):
+            providers = original(config, **kwargs)
+            captured["providers"] = providers
+            return providers
+
+        monkeypatch.setattr(ep_module, "build_providers_from_config", capturing_build)
+
+        cfg = _minimal_cfg(
+            cache_home=tmp_path,
+            use_exogenous_features=True,
+            exog_max_gap_hours=3,
+            exog_max_tail_gap_hours=48,
+            include_entsoe_forecast_load=True,
+            # skip so the pipeline can complete even though there is no interim CSV
+            on_exog_provider_failure="skip",
+        )
+        task = LazyTask(cfg, dataframe=synth_df)
+        task.prepare_data().detect_outliers().impute().build_exogenous_features()
+
+        providers = captured.get("providers", [])
+        assert providers, "No providers captured"
+        assert all(p.max_tail_gap == 48 for p in providers)
+
+    def test_default_tail_gap_is_zero(self, synth_df, tmp_path, monkeypatch):
+        """Default config yields providers with max_tail_gap==0."""
+        captured = {}
+
+        import spotforecast2_safe.preprocessing.exog_providers as ep_module
+
+        original = ep_module.build_providers_from_config
+
+        def capturing_build(config, **kwargs):
+            providers = original(config, **kwargs)
+            captured["providers"] = providers
+            return providers
+
+        monkeypatch.setattr(ep_module, "build_providers_from_config", capturing_build)
+
+        cfg = _minimal_cfg(
+            cache_home=tmp_path,
+            use_exogenous_features=True,
+            include_entsoe_forecast_load=True,
+            # skip so the pipeline can complete even though there is no interim CSV
+            on_exog_provider_failure="skip",
+        )
+        task = LazyTask(cfg, dataframe=synth_df)
+        task.prepare_data().detect_outliers().impute().build_exogenous_features()
+
+        providers = captured.get("providers", [])
+        assert providers, "No providers captured"
+        assert all(p.max_tail_gap == 0 for p in providers)

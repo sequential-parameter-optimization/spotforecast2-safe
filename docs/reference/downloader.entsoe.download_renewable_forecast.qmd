@@ -7,6 +7,7 @@ downloader.entsoe.download_renewable_forecast(
     start=None,
     end=None,
     force=False,
+    timeout=60.0,
 )
 ```
 
@@ -22,13 +23,14 @@ via `spotforecast2_safe.data.fetch_data.load_renewable_forecast`.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type                                          | Description                                                                        | Default    |
-|--------------|-----------------------------------------------|------------------------------------------------------------------------------------|------------|
-| api_key      | [str](`str`)                                  | ENTSO-E Web API security token.                                                    | _required_ |
-| country_code | [str](`str`)                                  | Country / bidding-zone code. Defaults to ``"DE"``.                                 | `'DE'`     |
-| start        | [Optional](`typing.Optional`)\[[str](`str`)\] | Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to seven days ago.      | `None`     |
-| end          | [Optional](`typing.Optional`)\[[str](`str`)\] | End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the start of tomorrow. | `None`     |
-| force        | [bool](`bool`)                                | If True, bypass the small-window cooldown check.                                   | `False`    |
+| Name         | Type                                              | Description                                                                                          | Default    |
+|--------------|---------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| api_key      | [str](`str`)                                      | ENTSO-E Web API security token.                                                                      | _required_ |
+| country_code | [str](`str`)                                      | Country / bidding-zone code. Defaults to ``"DE"``.                                                   | `'DE'`     |
+| start        | [Optional](`typing.Optional`)\[[str](`str`)\]     | Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to seven days ago.                        | `None`     |
+| end          | [Optional](`typing.Optional`)\[[str](`str`)\]     | End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the start of tomorrow.                   | `None`     |
+| force        | [bool](`bool`)                                    | If True, bypass the small-window cooldown check.                                                     | `False`    |
+| timeout      | [Optional](`typing.Optional`)\[[float](`float`)\] | Per-socket-operation read timeout in seconds.  ``None`` disables the timeout.  Defaults to ``60.0``. | `60.0`     |
 
 ## Raises {.doc-section .doc-section-raises}
 
