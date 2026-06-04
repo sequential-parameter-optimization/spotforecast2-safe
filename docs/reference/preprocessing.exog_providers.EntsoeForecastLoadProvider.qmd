@@ -1,7 +1,11 @@
 # preprocessing.exog_providers.EntsoeForecastLoadProvider { #spotforecast2_safe.preprocessing.exog_providers.EntsoeForecastLoadProvider }
 
 ```python
-preprocessing.exog_providers.EntsoeForecastLoadProvider(data_home=None)
+preprocessing.exog_providers.EntsoeForecastLoadProvider(
+    data_home=None,
+    max_gap=0,
+    provider_window=None,
+)
 ```
 
 ENTSO-E day-ahead Forecasted Load as an exogenous near-oracle prior.
@@ -13,9 +17,11 @@ is therefore genuinely available at forecast time (leakage-clean, CR-3).
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                                   | Description                                                                             | Default   |
-|-----------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|-----------|
-| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`) | Root data directory forwarded to the loader. ``None`` resolves via ``get_data_home()``. | `None`    |
+| Name            | Type                                                                                    | Description                                                                                                                            | Default   |
+|-----------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to the loader. ``None`` resolves via ``get_data_home()``.                                                | `None`    |
+| max_gap         | [int](`int`)                                                                            | Maximum contiguous missing-value run healed by ``_align_to_index``. See :func:`_align_to_index` for full semantics. Defaults to ``0``. | `0`       |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index passed to ``_align_to_index`` as *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.                 | `None`    |
 
 ## Examples {.doc-section .doc-section-examples}
 

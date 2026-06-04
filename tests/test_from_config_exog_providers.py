@@ -38,3 +38,31 @@ def test_direct_construction_default_has_no_providers():
     model = ForecasterRecursiveModel(iteration=0)
     assert model.preprocessor.providers == []
     assert model.preprocessor.on_provider_failure == "raise"
+
+
+# ---------------------------------------------------------------------------
+# exog_max_gap_hours threading through from_config
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
+def test_from_config_max_gap_forwarded_to_providers(config_cls):
+    """Config with include_entsoe_forecast_load=True and exog_max_gap_hours=3
+    → the built providers carry max_gap==3."""
+    cfg = config_cls(
+        include_entsoe_forecast_load=True,
+        exog_max_gap_hours=3,
+    )
+    model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
+    assert len(model.preprocessor.providers) == 1
+    provider = model.preprocessor.providers[0]
+    assert provider.max_gap == 3
+
+
+@pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
+def test_from_config_default_max_gap_is_zero(config_cls):
+    """Default config → max_gap==0 and no providers."""
+    cfg = config_cls()
+    model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
+    assert model.preprocessor.providers == []
+    assert model.exog_max_gap_hours == 0

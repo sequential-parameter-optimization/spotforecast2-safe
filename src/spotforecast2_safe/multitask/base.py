@@ -781,8 +781,41 @@ class BaseTask:
             build_providers_from_config = None  # type: ignore[assignment]
         if build_providers_from_config is not None:
             on_fail = getattr(self.config, "on_exog_provider_failure", "raise")
+            provider_window = None
+            if getattr(self.config, "exog_provider_window", "full") == "train":
+                if getattr(self.config, "start_train_ts", None) is None:
+                    self._setup_training_window()
+                _start_train = getattr(self.config, "start_train_ts", None)
+                _cov_end = getattr(self.config, "cov_end", None)
+                if _start_train is not None and _cov_end is not None:
+                    _cov_end_ts = pd.Timestamp(_cov_end)
+                    if _cov_end_ts.tz is None and _start_train.tz is not None:
+                        _cov_end_ts = _cov_end_ts.tz_localize(_start_train.tz)
+                    elif _cov_end_ts.tz is not None and _start_train.tz is None:
+                        _cov_end_ts = _cov_end_ts.tz_convert(None)
+                    elif (
+                        _cov_end_ts.tz is not None
+                        and _start_train.tz is not None
+                        and str(_cov_end_ts.tz) != str(_start_train.tz)
+                    ):
+                        _cov_end_ts = _cov_end_ts.tz_convert(_start_train.tz)
+                    provider_window = pd.date_range(
+                        start=_start_train,
+                        end=_cov_end_ts,
+                        freq="h",
+                    )
+                else:
+                    self.logger.warning(
+                        "exog_provider_window='train' requested but the "
+                        "training window is not set (start_train_ts=%s, "
+                        "cov_end=%s); falling back to full-index validation.",
+                        _start_train,
+                        _cov_end,
+                    )
             provider_frames = []
-            for provider in build_providers_from_config(self.config):
+            for provider in build_providers_from_config(
+                self.config, provider_window=provider_window
+            ):
                 try:
                     cols = provider.build(self.exogenous_features.index)
                 except ExogProviderError as exc:

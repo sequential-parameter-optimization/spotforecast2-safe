@@ -62,3 +62,30 @@ def test_invalid_provider_failure_policy_rejected_on_set(config_cls):
     cfg = config_cls()
     with pytest.raises(ValueError):
         cfg.set_params(on_exog_provider_failure="bogus")
+
+
+# ---------------------------------------------------------------------------
+# exog_max_gap_hours and exog_provider_window (new params)
+# ---------------------------------------------------------------------------
+
+
+def test_exog_gap_defaults(config_cls):
+    cfg = config_cls()
+    assert cfg.exog_max_gap_hours == 0
+    assert cfg.exog_provider_window == "full"
+
+
+def test_exog_gap_in_param_names(config_cls):
+    assert "exog_max_gap_hours" in config_cls._PARAM_NAMES
+    assert "exog_provider_window" in config_cls._PARAM_NAMES
+
+
+def test_exog_gap_get_set_round_trip(config_cls):
+    cfg = config_cls(exog_max_gap_hours=6, exog_provider_window="train")
+    params = cfg.get_params()
+    assert params["exog_max_gap_hours"] == 6
+    assert params["exog_provider_window"] == "train"
+    cfg2 = config_cls()
+    cfg2.set_params(exog_max_gap_hours=6, exog_provider_window="train")
+    assert cfg2.exog_max_gap_hours == 6
+    assert cfg2.exog_provider_window == "train"
