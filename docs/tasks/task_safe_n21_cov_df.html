@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A step-by-step walkthrough of the N-to-1 covariate forecasting pipeline and its test suite.">
+<meta name="description" content="How the ConfigMulti-driven N-to-1 forecasting task works and how to use it.">
 
-<title>task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained – spotforecast2-safe</title>
+<title>task_safe_n_to_1_with_covariates_and_dataframe: Design and Usage – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -107,10 +107,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
 
 </head>
@@ -1038,12 +1034,112 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
- <span class="menu-text">Utils</span></a>
+ <span class="menu-text">Multitask</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.base.BaseTask.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">BaseTask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.base.agg_predictor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">agg_predictor</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.multi.MultiTask.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MultiTask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.lazy.LazyTask.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LazyTask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.defaults.DefaultsTask.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DefaultsTask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.predict.PredictTask.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PredictTask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.clean.CleanTask.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CleanTask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.factories.default_lgbm_forecaster_factory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">default_lgbm_forecaster_factory</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">Strategies</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.strategies.TrainingStrategy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TrainingStrategy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.strategies.LazyStrategy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LazyStrategy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.strategies.DefaultsStrategy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DefaultsStrategy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.runner.run.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/multitask.runner.make_demo10_config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">make_demo10_config</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false">
+ <span class="menu-text">Utils</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-20" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/utils.html" class="sidebar-item-text sidebar-link">
@@ -1072,13 +1168,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false">
  <span class="menu-text">Stats</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-21" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/stats.stationarity.augmented_dickey_fuller.html" class="sidebar-item-text sidebar-link">
@@ -1101,13 +1197,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false">
  <span class="menu-text">Security</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-20" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/security.masking.mask_estimator.html" class="sidebar-item-text sidebar-link">
@@ -1118,13 +1214,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false">
  <span class="menu-text">Calendar</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-21" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-23" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/calendar.holiday.create_holiday_df.html" class="sidebar-item-text sidebar-link">
@@ -1165,13 +1261,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false">
  <span class="menu-text">Weather</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-24" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/weather.html" class="sidebar-item-text sidebar-link">
@@ -1200,13 +1296,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false">
  <span class="menu-text">Downloader</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-23" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-25" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
@@ -1241,13 +1337,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false">
  <span class="menu-text">Tasks API</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-24" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/tasks.task_safe_demo.html" class="sidebar-item-text sidebar-link">
@@ -1266,13 +1362,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="false">
  <span class="menu-text">Processing Guides</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-25" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-27" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/processing/model_persistence.html" class="sidebar-item-text sidebar-link">
@@ -1283,13 +1379,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false">
  <span class="menu-text">Preprocessing Guides</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/preprocessing/outliers.html" class="sidebar-item-text sidebar-link">
@@ -1318,13 +1414,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false">
  <span class="menu-text">Forecaster Guides</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-27" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-29" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/recursive/ForecasterRecursive.html" class="sidebar-item-text sidebar-link">
@@ -1341,13 +1437,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
  <span class="menu-text">Safety &amp; Security</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
@@ -1376,13 +1472,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="true">
  <span class="menu-text">Tasks</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-29" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/tasks/tasks.html" class="sidebar-item-text sidebar-link">
@@ -1405,13 +1501,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-32" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/tutorials/n2n_predict_with_covariates_explained.html" class="sidebar-item-text sidebar-link">
@@ -1436,20 +1532,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#covariate-data-preparation" id="toc-covariate-data-preparation" class="nav-link active" data-scroll-target="#covariate-data-preparation">Covariate Data Preparation</a></li>
-  <li><a href="#exogenous-variable-validation" id="toc-exogenous-variable-validation" class="nav-link" data-scroll-target="#exogenous-variable-validation">Exogenous Variable Validation</a></li>
-  <li><a href="#logging-and-timestamp-format" id="toc-logging-and-timestamp-format" class="nav-link" data-scroll-target="#logging-and-timestamp-format">Logging and Timestamp Format</a></li>
-  <li><a href="#the-n-to-1-forecasting-structure" id="toc-the-n-to-1-forecasting-structure" class="nav-link" data-scroll-target="#the-n-to-1-forecasting-structure">The N-to-1 Forecasting Structure</a></li>
-  <li><a href="#feature-engineering-with-covariates" id="toc-feature-engineering-with-covariates" class="nav-link" data-scroll-target="#feature-engineering-with-covariates">Feature Engineering with Covariates</a></li>
-  <li><a href="#integrating-exogenous-variables-into-the-feature-matrix" id="toc-integrating-exogenous-variables-into-the-feature-matrix" class="nav-link" data-scroll-target="#integrating-exogenous-variables-into-the-feature-matrix">Integrating Exogenous Variables into the Feature Matrix</a></li>
-  <li><a href="#prediction-aggregation" id="toc-prediction-aggregation" class="nav-link" data-scroll-target="#prediction-aggregation">Prediction Aggregation</a></li>
-  <li><a href="#timezone-handling" id="toc-timezone-handling" class="nav-link" data-scroll-target="#timezone-handling">Timezone Handling</a></li>
-  <li><a href="#forced-training-vs.-cached-model-loading" id="toc-forced-training-vs.-cached-model-loading" class="nav-link" data-scroll-target="#forced-training-vs.-cached-model-loading">Forced Training vs.&nbsp;Cached Model Loading</a></li>
-  <li><a href="#error-handling" id="toc-error-handling" class="nav-link" data-scroll-target="#error-handling">Error Handling</a></li>
-  <li><a href="#kwargs-flexibility" id="toc-kwargs-flexibility" class="nav-link" data-scroll-target="#kwargs-flexibility">Kwargs Flexibility</a></li>
-  <li><a href="#integration-the-complete-pipeline" id="toc-integration-the-complete-pipeline" class="nav-link" data-scroll-target="#integration-the-complete-pipeline">Integration: The Complete Pipeline</a></li>
-  <li><a href="#the-complete-execution-flow" id="toc-the-complete-execution-flow" class="nav-link" data-scroll-target="#the-complete-execution-flow">The Complete Execution Flow</a></li>
-  <li><a href="#simple-run" id="toc-simple-run" class="nav-link" data-scroll-target="#simple-run">Simple Run</a></li>
+  <li><a href="#configmulti-as-single-source-of-truth" id="toc-configmulti-as-single-source-of-truth" class="nav-link active" data-scroll-target="#configmulti-as-single-source-of-truth">ConfigMulti as single source of truth</a></li>
+  <li><a href="#pipeline-stages" id="toc-pipeline-stages" class="nav-link" data-scroll-target="#pipeline-stages">Pipeline stages</a></li>
+  <li><a href="#run_pipeline-usage" id="toc-run_pipeline-usage" class="nav-link" data-scroll-target="#run_pipeline-usage">run_pipeline usage</a></li>
+  <li><a href="#aggregation-weights" id="toc-aggregation-weights" class="nav-link" data-scroll-target="#aggregation-weights">Aggregation weights</a></li>
+  <li><a href="#cli-usage" id="toc-cli-usage" class="nav-link" data-scroll-target="#cli-usage">CLI usage</a></li>
+  <li><a href="#model-persistence" id="toc-model-persistence" class="nav-link" data-scroll-target="#model-persistence">Model persistence</a></li>
+  <li><a href="#relationship-to-the-test-suite" id="toc-relationship-to-the-test-suite" class="nav-link" data-scroll-target="#relationship-to-the-test-suite">Relationship to the test suite</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tasks/task_safe_n21_cov_df.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -1459,12 +1548,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tasks/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../../docs/tasks/task_safe_n21_cov_df.html">Task Safe n-to-1 Explained</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained</h1>
+<h1 class="title">task_safe_n_to_1_with_covariates_and_dataframe: Design and Usage</h1>
 </div>
 
 <div>
   <div class="description">
-    A step-by-step walkthrough of the N-to-1 covariate forecasting pipeline and its test suite.
+    How the ConfigMulti-driven N-to-1 forecasting task works and how to use it.
   </div>
 </div>
 
@@ -1481,755 +1570,259 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>The <code>task_safe_n_to_1_with_covariates_and_dataframe</code> script extends the baseline forecasting pipeline by adding exogenous covariates — weather observations, public holidays, and automatically engineered calendar features. The outcome is a signed weighted aggregation of 11 per-column recursive forecasts into a single combined prediction. Every public parameter is validated, every sensitive value is masked in log output, and every execution path is wrapped in structured error handling.</p>
-<p>The test suite in <code>tests/test_task_safe_n_to_1_with_covariates.py</code> decomposes this pipeline into isolated units so that a failure in any stage surfaces as a specific, attributable assertion error rather than a silent mismatch at evaluation time. The classes below follow the logical execution order of the pipeline.</p>
-<section id="covariate-data-preparation" class="level2">
-<h2 class="anchored" data-anchor-id="covariate-data-preparation">Covariate Data Preparation</h2>
-<p>Before any model is trained, the pipeline constructs three categories of exogenous features. The <code>TestCovariateDataPreperation</code> class verifies that each category satisfies its structural contract.</p>
-<p>Weather data arrives as a DataFrame with a <code>DatetimeIndex</code> and columns for temperature, humidity, and wind speed. The test confirms the exact shape <code>(100, 3)</code> and the presence of all three column names. This is not cosmetic: downstream feature-engineering code selects columns by name, so a missing column produces a <code>KeyError</code> rather than a silently degraded feature set.</p>
-<p>Holiday data must be binary — every entry is either <code>0</code> (non-holiday) or <code>1</code> (holiday). The test calls <code>set(holidays.unique()).issubset({0, 1})</code> to confirm that no fractional or multi-valued entries have slipped through. Any departure from binary encoding would distort the model’s ability to isolate the holiday effect.</p>
-<p>Calendar features — day of week, day of month, month, quarter, weekend flag — are derived directly from the <code>DatetimeIndex</code>. The test verifies that <code>day_of_week</code> spans 0–6, that <code>month</code> spans 1–12, and that the total row count equals 365. These bounds are the minimum necessary to confirm that no date arithmetic has produced impossible values.</p>
-<p>Cyclical encoding replaces raw integer months with sine and cosine components so that December and January are numerically close. The test confirms that both components are bounded strictly within <code>[-1, 1]</code>, which is the mathematical guarantee of the unit-circle encoding.</p>
-<div id="1d9685c7" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">365</span>, freq<span class="op">=</span><span class="st">"D"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>month <span class="op">=</span> dates.month</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>month_sin <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>month_cos <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> month <span class="op">/</span> <span class="dv">12</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"month"</span>: month[:<span class="dv">6</span>], <span class="st">"sin"</span>: month_sin[:<span class="dv">6</span>].<span class="bu">round</span>(<span class="dv">4</span>), <span class="st">"cos"</span>: month_cos[:<span class="dv">6</span>].<span class="bu">round</span>(<span class="dv">4</span>)},</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>dates[:<span class="dv">6</span>],</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<p><code>task_safe_n_to_1_with_covariates_and_dataframe</code> is the entry point for multi-target N-to-1 time-series forecasting in <code>spotforecast2-safe</code>. Its public surface is a single function <code>run_pipeline</code> and a CLI entry point <code>spotforecast-safe-n2o1-cov-df</code>. All pipeline parameters are centralised in a <code>ConfigMulti</code> object; the function delegates to <code>spotforecast2_safe.multitask.runner.run</code> with <code>task="lazy"</code>.</p>
+<p>The n2n pipeline (<code>processing/n2n_predict_with_covariates.py</code>) is still available and is used by <code>task_safe_demo</code> and the <code>spotforecast2</code> sibling package. The n-to-1 task described here now runs on <code>spotforecast2_safe.multitask</code> instead.</p>
+<section id="configmulti-as-single-source-of-truth" class="level2">
+<h2 class="anchored" data-anchor-id="configmulti-as-single-source-of-truth">ConfigMulti as single source of truth</h2>
+<p><code>ConfigMulti</code> centralises every pipeline knob: forecast horizon, training window, outlier policy, exogenous-feature flags, aggregation weights, and cache location. Passing one object to <code>run_pipeline</code> (or to <code>MultiTask</code> directly) is all that is needed to reproduce a run exactly.</p>
+<p>Aggregation weights live on <code>ConfigMulti.agg_weights</code>. For the 11-target ENTSO-E demo dataset (<code>demo10.csv</code>) the presets are loaded by <code>make_demo10_config()</code>. For a custom dataset, pass <code>agg_weights</code> explicitly when constructing <code>ConfigMulti</code>.</p>
+<div id="4b33a414" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask.runner <span class="im">import</span> make_demo10_config</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> make_demo10_config(predict_size<span class="op">=</span><span class="dv">24</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Targets:    </span><span class="sc">{</span>cfg<span class="sc">.</span>targets<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># None until prepare_data runs</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Weights:    </span><span class="sc">{</span>cfg<span class="sc">.</span>agg_weights<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Horizon:    </span><span class="sc">{</span>cfg<span class="sc">.</span>predict_size<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Targets:    None
+Weights:    [1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0]
+Horizon:    24</code></pre>
+</div>
+</div>
+</section>
+<section id="pipeline-stages" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline-stages">Pipeline stages</h2>
+<p>A call to <code>run_pipeline</code> (or equivalently <code>runner.run</code>) executes the following steps in order:</p>
+<ol type="1">
+<li><code>prepare_data</code> — loads, resamples, and validates the input DataFrame.</li>
+<li><code>detect_outliers</code> — applies hard-bound clipping and IsolationForest (controlled by <code>ConfigMulti.use_outlier_detection</code> and <code>bounds</code>).</li>
+<li><code>impute</code> — fills missing values using the configured <code>ConfigMulti.imputation_method</code>.</li>
+<li><code>build_exogenous_features</code> — assembles weather, calendar, day/night, holiday, and (optionally) holiday-adjacency covariates; runs cyclical encoding and polynomial interactions; selects the final feature set.</li>
+<li><code>run(task="lazy")</code> — fits one <code>ForecasterRecursive</code> per target with LightGBM defaults, aggregates per-target predictions using <code>agg_weights</code>, and returns the combined forecast.</li>
+</ol>
+</section>
+<section id="run_pipeline-usage" class="level2">
+<h2 class="anchored" data-anchor-id="run_pipeline-usage">run_pipeline usage</h2>
+<p>The simplest call loads <code>demo10.csv</code> from the bundled datasets and uses the demo10 presets:</p>
+<div id="06ddcaf8" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe <span class="im">import</span> run_pipeline</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> run_pipeline()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(forecast.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.
+WeightFunction: all sample weights for the requested index are zero (the window falls entirely within gap-penalty zones). Returning None so ForecasterRecursive uses uniform weighting.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                              forecast
+2021-12-24 22:00:00+00:00  8519.478988
+2021-12-24 23:00:00+00:00  7048.321873
+2021-12-25 00:00:00+00:00  6737.210432
+2021-12-25 01:00:00+00:00  6413.015804
+2021-12-25 02:00:00+00:00  6222.748145</code></pre>
+</div>
+</div>
+<p>For a custom dataset, supply a <code>ConfigMulti</code> and a DataFrame:</p>
+<div id="cb14f7ee" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe <span class="im">import</span> run_pipeline</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    rng.uniform(<span class="dv">0</span>, <span class="dv">100</span>, size<span class="op">=</span>(n, <span class="dv">3</span>)),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>idx,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>],</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>df.index.name <span class="op">=</span> <span class="st">"DateTime"</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    cfg <span class="op">=</span> ConfigMulti(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        predict_size<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        train_size<span class="op">=</span>pd.Timedelta(days<span class="op">=</span><span class="dv">14</span>),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        use_exogenous_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        use_outlier_detection<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        imputation_method<span class="op">=</span><span class="st">"linear"</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        agg_weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>],</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> run_pipeline(config<span class="op">=</span>cfg, dataframe<span class="op">=</span>df, project_name<span class="op">=</span><span class="st">"demo_custom"</span>, cache_home<span class="op">=</span>tmp)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">type</span>(result))</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+                            forecast
+2020-01-21 20:00:00+00:00  35.461207
+2020-01-21 21:00:00+00:00  35.352643
+2020-01-21 22:00:00+00:00  56.528335
+2020-01-21 23:00:00+00:00  41.834456</code></pre>
+</div>
+</div>
+</section>
+<section id="aggregation-weights" class="level2">
+<h2 class="anchored" data-anchor-id="aggregation-weights">Aggregation weights</h2>
+<p><code>ConfigMulti.agg_weights</code> replaces the old hard-coded <code>DEFAULT_WEIGHTS</code> constant. A positive weight adds that target’s forecast to the aggregate; a negative weight subtracts it, expressing a net-position convention. Equal weights are used as a fallback when <code>agg_weights</code> is <code>None</code>.</p>
+<p>The demo10 presets from <code>make_demo10_config()</code> encode the eleven-element signed vector <code>[+1, +1, -1, -1, +1, -1, +1, +1, +1, -1, +1]</code>, identical to the previous <code>DEFAULT_WEIGHTS</code> constant.</p>
+</section>
+<section id="cli-usage" class="level2">
+<h2 class="anchored" data-anchor-id="cli-usage">CLI usage</h2>
+<p>The entry point <code>spotforecast-safe-n2o1-cov-df</code> accepts a subset of <code>ConfigMulti</code> fields as flags and delegates to <code>run_pipeline</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default run — loads demo10.csv, uses make_demo10_config() presets</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom forecast horizon</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--forecast_horizon</span> 48</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Holiday features on, 2-degree polynomial interactions</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--include_holiday_features</span> true <span class="at">--poly_features_degree</span> 2</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom aggregation weights</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--weights</span> 1.0 1.0 <span class="at">-1.0</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify cache directory</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--log_dir</span> ~/my_cache</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Available flags:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 26%">
+<col style="width: 55%">
+</colgroup>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">month</th>
-<th data-quarto-table-cell-role="th">sin</th>
-<th data-quarto-table-cell-role="th">cos</th>
+<th>Flag</th>
+<th>Default</th>
+<th>ConfigMulti field</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2020-01-01</td>
-<td>1</td>
-<td>0.5</td>
-<td>0.866</td>
+<td><code>--forecast_horizon</code></td>
+<td>24</td>
+<td><code>predict_size</code></td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2020-01-02</td>
-<td>1</td>
-<td>0.5</td>
-<td>0.866</td>
+<td><code>--lags</code></td>
+<td>24</td>
+<td><code>lags_consider=range(1, N+1)</code></td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2020-01-03</td>
-<td>1</td>
-<td>0.5</td>
-<td>0.866</td>
+<td><code>--train_ratio</code></td>
+<td>0.8</td>
+<td><code>train_size</code> (derived from data extent)</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2020-01-04</td>
-<td>1</td>
-<td>0.5</td>
-<td>0.866</td>
+<td><code>--contamination</code></td>
+<td>0.01</td>
+<td><code>contamination</code></td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2020-01-05</td>
-<td>1</td>
-<td>0.5</td>
-<td>0.866</td>
+<td><code>--window_size</code></td>
+<td>72</td>
+<td><code>window_size</code></td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2020-01-06</td>
+<td><code>--latitude</code></td>
+<td>51.5136</td>
+<td><code>latitude</code></td>
+</tr>
+<tr class="odd">
+<td><code>--longitude</code></td>
+<td>7.4653</td>
+<td><code>longitude</code></td>
+</tr>
+<tr class="even">
+<td><code>--timezone</code></td>
+<td>UTC</td>
+<td><code>timezone</code></td>
+</tr>
+<tr class="odd">
+<td><code>--country_code</code></td>
+<td>DE</td>
+<td><code>country_code</code></td>
+</tr>
+<tr class="even">
+<td><code>--state</code></td>
+<td>NW</td>
+<td><code>state</code></td>
+</tr>
+<tr class="odd">
+<td><code>--include_weather_windows</code></td>
+<td>false</td>
+<td><code>include_weather_windows</code></td>
+</tr>
+<tr class="even">
+<td><code>--include_holiday_features</code></td>
+<td>false</td>
+<td><code>include_holiday_features</code></td>
+</tr>
+<tr class="odd">
+<td><code>--include_holiday_adjacency_features</code></td>
+<td>false</td>
+<td><code>include_holiday_adjacency_features</code></td>
+</tr>
+<tr class="even">
+<td><code>--poly_features_degree</code></td>
 <td>1</td>
-<td>0.5</td>
-<td>0.866</td>
+<td><code>poly_features_degree</code></td>
+</tr>
+<tr class="odd">
+<td><code>--max_poly_features</code></td>
+<td>10</td>
+<td><code>max_poly_features</code></td>
+</tr>
+<tr class="even">
+<td><code>--verbose</code></td>
+<td>false</td>
+<td><code>verbose</code></td>
+</tr>
+<tr class="odd">
+<td><code>--weights</code></td>
+<td>None</td>
+<td><code>agg_weights</code></td>
+</tr>
+<tr class="even">
+<td><code>--log_dir</code></td>
+<td>None</td>
+<td><code>cache_home</code></td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
 </section>
-<section id="exogenous-variable-validation" class="level2">
-<h2 class="anchored" data-anchor-id="exogenous-variable-validation">Exogenous Variable Validation</h2>
-<p>The <code>TestExogenousVariableValidation</code> class enforces four structural invariants that must hold before the exogenous DataFrame is passed to the forecaster.</p>
-<p>The exogenous matrix must have exactly the same number of rows as the target series and an identical index. The test creates both objects on the same <code>DatetimeIndex</code> and checks <code>exog.index.equals(y.index)</code>. A mismatch here would cause <code>ForecasterRecursive.fit</code> to raise an alignment error, but verifying it before training saves the cost of constructing lag matrices for an incompatible input.</p>
-<p>Missing features are detected by comparing the actual column list against a required set. If a required column is absent, the gap is made explicit rather than letting a downstream <code>KeyError</code> propagate with an opaque stack trace.</p>
-<p>NaN handling is tested by confirming that two missing values survive <code>exog.isna().sum().sum()</code> and that forward-fill removes all of them. The <code>ffill()</code> strategy is appropriate for weather and calendar data because the last observed value is the most conservative assumption in the absence of new information.</p>
-<div id="63ecb7b4" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>exog <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"feat1"</span>: [<span class="fl">1.0</span>, <span class="fl">2.0</span>, np.nan, <span class="fl">4.0</span>, <span class="fl">5.0</span>],</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"feat2"</span>: [<span class="fl">10.0</span>, np.nan, <span class="fl">30.0</span>, <span class="fl">40.0</span>, <span class="fl">50.0</span>],</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NaNs before ffill: </span><span class="sc">{</span>exog<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>exog_filled <span class="op">=</span> exog.ffill()</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NaNs after  ffill: </span><span class="sc">{</span>exog_filled<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NaNs before ffill: 2
-NaNs after  ffill: 0</code></pre>
-</div>
-</div>
+<section id="model-persistence" class="level2">
+<h2 class="anchored" data-anchor-id="model-persistence">Model persistence</h2>
+<p>Fitted models are saved under <code>&lt;cache_home&gt;/models/&lt;project_name&gt;/</code> by <code>BaseTask.save_models</code>. A subsequent <code>run_pipeline</code> call with the same <code>project_name</code> and <code>cache_home</code> can load them via <code>task="predict"</code> (using <code>MultiTask</code> directly or <code>runner.run</code>). The <code>"clean"</code> task removes all artefacts for a project.</p>
 </section>
-<section id="logging-and-timestamp-format" class="level2">
-<h2 class="anchored" data-anchor-id="logging-and-timestamp-format">Logging and Timestamp Format</h2>
-<p>The <code>TestLoggingForCovariates</code> class tests two aspects of the dual-handler logging system used throughout the covariate pipeline.</p>
-<p>The first test verifies that attaching a <code>StreamHandler</code> with a standard formatter results in a logger with at least one handler and level <code>INFO</code>. The N-to-1 pipeline sets this level rather than <code>DEBUG</code> because it is the outermost user-facing task: operators need progress updates, not internal variable traces.</p>
-<p>The second test verifies the timestamp format <code>YYYYMMDD_HHMMSS</code>. A 15-character string, an underscore at position 8, and an all-digit date component are the three assertions. This format is used in log file names, so any deviation would produce files that sort incorrectly by creation time in a directory listing — a subtle but consequential problem in audit contexts where log files are reviewed chronologically.</p>
-</section>
-<section id="the-n-to-1-forecasting-structure" class="level2">
-<h2 class="anchored" data-anchor-id="the-n-to-1-forecasting-structure">The N-to-1 Forecasting Structure</h2>
-<p>The <code>TestNto1ForecastingPipeline</code> class establishes the data structure contracts for the recursive forecasting stage.</p>
-<p>The basic structure test creates a Series of length <code>100 + horizon</code> to represent the full available history. The extra <code>horizon</code> rows will become the test set; only the first 100 rows feed the training stage. Constructing the Series with this combined length from the start avoids off-by-one errors when slicing at the train/test boundary.</p>
-<p>The recursive forecaster is initialised with <code>LGBMRegressor(n_estimators=100, learning_rate=0.1, random_state=42, verbose=-1)</code>. The test confirms that the estimator attributes match the provided values, which establishes that the <code>LGBMRegressor</code> constructor accepted the parameters without silently ignoring any of them. This is important because some sklearn-compatible estimators silently clip or ignore out-of-range parameters.</p>
-<p>Multi-output forecasting produces a one-dimensional array of length <code>steps</code>. The test confirms <code>forecast_array.ndim == 1</code> to distinguish the multi-step output from a two-dimensional matrix that would indicate an accidental multi-target configuration.</p>
-</section>
-<section id="feature-engineering-with-covariates" class="level2">
-<h2 class="anchored" data-anchor-id="feature-engineering-with-covariates">Feature Engineering with Covariates</h2>
-<p>The <code>TestCovariateFeatureEngineering</code> class validates three feature construction patterns used by the pipeline.</p>
-<p>Polynomial features are computed by stacking <code>x</code>, <code>x**2</code>, and <code>x**3</code> into a matrix. The test confirms the shape <code>(5, 3)</code> and verifies that the first column is identical to the original input and the second column equals its square. This establishes that no column reordering or normalisation has been applied, which matters because the aggregation weights are positionally indexed.</p>
-<p>Lag features are created with <code>y.shift(i)</code> for <code>i</code> in <code>[1, 2, 3]</code>. The test checks that the first row of <code>lag_1</code> is NaN, confirming that the shift operation introduces the expected initial missing values rather than wrapping around or filling with zeros.</p>
-<p>Rolling window features are computed with <code>y.rolling(window=7).mean()</code>. The test confirms that the first six values are NaN — a direct consequence of requiring a full window before computing the first valid mean. Any model trained without respecting this warm-up period would use NaN-contaminated features for the earliest training rows.</p>
-<div id="e48d2cd9" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.Series(np.arange(<span class="dv">1</span>, <span class="dv">11</span>, dtype<span class="op">=</span><span class="bu">float</span>))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lags <span class="op">=</span> pd.DataFrame({<span class="ss">f"lag_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>: y.shift(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>)})</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>rolling_mean <span class="op">=</span> y.rolling(window<span class="op">=</span><span class="dv">7</span>).mean()</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Lag features (first 5 rows):"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lags.head())</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Rolling mean NaNs in first 6 positions: </span><span class="sc">{</span>rolling_mean<span class="sc">.</span>iloc[:<span class="dv">6</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Lag features (first 5 rows):
-   lag_1  lag_2  lag_3
-0    NaN    NaN    NaN
-1    1.0    NaN    NaN
-2    2.0    1.0    NaN
-3    3.0    2.0    1.0
-4    4.0    3.0    2.0
-
-Rolling mean NaNs in first 6 positions: 6</code></pre>
-</div>
-</div>
-</section>
-<section id="integrating-exogenous-variables-into-the-feature-matrix" class="level2">
-<h2 class="anchored" data-anchor-id="integrating-exogenous-variables-into-the-feature-matrix">Integrating Exogenous Variables into the Feature Matrix</h2>
-<p>The <code>TestExogenousIntegration</code> class tests how exogenous features are merged with lag features to form the complete training matrix.</p>
-<p>The feature matrix expansion test creates a base matrix of 5 columns and an exogenous matrix of 3 columns, then combines them with <code>np.column_stack</code>. The result must have exactly 8 columns. This verifies that column stacking does not drop any features and does not introduce duplicates.</p>
-<p>The lag-and-exog combination test uses <code>pd.concat([y_lags, exog], axis=1)</code> and confirms the combined column count is 4 (two lags plus two exogenous features). The presence of both <code>y_lag_1</code> and <code>temp</code> in the column set confirms that the concatenation preserved column names, which <code>ForecasterRecursive</code> uses when calling <code>estimator.fit</code>.</p>
-</section>
-<section id="prediction-aggregation" class="level2">
-<h2 class="anchored" data-anchor-id="prediction-aggregation">Prediction Aggregation</h2>
-<p>The <code>TestPredictionAggregation</code> class mirrors the <code>TestAggregatePredict</code> class from the demo task but extends it with temporal index preservation.</p>
-<p>The basic aggregation test uses positive fractional weights <code>[0.5, 0.3, 0.2]</code> that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.</p>
-<p>The unequal importance test verifies the ordering <code>high_priority &gt; medium_priority &gt; low_priority</code> directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.</p>
-<p>The temporal index preservation test reconstructs the aggregated Series with the original <code>DatetimeIndex</code> and calls <code>aggregated_series.index.equals(dates)</code>. This confirms that the matrix multiplication idiom <code>predictions.values @ np.array(weights)</code> — which returns a plain <code>np.ndarray</code> — does not silently discard the temporal index when it is re-attached via <code>pd.Series(aggregated, index=dates)</code>.</p>
-<div id="3cebd5f5" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> pd.date_range(<span class="st">"2020-01-01"</span>, periods<span class="op">=</span><span class="dv">10</span>, freq<span class="op">=</span><span class="st">"h"</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    np.random.randn(<span class="dv">10</span>, <span class="dv">3</span>), index<span class="op">=</span>dates, columns<span class="op">=</span>[<span class="st">"loc_1"</span>, <span class="st">"loc_2"</span>, <span class="st">"loc_3"</span>]</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="fl">0.2</span>])</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>aggregated <span class="op">=</span> pd.Series(predictions.values <span class="op">@</span> weights, index<span class="op">=</span>dates)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(aggregated.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2020-01-01 00:00:00    0.675121
-2020-01-01 01:00:00    0.192511
-2020-01-01 02:00:00    0.063996
-2020-01-01 03:00:00   -0.185861
-2020-01-01 04:00:00    0.149508
-Freq: h, dtype: float64</code></pre>
-</div>
-</div>
-</section>
-<section id="timezone-handling" class="level2">
-<h2 class="anchored" data-anchor-id="timezone-handling">Timezone Handling</h2>
-<p>The <code>TestCovariateTimezone</code> class addresses a recurring source of alignment failures in time series pipelines: mixed timezone-aware and timezone-naive indices.</p>
-<p>The first test creates a UTC-indexed Series and confirms that <code>y.index.tz is not None</code> and that the timezone string is <code>"UTC"</code>. A <code>None</code> timezone indicates a tz-naive index, which cannot be compared with a tz-aware index without an explicit <code>tz_localize</code> call.</p>
-<p>The conversion test uses <code>tz_convert("US/Eastern")</code> to move from UTC to Eastern time and confirms that the result has a non-<code>None</code> timezone. This is relevant when the pipeline is deployed in a timezone other than UTC: the model’s training data and the forecast period must share a consistent timezone, or the lag indices will misalign by a constant offset equal to the UTC offset.</p>
-<p>The consistency test creates both <code>y</code> and <code>exog</code> on the same UTC index and verifies <code>str(y.index.tz) == str(exog.index.tz)</code>. A mismatch between the target and exogenous timezone would cause <code>ForecasterRecursive.fit</code> to raise an error when it attempts to align the two inputs.</p>
-</section>
-<section id="forced-training-vs.-cached-model-loading" class="level2">
-<h2 class="anchored" data-anchor-id="forced-training-vs.-cached-model-loading">Forced Training vs.&nbsp;Cached Model Loading</h2>
-<p>The <code>TestForcedTraining</code> class tests the persistence decision logic that controls whether the pipeline trains a new model or loads a previously serialised one.</p>
-<p>The <code>force_train</code> flag maps directly to the action string <code>"retrain_model"</code> when <code>True</code> and <code>"load_cached_model"</code> when <code>False</code>. This test formalises the boolean semantics in isolation from the actual file I/O, confirming that the branching logic is correct before it interacts with the filesystem.</p>
-<p>The directory creation test calls <code>Path.mkdir(parents=True, exist_ok=True)</code> on a path under <code>/tmp</code> and verifies that the directory exists afterwards. The <code>exist_ok=True</code> flag prevents a <code>FileExistsError</code> on repeated runs, which is the correct behaviour for a pipeline that may be invoked multiple times with the same model directory.</p>
-</section>
-<section id="error-handling" class="level2">
-<h2 class="anchored" data-anchor-id="error-handling">Error Handling</h2>
-<p>The <code>TestErrorHandlingCovariates</code> class covers three failure modes that are specific to the covariate pipeline.</p>
-<p>The missing exog detection test computes the shortfall when only 20 steps of exogenous data are provided for a 24-step forecast horizon. The result <code>horizon - exog_provided == 4</code> establishes the arithmetic that the validation layer must implement to produce a meaningful error message rather than an implicit out-of-bounds slice.</p>
-<p>The misaligned index test creates <code>y</code> with 100 rows and <code>exog</code> with 95 rows, then computes their index intersection. The intersection contains 95 elements, confirming that the safe strategy is to restrict computation to the common index rather than raising an error. This mirrors the <code>dropna</code>/<code>intersection</code> pattern used in the demo task.</p>
-<p>The invalid horizon test confirms that <code>-24</code> is not a member of the accepted horizons <code>[6, 12, 24, 48, 168]</code> and that it is negative. This validates the guard condition that <code>n2n_predict_with_covariates</code> enforces at its entry point.</p>
-</section>
-<section id="kwargs-flexibility" class="level2">
-<h2 class="anchored" data-anchor-id="kwargs-flexibility">Kwargs Flexibility</h2>
-<p>The <code>TestKwargsFlexibility</code> class verifies that the <code>**kwargs</code> mechanism correctly forwards parameters through the pipeline layers.</p>
-<p>The estimator kwargs test confirms that a dictionary with <code>n_estimators=500</code>, <code>learning_rate=0.05</code>, and <code>num_leaves=100</code> retains all three keys and values. The <code>n_to_1_with_covariates</code> function collects these in a <code>forecast_kwargs</code> dictionary before passing them to <code>n2n_predict_with_covariates</code>, so the forwarding chain must preserve each key without mutation.</p>
-<p>The forecaster kwargs test checks that <code>lags=[1, 7, 24]</code> and <code>window_size=72</code> survive the forwarding. Using a list for <code>lags</code> instead of a scalar activates the skforecast multi-lag construction path, so the type must be preserved exactly.</p>
-<p>The aggregation kwargs test verifies that <code>method</code> and <code>normalize_weights</code> entries are accessible after construction. These parameters control how <code>agg_predict</code> normalises the weight vector, and their presence in the kwargs dictionary is the precondition for the aggregation stage to respect user-specified aggregation semantics.</p>
-</section>
-<section id="integration-the-complete-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="integration-the-complete-pipeline">Integration: The Complete Pipeline</h2>
-<p>The <code>TestIntegrationN2N</code> class tests the properties that only emerge when all components operate together.</p>
-<p>The end-to-end structure test constructs a 100-row hourly Series named <code>load</code> alongside a two-column exogenous DataFrame with <code>temperature</code> and <code>hour</code> columns on the same index. The three assertions — correct Series length, correct exog shape, and identical indices — are the minimum conditions for a successful call to <code>ForecasterRecursive.fit(y, exog=exog)</code>.</p>
-<p>The output consistency test simulates the pipeline’s return value: a <code>(24, 11)</code> predictions DataFrame, a 24-element aggregated Series, and a metrics dictionary with <code>MAE</code> and <code>MSE</code> keys. Verifying the shape of the predictions DataFrame confirms that the multi-output forecasting produced the expected number of timesteps and columns before aggregation.</p>
-<p>The reproducibility test seeds <code>np.random</code> with <code>42</code>, draws 10 values, reseeds, and draws again. Exact equality between the two arrays confirms that the seed resets the PRNG state completely. In the pipeline, <code>random_state=42</code> is passed to <code>LGBMRegressor</code> for the same reason: two runs with identical input must produce identical output, which is a core requirement of the safety-critical design.</p>
-<div id="16f20f5b" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>seed <span class="op">=</span> <span class="dv">42</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(seed)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>data_1 <span class="op">=</span> np.random.randn(<span class="dv">10</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(seed)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>data_2 <span class="op">=</span> np.random.randn(<span class="dv">10</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Arrays identical: </span><span class="sc">{</span>(data_1 <span class="op">==</span> data_2)<span class="sc">.</span><span class="bu">all</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"First 5 values:   </span><span class="sc">{</span>data_1[:<span class="dv">5</span>]<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Arrays identical: True
-First 5 values:   [ 0.4967 -0.1383  0.6477  1.523  -0.2342]</code></pre>
-</div>
-</div>
-</section>
-<section id="the-complete-execution-flow" class="level2">
-<h2 class="anchored" data-anchor-id="the-complete-execution-flow">The Complete Execution Flow</h2>
-<p>A single invocation of <code>task_safe_n_to_1_with_covariates_and_dataframe</code> follows this sequence. The optional logging system is activated first if <code>--logging true</code> is passed. The <code>fetch_data</code> call loads the target time series from the configured data file. Feature engineering then constructs the exogenous matrix: calendar features from the <code>DatetimeIndex</code>, optionally extended with weather windows, holiday indicators, and polynomial interaction terms. The <code>n2n_predict_with_covariates</code> function trains one <code>ForecasterRecursive</code> per target column with the assembled exogenous inputs, serialises each model to the model directory, and returns the prediction DataFrame. Geographic coordinates are redacted from all log output at every level per CWE-312 and CWE-532. The 11-column prediction DataFrame is reduced to a single combined forecast by <code>agg_predict</code> using the <code>DEFAULT_WEIGHTS</code> vector. The combined prediction is printed to stdout and logged to the timestamped log file if logging is enabled.</p>
-<p>The test suite mirrors this flow by isolating each stage into a dedicated class, so a regression in any component produces a targeted failure that pinpoints the affected stage without requiring a full pipeline run.</p>
-<div id="5133812e" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> argparse</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any, Dict, List, Optional, Tuple, Union</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> fetch_data, get_package_data_home</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.logger <span class="im">import</span> setup_logging</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.utils.parse <span class="im">import</span> parse_bool</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.agg_predict <span class="im">import</span> agg_predict</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.processing.n2n_predict_with_covariates <span class="im">import</span> (</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    n2n_predict_with_covariates,</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.security.masking <span class="im">import</span> mask_estimator</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Default aggregation weights for the N-to-1 forecasting task.</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co"># The position of each value corresponds to a specific forecast component or</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co"># aggregation term used by `agg_predict`. Positive values increase the influence</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co"># of the corresponding component in the final aggregated forecast, whereas</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co"># negative values down-weight or invert the contribution of that component.</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">:</span></span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="co"># - These defaults are domain-specific and should be updated together with any</span></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   changes to the aggregation logic or the ordering of components in</span></span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   `agg_predict`.</span></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co"># - They are defined as a named constant (rather than inline) to make it clear</span></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   what is being tuned and to avoid unexplained "magic numbers" in the code.</span></span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>DEFAULT_WEIGHTS: List[<span class="bu">float</span>] <span class="op">=</span> [</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 0 – weight for forecast component 0</span></span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 1 – weight for forecast component 1</span></span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span><span class="fl">1.0</span>,  <span class="co"># Index 2 – weight for forecast component 2</span></span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span><span class="fl">1.0</span>,  <span class="co"># Index 3 – weight for forecast component 3</span></span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 4 – weight for forecast component 4</span></span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span><span class="fl">1.0</span>,  <span class="co"># Index 5 – weight for forecast component 5</span></span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 6 – weight for forecast component 6</span></span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 7 – weight for forecast component 7</span></span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 8 – weight for forecast component 8</span></span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span><span class="fl">1.0</span>,  <span class="co"># Index 9 – weight for forecast component 9</span></span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span>,  <span class="co"># Index 10 – weight for forecast component 10</span></span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>warnings.simplefilter(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">FutureWarning</span>)</span>
-<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>warnings.simplefilter(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">UserWarning</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="09dc4327" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> n_to_1_with_covariates(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    data: Optional[pd.DataFrame] <span class="op">=</span> <span class="va">None</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    forecast_horizon: <span class="bu">int</span> <span class="op">=</span> <span class="dv">24</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    contamination: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    window_size: <span class="bu">int</span> <span class="op">=</span> <span class="dv">72</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    lags: <span class="bu">int</span> <span class="op">=</span> <span class="dv">24</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    train_ratio: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    latitude: <span class="bu">float</span> <span class="op">=</span> <span class="fl">51.5136</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    longitude: <span class="bu">float</span> <span class="op">=</span> <span class="fl">7.4653</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    timezone: <span class="bu">str</span> <span class="op">=</span> <span class="st">"UTC"</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    country_code: <span class="bu">str</span> <span class="op">=</span> <span class="st">"DE"</span>,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    state: <span class="bu">str</span> <span class="op">=</span> <span class="st">"NW"</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    estimator: Optional[Union[<span class="bu">str</span>, <span class="bu">object</span>]] <span class="op">=</span> <span class="va">None</span>,</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    include_weather_windows: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>,</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    include_holiday_features: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>,</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    poly_features_degree: <span class="bu">int</span> <span class="op">=</span> <span class="dv">1</span>,</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    max_poly_features: <span class="bu">int</span> <span class="op">=</span> <span class="dv">10</span>,</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    weights: Optional[Union[Dict[<span class="bu">str</span>, <span class="bu">float</span>], List[<span class="bu">float</span>], np.ndarray]] <span class="op">=</span> <span class="va">None</span>,</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    verbose: <span class="bu">bool</span> <span class="op">=</span> <span class="va">True</span>,</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    show_progress: <span class="bu">bool</span> <span class="op">=</span> <span class="va">True</span>,</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs: Any,</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>) <span class="op">-&gt;</span> Tuple[pd.DataFrame, pd.Series, Dict, Dict]:</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Execute N-to-1 forecasting pipeline with exogenous covariates.</span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">    This function performs a complete time series forecasting workflow:</span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">    1. Fetches and preprocesses data</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">    2. Engineers features (calendar, weather, holidays, cyclical, polynomial)</span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">    3. Trains recursive forecaster on multiple targets</span></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">    4. Aggregates predictions using weighted combination</span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co">    Security Note:</span></span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co">        Geographic coordinates (latitude/longitude) are considered sensitive PII</span></span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co">        (Personally Identifiable Information) per CWE-312 and CWE-532. This function</span></span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co">        implements data masking for all log output to prevent exposure in production</span></span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">        monitoring systems, log aggregators, or crash dumps. Raw coordinate values</span></span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">        are never logged at any log level, including DEBUG.</span></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">        data (Optional[pd.DataFrame]): Optional DataFrame with target time series data.</span></span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">            If None, fetches data automatically ("data10.csv"). Default: None.</span></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co">        forecast_horizon (int): Number of forecast steps ahead.</span></span>
-<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="co">            Determines how many time steps to predict into the future.</span></span>
-<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="co">            Typical values: 24 (1 day), 48 (2 days), 168 (1 week). Default: 24.</span></span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="co">        contamination (float): Outlier contamination level for anomaly detection.</span></span>
-<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="co">            Expected proportion of outliers in the training data [0, 1].</span></span>
-<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="co">            Higher values detect fewer outliers. Default: 0.01 (1%).</span></span>
-<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="co">        window_size (int): Rolling window size for feature engineering (hours).</span></span>
-<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="co">            Size of the rolling window for computing statistics.</span></span>
-<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="co">            Must be &gt; lags. Typical range: 24-168. Default: 72.</span></span>
-<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="co">        lags (int): Number of lagged features to create.</span></span>
-<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a><span class="co">            Creates AR(p) features with p=lags.</span></span>
-<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a><span class="co">            Typical values: 12, 24, 48. Default: 24.</span></span>
-<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a><span class="co">        train_ratio (float): Proportion of data for training [0, 1].</span></span>
-<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a><span class="co">            Remaining data (1 - train_ratio) used for validation/testing.</span></span>
-<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a><span class="co">            Typical values: 0.7-0.9. Default: 0.8.</span></span>
-<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="co">        latitude (float): Geographic latitude for solar features.</span></span>
-<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="co">            Used to compute sunrise/sunset times for day/night features.</span></span>
-<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: 51.5136 (Dortmund, Germany).</span></span>
-<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a><span class="co">        longitude (float): Geographic longitude for solar features.</span></span>
-<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="co">            Used to compute sunrise/sunset times for day/night features.</span></span>
-<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: 7.4653 (Dortmund, Germany).</span></span>
-<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="co">        timezone (str): Timezone for time-based features.</span></span>
-<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a><span class="co">            Any timezone recognized by pytz. Default: "UTC".</span></span>
-<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="co">        country_code (str): ISO 3166-1 alpha-2 country code for holidays.</span></span>
-<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a><span class="co">            Examples: "DE" (Germany), "US" (USA), "GB" (UK). Default: "DE".</span></span>
-<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a><span class="co">        state (str): State/region code for holidays.</span></span>
-<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a><span class="co">            Country-dependent. For Germany: "BW", "BY", "NW", etc.</span></span>
-<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: "NW" (Nordrhein-Westfalen).</span></span>
-<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a><span class="co">        estimator (Optional[Union[str, object]]): Forecaster model.</span></span>
-<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a><span class="co">            Can be:</span></span>
-<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a><span class="co">            - None: Uses LGBMRegressor(n_estimators=100, verbose=-1).</span></span>
-<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a><span class="co">            - "ForecasterRecursive": References default estimator (same as None).</span></span>
-<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a><span class="co">            - LGBMRegressor(...): Custom pre-configured estimator.</span></span>
-<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a><span class="co">            - Any sklearn-compatible regressor.</span></span>
-<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: None.</span></span>
-<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a><span class="co">        include_weather_windows (bool): Add rolling weather statistics.</span></span>
-<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="co">            Creates moving averages, min, max of weather features over</span></span>
-<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="co">            multiple windows (1D, 7D). Increases feature count significantly.</span></span>
-<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: False.</span></span>
-<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a><span class="co">        include_holiday_features (bool): Add holiday binary indicators.</span></span>
-<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a><span class="co">            Creates features indicating holidays and special dates.</span></span>
-<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a><span class="co">            Useful for capturing demand patterns around holidays.</span></span>
-<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: False.</span></span>
-<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a><span class="co">        poly_features_degree (int): Polynomial-interaction degree. 1 (default)</span></span>
-<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a><span class="co">            adds no interactions; 2 adds pairwise bilinear terms; 3+ higher order.</span></span>
-<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a><span class="co">        max_poly_features (int): Cap on kept polynomial interaction columns; only</span></span>
-<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a><span class="co">            the top-K ranked by mutual information with the target survive</span></span>
-<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a><span class="co">            (&lt;= 0 disables). Default: 10.</span></span>
-<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a><span class="co">        weights (Optional[Union[Dict[str, float], List[float], np.ndarray]]):</span></span>
-<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a><span class="co">            Weights for combining multi-output predictions.</span></span>
-<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a><span class="co">            Can be:</span></span>
-<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a><span class="co">            - None: Uses DEFAULT_WEIGHTS (see module-level constant for values)</span></span>
-<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a><span class="co">            - Dict: {"col_name": weight, ...} for specific columns</span></span>
-<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a><span class="co">            - List: [w1, w2, ...] in column order</span></span>
-<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a><span class="co">            - np.ndarray: Same as list</span></span>
-<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: None (uses DEFAULT_WEIGHTS).</span></span>
-<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a><span class="co">        verbose (bool): Enable progress logging.</span></span>
-<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="co">            Prints intermediate results and timestamps.</span></span>
-<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: True.</span></span>
-<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a><span class="co">        show_progress (bool): Show a progress bar for major pipeline steps.</span></span>
-<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a><span class="co">            Default: True.</span></span>
-<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a><span class="co">        **kwargs (Any): Additional parameters for underlying functions.</span></span>
-<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a><span class="co">            These are passed to n2n_predict_with_covariates().</span></span>
-<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a><span class="co">            Examples:</span></span>
-<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a><span class="co">            - freq: Frequency for data resampling. Default: "h" (hourly).</span></span>
-<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a><span class="co">            - columns: Specific columns to forecast. Default: None (all).</span></span>
-<span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a><span class="co">            Any parameter accepted by n2n_predict_with_covariates().</span></span>
-<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a><span class="co">        Tuple[pd.DataFrame, pd.Series, Dict, Dict]: A tuple containing:</span></span>
-<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a><span class="co">            - predictions (pd.DataFrame): Multi-output forecasts from recursive model.</span></span>
-<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a><span class="co">                Each column represents a target variable.</span></span>
-<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a><span class="co">                Index is datetime matching the forecast period.</span></span>
-<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a><span class="co">            - combined_prediction (pd.Series): Aggregated forecast from weighted combination.</span></span>
-<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a><span class="co">                Single column combining all output predictions.</span></span>
-<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a><span class="co">                Index is datetime matching the forecast period.</span></span>
-<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a><span class="co">            - model_metrics (Dict): Performance metrics from recursive forecaster.</span></span>
-<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a><span class="co">                Keys may include: 'mae', 'rmse', 'mape', etc.</span></span>
-<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a><span class="co">            - feature_info (Dict): Information about engineered features.</span></span>
-<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a><span class="co">                Contains feature counts, types, and engineering details.</span></span>
-<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
-<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a><span class="co">        ValueError: If forecast_horizon &lt;= 0 or invalid parameter combinations.</span></span>
-<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a><span class="co">        FileNotFoundError: If data source files cannot be accessed.</span></span>
-<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a><span class="co">        RuntimeError: If model training fails or data processing errors occur.</span></span>
-<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a><span class="co">    Examples:</span></span>
-<span id="cb11-146"><a href="#cb11-146" aria-hidden="true" tabindex="-1"></a><span class="co">        Basic usage (uses all defaults):</span></span>
-<span id="cb11-147"><a href="#cb11-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-148"><a href="#cb11-148" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; predictions, combined, metrics, features = n_to_1_with_covariates()</span></span>
-<span id="cb11-149"><a href="#cb11-149" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; print(f"Predictions shape: {predictions.shape}")</span></span>
-<span id="cb11-150"><a href="#cb11-150" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; print(f"Combined forecast head:</span><span class="ch">\\</span><span class="co">n{combined.head()}")</span></span>
-<span id="cb11-151"><a href="#cb11-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-152"><a href="#cb11-152" aria-hidden="true" tabindex="-1"></a><span class="co">        Custom location and forecast horizon:</span></span>
-<span id="cb11-153"><a href="#cb11-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-154"><a href="#cb11-154" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; predictions, combined, metrics, features = n_to_1_with_covariates(</span></span>
-<span id="cb11-155"><a href="#cb11-155" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     forecast_horizon=48,</span></span>
-<span id="cb11-156"><a href="#cb11-156" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     latitude=48.1351,</span></span>
-<span id="cb11-157"><a href="#cb11-157" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     longitude=11.5820,</span></span>
-<span id="cb11-158"><a href="#cb11-158" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     country_code="DE",</span></span>
-<span id="cb11-159"><a href="#cb11-159" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     state="BY",</span></span>
-<span id="cb11-160"><a href="#cb11-160" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     verbose=True</span></span>
-<span id="cb11-161"><a href="#cb11-161" aria-hidden="true" tabindex="-1"></a><span class="co">        ... )</span></span>
-<span id="cb11-162"><a href="#cb11-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-163"><a href="#cb11-163" aria-hidden="true" tabindex="-1"></a><span class="co">        With feature engineering enabled:</span></span>
-<span id="cb11-164"><a href="#cb11-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-165"><a href="#cb11-165" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; predictions, combined, metrics, features = n_to_1_with_covariates(</span></span>
-<span id="cb11-166"><a href="#cb11-166" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     forecast_horizon=24,</span></span>
-<span id="cb11-167"><a href="#cb11-167" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     include_weather_windows=True,</span></span>
-<span id="cb11-168"><a href="#cb11-168" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     include_holiday_features=True,</span></span>
-<span id="cb11-169"><a href="#cb11-169" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     poly_features_degree=2,</span></span>
-<span id="cb11-170"><a href="#cb11-170" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     verbose=True</span></span>
-<span id="cb11-171"><a href="#cb11-171" aria-hidden="true" tabindex="-1"></a><span class="co">        ... )</span></span>
-<span id="cb11-172"><a href="#cb11-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-173"><a href="#cb11-173" aria-hidden="true" tabindex="-1"></a><span class="co">        Custom estimator and weights:</span></span>
-<span id="cb11-174"><a href="#cb11-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-175"><a href="#cb11-175" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; from lightgbm import LGBMRegressor</span></span>
-<span id="cb11-176"><a href="#cb11-176" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; custom_estimator = LGBMRegressor(</span></span>
-<span id="cb11-177"><a href="#cb11-177" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     n_estimators=200,</span></span>
-<span id="cb11-178"><a href="#cb11-178" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     learning_rate=0.01,</span></span>
-<span id="cb11-179"><a href="#cb11-179" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     max_depth=7</span></span>
-<span id="cb11-180"><a href="#cb11-180" aria-hidden="true" tabindex="-1"></a><span class="co">        ... )</span></span>
-<span id="cb11-181"><a href="#cb11-181" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; custom_weights = [1.0, 1.0, -0.5, -0.5]</span></span>
-<span id="cb11-182"><a href="#cb11-182" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; predictions, combined, metrics, features = n_to_1_with_covariates(</span></span>
-<span id="cb11-183"><a href="#cb11-183" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     forecast_horizon=24,</span></span>
-<span id="cb11-184"><a href="#cb11-184" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     estimator=custom_estimator,</span></span>
-<span id="cb11-185"><a href="#cb11-185" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     weights=custom_weights,</span></span>
-<span id="cb11-186"><a href="#cb11-186" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     verbose=True</span></span>
-<span id="cb11-187"><a href="#cb11-187" aria-hidden="true" tabindex="-1"></a><span class="co">        ... )</span></span>
-<span id="cb11-188"><a href="#cb11-188" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-189"><a href="#cb11-189" aria-hidden="true" tabindex="-1"></a><span class="co">        With all advanced options:</span></span>
-<span id="cb11-190"><a href="#cb11-190" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-191"><a href="#cb11-191" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; predictions, combined, metrics, features = n_to_1_with_covariates(</span></span>
-<span id="cb11-192"><a href="#cb11-192" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     forecast_horizon=72,</span></span>
-<span id="cb11-193"><a href="#cb11-193" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     contamination=0.02,</span></span>
-<span id="cb11-194"><a href="#cb11-194" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     window_size=168,</span></span>
-<span id="cb11-195"><a href="#cb11-195" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     lags=48,</span></span>
-<span id="cb11-196"><a href="#cb11-196" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     train_ratio=0.75,</span></span>
-<span id="cb11-197"><a href="#cb11-197" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     latitude=50.1109,</span></span>
-<span id="cb11-198"><a href="#cb11-198" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     longitude=8.6821,</span></span>
-<span id="cb11-199"><a href="#cb11-199" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     timezone="Europe/Berlin",</span></span>
-<span id="cb11-200"><a href="#cb11-200" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     country_code="DE",</span></span>
-<span id="cb11-201"><a href="#cb11-201" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     state="HE",</span></span>
-<span id="cb11-202"><a href="#cb11-202" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     include_weather_windows=True,</span></span>
-<span id="cb11-203"><a href="#cb11-203" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     include_holiday_features=True,</span></span>
-<span id="cb11-204"><a href="#cb11-204" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     poly_features_degree=2,</span></span>
-<span id="cb11-205"><a href="#cb11-205" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     weights={"power": 1.0, "demand": 0.8},</span></span>
-<span id="cb11-206"><a href="#cb11-206" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     verbose=True,</span></span>
-<span id="cb11-207"><a href="#cb11-207" aria-hidden="true" tabindex="-1"></a><span class="co">        ...     freq="h",</span></span>
-<span id="cb11-208"><a href="#cb11-208" aria-hidden="true" tabindex="-1"></a><span class="co">        ... )</span></span>
-<span id="cb11-209"><a href="#cb11-209" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; print(f"Model Metrics: {metrics}")</span></span>
-<span id="cb11-210"><a href="#cb11-210" aria-hidden="true" tabindex="-1"></a><span class="co">        &gt;&gt;&gt; print(f"Feature Info: {features}")</span></span>
-<span id="cb11-211"><a href="#cb11-211" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb11-212"><a href="#cb11-212" aria-hidden="true" tabindex="-1"></a>    logger <span class="op">=</span> logging.getLogger(<span class="va">__name__</span>)</span>
-<span id="cb11-213"><a href="#cb11-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-214"><a href="#cb11-214" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Security: Mask sensitive coordinates immediately (CWE-532, CWE-312)</span></span>
-<span id="cb11-215"><a href="#cb11-215" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This prevents raw latitude/longitude from being accessed in logging contexts</span></span>
-<span id="cb11-216"><a href="#cb11-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-217"><a href="#cb11-217" aria-hidden="true" tabindex="-1"></a>    masked_estimator <span class="op">=</span> mask_estimator(estimator)</span>
-<span id="cb11-218"><a href="#cb11-218" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-219"><a href="#cb11-219" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Default weights if not provided</span></span>
-<span id="cb11-220"><a href="#cb11-220" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> weights <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb11-221"><a href="#cb11-221" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use documented default aggregation weights instead of inline magic numbers.</span></span>
-<span id="cb11-222"><a href="#cb11-222" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use a copy to avoid accidental mutation of the module-level default.</span></span>
-<span id="cb11-223"><a href="#cb11-223" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> DEFAULT_WEIGHTS.copy()</span>
-<span id="cb11-224"><a href="#cb11-224" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-225"><a href="#cb11-225" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> verbose:</span>
-<span id="cb11-226"><a href="#cb11-226" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"="</span> <span class="op">*</span> <span class="dv">80</span>)</span>
-<span id="cb11-227"><a href="#cb11-227" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"N-to-1 Forecasting with Exogenous Covariates"</span>)</span>
-<span id="cb11-228"><a href="#cb11-228" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"="</span> <span class="op">*</span> <span class="dv">80</span>)</span>
-<span id="cb11-229"><a href="#cb11-229" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"Configuration:"</span>)</span>
-<span id="cb11-230"><a href="#cb11-230" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Forecast Horizon: </span><span class="sc">{</span>forecast_horizon<span class="sc">}</span><span class="ss"> steps"</span>)</span>
-<span id="cb11-231"><a href="#cb11-231" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Contamination Level: </span><span class="sc">{</span>contamination<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-232"><a href="#cb11-232" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Window Size: </span><span class="sc">{</span>window_size<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-233"><a href="#cb11-233" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Lags: </span><span class="sc">{</span>lags<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-234"><a href="#cb11-234" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Train Ratio: </span><span class="sc">{</span>train_ratio<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-235"><a href="#cb11-235" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">SECURITY</span><span class="co">: Never log latitude/longitude at all to avoid PII in logs (CWE-312, CWE-532).</span></span>
-<span id="cb11-236"><a href="#cb11-236" aria-hidden="true" tabindex="-1"></a>        <span class="co">#           Only a fixed redacted placeholder is written to the logs; no masking functions are used.</span></span>
-<span id="cb11-237"><a href="#cb11-237" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"  Location: [REDACTED]"</span>)</span>
-<span id="cb11-238"><a href="#cb11-238" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Log timezone region only, not full timezone (security: CWE-532)</span></span>
-<span id="cb11-239"><a href="#cb11-239" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Region: </span><span class="sc">{</span>country_code<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>state<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-240"><a href="#cb11-240" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Log estimator type only, not configuration (security: CWE-532)</span></span>
-<span id="cb11-241"><a href="#cb11-241" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Estimator: </span><span class="sc">{</span>masked_estimator<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-242"><a href="#cb11-242" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"  Feature Engineering:"</span>)</span>
-<span id="cb11-243"><a href="#cb11-243" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    - Weather Windows: </span><span class="sc">{</span>include_weather_windows<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-244"><a href="#cb11-244" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    - Holiday Features: </span><span class="sc">{</span>include_holiday_features<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-245"><a href="#cb11-245" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    - Polynomial Degree: </span><span class="sc">{</span>poly_features_degree<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-246"><a href="#cb11-246" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    - Max Polynomial Features: </span><span class="sc">{</span>max_poly_features<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-247"><a href="#cb11-247" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"  Weights Type: </span><span class="sc">{</span><span class="bu">type</span>(weights)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-248"><a href="#cb11-248" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"</span><span class="sc">{</span><span class="st">'='</span> <span class="op">*</span> <span class="dv">80</span><span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-249"><a href="#cb11-249" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-250"><a href="#cb11-250" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">SECURITY</span><span class="co"> CRITICAL (CWE-312, CWE-532): NEVER log the following in clear text:</span></span>
-<span id="cb11-251"><a href="#cb11-251" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - Raw latitude/longitude values (beyond 1 decimal precision)</span></span>
-<span id="cb11-252"><a href="#cb11-252" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - Full timezone strings (only log region/country)</span></span>
-<span id="cb11-253"><a href="#cb11-253" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - Estimator configuration details (only log type)</span></span>
-<span id="cb11-254"><a href="#cb11-254" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - The forecast_kwargs dictionary (contains unmasked sensitive data)</span></span>
-<span id="cb11-255"><a href="#cb11-255" aria-hidden="true" tabindex="-1"></a>        <span class="co"># This applies to ALL log levels including DEBUG, and to ALL error messages.</span></span>
-<span id="cb11-256"><a href="#cb11-256" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Rationale: Prevents PII exposure in log aggregation systems, crash dumps,</span></span>
-<span id="cb11-257"><a href="#cb11-257" aria-hidden="true" tabindex="-1"></a>        <span class="co"># and production monitoring tools where logs may be retained long-term or</span></span>
-<span id="cb11-258"><a href="#cb11-258" aria-hidden="true" tabindex="-1"></a>        <span class="co"># accessible to unauthorized parties.</span></span>
-<span id="cb11-259"><a href="#cb11-259" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-260"><a href="#cb11-260" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Step 1: Multi-Output Recursive Forecasting with Covariates ---</span></span>
-<span id="cb11-261"><a href="#cb11-261" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> verbose:</span>
-<span id="cb11-262"><a href="#cb11-262" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"Step 1: Executing multi-output recursive forecasting..."</span>)</span>
-<span id="cb11-263"><a href="#cb11-263" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-264"><a href="#cb11-264" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare kwargs for n2n_predict_with_covariates</span></span>
-<span id="cb11-265"><a href="#cb11-265" aria-hidden="true" tabindex="-1"></a>    <span class="co"># </span><span class="al">SECURITY</span><span class="co">: Do NOT log this dict - contains sensitive location data (CWE-532, CWE-312)</span></span>
-<span id="cb11-266"><a href="#cb11-266" aria-hidden="true" tabindex="-1"></a>    forecast_kwargs <span class="op">=</span> {</span>
-<span id="cb11-267"><a href="#cb11-267" aria-hidden="true" tabindex="-1"></a>        <span class="st">"data"</span>: data,</span>
-<span id="cb11-268"><a href="#cb11-268" aria-hidden="true" tabindex="-1"></a>        <span class="st">"forecast_horizon"</span>: forecast_horizon,</span>
-<span id="cb11-269"><a href="#cb11-269" aria-hidden="true" tabindex="-1"></a>        <span class="st">"contamination"</span>: contamination,</span>
-<span id="cb11-270"><a href="#cb11-270" aria-hidden="true" tabindex="-1"></a>        <span class="st">"window_size"</span>: window_size,</span>
-<span id="cb11-271"><a href="#cb11-271" aria-hidden="true" tabindex="-1"></a>        <span class="st">"lags"</span>: lags,</span>
-<span id="cb11-272"><a href="#cb11-272" aria-hidden="true" tabindex="-1"></a>        <span class="st">"train_ratio"</span>: train_ratio,</span>
-<span id="cb11-273"><a href="#cb11-273" aria-hidden="true" tabindex="-1"></a>        <span class="st">"latitude"</span>: latitude,</span>
-<span id="cb11-274"><a href="#cb11-274" aria-hidden="true" tabindex="-1"></a>        <span class="st">"longitude"</span>: longitude,</span>
-<span id="cb11-275"><a href="#cb11-275" aria-hidden="true" tabindex="-1"></a>        <span class="st">"timezone"</span>: timezone,</span>
-<span id="cb11-276"><a href="#cb11-276" aria-hidden="true" tabindex="-1"></a>        <span class="st">"country_code"</span>: country_code,</span>
-<span id="cb11-277"><a href="#cb11-277" aria-hidden="true" tabindex="-1"></a>        <span class="st">"state"</span>: state,</span>
-<span id="cb11-278"><a href="#cb11-278" aria-hidden="true" tabindex="-1"></a>        <span class="st">"estimator"</span>: estimator,</span>
-<span id="cb11-279"><a href="#cb11-279" aria-hidden="true" tabindex="-1"></a>        <span class="st">"include_weather_windows"</span>: include_weather_windows,</span>
-<span id="cb11-280"><a href="#cb11-280" aria-hidden="true" tabindex="-1"></a>        <span class="st">"include_holiday_features"</span>: include_holiday_features,</span>
-<span id="cb11-281"><a href="#cb11-281" aria-hidden="true" tabindex="-1"></a>        <span class="st">"poly_features_degree"</span>: poly_features_degree,</span>
-<span id="cb11-282"><a href="#cb11-282" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_poly_features"</span>: max_poly_features,</span>
-<span id="cb11-283"><a href="#cb11-283" aria-hidden="true" tabindex="-1"></a>        <span class="st">"verbose"</span>: verbose,</span>
-<span id="cb11-284"><a href="#cb11-284" aria-hidden="true" tabindex="-1"></a>        <span class="st">"show_progress"</span>: show_progress,</span>
-<span id="cb11-285"><a href="#cb11-285" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb11-286"><a href="#cb11-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-287"><a href="#cb11-287" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add any additional kwargs</span></span>
-<span id="cb11-288"><a href="#cb11-288" aria-hidden="true" tabindex="-1"></a>    forecast_kwargs.update(kwargs)</span>
-<span id="cb11-289"><a href="#cb11-289" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-290"><a href="#cb11-290" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Execute recursive forecasting</span></span>
-<span id="cb11-291"><a href="#cb11-291" aria-hidden="true" tabindex="-1"></a>    <span class="co"># </span><span class="al">SECURITY</span><span class="co">: Wrapped in try-except to prevent sensitive data exposure in tracebacks</span></span>
-<span id="cb11-292"><a href="#cb11-292" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb11-293"><a href="#cb11-293" aria-hidden="true" tabindex="-1"></a>        predictions, model_metrics, feature_info <span class="op">=</span> n2n_predict_with_covariates(</span>
-<span id="cb11-294"><a href="#cb11-294" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>forecast_kwargs</span>
-<span id="cb11-295"><a href="#cb11-295" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb11-296"><a href="#cb11-296" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb11-297"><a href="#cb11-297" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">SECURITY</span><span class="co">: Do not log any location data (even masked) to avoid CWE-532/CWE-312</span></span>
-<span id="cb11-298"><a href="#cb11-298" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Include only non-sensitive context information in the error message.</span></span>
-<span id="cb11-299"><a href="#cb11-299" aria-hidden="true" tabindex="-1"></a>        logger.error(</span>
-<span id="cb11-300"><a href="#cb11-300" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Forecasting failed during N-to-1 forecasting. Exception type: </span><span class="sc">%s</span><span class="st">. Estimator: </span><span class="sc">%s</span><span class="st">"</span>,</span>
-<span id="cb11-301"><a href="#cb11-301" aria-hidden="true" tabindex="-1"></a>            <span class="bu">type</span>(e).<span class="va">__name__</span>,</span>
-<span id="cb11-302"><a href="#cb11-302" aria-hidden="true" tabindex="-1"></a>            masked_estimator,</span>
-<span id="cb11-303"><a href="#cb11-303" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb11-304"><a href="#cb11-304" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span></span>
-<span id="cb11-305"><a href="#cb11-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-306"><a href="#cb11-306" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> verbose:</span>
-<span id="cb11-307"><a href="#cb11-307" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"Multi-output predictions shape: </span><span class="sc">{</span>predictions<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-308"><a href="#cb11-308" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"Output columns: </span><span class="sc">{</span><span class="bu">list</span>(predictions.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-309"><a href="#cb11-309" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"Date range: </span><span class="sc">{</span>predictions<span class="sc">.</span>index[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>predictions<span class="sc">.</span>index[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-310"><a href="#cb11-310" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-311"><a href="#cb11-311" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Step 2: Prediction Aggregation ---</span></span>
-<span id="cb11-312"><a href="#cb11-312" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> verbose:</span>
-<span id="cb11-313"><a href="#cb11-313" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"Step 2: Aggregating predictions using weighted combination..."</span>)</span>
-<span id="cb11-314"><a href="#cb11-314" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-315"><a href="#cb11-315" aria-hidden="true" tabindex="-1"></a>    combined_prediction <span class="op">=</span> agg_predict(predictions, weights<span class="op">=</span>weights)</span>
-<span id="cb11-316"><a href="#cb11-316" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-317"><a href="#cb11-317" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> verbose:</span>
-<span id="cb11-318"><a href="#cb11-318" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"Combined prediction shape: </span><span class="sc">{</span>combined_prediction<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-319"><a href="#cb11-319" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"Aggregation Summary:"</span>)</span>
-<span id="cb11-320"><a href="#cb11-320" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"  Combined Prediction Head:"</span>)</span>
-<span id="cb11-321"><a href="#cb11-321" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span>combined_prediction<span class="sc">.</span>head()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-322"><a href="#cb11-322" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="st">"  Combined Prediction Statistics:"</span>)</span>
-<span id="cb11-323"><a href="#cb11-323" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    Mean: </span><span class="sc">{</span>combined_prediction<span class="sc">.</span>mean()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb11-324"><a href="#cb11-324" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    Std:  </span><span class="sc">{</span>combined_prediction<span class="sc">.</span>std()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb11-325"><a href="#cb11-325" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    Min:  </span><span class="sc">{</span>combined_prediction<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb11-326"><a href="#cb11-326" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"    Max:  </span><span class="sc">{</span>combined_prediction<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb11-327"><a href="#cb11-327" aria-hidden="true" tabindex="-1"></a>        logger.info(<span class="ss">f"</span><span class="sc">{</span><span class="st">'='</span> <span class="op">*</span> <span class="dv">80</span><span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-328"><a href="#cb11-328" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-329"><a href="#cb11-329" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> predictions, combined_prediction, model_metrics, feature_info</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="simple-run" class="level2">
-<h2 class="anchored" data-anchor-id="simple-run">Simple Run</h2>
-<div id="c900003f" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>predictions, combined, metrics, features <span class="op">=</span> n_to_1_with_covariates()</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Combined forecast head:</span><span class="ch">\\</span><span class="ss">n</span><span class="sc">{</span>combined<span class="sc">.</span>head()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>================================================================================
-N2N Recursive Forecasting with Exogenous Covariates
-================================================================================
-
-[1/10] Loading and preparing target data...
-  Fetching data from CSV...
-  Target variables: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-Data range: 2019-12-01T00:00 to 2021-12-24T21:00
-Covariate data range: 2019-12-01T00:00 to 2021-12-25T21:00
-The time series data has a valid datetime index that is sorted and complete.
-Original data shape: (18118, 11)
-Data resampled with rule='h', closed='left', label='left', aggregation='mean'.
-Resampled data shape: (18118, 11)
-
-[2/10] Detecting and marking outliers...
-Column 'A': Marked 1.0045% of data points as outliers.
-Column 'B': Marked 0.9990% of data points as outliers.
-Column 'C': Marked 1.0045% of data points as outliers.
-Column 'D': Marked 0.9990% of data points as outliers.
-Column 'E': Marked 0.9769% of data points as outliers.
-Column 'F': Marked 0.9493% of data points as outliers.
-Column 'G': Marked 1.0045% of data points as outliers.
-Column 'H': Marked 0.9769% of data points as outliers.
-Column 'I': Marked 1.0045% of data points as outliers.
-Column 'J': Marked 0.9990% of data points as outliers.
-Column 'K': Marked 0.9990% of data points as outliers.
-
-[3/10] Processing missing values and creating sample weights...
-Number of rows with missing values: 13500
-Percentage of rows with missing values: 74.51%
-missing_indices: DatetimeIndex(['2019-12-01 00:00:00+00:00', '2019-12-01 01:00:00+00:00',
-               '2019-12-01 02:00:00+00:00', '2019-12-01 03:00:00+00:00',
-               '2019-12-01 04:00:00+00:00', '2019-12-01 05:00:00+00:00',
-               '2019-12-01 06:00:00+00:00', '2019-12-01 07:00:00+00:00',
-               '2019-12-01 08:00:00+00:00', '2019-12-01 09:00:00+00:00',
-               ...
-               '2021-12-21 02:00:00+00:00', '2021-12-21 06:00:00+00:00',
-               '2021-12-22 01:00:00+00:00', '2021-12-22 06:00:00+00:00',
-               '2021-12-24 01:00:00+00:00', '2021-12-24 08:00:00+00:00',
-               '2021-12-24 10:00:00+00:00', '2021-12-24 13:00:00+00:00',
-               '2021-12-24 17:00:00+00:00', '2021-12-24 19:00:00+00:00'],
-              dtype='datetime64[us, UTC]', name='DateTime', length=13500, freq=None)
-Number of rows with missing weights after processing: 18055
-Percentage of rows with missing weights after processing: 99.65%
-
-[4/10] Creating exogenous features...
-Fetching weather data...
-Processing weather features...
-Weather features shape: (18142, 105)
-
-[5/10] Combining and encoding exogenous features...
-
-[6/10] Selecting exogenous features...
-  Selected 27 exogenous features
-
-[7/10] Merging target and exogenous data...
-  Merged data shape: (18118, 38)
-  Exogenous prediction shape: (24, 126)
-
-[8/10] Splitting data into train/validation/test...
-Splitting data into train/val/test with percentages: 80.0000% / 20.0000% / 0.0000%
-Train size: 14494 (80.00%)
-Val size: 3624 (20.00%)
-Test size: 0 (0.00%)
-
-[9/10] Loading or training recursive forecasters with exogenous variables...</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"a78cc8aa06b445a090e17af3876da91e","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Training forecaster for A...
-    ✓ Forecaster trained for A
-  Training forecaster for B...
-    ✓ Forecaster trained for B
-  Training forecaster for C...
-    ✓ Forecaster trained for C
-  Training forecaster for D...
-    ✓ Forecaster trained for D
-  Training forecaster for E...
-    ✓ Forecaster trained for E
-  Training forecaster for F...
-    ✓ Forecaster trained for F
-  Training forecaster for G...
-    ✓ Forecaster trained for G
-  Training forecaster for H...
-    ✓ Forecaster trained for H
-  Training forecaster for I...
-    ✓ Forecaster trained for I
-  Training forecaster for J...
-    ✓ Forecaster trained for J
-  Training forecaster for K...
-    ✓ Forecaster trained for K
-  Saving 11 trained forecasters to disk...
-  ✓ Saved forecaster for A to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_A.joblib
-  ✓ Saved forecaster for B to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_B.joblib
-  ✓ Saved forecaster for C to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_C.joblib
-  ✓ Saved forecaster for D to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_D.joblib
-  ✓ Saved forecaster for E to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_E.joblib
-  ✓ Saved forecaster for F to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_F.joblib
-  ✓ Saved forecaster for G to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_G.joblib
-  ✓ Saved forecaster for H to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_H.joblib
-  ✓ Saved forecaster for I to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_I.joblib
-  ✓ Saved forecaster for J to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_J.joblib
-  ✓ Saved forecaster for K to /Users/bartz/.spotforecast2_cache/forecasters/forecaster_K.joblib
-  ✓ Total forecasters available: 11
-
-[10/10] Generating predictions...</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"0c879d382ef4473dac65af6b69e7888d","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Predictions shape: (24, 11)
-
-================================================================================
-Forecasting completed successfully!
-================================================================================
-Combined forecast head:\n2021-12-24 22:00:00+00:00    13979.171421
-2021-12-24 23:00:00+00:00    10813.207343
-2021-12-25 00:00:00+00:00    11889.678204
-2021-12-25 01:00:00+00:00     9257.219741
-2021-12-25 02:00:00+00:00    10461.024184
-Freq: h, dtype: float64</code></pre>
-</div>
-</div>
+<section id="relationship-to-the-test-suite" class="level2">
+<h2 class="anchored" data-anchor-id="relationship-to-the-test-suite">Relationship to the test suite</h2>
+<p>The previous test suite (<code>tests/test_task_safe_n_to_1_with_covariates.py</code>) tested the old monolithic <code>n_to_1_with_covariates</code> function, covering covariate construction, logging format, forecaster structure, feature engineering, aggregation, timezone handling, model persistence decisions, error handling, and end-to-end reproducibility. Those unit contracts now transfer to the constituent multitask components:</p>
+<ul>
+<li>Data preparation and validation → <code>BaseTask.prepare_data</code> (tested via <code>tests/test_manager_features.py</code> and pipeline integration tests).</li>
+<li>Outlier detection → <code>BaseTask.detect_outliers</code>.</li>
+<li>Exogenous feature construction → <code>BaseTask.build_exogenous_features</code>.</li>
+<li>Aggregation → <code>agg_predict</code> (<code>tests/test_processing.py</code>).</li>
+<li>Model persistence → <code>BaseTask.save_models</code> / <code>BaseTask.load_models</code>.</li>
+</ul>
 
 
 </section>
 
 </main> <!-- /main -->
-<script type="application/vnd.jupyter.widget-state+json">
-{"state":{"01caf2e974e847c6ab09774b7272abfe":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"0c879d382ef4473dac65af6b69e7888d":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_5f23f39776164bd79f07ece960136a28","IPY_MODEL_12cf3f39a6b24eac811352707a95d2db","IPY_MODEL_5327bbf636644f438da3f719b95266ee"],"layout":"IPY_MODEL_d562e33ed5e34a75918d6df6fd80c651","tabbable":null,"tooltip":null}},"0df88eccbd2b4b51b6eece3e2ad2d082":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"12cf3f39a6b24eac811352707a95d2db":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_1a9db0bd27be4a47a312b7cfbe87aee8","max":11,"min":0,"orientation":"horizontal","style":"IPY_MODEL_b285ebc110ba4e678d052573e0f764aa","tabbable":null,"tooltip":null,"value":11}},"1a9db0bd27be4a47a312b7cfbe87aee8":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"23342236bd5e43d79535c354a75a8169":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"509c5225bb4c4ad3add76648cc62a391":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"5327bbf636644f438da3f719b95266ee":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_f90850b46f564bc8ba0f02f8d47102c4","placeholder":"​","style":"IPY_MODEL_767a223770374ba48adf101e0b228e49","tabbable":null,"tooltip":null,"value":" 11/11 [00:00&lt;00:00, 394.92model/s]"}},"5f23f39776164bd79f07ece960136a28":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_23342236bd5e43d79535c354a75a8169","placeholder":"​","style":"IPY_MODEL_d19ab2761fd34bb3a001ec0f6af19baf","tabbable":null,"tooltip":null,"value":"Predicting targets: 100%"}},"618c967be68947efb72c0d3de7e43ca5":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_fb2c29a46fb641b5b62a254202198e8d","placeholder":"​","style":"IPY_MODEL_01caf2e974e847c6ab09774b7272abfe","tabbable":null,"tooltip":null,"value":" 11/11 [00:08&lt;00:00,  1.26model/s]"}},"767a223770374ba48adf101e0b228e49":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"77b02a3c2a9e4b6ba185aedba221630e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_0df88eccbd2b4b51b6eece3e2ad2d082","placeholder":"​","style":"IPY_MODEL_c72011c822a54415bf56840717b05966","tabbable":null,"tooltip":null,"value":"Training forecasters: 100%"}},"8846be696c544ca4bf60d8f1d5136571":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_ead15fe8a16341518403fb25f4b00372","max":11,"min":0,"orientation":"horizontal","style":"IPY_MODEL_509c5225bb4c4ad3add76648cc62a391","tabbable":null,"tooltip":null,"value":11}},"8c70a91537e54a03815559e4b33315e3":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"a78cc8aa06b445a090e17af3876da91e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_77b02a3c2a9e4b6ba185aedba221630e","IPY_MODEL_8846be696c544ca4bf60d8f1d5136571","IPY_MODEL_618c967be68947efb72c0d3de7e43ca5"],"layout":"IPY_MODEL_8c70a91537e54a03815559e4b33315e3","tabbable":null,"tooltip":null}},"b285ebc110ba4e678d052573e0f764aa":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"c72011c822a54415bf56840717b05966":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"d19ab2761fd34bb3a001ec0f6af19baf":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"d562e33ed5e34a75918d6df6fd80c651":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"ead15fe8a16341518403fb25f4b00372":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"f90850b46f564bc8ba0f02f8d47102c4":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"fb2c29a46fb641b5b62a254202198e8d":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}}},"version_major":2,"version_minor":0}
-</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
