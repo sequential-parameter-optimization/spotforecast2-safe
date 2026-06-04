@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="What spotforecast2_safe.multitask provides, how ConfigMulti drives it, and a complete runnable example.">
 
-<title>data.fetch_data.load_timeseries_forecast – spotforecast2-safe</title>
+<title>task_multi: Config-Driven Multi-Target Forecasting with MultiTask – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -106,6 +107,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -305,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data_classes.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html">load_timeseries_forecast</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tasks/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../../docs/tasks/task_multi.html">Task Multi: MultiTask Pipeline</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -331,13 +335,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">API Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link">
@@ -346,13 +350,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/data.data_classes.html" class="sidebar-item-text sidebar-link">
@@ -403,7 +407,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">load_timeseries_forecast</span></a>
   </div>
 </li>
@@ -1471,13 +1475,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="true">
  <span class="menu-text">Tasks</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/tasks/tasks.html" class="sidebar-item-text sidebar-link">
@@ -1498,7 +1502,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tasks/task_multi.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/tasks/task_multi.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Task Multi: MultiTask Pipeline</span></a>
   </div>
 </li>
@@ -1537,22 +1541,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#vocabulary" id="toc-vocabulary" class="nav-link active" data-scroll-target="#vocabulary">Vocabulary</a></li>
+  <li><a href="#task-modes" id="toc-task-modes" class="nav-link" data-scroll-target="#task-modes">Task modes</a></li>
+  <li><a href="#a-complete-worked-example" id="toc-a-complete-worked-example" class="nav-link" data-scroll-target="#a-complete-worked-example">A complete worked example</a></li>
+  <li><a href="#fail-safe-behaviour" id="toc-fail-safe-behaviour" class="nav-link" data-scroll-target="#fail-safe-behaviour">Fail-safe behaviour</a></li>
+  <li><a href="#the-n-to-1-task-entry-point" id="toc-the-n-to-1-task-entry-point" class="nav-link" data-scroll-target="#the-n-to-1-task-entry-point">The n-to-1 task entry point</a></li>
+  <li><a href="#scaling-up-from-the-toy-example" id="toc-scaling-up-from-the-toy-example" class="nav-link" data-scroll-target="#scaling-up-from-the-toy-example">Scaling up from the toy example</a></li>
+  <li><a href="#upgrade-path-the-same-config-in-spotforecast2" id="toc-upgrade-path-the-same-config-in-spotforecast2" class="nav-link" data-scroll-target="#upgrade-path-the-same-config-in-spotforecast2">Upgrade path: the same config in spotforecast2</a></li>
+  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next">Where to go next</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.fetch_data.load_timeseries_forecast.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tasks/task_multi.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.data_classes.html">Data</a></li><li class="breadcrumb-item"><a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html">load_timeseries_forecast</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/tasks/tasks.html">Tasks</a></li><li class="breadcrumb-item"><a href="../../docs/tasks/task_multi.html">Task Multi: MultiTask Pipeline</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">data.fetch_data.load_timeseries_forecast</h1>
+<h1 class="title">task_multi: Config-Driven Multi-Target Forecasting with MultiTask</h1>
 </div>
 
+<div>
+  <div class="description">
+    What spotforecast2_safe.multitask provides, how ConfigMulti drives it, and a complete runnable example.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -1567,125 +1580,297 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data.fetch_data.load_timeseries_forecast(data_home<span class="op">=</span><span class="va">None</span>, on_missing<span class="op">=</span><span class="st">'raise'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Load the day-ahead forecast time series from <code>interim/energy_load.csv</code>.</p>
-<p>Reads the <code>Forecasted Load</code> column and converts the index to a UTC <code>DatetimeIndex</code> with hourly frequency. Missing values are <strong>rejected</strong> by default so callers cannot accidentally feed imputed values into downstream safety-critical pipelines. Pass <code>on_missing='ffill_bfill'</code> to opt into the legacy forward/backward fill behavior that was the default before the 1.0 major release.</p>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<p><code>spotforecast2_safe.multitask</code> is the config-driven orchestrator for multi-target time-series forecasting. It owns the complete pipeline — data preparation, outlier handling, imputation, exogenous features, training, prediction, persistence — and is driven by a single <code>ConfigMulti</code> object. The unrestricted sibling package <code>spotforecast2</code> inherits this pipeline and adds only what is deliberately excluded here: hyperparameter tuning (Optuna, SpotOptim) and interactive plotting.</p>
+<p>Before version 16.0.0 this pipeline existed twice: once in the sibling package and once, in procedural form, behind the n-to-1 task’s 18 keyword arguments and a hard-coded weight list. Both paths are now one implementation in this package, and the dependency between the siblings is strictly one-way: <code>spotforecast2</code> imports from <code>spotforecast2-safe</code>, never the reverse.</p>
+<section id="vocabulary" class="level2">
+<h2 class="anchored" data-anchor-id="vocabulary">Vocabulary</h2>
+<div id="def-multitask" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 1 (MultiTask)</strong></span> The task dispatcher of the <code>multitask</code> package. A <code>MultiTask</code> instance is constructed from a <code>ConfigMulti</code> and a DataFrame, prepared with the four pipeline stages (<code>prepare_data</code>, <code>detect_outliers</code>, <code>impute</code>, <code>build_exogenous_features</code>), and executed with <code>run(task=...)</code>, where <code>task</code> selects one of the available task modes.</p>
+</div>
+<div id="def-n-to-1-aggregation" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition 2 (N-to-1 aggregation)</strong></span> The reduction of per-target forecasts to a single series as a weighted sum, with weights taken from <code>ConfigMulti.agg_weights</code> in target order. Equal weights are used when <code>agg_weights</code> is <code>None</code>.</p>
+</div>
+</section>
+<section id="task-modes" class="level2">
+<h2 class="anchored" data-anchor-id="task-modes">Task modes</h2>
+<p>The safe package ships four task modes:</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
+<th>Mode</th>
+<th>What it does</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>data_home</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a>]]</td>
-<td>Root data directory. If None, resolved via <code>get_data_home()</code>.</td>
-<td><code>None</code></td>
+<td><code>lazy</code></td>
+<td>Fit one <code>ForecasterRecursive</code> per target with LightGBM defaults, applying cached tuning results when present.</td>
 </tr>
 <tr class="even">
-<td>on_missing</td>
-<td><code>OnMissing</code></td>
-<td>How to handle NaN rows in <code>Forecasted Load</code>. <code>'raise'</code> (default) fails fast with the gap timestamps; <code>'ffill_bfill'</code> forward- then back-fills.</td>
-<td><code>'raise'</code></td>
+<td><code>defaults</code></td>
+<td>Same fit, but ignoring any tuning cache — fully deterministic baseline.</td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
 <tr class="odd">
-<td></td>
-<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.html#pandas.Series">Series</a></td>
-<td>pd.Series: Hourly forecasted-load series indexed by UTC timestamps.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="raises" class="level2 doc-section doc-section-raises">
-<h2 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError">FileNotFoundError</a></td>
-<td>If <code>interim/energy_load.csv</code> does not exist.</td>
+<td><code>predict</code></td>
+<td>Load previously saved models and predict without retraining.</td>
 </tr>
 <tr class="even">
-<td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#KeyError">KeyError</a></td>
-<td>If <code>Forecasted Load</code> column is not present.</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
-<td>If <code>on_missing='raise'</code> and the series has NaNs.</td>
+<td><code>clean</code></td>
+<td>Remove the pipeline’s cache directory (models, tuning results, logs).</td>
 </tr>
 </tbody>
 </table>
+<p>The tuning modes <code>optuna</code> and <code>spotoptim</code> exist only in <code>spotforecast2</code>; requesting them here raises an explicit <code>ValueError</code> (see <a href="#fail-safe-behaviour">Fail-safe behaviour</a>).</p>
 </section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="b93ca8a9" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.fetch_data <span class="im">import</span> (</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    get_package_data_home,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    load_timeseries_forecast,</span>
+<section id="a-complete-worked-example" class="level2">
+<h2 class="anchored" data-anchor-id="a-complete-worked-example">A complete worked example</h2>
+<div id="exm-synthetic-config" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1 (Synthetic data and a minimal configuration)</strong></span> Two hourly target series over four weeks, a named <code>DatetimeIndex</code> matching <code>ConfigMulti.index_name</code> (default <code>"DateTime"</code>), and a configuration with the expensive options disabled so the example runs in seconds and offline.</p>
+<div id="cedd25e1" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">24</span> <span class="op">*</span> <span class="dv">28</span>  <span class="co"># 4 weeks, hourly</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2023-01-01"</span>, periods<span class="op">=</span>n, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>idx.name <span class="op">=</span> <span class="st">"DateTime"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: <span class="dv">100</span> <span class="op">+</span> <span class="dv">10</span> <span class="op">*</span> np.sin(np.arange(n) <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">/</span> <span class="dv">24</span>) <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">2</span>, n),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: <span class="dv">200</span> <span class="op">+</span> <span class="dv">20</span> <span class="op">*</span> np.cos(np.arange(n) <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">/</span> <span class="dv">24</span>) <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">4</span>, n),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>idx,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>cache <span class="op">=</span> tempfile.mkdtemp()</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> ConfigMulti(</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">6</span>,                 <span class="co"># forecast horizon: 6 hours</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span>[<span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>],        <span class="co"># n-to-1 combination: a - b</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    use_exogenous_features<span class="op">=</span><span class="va">False</span>,   <span class="co"># offline example: no weather/calendar</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    use_outlier_detection<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,          <span class="co"># persist models for the predict mode below</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>df.tail(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">a</th>
+<th data-quarto-table-cell-role="th">b</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">DateTime</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-01-28 21:00:00+00:00</td>
+<td>93.591621</td>
+<td>219.025208</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-01-28 22:00:00+00:00</td>
+<td>94.698887</td>
+<td>220.480717</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-01-28 23:00:00+00:00</td>
+<td>97.692551</td>
+<td>224.620083</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="exm-pipeline-run" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2 (Running the pipeline)</strong></span> The four stages chain (each returns the task), then <code>run</code> fits and predicts. The returned aggregated package carries the combined forecast under <code>"future_pred"</code>; the per-target packages live in <code>task.results</code>.</p>
+<div id="77fdb80d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> MultiTask</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>mt <span class="op">=</span> MultiTask(cfg, dataframe<span class="op">=</span>df, cache_home<span class="op">=</span>cache)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> (</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    mt.prepare_data()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      .detect_outliers()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      .impute()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      .build_exogenous_features()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      .run(task<span class="op">=</span><span class="st">"defaults"</span>)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> tempfile.mkdtemp()</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"SPOTFORECAST2_DATA"</span>] <span class="op">=</span> tmp</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>interim <span class="op">=</span> os.path.join(tmp, <span class="st">"interim"</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>os.makedirs(interim, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>demo <span class="op">=</span> get_package_data_home() <span class="op">/</span> <span class="st">"demo01.csv"</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(demo).rename(</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Time"</span>: <span class="st">"Time (UTC)"</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Actual"</span>: <span class="st">"Actual Load"</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Forecast"</span>: <span class="st">"Forecasted Load"</span>,</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>df.to_csv(os.path.join(interim, <span class="st">"energy_load.csv"</span>), index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># demo01.csv has gaps on Jan 1 of each year, so we opt into the</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># legacy ffill/bfill behavior here.  Production callers should</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># leave on_missing='raise' (the default) and surface the gaps.</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>y_f <span class="op">=</span> load_timeseries_forecast(on_missing<span class="op">=</span><span class="st">"ffill_bfill"</span>)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">isinstance</span>(y_f, pd.Series))</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>shutil.rmtree(tmp)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> os.environ[<span class="st">"SPOTFORECAST2_DATA"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>result[<span class="st">"future_pred"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>2023-01-29 00:00:00+00:00   -117.612059
+2023-01-29 01:00:00+00:00   -120.726869
+2023-01-29 02:00:00+00:00   -117.511861
+2023-01-29 03:00:00+00:00   -107.689754
+2023-01-29 04:00:00+00:00   -103.317560
+2023-01-29 05:00:00+00:00    -95.314405
+Freq: h, dtype: float64</code></pre>
+</div>
+</div>
+</div>
+<div id="exm-weighted-aggregation" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3 (The aggregation is exactly the configured weighted sum)</strong></span> <a href="#def-n-to-1-aggregation" class="quarto-xref">Definition&nbsp;2</a> can be verified directly against the per-target forecasts:</p>
+<div id="c909118c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pred_a <span class="op">=</span> mt.results[<span class="st">"defaults"</span>][<span class="st">"a"</span>][<span class="st">"future_pred"</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pred_b <span class="op">=</span> mt.results[<span class="st">"defaults"</span>][<span class="st">"b"</span>][<span class="st">"future_pred"</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>manual <span class="op">=</span> <span class="fl">1.0</span> <span class="op">*</span> pred_a <span class="op">+</span> (<span class="op">-</span><span class="fl">1.0</span>) <span class="op">*</span> pred_b</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"max |aggregated - manual| ="</span>, <span class="bu">float</span>((result[<span class="st">"future_pred"</span>] <span class="op">-</span> manual).<span class="bu">abs</span>().<span class="bu">max</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>True</code></pre>
+<pre><code>max |aggregated - manual| = 0.0</code></pre>
 </div>
 </div>
+</div>
+<div id="exm-train-then-predict" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4 (Train once, predict many times)</strong></span> With <code>auto_save_models=True</code> the fitted forecasters were persisted under <code>cache_home</code>. A later <code>predict</code> run loads them instead of retraining — the production pattern for scheduled forecasts:</p>
+<div id="e10f6f12" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mt2 <span class="op">=</span> MultiTask(cfg, dataframe<span class="op">=</span>df, cache_home<span class="op">=</span>cache)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>mt2.prepare_data().detect_outliers().impute().build_exogenous_features()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>reloaded <span class="op">=</span> mt2.run(task<span class="op">=</span><span class="st">"predict"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>reloaded[<span class="st">"future_pred"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>2023-01-29 00:00:00+00:00   -117.612059
+2023-01-29 01:00:00+00:00   -120.726869
+2023-01-29 02:00:00+00:00   -117.511861
+2023-01-29 03:00:00+00:00   -107.689754
+2023-01-29 04:00:00+00:00   -103.317560
+2023-01-29 05:00:00+00:00    -95.314405
+Freq: h, dtype: float64</code></pre>
+</div>
+</div>
+</div>
+<div id="exm-determinism" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5 (Determinism)</strong></span> Same input, same configuration, bit-identical output — a hard requirement of this package, enforced by the test suite and demonstrable here with a fresh instance in a fresh cache directory:</p>
+<div id="aec6e6f1" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mt3 <span class="op">=</span> MultiTask(cfg, dataframe<span class="op">=</span>df.copy(), cache_home<span class="op">=</span>tempfile.mkdtemp())</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>rerun <span class="op">=</span> (</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    mt3.prepare_data()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>       .detect_outliers()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>       .impute()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>       .build_exogenous_features()</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>       .run(task<span class="op">=</span><span class="st">"defaults"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>pd.testing.assert_series_equal(result[<span class="st">"future_pred"</span>], rerun[<span class="st">"future_pred"</span>], check_exact<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"bit-identical:"</span>, result[<span class="st">"future_pred"</span>].equals(rerun[<span class="st">"future_pred"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>bit-identical: True</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="fail-safe-behaviour" class="level2">
+<h2 class="anchored" data-anchor-id="fail-safe-behaviour">Fail-safe behaviour</h2>
+<p>Invalid requests raise immediately instead of degrading silently. Requesting a tuning mode in the safe package names the package that provides it:</p>
+<div id="1959afa1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    mt.run(task<span class="op">=</span><span class="st">"spotoptim"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> err:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(err)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Task 'spotoptim' requires auto-tuning, which is not available in spotforecast2-safe. Use the spotforecast2 package, or task='lazy'/'defaults'.</code></pre>
+</div>
+</div>
+<p>The same policy applies to unexpected keyword arguments (<code>TypeError</code> instead of silent dropping) and to plotting: <code>MultiTask.plot_with_outliers()</code> raises <code>NotImplementedError</code> because no plotting library is permitted in this package.</p>
+</section>
+<section id="the-n-to-1-task-entry-point" class="level2">
+<h2 class="anchored" data-anchor-id="the-n-to-1-task-entry-point">The n-to-1 task entry point</h2>
+<p><code>run_pipeline</code> from <a href="../../docs/tasks/task_safe_n21_cov_df.html"><code>task_safe_n_to_1_with_covariates_and_dataframe</code></a> wraps exactly this pipeline with <code>task="lazy"</code> — one call from config and DataFrame to combined forecast:</p>
+<div id="e9613bba" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe <span class="im">import</span> (</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    run_pipeline,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> run_pipeline(config<span class="op">=</span>cfg, dataframe<span class="op">=</span>df, cache_home<span class="op">=</span>cache)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>forecast.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">forecast</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-01-29 00:00:00+00:00</td>
+<td>-117.612059</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-01-29 01:00:00+00:00</td>
+<td>-120.726869</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-01-29 02:00:00+00:00</td>
+<td>-117.511861</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The matching console script accepts the same knobs as flags:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--forecast_horizon</span> 24 <span class="at">--lags</span> 24 <span class="dt">\</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--include_holiday_features</span> true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="scaling-up-from-the-toy-example" class="level2">
+<h2 class="anchored" data-anchor-id="scaling-up-from-the-toy-example">Scaling up from the toy example</h2>
+<p>For a real run, switch the feature machinery on instead of off: <code>use_exogenous_features=True</code> with <code>include_holiday_features</code>, <code>include_holiday_adjacency_features</code> (bridge days), and <code>include_weather_windows</code> adds calendar, holiday, day/night, weather, and polynomial-interaction covariates before training. Weather features require network access; <code>on_weather_failure</code> keeps its fail-safe default <code>"raise"</code> unless you explicitly opt into <code>"skip"</code>.</p>
+</section>
+<section id="upgrade-path-the-same-config-in-spotforecast2" class="level2">
+<h2 class="anchored" data-anchor-id="upgrade-path-the-same-config-in-spotforecast2">Upgrade path: the same config in spotforecast2</h2>
+<p>The unrestricted sibling subclasses this pipeline and re-adds tuning and plotting. The configuration object travels unchanged:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># spotforecast2 (not installable here — one-way dependency)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2.multitask <span class="im">import</span> MultiTask</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>mt <span class="op">=</span> MultiTask(cfg, dataframe<span class="op">=</span>df, task<span class="op">=</span><span class="st">"spotoptim"</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>mt.prepare_data().detect_outliers().impute().build_exogenous_features()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>mt.run(show<span class="op">=</span><span class="va">True</span>)   <span class="co"># hyperparameter search + interactive figures</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The dependency between the packages is strictly one-way: <code>spotforecast2</code> imports from <code>spotforecast2-safe</code>, never the reverse. That is why the cell above is a listing rather than executed code — this documentation builds in an environment where <code>spotforecast2</code> is, by design, absent.</p>
+</div>
+</div>
+</section>
+<section id="where-to-go-next" class="level2">
+<h2 class="anchored" data-anchor-id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><a href="../../docs/tasks/task_safe_n21_cov_df.html"><code>task_safe_n_to_1_with_covariates_and_dataframe</code>: Design and Usage</a> — the CLI-facing wrapper around this pipeline.</li>
+<li>API reference: <a href="../../docs/reference/multitask.multi.MultiTask.html"><code>MultiTask</code></a>, <a href="../../docs/reference/multitask.base.BaseTask.html"><code>BaseTask</code></a>, <a href="../../docs/reference/configurator.config_multi.ConfigMulti.html"><code>ConfigMulti</code></a>, <a href="../../docs/reference/multitask.runner.run.html"><code>runner.run</code></a>.</li>
+</ul>
 
 
 </section>
@@ -2118,7 +2303,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/data.fetch_data.load_timeseries_forecast.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/tasks/task_multi.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
