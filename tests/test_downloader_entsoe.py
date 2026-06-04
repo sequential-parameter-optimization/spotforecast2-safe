@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
-from spotforecast2_safe.downloader.entsoe import download_new_data, merge_build_manual
+import spotforecast2_safe.downloader.entsoe as entsoe_mod
 
 # Mock entsoe before importing our module
 mock_entsoe = MagicMock()
@@ -531,11 +531,9 @@ class TestDownloadTimeoutForwarding(unittest.TestCase):
         self.test_dir = Path(tempfile.mkdtemp())
         (self.test_dir / "raw").mkdir()
         (self.test_dir / "interim").mkdir()
-        import spotforecast2_safe.downloader.entsoe as _entsoe_mod
-
-        self._entsoe_mod = _entsoe_mod
-        self._orig_flag = _entsoe_mod._TIMEOUT_WARNING_ISSUED
-        _entsoe_mod._TIMEOUT_WARNING_ISSUED = False
+        self._entsoe_mod = entsoe_mod
+        self._orig_flag = entsoe_mod._TIMEOUT_WARNING_ISSUED
+        entsoe_mod._TIMEOUT_WARNING_ISSUED = False
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
