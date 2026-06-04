@@ -1574,7 +1574,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    force<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    keep_forecast_future<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    timeout<span class="op">=</span><span class="fl">60.0</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Download new load and forecast data from ENTSO-E.</p>
 <p>This function queries the ENTSO-E Transparency Platform for a given period. If no start date is provided, it automatically resumes from the last available data point. Should the trailing rows hold a published day-ahead forecast but no <code>Actual Load</code> yet (ENTSO-E publishes actuals with a lag and occasionally backfills them days later), the fetch window is extended back to the first hour whose actuals are still missing, bounded by <code>_MAX_BACKFILL_DAYS</code>, so late-published values heal automatically on the next incremental download.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -1625,6 +1626,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>If True, retain rows after the current UTC moment when building the interim file, preserving ENTSO-E’s day-ahead <code>Forecasted Load</code> for tomorrow. Defaults to False (future rows are dropped, the leakage-free input for training). The flag only keeps rows the query window already covers, so pass an <code>end</code> that reaches into the target day (e.g.&nbsp;tomorrow) as well. See <code>merge_build_manual</code> for details.</td>
 <td><code>False</code></td>
 </tr>
+<tr class="odd">
+<td>timeout</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]</td>
+<td>Per-socket-operation read timeout in seconds passed to the ENTSO-E client. Kills stalled connections (raises <code>requests.exceptions.Timeout</code>, caught by the existing retry loop, then <code>RuntimeError</code> after retries) without bounding long live transfers. <code>None</code> disables the timeout. Defaults to <code>60.0</code>.</td>
+<td><code>60.0</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1660,7 +1667,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="notes" class="level2 doc-section doc-section-notes">
 <h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
 <p>Logging information can be selected by setting the log level for the <code>spotforecast2_safe.downloader.entsoe</code> logger. Common levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, and <code>CRITICAL</code>. The cell below shows the default (WARNING); change the level to <code>INFO</code> or <code>DEBUG</code> for more verbose output.</p>
-<div id="c5452f01" class="cell" data-execution_count="1">
+<div id="2189dd79" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">"spotforecast2_safe.downloader.entsoe"</span>).setLevel(logging.WARNING)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1668,7 +1675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Replace <code>YOUR_API_KEY</code> below with your ENTSO-E Web API Security Token (free registration at https://transparency.entsoe.eu, then “My Account Settings” → “Web API Security Token”). Prefer reading the token from an environment variable rather than hard-coding it in source — see the Information-Disclosure note in the module STRIDE table above.</p>
-<div id="1f4c2184" class="cell" data-execution_count="2">
+<div id="bbc4b017" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> download_new_data</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic download for Germany with explicit start/end dates</span></span>
