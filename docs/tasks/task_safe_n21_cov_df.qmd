@@ -1,581 +1,182 @@
 ---
-title: "task_safe_n_to_1_with_covariates_and_dataframe: Design and Test Logic Explained"
-description: "A step-by-step walkthrough of the N-to-1 covariate forecasting pipeline and its test suite."
+title: "task_safe_n_to_1_with_covariates_and_dataframe: Design and Usage"
+description: "How the ConfigMulti-driven N-to-1 forecasting task works and how to use it."
 ---
 
-The `task_safe_n_to_1_with_covariates_and_dataframe` script extends the baseline forecasting pipeline by adding exogenous covariates — weather observations, public holidays, and automatically engineered calendar features. The outcome is a signed weighted aggregation of 11 per-column recursive forecasts into a single combined prediction. Every public parameter is validated, every sensitive value is masked in log output, and every execution path is wrapped in structured error handling.
+`task_safe_n_to_1_with_covariates_and_dataframe` is the entry point for
+multi-target N-to-1 time-series forecasting in `spotforecast2-safe`.  Its
+public surface is a single function `run_pipeline` and a CLI entry point
+`spotforecast-safe-n2o1-cov-df`.  All pipeline parameters are centralised in a
+`ConfigMulti` object; the function delegates to
+`spotforecast2_safe.multitask.runner.run` with `task="lazy"`.
 
-The test suite in `tests/test_task_safe_n_to_1_with_covariates.py` decomposes this pipeline into isolated units so that a failure in any stage surfaces as a specific, attributable assertion error rather than a silent mismatch at evaluation time. The classes below follow the logical execution order of the pipeline.
+The n2n pipeline (`processing/n2n_predict_with_covariates.py`) is still
+available and is used by `task_safe_demo` and the `spotforecast2` sibling
+package.  The n-to-1 task described here now runs on
+`spotforecast2_safe.multitask` instead.
 
-## Covariate Data Preparation
+## ConfigMulti as single source of truth
 
-Before any model is trained, the pipeline constructs three categories of exogenous features. The `TestCovariateDataPreperation` class verifies that each category satisfies its structural contract.
+`ConfigMulti` centralises every pipeline knob: forecast horizon, training
+window, outlier policy, exogenous-feature flags, aggregation weights, and
+cache location.  Passing one object to `run_pipeline` (or to `MultiTask`
+directly) is all that is needed to reproduce a run exactly.
 
-Weather data arrives as a DataFrame with a `DatetimeIndex` and columns for temperature, humidity, and wind speed. The test confirms the exact shape `(100, 3)` and the presence of all three column names. This is not cosmetic: downstream feature-engineering code selects columns by name, so a missing column produces a `KeyError` rather than a silently degraded feature set.
-
-Holiday data must be binary — every entry is either `0` (non-holiday) or `1` (holiday). The test calls `set(holidays.unique()).issubset({0, 1})` to confirm that no fractional or multi-valued entries have slipped through. Any departure from binary encoding would distort the model's ability to isolate the holiday effect.
-
-Calendar features — day of week, day of month, month, quarter, weekend flag — are derived directly from the `DatetimeIndex`. The test verifies that `day_of_week` spans 0–6, that `month` spans 1–12, and that the total row count equals 365. These bounds are the minimum necessary to confirm that no date arithmetic has produced impossible values.
-
-Cyclical encoding replaces raw integer months with sine and cosine components so that December and January are numerically close. The test confirms that both components are bounded strictly within `[-1, 1]`, which is the mathematical guarantee of the unit-circle encoding.
+Aggregation weights live on `ConfigMulti.agg_weights`.  For the 11-target
+ENTSO-E demo dataset (`demo10.csv`) the presets are loaded by
+`make_demo10_config()`.  For a custom dataset, pass `agg_weights` explicitly
+when constructing `ConfigMulti`.
 
 ```{python}
-import numpy as np
-import pandas as pd
+from spotforecast2_safe.multitask.runner import make_demo10_config
 
-dates = pd.date_range("2020-01-01", periods=365, freq="D")
-month = dates.month
-
-month_sin = np.sin(2 * np.pi * month / 12)
-month_cos = np.cos(2 * np.pi * month / 12)
-
-pd.DataFrame(
-    {"month": month[:6], "sin": month_sin[:6].round(4), "cos": month_cos[:6].round(4)},
-    index=dates[:6],
-)
+cfg = make_demo10_config(predict_size=24)
+print(f"Targets:    {cfg.targets}")        # None until prepare_data runs
+print(f"Weights:    {cfg.agg_weights}")
+print(f"Horizon:    {cfg.predict_size}")
 ```
 
-## Exogenous Variable Validation
+## Pipeline stages
 
-The `TestExogenousVariableValidation` class enforces four structural invariants that must hold before the exogenous DataFrame is passed to the forecaster.
+A call to `run_pipeline` (or equivalently `runner.run`) executes the following
+steps in order:
 
-The exogenous matrix must have exactly the same number of rows as the target series and an identical index. The test creates both objects on the same `DatetimeIndex` and checks `exog.index.equals(y.index)`. A mismatch here would cause `ForecasterRecursive.fit` to raise an alignment error, but verifying it before training saves the cost of constructing lag matrices for an incompatible input.
+1. `prepare_data` — loads, resamples, and validates the input DataFrame.
+2. `detect_outliers` — applies hard-bound clipping and IsolationForest
+   (controlled by `ConfigMulti.use_outlier_detection` and `bounds`).
+3. `impute` — fills missing values using the configured
+   `ConfigMulti.imputation_method`.
+4. `build_exogenous_features` — assembles weather, calendar, day/night, holiday,
+   and (optionally) holiday-adjacency covariates; runs cyclical encoding and
+   polynomial interactions; selects the final feature set.
+5. `run(task="lazy")` — fits one `ForecasterRecursive` per target with
+   LightGBM defaults, aggregates per-target predictions using `agg_weights`,
+   and returns the combined forecast.
 
-Missing features are detected by comparing the actual column list against a required set. If a required column is absent, the gap is made explicit rather than letting a downstream `KeyError` propagate with an opaque stack trace.
+## run_pipeline usage
 
-NaN handling is tested by confirming that two missing values survive `exog.isna().sum().sum()` and that forward-fill removes all of them. The `ffill()` strategy is appropriate for weather and calendar data because the last observed value is the most conservative assumption in the absence of new information.
-
-```{python}
-exog = pd.DataFrame({
-    "feat1": [1.0, 2.0, np.nan, 4.0, 5.0],
-    "feat2": [10.0, np.nan, 30.0, 40.0, 50.0],
-})
-print(f"NaNs before ffill: {exog.isna().sum().sum()}")
-exog_filled = exog.ffill()
-print(f"NaNs after  ffill: {exog_filled.isna().sum().sum()}")
-```
-
-## Logging and Timestamp Format
-
-The `TestLoggingForCovariates` class tests two aspects of the dual-handler logging system used throughout the covariate pipeline.
-
-The first test verifies that attaching a `StreamHandler` with a standard formatter results in a logger with at least one handler and level `INFO`. The N-to-1 pipeline sets this level rather than `DEBUG` because it is the outermost user-facing task: operators need progress updates, not internal variable traces.
-
-The second test verifies the timestamp format `YYYYMMDD_HHMMSS`. A 15-character string, an underscore at position 8, and an all-digit date component are the three assertions. This format is used in log file names, so any deviation would produce files that sort incorrectly by creation time in a directory listing — a subtle but consequential problem in audit contexts where log files are reviewed chronologically.
-
-## The N-to-1 Forecasting Structure
-
-The `TestNto1ForecastingPipeline` class establishes the data structure contracts for the recursive forecasting stage.
-
-The basic structure test creates a Series of length `100 + horizon` to represent the full available history. The extra `horizon` rows will become the test set; only the first 100 rows feed the training stage. Constructing the Series with this combined length from the start avoids off-by-one errors when slicing at the train/test boundary.
-
-The recursive forecaster is initialised with `LGBMRegressor(n_estimators=100, learning_rate=0.1, random_state=42, verbose=-1)`. The test confirms that the estimator attributes match the provided values, which establishes that the `LGBMRegressor` constructor accepted the parameters without silently ignoring any of them. This is important because some sklearn-compatible estimators silently clip or ignore out-of-range parameters.
-
-Multi-output forecasting produces a one-dimensional array of length `steps`. The test confirms `forecast_array.ndim == 1` to distinguish the multi-step output from a two-dimensional matrix that would indicate an accidental multi-target configuration.
-
-## Feature Engineering with Covariates
-
-The `TestCovariateFeatureEngineering` class validates three feature construction patterns used by the pipeline.
-
-Polynomial features are computed by stacking `x`, `x**2`, and `x**3` into a matrix. The test confirms the shape `(5, 3)` and verifies that the first column is identical to the original input and the second column equals its square. This establishes that no column reordering or normalisation has been applied, which matters because the aggregation weights are positionally indexed.
-
-Lag features are created with `y.shift(i)` for `i` in `[1, 2, 3]`. The test checks that the first row of `lag_1` is NaN, confirming that the shift operation introduces the expected initial missing values rather than wrapping around or filling with zeros.
-
-Rolling window features are computed with `y.rolling(window=7).mean()`. The test confirms that the first six values are NaN — a direct consequence of requiring a full window before computing the first valid mean. Any model trained without respecting this warm-up period would use NaN-contaminated features for the earliest training rows.
+The simplest call loads `demo10.csv` from the bundled datasets and uses the
+demo10 presets:
 
 ```{python}
-y = pd.Series(np.arange(1, 11, dtype=float))
-lags = pd.DataFrame({f"lag_{i}": y.shift(i) for i in range(1, 4)})
-rolling_mean = y.rolling(window=7).mean()
-
-print("Lag features (first 5 rows):")
-print(lags.head())
-print(f"\nRolling mean NaNs in first 6 positions: {rolling_mean.iloc[:6].isna().sum()}")
-```
-
-## Integrating Exogenous Variables into the Feature Matrix
-
-The `TestExogenousIntegration` class tests how exogenous features are merged with lag features to form the complete training matrix.
-
-The feature matrix expansion test creates a base matrix of 5 columns and an exogenous matrix of 3 columns, then combines them with `np.column_stack`. The result must have exactly 8 columns. This verifies that column stacking does not drop any features and does not introduce duplicates.
-
-The lag-and-exog combination test uses `pd.concat([y_lags, exog], axis=1)` and confirms the combined column count is 4 (two lags plus two exogenous features). The presence of both `y_lag_1` and `temp` in the column set confirms that the concatenation preserved column names, which `ForecasterRecursive` uses when calling `estimator.fit`.
-
-## Prediction Aggregation
-
-The `TestPredictionAggregation` class mirrors the `TestAggregatePredict` class from the demo task but extends it with temporal index preservation.
-
-The basic aggregation test uses positive fractional weights `[0.5, 0.3, 0.2]` that sum to 1. Multiplying each column by its weight and summing across columns produces a length-3 Series, confirming that the operation reduces a multi-column DataFrame to a single forecast Series.
-
-The unequal importance test verifies the ordering `high_priority > medium_priority > low_priority` directly in the weights dictionary. This is a boundary check: the weights must encode a strict priority ranking, and any normalisation that flattened this ranking would silently degrade the combined forecast quality.
-
-The temporal index preservation test reconstructs the aggregated Series with the original `DatetimeIndex` and calls `aggregated_series.index.equals(dates)`. This confirms that the matrix multiplication idiom `predictions.values @ np.array(weights)` — which returns a plain `np.ndarray` — does not silently discard the temporal index when it is re-attached via `pd.Series(aggregated, index=dates)`.
-
-```{python}
-dates = pd.date_range("2020-01-01", periods=10, freq="h")
-predictions = pd.DataFrame(
-    np.random.randn(10, 3), index=dates, columns=["loc_1", "loc_2", "loc_3"]
-)
-weights = np.array([0.4, 0.4, 0.2])
-aggregated = pd.Series(predictions.values @ weights, index=dates)
-print(aggregated.head())
-```
-
-## Timezone Handling
-
-The `TestCovariateTimezone` class addresses a recurring source of alignment failures in time series pipelines: mixed timezone-aware and timezone-naive indices.
-
-The first test creates a UTC-indexed Series and confirms that `y.index.tz is not None` and that the timezone string is `"UTC"`. A `None` timezone indicates a tz-naive index, which cannot be compared with a tz-aware index without an explicit `tz_localize` call.
-
-The conversion test uses `tz_convert("US/Eastern")` to move from UTC to Eastern time and confirms that the result has a non-`None` timezone. This is relevant when the pipeline is deployed in a timezone other than UTC: the model's training data and the forecast period must share a consistent timezone, or the lag indices will misalign by a constant offset equal to the UTC offset.
-
-The consistency test creates both `y` and `exog` on the same UTC index and verifies `str(y.index.tz) == str(exog.index.tz)`. A mismatch between the target and exogenous timezone would cause `ForecasterRecursive.fit` to raise an error when it attempts to align the two inputs.
-
-## Forced Training vs. Cached Model Loading
-
-The `TestForcedTraining` class tests the persistence decision logic that controls whether the pipeline trains a new model or loads a previously serialised one.
-
-The `force_train` flag maps directly to the action string `"retrain_model"` when `True` and `"load_cached_model"` when `False`. This test formalises the boolean semantics in isolation from the actual file I/O, confirming that the branching logic is correct before it interacts with the filesystem.
-
-The directory creation test calls `Path.mkdir(parents=True, exist_ok=True)` on a path under `/tmp` and verifies that the directory exists afterwards. The `exist_ok=True` flag prevents a `FileExistsError` on repeated runs, which is the correct behaviour for a pipeline that may be invoked multiple times with the same model directory.
-
-## Error Handling
-
-The `TestErrorHandlingCovariates` class covers three failure modes that are specific to the covariate pipeline.
-
-The missing exog detection test computes the shortfall when only 20 steps of exogenous data are provided for a 24-step forecast horizon. The result `horizon - exog_provided == 4` establishes the arithmetic that the validation layer must implement to produce a meaningful error message rather than an implicit out-of-bounds slice.
-
-The misaligned index test creates `y` with 100 rows and `exog` with 95 rows, then computes their index intersection. The intersection contains 95 elements, confirming that the safe strategy is to restrict computation to the common index rather than raising an error. This mirrors the `dropna`/`intersection` pattern used in the demo task.
-
-The invalid horizon test confirms that `-24` is not a member of the accepted horizons `[6, 12, 24, 48, 168]` and that it is negative. This validates the guard condition that `n2n_predict_with_covariates` enforces at its entry point.
-
-## Kwargs Flexibility
-
-The `TestKwargsFlexibility` class verifies that the `**kwargs` mechanism correctly forwards parameters through the pipeline layers.
-
-The estimator kwargs test confirms that a dictionary with `n_estimators=500`, `learning_rate=0.05`, and `num_leaves=100` retains all three keys and values. The `n_to_1_with_covariates` function collects these in a `forecast_kwargs` dictionary before passing them to `n2n_predict_with_covariates`, so the forwarding chain must preserve each key without mutation.
-
-The forecaster kwargs test checks that `lags=[1, 7, 24]` and `window_size=72` survive the forwarding. Using a list for `lags` instead of a scalar activates the skforecast multi-lag construction path, so the type must be preserved exactly.
-
-The aggregation kwargs test verifies that `method` and `normalize_weights` entries are accessible after construction. These parameters control how `agg_predict` normalises the weight vector, and their presence in the kwargs dictionary is the precondition for the aggregation stage to respect user-specified aggregation semantics.
-
-## Integration: The Complete Pipeline
-
-The `TestIntegrationN2N` class tests the properties that only emerge when all components operate together.
-
-The end-to-end structure test constructs a 100-row hourly Series named `load` alongside a two-column exogenous DataFrame with `temperature` and `hour` columns on the same index. The three assertions — correct Series length, correct exog shape, and identical indices — are the minimum conditions for a successful call to `ForecasterRecursive.fit(y, exog=exog)`.
-
-The output consistency test simulates the pipeline's return value: a `(24, 11)` predictions DataFrame, a 24-element aggregated Series, and a metrics dictionary with `MAE` and `MSE` keys. Verifying the shape of the predictions DataFrame confirms that the multi-output forecasting produced the expected number of timesteps and columns before aggregation.
-
-The reproducibility test seeds `np.random` with `42`, draws 10 values, reseeds, and draws again. Exact equality between the two arrays confirms that the seed resets the PRNG state completely. In the pipeline, `random_state=42` is passed to `LGBMRegressor` for the same reason: two runs with identical input must produce identical output, which is a core requirement of the safety-critical design.
-
-```{python}
-seed = 42
-np.random.seed(seed)
-data_1 = np.random.randn(10)
-
-np.random.seed(seed)
-data_2 = np.random.randn(10)
-
-print(f"Arrays identical: {(data_1 == data_2).all()}")
-print(f"First 5 values:   {data_1[:5].round(4)}")
-```
-
-## The Complete Execution Flow
-
-A single invocation of `task_safe_n_to_1_with_covariates_and_dataframe` follows this sequence. The optional logging system is activated first if `--logging true` is passed. The `fetch_data` call loads the target time series from the configured data file. Feature engineering then constructs the exogenous matrix: calendar features from the `DatetimeIndex`, optionally extended with weather windows, holiday indicators, and polynomial interaction terms. The `n2n_predict_with_covariates` function trains one `ForecasterRecursive` per target column with the assembled exogenous inputs, serialises each model to the model directory, and returns the prediction DataFrame. Geographic coordinates are redacted from all log output at every level per CWE-312 and CWE-532. The 11-column prediction DataFrame is reduced to a single combined forecast by `agg_predict` using the `DEFAULT_WEIGHTS` vector. The combined prediction is printed to stdout and logged to the timestamped log file if logging is enabled.
-
-The test suite mirrors this flow by isolating each stage into a dedicated class, so a regression in any component produces a targeted failure that pinpoints the affected stage without requiring a full pipeline run.
-
-```{python}
-
-import argparse
-import logging
-import sys
 import warnings
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+warnings.filterwarnings("ignore")
+from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import run_pipeline
 
+forecast = run_pipeline()
+print(forecast.head())
+```
+
+For a custom dataset, supply a `ConfigMulti` and a DataFrame:
+
+```{python}
+import tempfile
 import numpy as np
 import pandas as pd
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import run_pipeline
 
-from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
-from spotforecast2_safe.manager.logger import setup_logging
-from spotforecast2_safe.utils.parse import parse_bool
-from spotforecast2_safe.processing.agg_predict import agg_predict
-from spotforecast2_safe.processing.n2n_predict_with_covariates import (
-    n2n_predict_with_covariates,
+rng = np.random.default_rng(0)
+n = 500
+idx = pd.date_range("2020-01-01", periods=n, freq="h", tz="UTC")
+df = pd.DataFrame(
+    rng.uniform(0, 100, size=(n, 3)),
+    index=idx,
+    columns=["A", "B", "C"],
 )
-from spotforecast2_safe.security.masking import mask_estimator
+df.index.name = "DateTime"
 
-# Default aggregation weights for the N-to-1 forecasting task.
-#
-# The position of each value corresponds to a specific forecast component or
-# aggregation term used by `agg_predict`. Positive values increase the influence
-# of the corresponding component in the final aggregated forecast, whereas
-# negative values down-weight or invert the contribution of that component.
-#
-# NOTE:
-# - These defaults are domain-specific and should be updated together with any
-#   changes to the aggregation logic or the ordering of components in
-#   `agg_predict`.
-# - They are defined as a named constant (rather than inline) to make it clear
-#   what is being tuned and to avoid unexplained "magic numbers" in the code.
-DEFAULT_WEIGHTS: List[float] = [
-    1.0,  # Index 0 – weight for forecast component 0
-    1.0,  # Index 1 – weight for forecast component 1
-    -1.0,  # Index 2 – weight for forecast component 2
-    -1.0,  # Index 3 – weight for forecast component 3
-    1.0,  # Index 4 – weight for forecast component 4
-    -1.0,  # Index 5 – weight for forecast component 5
-    1.0,  # Index 6 – weight for forecast component 6
-    1.0,  # Index 7 – weight for forecast component 7
-    1.0,  # Index 8 – weight for forecast component 8
-    -1.0,  # Index 9 – weight for forecast component 9
-    1.0,  # Index 10 – weight for forecast component 10
-]
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=4,
+        train_size=pd.Timedelta(days=14),
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        imputation_method="linear",
+        agg_weights=[1.0, 1.0, -1.0],
+    )
+    result = run_pipeline(config=cfg, dataframe=df, project_name="demo_custom", cache_home=tmp)
 
-warnings.simplefilter("ignore", category=FutureWarning)
-warnings.simplefilter("ignore", category=UserWarning)
+print(type(result))
+print(result)
 ```
 
-```{python}
+## Aggregation weights
 
-def n_to_1_with_covariates(
-    data: Optional[pd.DataFrame] = None,
-    forecast_horizon: int = 24,
-    contamination: float = 0.01,
-    window_size: int = 72,
-    lags: int = 24,
-    train_ratio: float = 0.8,
-    latitude: float = 51.5136,
-    longitude: float = 7.4653,
-    timezone: str = "UTC",
-    country_code: str = "DE",
-    state: str = "NW",
-    estimator: Optional[Union[str, object]] = None,
-    include_weather_windows: bool = False,
-    include_holiday_features: bool = False,
-    poly_features_degree: int = 1,
-    max_poly_features: int = 10,
-    weights: Optional[Union[Dict[str, float], List[float], np.ndarray]] = None,
-    verbose: bool = True,
-    show_progress: bool = True,
-    **kwargs: Any,
-) -> Tuple[pd.DataFrame, pd.Series, Dict, Dict]:
-    """Execute N-to-1 forecasting pipeline with exogenous covariates.
+`ConfigMulti.agg_weights` replaces the old hard-coded `DEFAULT_WEIGHTS`
+constant.  A positive weight adds that target's forecast to the aggregate; a
+negative weight subtracts it, expressing a net-position convention.  Equal
+weights are used as a fallback when `agg_weights` is `None`.
 
-    This function performs a complete time series forecasting workflow:
-    1. Fetches and preprocesses data
-    2. Engineers features (calendar, weather, holidays, cyclical, polynomial)
-    3. Trains recursive forecaster on multiple targets
-    4. Aggregates predictions using weighted combination
+The demo10 presets from `make_demo10_config()` encode the eleven-element signed
+vector `[+1, +1, -1, -1, +1, -1, +1, +1, +1, -1, +1]`, identical to the
+previous `DEFAULT_WEIGHTS` constant.
 
-    Security Note:
-        Geographic coordinates (latitude/longitude) are considered sensitive PII
-        (Personally Identifiable Information) per CWE-312 and CWE-532. This function
-        implements data masking for all log output to prevent exposure in production
-        monitoring systems, log aggregators, or crash dumps. Raw coordinate values
-        are never logged at any log level, including DEBUG.
+## CLI usage
 
-    Args:
-        data (Optional[pd.DataFrame]): Optional DataFrame with target time series data.
-            If None, fetches data automatically ("data10.csv"). Default: None.
+The entry point `spotforecast-safe-n2o1-cov-df` accepts a subset of
+`ConfigMulti` fields as flags and delegates to `run_pipeline`:
 
-        forecast_horizon (int): Number of forecast steps ahead.
-            Determines how many time steps to predict into the future.
-            Typical values: 24 (1 day), 48 (2 days), 168 (1 week). Default: 24.
+```bash
+# Default run — loads demo10.csv, uses make_demo10_config() presets
+uv run spotforecast-safe-n2o1-cov-df
 
-        contamination (float): Outlier contamination level for anomaly detection.
-            Expected proportion of outliers in the training data [0, 1].
-            Higher values detect fewer outliers. Default: 0.01 (1%).
+# Custom forecast horizon
+uv run spotforecast-safe-n2o1-cov-df --forecast_horizon 48
 
-        window_size (int): Rolling window size for feature engineering (hours).
-            Size of the rolling window for computing statistics.
-            Must be > lags. Typical range: 24-168. Default: 72.
+# Holiday features on, 2-degree polynomial interactions
+uv run spotforecast-safe-n2o1-cov-df --include_holiday_features true --poly_features_degree 2
 
-        lags (int): Number of lagged features to create.
-            Creates AR(p) features with p=lags.
-            Typical values: 12, 24, 48. Default: 24.
+# Custom aggregation weights
+uv run spotforecast-safe-n2o1-cov-df --weights 1.0 1.0 -1.0
 
-        train_ratio (float): Proportion of data for training [0, 1].
-            Remaining data (1 - train_ratio) used for validation/testing.
-            Typical values: 0.7-0.9. Default: 0.8.
-
-        latitude (float): Geographic latitude for solar features.
-            Used to compute sunrise/sunset times for day/night features.
-            Default: 51.5136 (Dortmund, Germany).
-
-        longitude (float): Geographic longitude for solar features.
-            Used to compute sunrise/sunset times for day/night features.
-            Default: 7.4653 (Dortmund, Germany).
-
-        timezone (str): Timezone for time-based features.
-            Any timezone recognized by pytz. Default: "UTC".
-
-        country_code (str): ISO 3166-1 alpha-2 country code for holidays.
-            Examples: "DE" (Germany), "US" (USA), "GB" (UK). Default: "DE".
-
-        state (str): State/region code for holidays.
-            Country-dependent. For Germany: "BW", "BY", "NW", etc.
-            Default: "NW" (Nordrhein-Westfalen).
-
-        estimator (Optional[Union[str, object]]): Forecaster model.
-            Can be:
-            - None: Uses LGBMRegressor(n_estimators=100, verbose=-1).
-            - "ForecasterRecursive": References default estimator (same as None).
-            - LGBMRegressor(...): Custom pre-configured estimator.
-            - Any sklearn-compatible regressor.
-            Default: None.
-
-        include_weather_windows (bool): Add rolling weather statistics.
-            Creates moving averages, min, max of weather features over
-            multiple windows (1D, 7D). Increases feature count significantly.
-            Default: False.
-
-        include_holiday_features (bool): Add holiday binary indicators.
-            Creates features indicating holidays and special dates.
-            Useful for capturing demand patterns around holidays.
-            Default: False.
-
-        poly_features_degree (int): Polynomial-interaction degree. 1 (default)
-            adds no interactions; 2 adds pairwise bilinear terms; 3+ higher order.
-        max_poly_features (int): Cap on kept polynomial interaction columns; only
-            the top-K ranked by mutual information with the target survive
-            (<= 0 disables). Default: 10.
-
-        weights (Optional[Union[Dict[str, float], List[float], np.ndarray]]):
-            Weights for combining multi-output predictions.
-            Can be:
-            - None: Uses DEFAULT_WEIGHTS (see module-level constant for values)
-            - Dict: {"col_name": weight, ...} for specific columns
-            - List: [w1, w2, ...] in column order
-            - np.ndarray: Same as list
-            Default: None (uses DEFAULT_WEIGHTS).
-
-        verbose (bool): Enable progress logging.
-            Prints intermediate results and timestamps.
-            Default: True.
-
-        show_progress (bool): Show a progress bar for major pipeline steps.
-            Default: True.
-
-        **kwargs (Any): Additional parameters for underlying functions.
-            These are passed to n2n_predict_with_covariates().
-            Examples:
-            - freq: Frequency for data resampling. Default: "h" (hourly).
-            - columns: Specific columns to forecast. Default: None (all).
-            Any parameter accepted by n2n_predict_with_covariates().
-
-    Returns:
-        Tuple[pd.DataFrame, pd.Series, Dict, Dict]: A tuple containing:
-            - predictions (pd.DataFrame): Multi-output forecasts from recursive model.
-                Each column represents a target variable.
-                Index is datetime matching the forecast period.
-            - combined_prediction (pd.Series): Aggregated forecast from weighted combination.
-                Single column combining all output predictions.
-                Index is datetime matching the forecast period.
-            - model_metrics (Dict): Performance metrics from recursive forecaster.
-                Keys may include: 'mae', 'rmse', 'mape', etc.
-            - feature_info (Dict): Information about engineered features.
-                Contains feature counts, types, and engineering details.
-
-    Raises:
-        ValueError: If forecast_horizon <= 0 or invalid parameter combinations.
-        FileNotFoundError: If data source files cannot be accessed.
-        RuntimeError: If model training fails or data processing errors occur.
-
-    Examples:
-        Basic usage (uses all defaults):
-
-        >>> predictions, combined, metrics, features = n_to_1_with_covariates()
-        >>> print(f"Predictions shape: {predictions.shape}")
-        >>> print(f"Combined forecast head:\\n{combined.head()}")
-
-        Custom location and forecast horizon:
-
-        >>> predictions, combined, metrics, features = n_to_1_with_covariates(
-        ...     forecast_horizon=48,
-        ...     latitude=48.1351,
-        ...     longitude=11.5820,
-        ...     country_code="DE",
-        ...     state="BY",
-        ...     verbose=True
-        ... )
-
-        With feature engineering enabled:
-
-        >>> predictions, combined, metrics, features = n_to_1_with_covariates(
-        ...     forecast_horizon=24,
-        ...     include_weather_windows=True,
-        ...     include_holiday_features=True,
-        ...     poly_features_degree=2,
-        ...     verbose=True
-        ... )
-
-        Custom estimator and weights:
-
-        >>> from lightgbm import LGBMRegressor
-        >>> custom_estimator = LGBMRegressor(
-        ...     n_estimators=200,
-        ...     learning_rate=0.01,
-        ...     max_depth=7
-        ... )
-        >>> custom_weights = [1.0, 1.0, -0.5, -0.5]
-        >>> predictions, combined, metrics, features = n_to_1_with_covariates(
-        ...     forecast_horizon=24,
-        ...     estimator=custom_estimator,
-        ...     weights=custom_weights,
-        ...     verbose=True
-        ... )
-
-        With all advanced options:
-
-        >>> predictions, combined, metrics, features = n_to_1_with_covariates(
-        ...     forecast_horizon=72,
-        ...     contamination=0.02,
-        ...     window_size=168,
-        ...     lags=48,
-        ...     train_ratio=0.75,
-        ...     latitude=50.1109,
-        ...     longitude=8.6821,
-        ...     timezone="Europe/Berlin",
-        ...     country_code="DE",
-        ...     state="HE",
-        ...     include_weather_windows=True,
-        ...     include_holiday_features=True,
-        ...     poly_features_degree=2,
-        ...     weights={"power": 1.0, "demand": 0.8},
-        ...     verbose=True,
-        ...     freq="h",
-        ... )
-        >>> print(f"Model Metrics: {metrics}")
-        >>> print(f"Feature Info: {features}")
-    """
-    logger = logging.getLogger(__name__)
-
-    # Security: Mask sensitive coordinates immediately (CWE-532, CWE-312)
-    # This prevents raw latitude/longitude from being accessed in logging contexts
-
-    masked_estimator = mask_estimator(estimator)
-
-    # Default weights if not provided
-    if weights is None:
-        # Use documented default aggregation weights instead of inline magic numbers.
-        # Use a copy to avoid accidental mutation of the module-level default.
-        weights = DEFAULT_WEIGHTS.copy()
-
-    if verbose:
-        logger.info("=" * 80)
-        logger.info("N-to-1 Forecasting with Exogenous Covariates")
-        logger.info("=" * 80)
-        logger.info("Configuration:")
-        logger.info(f"  Forecast Horizon: {forecast_horizon} steps")
-        logger.info(f"  Contamination Level: {contamination}")
-        logger.info(f"  Window Size: {window_size}")
-        logger.info(f"  Lags: {lags}")
-        logger.info(f"  Train Ratio: {train_ratio}")
-        # SECURITY: Never log latitude/longitude at all to avoid PII in logs (CWE-312, CWE-532).
-        #           Only a fixed redacted placeholder is written to the logs; no masking functions are used.
-        logger.info("  Location: [REDACTED]")
-        # Log timezone region only, not full timezone (security: CWE-532)
-        logger.info(f"  Region: {country_code}-{state}")
-        # Log estimator type only, not configuration (security: CWE-532)
-        logger.info(f"  Estimator: {masked_estimator}")
-        logger.info("  Feature Engineering:")
-        logger.info(f"    - Weather Windows: {include_weather_windows}")
-        logger.info(f"    - Holiday Features: {include_holiday_features}")
-        logger.info(f"    - Polynomial Degree: {poly_features_degree}")
-        logger.info(f"    - Max Polynomial Features: {max_poly_features}")
-        logger.info(f"  Weights Type: {type(weights).__name__}")
-        logger.info(f"{'=' * 80}")
-
-        # SECURITY CRITICAL (CWE-312, CWE-532): NEVER log the following in clear text:
-        # - Raw latitude/longitude values (beyond 1 decimal precision)
-        # - Full timezone strings (only log region/country)
-        # - Estimator configuration details (only log type)
-        # - The forecast_kwargs dictionary (contains unmasked sensitive data)
-        # This applies to ALL log levels including DEBUG, and to ALL error messages.
-        # Rationale: Prevents PII exposure in log aggregation systems, crash dumps,
-        # and production monitoring tools where logs may be retained long-term or
-        # accessible to unauthorized parties.
-
-    # --- Step 1: Multi-Output Recursive Forecasting with Covariates ---
-    if verbose:
-        logger.info("Step 1: Executing multi-output recursive forecasting...")
-
-    # Prepare kwargs for n2n_predict_with_covariates
-    # SECURITY: Do NOT log this dict - contains sensitive location data (CWE-532, CWE-312)
-    forecast_kwargs = {
-        "data": data,
-        "forecast_horizon": forecast_horizon,
-        "contamination": contamination,
-        "window_size": window_size,
-        "lags": lags,
-        "train_ratio": train_ratio,
-        "latitude": latitude,
-        "longitude": longitude,
-        "timezone": timezone,
-        "country_code": country_code,
-        "state": state,
-        "estimator": estimator,
-        "include_weather_windows": include_weather_windows,
-        "include_holiday_features": include_holiday_features,
-        "poly_features_degree": poly_features_degree,
-        "max_poly_features": max_poly_features,
-        "verbose": verbose,
-        "show_progress": show_progress,
-    }
-
-    # Add any additional kwargs
-    forecast_kwargs.update(kwargs)
-
-    # Execute recursive forecasting
-    # SECURITY: Wrapped in try-except to prevent sensitive data exposure in tracebacks
-    try:
-        predictions, model_metrics, feature_info = n2n_predict_with_covariates(
-            **forecast_kwargs
-        )
-    except Exception as e:
-        # SECURITY: Do not log any location data (even masked) to avoid CWE-532/CWE-312
-        # Include only non-sensitive context information in the error message.
-        logger.error(
-            "Forecasting failed during N-to-1 forecasting. Exception type: %s. Estimator: %s",
-            type(e).__name__,
-            masked_estimator,
-        )
-        raise
-
-    if verbose:
-        logger.info(f"Multi-output predictions shape: {predictions.shape}")
-        logger.info(f"Output columns: {list(predictions.columns)}")
-        logger.info(f"Date range: {predictions.index[0]} to {predictions.index[-1]}")
-
-    # --- Step 2: Prediction Aggregation ---
-    if verbose:
-        logger.info("Step 2: Aggregating predictions using weighted combination...")
-
-    combined_prediction = agg_predict(predictions, weights=weights)
-
-    if verbose:
-        logger.info(f"Combined prediction shape: {combined_prediction.shape}")
-        logger.info("Aggregation Summary:")
-        logger.info("  Combined Prediction Head:")
-        logger.info(f"\n{combined_prediction.head()}")
-        logger.info("  Combined Prediction Statistics:")
-        logger.info(f"    Mean: {combined_prediction.mean():.4f}")
-        logger.info(f"    Std:  {combined_prediction.std():.4f}")
-        logger.info(f"    Min:  {combined_prediction.min():.4f}")
-        logger.info(f"    Max:  {combined_prediction.max():.4f}")
-        logger.info(f"{'=' * 80}")
-
-    return predictions, combined_prediction, model_metrics, feature_info
-
+# Specify cache directory
+uv run spotforecast-safe-n2o1-cov-df --log_dir ~/my_cache
 ```
 
-## Simple Run
+Available flags:
 
-```{python}
-predictions, combined, metrics, features = n_to_1_with_covariates()
-print(f"Combined forecast head:\\n{combined.head()}")
-```
+| Flag | Default | ConfigMulti field |
+|------|---------|-------------------|
+| `--forecast_horizon` | 24 | `predict_size` |
+| `--lags` | 24 | `lags_consider=range(1, N+1)` |
+| `--train_ratio` | 0.8 | `train_size` (derived from data extent) |
+| `--contamination` | 0.01 | `contamination` |
+| `--window_size` | 72 | `window_size` |
+| `--latitude` | 51.5136 | `latitude` |
+| `--longitude` | 7.4653 | `longitude` |
+| `--timezone` | UTC | `timezone` |
+| `--country_code` | DE | `country_code` |
+| `--state` | NW | `state` |
+| `--include_weather_windows` | false | `include_weather_windows` |
+| `--include_holiday_features` | false | `include_holiday_features` |
+| `--include_holiday_adjacency_features` | false | `include_holiday_adjacency_features` |
+| `--poly_features_degree` | 1 | `poly_features_degree` |
+| `--max_poly_features` | 10 | `max_poly_features` |
+| `--verbose` | false | `verbose` |
+| `--weights` | None | `agg_weights` |
+| `--log_dir` | None | `cache_home` |
+
+## Model persistence
+
+Fitted models are saved under `<cache_home>/models/<project_name>/` by
+`BaseTask.save_models`.  A subsequent `run_pipeline` call with the same
+`project_name` and `cache_home` can load them via `task="predict"` (using
+`MultiTask` directly or `runner.run`).  The `"clean"` task removes all
+artefacts for a project.
+
+## Relationship to the test suite
+
+The previous test suite (`tests/test_task_safe_n_to_1_with_covariates.py`)
+tested the old monolithic `n_to_1_with_covariates` function, covering
+covariate construction, logging format, forecaster structure, feature
+engineering, aggregation, timezone handling, model persistence decisions, error
+handling, and end-to-end reproducibility.  Those unit contracts now transfer to
+the constituent multitask components:
+
+- Data preparation and validation → `BaseTask.prepare_data` (tested via
+  `tests/test_manager_features.py` and pipeline integration tests).
+- Outlier detection → `BaseTask.detect_outliers`.
+- Exogenous feature construction → `BaseTask.build_exogenous_features`.
+- Aggregation → `agg_predict` (`tests/test_processing.py`).
+- Model persistence → `BaseTask.save_models` / `BaseTask.load_models`.

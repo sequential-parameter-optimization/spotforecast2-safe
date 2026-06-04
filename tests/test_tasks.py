@@ -57,34 +57,58 @@ class TestTaskSafeDemo(unittest.TestCase):
 
 
 class TestTaskSafeN2O1CovDf(unittest.TestCase):
-    """Tests for task_safe_n_to_1_with_covariates_and_dataframe.py."""
+    """Tests for task_safe_n_to_1_with_covariates_and_dataframe.py (ConfigMulti-driven)."""
 
-    @patch(
-        "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe.n2n_predict_with_covariates"
-    )
-    @patch(
-        "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe.agg_predict"
-    )
-    @patch(
-        "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe.fetch_data"
-    )
-    def test_main_returns_zero_on_success(self, mock_fetch, mock_agg, mock_cov):
-        """Test that main() returns 0 on successful execution."""
+    def test_main_exits_0_on_help(self):
+        """main(["--help"]) must exit with code 0."""
         from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import (
             main,
         )
 
-        # Mock return values
-        mock_predictions = pd.DataFrame({"col1": [1, 2, 3]})
-        mock_fetch.return_value = pd.DataFrame(
-            {"col1": range(100)},
-            index=pd.date_range("2020-01-01", periods=100, freq="h"),
-        )
-        mock_cov.return_value = (mock_predictions, {}, {})
-        mock_agg.return_value = pd.Series([1, 2, 3])
+        with self.assertRaises(SystemExit) as ctx:
+            main(["--help"])
+        self.assertEqual(ctx.exception.code, 0)
 
-        # Should complete without error (returns None)
-        main(verbose=False)
+    @patch(
+        "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe.run_pipeline"
+    )
+    def test_main_with_empty_argv_calls_run_pipeline(self, mock_run):
+        """main([]) builds a config from defaults and delegates to run_pipeline."""
+        from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import (
+            main,
+        )
+
+        mock_run.return_value = pd.DataFrame({"forecast": [1.0, 2.0, 3.0]})
+        main([])
+        mock_run.assert_called_once()
+
+    @patch(
+        "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe.run_pipeline"
+    )
+    def test_main_forecast_horizon_flag(self, mock_run):
+        """--forecast_horizon flag is translated to config.predict_size."""
+        from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import (
+            main,
+        )
+
+        mock_run.return_value = pd.DataFrame({"forecast": [1.0]})
+        main(["--forecast_horizon", "48"])
+        _, kwargs = mock_run.call_args
+        self.assertEqual(kwargs["config"].predict_size, 48)
+
+    @patch(
+        "spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe.run_pipeline",
+        side_effect=RuntimeError("pipeline error"),
+    )
+    def test_main_exits_1_on_failure(self, _mock_run):
+        """main exits with code 1 when run_pipeline raises."""
+        from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import (
+            main,
+        )
+
+        with self.assertRaises(SystemExit) as ctx:
+            main([])
+        self.assertEqual(ctx.exception.code, 1)
 
 
 if __name__ == "__main__":
