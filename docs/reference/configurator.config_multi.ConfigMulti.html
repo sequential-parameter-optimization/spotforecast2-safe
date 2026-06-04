@@ -1635,7 +1635,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
 <span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
 <span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    on_exog_provider_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    exog_max_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    exog_provider_window<span class="op">=</span><span class="st">'full'</span>,</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the multi-input forecasting pipeline.</p>
 <p>This class manages all configuration parameters for the multi-input task, including training/prediction intervals, data sources, and feature engineering specifications. All parameters can be customized during initialization or used with sensible defaults.</p>
 <p><code>country_code</code> serves as the single ISO country code used for both API queries and holiday feature generation.</p>
@@ -1957,6 +1959,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Policy for handling Open-Meteo fetch failures inside <code>BaseTask.build_exogenous_features</code>. <code>"raise"</code> (default) aborts the pipeline with a <code>WeatherFetchError</code> and preserves the safety-critical fail-safe semantics. <code>"skip"</code> logs a warning and continues with empty weather features so the rest of the pipeline can run without the Open-Meteo dependency.</td>
 <td><code>'raise'</code></td>
 </tr>
+<tr class="even">
+<td>exog_max_gap_hours</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Maximum length, in hours, of a contiguous run of missing exogenous-provider values healed before the provider is rejected. Interior gaps are time-interpolated; leading/trailing edge gaps are back-/forward-filled. <code>0</code> (default) keeps the strict fail-safe (any gap raises). Healed runs are logged with count and span. Only already-published day-ahead vintages are involved, so healing is leakage-clean (CR-3).</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td>exog_provider_window</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>['full', 'train']</td>
+<td>Span the exogenous providers are validated against. <code>"full"</code> (default) requires coverage of the entire <code>data_start</code>→<code>cov_end</code> request, matching prior behaviour. <code>"train"</code> validates only the consumed window <code>[start_train_ts, cov_end]</code>, tolerating missing values before the training window. Honoured by the MultiTask pipeline; the forecaster-wrapper path currently always validates the full span.</td>
+<td><code>'full'</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -2251,6 +2265,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>['raise', 'skip']</td>
 <td>Exog-provider failure policy in <code>ExogBuilder.build</code>: <code>"raise"</code> (default) propagates the <code>ExogProviderError</code>; <code>"skip"</code> logs and omits the failing provider’s columns.</td>
 </tr>
+<tr class="odd">
+<td>exog_max_gap_hours</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Maximum contiguous gap in hours that providers will heal before raising (0 = strict fail-safe).</td>
+</tr>
+<tr class="even">
+<td>exog_provider_window</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>['full', 'train']</td>
+<td>Validation window for exog providers: <code>"full"</code> (default) or <code>"train"</code>.</td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -2261,7 +2285,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="d0935656" class="cell" data-execution_count="1">
+<div id="9e76f0c5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
@@ -2406,7 +2430,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="7a51d8a5" class="cell" data-execution_count="2">
+<div id="ae13ee11" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -2487,7 +2511,7 @@ agg_weights: None</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="d10728c4" class="cell" data-execution_count="3">
+<div id="2e274c7a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>

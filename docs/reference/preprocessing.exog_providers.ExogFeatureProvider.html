@@ -1558,7 +1558,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>preprocessing.exog_providers.ExogFeatureProvider</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.exog_providers.ExogFeatureProvider()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Contract for a pluggable exogenous-feature source.</p>
-<p>A provider maps the hourly target index to a numeric, NaN-free feature frame on that exact index. Subclasses set :attr:<code>name</code> (a short identifier used in logs and as the default column name) and implement :meth:<code>build</code>.</p>
+<p>A provider maps the hourly target index to a numeric feature frame on that exact index. Subclasses set :attr:<code>name</code> (a short identifier used in logs and as the default column name) and implement :meth:<code>build</code>.</p>
 <p>Implementations should load their backing data lazily inside :meth:<code>build</code> and raise :class:<code>ExogProviderError</code> when the data is missing or cannot cover the requested range, so the fail-safe policy lives in one place.</p>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
@@ -1615,7 +1615,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
-<td>pd.DataFrame: Numeric, NaN-free columns indexed exactly by <em>index</em>.</td>
+<td>pd.DataFrame: Numeric columns indexed exactly by <em>index</em>, NaN-free within the validated window (the full <em>index</em> unless a <code>provider_window</code> was set at construction).</td>
 </tr>
 </tbody>
 </table>
