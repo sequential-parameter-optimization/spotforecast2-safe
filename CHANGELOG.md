@@ -1,3 +1,20 @@
+## [15.9.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.8.0...v15.9.0-rc.1) (2026-06-04)
+
+
+### Features
+
+* **calendar:** add holiday-adjacency features (brueckentag, before/after holiday) ([b04fe45](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b04fe45a0417d8ddbabb8ae0fd13a44b4c9ea1fc))
+
+
+### Bug Fixes
+
+* **features:** select the real is_holiday column in select_exogenous_features ([92e7030](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/92e7030588fc63c3fdf83ce30b95e70111c19127))
+
+
+### Documentation
+
+* **reference:** regenerate API reference for holiday-adjacency functions ([671361a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/671361a3dee8de13dd6ef361f0849ef9352b06d8))
+
 ## [15.8.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.7.0...v15.8.0) (2026-06-03)
 
 
