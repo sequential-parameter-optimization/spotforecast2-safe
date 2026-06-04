@@ -282,6 +282,32 @@ class TestSelectExogenousFeatures:
         )
         assert "holiday_xmas" in selected
 
+    def test_is_holiday_column_selected_when_flag_set(self, full_exog, weather_df):
+        """Regression: the production column ``is_holiday`` must be selected.
+
+        ``create_holiday_df`` emits ``is_holiday``, which the former
+        ``startswith("holiday")`` filter silently missed — holiday features
+        never reached the model despite ``include_holiday_features=True``.
+        """
+        exog = full_exog.copy()
+        exog["is_holiday"] = 0
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=True,
+        )
+        assert "is_holiday" in selected
+
+    def test_is_holiday_column_excluded_by_default(self, full_exog, weather_df):
+        exog = full_exog.copy()
+        exog["is_holiday"] = 0
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=False,
+        )
+        assert "is_holiday" not in selected
+
     def test_no_duplicates(self, full_exog, weather_df):
         selected = select_exogenous_features(
             exogenous_features=full_exog,

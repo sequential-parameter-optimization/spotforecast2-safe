@@ -291,7 +291,8 @@ def select_exogenous_features(
     1. Cyclical sine/cosine columns (always included).
     2. Weather rolling-window columns (optional, ``include_weather_windows``).
     3. Raw weather columns shared with *weather_aligned*.
-    4. Holiday-related columns starting with ``"holiday"`` (optional).
+    4. Holiday-related columns: ``is_holiday`` plus any column starting
+       with ``"holiday"`` (optional).
     5. Polynomial interaction columns starting with ``"poly_"`` (included
        when ``poly_features_degree >= 2``).
 
@@ -308,8 +309,9 @@ def select_exogenous_features(
         include_weather_windows: If ``True``, include rolling-window weather
             columns (those containing ``"_window_"`` plus ``"_mean"``,
             ``"_min"``, or ``"_max"``).  Defaults to ``False``.
-        include_holiday_features: If ``True``, include columns whose names
-            start with ``"holiday"``.  Defaults to ``False``.
+        include_holiday_features: If ``True``, include the ``is_holiday``
+            column and any column whose name starts with ``"holiday"``.
+            Defaults to ``False``.
         poly_features_degree: Polynomial-interaction degree. Interaction
             columns (names starting with ``"poly_"``) are included only when
             this is ``>= 2``; at ``1`` no interactions exist. Defaults to
@@ -368,7 +370,9 @@ def select_exogenous_features(
 
     if include_holiday_features:
         holiday_related = [
-            col for col in exogenous_features.columns if col.startswith("holiday")
+            col
+            for col in exogenous_features.columns
+            if col == "is_holiday" or col.startswith("holiday")
         ]
         exog_list.extend(holiday_related)
 
