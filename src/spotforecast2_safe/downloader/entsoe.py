@@ -374,17 +374,13 @@ def download_new_data(
             # resuming strictly from the last row would never re-fetch them.
             # If actuals are missing at the tail, restart the fetch at the
             # first missing hour instead, bounded by _MAX_BACKFILL_DAYS.
-            if not observed.empty and "Actual Load" in getattr(
-                observed, "columns", ()
-            ):
+            if not observed.empty and "Actual Load" in getattr(observed, "columns", ()):
                 backfill_floor = start_date - pd.Timedelta(days=_MAX_BACKFILL_DAYS)
                 last_valid_actual = observed["Actual Load"].last_valid_index()
                 backfill_start = (
                     backfill_floor
                     if last_valid_actual is None
-                    else max(
-                        last_valid_actual + pd.Timedelta(hours=1), backfill_floor
-                    )
+                    else max(last_valid_actual + pd.Timedelta(hours=1), backfill_floor)
                 )
                 if backfill_start < start_date:
                     logger.info(

@@ -14,11 +14,18 @@ from spotforecast2_safe.calendar.features import (
     get_calendar_features,
     get_day_night_features,
 )
-from spotforecast2_safe.calendar.holiday import create_holiday_df, get_holiday_features
+from spotforecast2_safe.calendar.holiday import (
+    create_holiday_adjacency_df,
+    create_holiday_df,
+    get_holiday_adjacency_features,
+    get_holiday_features,
+)
 
 __all__ = [
+    "create_holiday_adjacency_df",
     "create_holiday_df",
     "get_calendar_features",
     "get_day_night_features",
+    "get_holiday_adjacency_features",
     "get_holiday_features",
 ]

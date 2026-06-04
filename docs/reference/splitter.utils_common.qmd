@@ -4,44 +4,6 @@
 
 Common validation and initialization utilities for model selection.
 
-## Classes
-
-| Name | Description |
-| --- | --- |
-| [OneStepAheadValidationWarning](#spotforecast2_safe.splitter.utils_common.OneStepAheadValidationWarning) | Warning used to notify that the one-step-ahead validation is being used. |
-
-### OneStepAheadValidationWarning { #spotforecast2_safe.splitter.utils_common.OneStepAheadValidationWarning }
-
-```python
-splitter.utils_common.OneStepAheadValidationWarning(message)
-```
-
-Warning used to notify that the one-step-ahead validation is being used.
-
-#### Parameters {.doc-section .doc-section-parameters}
-
-| Name    | Type         | Description                          | Default    |
-|---------|--------------|--------------------------------------|------------|
-| message | [str](`str`) | The warning message to be displayed. | _required_ |
-
-#### Examples {.doc-section .doc-section-examples}
-
-```{python}
-import warnings
-from spotforecast2_safe.splitter.utils_common import OneStepAheadValidationWarning
-
-with warnings.catch_warnings(record=True) as caught:
-    warnings.simplefilter("always")
-    warnings.warn(
-        "This is a one-step-ahead validation warning.",
-        OneStepAheadValidationWarning,
-    )
-
-assert len(caught) == 1
-assert issubclass(caught[0].category, OneStepAheadValidationWarning)
-print(str(caught[0].message))
-```
-
 ## Functions
 
 | Name | Description |

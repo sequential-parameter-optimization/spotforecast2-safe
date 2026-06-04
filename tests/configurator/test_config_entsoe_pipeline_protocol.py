@@ -30,6 +30,7 @@ PIPELINE_PROTOCOL_FIELDS = [
     ("use_exogenous_features", True),
     ("include_weather_windows", False),
     ("include_holiday_features", False),
+    ("include_holiday_adjacency_features", False),
     ("poly_features_degree", 1),
     ("max_poly_features", 10),
     ("latitude", 51.5136),

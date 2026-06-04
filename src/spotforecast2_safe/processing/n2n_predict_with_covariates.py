@@ -80,6 +80,7 @@ except ImportError:  # pragma: no cover - fallback when tqdm is not installed
 from spotforecast2_safe.calendar import (
     get_calendar_features,
     get_day_night_features,
+    get_holiday_adjacency_features,
     get_holiday_features,
 )
 from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
@@ -127,6 +128,7 @@ def n2n_predict_with_covariates(
     estimator: Optional[object] = None,
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
+    include_holiday_adjacency_features: bool = False,
     poly_features_degree: int = 1,
     max_poly_features: int = 10,
     force_train: bool = True,
@@ -168,6 +170,10 @@ def n2n_predict_with_covariates(
             If None, uses LGBMRegressor. Default: None.
         include_weather_windows: Include weather window features. Default: False.
         include_holiday_features: Include holiday features. Default: False.
+        include_holiday_adjacency_features: Include Brückentag and
+            before/after-holiday binary indicators (``is_brueckentag``,
+            ``is_before_holiday``, ``is_after_holiday``).  When ``False``
+            (default), behaviour is byte-identical to today.
         poly_features_degree: Polynomial-interaction degree. 1 (default) = no
             interactions; 2 = pairwise bilinear; 3+ = higher order.
         max_poly_features: Cap on kept polynomial interaction columns; only the
@@ -384,6 +390,21 @@ def n2n_predict_with_covariates(
         state=state,
     )
 
+    # Holiday adjacency (Brückentage, before/after holiday)
+    if include_holiday_adjacency_features:
+        holiday_adjacency_features = get_holiday_adjacency_features(
+            data=imputed_data,
+            start=start,
+            cov_end=cov_end,
+            forecast_horizon=forecast_horizon,
+            tz=timezone,
+            freq="h",
+            country_code=country_code,
+            state=state,
+        )
+    else:
+        holiday_adjacency_features = None
+
     # Weather — honour the `on_weather_failure` policy.  ``"skip"`` swaps in
     # empty DataFrames aligned to the [start, cov_end] hourly grid so the
     # rest of the pipeline (calendar, holidays, day/night) can still run.
@@ -435,15 +456,15 @@ def n2n_predict_with_covariates(
     if verbose:
         print("\n[5/10] Combining and encoding exogenous features...")
 
-    exogenous_features = pd.concat(
-        [
-            calendar_features,
-            sun_light_features,
-            weather_features,
-            holiday_features,
-        ],
-        axis=1,
-    )
+    _concat_parts = [
+        calendar_features,
+        sun_light_features,
+        weather_features,
+        holiday_features,
+    ]
+    if holiday_adjacency_features is not None:
+        _concat_parts.append(holiday_adjacency_features)
+    exogenous_features = pd.concat(_concat_parts, axis=1)
 
     missing_count = exogenous_features.isnull().sum().sum()
     if missing_count != 0:
@@ -494,6 +515,7 @@ def n2n_predict_with_covariates(
         weather_aligned=weather_aligned,
         include_weather_windows=include_weather_windows,
         include_holiday_features=include_holiday_features,
+        include_holiday_adjacency_features=include_holiday_adjacency_features,
         poly_features_degree=poly_features_degree,
     )
 
