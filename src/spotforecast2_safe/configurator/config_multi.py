@@ -62,6 +62,9 @@ class ConfigMulti:
         state (str): ISO 3166-2 subdivision code for regional holidays (e.g. ``"NW"``).
         include_weather_windows (bool): If True, include rolling weather-window features.
         include_holiday_features (bool): If True, include public-holiday indicator features.
+        include_holiday_adjacency_features (bool): If True, include Brückentag and
+            before/after-holiday indicators (``is_brueckentag``, ``is_before_holiday``,
+            ``is_after_holiday``).  Defaults to ``False``.
         poly_features_degree (int): Polynomial-interaction degree. ``1`` (default)
             generates no interactions; ``2`` adds pairwise bilinear terms; ``3+``
             higher order.
@@ -165,6 +168,8 @@ class ConfigMulti:
         state (str): Subdivision code for regional holidays.
         include_weather_windows (bool): Weather-window feature toggle.
         include_holiday_features (bool): Holiday feature toggle.
+        include_holiday_adjacency_features (bool): Brückentag and
+            before/after-holiday indicator toggle.  Defaults to ``False``.
         poly_features_degree (int): Polynomial-interaction degree (1 = off).
         max_poly_features (int): Cap on kept ``poly_*`` columns (top-K by MI).
         poly_mi_n_jobs (Optional[int]): Parallel jobs for the MI ranking
@@ -305,6 +310,7 @@ class ConfigMulti:
         "state",
         "include_weather_windows",
         "include_holiday_features",
+        "include_holiday_adjacency_features",
         "poly_features_degree",
         "max_poly_features",
         "poly_mi_n_jobs",
@@ -374,6 +380,7 @@ class ConfigMulti:
         # Feature selection toggles
         include_weather_windows: bool = False,
         include_holiday_features: bool = False,
+        include_holiday_adjacency_features: bool = False,
         poly_features_degree: int = 1,
         max_poly_features: int = 10,
         poly_mi_n_jobs: Optional[int] = -1,
@@ -471,6 +478,7 @@ class ConfigMulti:
         # Feature selection toggles
         self.include_weather_windows = include_weather_windows
         self.include_holiday_features = include_holiday_features
+        self.include_holiday_adjacency_features = include_holiday_adjacency_features
         self.poly_features_degree = poly_features_degree
         self.max_poly_features = max_poly_features
         self.poly_mi_n_jobs = poly_mi_n_jobs

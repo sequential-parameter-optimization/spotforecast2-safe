@@ -382,6 +382,99 @@ class TestSelectExogenousFeatures:
         )
         assert "poly_hour_sin__temperature" not in selected
 
+    # --- Adjacency-feature tests ---
+
+    def _adjacency_exog(self, hourly_idx, weather_df):
+        """Exogenous DataFrame that includes all three adjacency columns."""
+        return pd.DataFrame(
+            {
+                "hour_sin": np.sin(2 * np.pi * hourly_idx.hour / 24),
+                "hour_cos": np.cos(2 * np.pi * hourly_idx.hour / 24),
+                "temperature": weather_df["temperature"].values,
+                "is_holiday": 0,
+                "is_brueckentag": 0,
+                "is_before_holiday": 0,
+                "is_after_holiday": 0,
+            },
+            index=hourly_idx,
+        )
+
+    def test_adjacency_excluded_by_default(self, hourly_idx, weather_df):
+        """Adjacency columns must not appear in the selection unless the flag is set."""
+        exog = self._adjacency_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+        )
+        for col in ["is_brueckentag", "is_before_holiday", "is_after_holiday"]:
+            assert col not in selected
+
+    def test_adjacency_included_when_flag_set(self, hourly_idx, weather_df):
+        """All three adjacency columns appear when include_holiday_adjacency_features=True."""
+        exog = self._adjacency_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_adjacency_features=True,
+        )
+        for col in ["is_brueckentag", "is_before_holiday", "is_after_holiday"]:
+            assert col in selected
+
+    def test_flag_independence_holiday_true_adjacency_false(
+        self, hourly_idx, weather_df
+    ):
+        """holiday flag True + adjacency False → is_holiday selected, no adjacency."""
+        exog = self._adjacency_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=True,
+            include_holiday_adjacency_features=False,
+        )
+        assert "is_holiday" in selected
+        for col in ["is_brueckentag", "is_before_holiday", "is_after_holiday"]:
+            assert col not in selected
+
+    def test_flag_independence_holiday_false_adjacency_true(
+        self, hourly_idx, weather_df
+    ):
+        """holiday flag False + adjacency True → adjacency selected, is_holiday not."""
+        exog = self._adjacency_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=False,
+            include_holiday_adjacency_features=True,
+        )
+        assert "is_holiday" not in selected
+        for col in ["is_brueckentag", "is_before_holiday", "is_after_holiday"]:
+            assert col in selected
+
+    def test_no_duplicates_with_both_flags(self, hourly_idx, weather_df):
+        """No duplicates when both holiday flags are set simultaneously."""
+        exog = self._adjacency_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=True,
+            include_holiday_adjacency_features=True,
+        )
+        assert len(selected) == len(set(selected))
+
+    def test_default_arg_identity(self, hourly_idx, weather_df):
+        """Calling without include_holiday_adjacency_features is identical to False."""
+        exog = self._adjacency_exog(hourly_idx, weather_df)
+        selected_implicit = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+        )
+        selected_explicit = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_adjacency_features=False,
+        )
+        assert selected_implicit == selected_explicit
+
 
 # =============================================================================
 # merge_data_and_covariates

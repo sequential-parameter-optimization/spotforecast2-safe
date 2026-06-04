@@ -98,6 +98,7 @@ def n_to_1_with_covariates(
     estimator: Optional[Union[str, object]] = None,
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
+    include_holiday_adjacency_features: bool = False,
     poly_features_degree: int = 1,
     max_poly_features: int = 10,
     weights: Optional[Union[Dict[str, float], List[float], np.ndarray]] = None,
@@ -179,6 +180,10 @@ def n_to_1_with_covariates(
             Creates features indicating holidays and special dates.
             Useful for capturing demand patterns around holidays.
             Default: False.
+
+        include_holiday_adjacency_features (bool): Add Brückentag and
+            before/after-holiday binary indicators (``is_brueckentag``,
+            ``is_before_holiday``, ``is_after_holiday``).  Default: False.
 
         poly_features_degree (int): Polynomial-interaction degree. 1 (default)
             adds no interactions; 2 adds pairwise bilinear terms between
@@ -328,6 +333,9 @@ def n_to_1_with_covariates(
         logger.info("  Feature Engineering:")
         logger.info(f"    - Weather Windows: {include_weather_windows}")
         logger.info(f"    - Holiday Features: {include_holiday_features}")
+        logger.info(
+            f"    - Holiday Adjacency Features: {include_holiday_adjacency_features}"
+        )
         logger.info(f"    - Polynomial Degree: {poly_features_degree}")
         logger.info(f"    - Max Polynomial Features: {max_poly_features}")
         logger.info(f"  Weights Type: {type(weights).__name__}")
@@ -364,6 +372,7 @@ def n_to_1_with_covariates(
         "estimator": estimator,
         "include_weather_windows": include_weather_windows,
         "include_holiday_features": include_holiday_features,
+        "include_holiday_adjacency_features": include_holiday_adjacency_features,
         "poly_features_degree": poly_features_degree,
         "max_poly_features": max_poly_features,
         "verbose": verbose,
@@ -428,6 +437,7 @@ def main(
     state: str = "NW",
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
+    include_holiday_adjacency_features: bool = False,
     poly_features_degree: int = 1,
     max_poly_features: int = 10,
     verbose: bool = False,
@@ -450,6 +460,8 @@ def main(
         state (str): Holiday state code. Default: "NW".
         include_weather_windows (bool): Toggle weather window features. Default: False.
         include_holiday_features (bool): Toggle holiday features. Default: False.
+        include_holiday_adjacency_features (bool): Toggle Brückentag and
+            before/after-holiday features. Default: False.
         poly_features_degree (int): Polynomial-interaction degree (1 = off). Default: 1.
         max_poly_features (int): Cap on kept poly columns (top-K by MI). Default: 10.
         verbose (bool): Toggle detailed logging. Default: False.
@@ -499,6 +511,7 @@ def main(
                 estimator=None,
                 include_weather_windows=include_weather_windows,
                 include_holiday_features=include_holiday_features,
+                include_holiday_adjacency_features=include_holiday_adjacency_features,
                 poly_features_degree=poly_features_degree,
                 max_poly_features=max_poly_features,
                 weights=weights,
@@ -596,6 +609,12 @@ if __name__ == "__main__":
         type=parse_bool,
         default=False,
         help="Enable holiday binary indicators.",
+    )
+    parser.add_argument(
+        "--include_holiday_adjacency_features",
+        type=parse_bool,
+        default=False,
+        help="Enable Brückentag and before/after-holiday binary indicators.",
     )
     parser.add_argument(
         "--poly_features_degree",

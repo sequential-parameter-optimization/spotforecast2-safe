@@ -280,6 +280,7 @@ def select_exogenous_features(
     cyclical_regex: str = "_sin$|_cos$",
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
+    include_holiday_adjacency_features: bool = False,
     poly_features_degree: int = 1,
 ) -> List[str]:
     """Select and deduplicate exogenous feature columns for model training.
@@ -292,8 +293,10 @@ def select_exogenous_features(
     2. Weather rolling-window columns (optional, ``include_weather_windows``).
     3. Raw weather columns shared with *weather_aligned*.
     4. Holiday-related columns: ``is_holiday`` plus any column starting
-       with ``"holiday"`` (optional).
-    5. Polynomial interaction columns starting with ``"poly_"`` (included
+       with ``"holiday"`` (optional, ``include_holiday_features``).
+    5. Holiday-adjacency columns: ``is_brueckentag``, ``is_before_holiday``,
+       ``is_after_holiday`` (optional, ``include_holiday_adjacency_features``).
+    6. Polynomial interaction columns starting with ``"poly_"`` (included
        when ``poly_features_degree >= 2``).
 
     Duplicates are removed while preserving insertion order.
@@ -311,6 +314,10 @@ def select_exogenous_features(
             ``"_min"``, or ``"_max"``).  Defaults to ``False``.
         include_holiday_features: If ``True``, include the ``is_holiday``
             column and any column whose name starts with ``"holiday"``.
+            Defaults to ``False``.
+        include_holiday_adjacency_features: If ``True``, include the three
+            adjacency columns ``is_brueckentag``, ``is_before_holiday``, and
+            ``is_after_holiday`` when present in *exogenous_features*.
             Defaults to ``False``.
         poly_features_degree: Polynomial-interaction degree. Interaction
             columns (names starting with ``"poly_"``) are included only when
@@ -375,6 +382,17 @@ def select_exogenous_features(
             if col == "is_holiday" or col.startswith("holiday")
         ]
         exog_list.extend(holiday_related)
+
+    if include_holiday_adjacency_features:
+        adjacency_allowlist = [
+            "is_brueckentag",
+            "is_before_holiday",
+            "is_after_holiday",
+        ]
+        adjacency_cols = [
+            col for col in adjacency_allowlist if col in exogenous_features.columns
+        ]
+        exog_list.extend(adjacency_cols)
 
     if poly_features_degree >= 2:
         poly_features_list = [
