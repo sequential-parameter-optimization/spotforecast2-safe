@@ -59,6 +59,9 @@ PIPELINE_PROTOCOL_FIELDS = [
     # Hooks
     ("forecaster_factory", None),
     ("data_loader", None),
+    # Gap healing and provider-window
+    ("exog_max_gap_hours", 0),
+    ("exog_provider_window", "full"),
 ]
 
 

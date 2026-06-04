@@ -152,9 +152,10 @@ def validate_config(config: object) -> None:
     Raises:
         ValueError: For a non-positive ``predict_size``, a ``contamination``
             outside ``[0, 0.5]``, a ``poly_features_degree`` below 1, a
-            ``poly_mi_sample_size`` below 1 (``None`` is allowed), or an
+            ``poly_mi_sample_size`` below 1 (``None`` is allowed), an
             ``on_weather_failure`` / ``on_exog_provider_failure`` that is not
-            ``"raise"`` or ``"skip"``.
+            ``"raise"`` or ``"skip"``, a negative ``exog_max_gap_hours``, or an
+            ``exog_provider_window`` that is not ``"full"`` or ``"train"``.
     """
     predict_size = getattr(config, "predict_size", None)
     if predict_size is not None and predict_size <= 0:
@@ -194,4 +195,18 @@ def validate_config(config: object) -> None:
         raise ValueError(
             "on_exog_provider_failure must be 'raise' or 'skip'; got "
             f"{on_exog_provider_failure!r}."
+        )
+
+    exog_max_gap_hours = getattr(config, "exog_max_gap_hours", None)
+    if exog_max_gap_hours is not None and exog_max_gap_hours < 0:
+        raise ValueError(f"exog_max_gap_hours must be >= 0; got {exog_max_gap_hours}.")
+
+    exog_provider_window = getattr(config, "exog_provider_window", None)
+    if exog_provider_window is not None and exog_provider_window not in (
+        "full",
+        "train",
+    ):
+        raise ValueError(
+            "exog_provider_window must be 'full' or 'train'; got "
+            f"{exog_provider_window!r}."
         )

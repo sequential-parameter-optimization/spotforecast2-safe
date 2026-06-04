@@ -156,6 +156,20 @@ class ConfigEntsoe:
             exogenous-provider failure inside ``ExogBuilder.build``. ``"raise"``
             (default) propagates the ``ExogProviderError`` (fail-safe);
             ``"skip"`` logs a warning and omits that provider's columns.
+        exog_max_gap_hours (int): Maximum length, in hours, of a contiguous run
+            of missing exogenous-provider values healed before the provider is
+            rejected. Interior gaps are time-interpolated; leading/trailing edge
+            gaps are back-/forward-filled. ``0`` (default) keeps the strict
+            fail-safe (any gap raises). Healed runs are logged with count and
+            span. Only already-published day-ahead vintages are involved, so
+            healing is leakage-clean (CR-3).
+        exog_provider_window (Literal["full", "train"]): Span the exogenous
+            providers are validated against. ``"full"`` (default) requires
+            coverage of the entire ``data_start``→``cov_end`` request, matching
+            prior behaviour. ``"train"`` validates only the consumed window
+            ``[start_train_ts, cov_end]``, tolerating missing values before the
+            training window. Honoured by the MultiTask pipeline; the
+            forecaster-wrapper path currently always validates the full span.
         retrain_max_age (pd.Timedelta): Maximum age of a previously trained
             model before retraining is required.  Consumed by
             ``spotforecast2_safe.manager.trainer.should_retrain`` to gate
@@ -267,6 +281,8 @@ class ConfigEntsoe:
         "number_folds",
         "on_weather_failure",
         "on_exog_provider_failure",
+        "exog_max_gap_hours",
+        "exog_provider_window",
         "retrain_max_age",
     )
 
@@ -358,6 +374,10 @@ class ConfigEntsoe:
         on_weather_failure: Literal["raise", "skip"] = "raise",
         # Exog-provider failure policy (consumed by preprocessing.exog_builder.ExogBuilder)
         on_exog_provider_failure: Literal["raise", "skip"] = "raise",
+        # Gap-healing budget for exog providers (0 = strict fail-safe)
+        exog_max_gap_hours: int = 0,
+        # Validation window for exog providers ("full" or "train")
+        exog_provider_window: Literal["full", "train"] = "full",
         # Retraining cadence (consumed by spotforecast2_safe.manager.trainer.should_retrain)
         retrain_max_age: Optional[pd.Timedelta] = None,
     ):
@@ -474,6 +494,10 @@ class ConfigEntsoe:
         # ``ExogBuilder``: ``"raise"`` aborts (default, fail-safe); ``"skip"``
         # logs a warning and omits the failing provider's columns.
         self.on_exog_provider_failure = on_exog_provider_failure
+        # Maximum contiguous gap in hours that providers will heal (0 = strict).
+        self.exog_max_gap_hours = exog_max_gap_hours
+        # Validation window for providers: "full" (default) or "train".
+        self.exog_provider_window = exog_provider_window
         # Maximum age of a previously trained model before retraining is
         # required.  Consumed by
         # ``spotforecast2_safe.manager.trainer.should_retrain``.
