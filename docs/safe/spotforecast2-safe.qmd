@@ -11,7 +11,7 @@ In safety-critical environments, reducing the "dead code" and unnecessary depend
 ---
 
 ## Positive List (Retained Components)
-The following files are essential for the execution of the primary workflows: `task_n_to_1.py` and `task_n_to_1_with_covariates_and_dataframe.py`.
+The following files are essential for the execution of the primary workflows: `task_safe_demo.py` and `task_safe_n_to_1_with_covariates_and_dataframe.py`.
 
 ### Orchestration & Pipelines
 - `src/spotforecast2_safe/processing/n2n_predict_with_covariates.py`
@@ -79,7 +79,20 @@ The following classes and functions (including internal helpers) are strictly re
 ### Orchestration & Processing
 - `agg_predict` (Function)
 - `n2n_predict` (Function)
-- `n2n_predict_with_covariates` (Function)
+- `n2n_predict_with_covariates` (Function) — used by `task_safe_demo`
+- `run_pipeline` (Function, `task_safe_n_to_1_with_covariates_and_dataframe`) — delegates to `multitask.runner.run`
+
+### Multitask Pipeline (n-to-1 task)
+- `BaseTask` (Class) — shared prepare/detect/impute/exog steps
+- `MultiTask` (Class) — task dispatcher
+- `LazyTask` (Class) — lazy fitting with optional cached tuning
+- `DefaultsTask` (Class) — deterministic defaults baseline
+- `PredictTask` (Class) — prediction from saved models
+- `CleanTask` (Class) — cache removal
+- `agg_predictor` (Function) — weighted aggregation of per-target packages
+- `default_lgbm_forecaster_factory` (Function) — LightGBM forecaster factory
+- `runner.run` (Function) — one-call pipeline entry point
+- `make_demo10_config` (Function) — demo10 preset builder
 
 ### Data & Environmental Services
 - `fetch_data` (Function)

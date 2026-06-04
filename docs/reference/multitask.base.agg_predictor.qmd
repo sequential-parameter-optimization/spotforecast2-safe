@@ -1,0 +1,30 @@
+# multitask.base.agg_predictor { #spotforecast2_safe.multitask.base.agg_predictor }
+
+```python
+multitask.base.agg_predictor(results, targets, weights)
+```
+
+Aggregate per-target prediction packages into a weighted forecast.
+
+Combines future predictions, training predictions, and training actuals
+from per-target prediction packages into an aggregated package compatible
+with downstream consumers.  This is a module-level convenience function;
+the same logic is available as ``BaseTask.agg_predictor``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                                                                              | Description                                                                                 | Default    |
+|---------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|------------|
+| results | [Dict](`typing.Dict`)\[[str](`str`), [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\]\] | Mapping of target name to prediction package (as returned by ``build_prediction_package``). | _required_ |
+| targets | [List](`typing.List`)\[[str](`str`)\]                                                             | Ordered list of target names to aggregate.                                                  | _required_ |
+| weights | [List](`typing.List`)\[[float](`float`)\]                                                         | Per-target aggregation weights aligned with ``targets``.                                    | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                        |
+|--------|------------------------------------------------------------|--------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package with keys ``train_actual``,          |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``train_pred``, ``future_pred``, ``future_actual``,                |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``metrics_train``, ``metrics_future``, ``metrics_future_one_day``, |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``validation_passed``, and (when present in all sources)           |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``test_actual``.                                                   |

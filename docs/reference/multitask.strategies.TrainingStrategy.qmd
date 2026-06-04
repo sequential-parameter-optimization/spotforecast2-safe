@@ -1,0 +1,31 @@
+# multitask.strategies.TrainingStrategy { #spotforecast2_safe.multitask.strategies.TrainingStrategy }
+
+```python
+multitask.strategies.TrainingStrategy()
+```
+
+Strategy interface for preparing a forecaster before the final fit.
+
+Implementations return a forecaster with any tuning/parameter changes
+applied.  The final ``forecaster.fit(...)`` and prediction packaging are
+performed by ``BaseTask._train_and_predict_target`` after this call.
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [prepare_forecaster](#spotforecast2_safe.multitask.strategies.TrainingStrategy.prepare_forecaster) | Return a forecaster ready for the final fit step. |
+
+### prepare_forecaster { #spotforecast2_safe.multitask.strategies.TrainingStrategy.prepare_forecaster }
+
+```python
+multitask.strategies.TrainingStrategy.prepare_forecaster(
+    task,
+    target,
+    forecaster,
+    y_train,
+    exog_train=None,
+)
+```
+
+Return a forecaster ready for the final fit step.

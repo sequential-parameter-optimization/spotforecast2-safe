@@ -1,0 +1,62 @@
+# multitask.defaults.DefaultsTask { #spotforecast2_safe.multitask.defaults.DefaultsTask }
+
+```python
+multitask.defaults.DefaultsTask(
+    config=None,
+    *,
+    dataframe=None,
+    data_test=None,
+    cache_home=None,
+    log_level=logging.INFO,
+    **overrides,
+)
+```
+
+Task 2 — Defaults fitting (no tuning, no cached params).
+
+Creates an unfitted forecaster per target via ``config.forecaster_factory``
+(or the package default) and fits with whatever parameters that factory
+chooses.  Unlike ``LazyTask``, never reads the tuning-result cache.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import DefaultsTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(data_frame_name="demo10", predict_size=24, cache_home=Path(tmp))
+    task = DefaultsTask(cfg)
+    print(f"Task: {task.TASK}")
+    print(f"Predict size: {task.config.predict_size}")
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [run](#spotforecast2_safe.multitask.defaults.DefaultsTask.run) | Run defaults fitting for all targets. |
+
+### run { #spotforecast2_safe.multitask.defaults.DefaultsTask.run }
+
+```python
+multitask.defaults.DefaultsTask.run(show=False, **kwargs)
+```
+
+Run defaults fitting for all targets.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                | Description                                                                                                | Default   |
+|----------|---------------------|------------------------------------------------------------------------------------------------------------|-----------|
+| show     | [bool](`bool`)      | If ``True``, invoke the visualisation hooks.                                                               | `False`   |
+| **kwargs | [Any](`typing.Any`) | Forwarded for compatibility with ``BaseTask.run``; ``DefaultsTask`` does not consume any extra parameters. | `{}`      |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                    |
+|--------|------------------------------------------------------------|----------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package.  Per-target packages are stored |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | on ``self.results["defaults"]``.                               |

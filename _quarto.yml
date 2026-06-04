@@ -315,6 +315,37 @@ website:
                   - text: "select_top_poly_features"
                     file: docs/reference/manager.features.select_top_poly_features.qmd
 
+          - section: "Multitask"
+            contents:
+              - text: "BaseTask"
+                file: docs/reference/multitask.base.BaseTask.qmd
+              - text: "agg_predictor"
+                file: docs/reference/multitask.base.agg_predictor.qmd
+              - text: "MultiTask"
+                file: docs/reference/multitask.multi.MultiTask.qmd
+              - text: "LazyTask"
+                file: docs/reference/multitask.lazy.LazyTask.qmd
+              - text: "DefaultsTask"
+                file: docs/reference/multitask.defaults.DefaultsTask.qmd
+              - text: "PredictTask"
+                file: docs/reference/multitask.predict.PredictTask.qmd
+              - text: "CleanTask"
+                file: docs/reference/multitask.clean.CleanTask.qmd
+              - text: "default_lgbm_forecaster_factory"
+                file: docs/reference/multitask.factories.default_lgbm_forecaster_factory.qmd
+              - section: "Strategies"
+                contents:
+                  - text: "TrainingStrategy"
+                    file: docs/reference/multitask.strategies.TrainingStrategy.qmd
+                  - text: "LazyStrategy"
+                    file: docs/reference/multitask.strategies.LazyStrategy.qmd
+                  - text: "DefaultsStrategy"
+                    file: docs/reference/multitask.strategies.DefaultsStrategy.qmd
+              - text: "run"
+                file: docs/reference/multitask.runner.run.qmd
+              - text: "make_demo10_config"
+                file: docs/reference/multitask.runner.make_demo10_config.qmd
+
           - section: "Utils"
             contents:
               - text: "Overview"
@@ -637,6 +668,30 @@ quartodoc:
         - manager.features.merge_data_and_covariates
         - manager.features.get_target_data
         - manager.features.select_top_poly_features
+
+    # ── Multitask ─────────────────────────────────────────────────────────────
+    - title: "Multitask"
+      desc: |
+        Config-driven multi-target forecasting orchestrator.  Tuning-free and
+        plotting-free safe subset of the sibling spotforecast2.multitask.
+        Provides BaseTask (shared pipeline steps), MultiTask (task dispatcher),
+        task-specific classes (LazyTask, DefaultsTask, PredictTask, CleanTask),
+        the module-level agg_predictor helper, a LightGBM factory, training
+        strategies, and a one-call runner.
+      contents:
+        - multitask.base.BaseTask
+        - multitask.base.agg_predictor
+        - multitask.multi.MultiTask
+        - multitask.lazy.LazyTask
+        - multitask.defaults.DefaultsTask
+        - multitask.predict.PredictTask
+        - multitask.clean.CleanTask
+        - multitask.factories.default_lgbm_forecaster_factory
+        - multitask.strategies.TrainingStrategy
+        - multitask.strategies.LazyStrategy
+        - multitask.strategies.DefaultsStrategy
+        - multitask.runner.run
+        - multitask.runner.make_demo10_config
 
     # ── Utils ─────────────────────────────────────────────────────────────────
     - title: "Utils"
