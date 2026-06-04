@@ -1,3 +1,19 @@
+## [16.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.9.0...v16.0.0-rc.1) (2026-06-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **multitask:** n_to_1_with_covariates() and DEFAULT_WEIGHTS are removed
+from tasks.task_safe_n_to_1_with_covariates_and_dataframe, and main() now
+only parses CLI argv. Use run_pipeline(config=ConfigMulti(...)) with
+agg_weights instead.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **multitask:** port tuning-free MultiTask pipeline and make n-to-1 task config-driven ([1999918](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/199991830eddc4ada849abcb7be75e788571ef60))
+
 ## [15.9.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v15.8.0...v15.9.0) (2026-06-04)
 
 
