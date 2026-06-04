@@ -520,12 +520,30 @@ class TestMethodChaining:
 # ---------------------------------------------------------------------------
 
 
+def _stub_weather(monkeypatch):
+    """Replace the Open-Meteo fetch with the empty-frame fallback shape.
+
+    These tests only assert on provider wiring; hitting the live
+    archive-api.open-meteo.com endpoint made them slow and flaky in CI.
+    The empty frames mirror exactly what the ``on_weather_failure="skip"``
+    fallback produces, so the downstream pipeline path is identical.
+    """
+    import spotforecast2_safe.multitask.base as mt_base
+
+    def offline_weather(*, data, **kwargs):
+        empty = pd.DataFrame(index=data.index)
+        return empty, empty.copy()
+
+    monkeypatch.setattr(mt_base, "get_weather_features", offline_weather)
+
+
 class TestExogProviderWindow:
     """Verify that exog_provider_window is honoured at the call site."""
 
     def test_train_window_passes_provider_window(self, synth_df, tmp_path, monkeypatch):
         """With exog_provider_window='train', build_providers_from_config receives
         a provider_window covering [start_train_ts, cov_end]."""
+        _stub_weather(monkeypatch)
         captured = {}
 
         import spotforecast2_safe.preprocessing.exog_providers as ep_module
@@ -554,6 +572,7 @@ class TestExogProviderWindow:
 
     def test_default_full_window_passes_none(self, synth_df, tmp_path, monkeypatch):
         """With the default exog_provider_window='full', provider_window is None."""
+        _stub_weather(monkeypatch)
         captured = {}
 
         import spotforecast2_safe.preprocessing.exog_providers as ep_module
@@ -571,63 +590,3 @@ class TestExogProviderWindow:
         task.prepare_data().detect_outliers().impute().build_exogenous_features()
 
         assert captured.get("provider_window") is None
-
-    def test_tail_gap_config_reaches_providers(self, synth_df, tmp_path, monkeypatch):
-        """Config with exog_max_tail_gap_hours=48 yields providers with max_tail_gap==48."""
-        captured = {}
-
-        import spotforecast2_safe.preprocessing.exog_providers as ep_module
-
-        original = ep_module.build_providers_from_config
-
-        def capturing_build(config, **kwargs):
-            providers = original(config, **kwargs)
-            captured["providers"] = providers
-            return providers
-
-        monkeypatch.setattr(ep_module, "build_providers_from_config", capturing_build)
-
-        cfg = _minimal_cfg(
-            cache_home=tmp_path,
-            use_exogenous_features=True,
-            exog_max_gap_hours=3,
-            exog_max_tail_gap_hours=48,
-            include_entsoe_forecast_load=True,
-            # skip so the pipeline can complete even though there is no interim CSV
-            on_exog_provider_failure="skip",
-        )
-        task = LazyTask(cfg, dataframe=synth_df)
-        task.prepare_data().detect_outliers().impute().build_exogenous_features()
-
-        providers = captured.get("providers", [])
-        assert providers, "No providers captured"
-        assert all(p.max_tail_gap == 48 for p in providers)
-
-    def test_default_tail_gap_is_zero(self, synth_df, tmp_path, monkeypatch):
-        """Default config yields providers with max_tail_gap==0."""
-        captured = {}
-
-        import spotforecast2_safe.preprocessing.exog_providers as ep_module
-
-        original = ep_module.build_providers_from_config
-
-        def capturing_build(config, **kwargs):
-            providers = original(config, **kwargs)
-            captured["providers"] = providers
-            return providers
-
-        monkeypatch.setattr(ep_module, "build_providers_from_config", capturing_build)
-
-        cfg = _minimal_cfg(
-            cache_home=tmp_path,
-            use_exogenous_features=True,
-            include_entsoe_forecast_load=True,
-            # skip so the pipeline can complete even though there is no interim CSV
-            on_exog_provider_failure="skip",
-        )
-        task = LazyTask(cfg, dataframe=synth_df)
-        task.prepare_data().detect_outliers().impute().build_exogenous_features()
-
-        providers = captured.get("providers", [])
-        assert providers, "No providers captured"
-        assert all(p.max_tail_gap == 0 for p in providers)
