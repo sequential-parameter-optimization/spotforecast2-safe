@@ -7,6 +7,7 @@ preprocessing.exog_providers.CovidInfectionRateProvider(
     column='covid_infection_rate',
     fill_outside=0.0,
     max_gap=0,
+    max_tail_gap=0,
     provider_window=None,
 )
 ```
@@ -27,14 +28,15 @@ available. For training over historical data this is the standard treatment.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name            | Type                                                                                             | Description                                                                                                                            | Default                  |
-|-----------------|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
-| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                           | Unused (kept for a uniform provider signature); the dataset is package data, located via ``get_package_data_home()``.                  | `None`                   |
-| csv_path        | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional explicit path to the COVID CSV, overriding the bundled location.                                                              | `None`                   |
-| column          | [str](`str`)                                                                                     | Output column name. Defaults to ``"covid_infection_rate"``.                                                                            | `'covid_infection_rate'` |
-| fill_outside    | [float](`float`)                                                                                 | Value used outside the observed date span. Defaults to ``0.0``.                                                                        | `0.0`                    |
-| max_gap         | [int](`int`)                                                                                     | Maximum contiguous missing-value run healed by ``_align_to_index``. See :func:`_align_to_index` for full semantics. Defaults to ``0``. | `0`                      |
-| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\]          | Validation index passed to ``_align_to_index`` as *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.                 | `None`                   |
+| Name            | Type                                                                                             | Description                                                                                                                                                                                            | Default                  |
+|-----------------|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                           | Unused (kept for a uniform provider signature); the dataset is package data, located via ``get_package_data_home()``.                                                                                  | `None`                   |
+| csv_path        | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional explicit path to the COVID CSV, overriding the bundled location.                                                                                                                              | `None`                   |
+| column          | [str](`str`)                                                                                     | Output column name. Defaults to ``"covid_infection_rate"``.                                                                                                                                            | `'covid_infection_rate'` |
+| fill_outside    | [float](`float`)                                                                                 | Value used outside the observed date span. Defaults to ``0.0``.                                                                                                                                        | `0.0`                    |
+| max_gap         | [int](`int`)                                                                                     | Maximum contiguous missing-value run healed by ``_align_to_index``. See :func:`_align_to_index` for full semantics. Defaults to ``0``.                                                                 | `0`                      |
+| max_tail_gap    | [int](`int`)                                                                                     | Extended healing budget for the trailing-edge NaN run (the run containing ``index[-1]``). The effective tail budget is ``max(max_gap, max_tail_gap)``. See :func:`_align_to_index`. Defaults to ``0``. | `0`                      |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\]          | Validation index passed to ``_align_to_index`` as *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.                                                                                 | `None`                   |
 
 ## Examples {.doc-section .doc-section-examples}
 
