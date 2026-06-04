@@ -5,8 +5,9 @@
 
 This module turns "add another exogenous driver" into a small, mechanical
 change. Each driver is an :class:`ExogFeatureProvider` — an object that, given
-the hourly target index, returns a numeric, NaN-free feature frame aligned to
-that index. Providers are registered in :data:`EXOG_PROVIDER_REGISTRY` against a
+the hourly target index, returns a numeric feature frame aligned to that
+index, NaN-free within the validated window (the full index unless a
+``provider_window`` is set). Providers are registered in :data:`EXOG_PROVIDER_REGISTRY` against a
 single boolean configuration flag, so :class:`spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe`
 (and ``ConfigMulti``) can switch each one on or off.
 
@@ -20,10 +21,13 @@ the calendar / cyclical / holiday block. Adding a new driver therefore costs:
 
 Design rules (consistent with the safety-critical contract):
 
-- **Fail-safe.** A provider that cannot supply a value for every requested
+- **Fail-safe.** A provider that cannot supply a value for every validated
   timestamp raises :class:`ExogProviderError` rather than silently imputing.
   ``ExogBuilder`` then either re-raises (``on_provider_failure="raise"``) or
-  logs and skips that provider (``"skip"``). Values are never fabricated.
+  logs and skips that provider (``"skip"``). Values are never silently
+  fabricated: the only imputation is the opt-in, bounded gap healing
+  (``max_gap``), which is all-or-nothing per gap and logged at WARNING with
+  count and span.
 - **Leakage-aware (CR-3).** Only inputs genuinely available at forecast time are
   admissible: ENTSO-E *day-ahead* forecasts/price (published D-1) and the static
   published COVID vintage — never a realised quantity for the target day.
@@ -61,27 +65,46 @@ class ExogProviderError(RuntimeError):
 
 
 def _align_to_index(
-    frame: pd.DataFrame, index: pd.DatetimeIndex, *, provider: str
+    frame: pd.DataFrame,
+    index: pd.DatetimeIndex,
+    *,
+    provider: str,
+    max_gap: int = 0,
+    validate_index: Optional[pd.DatetimeIndex] = None,
 ) -> pd.DataFrame:
-    """Reindex *frame* onto *index*, rejecting any gap (fail-safe).
+    """Reindex *frame* onto *index*, optionally healing small gaps (fail-safe).
 
     Harmonises timezone awareness with *index*, drops duplicate timestamps
     (keeping the last), reindexes exactly onto *index*, and refuses to return a
-    frame that still contains NaN — that would mean the provider cannot cover
-    the requested range. The result is cast to ``float32`` to match the dtype
-    the recursive forecaster expects for exogenous columns.
+    frame that still contains NaN within the validated window — that would mean
+    the provider cannot cover the requested range. The result is cast to
+    ``float32`` to match the dtype the recursive forecaster expects for
+    exogenous columns.
 
     Args:
         frame: Source feature frame with a ``DatetimeIndex``.
         index: Target hourly index the features must align to.
-        provider: Provider name, used in the error message.
+        provider: Provider name, used in log messages and the error.
+        max_gap: Maximum length, in hours, of a contiguous run of missing
+            values that will be healed before the provider is rejected.
+            Interior gaps are time-interpolated; leading/trailing edge gaps
+            are back-/forward-filled. ``0`` (default) keeps the strict
+            fail-safe (any gap raises). Healed runs are logged at WARNING
+            with count and span.
+        validate_index: If given, the NaN gate checks only the intersection
+            of *index* with this index. Timestamps outside the validation
+            window may carry NaN and are still returned (as ``float32`` NaN).
+            ``None`` (default) validates the full *index*, matching prior
+            behaviour exactly.
 
     Returns:
-        pd.DataFrame: *frame* reindexed onto *index*, NaN-free, ``float32``.
+        pd.DataFrame: *frame* reindexed onto *index*, ``float32``. NaN-free
+        within the validated window (after healing when ``max_gap > 0``);
+        out-of-window cells remain NaN when *validate_index* is supplied.
 
     Raises:
         ExogProviderError: If *frame* is not datetime-indexed or any requested
-            timestamp has no value after alignment.
+            timestamp in the validated window has no value after healing.
     """
     f = frame.copy()
     if not isinstance(f.index, pd.DatetimeIndex):
@@ -97,12 +120,83 @@ def _align_to_index(
     f = f[~f.index.duplicated(keep="last")].sort_index()
     aligned = f.reindex(index)
 
-    if bool(aligned.isna().any().any()):
-        missing_mask = aligned.isna().any(axis=1)
+    if max_gap > 0 and bool(aligned.isna().any().any()):
+        # Heal bounded gaps, all-or-nothing PER RUN: a contiguous NaN run no
+        # longer than max_gap is healed in full; a longer run is left
+        # entirely NaN (no partial fabrication) and still trips the NaN gate
+        # below if it intersects the validated window. An oversize run
+        # outside the window (e.g. a price series that starts years after
+        # data_start) therefore does not block healing of small in-window
+        # gaps.
+        pre_heal_na = aligned.isna()
+        healed = aligned.interpolate(
+            method="time",
+            limit=max_gap,
+            limit_area="inside",
+            limit_direction="both",
+        )
+        healed = healed.bfill(limit=max_gap)
+        healed = healed.ffill(limit=max_gap)
+        # Re-mask runs longer than max_gap: the interpolate/bfill/ffill
+        # ``limit`` caps fill steps per direction, so an oversize run could
+        # otherwise be partially (or, healed from both sides, even fully)
+        # filled.
+        for col in aligned.columns:
+            na = pre_heal_na[col]
+            if not bool(na.any()):
+                continue
+            # cumsum trick: consecutive NaN cells share one group label
+            # derived from the count of preceding non-NaN cells.
+            run_id = (~na).cumsum()[na]
+            run_len = run_id.groupby(run_id).transform("size")
+            oversize_idx = run_len.index[run_len > max_gap]
+            if len(oversize_idx):
+                healed.loc[oversize_idx, col] = float("nan")
+        aligned = healed
+        healed_mask = pre_heal_na & ~aligned.isna()
+        if bool(healed_mask.any().any()):
+            n_healed = int(healed_mask.sum().sum())
+            healed_ts = aligned.index[healed_mask.any(axis=1)]
+            # Identify contiguous runs of healed timestamps
+            gaps: list = []
+            if len(healed_ts) > 0:
+                run_start = healed_ts[0]
+                prev = healed_ts[0]
+                for ts in healed_ts[1:]:
+                    if ts - prev > pd.Timedelta(hours=1):
+                        gaps.append((run_start, prev))
+                        run_start = ts
+                    prev = ts
+                gaps.append((run_start, prev))
+            n_gaps = len(gaps)
+            spans_str = str([(str(s), str(e)) for s, e in gaps[:3]])
+            logger.warning(
+                "%s: healed %d missing cell(s) in %d gap(s) (max_gap=%d); spans: %s",
+                provider,
+                n_healed,
+                n_gaps,
+                max_gap,
+                spans_str,
+            )
+
+    if validate_index is None:
+        check = aligned
+        check_index = index
+    else:
+        check_index = validate_index.intersection(index)
+        if len(check_index) == 0:
+            raise ExogProviderError(
+                f"{provider}: validate_index has no overlap with the request "
+                "index; windowed validation would be vacuous."
+            )
+        check = aligned.reindex(check_index)
+
+    if bool(check.isna().any().any()):
+        missing_mask = check.isna().any(axis=1)
         n_missing = int(missing_mask.sum())
-        first = [str(ts) for ts in aligned.index[missing_mask][:3]]
+        first = [str(ts) for ts in check_index[missing_mask][:3]]
         raise ExogProviderError(
-            f"{provider}: {n_missing} of {len(index)} requested timestamps have "
+            f"{provider}: {n_missing} of {len(check_index)} requested timestamps have "
             f"no value (first: {first}). The provider cannot cover the requested "
             "range; supply the data or disable its flag."
         )
@@ -112,7 +206,7 @@ def _align_to_index(
 class ExogFeatureProvider(ABC):
     """Contract for a pluggable exogenous-feature source.
 
-    A provider maps the hourly target index to a numeric, NaN-free feature
+    A provider maps the hourly target index to a numeric feature
     frame on that exact index. Subclasses set :attr:`name` (a short identifier
     used in logs and as the default column name) and implement :meth:`build`.
 
@@ -132,7 +226,9 @@ class ExogFeatureProvider(ABC):
                 full training-plus-forecast window.
 
         Returns:
-            pd.DataFrame: Numeric, NaN-free columns indexed exactly by *index*.
+            pd.DataFrame: Numeric columns indexed exactly by *index*, NaN-free
+                within the validated window (the full *index* unless a
+                ``provider_window`` was set at construction).
 
         Raises:
             ExogProviderError: If the provider cannot cover *index*.
@@ -163,6 +259,10 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
         column: Output column name. Defaults to ``"covid_infection_rate"``.
         fill_outside: Value used outside the observed date span. Defaults to
             ``0.0``.
+        max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
+            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        provider_window: Validation index passed to ``_align_to_index`` as
+            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
 
     Examples:
         ```{python}
@@ -186,11 +286,15 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
         csv_path: Optional[Union[str, Path]] = None,
         column: str = "covid_infection_rate",
         fill_outside: float = 0.0,
+        max_gap: int = 0,
+        provider_window: Optional[pd.DatetimeIndex] = None,
     ) -> None:
         self.data_home = data_home
         self.csv_path = Path(csv_path) if csv_path is not None else None
         self.column = column
         self.fill_outside = float(fill_outside)
+        self.max_gap = max_gap
+        self.provider_window = provider_window
 
     def _load_daily(self) -> pd.Series:
         from spotforecast2_safe.data.fetch_data import get_package_data_home
@@ -223,6 +327,8 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
                 pd.DataFrame({self.column: self.fill_outside}, index=index),
                 index,
                 provider=self.name,
+                max_gap=self.max_gap,
+                validate_index=self.provider_window,
             )
 
         first, last = daily.index.min(), daily.index.max()
@@ -241,7 +347,11 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
         mapping = dict(zip(uniq, per_date.to_numpy()))
         values = [mapping[d] for d in target_dates]
         return _align_to_index(
-            pd.DataFrame({self.column: values}, index=index), index, provider=self.name
+            pd.DataFrame({self.column: values}, index=index),
+            index,
+            provider=self.name,
+            max_gap=self.max_gap,
+            validate_index=self.provider_window,
         )
 
 
@@ -256,6 +366,10 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
     Args:
         data_home: Root data directory forwarded to the loader. ``None`` resolves
             via ``get_data_home()``.
+        max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
+            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        provider_window: Validation index passed to ``_align_to_index`` as
+            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
 
     Examples:
         ```{python}
@@ -288,8 +402,16 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
 
     name = "entsoe_forecasted_load"
 
-    def __init__(self, *, data_home: DataHome = None) -> None:
+    def __init__(
+        self,
+        *,
+        data_home: DataHome = None,
+        max_gap: int = 0,
+        provider_window: Optional[pd.DatetimeIndex] = None,
+    ) -> None:
         self.data_home = data_home
+        self.max_gap = max_gap
+        self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
         from spotforecast2_safe.data.fetch_data import load_timeseries_forecast
@@ -300,7 +422,13 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
             )
         except (FileNotFoundError, KeyError) as exc:
             raise ExogProviderError(f"{self.name}: {exc}") from exc
-        return _align_to_index(series.to_frame(self.name), index, provider=self.name)
+        return _align_to_index(
+            series.to_frame(self.name),
+            index,
+            provider=self.name,
+            max_gap=self.max_gap,
+            validate_index=self.provider_window,
+        )
 
 
 class EntsoeRenewableForecastProvider(ExogFeatureProvider):
@@ -314,14 +442,26 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
 
     Args:
         data_home: Root data directory forwarded to the loader.
+        max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
+            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        provider_window: Validation index passed to ``_align_to_index`` as
+            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
     """
 
     name = "entsoe_renewable_forecast"
     wind_col = "entsoe_wind_forecast"
     solar_col = "entsoe_solar_forecast"
 
-    def __init__(self, *, data_home: DataHome = None) -> None:
+    def __init__(
+        self,
+        *,
+        data_home: DataHome = None,
+        max_gap: int = 0,
+        provider_window: Optional[pd.DatetimeIndex] = None,
+    ) -> None:
         self.data_home = data_home
+        self.max_gap = max_gap
+        self.provider_window = provider_window
 
     def _load(self) -> pd.DataFrame:
         from spotforecast2_safe.data.fetch_data import load_renewable_forecast
@@ -346,7 +486,13 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
         return out
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
-        return _align_to_index(self._load(), index, provider=self.name)
+        return _align_to_index(
+            self._load(),
+            index,
+            provider=self.name,
+            max_gap=self.max_gap,
+            validate_index=self.provider_window,
+        )
 
 
 class EntsoeNetLoadProvider(ExogFeatureProvider):
@@ -359,12 +505,24 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
 
     Args:
         data_home: Root data directory forwarded to the loaders.
+        max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
+            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        provider_window: Validation index passed to ``_align_to_index`` as
+            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
     """
 
     name = "entsoe_net_load"
 
-    def __init__(self, *, data_home: DataHome = None) -> None:
+    def __init__(
+        self,
+        *,
+        data_home: DataHome = None,
+        max_gap: int = 0,
+        provider_window: Optional[pd.DatetimeIndex] = None,
+    ) -> None:
         self.data_home = data_home
+        self.max_gap = max_gap
+        self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
         from spotforecast2_safe.data.fetch_data import (
@@ -384,7 +542,13 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
 
         renewable_total = renewable.sum(axis=1, skipna=False)
         net = load - renewable_total
-        return _align_to_index(net.to_frame(self.name), index, provider=self.name)
+        return _align_to_index(
+            net.to_frame(self.name),
+            index,
+            provider=self.name,
+            max_gap=self.max_gap,
+            validate_index=self.provider_window,
+        )
 
 
 class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
@@ -397,12 +561,24 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
 
     Args:
         data_home: Root data directory forwarded to the loader.
+        max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
+            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+        provider_window: Validation index passed to ``_align_to_index`` as
+            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
     """
 
     name = "entsoe_day_ahead_price"
 
-    def __init__(self, *, data_home: DataHome = None) -> None:
+    def __init__(
+        self,
+        *,
+        data_home: DataHome = None,
+        max_gap: int = 0,
+        provider_window: Optional[pd.DatetimeIndex] = None,
+    ) -> None:
         self.data_home = data_home
+        self.max_gap = max_gap
+        self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
         from spotforecast2_safe.data.fetch_data import load_day_ahead_price
@@ -413,7 +589,13 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
             )
         except (FileNotFoundError, KeyError) as exc:
             raise ExogProviderError(f"{self.name}: {exc}") from exc
-        return _align_to_index(series.to_frame(self.name), index, provider=self.name)
+        return _align_to_index(
+            series.to_frame(self.name),
+            index,
+            provider=self.name,
+            max_gap=self.max_gap,
+            validate_index=self.provider_window,
+        )
 
 
 # Maps a configuration flag name -> the provider constructed when it is True.
@@ -429,7 +611,11 @@ EXOG_PROVIDER_REGISTRY: Dict[str, Callable[..., ExogFeatureProvider]] = {
 
 
 def build_providers(
-    flags: Mapping[str, bool], *, data_home: DataHome = None
+    flags: Mapping[str, bool],
+    *,
+    data_home: DataHome = None,
+    max_gap: int = 0,
+    provider_window: Optional[pd.DatetimeIndex] = None,
 ) -> List[ExogFeatureProvider]:
     """Construct the providers whose flags are truthy, in registry order.
 
@@ -437,6 +623,10 @@ def build_providers(
         flags: Mapping from registry flag name to a boolean. Unknown keys are
             ignored; missing keys are treated as ``False``.
         data_home: Root data directory forwarded to each provider.
+        max_gap: Maximum contiguous missing-value run forwarded to each
+            provider. See :func:`_align_to_index`. Defaults to ``0``.
+        provider_window: Validation index forwarded to each provider as
+            *provider_window*. See :func:`_align_to_index`. Defaults to ``None``.
 
     Returns:
         List[ExogFeatureProvider]: Providers for the enabled flags, in the fixed
@@ -453,12 +643,21 @@ def build_providers(
     providers: List[ExogFeatureProvider] = []
     for flag, factory in EXOG_PROVIDER_REGISTRY.items():
         if flags.get(flag, False):
-            providers.append(factory(data_home=data_home))
+            providers.append(
+                factory(
+                    data_home=data_home,
+                    max_gap=max_gap,
+                    provider_window=provider_window,
+                )
+            )
     return providers
 
 
 def build_providers_from_config(
-    config: Union["ConfigEntsoe", "ConfigMulti", object], *, data_home: DataHome = None
+    config: Union["ConfigEntsoe", "ConfigMulti", object],
+    *,
+    data_home: DataHome = None,
+    provider_window: Optional[pd.DatetimeIndex] = None,
 ) -> List[ExogFeatureProvider]:
     """Construct providers by reading the registry flags off a config object.
 
@@ -466,6 +665,8 @@ def build_providers_from_config(
         config: A config object (e.g. ``ConfigEntsoe`` / ``ConfigMulti``) whose
             attributes include the :data:`EXOG_PROVIDER_REGISTRY` flag names.
         data_home: Root data directory forwarded to each provider.
+        provider_window: Validation index forwarded to each provider. Overrides
+            the per-provider window; ``None`` uses the full request index.
 
     Returns:
         List[ExogFeatureProvider]: Providers for the flags set to ``True`` on
@@ -474,4 +675,10 @@ def build_providers_from_config(
     flags = {
         flag: bool(getattr(config, flag, False)) for flag in EXOG_PROVIDER_REGISTRY
     }
-    return build_providers(flags, data_home=data_home)
+    max_gap = int(getattr(config, "exog_max_gap_hours", 0))
+    return build_providers(
+        flags,
+        data_home=data_home,
+        max_gap=max_gap,
+        provider_window=provider_window,
+    )
