@@ -1,3 +1,19 @@
+## [16.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.0.0...v16.1.0) (2026-06-04)
+
+
+### Features
+
+* **config:** add exog_max_gap_hours and exog_provider_window ([d113dd9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d113dd9b7d42f8b1baf4f2c4d782f2ae4dcbfb2a))
+* **exog:** bounded gap healing and windowed validation in provider alignment ([c81075c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c81075c7e4e990d186cde0e22ab687476e331e4c))
+* **forecaster:** thread exog_max_gap_hours into wrapper providers ([a1923ec](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a1923ecb486af59e26a7afa1c7aa2960ba19e9c0))
+* **multitask:** resolve provider validation window from config ([8ac1bf8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8ac1bf8da8388f8be87df59771a335c960121069))
+
+
+### Documentation
+
+* **reference:** regenerate API reference for provider gap tolerance ([2fbbead](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2fbbeadd8169f38e83a2efabc2c300e4aea4e1ea))
+* **tasks:** add task_multi tutorial for the MultiTask pipeline ([0cb9e3a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/0cb9e3a8c548b99f7b946b2c0a1a6983f258370c))
+
 ## [16.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.0.0...v16.1.0-rc.1) (2026-06-04)
 
 
