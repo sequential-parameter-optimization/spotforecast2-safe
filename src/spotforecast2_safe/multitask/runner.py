@@ -3,16 +3,17 @@
 
 """Convenience runner for the MultiTask forecasting pipeline.
 
-Provides a single ``run`` function that wraps the full pipeline
-sequence (prepare_data, detect_outliers, impute, build_exogenous_features,
-run) behind a one-call interface.
+Provides the ``run`` entry point, the parameterized ``run_with`` core it
+delegates to, and the ``SAFE_PIPELINE_TASKS`` constant.  ``run`` wraps the
+full pipeline sequence (prepare_data, detect_outliers, impute,
+build_exogenous_features, run) behind a one-call interface.
 
 Available tasks: ``"lazy"``, ``"defaults"``, ``"predict"``, ``"clean"``.
 Auto-tuning tasks (``"optuna"``, ``"spotoptim"``) are not available in
 ``spotforecast2-safe``; use the ``spotforecast2`` sibling package for those.
 """
 
-from typing import Any, List, Optional, Tuple
+from typing import Any, Callable, FrozenSet, List, Optional, Tuple
 
 import pandas as pd
 
@@ -57,7 +58,8 @@ _DEMO10_AGG_WEIGHTS: List[float] = [
     1.0,
 ]
 
-_PIPELINE_TASKS = frozenset({"lazy", "defaults", "predict"})
+SAFE_PIPELINE_TASKS: FrozenSet[str] = frozenset({"lazy", "defaults", "predict"})
+_PIPELINE_TASKS = SAFE_PIPELINE_TASKS
 _ALL_TASKS = _PIPELINE_TASKS | {"clean"}
 
 
@@ -92,6 +94,129 @@ def make_demo10_config(**overrides: Any) -> ConfigMulti:
     if overrides:
         cfg.set_params(**overrides)
     return cfg
+
+
+def run_with(
+    *,
+    multitask_cls: type,
+    all_tasks: FrozenSet[str],
+    unknown_task_message: Optional[Callable[[str, List[str]], str]] = None,
+    config: Optional[PipelineConfig] = None,
+    task: str = "lazy",
+    dataframe: Optional[pd.DataFrame] = None,
+    data_test: Optional[pd.DataFrame] = None,
+    project_name: str = "test_project",
+    cache_home: Optional[str] = None,
+    plot_with_outliers: bool = False,
+    show: bool = False,
+    show_progress: bool = False,
+    dry_run: bool = False,
+    log_level: int = 40,
+    **overrides: Any,
+) -> pd.DataFrame:
+    """Parameterized core of the MultiTask pipeline orchestration.
+
+    This is the reusable seam that allows the sibling ``spotforecast2``
+    package to bind an extended task class and a wider task set without
+    duplicating the orchestration body.  All caller-visible behaviour is
+    identical to ``run()``.
+
+    Args:
+        multitask_cls: The ``MultiTask``-compatible class to instantiate.
+            ``spotforecast2-safe`` passes its own ``MultiTask``; the sibling
+            package passes its subclass that adds tuning tasks.
+        all_tasks: The complete frozenset of permitted task names for this
+            binding.  ``run()`` passes ``_ALL_TASKS``; an extended binding
+            includes additional task names (e.g. ``"optuna"``).
+        unknown_task_message: Optional callable ``(task, sorted_tasks) ->
+            str`` that produces the ``ValueError`` message when ``task`` is
+            not in ``all_tasks``.  When ``None``, a default message
+            mentioning that auto-tuning tasks require the
+            ``spotforecast2`` sibling package is used.
+        config: A ``PipelineConfig``-conforming object (typically
+            ``ConfigMulti``).  When ``None``, a fresh ``ConfigMulti()``
+            is constructed with default fields.
+        task: Pipeline mode.  Must be a member of ``all_tasks``.
+            Defaults to ``"lazy"``.
+        dataframe: Input time-series data.  Required for pipeline tasks;
+            optional for ``"clean"``.
+        data_test: Ground-truth DataFrame covering the prediction horizon.
+            Optional.
+        project_name: Active-dataset identifier.  Sets
+            ``config.data_frame_name``.
+        cache_home: Cache directory override.  When ``None``,
+            ``get_cache_home()`` is called to resolve the default.
+        plot_with_outliers: When ``True``, calls ``mt.plot_with_outliers()``
+            between detect_outliers and impute.  Raises
+            ``NotImplementedError`` in ``spotforecast2-safe``.
+        show: Forwarded to ``mt.run(show=show)``.
+        show_progress: Forwarded to ``multitask_cls`` constructor.
+        dry_run: Forwarded to ``multitask_cls`` constructor.
+        log_level: Logging level.  Defaults to 40 (ERROR).
+        **overrides: Forwarded to the ``multitask_cls`` constructor, which
+            applies them via ``config.set_params(**overrides)`` in
+            ``BaseTask.__init__``.  Mutates the caller's config object.
+
+    Returns:
+        DataFrame whose index is the forecast horizon timestamps and
+        whose single column ``"forecast"`` contains the aggregated
+        predicted values.  For the ``"clean"`` task an empty DataFrame is
+        returned.
+
+    Raises:
+        ValueError: If ``task`` is not a member of ``all_tasks``.
+    """
+    if task not in all_tasks:
+        if unknown_task_message is not None:
+            msg = unknown_task_message(task, sorted(all_tasks))
+        else:
+            msg = (
+                f"Unknown task '{task}'. Choose from: {sorted(all_tasks)}. "
+                "Auto-tuning tasks ('optuna', 'spotoptim') require the "
+                "spotforecast2 sibling package."
+            )
+        raise ValueError(msg)
+
+    if cache_home is None:
+        cache_home = get_cache_home()
+
+    if config is None:
+        config = ConfigMulti()
+    # ``project_name`` is the public name for what lives on the config as
+    # ``data_frame_name``; keep the runner argument for ergonomic reasons.
+    config.data_frame_name = project_name
+
+    if task == "clean":
+        mt = multitask_cls(
+            config,
+            task="clean",
+            cache_home=cache_home,
+            dry_run=dry_run,
+            log_level=log_level,
+            **overrides,
+        )
+        mt.run()
+        return pd.DataFrame()
+
+    mt = multitask_cls(
+        config,
+        task=task,
+        dataframe=dataframe,
+        data_test=data_test,
+        cache_home=cache_home,
+        dry_run=dry_run,
+        show_progress=show_progress,
+        log_level=log_level,
+        **overrides,
+    )
+    mt.prepare_data()
+    mt.detect_outliers()
+    if plot_with_outliers:
+        mt.plot_with_outliers()  # raises NotImplementedError in spotforecast2-safe
+    mt.impute()
+    mt.build_exogenous_features()
+    result = mt.run(show=show)
+    return result["future_pred"].to_frame("forecast")
 
 
 def run(
@@ -207,50 +332,20 @@ def run(
         print(result.empty)
         ```
     """
-    if task not in _ALL_TASKS:
-        raise ValueError(
-            f"Unknown task '{task}'. Choose from: {sorted(_ALL_TASKS)}. "
-            "Auto-tuning tasks ('optuna', 'spotoptim') require the "
-            "spotforecast2 sibling package."
-        )
-
-    if cache_home is None:
-        cache_home = get_cache_home()
-
-    if config is None:
-        config = ConfigMulti()
-    # ``project_name`` is the public name for what lives on the config as
-    # ``data_frame_name``; keep the runner argument for ergonomic reasons.
-    config.data_frame_name = project_name
-
-    if task == "clean":
-        mt = MultiTask(
-            config,
-            task="clean",
-            cache_home=cache_home,
-            dry_run=dry_run,
-            log_level=log_level,
-            **overrides,
-        )
-        mt.run()
-        return pd.DataFrame()
-
-    mt = MultiTask(
-        config,
+    return run_with(
+        multitask_cls=MultiTask,
+        all_tasks=_ALL_TASKS,
+        unknown_task_message=None,
+        config=config,
         task=task,
         dataframe=dataframe,
         data_test=data_test,
+        project_name=project_name,
         cache_home=cache_home,
-        dry_run=dry_run,
+        plot_with_outliers=plot_with_outliers,
+        show=show,
         show_progress=show_progress,
+        dry_run=dry_run,
         log_level=log_level,
         **overrides,
     )
-    mt.prepare_data()
-    mt.detect_outliers()
-    if plot_with_outliers:
-        mt.plot_with_outliers()  # raises NotImplementedError in spotforecast2-safe
-    mt.impute()
-    mt.build_exogenous_features()
-    result = mt.run(show=show)
-    return result["future_pred"].to_frame("forecast")
