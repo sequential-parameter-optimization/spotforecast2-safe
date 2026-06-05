@@ -95,9 +95,15 @@ class TestWeightedInterpWeights:
         )
 
         assert isinstance(wf, WeightFunction)
-        # The gap slots (idx[2], idx[3]) must have weight 0
-        assert wf(pd.Index([idx[2]])) is None or wf.weights_series.loc[idx[2]] == 0.0
-        assert wf(pd.Index([idx[3]])) is None or wf.weights_series.loc[idx[3]] == 0.0
+        # The gap slots (idx[2], idx[3]) must have weight exactly 0 in the
+        # penalty zone — the "is None" fallback is only valid for the
+        # all-zero-weight edge case tested separately below.
+        assert (
+            wf.weights_series.loc[idx[2]] == 0.0
+        ), f"Gap slot idx[2] must have weight 0, got {wf.weights_series.loc[idx[2]]}"
+        assert (
+            wf.weights_series.loc[idx[3]] == 0.0
+        ), f"Gap slot idx[3] must have weight 0, got {wf.weights_series.loc[idx[3]]}"
 
     def test_clean_slots_before_gap_have_positive_weight(self):
         """Slots well before the gap must retain weight 1."""

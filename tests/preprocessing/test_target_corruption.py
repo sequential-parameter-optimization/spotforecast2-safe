@@ -467,3 +467,280 @@ class TestPolicyTruncate:
         pd.testing.assert_series_equal(
             df_out.loc[pre_mask, "load"], df_original.loc[pre_mask, "load"]
         )
+
+
+# ---------------------------------------------------------------------------
+# E1  Gap-spanning ramp must NOT flag
+# ---------------------------------------------------------------------------
+
+
+class TestDetectorGapSpanning:
+    """E1: A large value ramp that spans missing rows must not produce false flags."""
+
+    def _make_gapped_df(self, use_nan: bool) -> pd.DataFrame:
+        """15-min frame with a 6-hour block missing (rows dropped or NaN).
+
+        Values resume ~9 GW higher after the gap — a legitimate morning ramp
+        across missing data.  step_mw=6000 is smaller than the ramp (9000 MW),
+        so the step rule would flag if it saw the transition as adjacent.
+        """
+        idx = pd.date_range(
+            "2026-06-01", periods=2 * 24 * SLOTS_PER_HOUR, freq=CADENCE, tz="UTC"
+        )
+        vals = [50_000.0] * len(idx)
+        # After hour 6 the value rises to 59 GW (a 9 GW ramp across the gap).
+        gap_start_slot = 6 * SLOTS_PER_HOUR  # 06:00
+        gap_end_slot = 12 * SLOTS_PER_HOUR  # 12:00 (exclusive upper bound)
+        for i in range(gap_end_slot, len(idx)):
+            vals[i] = 59_000.0
+        df_full = pd.DataFrame({"load": vals}, index=idx)
+        if use_nan:
+            # Rows present, values NaN across the gap.
+            df_full.loc[idx[gap_start_slot:gap_end_slot], "load"] = float("nan")
+            return df_full
+        else:
+            # Rows entirely removed.
+            keep = list(range(gap_start_slot)) + list(range(gap_end_slot, len(idx)))
+            return df_full.iloc[keep]
+
+    def test_gap_spanning_ramp_rows_dropped(self):
+        """Rows dropped across the gap: step rule must not flag the boundary."""
+        df = self._make_gapped_df(use_nan=False)
+        mask = detect_target_corruption(
+            df,
+            targets=["load"],
+            range_mw=5_000,
+            step_mw=6_000,
+            window_days=3,
+        )
+        assert not mask.any(), (
+            "A legitimate ramp across removed rows must not be flagged "
+            "(gap boundary is not adjacent — dt != cadence)."
+        )
+
+    def test_gap_spanning_ramp_nan_rows(self):
+        """Rows present but NaN across the gap: step rule must not flag boundary."""
+        df = self._make_gapped_df(use_nan=True)
+        mask = detect_target_corruption(
+            df,
+            targets=["load"],
+            range_mw=5_000,
+            step_mw=6_000,
+            window_days=3,
+        )
+        assert not mask.any(), (
+            "NaN boundary transition (NaN -> value) yields NaN diff which "
+            "compares False against step_mw; must not flag."
+        )
+
+
+# ---------------------------------------------------------------------------
+# E2  Duplicate timestamps
+# ---------------------------------------------------------------------------
+
+
+class TestDetectorDuplicates:
+    """E2: Duplicate timestamps must not crash and must not false-flag the pair.
+
+    The critical semantics: ``dt == 0`` between two rows at the same timestamp
+    is never equal to the cadence, so the step rule treats them as non-adjacent
+    and does not flag the duplicate pair itself.  A genuine corrupt step placed
+    elsewhere in the same frame must still be detected.
+
+    We design the duplicate to have the same value as its partner (so no
+    adjacent transition carries a >step_mw diff from or to the duplicate row),
+    keeping the duplicate's neighbourhood clean.  Only the genuine corrupt step
+    fires.
+    """
+
+    def _make_dup_df(self) -> pd.DataFrame:
+        """Frame with a duplicate entry (same value) and a genuine corrupt step.
+
+        The duplicate row at 01:00 carries the same value as the original
+        01:00 slot, so no large transition is created by the duplicate itself.
+        The genuine corrupt step is at 04:15 (11 GW drop).
+        """
+        idx = pd.date_range(
+            "2026-06-01", periods=24 * SLOTS_PER_HOUR, freq=CADENCE, tz="UTC"
+        )
+        vals = [BASE_MW] * len(idx)
+        # Genuine corrupt step at 04:15 (slot 17): 11 GW drop.
+        vals[17] = BASE_MW - 11_000
+        df = pd.DataFrame({"load": vals}, index=idx)
+        # Duplicate slot at 01:00 with the SAME value (clean duplicate).
+        dup_ts = idx[4]  # 01:00
+        extra = pd.DataFrame({"load": [BASE_MW]}, index=[dup_ts])
+        return pd.concat([df, extra]).sort_index()
+
+    def test_no_exception_on_duplicates(self):
+        """detect_target_corruption must not raise on a duplicated index."""
+        df = self._make_dup_df()
+        assert df.index.has_duplicates
+        try:
+            detect_target_corruption(
+                df,
+                targets=["load"],
+                range_mw=5_000,
+                step_mw=8_000,
+                window_days=3,
+            )
+        except Exception as exc:
+            pytest.fail(f"detect_target_corruption raised on duplicate index: {exc}")
+
+    def test_duplicate_pair_does_not_flag(self):
+        """The duplicate pair must not flag: dt==0 between the two rows is not adjacent."""
+        df = self._make_dup_df()
+        mask = detect_target_corruption(
+            df,
+            targets=["load"],
+            range_mw=5_000,
+            step_mw=8_000,
+            window_days=3,
+        )
+        # The duplicate is at 01:00; the 01:00 hour must be clean (only the
+        # genuine corrupt step at 04:15 should appear in flagged hours).
+        dup_ts = pd.Timestamp("2026-06-01 01:00:00", tz="UTC")
+        slots_in_dup_hour = df.index[
+            (df.index >= dup_ts) & (df.index < dup_ts + pd.Timedelta(hours=1))
+        ]
+        assert not mask.loc[slots_in_dup_hour].any(), (
+            "The hour containing the duplicate pair must not be flagged "
+            "(dt==0 is not adjacent; the duplicate row carries no anomalous step)."
+        )
+
+    def test_genuine_corrupt_step_still_flags_with_duplicates(self):
+        """A genuine corrupt step elsewhere in the same frame must still be detected."""
+        df = self._make_dup_df()
+        mask = detect_target_corruption(
+            df,
+            targets=["load"],
+            range_mw=5_000,
+            step_mw=8_000,
+            window_days=3,
+        )
+        # Genuine corrupt slot 17 is at 04:15; the step flags the 04:00 hour.
+        genuine_hour = pd.Timestamp("2026-06-01 04:00:00", tz="UTC")
+        slots_in_genuine_hour = df.index[
+            (df.index >= genuine_hour)
+            & (df.index < genuine_hour + pd.Timedelta(hours=1))
+        ]
+        assert mask.loc[
+            slots_in_genuine_hour
+        ].any(), (
+            "Genuine corrupt step must be flagged even when duplicates are present."
+        )
+
+
+# ---------------------------------------------------------------------------
+# E3  DST safety
+# ---------------------------------------------------------------------------
+
+
+class TestDetectorDST:
+    """E3: Detector runs correctly across DST transitions (Europe/Berlin)."""
+
+    def test_fall_back_no_raise(self):
+        """Detector must not raise on a 15-min Europe/Berlin index that spans
+        the 2025-10-26 fall-back night (ambiguous 02:xx wall time)."""
+        idx = pd.date_range(
+            "2025-10-24 00:00",
+            periods=4 * 24 * 7,
+            freq=CADENCE,
+            tz="Europe/Berlin",
+        )
+        vals = [BASE_MW] * len(idx)
+        df = pd.DataFrame({"load": vals}, index=idx)
+        try:
+            mask = detect_target_corruption(
+                df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
+            )
+        except Exception as exc:
+            pytest.fail(
+                f"detect_target_corruption raised on fall-back DST index: {exc}"
+            )
+        assert not mask.any(), "Clean DST week must produce no flags."
+
+    def test_fall_back_dropout_is_flagged(self):
+        """An 11 GW step on the DST fall-back day must be flagged."""
+        idx = pd.date_range(
+            "2025-10-24 00:00",
+            periods=4 * 24 * 7,
+            freq=CADENCE,
+            tz="Europe/Berlin",
+        )
+        vals = [BASE_MW] * len(idx)
+        # Find a slot in the 01:00 UTC hour on the fall-back day.
+        idx_utc = idx.tz_convert("UTC")
+        target_hour_utc = pd.Timestamp("2025-10-26 01:00:00", tz="UTC")
+        slots_in_hour = [
+            i for i, ts in enumerate(idx_utc) if ts.floor("h") == target_hour_utc
+        ]
+        assert len(slots_in_hour) >= 2, "Need at least 2 slots to inject a step."
+        vals[slots_in_hour[1]] = BASE_MW - 11_000
+        df = pd.DataFrame({"load": vals}, index=idx)
+        mask = detect_target_corruption(
+            df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
+        )
+        assert mask.any(), "11 GW step on DST day must be flagged."
+
+    def test_spring_forward_no_raise(self):
+        """Detector must not raise on a 15-min Europe/Berlin index that spans
+        the 2026-03-29 spring-forward night."""
+        idx = pd.date_range(
+            "2026-03-27 00:00",
+            periods=4 * 24 * 7,
+            freq=CADENCE,
+            tz="Europe/Berlin",
+        )
+        vals = [BASE_MW] * len(idx)
+        df = pd.DataFrame({"load": vals}, index=idx)
+        try:
+            mask = detect_target_corruption(
+                df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
+            )
+        except Exception as exc:
+            pytest.fail(
+                f"detect_target_corruption raised on spring-forward DST index: {exc}"
+            )
+        assert not mask.any(), "Clean spring-forward DST week must produce no flags."
+
+
+# ---------------------------------------------------------------------------
+# E4  Step at the first slot of an hour flags both that hour and predecessor
+# ---------------------------------------------------------------------------
+
+
+class TestDetectorPredecessorHour:
+    """E4: A step between the last slot of hour H and the first slot of H+1
+    must flag BOTH hour H and hour H+1."""
+
+    def test_step_at_first_slot_flags_both_hours(self):
+        """Step between 00:45 and 01:00 must flag both the 00:00 and 01:00 hours."""
+        idx = pd.date_range(
+            "2026-06-01", periods=8 * SLOTS_PER_HOUR, freq=CADENCE, tz="UTC"
+        )
+        vals = [BASE_MW] * len(idx)
+        # idx[4] = 01:00 is the first slot of hour 1.
+        # Step between idx[3]=00:45 and idx[4]=01:00 (both one cadence apart).
+        vals[4] = BASE_MW - 11_000
+        df = pd.DataFrame({"load": vals}, index=idx)
+
+        mask = detect_target_corruption(
+            df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
+        )
+
+        h00 = pd.Timestamp("2026-06-01 00:00:00", tz="UTC")
+        h01 = pd.Timestamp("2026-06-01 01:00:00", tz="UTC")
+
+        slots_h00 = df.index[(df.index >= h00) & (df.index < h01)]
+        slots_h01 = df.index[
+            (df.index >= h01) & (df.index < h01 + pd.Timedelta(hours=1))
+        ]
+
+        assert mask.loc[slots_h00].all(), (
+            "All slots in the predecessor hour (00:00) must be flagged when "
+            "the step falls at the boundary between 00:45 and 01:00."
+        )
+        assert mask.loc[
+            slots_h01
+        ].all(), "All slots in the step's own hour (01:00) must be flagged."
