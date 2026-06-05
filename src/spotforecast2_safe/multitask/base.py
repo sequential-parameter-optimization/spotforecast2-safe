@@ -60,6 +60,7 @@ from spotforecast2_safe.preprocessing.outlier import (
     manual_outlier_removal,
 )
 from spotforecast2_safe.preprocessing.target_corruption import (
+    TargetCorruptionReport,
     apply_target_corruption_policy,
 )
 from spotforecast2_safe.processing.agg_predict import agg_predict
@@ -484,16 +485,20 @@ class BaseTask:
         ]
         _tc_targets_present = [c for c in _tc_targets_pre if c in df_pipeline.columns]
 
-        if _tc_targets_present and _tc_window is not None:
-            # Force weighted_interp for the heal policy regardless of whether
-            # the detector fires (deterministic per config — ADR §2 step 4).
-            if _tc_policy == "heal":
-                if self.config.imputation_method != "weighted_interp":
-                    self.logger.info(
-                        "target_corruption[heal]: forcing imputation_method to "
-                        "'weighted_interp' for this run."
-                    )
-                    self.config.imputation_method = "weighted_interp"
+        # Mirror the detector's own inertness condition (window AND at least
+        # one threshold) so the policy path — including the heal
+        # imputation-forcing side-effect — is never entered for a
+        # half-configured detector.
+        _tc_configured = _tc_window is not None and (
+            _tc_range is not None or _tc_step is not None
+        )
+        if _tc_targets_present and _tc_configured:
+            # The heal policy needs apply_imputation's "weighted_interp"
+            # method (interpolated values AND zero training weights).
+            # Deterministic per config, applied whether or not the detector
+            # fires; impute() swaps the method in for the call and restores
+            # it, so a config object shared across tasks is never mutated.
+            self._tc_force_weighted_interp = _tc_policy == "heal"
 
             df_pipeline, _tc_report = apply_target_corruption_policy(
                 df_pipeline,
@@ -508,10 +513,7 @@ class BaseTask:
                 logger=self.logger,
             )
         else:
-            from spotforecast2_safe.preprocessing.target_corruption import (
-                TargetCorruptionReport,
-            )
-
+            self._tc_force_weighted_interp = False
             _tc_report = TargetCorruptionReport(
                 fired=False,
                 n_flagged_cells=0,
@@ -564,6 +566,7 @@ class BaseTask:
         # retracted and bump predict_size idempotently so the forecast window
         # covers the same absolute span as it would have without the corruption.
         # ------------------------------------------------------------------
+        _tc_bump = 0
         if (
             _tc_report.action == "truncate"
             and _tc_report.pre_policy_last_target is not None
@@ -572,23 +575,51 @@ class BaseTask:
                 df_pipeline[self.config.targets].dropna(how="all").index.max()
             )
             if pd.notna(_data_end_realized):
-                _pre = _tc_report.pre_policy_last_target.floor("h")
-                _post = _data_end_realized.floor("h")
-                _bump = max(0, int((_pre - _post) / pd.Timedelta(hours=1)))
-                if _bump > 0:
-                    if not hasattr(self, "_tc_base_predict_size"):
-                        self._tc_base_predict_size = self.config.predict_size
-                    new_ps = self._tc_base_predict_size + _bump
-                    self.logger.warning(
-                        "target_corruption[truncate]: data_end retracted from %s "
-                        "to %s; bumping predict_size from %d to %d to preserve "
-                        "forecast coverage.",
-                        _pre,
-                        _post,
-                        self.config.predict_size,
-                        new_ps,
-                    )
-                    self.config.predict_size = new_ps
+                # Floor on BOTH sides is exact, not lossy: predict_size lives
+                # in the hourly geometry, and without truncation the hourly
+                # aggregation would itself have placed data_end at
+                # floor(pre_policy_last_target) — a partially observed hour
+                # still aggregates to a value at its floor.  (Ceiling here
+                # would over-extend cov_end by one hour whenever the last
+                # native slot is mid-hour: the +9h-phase-roll bug class.)
+                _pre = _tc_report.pre_policy_last_target
+                if _pre.tzinfo is not None and str(_pre.tz) != "UTC":
+                    _pre = _pre.tz_convert("UTC")
+                _post = _data_end_realized
+                if _post.tzinfo is not None and str(_post.tz) != "UTC":
+                    _post = _post.tz_convert("UTC")
+                _tc_bump = max(
+                    0,
+                    int((_pre.floor("h") - _post.floor("h")) / pd.Timedelta(hours=1)),
+                )
+
+        if _tc_bump > 0:
+            if not hasattr(self, "_tc_base_predict_size"):
+                self._tc_base_predict_size = self.config.predict_size
+            new_ps = self._tc_base_predict_size + _tc_bump
+            if new_ps != self.config.predict_size:
+                self.logger.warning(
+                    "target_corruption[truncate]: data_end retracted by %d h; "
+                    "bumping predict_size from %d to %d to preserve forecast "
+                    "coverage.",
+                    _tc_bump,
+                    self.config.predict_size,
+                    new_ps,
+                )
+                self.config.predict_size = new_ps
+        elif hasattr(self, "_tc_base_predict_size"):
+            # A previous prepare_data call on this task bumped predict_size
+            # but the current run did not truncate (corruption cleared, or
+            # the policy changed): restore the un-bumped horizon so cov_end
+            # does not over-extend.
+            if self.config.predict_size != self._tc_base_predict_size:
+                self.logger.warning(
+                    "target_corruption: no truncation this run; resetting "
+                    "predict_size from %d back to %d.",
+                    self.config.predict_size,
+                    self._tc_base_predict_size,
+                )
+                self.config.predict_size = self._tc_base_predict_size
 
         (
             self.config.data_start,
@@ -689,14 +720,31 @@ class BaseTask:
         if self.df_pipeline is None:
             raise RuntimeError("Call prepare_data() before impute().")
 
-        self.df_pipeline, self.weight_func = apply_imputation(
-            df_pipeline=self.df_pipeline,
-            config=self.config,
-            logger=self.logger,
-        )
-        self.logger.info(
-            "Imputation complete (method=%s).", self.config.imputation_method
-        )
+        # When prepare_data ran with target_corruption_policy="heal", the
+        # healed cells need apply_imputation's "weighted_interp" method
+        # (interpolated values AND zero training weights).  The method is
+        # swapped in only for this call and restored afterwards, so a config
+        # object shared across tasks is never left mutated.
+        _forced = getattr(self, "_tc_force_weighted_interp", False)
+        _method = self.config.imputation_method
+        if _forced and _method != "weighted_interp":
+            self.logger.info(
+                "target_corruption[heal]: using imputation_method "
+                "'weighted_interp' for this call (configured: '%s').",
+                _method,
+            )
+            self.config.imputation_method = "weighted_interp"
+        try:
+            self.df_pipeline, self.weight_func = apply_imputation(
+                df_pipeline=self.df_pipeline,
+                config=self.config,
+                logger=self.logger,
+            )
+            self.logger.info(
+                "Imputation complete (method=%s).", self.config.imputation_method
+            )
+        finally:
+            self.config.imputation_method = _method
         return self
 
     # ------------------------------------------------------------------

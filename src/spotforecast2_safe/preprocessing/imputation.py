@@ -307,8 +307,8 @@ def apply_imputation(
             when ``"linear"`` imputation is used.
 
     Raises:
-        ValueError: If ``config.imputation_method`` is neither ``"weighted"``
-            nor ``"linear"``.
+        ValueError: If ``config.imputation_method`` is not one of
+            ``"weighted"``, ``"weighted_interp"``, or ``"linear"``.
 
     Examples:
         ```{python}

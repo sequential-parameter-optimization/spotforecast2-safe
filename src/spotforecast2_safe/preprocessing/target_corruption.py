@@ -208,6 +208,13 @@ def detect_target_corruption(
 
     window_start = max(df.index.min(), last_target_ts - pd.Timedelta(days=window_days))
     scan = df.loc[window_start:last_target_ts, list(targets)]
+    # DST safety: floor("h")/resample("h") on a tz-aware non-UTC index can
+    # raise on ambiguous wall times (fall-back hour).  All hour bucketing is
+    # therefore done on a UTC view; positions are unchanged, and for the
+    # whole-hour-offset zones ENTSO-E uses, UTC hour bins coincide with wall
+    # hour bins.  Naive indexes pass through untouched.
+    if scan.index.tz is not None and str(scan.index.tz) != "UTC":
+        scan = scan.tz_convert("UTC")
 
     # hour_flag will accumulate which hour-floored timestamps are corrupt.
     flagged_hours: set = set()
@@ -215,8 +222,8 @@ def detect_target_corruption(
     for col in targets:
         if col not in scan.columns:
             continue
-        series = scan[col].dropna()
-        if len(series) < 2:
+        series = scan[col]
+        if series.notna().sum() < 2:
             continue
 
         # --- range rule (sub-hourly only) ---
@@ -228,23 +235,33 @@ def detect_target_corruption(
         # --- step rule (all cadences) ---
         if step_mw is not None:
             abs_diff = series.diff().abs()
+            # Only slot pairs exactly one cadence apart are "adjacent": a
+            # value change across a data gap (missing rows) or a duplicate
+            # timestamp is not a step — a legitimate ramp can span a gap and
+            # must not flag.  NaN values yield NaN diffs, which compare
+            # False, so gap *boundaries* (NaN -> value) never flag either —
+            # matching the chapter tripwire's semantics.
+            adjacent = scan.index.to_series().diff() == cadence
+            bad_mask = (abs_diff > step_mw) & adjacent
             # A step between slot i-1 and slot i flags the hour of slot i
-            # *and* the hour of slot i-1.
-            bad_mask = abs_diff > step_mw
-            for ts in abs_diff.index[bad_mask]:
+            # *and* the hour of slot i-1 (the left endpoint of the step lives
+            # one cadence earlier).
+            for ts in series.index[bad_mask]:
                 flagged_hours.add(ts.floor("h"))
-                # also flag the predecessor's hour
-                loc = series.index.get_loc(ts)
-                if loc > 0:
-                    flagged_hours.add(series.index[loc - 1].floor("h"))
+                flagged_hours.add((ts - cadence).floor("h"))
 
     if not flagged_hours:
         return pd.Series(False, index=df.index)
 
-    # Expand flagged hours back to all native-cadence slots of that hour.
-    floored = df.index.floor("h")
-    flagged_set = set(flagged_hours)
-    mask = pd.Series([fh in flagged_set for fh in floored], index=df.index, dtype=bool)
+    # Expand flagged hours back to all native-cadence slots of that hour
+    # (positions are identical between df.index and the UTC view).
+    if df.index.tz is not None and str(df.index.tz) != "UTC":
+        floored = df.index.tz_convert("UTC").floor("h")
+    else:
+        floored = df.index.floor("h")
+    mask = pd.Series(
+        floored.isin(pd.DatetimeIndex(sorted(flagged_hours))), index=df.index, dtype=bool
+    )
     return mask
 
 
@@ -365,9 +382,12 @@ def apply_target_corruption_policy(
             pre_policy_last_target=None,
         )
 
-    # Compute summary stats from the mask.
+    # Compute summary stats from the mask (hour bucketing on a UTC view for
+    # DST safety, mirroring detect_target_corruption).
     n_flagged_cells = int(flag_mask.sum())
     flagged_index = df.index[flag_mask]
+    if flagged_index.tz is not None and str(flagged_index.tz) != "UTC":
+        flagged_index = flagged_index.tz_convert("UTC")
     flagged_hours_index = pd.DatetimeIndex(sorted(set(flagged_index.floor("h"))))
     n_flagged_hours = len(flagged_hours_index)
     spans = _compute_spans(flagged_hours_index)
