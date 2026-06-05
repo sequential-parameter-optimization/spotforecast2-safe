@@ -1,3 +1,10 @@
+## [16.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.2.0...v16.3.0) (2026-06-05)
+
+
+### Features
+
+* **multitask:** add parameterized run_with core for cross-package reuse ([c414caa](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c414caa91a6e0d29cc99cab5de0bb8037210ad08))
+
 ## [16.3.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.2.0...v16.3.0-rc.1) (2026-06-05)
 
 
