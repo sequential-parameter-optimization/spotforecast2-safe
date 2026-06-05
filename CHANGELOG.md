@@ -1,3 +1,10 @@
+## [16.4.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.3.1...v16.4.0-rc.1) (2026-06-05)
+
+
+### Features
+
+* **preprocessing:** target-corruption detector with abort/heal/truncate policy ([#328](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/328)) ([6eed52a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/6eed52aa358d9635d2427cb9967729fc8f4f3a00))
+
 ## [16.3.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.3.0...v16.3.1) (2026-06-05)
 
 

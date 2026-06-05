@@ -260,7 +260,7 @@ def apply_imputation(
 ) -> tuple[pd.DataFrame, "WeightFunction | None"]:
     """Apply imputation to a DataFrame based on the method specified in config.
 
-    Supports two strategies:
+    Supports three strategies:
 
     - ``"weighted"``: forward-fill then backward-fill gaps, then build a
       `WeightFunction` that down-weights training rows near any gap.
@@ -271,6 +271,14 @@ def apply_imputation(
       so the gap-penalty width can be tuned independently of any rolling
       feature window.
     - ``"linear"``: apply `LinearlyInterpolateTS` column-by-column.
+    - ``"weighted_interp"``: like ``"weighted"`` but uses time-interpolation
+      (via `LinearlyInterpolateTS`) for the fill step instead of ffill/bfill.
+      Boundary NaNs that interpolation cannot bracket are resolved by
+      ffill/bfill as a final fallback.  The pre-fill NaN mask drives the
+      same rolling penalty-window zero-weight construction as ``"weighted"``.
+      Intended for use with ``target_corruption_policy="heal"``, where
+      physically-impossible dropouts should be bridged smoothly rather than
+      step-filled.
 
     A diagnostic summary (NaN count before **and** after imputation) is
     always written to the logger.
@@ -299,8 +307,8 @@ def apply_imputation(
             when ``"linear"`` imputation is used.
 
     Raises:
-        ValueError: If ``config.imputation_method`` is neither ``"weighted"``
-            nor ``"linear"``.
+        ValueError: If ``config.imputation_method`` is not one of
+            ``"weighted"``, ``"weighted_interp"``, or ``"linear"``.
 
     Examples:
         ```{python}
@@ -364,10 +372,56 @@ def apply_imputation(
         for col in config.targets:
             series = df_pipeline[col]
             df_pipeline[col] = interpolator.fit_transform(series)
+    elif config.imputation_method == "weighted_interp":
+        logger.info(
+            "Applying weighted_interp imputation "
+            "(time-interpolation + zero-weight penalty zone)..."
+        )
+        # Capture the pre-fill NaN mask before any mutation.
+        pre_fill_na = df_pipeline.isnull().any(axis=1)
+
+        # Time-interpolate target columns; fall back to ffill/bfill for
+        # any boundary NaNs that interpolation cannot bracket.
+        interpolator = LinearlyInterpolateTS(on_missing="passthrough")
+        for col in config.targets:
+            if col not in df_pipeline.columns:
+                continue
+            interpolated = interpolator.fit_transform(df_pipeline[col])
+            # Boundary NaN fallback: ffill then bfill the residuals.
+            if interpolated.isna().any():
+                interpolated = interpolated.ffill().bfill()
+            df_pipeline[col] = interpolated
+
+        # Build the same rolling penalty-window zero-weight Series as the
+        # "weighted" branch, but seeded from the *pre-interpolation* NaN mask
+        # so the penalty zone reflects where values were imputed.
+        penalty_window = (
+            config.imputation_window_size
+            if getattr(config, "imputation_window_size", None) is not None
+            else config.window_size
+        )
+        missing_indicator = pre_fill_na.astype(int)
+        weights_series = (
+            1.0
+            - missing_indicator.rolling(window=penalty_window + 1, min_periods=1).max()
+        )
+        if weights_series.sum() == 0:
+            # Degenerate: the entire series falls inside the penalty zone.
+            weight_func = None
+            logger.warning(
+                "weighted_interp: all rows fall inside the penalty zone; "
+                "weight_func set to None (uniform weights)."
+            )
+        else:
+            weight_func = WeightFunction(weights_series)
+            logger.info(
+                "weighted_interp: weight function created with %d entries.",
+                len(weights_series),
+            )
     else:
         raise ValueError(
             f"Unknown imputation_method: {config.imputation_method!r}. "
-            "Expected one of: 'weighted', 'linear'."
+            "Expected one of: 'weighted', 'linear', 'weighted_interp'."
         )
 
     nan_after = int(df_pipeline.isnull().sum().sum())
