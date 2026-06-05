@@ -11,7 +11,7 @@ preprocessing.imputation.apply_imputation(
 
 Apply imputation to a DataFrame based on the method specified in config.
 
-Supports two strategies:
+Supports three strategies:
 
 - ``"weighted"``: forward-fill then backward-fill gaps, then build a
   `WeightFunction` that down-weights training rows near any gap.
@@ -22,6 +22,14 @@ Supports two strategies:
   so the gap-penalty width can be tuned independently of any rolling
   feature window.
 - ``"linear"``: apply `LinearlyInterpolateTS` column-by-column.
+- ``"weighted_interp"``: like ``"weighted"`` but uses time-interpolation
+  (via `LinearlyInterpolateTS`) for the fill step instead of ffill/bfill.
+  Boundary NaNs that interpolation cannot bracket are resolved by
+  ffill/bfill as a final fallback.  The pre-fill NaN mask drives the
+  same rolling penalty-window zero-weight construction as ``"weighted"``.
+  Intended for use with ``target_corruption_policy="heal"``, where
+  physically-impossible dropouts should be bridged smoothly rather than
+  step-filled.
 
 A diagnostic summary (NaN count before **and** after imputation) is
 always written to the logger.
@@ -45,9 +53,9 @@ always written to the logger.
 
 ## Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                       | Description                                                                 |
-|--------|----------------------------|-----------------------------------------------------------------------------|
-|        | [ValueError](`ValueError`) | If ``config.imputation_method`` is neither ``"weighted"`` nor ``"linear"``. |
+| Name   | Type                       | Description                                                                                           |
+|--------|----------------------------|-------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If ``config.imputation_method`` is not one of ``"weighted"``, ``"weighted_interp"``, or ``"linear"``. |
 
 ## Examples {.doc-section .doc-section-examples}
 

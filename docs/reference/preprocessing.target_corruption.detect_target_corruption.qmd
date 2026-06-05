@@ -1,0 +1,78 @@
+# preprocessing.target_corruption.detect_target_corruption { #spotforecast2_safe.preprocessing.target_corruption.detect_target_corruption }
+
+```python
+preprocessing.target_corruption.detect_target_corruption(
+    df,
+    *,
+    targets,
+    range_mw,
+    step_mw,
+    window_days,
+)
+```
+
+Detect physically-impossible target-column corruption in the native frame.
+
+Applies two independent rules on the native-cadence (e.g. 15-min) series
+within a rolling look-back window ending at the last observed target
+timestamp:
+
+- **Range rule** (sub-hourly cadence only): an hour is flagged when
+  ``intra-hour max - intra-hour min > range_mw`` for any target column.
+  Vacuously skipped for hourly-or-coarser cadence (intra-hour range is
+  undefined on a single slot per hour).
+- **Step rule**: an hour is flagged when any ``|adjacent-slot diff|``
+  that *touches* that hour exceeds ``step_mw`` for any target column.
+  Applies to all cadences.
+
+Flags are OR-ed across target columns.  ALL native-cadence slots of a
+flagged calendar hour are marked ``True`` in the returned boolean
+``Series``, so downstream NaN-ing operates on full hours rather than
+individual sub-hourly slots.
+
+The detector is **inert** (returns all-``False``) unless ``window_days``
+is set AND at least one of ``range_mw`` / ``step_mw`` is set.  If the
+data is shorter than ``window_days``, the window is clamped to
+``df.index.min()`` without raising.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                              | Description                                                                                                  | Default    |
+|-------------|---------------------------------------------------|--------------------------------------------------------------------------------------------------------------|------------|
+| df          | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)    | Native-cadence ``DataFrame`` indexed by a ``DatetimeIndex``. Must contain all columns listed in ``targets``. | _required_ |
+| targets     | [Sequence](`typing.Sequence`)\[[str](`str`)\]     | Sequence of target column names to inspect.                                                                  | _required_ |
+| range_mw    | [Optional](`typing.Optional`)\[[float](`float`)\] | Maximum allowed intra-hour range (MW).  ``None`` skips the range rule.                                       | _required_ |
+| step_mw     | [Optional](`typing.Optional`)\[[float](`float`)\] | Maximum allowed absolute adjacent-slot difference (MW). ``None`` skips the step rule.                        | _required_ |
+| window_days | [Optional](`typing.Optional`)\[[int](`int`)\]     | Number of days before the last observed target to include in the scan.  ``None`` makes the detector inert.   | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                        |
+|--------|------------------------------------------|--------------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | Boolean ``pd.Series`` aligned to ``df.index``.  ``True`` means the |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | slot belongs to a flagged calendar hour.  All-``False`` when the   |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | detector is inert or no corruption is found.                       |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+import numpy as np
+from spotforecast2_safe.preprocessing.target_corruption import (
+    detect_target_corruption,
+)
+
+# 15-min cadence; one GW dropout at 12:15 inside the window
+idx = pd.date_range("2026-06-03", periods=48, freq="15min", tz="UTC")
+vals = [55_000.0] * 48
+vals[5] = 44_000.0          # 11 GW step drop  -> flags 12:00 hour
+df = pd.DataFrame({"load": vals}, index=idx)
+
+mask = detect_target_corruption(
+    df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=3
+)
+# Slots in the 12:00 hour (index 4-7) are flagged
+assert mask.iloc[4:8].all(), "Slots in the flagged hour must be True"
+assert not mask.iloc[8:].any(), "Subsequent clean slots must be False"
+print("flagged:", mask.sum(), "slots")
+```

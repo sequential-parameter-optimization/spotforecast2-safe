@@ -1,0 +1,48 @@
+# preprocessing.target_corruption.TargetCorruptionReport { #spotforecast2_safe.preprocessing.target_corruption.TargetCorruptionReport }
+
+```python
+preprocessing.target_corruption.TargetCorruptionReport(
+    fired,
+    n_flagged_cells,
+    n_flagged_hours,
+    spans,
+    action,
+    first_flagged_hour,
+    pre_policy_last_target,
+)
+```
+
+Immutable summary of a target-corruption detection and policy run.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                   | Type                                                                            | Description                                                                                                                                                                                                                                                | Default    |
+|------------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| fired                  | [bool](`bool`)                                                                  | ``True`` when the detector identified at least one flagged hour-slot; ``False`` means no corruption was found (or the detector was not configured).                                                                                                        | _required_ |
+| n_flagged_cells        | [int](`int`)                                                                    | Number of native-cadence (e.g. 15-min) slots that were flagged across all target columns.                                                                                                                                                                  | _required_ |
+| n_flagged_hours        | [int](`int`)                                                                    | Number of distinct calendar hours that contain at least one flagged slot.                                                                                                                                                                                  | _required_ |
+| spans                  | [List](`typing.List`)\[[Tuple](`typing.Tuple`)\[[str](`str`), [str](`str`)\]\]  | Contiguous flagged hour-runs as ``(start_iso, end_iso)`` string pairs.  Empty list when the detector did not fire.                                                                                                                                         | _required_ |
+| action                 | [str](`str`)                                                                    | The policy action taken: one of ``"abort"``, ``"heal"``, ``"truncate"``, or ``"noop"``.                                                                                                                                                                    | _required_ |
+| first_flagged_hour     | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | The earliest flagged calendar hour, as a tz-aware ``pd.Timestamp`` floored to the hour, or ``None`` when the detector did not fire.                                                                                                                        | _required_ |
+| pre_policy_last_target | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | The last observed-target timestamp BEFORE any policy mutation.  ``None`` when the detector did not fire. Used by the ``"truncate"`` path in ``prepare_data`` to compute how many hours were retracted so that ``predict_size`` can be bumped idempotently. | _required_ |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.preprocessing.target_corruption import (
+    TargetCorruptionReport,
+)
+
+report = TargetCorruptionReport(
+    fired=False,
+    n_flagged_cells=0,
+    n_flagged_hours=0,
+    spans=[],
+    action="noop",
+    first_flagged_hour=None,
+    pre_policy_last_target=None,
+)
+print(report.fired, report.action)
+assert not report.fired
+assert report.action == "noop"
+```

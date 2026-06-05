@@ -41,6 +41,7 @@ print(caught[0].category.__name__)
 | [ResidualsUsageWarning](#spotforecast2_safe.exceptions.ResidualsUsageWarning) | Warning for incorrect residuals usage. |
 | [SaveLoadSkforecastWarning](#spotforecast2_safe.exceptions.SaveLoadSkforecastWarning) | Warning for save/load operations. |
 | [SpotforecastVersionWarning](#spotforecast2_safe.exceptions.SpotforecastVersionWarning) | Warning for version mismatch. |
+| [TargetCorruptionError](#spotforecast2_safe.exceptions.TargetCorruptionError) | Exception raised when physically-impossible target corruption is detected. |
 | [UnknownLevelWarning](#spotforecast2_safe.exceptions.UnknownLevelWarning) | Warning for unknown levels in prediction. |
 
 ### DataTransformationWarning { #spotforecast2_safe.exceptions.DataTransformationWarning }
@@ -448,6 +449,37 @@ with warnings.catch_warnings(record=True) as caught:
 assert len(caught) == 1
 assert issubclass(caught[0].category, SpotforecastVersionWarning)
 print(caught[0].category.__name__)
+```
+
+### TargetCorruptionError { #spotforecast2_safe.exceptions.TargetCorruptionError }
+
+```python
+exceptions.TargetCorruptionError()
+```
+
+Exception raised when physically-impossible target corruption is detected.
+
+Raised by
+`spotforecast2_safe.preprocessing.target_corruption.apply_target_corruption_policy`
+when ``target_corruption_policy="abort"`` and the detector fires, or when
+the ``"heal"`` policy is requested but cannot be applied safely (e.g. the
+corrupt span touches the anchor zone, or exceeds the heal budget).
+
+Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+working; the dedicated class lets safety-critical callers distinguish
+target-corruption aborts from generic runtime errors.
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.exceptions import TargetCorruptionError
+
+try:
+    raise TargetCorruptionError("Corrupt target tail detected")
+except TargetCorruptionError as e:
+    print(type(e).__name__, str(e))
+
+assert issubclass(TargetCorruptionError, RuntimeError)
 ```
 
 ### UnknownLevelWarning { #spotforecast2_safe.exceptions.UnknownLevelWarning }
