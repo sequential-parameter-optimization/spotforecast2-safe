@@ -1,3 +1,10 @@
+## [16.3.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.3.0...v16.3.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* **multitask:** anchor window geometry on the last observed target ([#326](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/326)) ([e0e330a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e0e330a574d103025a3e99fc3ae1e96a0e5d0c90))
+
 ## [16.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.2.0...v16.3.0) (2026-06-05)
 
 
