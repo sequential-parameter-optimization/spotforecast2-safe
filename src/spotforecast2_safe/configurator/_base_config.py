@@ -231,3 +231,44 @@ def validate_config(config: object) -> None:
             "exog_provider_window must be 'full' or 'train'; got "
             f"{exog_provider_window!r}."
         )
+
+    target_qc_range_mw = getattr(config, "target_qc_range_mw", None)
+    if target_qc_range_mw is not None and target_qc_range_mw < 0:
+        raise ValueError(
+            f"target_qc_range_mw must be >= 0 if set; got {target_qc_range_mw}."
+        )
+
+    target_qc_step_mw = getattr(config, "target_qc_step_mw", None)
+    if target_qc_step_mw is not None and target_qc_step_mw < 0:
+        raise ValueError(
+            f"target_qc_step_mw must be >= 0 if set; got {target_qc_step_mw}."
+        )
+
+    target_qc_window_days = getattr(config, "target_qc_window_days", None)
+    if target_qc_window_days is not None and target_qc_window_days < 1:
+        raise ValueError(
+            f"target_qc_window_days must be >= 1 if set; got {target_qc_window_days}."
+        )
+
+    target_corruption_policy = getattr(config, "target_corruption_policy", None)
+    if target_corruption_policy is not None and target_corruption_policy not in (
+        "abort",
+        "heal",
+        "truncate",
+    ):
+        raise ValueError(
+            "target_corruption_policy must be one of 'abort', 'heal', 'truncate'; "
+            f"got {target_corruption_policy!r}."
+        )
+
+    target_max_heal_hours = getattr(config, "target_max_heal_hours", None)
+    if target_max_heal_hours is not None and target_max_heal_hours < 0:
+        raise ValueError(
+            f"target_max_heal_hours must be >= 0; got {target_max_heal_hours}."
+        )
+
+    target_anchor_zone_hours = getattr(config, "target_anchor_zone_hours", None)
+    if target_anchor_zone_hours is not None and target_anchor_zone_hours < 0:
+        raise ValueError(
+            f"target_anchor_zone_hours must be >= 0; got {target_anchor_zone_hours}."
+        )

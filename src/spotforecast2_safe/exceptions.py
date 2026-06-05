@@ -541,6 +541,33 @@ class PredictionPackageError(RuntimeError):
     """
 
 
+class TargetCorruptionError(RuntimeError):
+    """Exception raised when physically-impossible target corruption is detected.
+
+    Raised by
+    `spotforecast2_safe.preprocessing.target_corruption.apply_target_corruption_policy`
+    when ``target_corruption_policy="abort"`` and the detector fires, or when
+    the ``"heal"`` policy is requested but cannot be applied safely (e.g. the
+    corrupt span touches the anchor zone, or exceeds the heal budget).
+
+    Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+    working; the dedicated class lets safety-critical callers distinguish
+    target-corruption aborts from generic runtime errors.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.exceptions import TargetCorruptionError
+
+        try:
+            raise TargetCorruptionError("Corrupt target tail detected")
+        except TargetCorruptionError as e:
+            print(type(e).__name__, str(e))
+
+        assert issubclass(TargetCorruptionError, RuntimeError)
+        ```
+    """
+
+
 warn_skforecast_categories = [
     DataTypeWarning,
     DataTransformationWarning,

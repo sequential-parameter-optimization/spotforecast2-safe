@@ -32,6 +32,11 @@ from .imputation import (
     custom_weights,
     get_missing_weights,
 )
+from .target_corruption import (
+    TargetCorruptionReport,
+    apply_target_corruption_policy,
+    detect_target_corruption,
+)
 from .linearly_interpolate_ts import LinearlyInterpolateTS
 from .outlier import get_outliers, manual_outlier_removal, mark_outliers
 from .repeating_basis_function import RepeatingBasisFunction
@@ -71,4 +76,7 @@ __all__ = [
     "build_providers_from_config",
     "LinearlyInterpolateTS",
     "build_deterministic_process",
+    "TargetCorruptionReport",
+    "detect_target_corruption",
+    "apply_target_corruption_policy",
 ]
