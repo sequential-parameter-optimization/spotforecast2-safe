@@ -169,6 +169,14 @@ website:
                     file: docs/reference/preprocessing.imputation.get_missing_weights.qmd
                   - text: "custom_weights"
                     file: docs/reference/preprocessing.imputation.custom_weights.qmd
+              - section: "Target Corruption"
+                contents:
+                  - text: "TargetCorruptionReport"
+                    file: docs/reference/preprocessing.target_corruption.TargetCorruptionReport.qmd
+                  - text: "detect_target_corruption"
+                    file: docs/reference/preprocessing.target_corruption.detect_target_corruption.qmd
+                  - text: "apply_target_corruption_policy"
+                    file: docs/reference/preprocessing.target_corruption.apply_target_corruption_policy.qmd
               - section: "Outlier"
                 contents:
                   - text: "mark_outliers"
@@ -581,6 +589,9 @@ quartodoc:
         - preprocessing.exog_providers.build_providers_from_config
         - preprocessing.imputation.apply_imputation
         - preprocessing.imputation.WeightFunction
+        - preprocessing.target_corruption.TargetCorruptionReport
+        - preprocessing.target_corruption.detect_target_corruption
+        - preprocessing.target_corruption.apply_target_corruption_policy
         - preprocessing.imputation.custom_weights
         - preprocessing.imputation.get_missing_weights
         - preprocessing.data_transform

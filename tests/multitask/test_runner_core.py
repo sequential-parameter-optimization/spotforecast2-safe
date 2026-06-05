@@ -27,7 +27,6 @@ import pytest
 from spotforecast2_safe.multitask import SAFE_PIPELINE_TASKS, run_with
 from spotforecast2_safe.multitask.runner import _ALL_TASKS, _PIPELINE_TASKS
 
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -419,9 +418,7 @@ class TestCacheHomeResolution:
         mt.run.return_value = {"future_pred": pd.Series([1.0])}
         cls = MagicMock(return_value=mt)
 
-        with patch(
-            "spotforecast2_safe.multitask.runner.get_cache_home"
-        ) as mock_gch:
+        with patch("spotforecast2_safe.multitask.runner.get_cache_home") as mock_gch:
             run_with(
                 multitask_cls=cls,
                 all_tasks=_ALL_TASKS,

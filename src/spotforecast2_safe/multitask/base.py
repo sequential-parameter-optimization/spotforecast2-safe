@@ -59,6 +59,10 @@ from spotforecast2_safe.preprocessing.outlier import (
     get_outliers,
     manual_outlier_removal,
 )
+from spotforecast2_safe.preprocessing.target_corruption import (
+    TargetCorruptionReport,
+    apply_target_corruption_policy,
+)
 from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.splitter.split_ts_cv import TimeSeriesFold
 from spotforecast2_safe.weather import WeatherFetchError, get_weather_features
@@ -439,6 +443,88 @@ class BaseTask:
             self.config.targets = all_targets
 
         df_pipeline = demo_data.set_index(self.config.index_name)
+
+        # ------------------------------------------------------------------
+        # Target-corruption detector + policy (§1 / §2 of the ADR).
+        # Runs at native cadence BEFORE agg_and_resample_data so the
+        # intra-hour dynamics are still visible.  The hook is a cheap
+        # identity path when the six knobs are at their defaults (all None /
+        # off) — zero new code paths that mutate data.
+        # ------------------------------------------------------------------
+        _tc_policy = getattr(self.config, "target_corruption_policy", "abort")
+        _tc_range = getattr(self.config, "target_qc_range_mw", None)
+        _tc_step = getattr(self.config, "target_qc_step_mw", None)
+        _tc_window = getattr(self.config, "target_qc_window_days", None)
+        _tc_max_heal = getattr(self.config, "target_max_heal_hours", 0)
+        _tc_anchor = getattr(self.config, "target_anchor_zone_hours", 168)
+
+        # Derive the effective cutoff for the anchor-zone check: mirror the
+        # end_train_default / last_ts logic above (ADR §2 step 1).
+        _tc_cutoff: "pd.Timestamp | None" = None
+        if _tc_window is not None:
+            _user_end_train = pd.to_datetime(
+                getattr(self.config, "end_train_default", None),
+                utc=True,
+                errors="coerce",
+            )
+            _last_ts = pd.Timestamp(demo_data[self.config.index_name].iloc[-1])
+            _last_ts_utc = (
+                _last_ts.tz_convert("UTC")
+                if _last_ts.tzinfo
+                else _last_ts.tz_localize("UTC")
+            )
+            if _user_end_train is pd.NaT or _user_end_train > _last_ts_utc:
+                _tc_cutoff = _last_ts_utc
+            else:
+                _tc_cutoff = _user_end_train
+
+        # Determine targets for the corruption check (before the full target
+        # reconciliation below — use the pre-set list if available).
+        _tc_targets_pre = getattr(self.config, "targets", None) or [
+            c for c in demo_data.columns if c != self.config.index_name
+        ]
+        _tc_targets_present = [c for c in _tc_targets_pre if c in df_pipeline.columns]
+
+        # Mirror the detector's own inertness condition (window AND at least
+        # one threshold) so the policy path — including the heal
+        # imputation-forcing side-effect — is never entered for a
+        # half-configured detector.
+        _tc_configured = _tc_window is not None and (
+            _tc_range is not None or _tc_step is not None
+        )
+        if _tc_targets_present and _tc_configured:
+            # The heal policy needs apply_imputation's "weighted_interp"
+            # method (interpolated values AND zero training weights).
+            # Deterministic per config, applied whether or not the detector
+            # fires; impute() swaps the method in for the call and restores
+            # it, so a config object shared across tasks is never mutated.
+            self._tc_force_weighted_interp = _tc_policy == "heal"
+
+            df_pipeline, _tc_report = apply_target_corruption_policy(
+                df_pipeline,
+                targets=_tc_targets_present,
+                policy=_tc_policy,
+                range_mw=_tc_range,
+                step_mw=_tc_step,
+                window_days=_tc_window,
+                max_heal_hours=_tc_max_heal,
+                anchor_zone_hours=_tc_anchor,
+                cutoff=_tc_cutoff,
+                logger=self.logger,
+            )
+        else:
+            self._tc_force_weighted_interp = False
+            _tc_report = TargetCorruptionReport(
+                fired=False,
+                n_flagged_cells=0,
+                n_flagged_hours=0,
+                spans=[],
+                action="noop",
+                first_flagged_hour=None,
+                pre_policy_last_target=None,
+            )
+        self.target_corruption_report = _tc_report
+
         df_pipeline = agg_and_resample_data(df_pipeline, verbose=self.config.verbose)
         basic_ts_checks(df_pipeline, verbose=self.config.verbose)
 
@@ -472,6 +558,68 @@ class BaseTask:
                     df_pipeline.index.max(),
                 )
                 df_pipeline = df_pipeline.loc[:last_target_ts]
+
+        # ------------------------------------------------------------------
+        # Truncate + predict_size bump (ADR §2 step 3).
+        # After the existing 16.3.1 trailing-clamp, when the corruption
+        # policy was "truncate" and it fired, compute how many hours were
+        # retracted and bump predict_size idempotently so the forecast window
+        # covers the same absolute span as it would have without the corruption.
+        # ------------------------------------------------------------------
+        _tc_bump = 0
+        if (
+            _tc_report.action == "truncate"
+            and _tc_report.pre_policy_last_target is not None
+        ):
+            _data_end_realized = (
+                df_pipeline[self.config.targets].dropna(how="all").index.max()
+            )
+            if pd.notna(_data_end_realized):
+                # Floor on BOTH sides is exact, not lossy: predict_size lives
+                # in the hourly geometry, and without truncation the hourly
+                # aggregation would itself have placed data_end at
+                # floor(pre_policy_last_target) — a partially observed hour
+                # still aggregates to a value at its floor.  (Ceiling here
+                # would over-extend cov_end by one hour whenever the last
+                # native slot is mid-hour: the +9h-phase-roll bug class.)
+                _pre = _tc_report.pre_policy_last_target
+                if _pre.tzinfo is not None and str(_pre.tz) != "UTC":
+                    _pre = _pre.tz_convert("UTC")
+                _post = _data_end_realized
+                if _post.tzinfo is not None and str(_post.tz) != "UTC":
+                    _post = _post.tz_convert("UTC")
+                _tc_bump = max(
+                    0,
+                    int((_pre.floor("h") - _post.floor("h")) / pd.Timedelta(hours=1)),
+                )
+
+        if _tc_bump > 0:
+            if not hasattr(self, "_tc_base_predict_size"):
+                self._tc_base_predict_size = self.config.predict_size
+            new_ps = self._tc_base_predict_size + _tc_bump
+            if new_ps != self.config.predict_size:
+                self.logger.warning(
+                    "target_corruption[truncate]: data_end retracted by %d h; "
+                    "bumping predict_size from %d to %d to preserve forecast "
+                    "coverage.",
+                    _tc_bump,
+                    self.config.predict_size,
+                    new_ps,
+                )
+                self.config.predict_size = new_ps
+        elif hasattr(self, "_tc_base_predict_size"):
+            # A previous prepare_data call on this task bumped predict_size
+            # but the current run did not truncate (corruption cleared, or
+            # the policy changed): restore the un-bumped horizon so cov_end
+            # does not over-extend.
+            if self.config.predict_size != self._tc_base_predict_size:
+                self.logger.warning(
+                    "target_corruption: no truncation this run; resetting "
+                    "predict_size from %d back to %d.",
+                    self.config.predict_size,
+                    self._tc_base_predict_size,
+                )
+                self.config.predict_size = self._tc_base_predict_size
 
         (
             self.config.data_start,
@@ -572,14 +720,31 @@ class BaseTask:
         if self.df_pipeline is None:
             raise RuntimeError("Call prepare_data() before impute().")
 
-        self.df_pipeline, self.weight_func = apply_imputation(
-            df_pipeline=self.df_pipeline,
-            config=self.config,
-            logger=self.logger,
-        )
-        self.logger.info(
-            "Imputation complete (method=%s).", self.config.imputation_method
-        )
+        # When prepare_data ran with target_corruption_policy="heal", the
+        # healed cells need apply_imputation's "weighted_interp" method
+        # (interpolated values AND zero training weights).  The method is
+        # swapped in only for this call and restored afterwards, so a config
+        # object shared across tasks is never left mutated.
+        _forced = getattr(self, "_tc_force_weighted_interp", False)
+        _method = self.config.imputation_method
+        if _forced and _method != "weighted_interp":
+            self.logger.info(
+                "target_corruption[heal]: using imputation_method "
+                "'weighted_interp' for this call (configured: '%s').",
+                _method,
+            )
+            self.config.imputation_method = "weighted_interp"
+        try:
+            self.df_pipeline, self.weight_func = apply_imputation(
+                df_pipeline=self.df_pipeline,
+                config=self.config,
+                logger=self.logger,
+            )
+            self.logger.info(
+                "Imputation complete (method=%s).", self.config.imputation_method
+            )
+        finally:
+            self.config.imputation_method = _method
         return self
 
     # ------------------------------------------------------------------
