@@ -446,6 +446,33 @@ class BaseTask:
             c for c in self.config.targets if c in df_pipeline.columns
         ]
 
+        # Trailing rows that carry no observed target value (e.g. future
+        # day-ahead Forecasted-Load rows kept by ``keep_forecast_future=True``)
+        # must not define the window geometry: ``get_start_end`` anchors
+        # ``data_end`` on ``index.max()``, and a contaminated ``data_end``
+        # shifts ``cov_end`` and thereby ``exo_pred`` — the forecaster then
+        # consumes a positionally misaligned exogenous window (the 2026-06-05/06
+        # live incident: forecasts phase-rolled by ~+9 h). Clamp the frame to
+        # the last index where at least one configured target is observed;
+        # forecast-window exogenous features are built independently up to
+        # ``cov_end`` by the calendar/weather/provider builders.
+        if self.config.targets:
+            last_target_ts = (
+                df_pipeline[self.config.targets].dropna(how="all").index.max()
+            )
+            if pd.notna(last_target_ts) and last_target_ts < df_pipeline.index.max():
+                n_dropped = int((df_pipeline.index > last_target_ts).sum())
+                self.logger.warning(
+                    "prepare_data: dropping %d trailing rows without any "
+                    "observed target (%s -> %s); window geometry "
+                    "(data_end/cov_end/exo_pred) is anchored on the last "
+                    "observed target instead.",
+                    n_dropped,
+                    last_target_ts,
+                    df_pipeline.index.max(),
+                )
+                df_pipeline = df_pipeline.loc[:last_target_ts]
+
         (
             self.config.data_start,
             self.config.data_end,

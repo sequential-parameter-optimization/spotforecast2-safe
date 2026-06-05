@@ -20,6 +20,7 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
 from spotforecast2_safe.manager.trainer import get_last_model
+from spotforecast2_safe.preprocessing.data_transform import expand_index
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +161,37 @@ def build_prediction_package(
     }
 
     # --- Future predictions ---
+    # Fail-safe alignment guard (2026-06-05/06 live incident): the forecaster
+    # consumes ``exog`` positionally (``exog.to_numpy()[:steps]``) and derives
+    # the prediction index from its ``last_window_``. If ``exog_future``
+    # carries index labels for a different window (e.g. a ``data_end``
+    # contaminated by trailing exogenous-only rows), the model silently reads
+    # phase-shifted features. Realign to the true prediction window and refuse
+    # to predict when that window is not covered.
+    last_window = getattr(forecaster, "last_window_", None)
+    if (
+        isinstance(exog_future, pd.DataFrame)
+        and isinstance(exog_future.index, pd.DatetimeIndex)
+        and isinstance(getattr(last_window, "index", None), pd.DatetimeIndex)
+    ):
+        expected_index = expand_index(index=last_window.index, steps=predict_size)
+        if not exog_future.index[:predict_size].equals(expected_index):
+            realigned = exog_future.reindex(expected_index)
+            if realigned.isna().any().any():
+                raise ValueError(
+                    "exog_future is not aligned with the prediction window "
+                    f"[{expected_index[0]} .. {expected_index[-1]}]: it covers "
+                    f"[{exog_future.index.min()} .. {exog_future.index.max()}]. "
+                    "Refusing to predict with positionally misaligned "
+                    "exogenous data."
+                )
+            logger.warning(
+                "build_prediction_package: exog_future was label-misaligned; "
+                "realigned to the prediction window [%s .. %s].",
+                expected_index[0],
+                expected_index[-1],
+            )
+            exog_future = realigned
     future_pred = forecaster.predict(steps=predict_size, exog=exog_future)
 
     pred_pkg: Dict[str, Any] = {
