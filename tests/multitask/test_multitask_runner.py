@@ -4,7 +4,6 @@
 """Tests for the multitask runner module.
 
 Covers:
-- make_demo10_config returns a valid ConfigMulti with consistent bounds/agg_weights
 - runner.run rejects optuna/spotoptim task names
 - runner.run(plot_with_outliers=True) raises NotImplementedError
 - runner.run(task='clean') returns an empty DataFrame
@@ -19,7 +18,7 @@ import pytest
 
 from spotforecast2_safe.configurator.config_multi import ConfigMulti
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.multitask.runner import make_demo10_config, run
+from spotforecast2_safe.multitask.runner import run
 from spotforecast2_safe.preprocessing import RollingFeatures
 
 # ---------------------------------------------------------------------------
@@ -61,45 +60,6 @@ def _minimal_cfg(**kwargs) -> ConfigMulti:
     )
     defaults.update(kwargs)
     return ConfigMulti(**defaults)
-
-
-# ---------------------------------------------------------------------------
-# make_demo10_config
-# ---------------------------------------------------------------------------
-
-
-class TestMakeDemo10Config:
-    def test_returns_config_multi(self):
-        cfg = make_demo10_config()
-        assert isinstance(cfg, ConfigMulti)
-
-    def test_bounds_length(self):
-        cfg = make_demo10_config()
-        assert len(cfg.bounds) == 11
-
-    def test_agg_weights_length(self):
-        cfg = make_demo10_config()
-        assert len(cfg.agg_weights) == 11
-
-    def test_bounds_and_agg_weights_consistent(self):
-        cfg = make_demo10_config()
-        assert len(cfg.bounds) == len(cfg.agg_weights)
-
-    def test_bounds_are_tuples(self):
-        cfg = make_demo10_config()
-        for b in cfg.bounds:
-            assert len(b) == 2
-            lower, upper = b
-            assert lower < upper
-
-    def test_overrides_applied(self):
-        cfg = make_demo10_config(predict_size=48)
-        assert cfg.predict_size == 48
-
-    def test_fresh_instance_per_call(self):
-        cfg1 = make_demo10_config()
-        cfg2 = make_demo10_config()
-        assert cfg1 is not cfg2
 
 
 # ---------------------------------------------------------------------------

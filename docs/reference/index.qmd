@@ -57,6 +57,9 @@ feature engineering, and temporal train/test splitting.
 | [preprocessing.exog_providers.build_providers_from_config](preprocessing.exog_providers.build_providers_from_config.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers_from_config) | Construct providers by reading the registry flags off a config object. |
 | [preprocessing.imputation.apply_imputation](preprocessing.imputation.apply_imputation.qmd#spotforecast2_safe.preprocessing.imputation.apply_imputation) | Apply imputation to a DataFrame based on the method specified in config. |
 | [preprocessing.imputation.WeightFunction](preprocessing.imputation.WeightFunction.qmd#spotforecast2_safe.preprocessing.imputation.WeightFunction) | Callable class for sample weights that can be pickled. |
+| [preprocessing.target_corruption.TargetCorruptionReport](preprocessing.target_corruption.TargetCorruptionReport.qmd#spotforecast2_safe.preprocessing.target_corruption.TargetCorruptionReport) | Immutable summary of a target-corruption detection and policy run. |
+| [preprocessing.target_corruption.detect_target_corruption](preprocessing.target_corruption.detect_target_corruption.qmd#spotforecast2_safe.preprocessing.target_corruption.detect_target_corruption) | Detect physically-impossible target-column corruption in the native frame. |
+| [preprocessing.target_corruption.apply_target_corruption_policy](preprocessing.target_corruption.apply_target_corruption_policy.qmd#spotforecast2_safe.preprocessing.target_corruption.apply_target_corruption_policy) | Apply the configured corruption policy to the native-cadence frame. |
 | [preprocessing.imputation.custom_weights](preprocessing.imputation.custom_weights.qmd#spotforecast2_safe.preprocessing.imputation.custom_weights) | Return 0 if index is in or near any gap. |
 | [preprocessing.imputation.get_missing_weights](preprocessing.imputation.get_missing_weights.qmd#spotforecast2_safe.preprocessing.imputation.get_missing_weights) | Return imputed DataFrame and a series indicating missing weights. |
 | [preprocessing.data_transform](preprocessing.data_transform.qmd#spotforecast2_safe.preprocessing.data_transform) | Data transformation utilities for time series forecasting. |
@@ -183,7 +186,6 @@ strategies, and a one-call runner.
 | [multitask.strategies.LazyStrategy](multitask.strategies.LazyStrategy.qmd#spotforecast2_safe.multitask.strategies.LazyStrategy) | Approach 1 — Lazy fitting with optional cached tuning. |
 | [multitask.strategies.DefaultsStrategy](multitask.strategies.DefaultsStrategy.qmd#spotforecast2_safe.multitask.strategies.DefaultsStrategy) | Approach 2 — Train with defaults, no tuning, no cached params. |
 | [multitask.runner.run](multitask.runner.run.qmd#spotforecast2_safe.multitask.runner.run) | Run the MultiTask forecasting pipeline and return predictions. |
-| [multitask.runner.make_demo10_config](multitask.runner.make_demo10_config.qmd#spotforecast2_safe.multitask.runner.make_demo10_config) | Build a ``ConfigMulti`` pre-loaded with the 11-target demo10 presets. |
 
 ## Utils
 

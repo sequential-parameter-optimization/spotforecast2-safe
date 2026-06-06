@@ -8,7 +8,8 @@ These tests exercise the thin entry-point in
 by verifying:
 
 - ``run_pipeline`` delegates to ``runner.run`` with the right arguments.
-- ``run_pipeline`` with ``config=None`` builds the demo10 config.
+- ``run_pipeline`` with ``config=None`` raises ``ValueError`` with a message
+  mentioning "explicitly" (no demo10 preset is substituted).
 - ``_build_config_from_cli`` maps CLI flags to ``ConfigMulti`` fields correctly.
 - A real end-to-end run on synthetic data returns a non-empty forecast DataFrame.
 - Fail-safe: invalid input raises ``TypeError``/``ValueError``.
@@ -88,22 +89,10 @@ class TestRunPipelineRouting:
         assert kwargs["cache_home"] == "/tmp"
         assert kwargs["dataframe"] is df
 
-    @patch(f"{MOD}.run")
-    @patch(f"{MOD}.make_demo10_config")
-    @patch("pandas.read_csv")
-    def test_none_config_uses_demo10_config(self, mock_read_csv, mock_demo10, mock_run):
-        """When config=None, make_demo10_config() is invoked."""
-        fake_cfg = _minimal_config()
-        mock_demo10.return_value = fake_cfg
-        # _make_synthetic_df already returns a DatetimeIndex DF
-        fake_df = _make_synthetic_df()
-        mock_read_csv.return_value = fake_df
-        mock_run.return_value = pd.DataFrame({"forecast": [1.0]})
-
-        run_pipeline(config=None)
-
-        mock_demo10.assert_called_once()
-        mock_run.assert_called_once()
+    def test_none_config_raises_value_error(self):
+        """When config=None, run_pipeline raises ValueError mentioning 'explicitly'."""
+        with pytest.raises(ValueError, match="explicitly"):
+            run_pipeline(config=None)
 
     @patch(f"{MOD}.run")
     def test_returns_dataframe_from_runner(self, mock_run):

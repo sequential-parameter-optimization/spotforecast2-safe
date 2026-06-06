@@ -8,10 +8,14 @@ It delegates all heavy lifting to
 ``spotforecast2_safe.multitask.runner.run`` with ``task="lazy"`` and
 returns the forecast DataFrame directly.
 
-The previous monolithic ``n_to_1_with_covariates`` function and its
-``DEFAULT_WEIGHTS`` constant have been removed.  Default weights are now
-embedded in ``make_demo10_config()``; the CLI flag ``--weights`` maps to
-``ConfigMulti.agg_weights``.
+``run_pipeline`` requires an explicit ``ConfigMulti`` instance.  Outlier
+``bounds`` and aggregation ``agg_weights`` are domain-specific calibrations
+and must be supplied by the caller on ``ConfigMulti``; there are no
+dataset-specific presets.  Input data must always be passed explicitly via
+the ``dataframe`` argument.  The CLI flag ``--weights`` maps to
+``ConfigMulti.agg_weights``; the flag ``--train_ratio`` derives
+``train_size`` from the extent of the bundled ``demo10.csv`` (Python API
+callers supply ``train_size`` explicitly on ``ConfigMulti``).
 
 CLI entry point: ``spotforecast-safe-n2o1-cov-df``
 """
@@ -25,7 +29,7 @@ import pandas as pd
 
 from spotforecast2_safe.configurator.config_multi import ConfigMulti
 from spotforecast2_safe.data.fetch_data import get_package_data_home
-from spotforecast2_safe.multitask.runner import make_demo10_config, run
+from spotforecast2_safe.multitask.runner import run
 from spotforecast2_safe.utils.parse import parse_bool
 
 # ---------------------------------------------------------------------------
@@ -254,18 +258,20 @@ def run_pipeline(
 ) -> pd.DataFrame:
     """Execute the N-to-1 forecasting pipeline and return the forecast DataFrame.
 
-    When ``config`` is ``None``, ``make_demo10_config()`` is used to build
-    a ``ConfigMulti`` pre-loaded with the 11-target demo10 outlier bounds
-    and aggregation weights.  Execution is delegated to
-    ``spotforecast2_safe.multitask.runner.run`` with ``task="lazy"``.
+    Execution is delegated to ``spotforecast2_safe.multitask.runner.run``
+    with ``task="lazy"``.  A ``ConfigMulti`` instance must be supplied
+    explicitly; there is no implicit fallback.  Outlier ``bounds`` and
+    aggregation ``agg_weights`` are domain-specific calibrations and must
+    be provided by the caller — no preset values are substituted.  Input
+    data must likewise be supplied via ``dataframe``; auto-loading is not
+    performed.
 
     Args:
-        config: A ``ConfigMulti`` instance.  When ``None``, the demo10
-            preset is used (11 targets, ENTSO-E demo dataset).
+        config: A ``ConfigMulti`` instance.  Must not be ``None``; passing
+            ``None`` raises ``ValueError``.
         dataframe: Input time-series DataFrame.  Must contain a datetime
             column matching ``config.index_name`` and at least one numeric
-            target column.  When ``None`` and ``config`` is also ``None``,
-            ``demo10.csv`` from the bundled datasets is loaded automatically.
+            target column.
         data_test: Ground-truth DataFrame covering the prediction horizon.
             Optional; passed through to the runner for metric computation.
         project_name: Cache subdirectory and model-file identifier.
@@ -280,8 +286,9 @@ def run_pipeline(
         horizon timestamps.
 
     Raises:
-        ValueError: If the supplied ``config`` or ``dataframe`` is invalid
-            (propagated from ``runner.run`` / ``BaseTask``).
+        ValueError: If ``config`` is ``None``, or if the supplied
+            ``config`` or ``dataframe`` is invalid (propagated from
+            ``runner.run`` / ``BaseTask``).
         TypeError: If ``config`` is not ``None`` and not a ``ConfigMulti``
             instance.
 
@@ -325,18 +332,16 @@ def run_pipeline(
         )
 
     if config is None:
-        config = make_demo10_config()
-        if dataframe is None:
-            data_home = get_package_data_home()
-            dataframe = pd.read_csv(
-                data_home / "demo10.csv",
-                index_col=0,
-                parse_dates=True,
-            )
-            dataframe.index.name = "DateTime"
-            # Keep the DatetimeIndex intact — BaseTask.prepare_data calls
-            # preprocessing.curate_data.reset_index internally, which expects
-            # a DataFrame with a DatetimeIndex and resets it there.
+        raise ValueError(
+            "config is required: build a ConfigMulti and pass it explicitly, e.g.\n"
+            "    ConfigMulti(\n"
+            "        predict_size=24,\n"
+            "        agg_weights=[...],   # one weight per target column; None = equal 1/n\n"
+            "        bounds=[...],        # one (lower, upper) per target; None = no clipping\n"
+            "    )\n"
+            "Outlier `bounds` and aggregation `agg_weights` are domain-specific "
+            "calibrations and are never defaulted to demo-dataset values."
+        )
 
     return run(
         config,

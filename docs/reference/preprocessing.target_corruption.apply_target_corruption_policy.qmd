@@ -1,0 +1,105 @@
+# preprocessing.target_corruption.apply_target_corruption_policy { #spotforecast2_safe.preprocessing.target_corruption.apply_target_corruption_policy }
+
+```python
+preprocessing.target_corruption.apply_target_corruption_policy(
+    df,
+    *,
+    targets,
+    policy,
+    range_mw,
+    step_mw,
+    window_days,
+    max_heal_hours,
+    anchor_zone_hours,
+    cutoff,
+    logger,
+)
+```
+
+Apply the configured corruption policy to the native-cadence frame.
+
+This is the single entry point for the target-corruption sub-pipeline.
+It runs :func:`detect_target_corruption` and then dispatches to the
+``policy`` branch.  The function always acts only on target columns;
+exogenous columns are never modified.
+
+Policy semantics:
+
+- **noop** (detector inert or no flags): returns the **same** ``df``
+  object (no copy) and a report with ``action="noop"``.
+- **abort**: raises :class:`~spotforecast2_safe.exceptions.TargetCorruptionError`
+  with the span list and operator guidance.
+- **heal**: refuses and raises when (a) any flagged slot lies within
+  ``anchor_zone_hours`` of ``cutoff``, or (b) ``n_flagged_hours >
+  max_heal_hours``.  Otherwise sets flagged target slots to ``NaN`` so
+  that ``apply_imputation("weighted_interp")`` can interpolate and
+  zero-weight them.
+- **truncate**: sets ALL target columns to ``NaN`` from
+  ``first_flagged_hour`` onward.  The existing 16.3.1 trailing-clamp in
+  ``prepare_data`` then retracts ``data_end`` to the new last observed
+  target.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                                                            | Description                                                                                                                              | Default    |
+|-------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| df                | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                  | Native-cadence ``DataFrame`` indexed by a ``DatetimeIndex``.                                                                             | _required_ |
+| targets           | [Sequence](`typing.Sequence`)\[[str](`str`)\]                                   | Target column names.                                                                                                                     | _required_ |
+| policy            | [str](`str`)                                                                    | One of ``"abort"``, ``"heal"``, ``"truncate"``.                                                                                          | _required_ |
+| range_mw          | [Optional](`typing.Optional`)\[[float](`float`)\]                               | Range-rule threshold (MW); ``None`` skips that rule.                                                                                     | _required_ |
+| step_mw           | [Optional](`typing.Optional`)\[[float](`float`)\]                               | Step-rule threshold (MW); ``None`` skips that rule.                                                                                      | _required_ |
+| window_days       | [Optional](`typing.Optional`)\[[int](`int`)\]                                   | Look-back window for the detector (days); ``None`` makes the detector inert.                                                             | _required_ |
+| max_heal_hours    | [int](`int`)                                                                    | Maximum number of flagged hours the ``"heal"`` policy will accept.  ``0`` effectively disables healing.                                  | _required_ |
+| anchor_zone_hours | [int](`int`)                                                                    | Hours before ``cutoff`` that are protected from healing.  Flagged slots inside this zone force a refusal. Default is ``168`` (one week). | _required_ |
+| cutoff            | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | The effective training cutoff timestamp used for the anchor-zone check.  ``None`` disables the zone check.                               | _required_ |
+| logger            | [logging](`logging`).[Logger](`logging.Logger`)                                 | Standard-library logger for WARNING/INFO messages.                                                                                       | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                                                                             | Description                                                      |
+|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                                                                                                                   | Tuple of ``(df_out, report)`` where ``df_out`` is either the     |
+|        | [TargetCorruptionReport](`spotforecast2_safe.preprocessing.target_corruption.TargetCorruptionReport`)                                                                            | original ``df`` object (noop) or a mutated copy (heal/truncate), |
+|        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`), [TargetCorruptionReport](`spotforecast2_safe.preprocessing.target_corruption.TargetCorruptionReport`)\] | and ``report`` is a :class:`TargetCorruptionReport`.             |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                           | Description                                                                                      |
+|--------|--------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+|        | [TargetCorruptionError](`spotforecast2_safe.exceptions.TargetCorruptionError`) | On ``policy="abort"`` when flags are found, or on ``policy="heal"`` when the heal guard refuses. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import logging
+import pandas as pd
+import numpy as np
+from spotforecast2_safe.preprocessing.target_corruption import (
+    apply_target_corruption_policy,
+)
+
+log = logging.getLogger("demo")
+idx = pd.date_range("2026-06-03", periods=96, freq="15min", tz="UTC")
+vals = [55_000.0] * 96
+vals[5] = 44_000.0  # 11 GW step -> flags the 00:00 hour
+df = pd.DataFrame({"load": vals}, index=idx)
+
+df_out, report = apply_target_corruption_policy(
+    df,
+    targets=["load"],
+    policy="truncate",
+    range_mw=5_000,
+    step_mw=8_000,
+    window_days=3,
+    max_heal_hours=0,
+    anchor_zone_hours=168,
+    cutoff=None,
+    logger=log,
+)
+assert report.fired
+assert report.action == "truncate"
+# All target slots from first_flagged_hour onward are NaN
+nanned = df_out.loc[report.first_flagged_hour:, "load"]
+assert nanned.isna().all()
+print("action:", report.action, "flagged hours:", report.n_flagged_hours)
+```
