@@ -1151,12 +1151,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">run</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/multitask.runner.make_demo10_config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">make_demo10_config</span></a>
-  </div>
-</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1521,12 +1515,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tasks/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Task Safe n-to-1 Explained</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../../docs/tasks/task_multi.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Multi: MultiTask Pipeline</span></a>
   </div>
@@ -1600,7 +1588,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>tasks.task_safe_n_to_1_with_covariates_and_dataframe</code></p>
 <p>Thin ConfigMulti-driven entry point for N-to-1 forecasting.</p>
 <p>This module is a single-call wrapper around the <code>multitask</code> pipeline. It delegates all heavy lifting to <code>spotforecast2_safe.multitask.runner.run</code> with <code>task="lazy"</code> and returns the forecast DataFrame directly.</p>
-<p>The previous monolithic <code>n_to_1_with_covariates</code> function and its <code>DEFAULT_WEIGHTS</code> constant have been removed. Default weights are now embedded in <code>make_demo10_config()</code>; the CLI flag <code>--weights</code> maps to <code>ConfigMulti.agg_weights</code>.</p>
+<p><code>run_pipeline</code> requires an explicit <code>ConfigMulti</code> instance. Outlier <code>bounds</code> and aggregation <code>agg_weights</code> are domain-specific calibrations and must be supplied by the caller on <code>ConfigMulti</code>; there are no dataset-specific presets. Input data must always be passed explicitly via the <code>dataframe</code> argument. The CLI flag <code>--weights</code> maps to <code>ConfigMulti.agg_weights</code>; the flag <code>--train_ratio</code> derives <code>train_size</code> from the extent of the bundled <code>demo10.csv</code> (Python API callers supply <code>train_size</code> explicitly on <code>ConfigMulti</code>).</p>
 <p>CLI entry point: <code>spotforecast-safe-n2o1-cov-df</code></p>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
@@ -1662,7 +1650,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    show_progress<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Execute the N-to-1 forecasting pipeline and return the forecast DataFrame.</p>
-<p>When <code>config</code> is <code>None</code>, <code>make_demo10_config()</code> is used to build a <code>ConfigMulti</code> pre-loaded with the 11-target demo10 outlier bounds and aggregation weights. Execution is delegated to <code>spotforecast2_safe.multitask.runner.run</code> with <code>task="lazy"</code>.</p>
+<p>Execution is delegated to <code>spotforecast2_safe.multitask.runner.run</code> with <code>task="lazy"</code>. A <code>ConfigMulti</code> instance must be supplied explicitly; there is no implicit fallback. Outlier <code>bounds</code> and aggregation <code>agg_weights</code> are domain-specific calibrations and must be provided by the caller — no preset values are substituted. Input data must likewise be supplied via <code>dataframe</code>; auto-loading is not performed.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
@@ -1678,13 +1666,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>config</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="../../docs/reference/configurator.config_multi.ConfigMulti.html#spotforecast2_safe.configurator.config_multi.ConfigMulti">ConfigMulti</a>]</td>
-<td>A <code>ConfigMulti</code> instance. When <code>None</code>, the demo10 preset is used (11 targets, ENTSO-E demo dataset).</td>
+<td>A <code>ConfigMulti</code> instance. Must not be <code>None</code>; passing <code>None</code> raises <code>ValueError</code>.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>dataframe</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>Input time-series DataFrame. Must contain a datetime column matching <code>config.index_name</code> and at least one numeric target column. When <code>None</code> and <code>config</code> is also <code>None</code>, <code>demo10.csv</code> from the bundled datasets is loaded automatically.</td>
+<td>Input time-series DataFrame. Must contain a datetime column matching <code>config.index_name</code> and at least one numeric target column.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
@@ -1752,7 +1740,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
-<td>If the supplied <code>config</code> or <code>dataframe</code> is invalid (propagated from <code>runner.run</code> / <code>BaseTask</code>).</td>
+<td>If <code>config</code> is <code>None</code>, or if the supplied <code>config</code> or <code>dataframe</code> is invalid (propagated from <code>runner.run</code> / <code>BaseTask</code>).</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -1764,7 +1752,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div id="f15bebcd" class="cell" data-execution_count="1">
+<div id="85f5a3f2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>

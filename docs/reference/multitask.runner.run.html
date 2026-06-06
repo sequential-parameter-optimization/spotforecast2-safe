@@ -1151,12 +1151,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">run</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/multitask.runner.make_demo10_config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">make_demo10_config</span></a>
-  </div>
-</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1521,12 +1515,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/tasks/task_safe_n21_cov_df.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Task Safe n-to-1 Explained</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../../docs/tasks/task_multi.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Task Multi: MultiTask Pipeline</span></a>
   </div>
@@ -1633,7 +1621,7 @@ build_exogenous_features -&gt; run</code></pre>
 <tr class="odd">
 <td>config</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<code>PipelineConfig</code>]</td>
-<td>A <code>PipelineConfig</code>-conforming object (typically <code>ConfigMulti</code>). When <code>None</code>, a fresh <code>ConfigMulti()</code> is constructed with default fields. Use <code>make_demo10_config()</code> to opt in to the 11-target demo10 <code>bounds</code> / <code>agg_weights</code> presets.</td>
+<td>A <code>PipelineConfig</code>-conforming object (typically <code>ConfigMulti</code>). When <code>None</code>, a fresh <code>ConfigMulti()</code> is constructed with default fields. Outlier <code>bounds</code> and aggregation <code>agg_weights</code> are domain-specific calibrations and must be supplied explicitly on <code>ConfigMulti</code>.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
@@ -1761,7 +1749,7 @@ build_exogenous_features -&gt; run</code></pre>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Run the pipeline using cached or default model parameters (<code>"lazy"</code> task):</p>
-<div id="c01fadd9" class="cell" data-execution_count="1">
+<div id="19c5db3d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -1809,13 +1797,13 @@ build_exogenous_features -&gt; run</code></pre>
 </div>
 </div>
 <p>Remove all cached models and artefacts for a project (<code>"clean"</code> task). Returns an empty DataFrame:</p>
-<div id="6fe6b2dc" class="cell" data-execution_count="2">
+<div id="c0091363" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask.runner <span class="im">import</span> run</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> run(task<span class="op">=</span><span class="st">"clean"</span>, project_name<span class="op">=</span><span class="st">"demo02"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.empty)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[clean] Cache removed successfully: /Users/bartz/.spotforecast2_cache
+<pre><code>[clean] Cache removed successfully: /home/runner/.spotforecast2_cache
 True</code></pre>
 </div>
 </div>
