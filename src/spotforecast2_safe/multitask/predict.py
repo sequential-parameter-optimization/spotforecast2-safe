@@ -63,7 +63,7 @@ def execute_predict(
 
     results: Dict[str, Dict[str, Any]] = {}
 
-    for target in task.config.targets:
+    for target in task.run_state.targets:
         if target not in loaded_models:
             raise RuntimeError(
                 f"No saved model found for target '{target}'. "

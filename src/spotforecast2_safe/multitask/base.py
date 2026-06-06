@@ -18,6 +18,7 @@ sibling package for interactive figures.
 
 import json
 import logging
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Protocol
@@ -48,6 +49,7 @@ from spotforecast2_safe.manager.features import (
 )
 from spotforecast2_safe.manager.predictor import build_prediction_package
 from spotforecast2_safe.multitask.factories import default_lgbm_forecaster_factory
+from spotforecast2_safe.multitask.run_state import RunState
 from spotforecast2_safe.preprocessing.curate_data import (
     agg_and_resample_data,
     basic_ts_checks,
@@ -80,17 +82,15 @@ class PipelineConfig(Protocol):
     without subclassing or rebuilding kwargs.
     """
 
-    # Targets and aggregation
+    # Targets and aggregation (user input)
     targets: Optional[List[str]]
     agg_weights: Optional[List[float]]
     bounds: Optional[List[tuple]]
-    # Forecast horizon and training window
+    # Forecast horizon and training window (user input)
     predict_size: int
     train_size: pd.Timedelta
     delta_val: pd.Timedelta
     end_train_default: str
-    end_train_ts: Optional[pd.Timestamp]
-    start_train_ts: Optional[pd.Timestamp]
     # Outlier detection / imputation
     use_outlier_detection: bool
     contamination: float
@@ -110,13 +110,6 @@ class PipelineConfig(Protocol):
     state: str
     country_code: str
     lags_consider: List[int]
-    # Data ranges (derived after data loading)
-    data_start: Optional[pd.Timestamp]
-    data_end: Optional[pd.Timestamp]
-    cov_start: Optional[pd.Timestamp]
-    cov_end: Optional[pd.Timestamp]
-    start_download: Optional[str]
-    end_download: Optional[str]
     # Tuning trial budgets
     n_trials_optuna: int
     n_trials_spotoptim: int
@@ -298,6 +291,11 @@ class BaseTask:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.logger.setLevel(log_level)
 
+        # Task-owned runtime-derived state (see RunState / ADR adr-multitask-configmulti-merge)
+        self.run_state = RunState()
+        self._run_state_deprecation_warned: bool = False
+        self._data_last_ts_utc: Optional[pd.Timestamp] = None
+
         # Pipeline state (populated by methods)
         self.df_pipeline: Optional[pd.DataFrame] = None
         self.df_pipeline_original: Optional[pd.DataFrame] = None
@@ -334,6 +332,43 @@ class BaseTask:
             )
         )
         self.logger.addHandler(handler)
+
+    # ------------------------------------------------------------------
+    # Derived-state helpers (ADR adr-multitask-configmulti-merge, step 7)
+    # ------------------------------------------------------------------
+
+    def _set_derived(self, field: str, value: Any) -> None:
+        """Write a derived pipeline value to ``run_state`` and mirror it onto
+        ``config`` (one-minor-cycle shim with ``DeprecationWarning``).
+
+        The derived fields were historically stored directly on the config
+        object.  They now live on ``self.run_state``.  During this transition
+        cycle the value is also mirrored via ``setattr`` so that any legacy
+        reader that reads ``config.<derived>`` continues to get a valid value.
+        A single ``DeprecationWarning`` is emitted per task instance.
+
+        .. deprecated::
+            Reading derived pipeline fields from the config is deprecated and
+            will stop working in the next major release.  Read them from
+            ``task.run_state`` instead.
+        """
+        setattr(self.run_state, field, value)
+        if not self._run_state_deprecation_warned:
+            warnings.warn(
+                "Derived pipeline fields (start_download, end_download, "
+                "data_start, data_end, cov_start, cov_end, end_train_ts, "
+                "start_train_ts) have moved to task.run_state. "
+                "Reading them from the config is deprecated and will stop "
+                "working in the next major release. "
+                "config.targets continues to hold the user input unchanged; "
+                "read the resolved list from task.run_state.targets.",
+                DeprecationWarning,
+                # stacklevel=3: caller → prepare_data/_setup_training_window
+                # → _set_derived.  Adjust if call depth changes.
+                stacklevel=3,
+            )
+            self._run_state_deprecation_warned = True
+        setattr(self.config, field, value)
 
     # ------------------------------------------------------------------
     # Step 1 — Data Preparation
@@ -394,7 +429,7 @@ class BaseTask:
                 mt = MultiTask(cfg, dataframe=df)
                 mt.prepare_data()
                 print(f"Pipeline shape: {mt.df_pipeline.shape}")
-                print(f"Targets: {mt.config.targets}")
+                print(f"Targets: {mt.run_state.targets}")
             ```
         """
         if demo_data is None:
@@ -424,23 +459,26 @@ class BaseTask:
 
         first_ts = pd.Timestamp(demo_data[self.config.index_name].iloc[0])
         last_ts = pd.Timestamp(demo_data[self.config.index_name].iloc[-1])
-        self.config.start_download = first_ts.strftime("%Y%m%d%H%M")
-        self.config.end_download = last_ts.strftime("%Y%m%d%H%M")
-        # Honour an explicit user-set ``end_train_default`` when it is earlier
-        # than the last data row; only overwrite when the requested cutoff
-        # exceeds the data extent (e.g. demo flows that have no anchor).
-        user_end_train = pd.to_datetime(
-            getattr(self.config, "end_train_default", None), utc=True, errors="coerce"
-        )
+        self._set_derived("start_download", first_ts.strftime("%Y%m%d%H%M"))
+        self._set_derived("end_download", last_ts.strftime("%Y%m%d%H%M"))
+
+        # Store the effective last data timestamp for later use in
+        # _setup_training_window to clamp end_train_ts (the clamp is no
+        # longer applied here to avoid mutating config.end_train_default).
         last_ts_utc = (
             last_ts.tz_convert("UTC") if last_ts.tzinfo else last_ts.tz_localize("UTC")
         )
-        if user_end_train is pd.NaT or user_end_train > last_ts_utc:
-            self.config.end_train_default = last_ts.isoformat()
+        self._data_last_ts_utc = last_ts_utc
 
         all_targets = [c for c in demo_data.columns if c != self.config.index_name]
-        if self.config.targets is None:
-            self.config.targets = all_targets
+        # Initialise the working target list from user input; keep config.targets
+        # as the user supplied it (None stays None).  The resolved list lives on
+        # run_state.targets and is written at the end of this method.
+        _working_targets: List[str] = (
+            list(self.config.targets)
+            if self.config.targets is not None
+            else all_targets
+        )
 
         df_pipeline = demo_data.set_index(self.config.index_name)
 
@@ -478,12 +516,9 @@ class BaseTask:
             else:
                 _tc_cutoff = _user_end_train
 
-        # Determine targets for the corruption check (before the full target
-        # reconciliation below — use the pre-set list if available).
-        _tc_targets_pre = getattr(self.config, "targets", None) or [
-            c for c in demo_data.columns if c != self.config.index_name
-        ]
-        _tc_targets_present = [c for c in _tc_targets_pre if c in df_pipeline.columns]
+        # Determine targets for the corruption check (use working list derived
+        # from user input above; config.targets is not mutated).
+        _tc_targets_present = [c for c in _working_targets if c in df_pipeline.columns]
 
         # Mirror the detector's own inertness condition (window AND at least
         # one threshold) so the policy path — including the heal
@@ -528,9 +563,9 @@ class BaseTask:
         df_pipeline = agg_and_resample_data(df_pipeline, verbose=self.config.verbose)
         basic_ts_checks(df_pipeline, verbose=self.config.verbose)
 
-        self.config.targets = [
-            c for c in self.config.targets if c in df_pipeline.columns
-        ]
+        # Reconcile working targets against columns actually present after resampling.
+        # config.targets is NOT mutated; the resolved list lives on run_state.targets.
+        _working_targets = [c for c in _working_targets if c in df_pipeline.columns]
 
         # Trailing rows that carry no observed target value (e.g. future
         # day-ahead Forecasted-Load rows kept by ``keep_forecast_future=True``)
@@ -542,10 +577,8 @@ class BaseTask:
         # the last index where at least one configured target is observed;
         # forecast-window exogenous features are built independently up to
         # ``cov_end`` by the calendar/weather/provider builders.
-        if self.config.targets:
-            last_target_ts = (
-                df_pipeline[self.config.targets].dropna(how="all").index.max()
-            )
+        if _working_targets:
+            last_target_ts = df_pipeline[_working_targets].dropna(how="all").index.max()
             if pd.notna(last_target_ts) and last_target_ts < df_pipeline.index.max():
                 n_dropped = int((df_pipeline.index > last_target_ts).sum())
                 self.logger.warning(
@@ -572,7 +605,7 @@ class BaseTask:
             and _tc_report.pre_policy_last_target is not None
         ):
             _data_end_realized = (
-                df_pipeline[self.config.targets].dropna(how="all").index.max()
+                df_pipeline[_working_targets].dropna(how="all").index.max()
             )
             if pd.notna(_data_end_realized):
                 # Floor on BOTH sides is exact, not lossy: predict_size lives
@@ -621,16 +654,25 @@ class BaseTask:
                 )
                 self.config.predict_size = self._tc_base_predict_size
 
-        (
-            self.config.data_start,
-            self.config.data_end,
-            self.config.cov_start,
-            self.config.cov_end,
-        ) = get_start_end(
+        _data_start_str, _data_end_str, _cov_start_str, _cov_end_str = get_start_end(
             data=df_pipeline,
             forecast_horizon=self.config.predict_size,
             verbose=self.config.verbose,
         )
+        # get_start_end returns ISO strings; RunState stores pd.Timestamps.
+        _data_start = pd.to_datetime(_data_start_str, utc=True)
+        _data_end = pd.to_datetime(_data_end_str, utc=True)
+        _cov_start = pd.to_datetime(_cov_start_str, utc=True)
+        _cov_end = pd.to_datetime(_cov_end_str, utc=True)
+        self._set_derived("data_start", _data_start)
+        self._set_derived("data_end", _data_end)
+        self._set_derived("cov_start", _cov_start)
+        self._set_derived("cov_end", _cov_end)
+
+        # Write the resolved target list to run_state only.
+        # config.targets must remain unchanged (user input).
+        # The mirror shim is NOT applied for targets (it would overwrite user input).
+        self.run_state.targets = _working_targets
 
         self.df_pipeline = df_pipeline
         self.logger.info("Pipeline data shape after preparation: %s", df_pipeline.shape)
@@ -739,6 +781,7 @@ class BaseTask:
                 df_pipeline=self.df_pipeline,
                 config=self.config,
                 logger=self.logger,
+                targets=self.run_state.targets,
             )
             self.logger.info(
                 "Imputation complete (method=%s).", self.config.imputation_method
@@ -860,8 +903,8 @@ class BaseTask:
         try:
             weather_features, self.weather_aligned = get_weather_features(
                 data=self.df_pipeline,
-                start=self.config.data_start,
-                cov_end=self.config.cov_end,
+                start=self.run_state.data_start,
+                cov_end=self.run_state.cov_end,
                 forecast_horizon=self.config.predict_size,
                 latitude=self.config.latitude,
                 longitude=self.config.longitude,
@@ -884,8 +927,8 @@ class BaseTask:
 
         # 4b. Calendar
         calendar_features = get_calendar_features(
-            start=self.config.data_start,
-            cov_end=self.config.cov_end,
+            start=self.run_state.data_start,
+            cov_end=self.run_state.cov_end,
             freq="h",
             timezone=self.config.timezone,
         )
@@ -898,8 +941,8 @@ class BaseTask:
             timezone=self.config.timezone,
         )
         sun_light_features = get_day_night_features(
-            start=self.config.data_start,
-            cov_end=self.config.cov_end,
+            start=self.run_state.data_start,
+            cov_end=self.run_state.cov_end,
             location=location,
             freq="h",
             timezone=self.config.timezone,
@@ -909,8 +952,8 @@ class BaseTask:
         # 4d. Holidays
         holiday_features = get_holiday_features(
             data=self.df_pipeline,
-            start=self.config.data_start,
-            cov_end=self.config.cov_end,
+            start=self.run_state.data_start,
+            cov_end=self.run_state.cov_end,
             forecast_horizon=self.config.predict_size,
             tz=self.config.timezone,
             freq="h",
@@ -929,8 +972,8 @@ class BaseTask:
         if self.config.include_holiday_adjacency_features:
             holiday_adjacency_features = get_holiday_adjacency_features(
                 data=self.df_pipeline,
-                start=self.config.data_start,
-                cov_end=self.config.cov_end,
+                start=self.run_state.data_start,
+                cov_end=self.run_state.cov_end,
                 forecast_horizon=self.config.predict_size,
                 tz=self.config.timezone,
                 freq="h",
@@ -975,10 +1018,10 @@ class BaseTask:
             on_fail = getattr(self.config, "on_exog_provider_failure", "raise")
             provider_window = None
             if getattr(self.config, "exog_provider_window", "full") == "train":
-                if getattr(self.config, "start_train_ts", None) is None:
+                if self.run_state.start_train_ts is None:
                     self._setup_training_window()
-                _start_train = getattr(self.config, "start_train_ts", None)
-                _cov_end = getattr(self.config, "cov_end", None)
+                _start_train = self.run_state.start_train_ts
+                _cov_end = self.run_state.cov_end
                 if _start_train is not None and _cov_end is not None:
                     _cov_end_ts = pd.Timestamp(_cov_end)
                     if _cov_end_ts.tz is None and _start_train.tz is not None:
@@ -1049,7 +1092,7 @@ class BaseTask:
             if poly_cols and max_poly and 0 < max_poly < len(poly_cols):
                 keep = select_top_poly_features(
                     self.exogenous_features[poly_cols],
-                    self.df_pipeline[self.config.targets[0]],
+                    self.df_pipeline[self.run_state.targets[0]],
                     max_poly_features=max_poly,
                     random_state=self.config.random_state,
                     n_jobs=getattr(self.config, "poly_mi_n_jobs", -1),
@@ -1092,11 +1135,11 @@ class BaseTask:
         self.data_with_exog, _, self.exo_pred = merge_data_and_covariates(
             data=self.df_pipeline,
             exogenous_features=self.exogenous_features,
-            target_columns=self.config.targets,
+            target_columns=self.run_state.targets,
             exog_features=self.exog_feature_names,
-            start=self.config.data_start,
-            end=self.config.data_end,
-            cov_end=self.config.cov_end,
+            start=self.run_state.data_start,
+            end=self.run_state.data_end,
+            cov_end=self.run_state.cov_end,
             forecast_horizon=self.config.predict_size,
             cast_dtype="float32",
         )
@@ -1112,18 +1155,37 @@ class BaseTask:
     # ------------------------------------------------------------------
 
     def _setup_training_window(self) -> None:
-        """Derive ``config.end_train_ts`` and ``config.start_train_ts``."""
-        self.config.end_train_ts = pd.to_datetime(
-            self.config.end_train_default, utc=True
-        )
-        self.config.start_train_ts = self.config.end_train_ts - self.config.train_size
-        self.config.start_train_ts = max(
-            self.config.start_train_ts, self.df_pipeline.index.min()
-        )
+        """Derive ``run_state.end_train_ts`` and ``run_state.start_train_ts``.
+
+        The end of the training window is clamped to the data extent: when
+        ``config.end_train_default`` exceeds the last observed data timestamp,
+        ``run_state.end_train_ts`` is set to that last timestamp instead.  An
+        explicitly earlier user cutoff is always honoured without modification.
+
+        ``config.end_train_default`` is never mutated.
+        """
+        requested_end = pd.to_datetime(self.config.end_train_default, utc=True)
+        # Apply clamp: cap to the last observed data timestamp so that a
+        # stale end_train_default does not extend the training window beyond
+        # what was actually downloaded.
+        data_last_ts = self._data_last_ts_utc
+        if data_last_ts is None and self.run_state.data_end is not None:
+            data_last_ts = self.run_state.data_end
+            if data_last_ts.tzinfo is None:
+                data_last_ts = data_last_ts.tz_localize("UTC")
+        if data_last_ts is not None and requested_end > data_last_ts:
+            effective_end = data_last_ts
+        else:
+            effective_end = requested_end
+
+        _start_train = effective_end - self.config.train_size
+        _start_train = max(_start_train, self.df_pipeline.index.min())
+        self._set_derived("end_train_ts", effective_end)
+        self._set_derived("start_train_ts", _start_train)
         self.logger.info(
             "Training window: %s to %s",
-            self.config.start_train_ts,
-            self.config.end_train_ts,
+            self.run_state.start_train_ts,
+            self.run_state.end_train_ts,
         )
 
     # ------------------------------------------------------------------
@@ -1138,7 +1200,7 @@ class BaseTask:
         compute split boundaries that respect temporal ordering and avoid
         data leakage between folds.
 
-        The validation boundary is determined by ``config.end_train_ts`` minus
+        The validation boundary is determined by ``run_state.end_train_ts`` minus
         ``config.delta_val``.  When ``config.train_size`` is set, the sklearn
         splitter uses a sliding fixed-size training window
         (``max_train_size``); otherwise an expanding window is used.
@@ -1152,7 +1214,7 @@ class BaseTask:
             A configured ``TimeSeriesFold`` instance ready to be passed to
             a model-selection function.
         """
-        end_cv = self.config.end_train_ts - self.config.delta_val
+        end_cv = self.run_state.end_train_ts - self.config.delta_val
         n_train_cv = len(y_train.loc[:end_cv])
 
         # CV block width: decoupled from the live forecast horizon.  Defaults to
@@ -1618,6 +1680,8 @@ class BaseTask:
                 self.exog_feature_names if self.exog_feature_names else None
             ),
             exo_pred=self.exo_pred,
+            start_train_ts=self.run_state.start_train_ts,
+            end_train_ts=self.run_state.end_train_ts,
         )
 
     # ------------------------------------------------------------------
@@ -1711,16 +1775,16 @@ class BaseTask:
         has no effect (the aggregated-figure hook is never invoked).  The
         result is stored in ``agg_results`` keyed by ``task_name``.
         """
-        if len(self.config.targets) == 1:
-            target = self.config.targets[0]
+        if len(self.run_state.targets) == 1:
+            target = self.run_state.targets[0]
             agg_pkg = results[target]
             self.agg_results[task_name] = agg_pkg
             return agg_pkg
 
         if self.config.agg_weights is not None:
-            active_weights = self.config.agg_weights[: len(self.config.targets)]
+            active_weights = self.config.agg_weights[: len(self.run_state.targets)]
         else:
-            n = len(self.config.targets)
+            n = len(self.run_state.targets)
             active_weights = [1.0 / n] * n
             self.logger.info(
                 "No agg_weights configured — using equal weights (1/%d each).", n
@@ -1728,7 +1792,7 @@ class BaseTask:
 
         agg_pkg = self.agg_predictor(
             results=results,
-            targets=self.config.targets,
+            targets=self.run_state.targets,
             weights=active_weights,
         )
         self.agg_results[task_name] = agg_pkg
@@ -1772,7 +1836,7 @@ class BaseTask:
         self._ensure_pipeline_ready()
         results: Dict[str, Dict[str, Any]] = {}
 
-        for target in self.config.targets:
+        for target in self.run_state.targets:
             if log_prefix:
                 self.logger.info("%sTarget '%s': %s ...", log_prefix, target, task_name)
             else:
@@ -1811,7 +1875,7 @@ class BaseTask:
         """Raise if data has not been prepared and training window not set."""
         if self.df_pipeline is None:
             raise RuntimeError("Pipeline data not prepared. Call prepare_data() first.")
-        if self.config.end_train_ts is None:
+        if self.run_state.end_train_ts is None:
             self._setup_training_window()
 
     # ------------------------------------------------------------------
