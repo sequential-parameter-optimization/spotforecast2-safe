@@ -260,7 +260,9 @@ def detect_target_corruption(
     else:
         floored = df.index.floor("h")
     mask = pd.Series(
-        floored.isin(pd.DatetimeIndex(sorted(flagged_hours))), index=df.index, dtype=bool
+        floored.isin(pd.DatetimeIndex(sorted(flagged_hours))),
+        index=df.index,
+        dtype=bool,
     )
     return mask
 

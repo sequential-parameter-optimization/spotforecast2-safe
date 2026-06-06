@@ -695,12 +695,28 @@ def df_pipeline(pipeline_idx):
 
 
 @pytest.fixture
-def base_config(pipeline_idx):
-    """ConfigMulti with training window covering the full 168-hour index."""
-    cfg = ConfigMulti(targets=["load"], use_exogenous_features=False)
-    cfg.start_train_ts = pipeline_idx[0]
-    cfg.end_train_ts = pipeline_idx[-1]
-    return cfg
+def train_window(pipeline_idx):
+    """Explicit training-window dict covering the full 168-hour index.
+
+    Pass as ``**train_window`` to every ``get_target_data`` call so the
+    function never falls back to the deprecated ``config.start_train_ts`` /
+    ``config.end_train_ts`` attributes (RunState extraction, v18.0.0).
+    """
+    return {
+        "start_train_ts": pipeline_idx[0],
+        "end_train_ts": pipeline_idx[-1],
+    }
+
+
+@pytest.fixture
+def base_config():
+    """ConfigMulti with no derived training-window attributes set.
+
+    The window is passed explicitly to ``get_target_data`` via the
+    ``train_window`` fixture; ``config.start_train_ts`` /
+    ``config.end_train_ts`` must not be set on the config object.
+    """
+    return ConfigMulti(targets=["load"], use_exogenous_features=False)
 
 
 @pytest.fixture
@@ -742,61 +758,81 @@ def exo_pred_df(exog_idx):
 class TestGetTargetDataNoExog:
     """get_target_data with use_exogenous_features=False."""
 
-    def test_returns_tuple_of_three(self, df_pipeline, base_config):
-        result = get_target_data("load", df_pipeline, base_config)
+    def test_returns_tuple_of_three(self, df_pipeline, base_config, train_window):
+        result = get_target_data("load", df_pipeline, base_config, **train_window)
         assert isinstance(result, tuple) and len(result) == 3
 
-    def test_y_train_is_series(self, df_pipeline, base_config):
-        y_train, _, _ = get_target_data("load", df_pipeline, base_config)
+    def test_y_train_is_series(self, df_pipeline, base_config, train_window):
+        y_train, _, _ = get_target_data(
+            "load", df_pipeline, base_config, **train_window
+        )
         assert isinstance(y_train, pd.Series)
 
-    def test_y_train_length(self, df_pipeline, base_config):
-        y_train, _, _ = get_target_data("load", df_pipeline, base_config)
+    def test_y_train_length(self, df_pipeline, base_config, train_window):
+        y_train, _, _ = get_target_data(
+            "load", df_pipeline, base_config, **train_window
+        )
         assert len(y_train) == 168
 
-    def test_y_train_values_match_pipeline(self, df_pipeline, base_config):
-        y_train, _, _ = get_target_data("load", df_pipeline, base_config)
+    def test_y_train_values_match_pipeline(
+        self, df_pipeline, base_config, train_window
+    ):
+        y_train, _, _ = get_target_data(
+            "load", df_pipeline, base_config, **train_window
+        )
         expected = df_pipeline["load"].loc[
-            base_config.start_train_ts : base_config.end_train_ts
+            train_window["start_train_ts"] : train_window["end_train_ts"]
         ]
         pd.testing.assert_series_equal(y_train, expected)
 
-    def test_exog_train_is_none(self, df_pipeline, base_config):
-        _, exog_train, _ = get_target_data("load", df_pipeline, base_config)
+    def test_exog_train_is_none(self, df_pipeline, base_config, train_window):
+        _, exog_train, _ = get_target_data(
+            "load", df_pipeline, base_config, **train_window
+        )
         assert exog_train is None
 
-    def test_exog_future_is_none(self, df_pipeline, base_config):
-        _, _, exog_future = get_target_data("load", df_pipeline, base_config)
+    def test_exog_future_is_none(self, df_pipeline, base_config, train_window):
+        _, _, exog_future = get_target_data(
+            "load", df_pipeline, base_config, **train_window
+        )
         assert exog_future is None
 
     def test_partial_training_window(self, df_pipeline, pipeline_idx):
         """Training window shorter than the full index."""
         cfg = ConfigMulti(targets=["load"], use_exogenous_features=False)
-        cfg.start_train_ts = pipeline_idx[10]
-        cfg.end_train_ts = pipeline_idx[72]
-        y_train, _, _ = get_target_data("load", df_pipeline, cfg)
+        y_train, _, _ = get_target_data(
+            "load",
+            df_pipeline,
+            cfg,
+            start_train_ts=pipeline_idx[10],
+            end_train_ts=pipeline_idx[72],
+        )
         assert len(y_train) == 63  # 72 - 10 + 1
 
     def test_second_target_column(self, df_pipeline, pipeline_idx):
         """Works for a target column other than the first."""
         cfg = ConfigMulti(targets=["temp_load"], use_exogenous_features=False)
-        cfg.start_train_ts = pipeline_idx[0]
-        cfg.end_train_ts = pipeline_idx[-1]
-        y_train, _, _ = get_target_data("temp_load", df_pipeline, cfg)
+        start = pipeline_idx[0]
+        end = pipeline_idx[-1]
+        y_train, _, _ = get_target_data(
+            "temp_load", df_pipeline, cfg, start_train_ts=start, end_train_ts=end
+        )
         pd.testing.assert_series_equal(
             y_train,
-            df_pipeline["temp_load"].loc[cfg.start_train_ts : cfg.end_train_ts],
+            df_pipeline["temp_load"].loc[start:end],
         )
 
-    def test_y_train_squeezed(self, df_pipeline, base_config):
+    def test_y_train_squeezed(self, df_pipeline, base_config, train_window):
         """Result of squeeze() must be a Series, not a DataFrame."""
-        y_train, _, _ = get_target_data("load", df_pipeline, base_config)
+        y_train, _, _ = get_target_data(
+            "load", df_pipeline, base_config, **train_window
+        )
         assert y_train.ndim == 1
 
-    def test_missing_target_raises(self, df_pipeline, base_config):
+    def test_missing_target_raises(self, df_pipeline, base_config, train_window):
         """Requesting a column not in df_pipeline should raise KeyError."""
         with pytest.raises(KeyError):
-            get_target_data("nonexistent", df_pipeline, base_config)
+            get_target_data("nonexistent", df_pipeline, base_config, **train_window)
 
 
 # =============================================================================
@@ -814,10 +850,11 @@ class TestGetTargetDataWithExog:
         self.data_with_exog = data_with_exog_df
         self.exo_pred = exo_pred_df
         self.exog_names = ["hour_sin", "hour_cos"]
+        # Training window stored as explicit timestamps (not on config).
+        self.start_train_ts = pipeline_idx[0]
+        self.end_train_ts = pipeline_idx[-1]
 
         self.cfg = ConfigMulti(targets=["load"], use_exogenous_features=True)
-        self.cfg.start_train_ts = pipeline_idx[0]
-        self.cfg.end_train_ts = pipeline_idx[-1]
 
     def _call(self):
         return get_target_data(
@@ -827,6 +864,8 @@ class TestGetTargetDataWithExog:
             data_with_exog=self.data_with_exog,
             exog_feature_names=self.exog_names,
             exo_pred=self.exo_pred,
+            start_train_ts=self.start_train_ts,
+            end_train_ts=self.end_train_ts,
         )
 
     def test_exog_train_is_dataframe(self):
@@ -861,20 +900,18 @@ class TestGetTargetDataWithExog:
         _, _, exog_future = self._call()
         assert (exog_future.dtypes == "float32").all()
 
-    def test_exog_train_window_matches_config(self):
+    def test_exog_train_window_matches_explicit_params(self):
         _, exog_train, _ = self._call()
-        assert exog_train.index[0] == self.cfg.start_train_ts
-        assert exog_train.index[-1] == self.cfg.end_train_ts
+        assert exog_train.index[0] == self.start_train_ts
+        assert exog_train.index[-1] == self.end_train_ts
 
     def test_exog_future_index_after_train_end(self):
         _, _, exog_future = self._call()
-        assert (exog_future.index > self.cfg.end_train_ts).all()
+        assert (exog_future.index > self.end_train_ts).all()
 
     def test_y_train_still_correct_with_exog(self):
         y_train, _, _ = self._call()
-        expected = self.df_pipeline["load"].loc[
-            self.cfg.start_train_ts : self.cfg.end_train_ts
-        ]
+        expected = self.df_pipeline["load"].loc[self.start_train_ts : self.end_train_ts]
         pd.testing.assert_series_equal(y_train, expected)
 
 
@@ -891,8 +928,6 @@ class TestGetTargetDataExogDisabledButProvided:
         self, df_pipeline, pipeline_idx, data_with_exog_df, exo_pred_df
     ):
         cfg = ConfigMulti(targets=["load"], use_exogenous_features=False)
-        cfg.start_train_ts = pipeline_idx[0]
-        cfg.end_train_ts = pipeline_idx[-1]
         _, exog_train, _ = get_target_data(
             "load",
             df_pipeline,
@@ -900,6 +935,8 @@ class TestGetTargetDataExogDisabledButProvided:
             data_with_exog=data_with_exog_df,
             exog_feature_names=["hour_sin", "hour_cos"],
             exo_pred=exo_pred_df,
+            start_train_ts=pipeline_idx[0],
+            end_train_ts=pipeline_idx[-1],
         )
         assert exog_train is None
 
@@ -907,8 +944,6 @@ class TestGetTargetDataExogDisabledButProvided:
         self, df_pipeline, pipeline_idx, data_with_exog_df, exo_pred_df
     ):
         cfg = ConfigMulti(targets=["load"], use_exogenous_features=False)
-        cfg.start_train_ts = pipeline_idx[0]
-        cfg.end_train_ts = pipeline_idx[-1]
         _, _, exog_future = get_target_data(
             "load",
             df_pipeline,
@@ -916,6 +951,8 @@ class TestGetTargetDataExogDisabledButProvided:
             data_with_exog=data_with_exog_df,
             exog_feature_names=["hour_sin", "hour_cos"],
             exo_pred=exo_pred_df,
+            start_train_ts=pipeline_idx[0],
+            end_train_ts=pipeline_idx[-1],
         )
         assert exog_future is None
 
@@ -933,18 +970,26 @@ class TestGetTargetDataExogEnabledButNone:
         self, df_pipeline, pipeline_idx
     ):
         cfg = ConfigMulti(targets=["load"], use_exogenous_features=True)
-        cfg.start_train_ts = pipeline_idx[0]
-        cfg.end_train_ts = pipeline_idx[-1]
-        _, exog_train, _ = get_target_data("load", df_pipeline, cfg)
+        _, exog_train, _ = get_target_data(
+            "load",
+            df_pipeline,
+            cfg,
+            start_train_ts=pipeline_idx[0],
+            end_train_ts=pipeline_idx[-1],
+        )
         assert exog_train is None
 
     def test_exog_future_none_when_data_with_exog_is_none(
         self, df_pipeline, pipeline_idx
     ):
         cfg = ConfigMulti(targets=["load"], use_exogenous_features=True)
-        cfg.start_train_ts = pipeline_idx[0]
-        cfg.end_train_ts = pipeline_idx[-1]
-        _, _, exog_future = get_target_data("load", df_pipeline, cfg)
+        _, _, exog_future = get_target_data(
+            "load",
+            df_pipeline,
+            cfg,
+            start_train_ts=pipeline_idx[0],
+            end_train_ts=pipeline_idx[-1],
+        )
         assert exog_future is None
 
 
@@ -981,13 +1026,13 @@ class TestGetTargetDataDocstringExamples:
         df_pipeline = pd.DataFrame({"load": rng.normal(100, 10, 168)}, index=idx)
 
         config = ConfigMulti(targets=["load"], use_exogenous_features=False)
-        config.start_train_ts = pd.Timestamp("2024-01-01 00:00", tz="UTC")
-        config.end_train_ts = pd.Timestamp("2024-01-07 23:00", tz="UTC")
 
         y_train, exog_train, exog_future = get_target_data(
             target="load",
             df_pipeline=df_pipeline,
             config=config,
+            start_train_ts=pd.Timestamp("2024-01-01 00:00", tz="UTC"),
+            end_train_ts=pd.Timestamp("2024-01-07 23:00", tz="UTC"),
         )
         assert len(y_train) == 168
         assert exog_train is None
@@ -1016,8 +1061,6 @@ class TestGetTargetDataDocstringExamples:
         )
 
         config = ConfigMulti(targets=["load"], use_exogenous_features=True)
-        config.start_train_ts = pd.Timestamp("2024-01-01 00:00", tz="UTC")
-        config.end_train_ts = pd.Timestamp("2024-01-07 23:00", tz="UTC")
 
         y_train, exog_train, exog_future = get_target_data(
             target="load",
@@ -1026,6 +1069,8 @@ class TestGetTargetDataDocstringExamples:
             data_with_exog=data_with_exog,
             exog_feature_names=["hour_sin", "hour_cos"],
             exo_pred=exo_pred,
+            start_train_ts=pd.Timestamp("2024-01-01 00:00", tz="UTC"),
+            end_train_ts=pd.Timestamp("2024-01-07 23:00", tz="UTC"),
         )
         assert len(y_train) == 168
         assert exog_train.shape == (168, 2)

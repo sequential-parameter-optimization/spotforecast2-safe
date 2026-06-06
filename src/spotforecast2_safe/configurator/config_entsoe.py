@@ -97,19 +97,11 @@ class ConfigEntsoe:
             spot price (DE/LU). Defaults to ``False``.
         index_name (str): Datetime column name when the DataFrame index is
             reset.  ENTSO-E CSVs use ``"Time (UTC)"``; defaults to that.
-        start_download (Optional[str]): Start of the data download range.
-        end_download (Optional[str]): End of the data download range.
-        data_start (Optional[pd.Timestamp]): First pipeline-data timestamp.
-        data_end (Optional[pd.Timestamp]): Last pipeline-data timestamp.
-        cov_start (Optional[pd.Timestamp]): Start of the covariate range.
-        cov_end (Optional[pd.Timestamp]): End of the covariate range.
         bounds (Optional[List[tuple]]): Per-column outlier bounds.  For
             single-target ENTSO-E this is typically ``None`` or a single
             ``[(lower, upper)]`` entry.
         verbose (bool): Verbose pipeline output.
         cache_home (Optional[Any]): Cache directory override.
-        end_train_ts (Optional[pd.Timestamp]): Derived end-of-training.
-        start_train_ts (Optional[pd.Timestamp]): Derived start-of-training.
         n_trials_optuna (int): Optuna Bayesian-search trial budget.
         n_trials_spotoptim (int): SpotOptim surrogate-search trial budget.
         n_initial_spotoptim (int): SpotOptim initial random evaluations.
@@ -265,17 +257,9 @@ class ConfigEntsoe:
         "include_entsoe_net_load",
         "include_entsoe_day_ahead_price",
         "index_name",
-        "start_download",
-        "end_download",
-        "data_start",
-        "data_end",
-        "cov_start",
-        "cov_end",
         "bounds",
         "verbose",
         "cache_home",
-        "end_train_ts",
-        "start_train_ts",
         "n_trials_optuna",
         "n_trials_spotoptim",
         "n_initial_spotoptim",
@@ -347,21 +331,11 @@ class ConfigEntsoe:
         include_entsoe_day_ahead_price: bool = False,
         # Data source and index
         index_name: str = "Time (UTC)",
-        start_download: Optional[str] = None,
-        end_download: Optional[str] = None,
-        # Derived date ranges (set after data loading via get_start_end())
-        data_start: Optional[pd.Timestamp] = None,
-        data_end: Optional[pd.Timestamp] = None,
-        cov_start: Optional[pd.Timestamp] = None,
-        cov_end: Optional[pd.Timestamp] = None,
         # Per-column outlier bounds
         bounds: Optional[List[tuple]] = None,
         # Verbosity and caching
         verbose: bool = False,
         cache_home: Optional[Any] = None,
-        # Derived training window
-        end_train_ts: Optional[pd.Timestamp] = None,
-        start_train_ts: Optional[pd.Timestamp] = None,
         # Hyperparameter tuning trial budgets
         n_trials_optuna: int = 15,
         n_trials_spotoptim: int = 10,
@@ -468,21 +442,11 @@ class ConfigEntsoe:
         self.include_entsoe_day_ahead_price = include_entsoe_day_ahead_price
         # Data source and index
         self.index_name = index_name
-        self.start_download = start_download
-        self.end_download = end_download
-        # Derived date ranges (set after data loading via get_start_end())
-        self.data_start = data_start
-        self.data_end = data_end
-        self.cov_start = cov_start
-        self.cov_end = cov_end
         # Per-column outlier bounds
         self.bounds = bounds
         # Verbosity and caching
         self.verbose = verbose
         self.cache_home = cache_home
-        # Derived training window
-        self.end_train_ts = end_train_ts
-        self.start_train_ts = start_train_ts
         # Hyperparameter tuning trial budgets
         self.n_trials_optuna = n_trials_optuna
         self.n_trials_spotoptim = n_trials_spotoptim

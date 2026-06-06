@@ -82,28 +82,12 @@ class ConfigMulti:
             behaviour). Defaults to ``4000``.
         index_name (str): Name assigned to the datetime column when the index is reset.
             Defaults to ``"DateTime"``.
-        start_download (Optional[str]): Start of the download/data range as a string
-            (format ``"YYYYMMDDHHMM"``). Derived from the loaded dataset; ``None`` until set.
-        end_download (Optional[str]): End of the download/data range as a string
-            (format ``"YYYYMMDDHHMM"``). Derived from the loaded dataset; ``None`` until set.
-        data_start (Optional[pd.Timestamp]): First timestamp of the pipeline data range.
-            Derived from the loaded dataset via ``get_start_end()``; ``None`` until set.
-        data_end (Optional[pd.Timestamp]): Last timestamp of the pipeline data range.
-            Derived from the loaded dataset via ``get_start_end()``; ``None`` until set.
-        cov_start (Optional[pd.Timestamp]): Start of the covariate range (same as ``data_start``).
-            Derived from the loaded dataset via ``get_start_end()``; ``None`` until set.
-        cov_end (Optional[pd.Timestamp]): End of the covariate range (extends ``data_end`` by
-            ``predict_size`` hours). Derived via ``get_start_end()``; ``None`` until set.
         bounds (Optional[List[tuple]]): Per-column outlier bounds as a list of
             ``(lower, upper)`` tuples, one entry per target column. ``None`` until set.
         verbose (bool): If ``True``, enable verbose output for pipeline steps.
             Defaults to ``False``.
         cache_home (Optional[Any]): Path to the cache directory. ``None`` means
             the library default (``~/spotforecast2_cache/``) is used.
-        end_train_ts (Optional[pd.Timestamp]): End of the training window.
-            Derived from ``end_train_default`` after data loading; ``None`` until set.
-        start_train_ts (Optional[pd.Timestamp]): Start of the training window.
-            Derived as ``end_train_ts - train_size`` after data loading; ``None`` until set.
         n_trials_optuna (int): Number of Optuna Bayesian-search trials for hyperparameter
             optimization (task 3). Defaults to ``15``.
         n_trials_spotoptim (int): Number of SpotOptim surrogate-search trials (task 4).
@@ -211,17 +195,9 @@ class ConfigMulti:
         include_entsoe_day_ahead_price (bool): Append the ENTSO-E day-ahead
             spot price (DE/LU).
         index_name (str): Datetime column name used when resetting the index.
-        start_download (Optional[str]): Start of the data download range.
-        end_download (Optional[str]): End of the data download range.
-        data_start (Optional[pd.Timestamp]): First timestamp of the pipeline data.
-        data_end (Optional[pd.Timestamp]): Last timestamp of the pipeline data.
-        cov_start (Optional[pd.Timestamp]): Start of the covariate date range.
-        cov_end (Optional[pd.Timestamp]): End of the covariate date range.
         bounds (Optional[List[tuple]]): Per-column outlier bounds ``(lower, upper)``.
         verbose (bool): Verbose output toggle.
         cache_home (Optional[Any]): Path to the cache directory.
-        end_train_ts (Optional[pd.Timestamp]): End of the training window.
-        start_train_ts (Optional[pd.Timestamp]): Start of the training window.
         n_trials_optuna (int): Number of Optuna hyperparameter-search trials.
         n_trials_spotoptim (int): Number of SpotOptim search trials.
         n_initial_spotoptim (int): Number of initial SpotOptim evaluations.
@@ -268,26 +244,12 @@ class ConfigMulti:
         print(f"Targets (default): {config.targets}")
         print(f"agg_weights (default): {config.agg_weights}")
         print(f"index_name: {config.index_name}")
-        print(f"start_download: {config.start_download}")
-        print(f"end_download: {config.end_download}")
-        print(f"data_start: {config.data_start}")
-        print(f"data_end: {config.data_end}")
-        print(f"cov_start: {config.cov_start}")
-        print(f"cov_end: {config.cov_end}")
         print(f"bounds: {config.bounds}")
 
-        # Set targets and derived ranges after loading data
+        # Set targets and bounds (user input that stays on the config)
         config.targets = ["A", "B", "C"]
-        config.start_download = "202401010000"
-        config.end_download = "202412312300"
-        config.data_start = pd.Timestamp("2022-01-01", tz="UTC")
-        config.data_end = pd.Timestamp("2024-12-31", tz="UTC")
-        config.cov_start = pd.Timestamp("2022-01-01", tz="UTC")
-        config.cov_end = pd.Timestamp("2025-01-01", tz="UTC")
         config.bounds = [(-2500, 4500), (-10, 3000)]
         print(f"Targets (after setting): {config.targets}")
-        print(f"start_download: {config.start_download}")
-        print(f"data_start: {config.data_start}")
         print(f"bounds: {config.bounds}")
 
         # Create custom configuration — country_code serves both API and holiday purposes
@@ -349,17 +311,9 @@ class ConfigMulti:
         "include_entsoe_net_load",
         "include_entsoe_day_ahead_price",
         "index_name",
-        "start_download",
-        "end_download",
-        "data_start",
-        "data_end",
-        "cov_start",
-        "cov_end",
         "bounds",
         "verbose",
         "cache_home",
-        "end_train_ts",
-        "start_train_ts",
         "n_trials_optuna",
         "n_trials_spotoptim",
         "n_initial_spotoptim",
@@ -430,21 +384,11 @@ class ConfigMulti:
         include_entsoe_day_ahead_price: bool = False,
         # Data source and index
         index_name: str = "DateTime",
-        start_download: Optional[str] = None,
-        end_download: Optional[str] = None,
-        # Derived date ranges (set after data loading via get_start_end())
-        data_start: Optional[pd.Timestamp] = None,
-        data_end: Optional[pd.Timestamp] = None,
-        cov_start: Optional[pd.Timestamp] = None,
-        cov_end: Optional[pd.Timestamp] = None,
         # Per-column outlier bounds [(lower, upper), ...]
         bounds: Optional[List[tuple]] = None,
         # Verbosity and caching
         verbose: bool = False,
         cache_home: Optional[Any] = None,
-        # Derived training window (set after data loading)
-        end_train_ts: Optional[pd.Timestamp] = None,
-        start_train_ts: Optional[pd.Timestamp] = None,
         # Hyperparameter tuning trial budgets
         n_trials_optuna: int = 15,
         n_trials_spotoptim: int = 10,
@@ -549,21 +493,11 @@ class ConfigMulti:
         self.include_entsoe_day_ahead_price = include_entsoe_day_ahead_price
         # Data source and index
         self.index_name = index_name
-        self.start_download = start_download
-        self.end_download = end_download
-        # Derived date ranges (set after data loading via get_start_end())
-        self.data_start = data_start
-        self.data_end = data_end
-        self.cov_start = cov_start
-        self.cov_end = cov_end
         # Per-column outlier bounds [(lower, upper), ...]
         self.bounds = bounds
         # Verbosity and caching
         self.verbose = verbose
         self.cache_home = cache_home
-        # Derived training window (set after data loading)
-        self.end_train_ts = end_train_ts
-        self.start_train_ts = start_train_ts
         # Hyperparameter tuning trial budgets
         self.n_trials_optuna = n_trials_optuna
         self.n_trials_spotoptim = n_trials_spotoptim
@@ -651,10 +585,6 @@ class ConfigMulti:
             print(f"Predict size: {p['predict_size']}")
             print(f"Random state: {p['random_state']}")
             print(f"index_name: {p['index_name']}")
-            print(f"data_start: {p['data_start']}")
-            print(f"data_end: {p['data_end']}")
-            print(f"cov_start: {p['cov_start']}")
-            print(f"cov_end: {p['cov_end']}")
             print(f"bounds: {p['bounds']}")
             print(f"agg_weights: {p['agg_weights']}")
             ```
@@ -686,10 +616,6 @@ class ConfigMulti:
             print(f"country_code: {config.country_code}")
             print(f"Predict size: {config.predict_size}")
             print(f"Random state: {config.random_state}")
-
-            # Set derived download range after loading data
-            _ = config.set_params(start_download="202401010000", end_download="202412312300")
-            print(f"start_download: {config.start_download}")
 
             # Deep parameter setting
             _ = config.set_params(periods__daily__n_periods=24)

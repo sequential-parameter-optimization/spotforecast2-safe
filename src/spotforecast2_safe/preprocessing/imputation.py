@@ -257,6 +257,7 @@ def apply_imputation(
     config: Any,
     logger: logging.Logger,
     verbose: bool = False,
+    targets: "list[str] | None" = None,
 ) -> tuple[pd.DataFrame, "WeightFunction | None"]:
     """Apply imputation to a DataFrame based on the method specified in config.
 
@@ -290,7 +291,8 @@ def apply_imputation(
         config: Configuration object that must expose:
             - ``imputation_method`` (``str``): ``"weighted"`` or ``"linear"``.
             - ``targets`` (``list[str]``): column names to interpolate
-              (``"linear"`` method only).
+              (``"linear"`` method only; also accepted as the explicit
+              ``targets`` keyword argument which takes precedence).
             - ``window_size`` (``int``): rolling-window size passed to
               `get_missing_weights()` (``"weighted"`` method only).
         logger (logging.Logger): Standard-library logger used to emit
@@ -338,6 +340,11 @@ def apply_imputation(
         print(weight_func)  # None for linear method
         ```
     """
+    # Resolve target columns: explicit ``targets`` arg takes priority over
+    # config.targets, which may be None when the resolved list lives on
+    # task.run_state instead (RunState extraction, v18.0.0+).
+    _targets: list[str] = targets if targets is not None else (config.targets or [])
+
     nan_before = int(df_pipeline.isnull().sum().sum())
     logger.info(
         "apply_imputation: NaN cells before imputation: %d (method=%r, shape=%s)",
@@ -369,7 +376,7 @@ def apply_imputation(
         # surrounding logger.warning contract.
         interpolator = LinearlyInterpolateTS(on_missing="passthrough")
         # LinearlyInterpolateTS expects a Series; apply per column
-        for col in config.targets:
+        for col in _targets:
             series = df_pipeline[col]
             df_pipeline[col] = interpolator.fit_transform(series)
     elif config.imputation_method == "weighted_interp":
@@ -383,7 +390,7 @@ def apply_imputation(
         # Time-interpolate target columns; fall back to ffill/bfill for
         # any boundary NaNs that interpolation cannot bracket.
         interpolator = LinearlyInterpolateTS(on_missing="passthrough")
-        for col in config.targets:
+        for col in _targets:
             if col not in df_pipeline.columns:
                 continue
             interpolated = interpolator.fit_transform(df_pipeline[col])

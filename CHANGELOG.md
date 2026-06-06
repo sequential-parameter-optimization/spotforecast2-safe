@@ -1,3 +1,19 @@
+## [18.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v17.0.0...v18.0.0-rc.1) (2026-06-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **multitask:** ConfigMulti/ConfigEntsoe no longer declare start_download,
+end_download, data_start, data_end, cov_start, cov_end, end_train_ts,
+start_train_ts; read them from task.run_state. config.targets now always
+holds the user input; the resolved list lives on task.run_state.targets.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### Features
+
+* **multitask:** extract derived pipeline state into task-owned RunState ([b8ae6a8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b8ae6a844b2c8391068d13c2ba7ecb6f94792f4d))
+
 ## [17.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.4.0...v17.0.0) (2026-06-06)
 
 
