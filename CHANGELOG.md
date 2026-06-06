@@ -1,3 +1,28 @@
+## [17.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.4.0...v17.0.0-rc.1) (2026-06-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **multitask:** make_demo10_config, _DEMO10_BOUNDS and _DEMO10_AGG_WEIGHTS
+are removed from spotforecast2_safe.multitask.runner. The _DEMO10_*
+values are calibrated for private series and produce wrong forecasts on
+the shipped anonymized demo10.csv. Outlier `bounds` and aggregation
+`agg_weights` must now be supplied explicitly on ConfigMulti.
+run_pipeline(config=None) now raises ValueError instead of substituting
+demo10 presets and auto-loading demo10.csv. The docs page
+docs/tasks/task_safe_n21_cov_df.qmd (outdated) is removed.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **multitask:** remove demo10 config presets; require explicit bounds/agg_weights ([8fe840e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8fe840ea438234ab28ecb7f778e8b11f5c4707ec))
+
+
+### Documentation
+
+* regenerate quartodoc reference pages for 16.4.0 target-corruption symbols ([233d29c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/233d29c231e838ccc81efb08ad7f46e2547800ad)), closes [#328](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/328)
+
 ## [16.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v16.3.1...v16.4.0) (2026-06-05)
 
 
