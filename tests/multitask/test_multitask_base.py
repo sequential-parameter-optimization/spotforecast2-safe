@@ -89,31 +89,40 @@ class TestPrepareData:
         assert task.df_pipeline.shape[0] > 0
 
     def test_targets_auto_derived(self, synth_df, tmp_path):
-        """When config.targets is None, all numeric columns become targets."""
+        """When config.targets is None, all numeric columns become targets.
+
+        After the RunState extraction (v18.0.0) the resolved list lives on
+        task.run_state.targets; config.targets preserves the user input (None).
+        """
         cfg = _minimal_cfg(cache_home=tmp_path, targets=None)
         task = LazyTask(cfg, dataframe=synth_df)
         task.prepare_data()
-        assert set(task.config.targets) == {"a", "b"}
+        assert set(task.run_state.targets) == {"a", "b"}
+        # config.targets is user input and must not be mutated.
+        assert task.config.targets is None
 
     def test_targets_respected_when_set(self, synth_df, tmp_path):
         """When config.targets is pre-set, only those columns are used."""
         cfg = _minimal_cfg(cache_home=tmp_path, targets=["a"])
         task = LazyTask(cfg, dataframe=synth_df)
         task.prepare_data()
+        # config.targets holds the user input unchanged.
         assert task.config.targets == ["a"]
+        # run_state.targets holds the resolved list (same value when user specified one).
+        assert task.run_state.targets == ["a"]
 
     def test_date_range_populated(self, synth_df, tmp_path):
         task = LazyTask(_minimal_cfg(cache_home=tmp_path), dataframe=synth_df)
         task.prepare_data()
-        assert task.config.data_start is not None
-        assert task.config.data_end is not None
-        assert task.config.cov_start is not None
-        assert task.config.cov_end is not None
+        assert task.run_state.data_start is not None
+        assert task.run_state.data_end is not None
+        assert task.run_state.cov_start is not None
+        assert task.run_state.cov_end is not None
 
     def test_data_start_before_data_end(self, synth_df, tmp_path):
         task = LazyTask(_minimal_cfg(cache_home=tmp_path), dataframe=synth_df)
         task.prepare_data()
-        assert task.config.data_start < task.config.data_end
+        assert task.run_state.data_start < task.run_state.data_end
 
     def test_no_data_raises_value_error(self, tmp_path):
         """Calling prepare_data with no data must raise ValueError."""
@@ -131,7 +140,8 @@ class TestPrepareData:
 
         task = LazyTask(_minimal_cfg(cache_home=tmp_path), dataframe=synth_df)
         task.prepare_data(demo_data=df_alt)
-        assert "c" in task.config.targets
+        # run_state.targets holds the resolved list; config.targets is user input.
+        assert "c" in task.run_state.targets
 
     def test_data_loader_callable_used(self, synth_df, tmp_path):
         """config.data_loader is invoked when no explicit DataFrame is given."""
@@ -567,8 +577,10 @@ class TestExogProviderWindow:
         pw = captured.get("provider_window")
         assert pw is not None, "provider_window should have been passed"
         assert isinstance(pw, pd.DatetimeIndex)
-        assert pw[0] == cfg.start_train_ts
-        assert pw[-1] == pd.Timestamp(cfg.cov_end, tz="UTC")
+        # After RunState extraction (v18.0.0) the derived fields live on
+        # task.run_state; read them there instead of from cfg.
+        assert pw[0] == task.run_state.start_train_ts
+        assert pw[-1] == task.run_state.cov_end
 
     def test_default_full_window_passes_none(self, synth_df, tmp_path, monkeypatch):
         """With the default exog_provider_window='full', provider_window is None."""

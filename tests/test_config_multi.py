@@ -168,6 +168,9 @@ class TestConfigMultiGetParams:
 
     def test_get_params_contains_all_flat_keys(self):
         p = _default().get_params(deep=False)
+        # Derived fields (start_download, end_download, data_start, data_end,
+        # cov_start, cov_end, end_train_ts, start_train_ts) are no longer
+        # config params — they live on task.run_state.
         expected_keys = {
             "country_code",
             "periods",
@@ -182,10 +185,22 @@ class TestConfigMultiGetParams:
             "data_filename",
             "targets",
             "index_name",
-            "start_download",
-            "end_download",
         }
         assert expected_keys.issubset(p.keys())
+        # Derived fields must NOT appear in get_params.
+        for derived in (
+            "start_download",
+            "end_download",
+            "data_start",
+            "data_end",
+            "cov_start",
+            "cov_end",
+            "end_train_ts",
+            "start_train_ts",
+        ):
+            assert (
+                derived not in p
+            ), f"Derived field '{derived}' leaked into get_params()"
 
     def test_get_params_country_code_value(self):
         cfg = ConfigMulti(country_code="ES")
@@ -500,80 +515,63 @@ class TestConfigMultiCountryCode:
 
 
 class TestConfigMultiNewAttributes:
-    """Verify defaults and custom values for the new data-source attributes."""
+    """Verify defaults and custom values for the data-source attributes.
+
+    start_download and end_download were moved to task.run_state in v18.0.0
+    (ADR adr-multitask-configmulti-merge).  They are no longer config params.
+    """
 
     def test_index_name_default(self):
         assert _default().index_name == "DateTime"
 
-    def test_start_download_default_is_none(self):
-        assert _default().start_download is None
+    def test_start_download_not_a_config_param(self):
+        """start_download is a derived field — not in _PARAM_NAMES."""
+        assert "start_download" not in ConfigMulti._PARAM_NAMES
 
-    def test_end_download_default_is_none(self):
-        assert _default().end_download is None
+    def test_end_download_not_a_config_param(self):
+        """end_download is a derived field — not in _PARAM_NAMES."""
+        assert "end_download" not in ConfigMulti._PARAM_NAMES
 
     def test_custom_index_name(self):
         cfg = ConfigMulti(index_name="Timestamp")
         assert cfg.index_name == "Timestamp"
 
-    def test_custom_start_download(self):
-        cfg = ConfigMulti(start_download="202401010000")
-        assert cfg.start_download == "202401010000"
+    def test_start_download_not_in_get_params(self):
+        p = _default().get_params()
+        assert "start_download" not in p
 
-    def test_custom_end_download(self):
-        cfg = ConfigMulti(end_download="202412312300")
-        assert cfg.end_download == "202412312300"
+    def test_end_download_not_in_get_params(self):
+        p = _default().get_params()
+        assert "end_download" not in p
 
     def test_new_attrs_in_get_params(self):
         p = _default().get_params()
         assert "index_name" in p
-        assert "start_download" in p
-        assert "end_download" in p
-
-    def test_new_attrs_values_in_get_params(self):
-        cfg = ConfigMulti(
-            index_name="ts",
-            start_download="202401010000",
-            end_download="202412312300",
-        )
-        p = cfg.get_params()
-        assert p["index_name"] == "ts"
-        assert p["start_download"] == "202401010000"
-        assert p["end_download"] == "202412312300"
 
     def test_set_params_index_name(self):
         cfg = _default()
         cfg.set_params(index_name="ts")
         assert cfg.index_name == "ts"
 
-    def test_set_params_start_download(self):
+    def test_set_params_start_download_raises(self):
+        """set_params must reject start_download (it is derived, not user input)."""
         cfg = _default()
-        cfg.set_params(start_download="202401010000")
-        assert cfg.start_download == "202401010000"
+        with pytest.raises(ValueError, match="start_download"):
+            cfg.set_params(start_download="202401010000")
 
-    def test_set_params_end_download(self):
+    def test_set_params_end_download_raises(self):
+        """set_params must reject end_download (it is derived, not user input)."""
         cfg = _default()
-        cfg.set_params(end_download="202412312300")
-        assert cfg.end_download == "202412312300"
-
-    def test_direct_assignment_start_download(self):
-        cfg = _default()
-        cfg.start_download = "202401010000"
-        assert cfg.start_download == "202401010000"
-
-    def test_direct_assignment_end_download(self):
-        cfg = _default()
-        cfg.end_download = "202412312300"
-        assert cfg.end_download == "202412312300"
+        with pytest.raises(ValueError, match="end_download"):
+            cfg.set_params(end_download="202412312300")
 
     def test_new_attrs_preserved_alongside_targets(self):
         cfg = ConfigMulti(
             targets=["A"],
             index_name="DateTime",
-            start_download="202401010000",
         )
         assert cfg.targets == ["A"]
         assert cfg.index_name == "DateTime"
-        assert cfg.start_download == "202401010000"
 
 
 # ---------------------------------------------------------------------------
@@ -582,105 +580,30 @@ class TestConfigMultiNewAttributes:
 
 
 class TestConfigMultiDerivedAttributes:
-    """Tests for data_start, data_end, cov_start, cov_end, bounds."""
+    """Tests for bounds (user input) and the removal of derived fields.
 
-    # --- Defaults ---
+    data_start, data_end, cov_start, cov_end, start_download, end_download,
+    end_train_ts, start_train_ts were moved to task.run_state in v18.0.0.
+    They are no longer config params.  bounds remains a user-input field.
+    """
 
-    def test_data_start_default_is_none(self):
-        assert ConfigMulti().data_start is None
-
-    def test_data_end_default_is_none(self):
-        assert ConfigMulti().data_end is None
-
-    def test_cov_start_default_is_none(self):
-        assert ConfigMulti().cov_start is None
-
-    def test_cov_end_default_is_none(self):
-        assert ConfigMulti().cov_end is None
+    # --- bounds is still a user-input config field ---
 
     def test_bounds_default_is_none(self):
         assert ConfigMulti().bounds is None
-
-    # --- Custom init values ---
-
-    def test_custom_data_start(self):
-        ts = pd.Timestamp("2022-01-01", tz="UTC")
-        cfg = ConfigMulti(data_start=ts)
-        assert cfg.data_start == ts
-
-    def test_custom_data_end(self):
-        ts = pd.Timestamp("2024-12-31", tz="UTC")
-        cfg = ConfigMulti(data_end=ts)
-        assert cfg.data_end == ts
-
-    def test_custom_cov_start(self):
-        ts = pd.Timestamp("2022-01-01", tz="UTC")
-        cfg = ConfigMulti(cov_start=ts)
-        assert cfg.cov_start == ts
-
-    def test_custom_cov_end(self):
-        ts = pd.Timestamp("2025-01-01", tz="UTC")
-        cfg = ConfigMulti(cov_end=ts)
-        assert cfg.cov_end == ts
 
     def test_custom_bounds(self):
         b = [(-100, 100), (0, 500)]
         cfg = ConfigMulti(bounds=b)
         assert cfg.bounds == b
 
-    # --- In get_params ---
-
-    def test_derived_attrs_in_get_params(self):
+    def test_bounds_in_get_params(self):
         p = ConfigMulti().get_params()
-        for key in ("data_start", "data_end", "cov_start", "cov_end", "bounds"):
-            assert key in p
+        assert "bounds" in p
 
-    def test_derived_attrs_default_values_in_get_params(self):
+    def test_bounds_default_value_in_get_params(self):
         p = ConfigMulti().get_params()
-        assert p["data_start"] is None
-        assert p["data_end"] is None
-        assert p["cov_start"] is None
-        assert p["cov_end"] is None
         assert p["bounds"] is None
-
-    def test_derived_attrs_custom_values_in_get_params(self):
-        ts = pd.Timestamp("2023-06-15", tz="UTC")
-        b = [(0, 1000)]
-        cfg = ConfigMulti(
-            data_start=ts, data_end=ts, cov_start=ts, cov_end=ts, bounds=b
-        )
-        p = cfg.get_params()
-        assert p["data_start"] == ts
-        assert p["data_end"] == ts
-        assert p["cov_start"] == ts
-        assert p["cov_end"] == ts
-        assert p["bounds"] == b
-
-    # --- set_params ---
-
-    def test_set_params_data_start(self):
-        ts = pd.Timestamp("2022-03-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.set_params(data_start=ts)
-        assert cfg.data_start == ts
-
-    def test_set_params_data_end(self):
-        ts = pd.Timestamp("2024-06-30", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.set_params(data_end=ts)
-        assert cfg.data_end == ts
-
-    def test_set_params_cov_start(self):
-        ts = pd.Timestamp("2022-03-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.set_params(cov_start=ts)
-        assert cfg.cov_start == ts
-
-    def test_set_params_cov_end(self):
-        ts = pd.Timestamp("2025-01-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.set_params(cov_end=ts)
-        assert cfg.cov_end == ts
 
     def test_set_params_bounds(self):
         b = [(-500, 500), (0, 200)]
@@ -688,60 +611,16 @@ class TestConfigMultiDerivedAttributes:
         cfg.set_params(bounds=b)
         assert cfg.bounds == b
 
-    def test_set_params_all_derived_at_once(self):
-        ts_s = pd.Timestamp("2022-01-01", tz="UTC")
-        ts_e = pd.Timestamp("2024-12-31", tz="UTC")
-        ts_ce = pd.Timestamp("2025-01-01", tz="UTC")
-        b = [(0, 100)]
-        cfg = ConfigMulti()
-        cfg.set_params(
-            data_start=ts_s, data_end=ts_e, cov_start=ts_s, cov_end=ts_ce, bounds=b
-        )
-        assert cfg.data_start == ts_s
-        assert cfg.data_end == ts_e
-        assert cfg.cov_start == ts_s
-        assert cfg.cov_end == ts_ce
-        assert cfg.bounds == b
-
     def test_set_params_method_chaining(self):
-        ts = pd.Timestamp("2023-01-01", tz="UTC")
         cfg = ConfigMulti()
-        result = cfg.set_params(data_start=ts)
+        result = cfg.set_params(bounds=[(0, 100)])
         assert result is cfg
-
-    # --- Direct assignment ---
-
-    def test_direct_assignment_data_start(self):
-        ts = pd.Timestamp("2021-07-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.data_start = ts
-        assert cfg.data_start == ts
-
-    def test_direct_assignment_data_end(self):
-        ts = pd.Timestamp("2023-12-31", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.data_end = ts
-        assert cfg.data_end == ts
-
-    def test_direct_assignment_cov_start(self):
-        ts = pd.Timestamp("2021-07-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.cov_start = ts
-        assert cfg.cov_start == ts
-
-    def test_direct_assignment_cov_end(self):
-        ts = pd.Timestamp("2024-01-25", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.cov_end = ts
-        assert cfg.cov_end == ts
 
     def test_direct_assignment_bounds(self):
         b = [(-2500, 4500), (-10, 3000)]
         cfg = ConfigMulti()
         cfg.bounds = b
         assert cfg.bounds == b
-
-    # --- Isolation between instances ---
 
     def test_bounds_not_shared_between_instances(self):
         b = [(0, 100)]
@@ -751,14 +630,47 @@ class TestConfigMultiDerivedAttributes:
         cfg1.bounds.append((200, 300))
         assert cfg2.bounds is None
 
+    # --- Derived fields are NOT config params ---
+
+    def test_data_start_not_in_param_names(self):
+        assert "data_start" not in ConfigMulti._PARAM_NAMES
+
+    def test_data_end_not_in_param_names(self):
+        assert "data_end" not in ConfigMulti._PARAM_NAMES
+
+    def test_cov_start_not_in_param_names(self):
+        assert "cov_start" not in ConfigMulti._PARAM_NAMES
+
+    def test_cov_end_not_in_param_names(self):
+        assert "cov_end" not in ConfigMulti._PARAM_NAMES
+
+    def test_derived_attrs_not_in_get_params(self):
+        p = ConfigMulti().get_params()
+        for key in ("data_start", "data_end", "cov_start", "cov_end"):
+            assert key not in p, f"Derived field '{key}' leaked into get_params()"
+
+    def test_set_params_data_start_raises(self):
+        with pytest.raises(ValueError, match="data_start"):
+            ConfigMulti().set_params(data_start=pd.Timestamp("2022-03-01", tz="UTC"))
+
+    def test_set_params_data_end_raises(self):
+        with pytest.raises(ValueError, match="data_end"):
+            ConfigMulti().set_params(data_end=pd.Timestamp("2024-06-30", tz="UTC"))
+
+    def test_set_params_cov_start_raises(self):
+        with pytest.raises(ValueError, match="cov_start"):
+            ConfigMulti().set_params(cov_start=pd.Timestamp("2022-03-01", tz="UTC"))
+
+    def test_set_params_cov_end_raises(self):
+        with pytest.raises(ValueError, match="cov_end"):
+            ConfigMulti().set_params(cov_end=pd.Timestamp("2025-01-01", tz="UTC"))
+
     # --- Coexistence with other params ---
 
-    def test_derived_attrs_preserved_alongside_targets(self):
-        ts = pd.Timestamp("2023-01-01", tz="UTC")
+    def test_bounds_preserved_alongside_targets(self):
         b = [(0, 500)]
-        cfg = ConfigMulti(targets=["X"], data_start=ts, bounds=b)
+        cfg = ConfigMulti(targets=["X"], bounds=b)
         assert cfg.targets == ["X"]
-        assert cfg.data_start == ts
         assert cfg.bounds == b
 
 
@@ -770,7 +682,11 @@ class TestConfigMultiDerivedAttributes:
 
 
 class TestConfigMultiPipelineAttributes:
-    """Tests for the 10 new pipeline-control and tuning attributes."""
+    """Tests for pipeline-control and tuning attributes.
+
+    end_train_ts and start_train_ts were moved to task.run_state in v18.0.0
+    (ADR adr-multitask-configmulti-merge).  They are no longer config params.
+    """
 
     # --- Defaults ---
 
@@ -780,11 +696,13 @@ class TestConfigMultiPipelineAttributes:
     def test_cache_home_default_is_none(self):
         assert ConfigMulti().cache_home is None
 
-    def test_end_train_ts_default_is_none(self):
-        assert ConfigMulti().end_train_ts is None
+    def test_end_train_ts_not_a_config_param(self):
+        """end_train_ts is derived — not in _PARAM_NAMES."""
+        assert "end_train_ts" not in ConfigMulti._PARAM_NAMES
 
-    def test_start_train_ts_default_is_none(self):
-        assert ConfigMulti().start_train_ts is None
+    def test_start_train_ts_not_a_config_param(self):
+        """start_train_ts is derived — not in _PARAM_NAMES."""
+        assert "start_train_ts" not in ConfigMulti._PARAM_NAMES
 
     def test_n_trials_optuna_default(self):
         assert ConfigMulti().n_trials_optuna == 15
@@ -807,14 +725,6 @@ class TestConfigMultiPipelineAttributes:
         cfg = ConfigMulti(cache_home="/tmp/cache")
         assert cfg.cache_home == "/tmp/cache"
 
-    def test_custom_end_train_ts(self):
-        ts = pd.Timestamp("2024-12-31", tz="UTC")
-        assert ConfigMulti(end_train_ts=ts).end_train_ts == ts
-
-    def test_custom_start_train_ts(self):
-        ts = pd.Timestamp("2024-01-01", tz="UTC")
-        assert ConfigMulti(start_train_ts=ts).start_train_ts == ts
-
     def test_custom_n_trials_optuna(self):
         assert ConfigMulti(n_trials_optuna=50).n_trials_optuna == 50
 
@@ -835,33 +745,29 @@ class TestConfigMultiPipelineAttributes:
         for key in (
             "verbose",
             "cache_home",
-            "end_train_ts",
-            "start_train_ts",
             "n_trials_optuna",
             "n_trials_spotoptim",
             "n_initial_spotoptim",
             "task",
         ):
             assert key in p, f"'{key}' missing from get_params()"
+        # Derived fields must NOT appear in get_params.
+        assert "end_train_ts" not in p
+        assert "start_train_ts" not in p
 
     def test_new_attrs_default_values_in_get_params(self):
         p = ConfigMulti().get_params()
         assert p["verbose"] is False
         assert p["cache_home"] is None
-        assert p["end_train_ts"] is None
-        assert p["start_train_ts"] is None
         assert p["n_trials_optuna"] == 15
         assert p["n_trials_spotoptim"] == 10
         assert p["n_initial_spotoptim"] == 5
         assert p["task"] == "lazy"
 
     def test_custom_values_reflected_in_get_params(self):
-        ts = pd.Timestamp("2023-06-01", tz="UTC")
         cfg = ConfigMulti(
             verbose=True,
             cache_home="/c",
-            end_train_ts=ts,
-            start_train_ts=ts,
             n_trials_optuna=30,
             n_trials_spotoptim=25,
             n_initial_spotoptim=10,
@@ -870,8 +776,6 @@ class TestConfigMultiPipelineAttributes:
         p = cfg.get_params()
         assert p["verbose"] is True
         assert p["cache_home"] == "/c"
-        assert p["end_train_ts"] == ts
-        assert p["start_train_ts"] == ts
         assert p["n_trials_optuna"] == 30
         assert p["n_trials_spotoptim"] == 25
         assert p["n_initial_spotoptim"] == 10
@@ -889,17 +793,17 @@ class TestConfigMultiPipelineAttributes:
         cfg.set_params(cache_home="/cache")
         assert cfg.cache_home == "/cache"
 
-    def test_set_params_end_train_ts(self):
-        ts = pd.Timestamp("2024-06-30", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.set_params(end_train_ts=ts)
-        assert cfg.end_train_ts == ts
+    def test_set_params_end_train_ts_raises(self):
+        """end_train_ts is derived — set_params must reject it."""
+        with pytest.raises(ValueError, match="end_train_ts"):
+            ConfigMulti().set_params(end_train_ts=pd.Timestamp("2024-06-30", tz="UTC"))
 
-    def test_set_params_start_train_ts(self):
-        ts = pd.Timestamp("2023-07-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.set_params(start_train_ts=ts)
-        assert cfg.start_train_ts == ts
+    def test_set_params_start_train_ts_raises(self):
+        """start_train_ts is derived — set_params must reject it."""
+        with pytest.raises(ValueError, match="start_train_ts"):
+            ConfigMulti().set_params(
+                start_train_ts=pd.Timestamp("2023-07-01", tz="UTC")
+            )
 
     def test_set_params_n_trials_optuna(self):
         cfg = ConfigMulti()
@@ -932,18 +836,6 @@ class TestConfigMultiPipelineAttributes:
         cfg = ConfigMulti()
         cfg.verbose = True
         assert cfg.verbose is True
-
-    def test_direct_assignment_end_train_ts(self):
-        ts = pd.Timestamp("2025-01-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.end_train_ts = ts
-        assert cfg.end_train_ts == ts
-
-    def test_direct_assignment_start_train_ts(self):
-        ts = pd.Timestamp("2024-01-01", tz="UTC")
-        cfg = ConfigMulti()
-        cfg.start_train_ts = ts
-        assert cfg.start_train_ts == ts
 
     def test_direct_assignment_task(self):
         cfg = ConfigMulti()

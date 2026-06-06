@@ -54,12 +54,17 @@ def _synth_df(n_weeks: int = 4, n_cols: int = 1, seed: int = 0) -> pd.DataFrame:
 
 @pytest.fixture()
 def single_target_lazy(tmp_path) -> LazyTask:
-    """LazyTask with a single target set directly (bypasses prepare_data)."""
+    """LazyTask with a single target set directly (bypasses prepare_data).
+
+    After the RunState extraction (v18.0.0) the resolved target list lives on
+    ``task.run_state.targets`` — we set it there directly so tests that call
+    ``_aggregate_and_show`` without ``prepare_data`` still work.
+    """
     task = LazyTask(
         _minimal_cfg(tmp_path),
         dataframe=_synth_df(n_cols=1),
     )
-    task.config.targets = ["only_target"]
+    task.run_state.targets = ["only_target"]
     return task
 
 
@@ -118,7 +123,7 @@ def test_multi_target_aggregation_invokes_agg_predictor(tmp_path, monkeypatch):
         _minimal_cfg(tmp_path, agg_weights=[0.5, 0.5]),
         dataframe=_synth_df(n_cols=2),
     )
-    task.config.targets = ["a", "b"]
+    task.run_state.targets = ["a", "b"]
 
     seen: Dict[str, Any] = {}
 
