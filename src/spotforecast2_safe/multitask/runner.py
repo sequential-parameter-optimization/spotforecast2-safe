@@ -13,7 +13,7 @@ Auto-tuning tasks (``"optuna"``, ``"spotoptim"``) are not available in
 ``spotforecast2-safe``; use the ``spotforecast2`` sibling package for those.
 """
 
-from typing import Any, Callable, FrozenSet, List, Optional, Tuple
+from typing import Any, Callable, FrozenSet, List, Optional
 
 import pandas as pd
 
@@ -22,78 +22,9 @@ from spotforecast2_safe.data.fetch_data import get_cache_home
 from spotforecast2_safe.multitask.base import PipelineConfig
 from spotforecast2_safe.multitask.multi import MultiTask
 
-# Demo-dataset presets for ``run()``.
-#
-# These lists are calibrated for the 11-target ENTSO-E demo dataset
-# (``demo10.csv``) used in the package examples and the Quarto docs.  They are
-# *not* general-purpose defaults: a different dataset needs its own bounds and
-# aggregation weights, supplied explicitly to ``run(bounds=..., agg_weights=...)``
-# or carried by a config preset.  Kept here (not on ``ConfigMulti``) so that
-# direct ``ConfigMulti()`` users don't silently inherit demo10-specific values.
-_DEMO10_BOUNDS: List[Tuple[float, float]] = [
-    (-2500, 4500),
-    (-10, 3000),
-    (0, 230),
-    (0, 550),
-    (0, 1400),
-    (0, 1400),
-    (0, 10),
-    (0, 4500),
-    (0, 300),
-    (0, 400),
-    (0, 300),
-]
-
-_DEMO10_AGG_WEIGHTS: List[float] = [
-    1.0,
-    1.0,
-    -1.0,
-    -1.0,
-    1.0,
-    -1.0,
-    1.0,
-    1.0,
-    1.0,
-    -1.0,
-    1.0,
-]
-
 SAFE_PIPELINE_TASKS: FrozenSet[str] = frozenset({"lazy", "defaults", "predict"})
 _PIPELINE_TASKS = SAFE_PIPELINE_TASKS
 _ALL_TASKS = _PIPELINE_TASKS | {"clean"}
-
-
-def make_demo10_config(**overrides: Any) -> ConfigMulti:
-    """Build a ``ConfigMulti`` pre-loaded with the 11-target demo10 presets.
-
-    The 11-target ENTSO-E demo dataset (``demo10.csv``) ships with the
-    package and is the canonical example dataset for the Quarto docs and
-    tutorial notebooks.  Its outlier ``bounds`` and aggregation
-    ``agg_weights`` are dataset-specific and should not be inherited by
-    arbitrary callers — this helper makes the opt-in explicit.
-
-    Args:
-        **overrides: Forwarded to ``ConfigMulti.set_params`` to tweak any
-            other field on the returned config.
-
-    Returns:
-        A new ``ConfigMulti`` with ``bounds`` and ``agg_weights`` set to the
-        demo10 presets, plus any caller-supplied overrides applied.
-
-    Examples:
-        ```{python}
-        from spotforecast2_safe.multitask.runner import make_demo10_config
-
-        cfg = make_demo10_config(predict_size=48)
-        print(cfg.predict_size)
-        print(len(cfg.bounds))
-        print(len(cfg.agg_weights))
-        ```
-    """
-    cfg = ConfigMulti(bounds=_DEMO10_BOUNDS, agg_weights=_DEMO10_AGG_WEIGHTS)
-    if overrides:
-        cfg.set_params(**overrides)
-    return cfg
 
 
 def run_with(
@@ -258,9 +189,9 @@ def run(
     Args:
         config: A ``PipelineConfig``-conforming object (typically
             ``ConfigMulti``).  When ``None``, a fresh ``ConfigMulti()``
-            is constructed with default fields.  Use ``make_demo10_config()``
-            to opt in to the 11-target demo10 ``bounds`` / ``agg_weights``
-            presets.
+            is constructed with default fields.  Outlier ``bounds`` and
+            aggregation ``agg_weights`` are domain-specific calibrations
+            and must be supplied explicitly on ``ConfigMulti``.
         task: Pipeline mode — one of ``"lazy"``, ``"defaults"``,
             ``"predict"``, or ``"clean"``.  Defaults to ``"lazy"``.
         dataframe: Input time-series data.  Must contain a datetime

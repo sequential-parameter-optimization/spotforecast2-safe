@@ -57,7 +57,7 @@ with `task="lazy"`.  All pipeline parameters are centralised in a `ConfigMulti`
 object; aggregation weights come from `ConfigMulti.agg_weights` (replacing the
 former hard-coded `DEFAULT_WEIGHTS` constant).
 
-See [Task Safe n-to-1 Explained](task_safe_n21_cov_df.qmd) for a full
+See the `run_pipeline` and `_build_config_from_cli` API reference for a full
 description of the pipeline stages and `ConfigMulti` field mappings.
 
 ### Features
@@ -72,7 +72,7 @@ description of the pipeline stages and `ConfigMulti` field mappings.
 ### Usage
 
 ```bash
-# Run with default settings (loads demo10.csv, make_demo10_config() presets)
+# Run with custom settings (a ConfigMulti and explicit data path are required)
 uv run spotforecast-safe-n2o1-cov-df
 
 # Custom forecast horizon
@@ -144,7 +144,7 @@ Safety-critical tasks support comprehensive logging:
 uv run spotforecast-safe-demo --logging true
 
 # Specify custom log directory
-uv run spotforecast-safe-n2o1-cov-df --logging true --log_dir /var/log/spotforecast
+uv run spotforecast-safe-n2o1-cov-df --log_dir /var/log/spotforecast
 ```
 
 Log files include:
