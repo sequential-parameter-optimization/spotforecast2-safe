@@ -1590,10 +1590,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    data_with_exog<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    exog_feature_names<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    exo_pred<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Extract the training series and exogenous slices for one target column.</p>
-<p>Clips the target column of <em>df_pipeline</em> to the training window defined by <code>config.start_train_ts</code> and <code>config.end_train_ts</code>. When exogenous features are enabled (<code>config.use_exogenous_features is True</code>) and <em>data_with_exog</em> is provided, the matching exogenous training slice and forecast-horizon slice are also returned; otherwise both are <code>None</code>.</p>
+<p>Clips the target column of <em>df_pipeline</em> to the training window defined by <em>start_train_ts</em> and <em>end_train_ts</em>. When exogenous features are enabled (<code>config.use_exogenous_features is True</code>) and <em>data_with_exog</em> is provided, the matching exogenous training slice and forecast-horizon slice are also returned; otherwise both are <code>None</code>.</p>
 <p>This function is the canonical way to extract per-target data from the shared pipeline state so that outlier removal, imputation, and feature engineering are applied consistently across all forecasting tasks.</p>
+<p>The training-window timestamps are supplied as explicit parameters so that this helper stays decoupled from <code>RunState</code> (ADR <code>adr-multitask-configmulti-merge</code>, step 5). When either is <code>None</code> the function falls back to the corresponding attribute on <em>config</em> for backward compatibility with existing direct callers.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1621,13 +1624,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>config</td>
 <td>'ConfigMulti'</td>
-<td>Pipeline configuration object. Must have the following attributes set before calling this function: - <code>start_train_ts</code> — inclusive start of the training window (<code>Timestamp</code>, tz-aware). - <code>end_train_ts</code> — inclusive end of the training window (<code>Timestamp</code>, tz-aware). - <code>use_exogenous_features</code> — <code>bool</code> flag controlling whether exogenous features are used.</td>
+<td>Pipeline configuration object. <code>use_exogenous_features</code> must be set. <code>start_train_ts</code> / <code>end_train_ts</code> are only read from <em>config</em> when the explicit parameters are not supplied.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>data_with_exog</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>Merged DataFrame of target and exogenous columns covering at least <code>[config.start_train_ts, config.end_train_ts]</code>. Required when <code>config.use_exogenous_features</code> is <code>True</code>. Pass <code>None</code> (default) to skip exogenous slicing.</td>
+<td>Merged DataFrame of target and exogenous columns covering at least the training window. Required when <code>config.use_exogenous_features</code> is <code>True</code>. Pass <code>None</code> (default) to skip exogenous slicing.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
@@ -1639,7 +1642,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>exo_pred</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>Exogenous feature DataFrame covering the forecast horizon <code>(config.end_train_ts, config.cov_end]</code>. Required when <em>data_with_exog</em> is not <code>None</code>. Pass <code>None</code> (default) when exogenous features are disabled.</td>
+<td>Exogenous feature DataFrame covering the forecast horizon. Required when <em>data_with_exog</em> is not <code>None</code>. Pass <code>None</code> (default) when exogenous features are disabled.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>start_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Inclusive start of the training window (tz-aware <code>pd.Timestamp</code>). <strong>Required</strong> — pass <code>task.run_state.start_train_ts</code> after the pipeline has been prepared. Omitting this argument raises <code>ValueError</code>; reading the value from <code>config.start_train_ts</code> is deprecated and emits a <code>DeprecationWarning</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>end_train_ts</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Inclusive end of the training window (tz-aware <code>pd.Timestamp</code>). <strong>Required</strong> — pass <code>task.run_state.end_train_ts</code> after the pipeline has been prepared. Omitting this argument raises <code>ValueError</code>; reading the value from <code>config.end_train_ts</code> is deprecated and emits a <code>DeprecationWarning</code>.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>
@@ -1669,7 +1684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>- <strong>y_train</strong> — 1-D Series with the target values over the training window <code>[config.start_train_ts, config.end_train_ts]</code>, squeezed to a plain <code>Series</code>.</td>
+<td>- <strong>y_train</strong> — 1-D Series with the target values over the training window, squeezed to a plain <code>Series</code>.</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -1687,7 +1702,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Extract training data for a single target without exogenous features:</p>
-<div id="b7baf737" class="cell" data-execution_count="1">
+<div id="6b055d44" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> get_target_data</span>
@@ -1700,17 +1715,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    targets<span class="op">=</span>[<span class="st">"load"</span>],</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    use_exogenous_features<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>config.start_train_ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-01 00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>config.end_train_ts   <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-07 23:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>start_ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-01 00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>end_ts   <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-07 23:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>y_train, exog_train, exog_future <span class="op">=</span> get_target_data(</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    target<span class="op">=</span><span class="st">"load"</span>,</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    df_pipeline<span class="op">=</span>df_pipeline,</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    config<span class="op">=</span>config,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"y_train length: </span><span class="sc">{</span><span class="bu">len</span>(y_train)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_train:     </span><span class="sc">{</span>exog_train<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_future:    </span><span class="sc">{</span>exog_future<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span>start_ts,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span>end_ts,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"y_train length: </span><span class="sc">{</span><span class="bu">len</span>(y_train)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_train:     </span><span class="sc">{</span>exog_train<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_future:    </span><span class="sc">{</span>exog_future<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>y_train length: 168
 exog_train:     None
@@ -1718,7 +1735,7 @@ exog_future:    None</code></pre>
 </div>
 </div>
 <p>Extract training data with exogenous features enabled:</p>
-<div id="3a31100b" class="cell" data-execution_count="2">
+<div id="0955b2b6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> get_target_data</span>
@@ -1746,9 +1763,9 @@ exog_future:    None</code></pre>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>idx_future,</span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(targets<span class="op">=</span>[<span class="st">"load"</span>], use_exogenous_features<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>config.start_train_ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-01 00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>config.end_train_ts   <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-07 23:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>start_ts <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-01 00:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>end_ts   <span class="op">=</span> pd.Timestamp(<span class="st">"2024-01-07 23:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(targets<span class="op">=</span>[<span class="st">"load"</span>], use_exogenous_features<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>y_train, exog_train, exog_future <span class="op">=</span> get_target_data(</span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    target<span class="op">=</span><span class="st">"load"</span>,</span>
@@ -1757,11 +1774,13 @@ exog_future:    None</code></pre>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    data_with_exog<span class="op">=</span>data_with_exog,</span>
 <span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    exog_feature_names<span class="op">=</span>[<span class="st">"hour_sin"</span>, <span class="st">"hour_cos"</span>],</span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    exo_pred<span class="op">=</span>exo_pred,</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"y_train length:     </span><span class="sc">{</span><span class="bu">len</span>(y_train)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_train shape:   </span><span class="sc">{</span>exog_train<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_future shape:  </span><span class="sc">{</span>exog_future<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_train dtype:   </span><span class="sc">{</span>exog_train<span class="sc">.</span>dtypes<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span>start_ts,</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span>end_ts,</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"y_train length:     </span><span class="sc">{</span><span class="bu">len</span>(y_train)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_train shape:   </span><span class="sc">{</span>exog_train<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_future shape:  </span><span class="sc">{</span>exog_future<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exog_train dtype:   </span><span class="sc">{</span>exog_train<span class="sc">.</span>dtypes<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>y_train length:     168
 exog_train shape:   (168, 2)

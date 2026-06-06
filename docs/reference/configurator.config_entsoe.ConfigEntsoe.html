@@ -1625,43 +1625,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    include_entsoe_net_load<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    include_entsoe_day_ahead_price<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    index_name<span class="op">=</span><span class="st">'Time (UTC)'</span>,</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    start_download<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    end_download<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    data_start<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    data_end<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    cov_start<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    cov_end<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    end_train_ts<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    start_train_ts<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    n_jobs_spotoptim<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    test_data_loader<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    data_frame_name<span class="op">=</span><span class="st">'default'</span>,</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    on_exog_provider_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    exog_max_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    exog_max_tail_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    exog_provider_window<span class="op">=</span><span class="st">'full'</span>,</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    retrain_max_age<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    target_qc_range_mw<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    target_qc_step_mw<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    target_qc_window_days<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    target_corruption_policy<span class="op">=</span><span class="st">'abort'</span>,</span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    target_max_heal_hours<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    target_anchor_zone_hours<span class="op">=</span><span class="dv">168</span>,</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    cache_home<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    n_trials_optuna<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    n_jobs_spotoptim<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    test_data_loader<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    auto_save_models<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    data_frame_name<span class="op">=</span><span class="st">'default'</span>,</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    number_folds<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    on_weather_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    on_exog_provider_failure<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    exog_max_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    exog_max_tail_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    exog_provider_window<span class="op">=</span><span class="st">'full'</span>,</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    retrain_max_age<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    target_qc_range_mw<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    target_qc_step_mw<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    target_qc_window_days<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    target_corruption_policy<span class="op">=</span><span class="st">'abort'</span>,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    target_max_heal_hours<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    target_anchor_zone_hours<span class="op">=</span><span class="dv">168</span>,</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Configuration for the ENTSO-E forecasting pipeline.</p>
 <p>Single-target counterpart to <code>ConfigMulti</code>. Used by the ENTSO-E CLI (<code>spotforecast2.tasks.task_entsoe</code>) and any other single-target pipeline routed through <code>spotforecast2.multitask.runner.run(config_cls=ConfigEntsoe)</code>.</p>
 <p><code>country_code</code> is the canonical ISO 3166-1 alpha-2 country-code attribute used by both API queries and the multitask <code>PipelineConfig</code> protocol.</p>
@@ -1894,42 +1886,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>'Time (UTC)'</code></td>
 </tr>
 <tr class="odd">
-<td>start_download</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
-<td>Start of the data download range.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>end_download</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
-<td>End of the data download range.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>data_start</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>First pipeline-data timestamp.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>data_end</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>Last pipeline-data timestamp.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>cov_start</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>Start of the covariate range.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>cov_end</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>End of the covariate range.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
 <td>bounds</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>]]</td>
 <td>Per-column outlier bounds. For single-target ENTSO-E this is typically <code>None</code> or a single <code>[(lower, upper)]</code> entry.</td>
@@ -1945,18 +1901,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>cache_home</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</td>
 <td>Cache directory override.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>end_train_ts</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>Derived end-of-training.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>start_train_ts</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
-<td>Derived start-of-training.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
@@ -2117,7 +2061,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="5aea7548" class="cell" data-execution_count="1">
+<div id="5c781959" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
@@ -2223,7 +2167,7 @@ daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="2452cbef" class="cell" data-execution_count="2">
+<div id="36a7229d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
@@ -2292,7 +2236,7 @@ daily</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="931d0926" class="cell" data-execution_count="3">
+<div id="73264765" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
