@@ -31,12 +31,7 @@ from spotforecast2_safe.multitask.defaults import DefaultsTask
 from spotforecast2_safe.multitask.lazy import LazyTask
 from spotforecast2_safe.multitask.multi import MultiTask
 from spotforecast2_safe.multitask.predict import PredictTask
-from spotforecast2_safe.multitask.runner import (
-    SAFE_PIPELINE_TASKS,
-    make_demo10_config,
-    run,
-    run_with,
-)
+from spotforecast2_safe.multitask.runner import SAFE_PIPELINE_TASKS, run, run_with
 
 __all__ = [
     "BaseTask",
@@ -47,7 +42,6 @@ __all__ = [
     "PredictTask",
     "SAFE_PIPELINE_TASKS",
     "agg_predictor",
-    "make_demo10_config",
     "run",
     "run_with",
 ]
