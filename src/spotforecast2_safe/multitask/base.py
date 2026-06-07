@@ -575,6 +575,9 @@ class BaseTask:
         _tc_window = getattr(self.config, "target_qc_window_days", None)
         _tc_max_heal = getattr(self.config, "target_max_heal_hours", 0)
         _tc_anchor = getattr(self.config, "target_anchor_zone_hours", 168)
+        _tc_dev = getattr(self.config, "target_qc_deviation_mw", None)
+        _tc_dev_ref = getattr(self.config, "target_qc_deviation_ref", None)
+        _tc_dev_slots = getattr(self.config, "target_qc_deviation_slots", 2)
 
         # Derive the effective cutoff for the anchor-zone check: mirror the
         # end_train_default / last_ts logic above (ADR §2 step 1).
@@ -605,7 +608,7 @@ class BaseTask:
         # imputation-forcing side-effect — is never entered for a
         # half-configured detector.
         _tc_configured = _tc_window is not None and (
-            _tc_range is not None or _tc_step is not None
+            _tc_range is not None or _tc_step is not None or _tc_dev is not None
         )
         if _tc_targets_present and _tc_configured:
             # The heal policy needs apply_imputation's "weighted_interp"
@@ -626,6 +629,9 @@ class BaseTask:
                 anchor_zone_hours=_tc_anchor,
                 cutoff=_tc_cutoff,
                 logger=self.logger,
+                deviation_mw=_tc_dev,
+                deviation_ref=_tc_dev_ref,
+                deviation_slots=_tc_dev_slots,
             )
         else:
             self._tc_force_weighted_interp = False

@@ -1,3 +1,15 @@
+## [18.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v18.0.1...v18.1.0-rc.1) (2026-06-07)
+
+
+### Features
+
+* **preprocessing:** add deviation rule to target-corruption detector ([95d45d2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/95d45d2ee3a6f53b3f17716987f4f32579105897))
+
+
+### Documentation
+
+* add live {python} Examples to all public symbols missing them ([5fac4ca](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5fac4cada521448aa51413d575013a90abf478f0))
+
 ## [18.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v18.0.0...v18.0.1) (2026-06-07)
 
 
