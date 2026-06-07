@@ -3,6 +3,7 @@
 
 """Configuration for ENTSO-E task pipeline."""
 
+from dataclasses import dataclass, field, fields
 from typing import Any, Dict, List, Literal, Optional
 
 import pandas as pd
@@ -16,6 +17,7 @@ from spotforecast2_safe.configurator._base_config import (
 from spotforecast2_safe.data import Period
 
 
+@dataclass
 class ConfigEntsoe:
     """Configuration for the ENTSO-E forecasting pipeline.
 
@@ -220,310 +222,126 @@ class ConfigEntsoe:
         ```
     """
 
-    _PARAM_NAMES = (
-        "country_code",
-        "periods",
-        "lags_consider",
-        "train_size",
-        "end_train_default",
-        "delta_val",
-        "predict_size",
-        "cv_block_size",
-        "refit_size",
-        "random_state",
-        "n_hyperparameters_trials",
-        "data_filename",
-        "targets",
-        "use_outlier_detection",
-        "contamination",
-        "imputation_method",
-        "window_size",
-        "imputation_window_size",
-        "use_exogenous_features",
-        "latitude",
-        "longitude",
-        "timezone",
-        "state",
-        "include_weather_windows",
-        "include_holiday_features",
-        "include_holiday_adjacency_features",
-        "poly_features_degree",
-        "max_poly_features",
-        "poly_mi_n_jobs",
-        "poly_mi_sample_size",
-        "include_covid_infection_rate",
-        "include_entsoe_forecast_load",
-        "include_entsoe_renewable_forecast",
-        "include_entsoe_net_load",
-        "include_entsoe_day_ahead_price",
-        "index_name",
-        "bounds",
-        "verbose",
-        "cache_home",
-        "n_trials_optuna",
-        "n_trials_spotoptim",
-        "n_initial_spotoptim",
-        "n_jobs_spotoptim",
-        "warm_start_lags",
-        "task",
-        "agg_weights",
-        "forecaster_factory",
-        "data_loader",
-        "test_data_loader",
-        "auto_save_models",
-        "data_frame_name",
-        "number_folds",
-        "on_weather_failure",
-        "on_exog_provider_failure",
-        "exog_max_gap_hours",
-        "exog_max_tail_gap_hours",
-        "exog_provider_window",
-        "retrain_max_age",
-        "target_qc_range_mw",
-        "target_qc_step_mw",
-        "target_qc_window_days",
-        "target_corruption_policy",
-        "target_max_heal_hours",
-        "target_anchor_zone_hours",
-        "target_qc_deviation_mw",
-        "target_qc_deviation_ref",
-        "target_qc_deviation_slots",
+    country_code: str = "DE"
+    periods: List[Period] = field(default_factory=default_periods)
+    lags_consider: List[int] = field(default_factory=lambda: list(range(1, 24)))
+    train_size: pd.Timedelta = field(default_factory=lambda: pd.Timedelta(days=3 * 365))
+    end_train_default: str = "2025-12-31 00:00+00:00"
+    delta_val: pd.Timedelta = field(
+        default_factory=lambda: pd.Timedelta(hours=24 * 7 * 10)
     )
+    predict_size: int = 24
+    # Cross-validation test-block width (hours). ``None`` defers to
+    # ``predict_size``; the actual CV-split logic lives in the sibling
+    # ``spotforecast2`` package (``BaseTask.cv_ts``).
+    cv_block_size: Optional[int] = None
+    refit_size: int = 7
+    random_state: int = 314159
+    n_hyperparameters_trials: int = 20
+    data_filename: str = "interim/energy_load.csv"
+    targets: Optional[List[str]] = None
+    # Outlier detection
+    use_outlier_detection: bool = True
+    contamination: float = 0.01
+    # Imputation
+    imputation_method: str = "weighted"
+    window_size: int = 72
+    imputation_window_size: Optional[int] = None
+    # Exogenous features
+    use_exogenous_features: bool = True
+    latitude: float = 51.5136
+    longitude: float = 7.4653
+    timezone: str = "UTC"
+    state: str = "NW"
+    # Feature selection toggles
+    include_weather_windows: bool = False
+    include_holiday_features: bool = False
+    include_holiday_adjacency_features: bool = False
+    poly_features_degree: int = 1
+    max_poly_features: int = 10
+    poly_mi_n_jobs: Optional[int] = -1
+    poly_mi_sample_size: Optional[int] = 4000
+    # Provider-based exogenous toggles, each gated by a registry flag in
+    # ``spotforecast2_safe.preprocessing.exog_providers``.
+    include_covid_infection_rate: bool = False
+    include_entsoe_forecast_load: bool = False
+    include_entsoe_renewable_forecast: bool = False
+    include_entsoe_net_load: bool = False
+    include_entsoe_day_ahead_price: bool = False
+    # Data source and index (ENTSO-E CSVs use "Time (UTC)")
+    index_name: str = "Time (UTC)"
+    # Per-column outlier bounds
+    bounds: Optional[List[tuple]] = None
+    # Verbosity and caching
+    verbose: bool = False
+    cache_home: Optional[Any] = None
+    # Hyperparameter tuning trial budgets
+    n_trials_optuna: int = 15
+    n_trials_spotoptim: int = 10
+    n_initial_spotoptim: int = 5
+    # SpotOptim parallel-evaluation worker count (None=serial, -1=all cores);
+    # consumed by spotforecast2.multitask.strategies.SpotOptimStrategy
+    n_jobs_spotoptim: Optional[int] = None
+    # Seed the SpotOptim search with ``lags_consider`` (consumed by
+    # spotforecast2.multitask.strategies.SpotOptimStrategy)
+    warm_start_lags: bool = False
+    # Active task
+    task: str = "lazy"
+    # Aggregation weights (single-target uses [1.0] or None)
+    agg_weights: Optional[List[float]] = None
+    # Forecaster factory hook (consumed by spotforecast2.multitask.base):
+    # ``factory(config, *, weight_func, target) -> forecaster``.
+    forecaster_factory: Optional[Any] = None
+    # Data-loader hook (consumed by ``BaseTask.prepare_data``):
+    # ``data_loader(config) -> pd.DataFrame``, invoked when no DataFrame is
+    # supplied.
+    data_loader: Optional[Any] = None
+    # Test-data-loader hook (consumed by ``BaseTask.prepare_data``): mirrors
+    # ``data_loader`` for the test/ground-truth slice.
+    test_data_loader: Optional[Any] = None
+    # Persistence policy and active-dataset name (consumed by
+    # spotforecast2.multitask.base).
+    auto_save_models: bool = True
+    data_frame_name: str = "default"
+    # Cross-validation fold count (consumed by spotforecast2.multitask.base.cv_ts)
+    number_folds: int = 10
+    # Weather-fetch failure policy (consumed by
+    # spotforecast2.multitask.base.build_exogenous_features)
+    on_weather_failure: Literal["raise", "skip"] = "raise"
+    # Exog-provider failure policy (consumed by
+    # preprocessing.exog_builder.ExogBuilder)
+    on_exog_provider_failure: Literal["raise", "skip"] = "raise"
+    # Gap-healing budget for exog providers (0 = strict fail-safe)
+    exog_max_gap_hours: int = 0
+    # Extended trailing-edge healing budget (0 = same as exog_max_gap_hours)
+    exog_max_tail_gap_hours: int = 0
+    # Validation window for exog providers ("full" or "train")
+    exog_provider_window: Literal["full", "train"] = "full"
+    # Maximum age of a previously trained model before retraining is required
+    # (consumed by spotforecast2_safe.manager.trainer.should_retrain)
+    retrain_max_age: pd.Timedelta = field(default_factory=lambda: pd.Timedelta(days=7))
+    # Target-side corruption detector knobs. Detector active only when
+    # target_qc_window_days AND at least one of target_qc_range_mw /
+    # target_qc_step_mw / target_qc_deviation_mw are set. Defaults are all
+    # None / off, so the pipeline is byte-identical to the pre-feature baseline.
+    # Recommended episode policy: "truncate" (auto-extends predict_size).
+    # "heal" under the default anchor_zone_hours=168 with a <=7-day QC window
+    # never engages (refusal by design). The deviation rule (dropout-only, vs a
+    # published reference column such as "Forecasted Load") catches corruption
+    # that stays below the dynamics thresholds; when enabling it, scope
+    # ``targets`` to the actuals so heal/truncate leave the reference intact.
+    target_qc_range_mw: Optional[float] = None
+    target_qc_step_mw: Optional[float] = None
+    target_qc_window_days: Optional[int] = None
+    target_corruption_policy: str = "abort"
+    target_max_heal_hours: int = 0
+    target_anchor_zone_hours: int = 168
+    target_qc_deviation_mw: Optional[float] = None
+    target_qc_deviation_ref: Optional[str] = None
+    target_qc_deviation_slots: int = 2
 
-    def __init__(
-        self,
-        country_code: str = "DE",
-        periods: Optional[List[Period]] = None,
-        lags_consider: Optional[List[int]] = None,
-        train_size: Optional[pd.Timedelta] = None,
-        end_train_default: str = "2025-12-31 00:00+00:00",
-        delta_val: Optional[pd.Timedelta] = None,
-        predict_size: int = 24,
-        cv_block_size: Optional[int] = None,
-        refit_size: int = 7,
-        random_state: int = 314159,
-        n_hyperparameters_trials: int = 20,
-        data_filename: str = "interim/energy_load.csv",
-        targets: Optional[List[str]] = None,
-        # Outlier detection
-        use_outlier_detection: bool = True,
-        contamination: float = 0.01,
-        # Imputation
-        imputation_method: str = "weighted",
-        window_size: int = 72,
-        imputation_window_size: Optional[int] = None,
-        # Exogenous features
-        use_exogenous_features: bool = True,
-        latitude: float = 51.5136,
-        longitude: float = 7.4653,
-        timezone: str = "UTC",
-        state: str = "NW",
-        # Feature selection toggles
-        include_weather_windows: bool = False,
-        include_holiday_features: bool = False,
-        include_holiday_adjacency_features: bool = False,
-        poly_features_degree: int = 1,
-        max_poly_features: int = 10,
-        poly_mi_n_jobs: Optional[int] = -1,
-        poly_mi_sample_size: Optional[int] = 4000,
-        # Provider-based exogenous toggles (preprocessing.exog_providers)
-        include_covid_infection_rate: bool = False,
-        include_entsoe_forecast_load: bool = False,
-        include_entsoe_renewable_forecast: bool = False,
-        include_entsoe_net_load: bool = False,
-        include_entsoe_day_ahead_price: bool = False,
-        # Data source and index
-        index_name: str = "Time (UTC)",
-        # Per-column outlier bounds
-        bounds: Optional[List[tuple]] = None,
-        # Verbosity and caching
-        verbose: bool = False,
-        cache_home: Optional[Any] = None,
-        # Hyperparameter tuning trial budgets
-        n_trials_optuna: int = 15,
-        n_trials_spotoptim: int = 10,
-        n_initial_spotoptim: int = 5,
-        # SpotOptim parallel-evaluation worker count (None=serial, -1=all cores);
-        # consumed by spotforecast2.multitask.strategies.SpotOptimStrategy
-        n_jobs_spotoptim: Optional[int] = None,
-        # Seed the SpotOptim search with ``lags_consider`` (consumed by
-        # spotforecast2.multitask.strategies.SpotOptimStrategy)
-        warm_start_lags: bool = False,
-        # Active task
-        task: str = "lazy",
-        # Aggregation weights (single-target uses [1.0] or None)
-        agg_weights: Optional[List[float]] = None,
-        # Forecaster factory hook (consumed by spotforecast2.multitask.base)
-        forecaster_factory: Optional[Any] = None,
-        # Data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
-        data_loader: Optional[Any] = None,
-        # Test-data-loader hook (consumed by spotforecast2.multitask.base.prepare_data)
-        test_data_loader: Optional[Any] = None,
-        # Persistence policy and active-dataset name (consumed by spotforecast2.multitask.base)
-        auto_save_models: bool = True,
-        data_frame_name: str = "default",
-        # Cross-validation fold count (consumed by spotforecast2.multitask.base.cv_ts)
-        number_folds: int = 10,
-        # Weather-fetch failure policy (consumed by spotforecast2.multitask.base.build_exogenous_features)
-        on_weather_failure: Literal["raise", "skip"] = "raise",
-        # Exog-provider failure policy (consumed by preprocessing.exog_builder.ExogBuilder)
-        on_exog_provider_failure: Literal["raise", "skip"] = "raise",
-        # Gap-healing budget for exog providers (0 = strict fail-safe)
-        exog_max_gap_hours: int = 0,
-        # Extended trailing-edge healing budget (0 = same as exog_max_gap_hours)
-        exog_max_tail_gap_hours: int = 0,
-        # Validation window for exog providers ("full" or "train")
-        exog_provider_window: Literal["full", "train"] = "full",
-        # Retraining cadence (consumed by spotforecast2_safe.manager.trainer.should_retrain)
-        retrain_max_age: Optional[pd.Timedelta] = None,
-        # Target-side corruption detector knobs.
-        # Detector active only when target_qc_window_days AND at least one of
-        # target_qc_range_mw / target_qc_step_mw / target_qc_deviation_mw are
-        # set.  Defaults are all None / off, so the pipeline is byte-identical
-        # to the pre-feature baseline.
-        # Recommended episode policy: "truncate" (auto-extends predict_size).
-        # "heal" under the default anchor_zone_hours=168 with a <=7-day QC window
-        # never engages (refusal by design — lowering the zone is a deliberate
-        # operator decision).
-        # The deviation rule (dropout-only, vs a published reference column
-        # such as "Forecasted Load") catches corruption that stays below the
-        # dynamics thresholds; when enabling it, scope `targets` to the
-        # actuals so heal/truncate leave the reference column intact.
-        target_qc_range_mw: Optional[float] = None,
-        target_qc_step_mw: Optional[float] = None,
-        target_qc_window_days: Optional[int] = None,
-        target_corruption_policy: str = "abort",
-        target_max_heal_hours: int = 0,
-        target_anchor_zone_hours: int = 168,
-        target_qc_deviation_mw: Optional[float] = None,
-        target_qc_deviation_ref: Optional[str] = None,
-        target_qc_deviation_slots: int = 2,
-    ):
-        """Initialize ConfigEntsoe with specified or default parameters."""
-        self.country_code = country_code
-
-        self.periods = periods if periods is not None else default_periods()
-        self.lags_consider = (
-            lags_consider if lags_consider is not None else list(range(1, 24))
-        )
-        self.train_size = (
-            train_size if train_size is not None else pd.Timedelta(days=3 * 365)
-        )
-        self.end_train_default = end_train_default
-        self.delta_val = (
-            delta_val if delta_val is not None else pd.Timedelta(hours=24 * 7 * 10)
-        )
-        self.predict_size = predict_size
-        # Cross-validation test-block width (hours).  ``None`` defers to
-        # ``predict_size``; the actual CV-split logic lives in the sibling
-        # ``spotforecast2`` package (``BaseTask.cv_ts``).
-        self.cv_block_size = cv_block_size
-        self.refit_size = refit_size
-        self.random_state = random_state
-        self.n_hyperparameters_trials = n_hyperparameters_trials
-        self.data_filename = data_filename
-        self.targets = targets
-        # Outlier detection
-        self.use_outlier_detection = use_outlier_detection
-        self.contamination = contamination
-        # Imputation
-        self.imputation_method = imputation_method
-        self.window_size = window_size
-        self.imputation_window_size = imputation_window_size
-        # Exogenous features
-        self.use_exogenous_features = use_exogenous_features
-        self.latitude = latitude
-        self.longitude = longitude
-        self.timezone = timezone
-        self.state = state
-        # Feature selection toggles
-        self.include_weather_windows = include_weather_windows
-        self.include_holiday_features = include_holiday_features
-        self.include_holiday_adjacency_features = include_holiday_adjacency_features
-        self.poly_features_degree = poly_features_degree
-        self.max_poly_features = max_poly_features
-        self.poly_mi_n_jobs = poly_mi_n_jobs
-        self.poly_mi_sample_size = poly_mi_sample_size
-        # Provider-based exogenous toggles, each gated by a registry flag in
-        # ``spotforecast2_safe.preprocessing.exog_providers``.
-        self.include_covid_infection_rate = include_covid_infection_rate
-        self.include_entsoe_forecast_load = include_entsoe_forecast_load
-        self.include_entsoe_renewable_forecast = include_entsoe_renewable_forecast
-        self.include_entsoe_net_load = include_entsoe_net_load
-        self.include_entsoe_day_ahead_price = include_entsoe_day_ahead_price
-        # Data source and index
-        self.index_name = index_name
-        # Per-column outlier bounds
-        self.bounds = bounds
-        # Verbosity and caching
-        self.verbose = verbose
-        self.cache_home = cache_home
-        # Hyperparameter tuning trial budgets
-        self.n_trials_optuna = n_trials_optuna
-        self.n_trials_spotoptim = n_trials_spotoptim
-        self.n_initial_spotoptim = n_initial_spotoptim
-        self.n_jobs_spotoptim = n_jobs_spotoptim
-        # When True, ``SpotOptimStrategy`` injects ``lags_consider`` as a
-        # candidate lag set and seeds the optimizer's first evaluation with
-        # it (via SpotOptim's ``x0``).  Pure data here; the behaviour lives
-        # in the sibling ``spotforecast2`` package.
-        self.warm_start_lags = warm_start_lags
-        # Active task
-        self.task = task
-        # Aggregation weights
-        self.agg_weights = agg_weights
-        # Optional callable ``factory(config, *, weight_func, target) -> forecaster``.
-        self.forecaster_factory = forecaster_factory
-        # Optional callable ``data_loader(config) -> pd.DataFrame`` invoked
-        # by ``BaseTask.prepare_data`` when no DataFrame is supplied.
-        self.data_loader = data_loader
-        # Optional callable ``test_data_loader(config) -> pd.DataFrame`` invoked
-        # by ``BaseTask.prepare_data`` when no test DataFrame is supplied.
-        # Returned frame populates ``test_actual`` and ``metrics_future`` in
-        # the prediction package; mirrors ``data_loader`` for the test slice.
-        self.test_data_loader = test_data_loader
-        # Whether ``BaseTask._run_strategy`` should persist fitted models to
-        # the cache directory after every training run.  Defaults to ``True``
-        # so that saved models are immediately available for ``PredictTask``.
-        self.auto_save_models = auto_save_models
-        # Identifier for the active dataset, used by ``BaseTask`` for
-        # cache-subdirectory naming, model-file naming, and per-dataset
-        # log-file routing.
-        self.data_frame_name = data_frame_name
-        # Number of TimeSeriesSplit folds used by ``BaseTask.cv_ts`` when
-        # building cross-validation splitters for tuning tasks.
-        self.number_folds = number_folds
-        # Policy for Open-Meteo fetch failures consumed by
-        # ``BaseTask.build_exogenous_features``: ``"raise"`` aborts the
-        # pipeline (default, preserves fail-safe semantics); ``"skip"``
-        # logs a warning and continues without weather features.
-        self.on_weather_failure = on_weather_failure
-        # Policy for exog-provider failures consumed by
-        # ``ExogBuilder``: ``"raise"`` aborts (default, fail-safe); ``"skip"``
-        # logs a warning and omits the failing provider's columns.
-        self.on_exog_provider_failure = on_exog_provider_failure
-        # Maximum contiguous gap in hours that providers will heal (0 = strict).
-        self.exog_max_gap_hours = exog_max_gap_hours
-        # Extended trailing-edge healing budget (0 = same as exog_max_gap_hours).
-        self.exog_max_tail_gap_hours = exog_max_tail_gap_hours
-        # Validation window for providers: "full" (default) or "train".
-        self.exog_provider_window = exog_provider_window
-        # Maximum age of a previously trained model before retraining is
-        # required.  Consumed by
-        # ``spotforecast2_safe.manager.trainer.should_retrain``.
-        self.retrain_max_age = (
-            retrain_max_age if retrain_max_age is not None else pd.Timedelta(days=7)
-        )
-        # Target-side corruption detector and policy knobs.
-        self.target_qc_range_mw = target_qc_range_mw
-        self.target_qc_step_mw = target_qc_step_mw
-        self.target_qc_window_days = target_qc_window_days
-        self.target_corruption_policy = target_corruption_policy
-        self.target_max_heal_hours = target_max_heal_hours
-        self.target_anchor_zone_hours = target_anchor_zone_hours
-        self.target_qc_deviation_mw = target_qc_deviation_mw
-        self.target_qc_deviation_ref = target_qc_deviation_ref
-        self.target_qc_deviation_slots = target_qc_deviation_slots
+    def __post_init__(self) -> None:
+        """Reject clearly-invalid hyperparameter values (fail-safe)."""
         validate_config(self)
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
@@ -550,7 +368,7 @@ class ConfigEntsoe:
             assert p["cv_block_size"] is None
             ```
         """
-        return build_get_params(self, self._PARAM_NAMES, deep)
+        return build_get_params(self, [f.name for f in fields(self)], deep)
 
     def set_params(
         self, params: Dict[str, object] = None, **kwargs: object
@@ -590,3 +408,10 @@ class ConfigEntsoe:
             ```
         """
         return apply_set_params(self, params, **kwargs)
+
+
+# ``_PARAM_NAMES`` is derived from the dataclass fields (declaration order) so it
+# can never drift from the actual fields; consumers and tests still read it as a
+# class attribute. Set after the class body because ``fields()`` needs the
+# finished dataclass.
+ConfigEntsoe._PARAM_NAMES = tuple(f.name for f in fields(ConfigEntsoe))

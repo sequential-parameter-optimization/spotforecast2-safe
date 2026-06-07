@@ -7,7 +7,8 @@
 defaults and the same ``get_params`` / ``set_params`` semantics. Those were
 previously hand-duplicated in both classes, which let fields drift between the
 two copies. These helpers centralise the logic so each config only declares its
-ordered parameter names (``_PARAM_NAMES``) and its ``__init__``; the
+``@dataclass`` fields; ``_PARAM_NAMES`` is derived from
+``dataclasses.fields()`` (so it can never drift from the fields), and the
 ``get_params`` / ``set_params`` behaviour and the period defaults live here.
 """
 
@@ -270,8 +271,7 @@ def validate_config(config: object) -> None:
     on_weather_failure = getattr(config, "on_weather_failure", None)
     if on_weather_failure is not None and on_weather_failure not in ("raise", "skip"):
         raise ValueError(
-            "on_weather_failure must be 'raise' or 'skip'; got "
-            f"{on_weather_failure!r}."
+            f"on_weather_failure must be 'raise' or 'skip'; got {on_weather_failure!r}."
         )
 
     on_exog_provider_failure = getattr(config, "on_exog_provider_failure", None)
