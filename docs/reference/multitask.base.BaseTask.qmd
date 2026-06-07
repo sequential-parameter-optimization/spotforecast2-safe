@@ -59,6 +59,34 @@ methods are no-ops; override them in a subclass or use the
 | results            | [Dict](`typing.Dict`)\[[str](`str`), [Dict](`typing.Dict`)\]         | Per-task mapping of target name to prediction package. |
 | agg_results        | [Dict](`typing.Dict`)                                                | Mapping of task name to aggregated prediction package. |
 
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask.base import BaseTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 7, freq="h", tz="UTC")
+df = pd.DataFrame({"load": rng.normal(500, 30, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        cache_home=tmp,
+        auto_save_models=False,
+        verbose=False,
+    )
+    task = BaseTask(cfg, dataframe=df)
+    print(f"Task mode: {task.TASK}")
+    print(f"Config predict_size: {task.config.predict_size}")
+```
+
 ## Methods
 
 | Name | Description |
@@ -103,6 +131,35 @@ aggregation strategy when needed.
 | Name   | Type                                                       | Description                         |
 |--------|------------------------------------------------------------|-------------------------------------|
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package dict. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask import LazyTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx_train = pd.date_range("2023-01-01", periods=48, freq="h", tz="UTC")
+idx_future = pd.date_range("2023-01-03", periods=6, freq="h", tz="UTC")
+
+def _pkg(train_val, future_val):
+    return {
+        "train_actual": pd.Series(np.full(48, train_val), index=idx_train),
+        "train_pred": pd.Series(np.full(48, train_val * 0.99), index=idx_train),
+        "future_pred": pd.Series(np.full(6, future_val), index=idx_future),
+        "future_actual": pd.Series(dtype="float64"),
+    }
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(cache_home=tmp, verbose=False)
+    task = LazyTask(cfg)
+    results = {"wind": _pkg(100.0, 110.0), "solar": _pkg(200.0, 210.0)}
+    agg = task.agg_predictor(results, ["wind", "solar"], [0.4, 0.6])
+    print(f"Weighted future_pred: {agg['future_pred'].iloc[0]:.1f}")
+```
 
 ### build_exogenous_features { #spotforecast2_safe.multitask.base.BaseTask.build_exogenous_features }
 
@@ -284,6 +341,41 @@ splitter uses a sliding fixed-size training window
 |        | [TimeSeriesFold](`spotforecast2_safe.splitter.split_ts_cv.TimeSeriesFold`) | A configured ``TimeSeriesFold`` instance ready to be passed to |
 |        | [TimeSeriesFold](`spotforecast2_safe.splitter.split_ts_cv.TimeSeriesFold`) | a model-selection function.                                    |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        cache_home=tmp,
+        number_folds=2,
+        auto_save_models=False,
+        verbose=False,
+    )
+    mt = MultiTask(cfg, dataframe=df)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+    y_train = mt.df_pipeline["a"]
+    cv = mt.cv_ts(y_train)
+    print(f"TimeSeriesFold steps: {cv.steps}")
+    print(f"initial_train_size: {cv.initial_train_size}")
+```
+
 ### detect_outliers { #spotforecast2_safe.multitask.base.BaseTask.detect_outliers }
 
 ```python
@@ -309,6 +401,39 @@ advisory: detected outliers are logged per column but not removed.
 |--------|--------------------------------|-------------------------------------------------|
 |        | [RuntimeError](`RuntimeError`) | If method ``prepare_data`` has not been called. |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        cache_home=tmp,
+        auto_save_models=False,
+        verbose=False,
+    )
+    mt = MultiTask(cfg, dataframe=df)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        mt.prepare_data()
+        mt.detect_outliers()
+    print(f"Pipeline shape: {mt.df_pipeline.shape}")
+    assert mt.df_pipeline_original is not None
+```
+
 ### impute { #spotforecast2_safe.multitask.base.BaseTask.impute }
 
 ```python
@@ -328,6 +453,41 @@ Fill missing values using the configured imputation strategy.
 | Name   | Type                           | Description                                     |
 |--------|--------------------------------|-------------------------------------------------|
 |        | [RuntimeError](`RuntimeError`) | If method ``prepare_data`` has not been called. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+values = rng.normal(100, 10, len(idx))
+values[10:13] = float("nan")  # inject a few gaps
+df = pd.DataFrame({"a": values}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        cache_home=tmp,
+        auto_save_models=False,
+        verbose=False,
+    )
+    mt = MultiTask(cfg, dataframe=df)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        mt.prepare_data().detect_outliers().impute()
+    missing = mt.df_pipeline["a"].isna().sum()
+    print(f"Missing values after imputation: {missing}")
+    assert missing == 0
+```
 
 ### load_models { #spotforecast2_safe.multitask.base.BaseTask.load_models }
 
@@ -359,6 +519,32 @@ filters by ``task_name``, ``target``, and ``max_age_days``.
 |--------|------------------------------------------------------------|-----------------------------------------------------------|
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Mapping ``{target: forecaster}`` of loaded model objects. |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Empty dict if no matching models were found.              |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import LazyTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        data_frame_name="demo",
+        cache_home=Path(tmp),
+        verbose=False,
+    )
+    task = LazyTask(cfg)
+    # Save a dummy object, then load it back.
+    dummy_forecaster = {"lags": [1, 2, 24]}
+    task.save_models(
+        task_name="lazy",
+        forecasters={"load": dummy_forecaster},
+    )
+    loaded = task.load_models(task_name="lazy")
+    print(f"Loaded targets: {list(loaded.keys())}")
+    assert loaded["load"]["lags"] == [1, 2, 24]
+```
 
 ### load_tuning_results { #spotforecast2_safe.multitask.base.BaseTask.load_tuning_results }
 
@@ -421,6 +607,40 @@ multitask.base.BaseTask.log_summary()
 
 Log a summary of the current pipeline configuration.
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        cache_home=tmp,
+        auto_save_models=False,
+        verbose=False,
+    )
+    mt = MultiTask(cfg, dataframe=df)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+    # log_summary writes to the pipeline logger; call it to confirm
+    # it runs without error.
+    mt.log_summary()
+    print("log_summary completed without error")
+```
+
 ### plot_with_outliers { #spotforecast2_safe.multitask.base.BaseTask.plot_with_outliers }
 
 ```python
@@ -435,6 +655,40 @@ Visualise original vs. cleaned data with outlier markers.
 |--------|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 |        | [RuntimeError](`RuntimeError`)               | If method ``detect_outliers`` has not been called.                                                                  |
 |        | [NotImplementedError](`NotImplementedError`) | Always — plotting is not available in ``spotforecast2-safe``.  Use the ``spotforecast2`` package for visualisation. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        cache_home=tmp,
+        auto_save_models=False,
+        verbose=False,
+    )
+    mt = MultiTask(cfg, dataframe=df)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        mt.prepare_data().detect_outliers()
+    try:
+        mt.plot_with_outliers()
+    except NotImplementedError as exc:
+        print(f"Plotting unavailable in spotforecast2-safe: {exc}")
+```
 
 ### prepare_data { #spotforecast2_safe.multitask.base.BaseTask.prepare_data }
 
@@ -547,6 +801,26 @@ Subclasses must override this method.
 |--------|----------------------------------------------|------------------------------------------|
 |        | [NotImplementedError](`NotImplementedError`) | Always, unless overridden by a subclass. |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask.base import BaseTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+# BaseTask.run is abstract and always raises NotImplementedError.
+# Concrete subclasses (LazyTask, DefaultsTask, PredictTask, CleanTask)
+# provide the real implementation.
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(cache_home=Path(tmp), verbose=False)
+    task = BaseTask(cfg)
+    try:
+        task.run()
+    except NotImplementedError as exc:
+        print(f"Expected: {exc}")
+```
+
 ### save_models { #spotforecast2_safe.multitask.base.BaseTask.save_models }
 
 ```python
@@ -586,6 +860,31 @@ expected to contain a ``"forecaster"`` key.
 |--------|--------------------------------|-------------------------------------------------------------------------------------------|
 |        | [ValueError](`ValueError`)     | If ``task_name`` is not one of ``"lazy"``, ``"defaults"``, ``"optuna"``, ``"spotoptim"``. |
 |        | [RuntimeError](`RuntimeError`) | If no fitted models are available for the requested task.                                 |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import LazyTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        data_frame_name="demo",
+        cache_home=Path(tmp),
+        verbose=False,
+    )
+    task = LazyTask(cfg)
+    # Supply a tiny in-memory object as a stand-in for a fitted forecaster.
+    dummy_forecaster = object()
+    saved = task.save_models(
+        task_name="lazy",
+        forecasters={"load": dummy_forecaster},
+    )
+    print(f"Saved targets: {list(saved.keys())}")
+    assert saved["load"].suffix == ".joblib"
+```
 
 ### save_tuning_results { #spotforecast2_safe.multitask.base.BaseTask.save_tuning_results }
 

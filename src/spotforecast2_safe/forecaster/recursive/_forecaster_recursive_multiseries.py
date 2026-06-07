@@ -179,6 +179,35 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
         - `series_weights`: Controls relative importance of each series.
         - `weight_func`: Controls relative importance based on index values.
         If both are provided, they are multiplied. Negative weights are not allowed.
+
+    Examples:
+        ```{python}
+        import warnings
+        import numpy as np
+        import pandas as pd
+        from sklearn.linear_model import Ridge
+
+        from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+            ForecasterRecursiveMultiSeries,
+        )
+
+        warnings.simplefilter("ignore")
+        rng = np.random.default_rng(0)
+        series = pd.DataFrame(
+            {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+            index=pd.RangeIndex(60),
+        )
+        forecaster = ForecasterRecursiveMultiSeries(
+            estimator=Ridge(),
+            lags=3,
+            forecaster_id="demo",
+        )
+        forecaster.fit(series, suppress_warnings=True)
+        predictions = forecaster.predict(steps=3, suppress_warnings=True)
+        print(predictions)
+        assert predictions.shape == (6, 2)
+        assert set(predictions["level"].unique()) == {"A", "B"}
+        ```
     """
 
     def __init__(
@@ -1137,6 +1166,34 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Notes:
             See `_create_train_X_y` for detailed information on input types.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            X_train, y_train = forecaster.create_train_X_y(
+                series, suppress_warnings=True
+            )
+            print("X_train shape:", X_train.shape)
+            print("y_train shape:", y_train.shape)
+            print(X_train.head(3))
+            assert X_train.shape[0] == y_train.shape[0]
+            assert "lag_1" in X_train.columns
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -1308,6 +1365,39 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             np.ndarray: Weights to use in `fit` method.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            # Series A gets twice the weight of series B during training.
+            forecaster = ForecasterRecursiveMultiSeries(
+                estimator=Ridge(),
+                lags=3,
+                series_weights={"A": 2.0, "B": 1.0},
+            )
+            X_train, y_train = forecaster.create_train_X_y(series, suppress_warnings=True)
+            weights = forecaster.create_sample_weights(
+                series_names_in_=["A", "B"], X_train=X_train
+            )
+            print("weights shape:", weights.shape)
+            print("unique weight values:", np.unique(weights))
+            assert weights is not None
+            assert set(np.unique(weights)).issubset({1.0, 2.0})
+            ```
         """
 
         weights = None
@@ -1454,6 +1544,35 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
             - If `exog` is a long-format pandas Series or DataFrame with a MultiIndex,
               the first level contains the series IDs.
             - If `exog` is a dictionary, each key must correspond to a series ID.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(
+                series,
+                store_in_sample_residuals=True,
+                suppress_warnings=True,
+            )
+            print("Fitted:", forecaster.is_fitted)
+            print("Series seen:", forecaster.series_names_in_)
+            assert forecaster.is_fitted
+            assert set(forecaster.series_names_in_) == {"A", "B"}
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -2182,6 +2301,33 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             pd.DataFrame: Long-format DataFrame with the predictors.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(series, suppress_warnings=True)
+            X_predict = forecaster.create_predict_X(steps=2, suppress_warnings=True)
+            print("X_predict shape:", X_predict.shape)
+            print(X_predict.head(4))
+            assert "level" in X_predict.columns
+            assert "lag_1" in X_predict.columns
+            assert X_predict.shape[0] == 2 * len(forecaster.series_names_in_)
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -2335,6 +2481,32 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             pd.DataFrame: Long-format DataFrame with the predictions.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(series, suppress_warnings=True)
+            predictions = forecaster.predict(steps=4, suppress_warnings=True)
+            print(predictions)
+            assert predictions.shape == (8, 2)
+            assert "level" in predictions.columns
+            assert "pred" in predictions.columns
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -2428,6 +2600,36 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
         References:
             [1] Forecasting: Principles and Practice (3rd ed) Rob J Hyndman and George Athanasopoulos.
                 https://otexts.com/fpp3/prediction-intervals.html
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(
+                series, store_in_sample_residuals=True, suppress_warnings=True
+            )
+            boot_preds = forecaster.predict_bootstrapping(
+                steps=2, n_boot=5, random_state=0, suppress_warnings=True
+            )
+            print(boot_preds)
+            assert boot_preds.shape == (4, 6)  # 2 steps × 2 levels, 1 level col + 5 boot cols
+            assert "level" in boot_preds.columns
+            assert "pred_boot_0" in boot_preds.columns
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -2698,6 +2900,37 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             pd.DataFrame: Long-format DataFrame with predictions and intervals.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(
+                series, store_in_sample_residuals=True, suppress_warnings=True
+            )
+            interval_preds = forecaster.predict_interval(
+                steps=2, method="conformal", suppress_warnings=True
+            )
+            print(interval_preds)
+            assert "pred" in interval_preds.columns
+            assert "lower_bound" in interval_preds.columns
+            assert "upper_bound" in interval_preds.columns
+            assert interval_preds.shape[0] == 4  # 2 steps × 2 levels
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -2803,6 +3036,40 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             pd.DataFrame: Long-format DataFrame with the predicted quantiles.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(
+                series, store_in_sample_residuals=True, suppress_warnings=True
+            )
+            quantile_preds = forecaster.predict_quantiles(
+                steps=2,
+                quantiles=[0.1, 0.5, 0.9],
+                n_boot=5,
+                random_state=0,
+                suppress_warnings=True,
+            )
+            print(quantile_preds)
+            assert "q_0.1" in quantile_preds.columns
+            assert "q_0.9" in quantile_preds.columns
+            assert quantile_preds.shape[0] == 4  # 2 steps × 2 levels
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -2867,6 +3134,41 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             pd.DataFrame: Long-format DataFrame with parameters of the fitted distribution.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from scipy.stats import norm
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(
+                series, store_in_sample_residuals=True, suppress_warnings=True
+            )
+            dist_preds = forecaster.predict_dist(
+                steps=2,
+                distribution=norm,
+                n_boot=5,
+                random_state=0,
+                suppress_warnings=True,
+            )
+            print(dist_preds)
+            assert "loc" in dist_preds.columns
+            assert "scale" in dist_preds.columns
+            assert dist_preds.shape[0] == 4  # 2 steps × 2 levels
+            ```
         """
 
         if not hasattr(distribution, "_pdf") or not callable(
@@ -2913,6 +3215,26 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             None
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(alpha=1.0), lags=3)
+            print("alpha before:", forecaster.estimator.get_params()["alpha"])
+            forecaster.set_params({"alpha": 0.5})
+            print("alpha after:", forecaster.estimator.get_params()["alpha"])
+            assert forecaster.estimator.get_params()["alpha"] == 0.5
+            assert not forecaster.is_fitted
+            ```
         """
 
         self.estimator = clone(self.estimator)
@@ -2928,6 +3250,27 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             None
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.ensemble import RandomForestRegressor
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            forecaster = ForecasterRecursiveMultiSeries(
+                estimator=RandomForestRegressor(n_estimators=10, random_state=0),
+                lags=3,
+            )
+            forecaster.set_fit_kwargs({})
+            print("fit_kwargs:", forecaster.fit_kwargs)
+            assert isinstance(forecaster.fit_kwargs, dict)
+            ```
         """
 
         self.fit_kwargs = check_select_fit_kwargs(self.estimator, fit_kwargs=fit_kwargs)
@@ -2944,6 +3287,27 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             None
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            print("lags before:", forecaster.lags)
+            forecaster.set_lags([1, 2, 5])
+            print("lags after:", forecaster.lags)
+            assert list(forecaster.lags) == [1, 2, 5]
+            assert forecaster.max_lag == 5
+            assert forecaster.window_size == 5
+            ```
         """
 
         if self.window_features is None and lags is None:
@@ -2987,6 +3351,27 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             None
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+            from spotforecast2_safe.preprocessing import RollingFeatures
+
+            warnings.simplefilter("ignore")
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            print("window_features before:", forecaster.window_features)
+            forecaster.set_window_features(RollingFeatures(stats="mean", window_sizes=4))
+            print("window_features after:", forecaster.window_features_names)
+            assert forecaster.window_features is not None
+            assert "roll_mean_4" in forecaster.window_features_names
+            ```
         """
 
         if window_features is None and self.lags is None:
@@ -3046,6 +3431,35 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             None
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            # Fit without storing in-sample residuals, then compute them afterwards.
+            forecaster.fit(series, store_in_sample_residuals=False, suppress_warnings=True)
+            forecaster.set_in_sample_residuals(
+                series, random_state=0, suppress_warnings=True
+            )
+            print("in_sample_residuals_ keys:", list(forecaster.in_sample_residuals_.keys()))
+            assert "A" in forecaster.in_sample_residuals_
+            assert "B" in forecaster.in_sample_residuals_
+            assert "_unknown_level" in forecaster.in_sample_residuals_
+            ```
         """
 
         set_skforecast_warnings(suppress_warnings, action="ignore")
@@ -3140,6 +3554,37 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Notes:
             Out-of-sample residuals can only be stored for series seen during fit.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.linear_model import Ridge
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(estimator=Ridge(), lags=3)
+            forecaster.fit(series, store_in_sample_residuals=True, suppress_warnings=True)
+
+            # Provide held-out true vs. predicted values for both series.
+            y_true = {"A": rng.standard_normal(15), "B": rng.standard_normal(15)}
+            y_pred = {"A": rng.standard_normal(15), "B": rng.standard_normal(15)}
+            forecaster.set_out_sample_residuals(
+                y_true=y_true, y_pred=y_pred, random_state=0
+            )
+            print("out_sample_residuals_ keys:", list(forecaster.out_sample_residuals_.keys()))
+            assert "A" in forecaster.out_sample_residuals_
+            assert "_unknown_level" in forecaster.out_sample_residuals_
+            ```
         """
 
         if not self.is_fitted:
@@ -3415,6 +3860,36 @@ class ForecasterRecursiveMultiSeries(ForecasterBase):
 
         Returns:
             pd.DataFrame: Feature importances associated with each predictor.
+
+        Examples:
+            ```{python}
+            import warnings
+            import numpy as np
+            import pandas as pd
+            from sklearn.ensemble import RandomForestRegressor
+
+            from spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries import (
+                ForecasterRecursiveMultiSeries,
+            )
+
+            warnings.simplefilter("ignore")
+            rng = np.random.default_rng(0)
+            series = pd.DataFrame(
+                {"A": rng.standard_normal(60), "B": rng.standard_normal(60)},
+                index=pd.RangeIndex(60),
+            )
+            forecaster = ForecasterRecursiveMultiSeries(
+                estimator=RandomForestRegressor(n_estimators=10, random_state=0),
+                lags=3,
+            )
+            forecaster.fit(series, suppress_warnings=True)
+            importances = forecaster.get_feature_importances()
+            print(importances)
+            assert "feature" in importances.columns
+            assert "importance" in importances.columns
+            assert abs(importances["importance"].sum() - 1.0) < 1e-10
+            assert len(importances) == len(forecaster.X_train_features_names_out_)
+            ```
         """
 
         if not self.is_fitted:

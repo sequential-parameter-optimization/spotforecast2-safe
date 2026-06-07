@@ -28,11 +28,12 @@ Load a saved model at a given iteration.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import tempfile
->>> from spotforecast2_safe.manager.trainer import load_iteration
->>> with tempfile.TemporaryDirectory() as tmpdir:
-...     result = load_iteration("lgbm", 99, model_dir=tmpdir)
-...     result is None
-True
+```{python}
+import tempfile
+from spotforecast2_safe.manager.trainer import load_iteration
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    result = load_iteration("lgbm", 99, model_dir=tmpdir)
+    print(result)
+    assert result is None
 ```

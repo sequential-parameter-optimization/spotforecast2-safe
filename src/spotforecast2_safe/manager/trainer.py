@@ -36,13 +36,16 @@ def get_path_model(
         Path: Full path where the model file should be stored.
 
     Examples:
-        >>> import tempfile
-        >>> from pathlib import Path
-        >>> from spotforecast2_safe.manager.trainer import get_path_model
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     p = get_path_model("lgbm", 3, model_dir=tmpdir)
-        ...     p.name
-        'lgbm_forecaster_3.joblib'
+        ```{python}
+        import tempfile
+        from pathlib import Path
+        from spotforecast2_safe.manager.trainer import get_path_model
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = get_path_model("lgbm", 3, model_dir=tmpdir)
+            print(p.name)
+            assert p.name == "lgbm_forecaster_3.joblib"
+        ```
     """
     if model_dir is None:
         model_dir = get_cache_home()
@@ -73,12 +76,15 @@ def load_iteration(
             `None` instead — that's a legitimate "no model yet" state.
 
     Examples:
-        >>> import tempfile
-        >>> from spotforecast2_safe.manager.trainer import load_iteration
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     result = load_iteration("lgbm", 99, model_dir=tmpdir)
-        ...     result is None
-        True
+        ```{python}
+        import tempfile
+        from spotforecast2_safe.manager.trainer import load_iteration
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = load_iteration("lgbm", 99, model_dir=tmpdir)
+            print(result)
+            assert result is None
+        ```
     """
     path_file = get_path_model(name, iteration, model_dir=model_dir)
     if not path_file.exists():
@@ -110,6 +116,19 @@ def get_last_model(
     Raises:
         OSError: If the latest model file exists on disk but cannot be
             deserialised (corrupt joblib, version mismatch, etc.).
+
+    Examples:
+        ```{python}
+        import tempfile
+        from spotforecast2_safe.manager.trainer import get_last_model
+
+        # Empty directory — no model files yet.
+        with tempfile.TemporaryDirectory() as tmpdir:
+            iteration, model = get_last_model("lgbm", model_dir=tmpdir)
+            print(iteration, model)
+            assert iteration == -1
+            assert model is None
+        ```
     """
     if model_dir is None:
         model_dir = get_cache_home()

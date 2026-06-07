@@ -10,6 +10,25 @@ Implementations return a forecaster with any tuning/parameter changes
 applied.  The final ``forecaster.fit(...)`` and prediction packaging are
 performed by ``BaseTask._train_and_predict_target`` after this call.
 
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.multitask.strategies import (
+    TrainingStrategy,
+    LazyStrategy,
+    DefaultsStrategy,
+)
+
+# Both concrete strategies satisfy the TrainingStrategy protocol:
+# they expose a `name` attribute and a `prepare_forecaster` method.
+for cls in (LazyStrategy, DefaultsStrategy):
+    s = cls()
+    assert hasattr(s, "name"), f"{cls.__name__} missing .name"
+    assert callable(s.prepare_forecaster), f"{cls.__name__} missing .prepare_forecaster"
+    print(f"{cls.__name__}.name = {s.name!r}")
+```
+
 ## Methods
 
 | Name | Description |
@@ -29,3 +48,25 @@ multitask.strategies.TrainingStrategy.prepare_forecaster(
 ```
 
 Return a forecaster ready for the final fit step.
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+from spotforecast2_safe.multitask.strategies import DefaultsStrategy
+
+# Demonstrate prepare_forecaster via a concrete implementation.
+# DefaultsStrategy is the simplest: it returns the forecaster unchanged.
+forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
+y_train = pd.Series(range(30), dtype=float, name="target_0")
+
+class _NullTask:
+    pass
+
+strategy = DefaultsStrategy()
+result = strategy.prepare_forecaster(_NullTask(), "target_0", forecaster, y_train)
+assert result is forecaster
+print(f"prepare_forecaster returned the same object: {result is forecaster}")
+```

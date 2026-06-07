@@ -67,6 +67,36 @@ Extracts and returns the index from the input data X.
 
 Set the parameters of the Fold object after validating them.
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+import numpy as np
+from spotforecast2_safe.splitter import TimeSeriesFold
+from spotforecast2_safe.splitter.split_base import BaseFold
+
+# BaseFold is the shared base; TimeSeriesFold is its concrete subclass.
+rng = np.random.default_rng(0)
+idx = pd.date_range("2020-01-01", periods=120, freq="h")
+series = pd.Series(rng.standard_normal(120), index=idx)
+
+cv = TimeSeriesFold(
+    steps=6,
+    initial_train_size=100,
+    window_size=10,
+    verbose=False,
+)
+assert isinstance(cv, BaseFold)
+assert cv.initial_train_size == 100
+assert cv.window_size == 10
+
+# Inspect index extracted from the series.
+idx_extracted = cv._extract_index(series)
+assert len(idx_extracted) == 120
+print(f"BaseFold subclass: {type(cv).__name__}")
+print(f"initial_train_size={cv.initial_train_size}, window_size={cv.window_size}")
+```
+
 #### Methods
 
 | Name | Description |

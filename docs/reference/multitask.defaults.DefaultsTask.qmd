@@ -60,3 +60,40 @@ Run defaults fitting for all targets.
 |--------|------------------------------------------------------------|----------------------------------------------------------------|
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package.  Per-target packages are stored |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | on ``self.results["defaults"]``.                               |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from spotforecast2_safe.multitask.defaults import DefaultsTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"load": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=False,
+        number_folds=2,
+        cache_home=Path(tmp),
+        verbose=False,
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        task = DefaultsTask(cfg, dataframe=df)
+        task.prepare_data().detect_outliers().impute().build_exogenous_features()
+        result = task.run()
+
+print(f"Future predictions: {len(result['future_pred'])} steps")
+assert "defaults" in task.results
+assert isinstance(result["future_pred"], pd.Series)
+```

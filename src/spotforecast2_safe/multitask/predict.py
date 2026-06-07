@@ -45,6 +45,55 @@ def execute_predict(
     Raises:
         RuntimeError: If no saved models are found in the cache directory,
             or if a target has no matching saved model.
+
+    Examples:
+        ```{python}
+        import tempfile
+        import warnings
+        from pathlib import Path
+
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+        from spotforecast2_safe.multitask.lazy import LazyTask
+        from spotforecast2_safe.multitask.predict import PredictTask, execute_predict
+
+        warnings.filterwarnings("ignore")
+
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2023-01-01", periods=300, freq="h", tz="UTC")
+        df = pd.DataFrame(
+            {"total_load_actual": rng.normal(10_000, 500, 300).clip(8_000, 12_000)},
+            index=idx,
+        )
+        df.index.name = "DateTime"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = ConfigMulti(
+                data_frame_name="demo",
+                predict_size=12,
+                auto_save_models=True,
+                cache_home=Path(tmp),
+                targets=["total_load_actual"],
+                verbose=False,
+                use_outlier_detection=False,
+                use_exogenous_features=False,
+                number_folds=2,
+            )
+            # Train and save a model with LazyTask first.
+            lazy = LazyTask(cfg, dataframe=df)
+            lazy.prepare_data()
+            lazy.run()
+
+            # Load the saved model and generate predictions.
+            predict_task = PredictTask(cfg, dataframe=df)
+            predict_task.prepare_data()
+            result = execute_predict(predict_task)
+
+            print(f"Future predictions shape: {result['future_pred'].shape}")
+            assert result["future_pred"].shape == (12,)
+        ```
     """
     task._ensure_pipeline_ready()
 
@@ -152,6 +201,56 @@ class PredictTask(BaseTask):
         Raises:
             RuntimeError: If no saved models are found in the cache
                 directory, or if a target has no matching model.
+
+        Examples:
+            ```{python}
+            import tempfile
+            import warnings
+            from pathlib import Path
+
+            import numpy as np
+            import pandas as pd
+
+            from spotforecast2_safe.configurator.config_multi import ConfigMulti
+            from spotforecast2_safe.multitask.lazy import LazyTask
+            from spotforecast2_safe.multitask.predict import PredictTask
+
+            warnings.filterwarnings("ignore")
+
+            rng = np.random.default_rng(0)
+            idx = pd.date_range("2023-01-01", periods=300, freq="h", tz="UTC")
+            df = pd.DataFrame(
+                {"total_load_actual": rng.normal(10_000, 500, 300).clip(8_000, 12_000)},
+                index=idx,
+            )
+            df.index.name = "DateTime"
+
+            with tempfile.TemporaryDirectory() as tmp:
+                cfg = ConfigMulti(
+                    data_frame_name="demo",
+                    predict_size=12,
+                    auto_save_models=True,
+                    cache_home=Path(tmp),
+                    targets=["total_load_actual"],
+                    verbose=False,
+                    use_outlier_detection=False,
+                    use_exogenous_features=False,
+                    number_folds=2,
+                )
+                # Train and save a model with LazyTask first.
+                lazy = LazyTask(cfg, dataframe=df)
+                lazy.prepare_data()
+                lazy.run()
+
+                # Run PredictTask to load the saved model and forecast.
+                task = PredictTask(cfg, dataframe=df)
+                task.prepare_data()
+                result = task.run()
+
+                print(f"Future predictions shape: {result['future_pred'].shape}")
+                assert result["future_pred"].shape == (12,)
+                assert "metrics_train" in result
+            ```
         """
         return execute_predict(
             self,

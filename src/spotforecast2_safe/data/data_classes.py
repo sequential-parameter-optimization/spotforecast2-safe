@@ -21,6 +21,20 @@ class Data:
 
     Attributes:
         data: pandas DataFrame containing the input time series data.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.data.data_classes import Data
+
+        idx = pd.date_range("2024-01-01", periods=48, freq="h", tz="UTC")
+        df = pd.DataFrame({"load_mw": range(48)}, index=idx)
+        container = Data(data=df)
+        print(type(container.data))
+        print(container.data.shape)
+        assert container.data.shape == (48, 1)
+        assert str(container.data.index.tz) == "UTC"
+        ```
     """
 
     data: pd.DataFrame
@@ -62,16 +76,27 @@ class Data:
 
         Examples:
             ```{python}
-            #| eval: false
+            import tempfile
             from pathlib import Path
 
-            from spotforecast2_safe.data import Data
+            import pandas as pd
 
-            data = Data.from_csv(
-                Path("data.csv"),
-                timezone="UTC",
-                columns=["target_col"],
-            )
+            from spotforecast2_safe.data.data_classes import Data
+
+            # Write a tiny CSV with a naive datetime index (UTC will be inferred)
+            idx = pd.date_range("2024-01-01", periods=24, freq="h")
+            df_src = pd.DataFrame({"load_mw": range(24)}, index=idx)
+            with tempfile.NamedTemporaryFile(
+                suffix=".csv", mode="w", delete=False
+            ) as fh:
+                df_src.to_csv(fh.name)
+                csv_path = Path(fh.name)
+
+            data = Data.from_csv(csv_path, timezone="UTC", columns=["load_mw"])
+            print(data.data.shape)
+            print(data.data.index.tz)
+            assert data.data.shape == (24, 1)
+            assert str(data.data.index.tz) == "UTC"
             ```
         """
         # If columns specified, add index column to usecols for efficient reading
@@ -131,6 +156,33 @@ class Data:
         Raises:
             ValueError: If the DataFrame index is not a DatetimeIndex.
             ValueError: If the index is timezone-naive and no timezone is provided.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.data.data_classes import Data
+
+            # Build a tz-naive hourly DataFrame and wrap it in Data
+            idx = pd.date_range("2024-03-01", periods=48, freq="h")
+            df = pd.DataFrame(
+                {"temperature": [15.0 + i * 0.1 for i in range(48)]},
+                index=idx,
+            )
+            container = Data.from_dataframe(df, timezone="Europe/Berlin")
+            print(container.data.shape)
+            print(container.data.index.tz)
+            assert container.data.shape == (48, 1)
+            assert str(container.data.index.tz) == "UTC"
+
+            # Column subsetting: only keep 'temperature'
+            df2 = df.copy()
+            df2["extra"] = 0
+            container2 = Data.from_dataframe(
+                df2, timezone="Europe/Berlin", columns=["temperature"]
+            )
+            assert list(container2.data.columns) == ["temperature"]
+            print(container2.data.columns.tolist())
+            ```
         """
         df = convert_to_utc(df, timezone)
 

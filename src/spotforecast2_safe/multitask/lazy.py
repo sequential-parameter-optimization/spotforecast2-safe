@@ -41,6 +41,36 @@ def execute_lazy(
         Per-target packages are stored on ``task.results["lazy"]``.
         When ``task.config.auto_save_models`` is ``True`` (the default), fitted
         models are saved to disk so ``PredictTask`` can load them directly.
+
+    Examples:
+        ```{python}
+        import tempfile
+        import pandas as pd
+        import numpy as np
+        from spotforecast2_safe.multitask.lazy import LazyTask, execute_lazy
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+        df = pd.DataFrame({"load": rng.normal(100, 10, len(idx))}, index=idx)
+        df.index.name = "DateTime"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = ConfigMulti(
+                predict_size=6,
+                use_exogenous_features=False,
+                use_outlier_detection=False,
+                cache_home=tmp,
+                auto_save_models=False,
+                number_folds=2,
+            )
+            task = LazyTask(cfg, dataframe=df)
+            task.prepare_data()
+            result = execute_lazy(task, show=False, use_tuned_params=False)
+            print(f"Keys: {list(result.keys())[:4]}")
+            print(f"Forecast horizon: {len(result['future_pred'])} steps")
+            assert len(result["future_pred"]) == 6
+        ```
     """
     strategy = LazyStrategy(
         use_tuned_params=use_tuned_params, max_age_days=max_age_days
@@ -101,6 +131,35 @@ class LazyTask(BaseTask):
         Returns:
             Aggregated prediction package. Per-target packages are stored
             on ``self.results["lazy"]``.
+
+        Examples:
+            ```{python}
+            import tempfile
+            import pandas as pd
+            import numpy as np
+            from spotforecast2_safe.multitask.lazy import LazyTask
+            from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+            rng = np.random.default_rng(0)
+            idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+            df = pd.DataFrame({"load": rng.normal(100, 10, len(idx))}, index=idx)
+            df.index.name = "DateTime"
+
+            with tempfile.TemporaryDirectory() as tmp:
+                cfg = ConfigMulti(
+                    predict_size=6,
+                    use_exogenous_features=False,
+                    use_outlier_detection=False,
+                    cache_home=tmp,
+                    auto_save_models=False,
+                    number_folds=2,
+                )
+                task = LazyTask(cfg, dataframe=df)
+                task.prepare_data()
+                result = task.run(show=False, use_tuned_params=False)
+                print(f"Future predictions: {len(result['future_pred'])} steps")
+                assert len(result["future_pred"]) == 6
+            ```
         """
         return execute_lazy(
             self,
