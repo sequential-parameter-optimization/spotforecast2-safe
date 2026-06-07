@@ -1,3 +1,15 @@
+## [18.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v18.0.0...v18.0.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* **multitask:** anchor exo_pred on the training cutoff, not the data extent ([1832366](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1832366a26dd6d0ef0b3f2156f7c85795616395e))
+
+
+### Documentation
+
+* regenerate quartodoc reference pages (end_train parameter + RunState lag) ([e871522](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e871522c6543a1e30d02bda4308a05d2dba6c97a))
+
 ## [18.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v17.0.0...v18.0.0) (2026-06-06)
 
 
