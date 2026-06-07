@@ -65,23 +65,24 @@ tasks.task_safe_n_to_1_with_covariates_and_dataframe.run_pipeline(
 
 Execute the N-to-1 forecasting pipeline and return the forecast DataFrame.
 
-A ``ConfigMulti`` instance must be supplied explicitly; passing ``config=None``
-raises ``ValueError``.  Outlier ``bounds`` and aggregation ``agg_weights`` are
-domain-specific calibrations and must be provided by the caller.  Input data
-must be supplied via ``dataframe``; auto-loading is not performed.  Execution
-is delegated to ``spotforecast2_safe.multitask.runner.run`` with
-``task="lazy"``.
+Execution is delegated to ``spotforecast2_safe.multitask.runner.run``
+with ``task="lazy"``.  A ``ConfigMulti`` instance must be supplied
+explicitly; there is no implicit fallback.  Outlier ``bounds`` and
+aggregation ``agg_weights`` are domain-specific calibrations and must
+be provided by the caller — no preset values are substituted.  Input
+data must likewise be supplied via ``dataframe``; auto-loading is not
+performed.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name          | Type                                                                                                       | Description                                                                                                                                                                                                                                           | Default    |
-|---------------|------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| config        | [Optional](`typing.Optional`)\[[ConfigMulti](`spotforecast2_safe.configurator.config_multi.ConfigMulti`)\] | A ``ConfigMulti`` instance.  Must not be ``None``; passing ``None`` raises ``ValueError``.                                                                                                                                                            | `None`     |
-| dataframe     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                            | Input time-series DataFrame.  Must contain a datetime column matching ``config.index_name`` and at least one numeric target column.                                                                                                                    | `None`     |
-| data_test     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                            | Ground-truth DataFrame covering the prediction horizon. Optional; passed through to the runner for metric computation.                                                                                                                                | `None`     |
-| project_name  | [str](`str`)                                                                                               | Cache subdirectory and model-file identifier. Defaults to ``"demo10"``.                                                                                                                                                                               | `'demo10'` |
-| cache_home    | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]                                                    | Cache directory override.  When ``None``, the package default (``~/.spotforecast2_cache/``) is used.                                                                                                                                                  | `None`     |
-| show_progress | [bool](`bool`)                                                                                             | Whether to emit progress messages during pipeline execution.                                                                                                                                                                                          | `False`    |
+| Name          | Type                                                                                                       | Description                                                                                                                         | Default    |
+|---------------|------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|------------|
+| config        | [Optional](`typing.Optional`)\[[ConfigMulti](`spotforecast2_safe.configurator.config_multi.ConfigMulti`)\] | A ``ConfigMulti`` instance.  Must not be ``None``; passing ``None`` raises ``ValueError``.                                          | `None`     |
+| dataframe     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                            | Input time-series DataFrame.  Must contain a datetime column matching ``config.index_name`` and at least one numeric target column. | `None`     |
+| data_test     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                            | Ground-truth DataFrame covering the prediction horizon. Optional; passed through to the runner for metric computation.              | `None`     |
+| project_name  | [str](`str`)                                                                                               | Cache subdirectory and model-file identifier. Defaults to ``"demo10"``.                                                             | `'demo10'` |
+| cache_home    | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]                                                    | Cache directory override.  When ``None``, the package default (``~/.spotforecast2_cache/``) is used.                                | `None`     |
+| show_progress | [bool](`bool`)                                                                                             | Whether to emit progress messages during pipeline execution.                                                                        | `False`    |
 
 #### Returns {.doc-section .doc-section-returns}
 
@@ -92,10 +93,10 @@ is delegated to ``spotforecast2_safe.multitask.runner.run`` with
 
 #### Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                       | Description                                                                                                                     |
-|--------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Name   | Type                       | Description                                                                                                                           |
+|--------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
 |        | [ValueError](`ValueError`) | If ``config`` is ``None``, or if the supplied ``config`` or ``dataframe`` is invalid (propagated from ``runner.run`` / ``BaseTask``). |
-|        | [TypeError](`TypeError`)   | If ``config`` is not ``None`` and not a ``ConfigMulti`` instance.                                                               |
+|        | [TypeError](`TypeError`)   | If ``config`` is not ``None`` and not a ``ConfigMulti`` instance.                                                                     |
 
 #### Examples {.doc-section .doc-section-examples}
 

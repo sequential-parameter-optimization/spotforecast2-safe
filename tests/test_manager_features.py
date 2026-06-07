@@ -529,6 +529,85 @@ class TestMergeDataAndCovariates:
         )
         assert len(exo_pred) == 24
 
+    def test_end_train_anchors_pred_slice(self, base_data, base_exog):
+        """Regression (2026-06-06 live incident): a training cutoff earlier
+        than the data extent must anchor the prediction slice — the forecaster
+        starts predicting at ``end_train + 1h``, and an ``exo_pred`` anchored
+        on ``end`` instead is phase-shifted against the prediction window."""
+        start = pd.Timestamp("2024-01-01 00:00", tz="UTC")
+        end = pd.Timestamp("2024-01-01 23:00", tz="UTC")  # data extent
+        end_train = pd.Timestamp("2024-01-01 22:00", tz="UTC")  # 1 h earlier
+        cov_end = pd.Timestamp("2024-01-02 23:00", tz="UTC")
+        merged, _, exo_pred = merge_data_and_covariates(
+            data=base_data,
+            exogenous_features=base_exog,
+            target_columns=["load"],
+            exog_features=["hour_sin", "hour_cos"],
+            start=start,
+            end=end,
+            cov_end=cov_end,
+            forecast_horizon=24,
+            end_train=end_train,
+        )
+        # First exo_pred row is the first prediction step (end_train + 1h).
+        assert exo_pred.index[0] == end_train + pd.Timedelta(hours=1)
+        assert exo_pred.index[-1] == cov_end
+        assert len(exo_pred) == 25  # (end_train, cov_end] = 25 hourly rows
+        # The training-side merge is unaffected by the prediction anchor.
+        assert merged.index[-1] == end
+
+    def test_end_train_none_keeps_historical_behaviour(self, base_data, base_exog):
+        start = pd.Timestamp("2024-01-01 00:00", tz="UTC")
+        end = pd.Timestamp("2024-01-01 23:00", tz="UTC")
+        cov_end = pd.Timestamp("2024-01-02 23:00", tz="UTC")
+        kwargs = dict(
+            data=base_data,
+            exogenous_features=base_exog,
+            target_columns=["load"],
+            exog_features=["hour_sin", "hour_cos"],
+            start=start,
+            end=end,
+            cov_end=cov_end,
+            forecast_horizon=24,
+        )
+        _, _, pred_default = merge_data_and_covariates(**kwargs)
+        _, _, pred_equal = merge_data_and_covariates(**kwargs, end_train=end)
+        pd.testing.assert_frame_equal(pred_default, pred_equal)
+        assert pred_default.index[0] == end + pd.Timedelta(hours=1)
+
+    def test_end_train_after_end_is_clamped_to_end(self, base_data, base_exog):
+        """A stale ``end_train`` beyond the data extent must not push the
+        prediction anchor past ``end`` (min semantics)."""
+        start = pd.Timestamp("2024-01-01 00:00", tz="UTC")
+        end = pd.Timestamp("2024-01-01 23:00", tz="UTC")
+        cov_end = pd.Timestamp("2024-01-02 23:00", tz="UTC")
+        _, _, exo_pred = merge_data_and_covariates(
+            data=base_data,
+            exogenous_features=base_exog,
+            target_columns=["load"],
+            exog_features=["hour_sin", "hour_cos"],
+            start=start,
+            end=end,
+            cov_end=cov_end,
+            forecast_horizon=24,
+            end_train=end + pd.Timedelta(hours=5),
+        )
+        assert exo_pred.index[0] == end + pd.Timedelta(hours=1)
+
+    def test_end_train_accepts_string(self, base_data, base_exog):
+        _, _, exo_pred = merge_data_and_covariates(
+            data=base_data,
+            exogenous_features=base_exog,
+            target_columns=["load"],
+            exog_features=["hour_sin", "hour_cos"],
+            start="2024-01-01 00:00",
+            end="2024-01-01 23:00",
+            cov_end="2024-01-02 23:00",
+            forecast_horizon=24,
+            end_train="2024-01-01 22:00",
+        )
+        assert exo_pred.index[0] == pd.Timestamp("2024-01-01 23:00", tz="UTC")
+
     def test_cast_dtype_float32(self, base_data, base_exog):
         start = pd.Timestamp("2024-01-01 00:00", tz="UTC")
         end = pd.Timestamp("2024-01-01 23:00", tz="UTC")
