@@ -28,3 +28,28 @@ the same logic is available as ``BaseTask.agg_predictor``.
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``metrics_train``, ``metrics_future``, ``metrics_future_one_day``, |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``validation_passed``, and (when present in all sources)           |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``test_actual``.                                                   |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask.base import agg_predictor
+
+rng = np.random.default_rng(0)
+idx_train = pd.date_range("2023-01-01", periods=100, freq="h", tz="UTC")
+idx_future = pd.date_range("2023-01-05 04:00", periods=6, freq="h", tz="UTC")
+
+def _pkg(train_val, future_val):
+    return {
+        "train_actual": pd.Series(np.full(100, train_val), index=idx_train),
+        "train_pred": pd.Series(np.full(100, train_val * 0.99), index=idx_train),
+        "future_pred": pd.Series(np.full(6, future_val), index=idx_future),
+        "future_actual": pd.Series(dtype="float64"),
+    }
+
+results = {"wind": _pkg(100.0, 110.0), "solar": _pkg(200.0, 210.0)}
+agg = agg_predictor(results, targets=["wind", "solar"], weights=[0.5, 0.5])
+print(f"future_pred (weighted mean): {agg['future_pred'].iloc[0]:.1f}")
+assert set(agg.keys()) >= {"train_actual", "train_pred", "future_pred", "validation_passed"}
+```

@@ -71,6 +71,49 @@ class RunState:
             user-supplied ``config.targets`` value against the columns
             actually present in the pipeline DataFrame.  ``None`` until
             ``prepare_data`` completes.
+
+    Examples:
+        ```{python}
+        import tempfile
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.multitask.run_state import RunState
+        from spotforecast2_safe.multitask import MultiTask
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+        # A freshly constructed RunState has every field set to None.
+        rs = RunState()
+        assert rs.targets is None
+        assert rs.data_start is None
+        print("Fresh RunState (all None):", rs)
+
+        # The pipeline fills the fields progressively.  prepare_data populates
+        # data_start, data_end, cov_start, cov_end, and targets.
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2024-01-01", periods=24 * 14, freq="h", tz="UTC")
+        df = pd.DataFrame({"load": rng.normal(100, 10, len(idx))}, index=idx)
+        df.index.name = "DateTime"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = ConfigMulti(
+                predict_size=6,
+                use_exogenous_features=False,
+                use_outlier_detection=False,
+                cache_home=tmp,
+            )
+            mt = MultiTask(cfg, dataframe=df)
+            mt.prepare_data()
+
+            rs = mt.run_state
+            assert rs.targets == ["load"]
+            assert isinstance(rs.data_start, pd.Timestamp)
+            assert isinstance(rs.data_end, pd.Timestamp)
+            print(f"targets: {rs.targets}")
+            print(f"data_start: {rs.data_start}")
+            print(f"data_end:   {rs.data_end}")
+            print(f"cov_end extends data_end by predict_size hours: "
+                  f"{rs.cov_end > rs.data_end}")
+        ```
     """
 
     start_download: Optional[str] = None

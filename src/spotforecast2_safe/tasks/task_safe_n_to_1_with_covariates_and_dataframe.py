@@ -367,6 +367,29 @@ def main(argv: Optional[List[str]] = None) -> None:
 
     Args:
         argv: Argument list.  ``None`` means read from ``sys.argv``.
+
+    Examples:
+        ```{python}
+        import sys
+        from io import StringIO
+        from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import main
+
+        # Capture help text to verify the CLI is wired correctly without
+        # triggering a full training run.
+        buf = StringIO()
+        old_stdout, sys.stdout = sys.stdout, buf
+        try:
+            main(["--help"])
+        except SystemExit as exc:
+            assert exc.code == 0, f"--help exited with non-zero code: {exc.code}"
+        finally:
+            sys.stdout = old_stdout
+
+        help_text = buf.getvalue()
+        assert "forecast_horizon" in help_text
+        assert "lags" in help_text
+        print(help_text[:120])
+        ```
     """
     parser = _make_arg_parser()
     args = parser.parse_args(argv)

@@ -29,12 +29,11 @@ class ExogBuilder:
     with cyclical features encoded via RepeatingBasisFunctions and optional
     holiday indicators.
 
-    Optional :class:`~spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`
-    objects extend the built frame with additional drivers (e.g. ENTSO-E
-    day-ahead forecasts, COVID infection rate). Each provider returns numeric,
-    NaN-free columns aligned to the same hourly index; a provider that cannot
-    cover the range is either re-raised or skipped according to
-    *on_provider_failure*.
+    Optional `ExogFeatureProvider` objects extend the built frame with additional
+    drivers (e.g. ENTSO-E day-ahead forecasts, COVID infection rate). Each
+    provider returns numeric, NaN-free columns aligned to the same hourly index;
+    a provider that cannot cover the range is either re-raised or skipped
+    according to *on_provider_failure*.
 
     Attributes:
         periods (List[Period]): List of periodic features to encode.
@@ -47,16 +46,19 @@ class ExogBuilder:
             that provider's columns.
 
     Examples:
-        >>> import pandas as pd
-        >>> from spotforecast2_safe.data.data_classes import Period
-        >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
-        >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
-        >>> builder = ExogBuilder(periods=periods, country_code="DE")
-        >>> start = pd.Timestamp("2025-01-01", tz="UTC")
-        >>> end = pd.Timestamp("2025-01-02", tz="UTC")
-        >>> exog = builder.build(start, end)
-        >>> exog.shape[1] > 0
-        True
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.data.data_classes import Period
+        from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
+
+        periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
+        builder = ExogBuilder(periods=periods, country_code="DE")
+        start = pd.Timestamp("2025-01-01", tz="UTC")
+        end = pd.Timestamp("2025-01-02", tz="UTC")
+        exog = builder.build(start, end)
+        print(f"shape: {exog.shape}")
+        assert exog.shape[1] > 0
+        ```
     """
 
     def __init__(
@@ -127,16 +129,21 @@ class ExogBuilder:
             ValueError: If the date range is invalid.
 
         Examples:
-            >>> import pandas as pd
-            >>> from spotforecast2_safe.data.data_classes import Period
-            >>> from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
-            >>> periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
-            >>> builder = ExogBuilder(periods=periods, country_code="DE")
-            >>> start = pd.Timestamp("2025-01-01", tz="UTC")
-            >>> end = pd.Timestamp("2025-01-02", tz="UTC")
-            >>> exog = builder.build(start, end)
-            >>> exog.shape[1] > 0
-            True
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.data.data_classes import Period
+            from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
+
+            periods = [Period(name="hour", n_periods=24, column="hour", input_range=(0, 23))]
+            builder = ExogBuilder(periods=periods, country_code="DE")
+            start = pd.Timestamp("2025-01-01", tz="UTC")
+            end = pd.Timestamp("2025-01-02", tz="UTC")
+            exog = builder.build(start, end)
+            print(f"shape: {exog.shape}, columns: {list(exog.columns[:4])}")
+            assert exog.shape == (25, 26)
+            assert "holidays" in exog.columns
+            assert "is_weekend" in exog.columns
+            ```
         """
         date_range = pd.date_range(start=start_date, end=end_date, freq="h")
         X = pd.DataFrame(index=date_range)

@@ -13,11 +13,11 @@ Construct providers by reading the registry flags off a config object.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name            | Type                                                                                    | Description                                                                                                                       | Default    |
-|-----------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|------------|
-| config          | [Union](`typing.Union`)\[\'ConfigEntsoe\', \'ConfigMulti\', [object](`object`)\]        | A config object (e.g. ``ConfigEntsoe`` / ``ConfigMulti``) whose attributes include the :data:`EXOG_PROVIDER_REGISTRY` flag names. | _required_ |
-| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to each provider.                                                                                   | `None`     |
-| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index forwarded to each provider. Overrides the per-provider window; ``None`` uses the full request index.             | `None`     |
+| Name            | Type                                                                                    | Description                                                                                                                 | Default    |
+|-----------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|------------|
+| config          | [Union](`typing.Union`)\[\'ConfigEntsoe\', \'ConfigMulti\', [object](`object`)\]        | A config object (e.g. ``ConfigEntsoe`` / ``ConfigMulti``) whose attributes include the `EXOG_PROVIDER_REGISTRY` flag names. | _required_ |
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to each provider.                                                                             | `None`     |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index forwarded to each provider. Overrides the per-provider window; ``None`` uses the full request index.       | `None`     |
 
 ## Returns {.doc-section .doc-section-returns}
 
@@ -25,3 +25,25 @@ Construct providers by reading the registry flags off a config object.
 |--------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
 |        | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | List[ExogFeatureProvider]: Providers for the flags set to ``True`` on |
 |        | [List](`typing.List`)\[[ExogFeatureProvider](`spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider`)\] | *config*.                                                             |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.preprocessing.exog_providers import (
+    build_providers_from_config,
+)
+
+class SimpleConfig:
+    include_covid_infection_rate = True
+    include_entsoe_forecast_load = False
+    include_entsoe_renewable_forecast = False
+    include_entsoe_net_load = False
+    include_entsoe_day_ahead_price = False
+    exog_max_gap_hours = 0
+    exog_max_tail_gap_hours = 0
+
+providers = build_providers_from_config(SimpleConfig())
+print([p.name for p in providers])
+assert len(providers) == 1
+assert providers[0].name == "covid_infection_rate"
+```

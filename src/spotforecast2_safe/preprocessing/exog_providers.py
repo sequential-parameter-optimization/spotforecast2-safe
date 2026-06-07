@@ -65,6 +65,17 @@ class ExogProviderError(RuntimeError):
     failure or a skipped provider depending on its ``on_provider_failure``
     policy, so the error is the single fail-safe signal for "this exogenous
     input is unavailable".
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.preprocessing.exog_providers import ExogProviderError
+
+        try:
+            raise ExogProviderError("my_provider: data not found.")
+        except ExogProviderError as exc:
+            print(type(exc).__name__, str(exc))
+        assert issubclass(ExogProviderError, RuntimeError)
+        ```
     """
 
 
@@ -254,12 +265,34 @@ class ExogFeatureProvider(ABC):
     """Contract for a pluggable exogenous-feature source.
 
     A provider maps the hourly target index to a numeric feature
-    frame on that exact index. Subclasses set :attr:`name` (a short identifier
-    used in logs and as the default column name) and implement :meth:`build`.
+    frame on that exact index. Subclasses set `name` (a short identifier
+    used in logs and as the default column name) and implement `build`.
 
-    Implementations should load their backing data lazily inside :meth:`build`
-    and raise :class:`ExogProviderError` when the data is missing or cannot
+    Implementations should load their backing data lazily inside `build`
+    and raise `ExogProviderError` when the data is missing or cannot
     cover the requested range, so the fail-safe policy lives in one place.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            ExogFeatureProvider,
+            ExogProviderError,
+        )
+
+        class ConstantProvider(ExogFeatureProvider):
+            name = "constant"
+
+            def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+                return pd.DataFrame({"constant": 1.0}, index=index).astype("float32")
+
+        idx = pd.date_range("2023-06-01", periods=6, freq="h", tz="UTC")
+        p = ConstantProvider()
+        out = p.build(idx)
+        print(p.name, out.shape, out.dtypes["constant"].name)
+        assert out.shape == (6, 1)
+        assert not out.isna().any().any()
+        ```
     """
 
     name: str = "exog_provider"
@@ -279,6 +312,26 @@ class ExogFeatureProvider(ABC):
 
         Raises:
             ExogProviderError: If the provider cannot cover *index*.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                ExogFeatureProvider,
+            )
+
+            class LinearProvider(ExogFeatureProvider):
+                name = "linear"
+
+                def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+                    vals = range(len(index))
+                    return pd.DataFrame({"linear": list(vals)}, index=index).astype("float32")
+
+            idx = pd.date_range("2023-06-01", periods=4, freq="h", tz="UTC")
+            out = LinearProvider().build(idx)
+            print(out.shape, out["linear"].tolist())
+            assert out.shape == (4, 1)
+            ```
         """
         raise NotImplementedError
 
@@ -372,6 +425,35 @@ class CovidInfectionRateProvider(ExogFeatureProvider):
         return daily[~daily.index.duplicated(keep="last")].sort_index()
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        """Return a single-column ``float32`` frame with the COVID incidence.
+
+        Args:
+            index: Hourly ``DatetimeIndex`` (tz-aware UTC) covering the
+                training-plus-forecast window.
+
+        Returns:
+            pd.DataFrame: One column (``covid_infection_rate`` by default),
+                ``float32``, indexed exactly by *index*. Values outside the
+                pandemic date range are filled with ``fill_outside`` (0.0).
+
+        Raises:
+            ExogProviderError: If the bundled CSV is absent or malformed.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                CovidInfectionRateProvider,
+            )
+
+            idx = pd.date_range("2021-12-01", periods=24, freq="h", tz="UTC")
+            provider = CovidInfectionRateProvider()
+            out = provider.build(idx)
+            print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+            assert out.shape == (24, 1)
+            assert not out.isna().any().any()
+            ```
+        """
         daily = self._load_daily()
         if len(index) == 0:
             return pd.DataFrame({self.column: pd.Series(dtype="float32")}, index=index)
@@ -473,6 +555,48 @@ class EntsoeForecastLoadProvider(ExogFeatureProvider):
         self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        """Return the day-ahead Forecasted Load aligned to *index*.
+
+        Args:
+            index: Hourly ``DatetimeIndex`` (tz-aware UTC) for the forecast window.
+
+        Returns:
+            pd.DataFrame: Single column ``entsoe_forecasted_load``, ``float32``.
+
+        Raises:
+            ExogProviderError: If the interim CSV is missing or the
+                ``Forecasted Load`` column is absent.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+
+            import pandas as pd
+
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                EntsoeForecastLoadProvider,
+            )
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+            idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+            pd.DataFrame(
+                {"Actual Load": 100.0, "Forecasted Load": 98.0}, index=idx
+            ).rename_axis("Time (UTC)").to_csv(
+                os.path.join(tmp, "interim", "energy_load.csv")
+            )
+
+            out = EntsoeForecastLoadProvider().build(idx)
+            print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+            assert out.shape == (24, 1)
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
+        """
         from spotforecast2_safe.data.fetch_data import load_timeseries_forecast
 
         try:
@@ -503,11 +627,43 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
     Args:
         data_home: Root data directory forwarded to the loader.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
-            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+            See `_align_to_index` for full semantics. Defaults to ``0``.
         max_tail_gap: Extended healing budget for the trailing-edge NaN run.
-            See :func:`_align_to_index`. Defaults to ``0``.
+            See `_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
-            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
+            *validate_index*. See `_align_to_index`. Defaults to ``None``.
+
+    Examples:
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            EntsoeRenewableForecastProvider,
+        )
+
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+        idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+        pd.DataFrame(
+            {"Solar": 3.0, "Wind Onshore": 5.0}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(
+            os.path.join(tmp, "interim", "renewable_forecast.csv")
+        )
+
+        provider = EntsoeRenewableForecastProvider()
+        out = provider.build(idx)
+        print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+        assert set(out.columns) == {"entsoe_wind_forecast", "entsoe_solar_forecast"}
+        assert out.shape == (24, 2)
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
     """
 
     name = "entsoe_renewable_forecast"
@@ -550,6 +706,49 @@ class EntsoeRenewableForecastProvider(ExogFeatureProvider):
         return out
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        """Return wind and solar forecast columns aligned to *index*.
+
+        Args:
+            index: Hourly ``DatetimeIndex`` (tz-aware UTC) for the forecast window.
+
+        Returns:
+            pd.DataFrame: Two columns — ``entsoe_wind_forecast`` and
+                ``entsoe_solar_forecast`` — as ``float32``.
+
+        Raises:
+            ExogProviderError: If ``interim/renewable_forecast.csv`` is missing
+                or contains no wind or solar columns.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+
+            import pandas as pd
+
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                EntsoeRenewableForecastProvider,
+            )
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+            idx = pd.date_range("2023-06-01", periods=12, freq="h", tz="UTC")
+            pd.DataFrame(
+                {"Solar": 2.0, "Wind Onshore": 4.0}, index=idx
+            ).rename_axis("Time (UTC)").to_csv(
+                os.path.join(tmp, "interim", "renewable_forecast.csv")
+            )
+
+            out = EntsoeRenewableForecastProvider().build(idx)
+            print(out.columns.tolist(), out.shape)
+            assert not out.isna().any().any()
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
+        """
         return _align_to_index(
             self._load(),
             index,
@@ -566,16 +765,53 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
     Combines the day-ahead Forecasted Load with the day-ahead renewable
     forecast to form the net-load prior the residual is often modelled against.
     Both inputs are day-ahead (leakage-clean). Raises
-    :class:`ExogProviderError` if either input is unavailable.
+    `ExogProviderError` if either input is unavailable.
 
     Args:
         data_home: Root data directory forwarded to the loaders.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
-            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+            See `_align_to_index` for full semantics. Defaults to ``0``.
         max_tail_gap: Extended healing budget for the trailing-edge NaN run.
-            See :func:`_align_to_index`. Defaults to ``0``.
+            See `_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
-            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
+            *validate_index*. See `_align_to_index`. Defaults to ``None``.
+
+    Examples:
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            EntsoeNetLoadProvider,
+        )
+
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+        idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+        pd.DataFrame(
+            {"Actual Load": 100.0, "Forecasted Load": 90.0}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(
+            os.path.join(tmp, "interim", "energy_load.csv")
+        )
+        pd.DataFrame(
+            {"Solar": 3.0, "Wind Onshore": 5.0}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(
+            os.path.join(tmp, "interim", "renewable_forecast.csv")
+        )
+
+        provider = EntsoeNetLoadProvider()
+        out = provider.build(idx)
+        print(out.columns.tolist(), out.shape, float(out.iloc[0, 0]))
+        assert out.shape == (24, 1)
+        assert abs(float(out.iloc[0, 0]) - 82.0) < 0.1  # 90 - (3 + 5)
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
     """
 
     name = "entsoe_net_load"
@@ -594,6 +830,53 @@ class EntsoeNetLoadProvider(ExogFeatureProvider):
         self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        """Return the day-ahead net load (Forecasted Load minus renewables).
+
+        Args:
+            index: Hourly ``DatetimeIndex`` (tz-aware UTC) for the forecast window.
+
+        Returns:
+            pd.DataFrame: Single column ``entsoe_net_load``, ``float32``.
+
+        Raises:
+            ExogProviderError: If either ``energy_load.csv`` or
+                ``renewable_forecast.csv`` is missing.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+
+            import pandas as pd
+
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                EntsoeNetLoadProvider,
+            )
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+            idx = pd.date_range("2023-06-01", periods=12, freq="h", tz="UTC")
+            pd.DataFrame(
+                {"Actual Load": 100.0, "Forecasted Load": 80.0}, index=idx
+            ).rename_axis("Time (UTC)").to_csv(
+                os.path.join(tmp, "interim", "energy_load.csv")
+            )
+            pd.DataFrame(
+                {"Solar": 2.0, "Wind Onshore": 6.0}, index=idx
+            ).rename_axis("Time (UTC)").to_csv(
+                os.path.join(tmp, "interim", "renewable_forecast.csv")
+            )
+
+            out = EntsoeNetLoadProvider().build(idx)
+            print(out.columns.tolist(), out.shape, float(out.iloc[0, 0]))
+            assert out.shape == (12, 1)
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
+        """
         from spotforecast2_safe.data.fetch_data import (
             load_renewable_forecast,
             load_timeseries_forecast,
@@ -632,11 +915,43 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
     Args:
         data_home: Root data directory forwarded to the loader.
         max_gap: Maximum contiguous missing-value run healed by ``_align_to_index``.
-            See :func:`_align_to_index` for full semantics. Defaults to ``0``.
+            See `_align_to_index` for full semantics. Defaults to ``0``.
         max_tail_gap: Extended healing budget for the trailing-edge NaN run.
-            See :func:`_align_to_index`. Defaults to ``0``.
+            See `_align_to_index`. Defaults to ``0``.
         provider_window: Validation index passed to ``_align_to_index`` as
-            *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.
+            *validate_index*. See `_align_to_index`. Defaults to ``None``.
+
+    Examples:
+        ```{python}
+        import os
+        import shutil
+        import tempfile
+
+        import pandas as pd
+
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            EntsoeDayAheadPriceProvider,
+        )
+
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+        idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+        pd.DataFrame(
+            {"Day-ahead Price": 95.0}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(
+            os.path.join(tmp, "interim", "day_ahead_price.csv")
+        )
+
+        provider = EntsoeDayAheadPriceProvider()
+        out = provider.build(idx)
+        print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+        assert out.shape == (24, 1)
+        assert not out.isna().any().any()
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
     """
 
     name = "entsoe_day_ahead_price"
@@ -655,6 +970,48 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
         self.provider_window = provider_window
 
     def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        """Return the day-ahead price series aligned to *index*.
+
+        Args:
+            index: Hourly ``DatetimeIndex`` (tz-aware UTC) for the forecast window.
+
+        Returns:
+            pd.DataFrame: Single column ``entsoe_day_ahead_price``, ``float32``.
+
+        Raises:
+            ExogProviderError: If ``interim/day_ahead_price.csv`` is missing or
+                the ``Day-ahead Price`` column is absent.
+
+        Examples:
+            ```{python}
+            import os
+            import shutil
+            import tempfile
+
+            import pandas as pd
+
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                EntsoeDayAheadPriceProvider,
+            )
+
+            tmp = tempfile.mkdtemp()
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+            idx = pd.date_range("2023-06-01", periods=12, freq="h", tz="UTC")
+            pd.DataFrame(
+                {"Day-ahead Price": 88.5}, index=idx
+            ).rename_axis("Time (UTC)").to_csv(
+                os.path.join(tmp, "interim", "day_ahead_price.csv")
+            )
+
+            out = EntsoeDayAheadPriceProvider().build(idx)
+            print(out.columns.tolist(), out.shape, float(out.iloc[0, 0]))
+            assert out.shape == (12, 1)
+
+            shutil.rmtree(tmp)
+            del os.environ["SPOTFORECAST2_DATA"]
+            ```
+        """
         from spotforecast2_safe.data.fetch_data import load_day_ahead_price
 
         try:
@@ -700,15 +1057,15 @@ def build_providers(
             ignored; missing keys are treated as ``False``.
         data_home: Root data directory forwarded to each provider.
         max_gap: Maximum contiguous missing-value run forwarded to each
-            provider. See :func:`_align_to_index`. Defaults to ``0``.
+            provider. See `_align_to_index`. Defaults to ``0``.
         max_tail_gap: Extended trailing-edge healing budget forwarded to each
-            provider. See :func:`_align_to_index`. Defaults to ``0``.
+            provider. See `_align_to_index`. Defaults to ``0``.
         provider_window: Validation index forwarded to each provider as
-            *provider_window*. See :func:`_align_to_index`. Defaults to ``None``.
+            *provider_window*. See `_align_to_index`. Defaults to ``None``.
 
     Returns:
         List[ExogFeatureProvider]: Providers for the enabled flags, in the fixed
-        order of :data:`EXOG_PROVIDER_REGISTRY` (deterministic column ordering).
+        order of `EXOG_PROVIDER_REGISTRY` (deterministic column ordering).
 
     Examples:
         ```{python}
@@ -742,7 +1099,7 @@ def build_providers_from_config(
 
     Args:
         config: A config object (e.g. ``ConfigEntsoe`` / ``ConfigMulti``) whose
-            attributes include the :data:`EXOG_PROVIDER_REGISTRY` flag names.
+            attributes include the `EXOG_PROVIDER_REGISTRY` flag names.
         data_home: Root data directory forwarded to each provider.
         provider_window: Validation index forwarded to each provider. Overrides
             the per-provider window; ``None`` uses the full request index.
@@ -750,6 +1107,27 @@ def build_providers_from_config(
     Returns:
         List[ExogFeatureProvider]: Providers for the flags set to ``True`` on
         *config*.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            build_providers_from_config,
+        )
+
+        class SimpleConfig:
+            include_covid_infection_rate = True
+            include_entsoe_forecast_load = False
+            include_entsoe_renewable_forecast = False
+            include_entsoe_net_load = False
+            include_entsoe_day_ahead_price = False
+            exog_max_gap_hours = 0
+            exog_max_tail_gap_hours = 0
+
+        providers = build_providers_from_config(SimpleConfig())
+        print([p.name for p in providers])
+        assert len(providers) == 1
+        assert providers[0].name == "covid_infection_rate"
+        ```
     """
     flags = {
         flag: bool(getattr(config, flag, False)) for flag in EXOG_PROVIDER_REGISTRY

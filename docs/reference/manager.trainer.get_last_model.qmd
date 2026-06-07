@@ -27,3 +27,17 @@ Get the latest trained model from the cache.
 | Name   | Type                 | Description                                                                                                  |
 |--------|----------------------|--------------------------------------------------------------------------------------------------------------|
 |        | [OSError](`OSError`) | If the latest model file exists on disk but cannot be deserialised (corrupt joblib, version mismatch, etc.). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from spotforecast2_safe.manager.trainer import get_last_model
+
+# Empty directory — no model files yet.
+with tempfile.TemporaryDirectory() as tmpdir:
+    iteration, model = get_last_model("lgbm", model_dir=tmpdir)
+    print(iteration, model)
+    assert iteration == -1
+    assert model is None
+```

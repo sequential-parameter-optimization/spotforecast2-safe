@@ -17,6 +17,8 @@ Handles the low-level API interactions, parameter building, and response parsing
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
+#| eval: false
+# Fetching from Open-Meteo requires a live network connection.
 import pandas as pd
 from spotforecast2_safe.weather import WeatherClient
 client = WeatherClient(latitude=52.52, longitude=13.405)
@@ -25,6 +27,18 @@ df = client.fetch_archive(
     end=pd.Timestamp("2023-01-02", tz="UTC"),
 )
 print(df.head())
+```
+
+Construction and attribute inspection do not require a network call:
+
+```{python}
+from spotforecast2_safe.weather.client import WeatherClient
+
+client = WeatherClient(latitude=52.52, longitude=13.405)
+assert client.latitude == 52.52
+assert client.longitude == 13.405
+print(f"WeatherClient at ({client.latitude}, {client.longitude})")
+print("HOURLY_PARAMS count:", len(client.HOURLY_PARAMS))
 ```
 
 ## Methods
@@ -53,6 +67,8 @@ Fetch historical data from Archive API.
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
+#| eval: false
+# Requires a live connection to archive-api.open-meteo.com.
 import pandas as pd
 from spotforecast2_safe.weather import WeatherClient
 client = WeatherClient(latitude=52.52, longitude=13.405)
@@ -77,15 +93,17 @@ Fetch forecast data from Forecast API.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name       | Type         | Description                                                                                                                                                                                                                                                                                                                                                    | Default    |
-|------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| days_ahead | [int](`int`) | Number of days ahead for the forecast.                                                                                                                                                                                                                                                                                                                         | _required_ |
-| timezone   | [str](`str`) | Timezone for the data (default "UTC").                                                                                                                                                                                                                                                                                                                         | `'UTC'`    |
-| past_days  | [int](`int`) | Recent past days to also request from the forecast endpoint via Open-Meteo's ``past_days`` parameter (0--92). The archive endpoint lags several days, so ``past_days`` lets the forecast endpoint backfill that recent window; without it the ``[now - archive_lag, today]`` range is fetched by neither endpoint and is later carried forward as a flat line. | `0`        |
+| Name       | Type         | Description                                                                                                                                                                                                                                                                                                                                              | Default    |
+|------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| days_ahead | [int](`int`) | Number of days ahead for the forecast.                                                                                                                                                                                                                                                                                                                   | _required_ |
+| timezone   | [str](`str`) | Timezone for the data (default "UTC").                                                                                                                                                                                                                                                                                                                   | `'UTC'`    |
+| past_days  | [int](`int`) | Recent past days to also request from the forecast endpoint via Open-Meteo's `past_days` parameter (0--92). The archive endpoint lags several days, so `past_days` lets the forecast endpoint backfill that recent window; without it the `[now - archive_lag, today]` range is fetched by neither endpoint and is later carried forward as a flat line. | `0`        |
 
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
+#| eval: false
+# Requires a live connection to api.open-meteo.com.
 from spotforecast2_safe.weather import WeatherClient
 client = WeatherClient(latitude=52.52, longitude=13.405)
 df = client.fetch_forecast(days_ahead=7)

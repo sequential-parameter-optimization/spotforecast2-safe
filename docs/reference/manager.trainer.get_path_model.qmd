@@ -22,12 +22,13 @@ Yield the path to a model file for a given iteration and model name.
 
 ## Examples {.doc-section .doc-section-examples}
 
-```python
->>> import tempfile
->>> from pathlib import Path
->>> from spotforecast2_safe.manager.trainer import get_path_model
->>> with tempfile.TemporaryDirectory() as tmpdir:
-...     p = get_path_model("lgbm", 3, model_dir=tmpdir)
-...     p.name
-'lgbm_forecaster_3.joblib'
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.manager.trainer import get_path_model
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    p = get_path_model("lgbm", 3, model_dir=tmpdir)
+    print(p.name)
+    assert p.name == "lgbm_forecaster_3.joblib"
 ```

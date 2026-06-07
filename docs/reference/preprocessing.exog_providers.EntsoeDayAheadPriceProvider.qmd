@@ -18,9 +18,105 @@ the realised price must never be used.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name            | Type                                                                                    | Description                                                                                                                            | Default   |
-|-----------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to the loader.                                                                                           | `None`    |
-| max_gap         | [int](`int`)                                                                            | Maximum contiguous missing-value run healed by ``_align_to_index``. See :func:`_align_to_index` for full semantics. Defaults to ``0``. | `0`       |
-| max_tail_gap    | [int](`int`)                                                                            | Extended healing budget for the trailing-edge NaN run. See :func:`_align_to_index`. Defaults to ``0``.                                 | `0`       |
-| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index passed to ``_align_to_index`` as *validate_index*. See :func:`_align_to_index`. Defaults to ``None``.                 | `None`    |
+| Name            | Type                                                                                    | Description                                                                                                                      | Default   |
+|-----------------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|-----------|
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                  | Root data directory forwarded to the loader.                                                                                     | `None`    |
+| max_gap         | [int](`int`)                                                                            | Maximum contiguous missing-value run healed by ``_align_to_index``. See `_align_to_index` for full semantics. Defaults to ``0``. | `0`       |
+| max_tail_gap    | [int](`int`)                                                                            | Extended healing budget for the trailing-edge NaN run. See `_align_to_index`. Defaults to ``0``.                                 | `0`       |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\] | Validation index passed to ``_align_to_index`` as *validate_index*. See `_align_to_index`. Defaults to ``None``.                 | `None`    |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os
+import shutil
+import tempfile
+
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.exog_providers import (
+    EntsoeDayAheadPriceProvider,
+)
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+pd.DataFrame(
+    {"Day-ahead Price": 95.0}, index=idx
+).rename_axis("Time (UTC)").to_csv(
+    os.path.join(tmp, "interim", "day_ahead_price.csv")
+)
+
+provider = EntsoeDayAheadPriceProvider()
+out = provider.build(idx)
+print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+assert out.shape == (24, 1)
+assert not out.isna().any().any()
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [build](#spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider.build) | Return the day-ahead price series aligned to *index*. |
+
+### build { #spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider.build }
+
+```python
+preprocessing.exog_providers.EntsoeDayAheadPriceProvider.build(index)
+```
+
+Return the day-ahead price series aligned to *index*.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                   | Description                                                      | Default    |
+|--------|--------------------------------------------------------|------------------------------------------------------------------|------------|
+| index  | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | Hourly ``DatetimeIndex`` (tz-aware UTC) for the forecast window. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                          |
+|--------|------------------------------------------------|----------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Single column ``entsoe_day_ahead_price``, ``float32``. |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                                     | Description                                                                                |
+|--------|------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+|        | [ExogProviderError](`spotforecast2_safe.preprocessing.exog_providers.ExogProviderError`) | If ``interim/day_ahead_price.csv`` is missing or the ``Day-ahead Price`` column is absent. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os
+import shutil
+import tempfile
+
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.exog_providers import (
+    EntsoeDayAheadPriceProvider,
+)
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+idx = pd.date_range("2023-06-01", periods=12, freq="h", tz="UTC")
+pd.DataFrame(
+    {"Day-ahead Price": 88.5}, index=idx
+).rename_axis("Time (UTC)").to_csv(
+    os.path.join(tmp, "interim", "day_ahead_price.csv")
+)
+
+out = EntsoeDayAheadPriceProvider().build(idx)
+print(out.columns.tolist(), out.shape, float(out.iloc[0, 0]))
+assert out.shape == (12, 1)
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
+```

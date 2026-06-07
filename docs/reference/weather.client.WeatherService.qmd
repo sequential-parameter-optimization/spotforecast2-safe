@@ -26,6 +26,8 @@ and fallback strategies.
 ## Examples {.doc-section .doc-section-examples}
 
 ```{python}
+#| eval: false
+# Requires a live connection to Open-Meteo APIs.
 from pathlib import Path
 import pandas as pd
 from spotforecast2_safe.weather import WeatherService
@@ -35,6 +37,24 @@ end = pd.Timestamp("2023-01-07", tz="UTC")
 df = client.get_dataframe(start=start, end=end, fill_missing=False)
 print(df.head())
 print(df.tail())
+```
+
+Construction and configuration do not require a network call:
+
+```{python}
+from pathlib import Path
+from spotforecast2_safe.weather.client import WeatherService
+
+svc = WeatherService(
+    latitude=51.03,
+    longitude=7.57,
+    cache_path=None,
+    use_forecast=True,
+)
+assert svc.latitude == 51.03
+assert svc.use_forecast is True
+assert svc.cache_path is None
+print(f"WeatherService at ({svc.latitude}, {svc.longitude}), use_forecast={svc.use_forecast}")
 ```
 
 ## Methods
@@ -59,38 +79,62 @@ weather.client.WeatherService.get_dataframe(
 Get weather DataFrame for a specified range using best available methods.
 
 Refactored from spotpredict.create_weather_df.  Since the 1.0
-major release, remaining gaps after fetch are **rejected** by
+major release, remaining gaps after fetch are rejected by
 default so that synthesised values never reach downstream
-consumers labelled as measurements.  Pass ``fill_missing=True``
+consumers labelled as measurements.  Pass `fill_missing=True`
 to opt into the legacy forward/back-fill behavior.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name                | Type                                                           | Description                                                                                                                                                                                      | Default    |
-|---------------------|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| start               | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date for the data.                                                                                                                                                                         | _required_ |
-| end                 | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date for the data.                                                                                                                                                                           | _required_ |
-| timezone            | [str](`str`)                                                   | Timezone for the data (default "UTC").                                                                                                                                                           | `'UTC'`    |
-| freq                | [str](`str`)                                                   | Frequency for the data (default "h").                                                                                                                                                            | `'h'`      |
-| fallback_on_failure | [bool](`bool`)                                                 | Whether to use fallback data on failure (default True).                                                                                                                                          | `True`     |
-| fill_missing        | [bool](`bool`)                                                 | Whether to forward- and back-fill remaining NaN gaps after fetch/resample (default False).  When False (the fail-safe default), any remaining NaN raises ``ValueError`` with the gap timestamps. | `False`    |
+| Name                | Type                                                           | Description                                                                                                                                                                                    | Default    |
+|---------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| start               | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date for the data.                                                                                                                                                                       | _required_ |
+| end                 | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date for the data.                                                                                                                                                                         | _required_ |
+| timezone            | [str](`str`)                                                   | Timezone for the data (default "UTC").                                                                                                                                                         | `'UTC'`    |
+| freq                | [str](`str`)                                                   | Frequency for the data (default "h").                                                                                                                                                          | `'h'`      |
+| fallback_on_failure | [bool](`bool`)                                                 | Whether to use fallback data on failure (default True).                                                                                                                                        | `True`     |
+| fill_missing        | [bool](`bool`)                                                 | Whether to forward- and back-fill remaining NaN gaps after fetch/resample (default False).  When False (the fail-safe default), any remaining NaN raises `ValueError` with the gap timestamps. | `False`    |
 
 #### Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                       | Description                                                                        |
-|--------|----------------------------|------------------------------------------------------------------------------------|
-|        | [ValueError](`ValueError`) | If ``fill_missing=False`` and the merged frame still contains NaNs after resample. |
+| Name   | Type                       | Description                                                                      |
+|--------|----------------------------|----------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If `fill_missing=False` and the merged frame still contains NaNs after resample. |
 
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
+#| eval: false
+# Requires a live connection to Open-Meteo APIs.
 import pandas as pd
 from spotforecast2_safe.weather import WeatherService
 client = WeatherService(latitude=51.0267, longitude=7.5693)
-# get the weather data for the last week, using the cache if available, and filling any remaining gaps
 start = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=7)
 end = pd.Timestamp.now(tz="UTC")
 df = client.get_dataframe(start=start, end=end, fill_missing=False)
 print(df.head())
 print(df.tail())
+```
+
+The `fill_missing=False` default rejects frames with gaps.  The
+ValueError path can be exercised offline using `_finalize_df`
+directly with a synthetic frame that has NaN rows:
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather.client import WeatherService
+
+svc = WeatherService(latitude=51.03, longitude=7.57)
+idx = pd.date_range("2024-01-01", periods=4, freq="h", tz="UTC")
+df = pd.DataFrame({"temperature_2m": [1.0, float("nan"), 3.0, 4.0]}, index=idx)
+
+try:
+    svc._finalize_df(df, freq="h", fill_missing=False)
+except ValueError as exc:
+    print(f"ValueError raised as expected: {exc}")
+
+# With fill_missing=True the gap is imputed silently
+filled = svc._finalize_df(df.copy(), freq="h", fill_missing=True)
+assert not filled.isna().any().any()
+print("fill_missing=True: no NaNs remain")
 ```

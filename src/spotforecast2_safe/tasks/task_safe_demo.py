@@ -24,17 +24,18 @@ Logging Mechanism: This script uses a dual-handler logging system designed for s
     * Minimal dependency footprint (no plotting libraries).
 
 Examples:
-    # Run with default settings (force training)
-    >>> uv run spotforecast-safe-demo
-
-    # Skip training (use cached models if available)
-    >>> uv run spotforecast-safe-demo --force_train false
-
-    # Specify custom data path
-    >>> uv run spotforecast-safe-demo --data_path /path/to/data.csv
-
-    # Enable logging
-    >>> uv run spotforecast-safe-demo --logging true
+    ```{python}
+    #| eval: false
+    # These are shell commands; they cannot run inside a Python kernel.
+    # Run with default settings (force training):
+    #   uv run spotforecast-safe-demo
+    # Skip training (use cached models if available):
+    #   uv run spotforecast-safe-demo --force_train false
+    # Specify a custom data path:
+    #   uv run spotforecast-safe-demo --data_path /path/to/data.csv
+    # Enable logging:
+    #   uv run spotforecast-safe-demo --logging true
+    ```
 """
 
 from __future__ import annotations
@@ -68,6 +69,22 @@ def main(
     """
     Main execution entry point.
     Returns 0 on success, non-zero on failure.
+
+    Examples:
+        ```{python}
+        from pathlib import Path
+        from spotforecast2_safe.tasks.task_safe_demo import main
+
+        # Fail-fast path: when the ground truth file does not exist,
+        # main() returns 1 immediately without attempting any training.
+        result = main(
+            force_train=False,
+            data_path=Path("/nonexistent/path/data.csv"),
+            logging_enabled=False,
+        )
+        print(f"Return code (missing data): {result}")
+        assert result == 1, f"Expected 1, got {result}"
+        ```
     """
     # Initialize configuration first to get log path
     default_config = ConfigDemo()

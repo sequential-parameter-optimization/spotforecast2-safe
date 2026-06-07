@@ -280,16 +280,18 @@ def get_model_prediction(
          The original `ForecasterRecursiveModel.package_prediction()` does not — so this parameter is currently forward-looking API design, not yet wired end-to-end.
 
     Examples:
-        >>> import tempfile
-        >>> from spotforecast2_safe.manager.predictor import get_model_prediction
-        >>>
-        >>> # Example 1: No model found raises FileNotFoundError
-        >>> with tempfile.TemporaryDirectory() as tmpdir:
-        ...     try:
-        ...         get_model_prediction('lgbm', model_dir=tmpdir)
-        ...     except FileNotFoundError as e:
-        ...         print(type(e).__name__)
-        FileNotFoundError
+        ```{python}
+        import tempfile
+        from spotforecast2_safe.manager.predictor import get_model_prediction
+
+        # When no model has been trained, get_model_prediction raises FileNotFoundError.
+        with tempfile.TemporaryDirectory() as tmpdir:
+            try:
+                get_model_prediction("lgbm", model_dir=tmpdir)
+            except FileNotFoundError as e:
+                print(type(e).__name__)
+                assert "lgbm" in str(e)
+        ```
     """
     n_iteration, model = get_last_model(model_name, model_dir)
 
