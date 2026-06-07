@@ -25,14 +25,17 @@ class RepeatingBasisFunction(BaseEstimator, TransformerMixin):
         remainder (str): Policy for remaining columns (currently only 'drop' is supported).
 
     Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> from spotforecast2_safe.preprocessing.repeating_basis_function import RepeatingBasisFunction
-        >>> X = pd.DataFrame({"hour": [0, 6, 12, 18, 23]})
-        >>> rbf = RepeatingBasisFunction(n_periods=4, column="hour", input_range=(0, 23))
-        >>> features = rbf.fit_transform(X)
-        >>> features.shape
-        (5, 4)
+        ```{python}
+        import pandas as pd
+        import numpy as np
+        from spotforecast2_safe.preprocessing.repeating_basis_function import RepeatingBasisFunction
+
+        X = pd.DataFrame({"hour": [0, 6, 12, 18, 23]})
+        rbf = RepeatingBasisFunction(n_periods=4, column="hour", input_range=(0, 23))
+        features = rbf.fit_transform(X)
+        print(features.shape)
+        assert features.shape == (5, 4)
+        ```
     """
 
     def __init__(
@@ -66,6 +69,18 @@ class RepeatingBasisFunction(BaseEstimator, TransformerMixin):
 
         Returns:
             self: The fitted transformer.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.repeating_basis_function import RepeatingBasisFunction
+
+            X = pd.DataFrame({"month": [1, 3, 6, 9, 12]})
+            rbf = RepeatingBasisFunction(n_periods=6, column="month", input_range=(1, 12))
+            fitted = rbf.fit(X)
+            print(type(fitted))
+            assert fitted is rbf
+            ```
         """
         return self
 
@@ -81,6 +96,22 @@ class RepeatingBasisFunction(BaseEstimator, TransformerMixin):
 
         Raises:
             ValueError: If the specified column is not found in the input.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            import numpy as np
+            from spotforecast2_safe.preprocessing.repeating_basis_function import RepeatingBasisFunction
+
+            X = pd.DataFrame({"hour": list(range(0, 24, 4))})
+            rbf = RepeatingBasisFunction(n_periods=4, column="hour", input_range=(0, 23))
+            rbf.fit(X)
+            features = rbf.transform(X)
+            print(f"shape: {features.shape}, dtype: {features.dtype}")
+            assert features.shape == (6, 4)
+            assert features.dtype == np.float64
+            assert np.all((features >= 0) & (features <= 1))
+            ```
         """
         # Allow passing just the column series if X is not a DataFrame
         if isinstance(X, pd.Series):

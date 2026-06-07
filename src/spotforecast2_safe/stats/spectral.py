@@ -24,6 +24,24 @@ class PeriodogramResult:
         top_periods: ``pd.Series`` of the top-k periods (1 / frequency)
             indexed by their spectral power, sorted from strongest to
             weakest peak.
+
+    Examples:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+
+        from spotforecast2_safe.stats.spectral import compute_periodogram
+
+        rng = np.random.default_rng(0)
+        t = np.arange(256)
+        y = pd.Series(np.sin(2 * np.pi * t / 24) + 0.1 * rng.standard_normal(256))
+        result = compute_periodogram(y, max_peaks=3)
+        print(type(result).__name__)
+        print(result.spectrum.columns.tolist())
+        assert isinstance(result.top_periods, pd.Series)
+        assert len(result.top_periods) == 3
+        print(f"Dominant period: {result.top_periods.index[0]:.1f} samples")
+        ```
     """
 
     spectrum: pd.DataFrame

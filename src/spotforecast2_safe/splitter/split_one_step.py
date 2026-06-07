@@ -53,6 +53,28 @@ class OneStepAheadFold(BaseFold):
         return_all_indexes (bool): Whether to return all indexes or only the start
             and end indexes of each fold.
         verbose (bool): Whether to print information about generated folds.
+
+    Examples:
+        ```{python}
+        import numpy as np
+        import pandas as pd
+        from spotforecast2_safe.splitter.split_one_step import OneStepAheadFold
+
+        rng = np.random.default_rng(0)
+        idx = pd.date_range("2025-01-01", periods=120, freq="h", tz="UTC")
+        y = pd.Series(
+            50 + 10 * np.sin(np.arange(120) / 12) + rng.normal(0, 1, 120),
+            index=idx,
+            name="load",
+        )
+
+        cv = OneStepAheadFold(initial_train_size=96, verbose=False)
+        fold = cv.split(y, as_pandas=True)
+        print(fold)
+        assert fold["train_end"].iloc[0] == 96
+        assert fold["test_start"].iloc[0] == 96
+        assert fold["test_end"].iloc[0] == 120
+        ```
     """
 
     # Class-level type annotations for static analysis tools
@@ -161,6 +183,36 @@ class OneStepAheadFold(BaseFold):
             Following the python convention, the start index is inclusive and the end
             index is exclusive. This means that the last index is not included in the
             slice.
+
+        Examples:
+            ```{python}
+            import numpy as np
+            import pandas as pd
+            from spotforecast2_safe.splitter.split_one_step import OneStepAheadFold
+
+            rng = np.random.default_rng(0)
+            idx = pd.date_range("2025-01-01", periods=100, freq="h", tz="UTC")
+            y = pd.Series(
+                50 + 10 * np.sin(np.arange(100) / 12) + rng.normal(0, 1, 100),
+                index=idx,
+                name="load",
+            )
+
+            cv = OneStepAheadFold(initial_train_size=80, verbose=False)
+
+            # List form: [fold_id, [train_start, train_end], [test_start, test_end], fit]
+            fold_list = cv.split(y)
+            print("fold list:", fold_list)
+            assert fold_list[1] == [0, 80]
+            assert fold_list[2] == [80, 100]
+
+            # DataFrame form for human-readable inspection
+            fold_df = cv.split(y, as_pandas=True)
+            print(fold_df)
+            assert fold_df.shape == (1, 6)
+            assert int(fold_df["train_end"].iloc[0]) == 80
+            assert int(fold_df["test_end"].iloc[0]) == 100
+            ```
         """
 
         if not isinstance(X, (pd.Series, pd.DataFrame, pd.Index, dict)):

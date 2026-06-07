@@ -96,6 +96,71 @@ def run_with(
 
     Raises:
         ValueError: If ``task`` is not a member of ``all_tasks``.
+
+    Examples:
+        Run a lazy forecast via the low-level ``run_with`` seam, passing
+        ``MultiTask`` and the safe-package task set directly:
+
+        ```{python}
+        import warnings
+        import tempfile
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+
+        from spotforecast2_safe.multitask.runner import run_with, _ALL_TASKS
+        from spotforecast2_safe.multitask.multi import MultiTask
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+        from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+
+        data_home = get_package_data_home()
+        df = fetch_data(filename=str(data_home / "demo02.csv"))
+        cache_dir = tempfile.mkdtemp()
+
+        cfg = ConfigMulti(
+            train_size=pd.Timedelta(days=30),
+            predict_size=6,
+            imputation_method="weighted",
+            use_exogenous_features=False,
+            auto_save_models=False,
+            targets=["A"],
+            number_folds=2,
+            verbose=False,
+        )
+
+        forecast = run_with(
+            multitask_cls=MultiTask,
+            all_tasks=_ALL_TASKS,
+            config=cfg,
+            task="lazy",
+            dataframe=df,
+            project_name="demo02_runner",
+            cache_home=cache_dir,
+            show=False,
+            show_progress=False,
+            log_level=40,
+        )
+        print(forecast)
+        assert isinstance(forecast, pd.DataFrame)
+        assert "forecast" in forecast.columns
+        assert len(forecast) == 6
+        ```
+
+        Passing an unsupported task name raises a ``ValueError`` with a
+        descriptive message pointing to the sibling package:
+
+        ```{python}
+        from spotforecast2_safe.multitask.runner import run_with, _ALL_TASKS
+        from spotforecast2_safe.multitask.multi import MultiTask
+
+        try:
+            run_with(
+                multitask_cls=MultiTask,
+                all_tasks=_ALL_TASKS,
+                task="optuna",
+            )
+        except ValueError as exc:
+            print(exc)
+        ```
     """
     if task not in all_tasks:
         if unknown_task_message is not None:

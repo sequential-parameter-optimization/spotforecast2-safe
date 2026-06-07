@@ -42,6 +42,27 @@ def default_lgbm_forecaster_factory(
 
     Returns:
         A new ``ForecasterRecursive`` ready to be fit.
+
+    Examples:
+        ```{python}
+        import types
+        from spotforecast2_safe.multitask.factories import default_lgbm_forecaster_factory
+        from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+        # Build a minimal config-like object that satisfies the PipelineConfig
+        # protocol (random_state, lags_consider, window_size).
+        config = types.SimpleNamespace(
+            random_state=42,
+            lags_consider=[1, 2, 3],
+            window_size=3,
+        )
+
+        forecaster = default_lgbm_forecaster_factory(config, target="power")
+        assert isinstance(forecaster, ForecasterRecursive)
+        assert list(forecaster.lags) == [1, 2, 3]
+        print(f"type: {type(forecaster).__name__}")
+        print(f"lags: {list(forecaster.lags)}")
+        ```
     """
     del target  # default factory does not specialise per target
     return ForecasterRecursive(

@@ -27,6 +27,22 @@ def default_periods() -> List[Period]:
     hours (2-hour resolution, halving dimensionality); weekly/monthly/quarterly
     match their range size (1:1); yearly uses ``n_periods=12`` over 365 days for
     strong smoothing. See ``docs/PERIOD_CONFIGURATION_RATIONALE.md``.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.configurator._base_config import default_periods
+
+        periods = default_periods()
+        print(f"Number of default periods: {len(periods)}")
+        names = [p.name for p in periods]
+        print(f"Period names: {names}")
+        assert len(periods) == 5
+        assert names == ["daily", "weekly", "monthly", "quarterly", "yearly"]
+        daily = periods[0]
+        assert daily.n_periods == 12
+        assert daily.column == "hour"
+        assert daily.input_range == (1, 24)
+        ```
     """
     return [
         Period(name="daily", n_periods=12, column="hour", input_range=(1, 24)),
@@ -51,6 +67,23 @@ def build_get_params(
 
     Returns:
         Dictionary of parameter names mapped to their current values.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.configurator._base_config import build_get_params
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+        config = ConfigMulti(country_code="DE")
+        # Retrieve a subset of flat parameters
+        params = build_get_params(config, ["predict_size", "random_state"], deep=False)
+        print(f"predict_size: {params['predict_size']}")
+        print(f"random_state: {params['random_state']}")
+        assert params["predict_size"] == 24
+        # With deep=True (default) the nested Period sub-objects are also exposed
+        params_deep = build_get_params(config, ["predict_size"], deep=True)
+        assert "periods__daily__n_periods" in params_deep
+        print(f"periods__daily__n_periods: {params_deep['periods__daily__n_periods']}")
+        ```
     """
     params: Dict[str, object] = {name: getattr(config, name) for name in param_names}
 
@@ -72,7 +105,7 @@ def apply_set_params(
 
     Flat parameters are set via ``setattr`` (rejecting unknown names and
     read-only properties). Nested ``periods__<name>__<param>`` keys update the
-    frozen ``Period`` dataclasses via :func:`dataclasses.replace`.
+    frozen ``Period`` dataclasses via `dataclasses.replace()`.
 
     Args:
         config: The configuration instance to mutate.
@@ -85,6 +118,30 @@ def apply_set_params(
     Raises:
         ValueError: For an unknown flat parameter, a malformed ``periods__``
             key, or a period name not present in the configuration.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.configurator._base_config import apply_set_params
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+        config = ConfigMulti(country_code="DE")
+        print(f"predict_size before: {config.predict_size}")
+
+        # Update a flat parameter
+        apply_set_params(config, predict_size=48)
+        print(f"predict_size after: {config.predict_size}")
+        assert config.predict_size == 48
+
+        # Update a nested Period field via the periods__<name>__<param> notation
+        apply_set_params(config, **{"periods__daily__n_periods": 24})
+        daily = next(p for p in config.periods if p.name == "daily")
+        print(f"daily n_periods after: {daily.n_periods}")
+        assert daily.n_periods == 24
+
+        # apply_set_params returns the config instance for method chaining
+        result = apply_set_params(config, random_state=42)
+        assert result is config
+        ```
     """
     all_params: Dict[str, object] = {}
     if params is not None:
@@ -160,6 +217,32 @@ def validate_config(config: object) -> None:
             ``"raise"`` or ``"skip"``, a negative ``exog_max_gap_hours``, a
             negative ``exog_max_tail_gap_hours``, or an
             ``exog_provider_window`` that is not ``"full"`` or ``"train"``.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.configurator._base_config import validate_config
+        from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+        config = ConfigMulti(country_code="DE")
+        # A freshly constructed config always passes validation
+        validate_config(config)
+        print("Default config is valid.")
+
+        # Demonstrate that an invalid value is rejected
+        config.predict_size = -1
+        try:
+            validate_config(config)
+        except ValueError as exc:
+            print(f"Caught expected error: {exc}")
+
+        # Restore and check contamination boundary
+        config.predict_size = 24
+        config.contamination = 0.9  # out of [0, 0.5]
+        try:
+            validate_config(config)
+        except ValueError as exc:
+            print(f"Caught expected error: {exc}")
+        ```
     """
     predict_size = getattr(config, "predict_size", None)
     if predict_size is not None and predict_size <= 0:

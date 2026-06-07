@@ -7,12 +7,35 @@ preprocessing.exog_providers.ExogFeatureProvider()
 Contract for a pluggable exogenous-feature source.
 
 A provider maps the hourly target index to a numeric feature
-frame on that exact index. Subclasses set :attr:`name` (a short identifier
-used in logs and as the default column name) and implement :meth:`build`.
+frame on that exact index. Subclasses set `name` (a short identifier
+used in logs and as the default column name) and implement `build`.
 
-Implementations should load their backing data lazily inside :meth:`build`
-and raise :class:`ExogProviderError` when the data is missing or cannot
+Implementations should load their backing data lazily inside `build`
+and raise `ExogProviderError` when the data is missing or cannot
 cover the requested range, so the fail-safe policy lives in one place.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    ExogFeatureProvider,
+    ExogProviderError,
+)
+
+class ConstantProvider(ExogFeatureProvider):
+    name = "constant"
+
+    def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        return pd.DataFrame({"constant": 1.0}, index=index).astype("float32")
+
+idx = pd.date_range("2023-06-01", periods=6, freq="h", tz="UTC")
+p = ConstantProvider()
+out = p.build(idx)
+print(p.name, out.shape, out.dtypes["constant"].name)
+assert out.shape == (6, 1)
+assert not out.isna().any().any()
+```
 
 ## Methods
 
@@ -45,3 +68,24 @@ Return features aligned to *index*.
 | Name   | Type                                                                                     | Description                           |
 |--------|------------------------------------------------------------------------------------------|---------------------------------------|
 |        | [ExogProviderError](`spotforecast2_safe.preprocessing.exog_providers.ExogProviderError`) | If the provider cannot cover *index*. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    ExogFeatureProvider,
+)
+
+class LinearProvider(ExogFeatureProvider):
+    name = "linear"
+
+    def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        vals = range(len(index))
+        return pd.DataFrame({"linear": list(vals)}, index=index).astype("float32")
+
+idx = pd.date_range("2023-06-01", periods=4, freq="h", tz="UTC")
+out = LinearProvider().build(idx)
+print(out.shape, out["linear"].tolist())
+assert out.shape == (4, 1)
+```

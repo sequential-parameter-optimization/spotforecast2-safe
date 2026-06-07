@@ -17,10 +17,24 @@ class WeatherFetchError(ValueError):
     Distinguishes a transient external-API failure (network outage,
     rate-limit exhaustion, both the archive and forecast endpoints
     returning errors) from a real data-validity problem.  Subclasses
-    ``ValueError`` so existing callers that catch ``ValueError`` keep
+    `ValueError` so existing callers that catch `ValueError` keep
     working; consumers that want to react specifically to weather-API
-    failures (e.g. ``spotforecast2.multitask.base.BaseTask`` with
-    ``config.on_weather_failure="skip"``) catch this class instead.
+    failures (e.g. `spotforecast2.multitask.base.BaseTask` with
+    `config.on_weather_failure="skip"`) catch this class instead.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.weather.client import WeatherFetchError
+
+        try:
+            raise WeatherFetchError("Archive and forecast endpoints both failed")
+        except WeatherFetchError as exc:
+            print(f"Caught WeatherFetchError: {exc}")
+
+        # WeatherFetchError is a subclass of ValueError
+        assert issubclass(WeatherFetchError, ValueError)
+        print("issubclass(WeatherFetchError, ValueError):", True)
+        ```
     """
 
 
@@ -34,6 +48,8 @@ class WeatherClient:
 
     Examples:
         ```{python}
+        #| eval: false
+        # Fetching from Open-Meteo requires a live network connection.
         import pandas as pd
         from spotforecast2_safe.weather import WeatherClient
         client = WeatherClient(latitude=52.52, longitude=13.405)
@@ -42,6 +58,18 @@ class WeatherClient:
             end=pd.Timestamp("2023-01-02", tz="UTC"),
         )
         print(df.head())
+        ```
+
+        Construction and attribute inspection do not require a network call:
+
+        ```{python}
+        from spotforecast2_safe.weather.client import WeatherClient
+
+        client = WeatherClient(latitude=52.52, longitude=13.405)
+        assert client.latitude == 52.52
+        assert client.longitude == 13.405
+        print(f"WeatherClient at ({client.latitude}, {client.longitude})")
+        print("HOURLY_PARAMS count:", len(client.HOURLY_PARAMS))
         ```
     """
 
@@ -140,6 +168,8 @@ class WeatherClient:
 
         Examples:
             ```{python}
+            #| eval: false
+            # Requires a live connection to archive-api.open-meteo.com.
             import pandas as pd
             from spotforecast2_safe.weather import WeatherClient
             client = WeatherClient(latitude=52.52, longitude=13.405)
@@ -169,14 +199,16 @@ class WeatherClient:
             days_ahead: Number of days ahead for the forecast.
             timezone: Timezone for the data (default "UTC").
             past_days: Recent past days to also request from the forecast
-                endpoint via Open-Meteo's ``past_days`` parameter (0--92).
-                The archive endpoint lags several days, so ``past_days`` lets
+                endpoint via Open-Meteo's `past_days` parameter (0--92).
+                The archive endpoint lags several days, so `past_days` lets
                 the forecast endpoint backfill that recent window; without it
-                the ``[now - archive_lag, today]`` range is fetched by neither
+                the `[now - archive_lag, today]` range is fetched by neither
                 endpoint and is later carried forward as a flat line.
 
         Examples:
             ```{python}
+            #| eval: false
+            # Requires a live connection to api.open-meteo.com.
             from spotforecast2_safe.weather import WeatherClient
             client = WeatherClient(latitude=52.52, longitude=13.405)
             df = client.fetch_forecast(days_ahead=7)
@@ -214,6 +246,8 @@ class WeatherService(WeatherClient):
 
     Examples:
         ```{python}
+        #| eval: false
+        # Requires a live connection to Open-Meteo APIs.
         from pathlib import Path
         import pandas as pd
         from spotforecast2_safe.weather import WeatherService
@@ -223,6 +257,24 @@ class WeatherService(WeatherClient):
         df = client.get_dataframe(start=start, end=end, fill_missing=False)
         print(df.head())
         print(df.tail())
+        ```
+
+        Construction and configuration do not require a network call:
+
+        ```{python}
+        from pathlib import Path
+        from spotforecast2_safe.weather.client import WeatherService
+
+        svc = WeatherService(
+            latitude=51.03,
+            longitude=7.57,
+            cache_path=None,
+            use_forecast=True,
+        )
+        assert svc.latitude == 51.03
+        assert svc.use_forecast is True
+        assert svc.cache_path is None
+        print(f"WeatherService at ({svc.latitude}, {svc.longitude}), use_forecast={svc.use_forecast}")
         ```
     """
 
@@ -249,9 +301,9 @@ class WeatherService(WeatherClient):
         """Get weather DataFrame for a specified range using best available methods.
 
         Refactored from spotpredict.create_weather_df.  Since the 1.0
-        major release, remaining gaps after fetch are **rejected** by
+        major release, remaining gaps after fetch are rejected by
         default so that synthesised values never reach downstream
-        consumers labelled as measurements.  Pass ``fill_missing=True``
+        consumers labelled as measurements.  Pass `fill_missing=True`
         to opt into the legacy forward/back-fill behavior.
 
         Args:
@@ -263,24 +315,48 @@ class WeatherService(WeatherClient):
             fill_missing: Whether to forward- and back-fill remaining
                 NaN gaps after fetch/resample (default False).  When
                 False (the fail-safe default), any remaining NaN
-                raises ``ValueError`` with the gap timestamps.
+                raises `ValueError` with the gap timestamps.
 
         Raises:
-            ValueError: If ``fill_missing=False`` and the merged frame
+            ValueError: If `fill_missing=False` and the merged frame
                 still contains NaNs after resample.
 
         Examples:
-             ```{python}
-             import pandas as pd
-             from spotforecast2_safe.weather import WeatherService
-             client = WeatherService(latitude=51.0267, longitude=7.5693)
-             # get the weather data for the last week, using the cache if available, and filling any remaining gaps
-             start = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=7)
-             end = pd.Timestamp.now(tz="UTC")
-             df = client.get_dataframe(start=start, end=end, fill_missing=False)
-             print(df.head())
-             print(df.tail())
-             ```
+            ```{python}
+            #| eval: false
+            # Requires a live connection to Open-Meteo APIs.
+            import pandas as pd
+            from spotforecast2_safe.weather import WeatherService
+            client = WeatherService(latitude=51.0267, longitude=7.5693)
+            start = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=7)
+            end = pd.Timestamp.now(tz="UTC")
+            df = client.get_dataframe(start=start, end=end, fill_missing=False)
+            print(df.head())
+            print(df.tail())
+            ```
+
+            The `fill_missing=False` default rejects frames with gaps.  The
+            ValueError path can be exercised offline using `_finalize_df`
+            directly with a synthetic frame that has NaN rows:
+
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.weather.client import WeatherService
+
+            svc = WeatherService(latitude=51.03, longitude=7.57)
+            idx = pd.date_range("2024-01-01", periods=4, freq="h", tz="UTC")
+            df = pd.DataFrame({"temperature_2m": [1.0, float("nan"), 3.0, 4.0]}, index=idx)
+
+            try:
+                svc._finalize_df(df, freq="h", fill_missing=False)
+            except ValueError as exc:
+                print(f"ValueError raised as expected: {exc}")
+
+            # With fill_missing=True the gap is imputed silently
+            filled = svc._finalize_df(df.copy(), freq="h", fill_missing=True)
+            assert not filled.isna().any().any()
+            print("fill_missing=True: no NaNs remain")
+            ```
         """
         start_ts = pd.Timestamp(start)
         end_ts = pd.Timestamp(end)

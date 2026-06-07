@@ -290,3 +290,45 @@ following columns: 'fold', 'train_start', 'train_end', 'last_window_start',
 Following the python convention, the start index is inclusive and the end
 index is exclusive. This means that the last index is not included in the
 slice.
+
+###### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+y = pd.Series(
+    range(60), index=pd.date_range("2024-01-01", periods=60, freq="h")
+)
+cv = TimeSeriesFold(steps=5, initial_train_size=40, verbose=False)
+
+# Default: returns a list of fold descriptors
+folds = cv.split(y)
+print(f"Number of folds: {len(folds)}")
+# Each fold is [fold_idx, [train_start, train_end],
+#               [last_window_start, last_window_end],
+#               [test_start, test_end],
+#               [test_start_with_gap, test_end_with_gap],
+#               fit_forecaster]
+first = folds[0]
+assert first[0] == 0           # fold index
+assert first[1] == [0, 40]     # training slice
+assert first[-1] is True       # first fold always fits
+assert len(folds) == 4
+```
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+y = pd.Series(
+    range(60), index=pd.date_range("2024-01-01", periods=60, freq="h")
+)
+cv = TimeSeriesFold(steps=5, initial_train_size=40, verbose=False)
+
+# as_pandas=True returns a DataFrame with named columns
+df = cv.split(y, as_pandas=True)
+print(df[["fold", "train_start", "train_end", "test_start", "test_end"]])
+assert list(df.columns[:3]) == ["fold", "train_start", "train_end"]
+assert df.shape[0] == 4
+```

@@ -114,6 +114,56 @@ corresponding ``run_task_*`` method directly.
 |        | [ValueError](`ValueError`)     | If ``task`` is ``"optuna"`` or ``"spotoptim"`` (auto-tuning not available in this package), or if ``task`` is not one of the supported task names. |
 |        | [RuntimeError](`RuntimeError`) | If ``prepare_data`` has not been called (for training and prediction tasks).                                                                       |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask.multi import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=False,
+        number_folds=2,
+        cache_home=tmp,
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        mt = MultiTask(cfg, dataframe=df, task="lazy")
+        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+        result = mt.run(task="lazy")
+
+assert "future_pred" in result
+assert result["future_pred"].shape == (6,)
+print(f"Dispatched to 'lazy'; horizon: {result['future_pred'].shape[0]} h")
+
+# run() rejects unknown tasks and auto-tuning tasks
+with tempfile.TemporaryDirectory() as tmp:
+    cfg2 = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=False,
+        cache_home=tmp,
+    )
+    mt2 = MultiTask(cfg2, task="lazy")
+    try:
+        mt2.run(task="optuna")
+    except ValueError as exc:
+        print(f"ValueError: {str(exc)[:60]}")
+```
+
 ### run_task_clean { #spotforecast2_safe.multitask.multi.MultiTask.run_task_clean }
 
 ```python
@@ -148,6 +198,29 @@ Does not require ``prepare_data()`` to be called first.
 |--------|--------------------------------|-------------------------------------------|
 |        | [RuntimeError](`RuntimeError`) | If the cache directory cannot be removed. |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask.multi import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cache = Path(tmp) / "sf2_cache"
+    cache.mkdir()
+    (cache / "models").mkdir()
+    (cache / "tuning_results").mkdir()
+    cfg = ConfigMulti(cache_home=cache)
+    mt = MultiTask(cfg, task="clean")
+    result = mt.run_task_clean(dry_run=True)
+
+assert result["status"] == "dry_run"
+assert "models" in result["deleted_items"]
+print(f"Status: {result['status']}")
+print(f"Would remove: {sorted(result['deleted_items'])}")
+```
+
 ### run_task_defaults { #spotforecast2_safe.multitask.multi.MultiTask.run_task_defaults }
 
 ```python
@@ -173,6 +246,42 @@ ENTSO-E "Approach 2: Training without Tuning".
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target results in |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``self.results["defaults"]``.                        |
 
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask.multi import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=False,
+        number_folds=2,
+        cache_home=tmp,
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        mt = MultiTask(cfg, dataframe=df, task="defaults")
+        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+        result = mt.run_task_defaults()
+
+assert "future_pred" in result
+assert result["future_pred"].shape == (6,)
+print(f"Prediction horizon: {result['future_pred'].shape[0]} hours")
+print(f"validation_passed: {result['validation_passed']}")
+```
+
 ### run_task_lazy { #spotforecast2_safe.multitask.multi.MultiTask.run_task_lazy }
 
 ```python
@@ -193,6 +302,42 @@ Lazy Fitting with default LightGBM parameters.
 |--------|------------------------------------------------------------|------------------------------------------------------|
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package. Per-target results in |
 |        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | ``self.results["lazy"]``.                            |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask.multi import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=False,
+        number_folds=2,
+        cache_home=tmp,
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        mt = MultiTask(cfg, dataframe=df)
+        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+        result = mt.run_task_lazy()
+
+assert "future_pred" in result
+assert result["future_pred"].shape == (6,)
+print(f"Prediction horizon: {result['future_pred'].shape[0]} hours")
+print(f"Result keys: {sorted(k for k in result if k != 'forecaster')}")
+```
 
 ### run_task_predict { #spotforecast2_safe.multitask.multi.MultiTask.run_task_predict }
 
@@ -230,3 +375,44 @@ if no saved models are found.
 | Name   | Type                           | Description                   |
 |--------|--------------------------------|-------------------------------|
 |        | [RuntimeError](`RuntimeError`) | If no saved models are found. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import warnings
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.multitask.multi import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"a": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=True,
+        number_folds=2,
+        cache_home=tmp,
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # Train and persist models first.
+        train_mt = MultiTask(cfg, dataframe=df, task="lazy")
+        train_mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+        train_mt.run_task_lazy()
+
+        # Load saved models and predict without re-training.
+        pred_mt = MultiTask(cfg, dataframe=df, task="predict")
+        pred_mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+        result = pred_mt.run_task_predict()
+
+assert "future_pred" in result
+assert result["future_pred"].shape == (6,)
+print(f"Prediction horizon: {result['future_pred'].shape[0]} hours")
+```

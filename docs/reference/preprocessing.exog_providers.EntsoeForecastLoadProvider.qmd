@@ -53,3 +53,66 @@ print(out.columns.tolist(), out.shape)
 shutil.rmtree(tmp)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [build](#spotforecast2_safe.preprocessing.exog_providers.EntsoeForecastLoadProvider.build) | Return the day-ahead Forecasted Load aligned to *index*. |
+
+### build { #spotforecast2_safe.preprocessing.exog_providers.EntsoeForecastLoadProvider.build }
+
+```python
+preprocessing.exog_providers.EntsoeForecastLoadProvider.build(index)
+```
+
+Return the day-ahead Forecasted Load aligned to *index*.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                   | Description                                                      | Default    |
+|--------|--------------------------------------------------------|------------------------------------------------------------------|------------|
+| index  | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | Hourly ``DatetimeIndex`` (tz-aware UTC) for the forecast window. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                          |
+|--------|------------------------------------------------|----------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Single column ``entsoe_forecasted_load``, ``float32``. |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                                     | Description                                                                |
+|--------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+|        | [ExogProviderError](`spotforecast2_safe.preprocessing.exog_providers.ExogProviderError`) | If the interim CSV is missing or the ``Forecasted Load`` column is absent. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os
+import shutil
+import tempfile
+
+import pandas as pd
+
+from spotforecast2_safe.preprocessing.exog_providers import (
+    EntsoeForecastLoadProvider,
+)
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+os.makedirs(os.path.join(tmp, "interim"), exist_ok=True)
+idx = pd.date_range("2023-06-01", periods=24, freq="h", tz="UTC")
+pd.DataFrame(
+    {"Actual Load": 100.0, "Forecasted Load": 98.0}, index=idx
+).rename_axis("Time (UTC)").to_csv(
+    os.path.join(tmp, "interim", "energy_load.csv")
+)
+
+out = EntsoeForecastLoadProvider().build(idx)
+print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+assert out.shape == (24, 1)
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
+```
