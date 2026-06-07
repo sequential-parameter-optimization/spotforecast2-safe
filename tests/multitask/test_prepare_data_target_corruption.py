@@ -157,7 +157,7 @@ class TestTruncateComposeWithClamp:
         assert report.fired
         assert report.action == "truncate"
 
-        data_end = pd.to_datetime(task.config.data_end, utc=True)
+        data_end = pd.to_datetime(task.run_state.data_end, utc=True)
         first_flagged = report.first_flagged_hour
         assert (
             data_end < first_flagged
@@ -194,7 +194,7 @@ class TestTruncateComposeWithClamp:
         )
         task.prepare_data()
 
-        data_end_post = pd.to_datetime(task.config.data_end, utc=True)
+        data_end_post = pd.to_datetime(task.run_state.data_end, utc=True)
         lhs = data_end_post + task.config.predict_size * pd.Timedelta(hours=1)
         rhs = untruncated_data_end + PREDICT_SIZE * pd.Timedelta(hours=1)
         assert lhs == rhs, (
@@ -234,7 +234,7 @@ class TestTruncateComposeWithClamp:
         )
         task.prepare_data()
 
-        data_end_post = pd.to_datetime(task.config.data_end, utc=True)
+        data_end_post = pd.to_datetime(task.run_state.data_end, utc=True)
         lhs = data_end_post + task.config.predict_size * pd.Timedelta(hours=1)
         rhs = untruncated_data_end + PREDICT_SIZE * pd.Timedelta(hours=1)
         assert lhs == rhs, f"Mid-hour invariant violated: {lhs} != {rhs}"
@@ -265,7 +265,7 @@ class TestTruncateComposeWithClamp:
             f"{PREDICT_SIZE + _EXPECTED_BUMP}, got {task.config.predict_size}"
         )
 
-        data_end_post = pd.to_datetime(task.config.data_end, utc=True)
+        data_end_post = pd.to_datetime(task.run_state.data_end, utc=True)
         lhs = data_end_post + task.config.predict_size * pd.Timedelta(hours=1)
         rhs = untruncated_data_end + PREDICT_SIZE * pd.Timedelta(hours=1)
         assert lhs == rhs, (

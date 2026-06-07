@@ -40,7 +40,6 @@ def execute_defaults(
     Examples:
         ```{python}
         import tempfile
-        import warnings
         import numpy as np
         import pandas as pd
         from pathlib import Path
@@ -62,11 +61,9 @@ def execute_defaults(
                 cache_home=Path(tmp),
                 verbose=False,
             )
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", DeprecationWarning)
-                task = DefaultsTask(cfg, dataframe=df)
-                task.prepare_data().detect_outliers().impute().build_exogenous_features()
-                result = execute_defaults(task)
+            task = DefaultsTask(cfg, dataframe=df)
+            task.prepare_data().detect_outliers().impute().build_exogenous_features()
+            result = execute_defaults(task)
 
         print(f"Future predictions: {len(result['future_pred'])} steps")
         assert isinstance(result["future_pred"], pd.Series)
@@ -125,7 +122,6 @@ class DefaultsTask(BaseTask):
         Examples:
             ```{python}
             import tempfile
-            import warnings
             import numpy as np
             import pandas as pd
             from pathlib import Path
@@ -147,11 +143,9 @@ class DefaultsTask(BaseTask):
                     cache_home=Path(tmp),
                     verbose=False,
                 )
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", DeprecationWarning)
-                    task = DefaultsTask(cfg, dataframe=df)
-                    task.prepare_data().detect_outliers().impute().build_exogenous_features()
-                    result = task.run()
+                task = DefaultsTask(cfg, dataframe=df)
+                task.prepare_data().detect_outliers().impute().build_exogenous_features()
+                result = task.run()
 
             print(f"Future predictions: {len(result['future_pred'])} steps")
             assert "defaults" in task.results

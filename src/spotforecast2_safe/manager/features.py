@@ -26,7 +26,6 @@ exogenous inputs into model-ready feature matrices:
 
 from __future__ import annotations
 
-import warnings
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
@@ -673,11 +672,12 @@ def get_target_data(
     target: str,
     df_pipeline: pd.DataFrame,
     config: "ConfigMulti",
+    *,
     data_with_exog: Optional[pd.DataFrame] = None,
     exog_feature_names: Optional[List[str]] = None,
     exo_pred: Optional[pd.DataFrame] = None,
-    start_train_ts: Optional[pd.Timestamp] = None,
-    end_train_ts: Optional[pd.Timestamp] = None,
+    start_train_ts: pd.Timestamp,
+    end_train_ts: pd.Timestamp,
 ) -> Tuple[pd.Series, Optional[pd.DataFrame], Optional[pd.DataFrame]]:
     """Extract the training series and exogenous slices for one target column.
 
@@ -693,9 +693,8 @@ def get_target_data(
 
     The training-window timestamps are supplied as explicit parameters so that
     this helper stays decoupled from ``RunState`` (ADR
-    ``adr-multitask-configmulti-merge``, step 5).  When either is ``None``
-    the function falls back to the corresponding attribute on *config* for
-    backward compatibility with existing direct callers.
+    ``adr-multitask-configmulti-merge``, step 5).  Both parameters are
+    required; passing ``None`` raises ``ValueError``.
 
     Args:
         target: Name of the target column to extract from *df_pipeline*.
@@ -703,8 +702,7 @@ def get_target_data(
             containing all target columns produced by the preprocessing
             pipeline.
         config: Pipeline configuration object.  ``use_exogenous_features``
-            must be set.  ``start_train_ts`` / ``end_train_ts`` are only read
-            from *config* when the explicit parameters are not supplied.
+            must be set.
         data_with_exog: Merged DataFrame of target and exogenous columns
             covering at least the training window.  Required when
             ``config.use_exogenous_features`` is ``True``.
@@ -716,17 +714,13 @@ def get_target_data(
             Required when *data_with_exog* is not ``None``.  Pass ``None``
             (default) when exogenous features are disabled.
         start_train_ts: Inclusive start of the training window (tz-aware
-            ``pd.Timestamp``).  **Required** — pass
+            ``pd.Timestamp``).  **Keyword-only, required** — pass
             ``task.run_state.start_train_ts`` after the pipeline has been
-            prepared.  Omitting this argument raises ``ValueError``; reading
-            the value from ``config.start_train_ts`` is deprecated and
-            emits a ``DeprecationWarning``.
+            prepared.  Passing ``None`` raises ``ValueError``.
         end_train_ts: Inclusive end of the training window (tz-aware
-            ``pd.Timestamp``).  **Required** — pass
+            ``pd.Timestamp``).  **Keyword-only, required** — pass
             ``task.run_state.end_train_ts`` after the pipeline has been
-            prepared.  Omitting this argument raises ``ValueError``; reading
-            the value from ``config.end_train_ts`` is deprecated and
-            emits a ``DeprecationWarning``.
+            prepared.  Passing ``None`` raises ``ValueError``.
 
     Returns:
         Tuple[pd.Series, Optional[pd.DataFrame], Optional[pd.DataFrame]]:
@@ -822,48 +816,22 @@ def get_target_data(
         print(f"exog_train dtype:   {exog_train.dtypes.iloc[0]}")
         ```
     """
-    # Resolve training window: explicit params take precedence over config attrs.
-    # The config fallback is deprecated (RunState extraction, v18.0.0); pass
-    # start_train_ts/end_train_ts explicitly instead.
-    if start_train_ts is not None:
-        _start = start_train_ts
-    else:
-        _fallback_start = getattr(config, "start_train_ts", None)
-        if _fallback_start is None:
-            raise ValueError(
-                "start_train_ts is required: pass it as an explicit keyword "
-                "argument (start_train_ts=task.run_state.start_train_ts). "
-                "The config.start_train_ts fallback has been removed."
-            )
-        warnings.warn(
-            "Passing the training window via config.start_train_ts is "
-            "deprecated (RunState extraction, v18.0.0). Pass "
-            "start_train_ts explicitly; the config fallback will be "
-            "removed in the next major release.",
-            DeprecationWarning,
-            stacklevel=2,
+    # Training window must be supplied explicitly (RunState extraction, v18.0.0).
+    if start_train_ts is None:
+        raise ValueError(
+            "start_train_ts is required: pass it as an explicit keyword "
+            "argument (start_train_ts=task.run_state.start_train_ts). "
+            "The config.start_train_ts fallback has been removed."
         )
-        _start = _fallback_start
+    _start = start_train_ts
 
-    if end_train_ts is not None:
-        _end = end_train_ts
-    else:
-        _fallback_end = getattr(config, "end_train_ts", None)
-        if _fallback_end is None:
-            raise ValueError(
-                "end_train_ts is required: pass it as an explicit keyword "
-                "argument (end_train_ts=task.run_state.end_train_ts). "
-                "The config.end_train_ts fallback has been removed."
-            )
-        warnings.warn(
-            "Passing the training window via config.end_train_ts is "
-            "deprecated (RunState extraction, v18.0.0). Pass "
-            "end_train_ts explicitly; the config fallback will be "
-            "removed in the next major release.",
-            DeprecationWarning,
-            stacklevel=2,
+    if end_train_ts is None:
+        raise ValueError(
+            "end_train_ts is required: pass it as an explicit keyword "
+            "argument (end_train_ts=task.run_state.end_train_ts). "
+            "The config.end_train_ts fallback has been removed."
         )
-        _end = _fallback_end
+    _end = end_train_ts
 
     y_train = df_pipeline[target].loc[_start:_end].squeeze()
 

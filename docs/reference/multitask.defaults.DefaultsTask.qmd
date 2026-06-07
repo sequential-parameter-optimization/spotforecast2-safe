@@ -65,7 +65,6 @@ Run defaults fitting for all targets.
 
 ```{python}
 import tempfile
-import warnings
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -87,11 +86,9 @@ with tempfile.TemporaryDirectory() as tmp:
         cache_home=Path(tmp),
         verbose=False,
     )
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        task = DefaultsTask(cfg, dataframe=df)
-        task.prepare_data().detect_outliers().impute().build_exogenous_features()
-        result = task.run()
+    task = DefaultsTask(cfg, dataframe=df)
+    task.prepare_data().detect_outliers().impute().build_exogenous_features()
+    result = task.run()
 
 print(f"Future predictions: {len(result['future_pred'])} steps")
 assert "defaults" in task.results

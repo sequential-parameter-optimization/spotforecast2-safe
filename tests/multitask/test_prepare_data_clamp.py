@@ -69,7 +69,7 @@ class TestPrepareDataClamp:
         )
         task.prepare_data()
         last_target = frontier_df["Actual Load"].dropna().index.max()
-        assert pd.to_datetime(task.config.data_end, utc=True) == last_target
+        assert pd.to_datetime(task.run_state.data_end, utc=True) == last_target
 
     def test_cov_end_is_data_end_plus_predict_size(self, frontier_df, tmp_path):
         task = LazyTask(
@@ -77,8 +77,8 @@ class TestPrepareDataClamp:
             dataframe=frontier_df,
         )
         task.prepare_data()
-        data_end = pd.to_datetime(task.config.data_end, utc=True)
-        cov_end = pd.to_datetime(task.config.cov_end, utc=True)
+        data_end = pd.to_datetime(task.run_state.data_end, utc=True)
+        cov_end = pd.to_datetime(task.run_state.cov_end, utc=True)
         assert cov_end == data_end + pd.Timedelta(hours=PREDICT_SIZE)
 
     def test_clamp_emits_warning_log(self, frontier_df, tmp_path, caplog):
@@ -102,7 +102,7 @@ class TestPrepareDataClamp:
         )
         task.prepare_data()
         assert task.df_pipeline.index.max() == aligned.index.max()
-        assert pd.to_datetime(task.config.data_end, utc=True) == aligned.index.max()
+        assert pd.to_datetime(task.run_state.data_end, utc=True) == aligned.index.max()
 
     def test_all_columns_as_targets_keeps_extent(self, frontier_df, tmp_path):
         """With targets=None every column is a target; the exog-like column is
