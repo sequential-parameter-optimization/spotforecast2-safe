@@ -357,8 +357,6 @@ class BaseTask:
         # config value when explicitly supplied.
         if cache_home is not None:
             config.cache_home = cache_home
-        # Propagate the task identifier so config-aware helpers know the mode.
-        config.task = self.TASK
         self.config = config
 
         # Call-time data and per-instance state

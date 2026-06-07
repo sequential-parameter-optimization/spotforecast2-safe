@@ -777,9 +777,9 @@ def df_pipeline(pipeline_idx):
 def train_window(pipeline_idx):
     """Explicit training-window dict covering the full 168-hour index.
 
-    Pass as ``**train_window`` to every ``get_target_data`` call so the
-    function never falls back to the deprecated ``config.start_train_ts`` /
-    ``config.end_train_ts`` attributes (RunState extraction, v18.0.0).
+    Pass as ``**train_window`` to every ``get_target_data`` call.  The
+    function raises ``ValueError`` when these are ``None``; the config
+    fallback has been removed (19.0.0 breaking change).
     """
     return {
         "start_train_ts": pipeline_idx[0],
@@ -912,6 +912,17 @@ class TestGetTargetDataNoExog:
         """Requesting a column not in df_pipeline should raise KeyError."""
         with pytest.raises(KeyError):
             get_target_data("nonexistent", df_pipeline, base_config, **train_window)
+
+    @pytest.mark.parametrize("missing", ["start_train_ts", "end_train_ts"])
+    def test_none_window_timestamp_raises_value_error(
+        self, df_pipeline, base_config, train_window, missing
+    ):
+        """Passing None for either window timestamp raises ValueError (config
+        fallback removed in 19.0.0)."""
+        kwargs = dict(train_window)
+        kwargs[missing] = None
+        with pytest.raises(ValueError, match=missing):
+            get_target_data("load", df_pipeline, base_config, **kwargs)
 
 
 # =============================================================================
