@@ -1,3 +1,10 @@
+## [19.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.0.0...v19.1.0) (2026-06-07)
+
+
+### Features
+
+* **configurator:** convert ConfigMulti and ConfigEntsoe to dataclasses ([184a3d9](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/184a3d96287a75b0748c161114b2a980b741deb6)), closes [#4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/4)
+
 ## [19.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.0.0...v19.1.0-rc.1) (2026-06-07)
 
 
