@@ -1,3 +1,36 @@
+## [19.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v18.1.0...v19.0.0) (2026-06-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* **multitask:** The following 8 fields no longer exist on the config
+object after pipeline runs and will raise AttributeError if accessed
+there: `start_download`, `end_download`, `data_start`, `data_end`,
+`cov_start`, `cov_end`, `end_train_ts`, `start_train_ts`.  Read all of
+them from `task.run_state` instead.  `config.targets` still holds the
+user-supplied input (unchanged); the resolved target list is available
+as `task.run_state.targets`.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+* **multitask:** `get_target_data` no longer accepts `None` for
+`start_train_ts` or `end_train_ts` and will no longer fall back to
+`config.start_train_ts` / `config.end_train_ts` — callers must pass
+explicit `pd.Timestamp` values (e.g. from `task.run_state.start_train_ts`
+/ `task.run_state.end_train_ts`).  Both parameters are now keyword-only
+(bare `*` separator after `config`); positional passing of
+`data_with_exog`, `exog_feature_names`, or `exo_pred` is also no longer
+accepted.  Additionally, constructing any `MultiTask` subclass no longer
+mutates `config.task`; code that relied on `config.task` reflecting the
+active task type after task instantiation must read `task.TASK` from the
+task object instead.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **multitask:** drop config.task write and get_target_data config-window fallback ([0ee7a1f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/0ee7a1ff895c1ff54b6be7673fbd209f0bf5ab7f))
+* **multitask:** remove the RunState mirror shim ([1ddbfa4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1ddbfa470b219baf17eb640744da6484dec4d3e4))
+
 ## [18.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v18.0.1...v18.1.0) (2026-06-07)
 
 
