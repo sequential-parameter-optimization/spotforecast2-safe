@@ -18,7 +18,6 @@ sibling package for interactive figures.
 
 import json
 import logging
-import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Protocol
@@ -371,7 +370,6 @@ class BaseTask:
 
         # Task-owned runtime-derived state (see RunState / ADR adr-multitask-configmulti-merge)
         self.run_state = RunState()
-        self._run_state_deprecation_warned: bool = False
         self._data_last_ts_utc: Optional[pd.Timestamp] = None
 
         # Pipeline state (populated by methods)
@@ -410,43 +408,6 @@ class BaseTask:
             )
         )
         self.logger.addHandler(handler)
-
-    # ------------------------------------------------------------------
-    # Derived-state helpers (ADR adr-multitask-configmulti-merge, step 7)
-    # ------------------------------------------------------------------
-
-    def _set_derived(self, field: str, value: Any) -> None:
-        """Write a derived pipeline value to ``run_state`` and mirror it onto
-        ``config`` (one-minor-cycle shim with ``DeprecationWarning``).
-
-        The derived fields were historically stored directly on the config
-        object.  They now live on ``self.run_state``.  During this transition
-        cycle the value is also mirrored via ``setattr`` so that any legacy
-        reader that reads ``config.<derived>`` continues to get a valid value.
-        A single ``DeprecationWarning`` is emitted per task instance.
-
-        .. deprecated::
-            Reading derived pipeline fields from the config is deprecated and
-            will stop working in the next major release.  Read them from
-            ``task.run_state`` instead.
-        """
-        setattr(self.run_state, field, value)
-        if not self._run_state_deprecation_warned:
-            warnings.warn(
-                "Derived pipeline fields (start_download, end_download, "
-                "data_start, data_end, cov_start, cov_end, end_train_ts, "
-                "start_train_ts) have moved to task.run_state. "
-                "Reading them from the config is deprecated and will stop "
-                "working in the next major release. "
-                "config.targets continues to hold the user input unchanged; "
-                "read the resolved list from task.run_state.targets.",
-                DeprecationWarning,
-                # stacklevel=3: caller → prepare_data/_setup_training_window
-                # → _set_derived.  Adjust if call depth changes.
-                stacklevel=3,
-            )
-            self._run_state_deprecation_warned = True
-        setattr(self.config, field, value)
 
     # ------------------------------------------------------------------
     # Step 1 — Data Preparation
@@ -537,8 +498,8 @@ class BaseTask:
 
         first_ts = pd.Timestamp(demo_data[self.config.index_name].iloc[0])
         last_ts = pd.Timestamp(demo_data[self.config.index_name].iloc[-1])
-        self._set_derived("start_download", first_ts.strftime("%Y%m%d%H%M"))
-        self._set_derived("end_download", last_ts.strftime("%Y%m%d%H%M"))
+        self.run_state.start_download = first_ts.strftime("%Y%m%d%H%M")
+        self.run_state.end_download = last_ts.strftime("%Y%m%d%H%M")
 
         # Store the effective last data timestamp for later use in
         # _setup_training_window to clamp end_train_ts (the clamp is no
@@ -577,7 +538,7 @@ class BaseTask:
         _tc_dev_ref = getattr(self.config, "target_qc_deviation_ref", None)
         _tc_dev_slots = getattr(self.config, "target_qc_deviation_slots", 2)
 
-        # Derive the effective cutoff for the anchor-zone check: mirror the
+        # Derive the effective cutoff for the anchor-zone check: replicate the
         # end_train_default / last_ts logic above (ADR §2 step 1).
         _tc_cutoff: "pd.Timestamp | None" = None
         if _tc_window is not None:
@@ -748,14 +709,13 @@ class BaseTask:
         _data_end = pd.to_datetime(_data_end_str, utc=True)
         _cov_start = pd.to_datetime(_cov_start_str, utc=True)
         _cov_end = pd.to_datetime(_cov_end_str, utc=True)
-        self._set_derived("data_start", _data_start)
-        self._set_derived("data_end", _data_end)
-        self._set_derived("cov_start", _cov_start)
-        self._set_derived("cov_end", _cov_end)
+        self.run_state.data_start = _data_start
+        self.run_state.data_end = _data_end
+        self.run_state.cov_start = _cov_start
+        self.run_state.cov_end = _cov_end
 
         # Write the resolved target list to run_state only.
         # config.targets must remain unchanged (user input).
-        # The mirror shim is NOT applied for targets (it would overwrite user input).
         self.run_state.targets = _working_targets
 
         self.df_pipeline = df_pipeline
@@ -783,7 +743,6 @@ class BaseTask:
         Examples:
             ```{python}
             import tempfile
-            import warnings
             import numpy as np
             import pandas as pd
             from spotforecast2_safe.multitask import MultiTask
@@ -804,10 +763,8 @@ class BaseTask:
                     verbose=False,
                 )
                 mt = MultiTask(cfg, dataframe=df)
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", DeprecationWarning)
-                    mt.prepare_data()
-                    mt.detect_outliers()
+                mt.prepare_data()
+                mt.detect_outliers()
                 print(f"Pipeline shape: {mt.df_pipeline.shape}")
                 assert mt.df_pipeline_original is not None
             ```
@@ -857,7 +814,6 @@ class BaseTask:
         Examples:
             ```{python}
             import tempfile
-            import warnings
             import numpy as np
             import pandas as pd
             from spotforecast2_safe.multitask import MultiTask
@@ -878,9 +834,7 @@ class BaseTask:
                     verbose=False,
                 )
                 mt = MultiTask(cfg, dataframe=df)
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", DeprecationWarning)
-                    mt.prepare_data().detect_outliers()
+                mt.prepare_data().detect_outliers()
                 try:
                     mt.plot_with_outliers()
                 except NotImplementedError as exc:
@@ -911,7 +865,6 @@ class BaseTask:
         Examples:
             ```{python}
             import tempfile
-            import warnings
             import numpy as np
             import pandas as pd
             from spotforecast2_safe.multitask import MultiTask
@@ -934,9 +887,7 @@ class BaseTask:
                     verbose=False,
                 )
                 mt = MultiTask(cfg, dataframe=df)
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", DeprecationWarning)
-                    mt.prepare_data().detect_outliers().impute()
+                mt.prepare_data().detect_outliers().impute()
                 missing = mt.df_pipeline["a"].isna().sum()
                 print(f"Missing values after imputation: {missing}")
                 assert missing == 0
@@ -1373,8 +1324,8 @@ class BaseTask:
 
         _start_train = effective_end - self.config.train_size
         _start_train = max(_start_train, self.df_pipeline.index.min())
-        self._set_derived("end_train_ts", effective_end)
-        self._set_derived("start_train_ts", _start_train)
+        self.run_state.end_train_ts = effective_end
+        self.run_state.start_train_ts = _start_train
         self.logger.info(
             "Training window: %s to %s",
             self.run_state.start_train_ts,
@@ -1410,7 +1361,6 @@ class BaseTask:
         Examples:
             ```{python}
             import tempfile
-            import warnings
             import numpy as np
             import pandas as pd
             from spotforecast2_safe.multitask import MultiTask
@@ -1432,9 +1382,7 @@ class BaseTask:
                     verbose=False,
                 )
                 mt = MultiTask(cfg, dataframe=df)
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", DeprecationWarning)
-                    mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+                mt.prepare_data().detect_outliers().impute().build_exogenous_features()
                 y_train = mt.df_pipeline["a"]
                 cv = mt.cv_ts(y_train)
                 print(f"TimeSeriesFold steps: {cv.steps}")
@@ -2192,7 +2140,6 @@ class BaseTask:
         Examples:
             ```{python}
             import tempfile
-            import warnings
             import numpy as np
             import pandas as pd
             from spotforecast2_safe.multitask import MultiTask
@@ -2213,9 +2160,7 @@ class BaseTask:
                     verbose=False,
                 )
                 mt = MultiTask(cfg, dataframe=df)
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", DeprecationWarning)
-                    mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+                mt.prepare_data().detect_outliers().impute().build_exogenous_features()
                 # log_summary writes to the pipeline logger; call it to confirm
                 # it runs without error.
                 mt.log_summary()

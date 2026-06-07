@@ -35,7 +35,7 @@ from typing import List, Optional
 import pandas as pd
 
 
-@dataclass
+@dataclass(slots=True)
 class RunState:
     """Runtime-derived window geometry for one pipeline execution.
 
