@@ -1591,11 +1591,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>configurator.config_multi.ConfigMulti(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    lags_consider<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    train_size<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span>default_periods(),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    lags_consider<span class="op">=</span>(<span class="kw">lambda</span>: <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">24</span>)))(),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    train_size<span class="op">=</span>(<span class="kw">lambda</span>: pd.Timedelta(days<span class="op">=</span>(<span class="dv">3</span> <span class="op">*</span> <span class="dv">365</span>)))(),</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    end_train_default<span class="op">=</span><span class="st">'2025-12-31 00:00+00:00'</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    delta_val<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    delta_val<span class="op">=</span>(<span class="kw">lambda</span>: pd.Timedelta(hours<span class="op">=</span>(<span class="dv">24</span> <span class="op">*</span> <span class="dv">7</span> <span class="op">*</span> <span class="dv">10</span>)))(),</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">24</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    cv_block_size<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    refit_size<span class="op">=</span><span class="dv">7</span>,</span>
@@ -1682,19 +1682,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>periods</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<code>Period</code>]]</td>
 <td>List of Period objects defining cyclical feature encodings.</td>
-<td><code>None</code></td>
+<td><code>default_periods()</code></td>
 </tr>
 <tr class="odd">
 <td>lags_consider</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]]</td>
 <td>List of lag values to consider for feature selection.</td>
-<td><code>None</code></td>
+<td><code>(lambda: list(range(1, 24)))()</code></td>
 </tr>
 <tr class="even">
 <td>train_size</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a>]</td>
 <td>Time window for training data.</td>
-<td><code>None</code></td>
+<td><code>(lambda: pd.Timedelta(days=(3 * 365)))()</code></td>
 </tr>
 <tr class="odd">
 <td>end_train_default</td>
@@ -1706,7 +1706,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>delta_val</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a>]</td>
 <td>Validation window size.</td>
-<td><code>None</code></td>
+<td><code>(lambda: pd.Timedelta(hours=(24 * 7 * 10)))()</code></td>
 </tr>
 <tr class="odd">
 <td>predict_size</td>
@@ -2222,7 +2222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="032889f3" class="cell" data-execution_count="1">
+<div id="f335592b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
@@ -2345,7 +2345,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="1ea126bd" class="cell" data-execution_count="2">
+<div id="88fa1536" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -2418,7 +2418,7 @@ agg_weights: None</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="9e91986e" class="cell" data-execution_count="3">
+<div id="7b888753" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>

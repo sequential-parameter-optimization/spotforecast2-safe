@@ -1590,11 +1590,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>configurator.config_entsoe.ConfigEntsoe(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    lags_consider<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    train_size<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span>default_periods(),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    lags_consider<span class="op">=</span>(<span class="kw">lambda</span>: <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">24</span>)))(),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    train_size<span class="op">=</span>(<span class="kw">lambda</span>: pd.Timedelta(days<span class="op">=</span>(<span class="dv">3</span> <span class="op">*</span> <span class="dv">365</span>)))(),</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    end_train_default<span class="op">=</span><span class="st">'2025-12-31 00:00+00:00'</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    delta_val<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    delta_val<span class="op">=</span>(<span class="kw">lambda</span>: pd.Timedelta(hours<span class="op">=</span>(<span class="dv">24</span> <span class="op">*</span> <span class="dv">7</span> <span class="op">*</span> <span class="dv">10</span>)))(),</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="dv">24</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    cv_block_size<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    refit_size<span class="op">=</span><span class="dv">7</span>,</span>
@@ -1646,7 +1646,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    exog_max_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
 <span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    exog_max_tail_gap_hours<span class="op">=</span><span class="dv">0</span>,</span>
 <span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    exog_provider_window<span class="op">=</span><span class="st">'full'</span>,</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    retrain_max_age<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    retrain_max_age<span class="op">=</span>(<span class="kw">lambda</span>: pd.Timedelta(days<span class="op">=</span><span class="dv">7</span>))(),</span>
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    target_qc_range_mw<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    target_qc_step_mw<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    target_qc_window_days<span class="op">=</span><span class="va">None</span>,</span>
@@ -1682,19 +1682,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>periods</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<code>Period</code>]]</td>
 <td>Cyclical feature encodings.</td>
-<td><code>None</code></td>
+<td><code>default_periods()</code></td>
 </tr>
 <tr class="odd">
 <td>lags_consider</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]]</td>
 <td>Lag values for autoregressive features.</td>
-<td><code>None</code></td>
+<td><code>(lambda: list(range(1, 24)))()</code></td>
 </tr>
 <tr class="even">
 <td>train_size</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a>]</td>
 <td>Training window.</td>
-<td><code>None</code></td>
+<td><code>(lambda: pd.Timedelta(days=(3 * 365)))()</code></td>
 </tr>
 <tr class="odd">
 <td>end_train_default</td>
@@ -1706,7 +1706,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>delta_val</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a>]</td>
 <td>Validation window.</td>
-<td><code>None</code></td>
+<td><code>(lambda: pd.Timedelta(hours=(24 * 7 * 10)))()</code></td>
 </tr>
 <tr class="odd">
 <td>predict_size</td>
@@ -2018,7 +2018,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>retrain_max_age</td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html#pandas.Timedelta">Timedelta</a></td>
 <td>Maximum age of a previously trained model before retraining is required. Consumed by <code>spotforecast2_safe.manager.trainer.should_retrain</code> to gate scheduled retraining workflows. Defaults to <code>Timedelta(days=7)</code>.</td>
-<td><code>None</code></td>
+<td><code>(lambda: pd.Timedelta(days=7))()</code></td>
 </tr>
 </tbody>
 </table>
@@ -2064,7 +2064,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="2711777c" class="cell" data-execution_count="1">
+<div id="0c9ac309" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
@@ -2170,7 +2170,7 @@ daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="90052791" class="cell" data-execution_count="2">
+<div id="f66db76c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
@@ -2239,7 +2239,7 @@ daily</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="3742b8e3" class="cell" data-execution_count="3">
+<div id="7dbcf838" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_entsoe <span class="im">import</span> ConfigEntsoe</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigEntsoe()</span>
