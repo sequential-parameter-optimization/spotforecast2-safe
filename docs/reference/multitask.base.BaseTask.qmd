@@ -266,7 +266,7 @@ Internally uses ``sklearn.model_selection.TimeSeriesSplit`` to
 compute split boundaries that respect temporal ordering and avoid
 data leakage between folds.
 
-The validation boundary is determined by ``config.end_train_ts`` minus
+The validation boundary is determined by ``run_state.end_train_ts`` minus
 ``config.delta_val``.  When ``config.train_size`` is set, the sklearn
 splitter uses a sliding fixed-size training window
 (``max_train_size``); otherwise an expanding window is used.
@@ -498,7 +498,7 @@ with tempfile.TemporaryDirectory() as tmp:
     mt = MultiTask(cfg, dataframe=df)
     mt.prepare_data()
     print(f"Pipeline shape: {mt.df_pipeline.shape}")
-    print(f"Targets: {mt.config.targets}")
+    print(f"Targets: {mt.run_state.targets}")
 ```
 
 ### run { #spotforecast2_safe.multitask.base.BaseTask.run }

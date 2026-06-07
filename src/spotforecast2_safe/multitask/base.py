@@ -1132,6 +1132,15 @@ class BaseTask:
         )
 
         # Step 7 — Merge
+        # The prediction slice must be anchored on the end of the *training*
+        # window, not on the data extent: a user-pinned ``end_train_default``
+        # earlier than the last observed target row (e.g. an only partially
+        # published frontier hour) otherwise shifts ``exo_pred`` against the
+        # prediction window and the fail-safe alignment guard refuses to
+        # predict (2026-06-06 live incident).  Derive the training window now
+        # (idempotent) so ``run_state.end_train_ts`` is available.
+        if self.run_state.end_train_ts is None:
+            self._setup_training_window()
         self.data_with_exog, _, self.exo_pred = merge_data_and_covariates(
             data=self.df_pipeline,
             exogenous_features=self.exogenous_features,
@@ -1142,6 +1151,7 @@ class BaseTask:
             cov_end=self.run_state.cov_end,
             forecast_horizon=self.config.predict_size,
             cast_dtype="float32",
+            end_train=self.run_state.end_train_ts,
         )
         self.logger.info("Merged data shape: %s", self.data_with_exog.shape)
         self.logger.info(
