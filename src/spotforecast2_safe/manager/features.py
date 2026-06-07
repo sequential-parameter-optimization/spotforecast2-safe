@@ -540,6 +540,7 @@ def merge_data_and_covariates(
     cov_end: Union[str, pd.Timestamp],
     forecast_horizon: int,
     cast_dtype: Optional[str] = "float32",
+    end_train: Optional[Union[str, pd.Timestamp]] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Merge target data with exogenous features and split into train/predict slices.
 
@@ -571,6 +572,15 @@ def merge_data_and_covariates(
         cast_dtype: NumPy dtype string applied to the merged training
             DataFrame via `astype()`.  Pass ``None`` to
             skip casting.  Defaults to ``"float32"``.
+        end_train: Inclusive end of the *training* window when it is earlier
+            than *end* (the data extent).  The forecaster starts predicting at
+            ``end_train + 1h``, so the prediction slice must start there too;
+            anchoring it on *end* instead shifts the exogenous features
+            against the prediction window whenever a consumer pins the
+            training cutoff before the last observed target row (e.g. an
+            only partially published frontier hour — the 2026-06-06 live
+            incident).  ``None`` (default) and any value at or after *end*
+            keep the historical behaviour: the slice starts at ``end + 1h``.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: A three-tuple
@@ -581,7 +591,8 @@ def merge_data_and_covariates(
         - **exo_tmp** — full exogenous slice over ``[start, end]`` (all
             columns, not just *exog_features*).
         - **exo_pred** — forecast-window exogenous slice over
-            ``(end+1h, cov_end]`` (all columns).
+            ``(min(end, end_train)+1h, cov_end]`` (all columns), so that its
+            first row is always the first prediction step.
 
     Examples:
         Merge a toy target series with calendar features over a 3-day window:
@@ -624,9 +635,21 @@ def merge_data_and_covariates(
         end = pd.to_datetime(end, utc=True)
     if isinstance(cov_end, str):
         cov_end = pd.to_datetime(cov_end, utc=True)
+    if isinstance(end_train, str):
+        end_train = pd.to_datetime(end_train, utc=True)
+
+    # The prediction slice starts at the first prediction step, which is one
+    # hour after the end of the *training* window — not after the data
+    # extent.  When the two differ (end_train < end), anchoring on `end`
+    # hands the forecaster exogenous rows shifted against its prediction
+    # window; the fail-safe guard in ``build_prediction_package`` then
+    # (correctly) refuses to predict.  Anchor on the earlier of the two.
+    pred_anchor = end if end_train is None else min(end, end_train)
 
     exo_tmp = exogenous_features.loc[start:end].copy()
-    exo_pred = exogenous_features.loc[end + pd.Timedelta(hours=1) : cov_end].copy()
+    exo_pred = exogenous_features.loc[
+        pred_anchor + pd.Timedelta(hours=1) : cov_end
+    ].copy()
 
     data_with_exog = data[target_columns].merge(
         exo_tmp[exog_features],

@@ -357,6 +357,37 @@ class TestBuildExogenousFeatures:
         assert task.data_with_exog is not None
         assert task.exo_pred is not None
 
+    def test_exo_pred_anchored_on_end_train(self, synth_df, tmp_path):
+        """Regression (2026-06-06 live incident): with a user-pinned
+        ``end_train_default`` earlier than the last observed target row, the
+        prediction covariate slice must start at ``end_train_ts + 1h`` — the
+        first step the forecaster actually predicts — not one hour after the
+        data extent (which is phase-shifted against the prediction window
+        and trips the fail-safe alignment guard at predict time)."""
+        end_train = synth_df.index[-2]  # one hour before the data extent
+        cfg = ConfigMulti(
+            predict_size=6,
+            use_exogenous_features=True,
+            include_weather_windows=False,
+            include_holiday_features=True,
+            include_holiday_adjacency_features=False,
+            use_outlier_detection=False,
+            auto_save_models=False,
+            number_folds=2,
+            on_weather_failure="skip",  # skip network
+            cache_home=tmp_path,
+            verbose=False,
+            end_train_default=end_train.isoformat(),
+        )
+        task = LazyTask(cfg, dataframe=synth_df)
+        task.prepare_data().detect_outliers().impute().build_exogenous_features()
+        assert task.run_state.end_train_ts == end_train
+        assert task.exo_pred.index[0] == end_train + pd.Timedelta(hours=1)
+        # The slice still reaches cov_end, so it covers the full prediction
+        # window [end_train + 1h, end_train + predict_size] and beyond.
+        expected_last_pred = end_train + pd.Timedelta(hours=cfg.predict_size)
+        assert task.exo_pred.index[-1] >= expected_last_pred
+
 
 # ---------------------------------------------------------------------------
 # Guards (cross-step ordering)
