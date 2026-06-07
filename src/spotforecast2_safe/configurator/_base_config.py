@@ -355,3 +355,24 @@ def validate_config(config: object) -> None:
         raise ValueError(
             f"target_anchor_zone_hours must be >= 0; got {target_anchor_zone_hours}."
         )
+
+    target_qc_deviation_mw = getattr(config, "target_qc_deviation_mw", None)
+    if target_qc_deviation_mw is not None and target_qc_deviation_mw < 0:
+        raise ValueError(
+            f"target_qc_deviation_mw must be >= 0 if set; got {target_qc_deviation_mw}."
+        )
+
+    target_qc_deviation_ref = getattr(config, "target_qc_deviation_ref", None)
+    if target_qc_deviation_ref is not None and not isinstance(
+        target_qc_deviation_ref, str
+    ):
+        raise ValueError(
+            "target_qc_deviation_ref must be a column name (str) if set; "
+            f"got {target_qc_deviation_ref!r}."
+        )
+
+    target_qc_deviation_slots = getattr(config, "target_qc_deviation_slots", None)
+    if target_qc_deviation_slots is not None and target_qc_deviation_slots < 1:
+        raise ValueError(
+            f"target_qc_deviation_slots must be >= 1; got {target_qc_deviation_slots}."
+        )

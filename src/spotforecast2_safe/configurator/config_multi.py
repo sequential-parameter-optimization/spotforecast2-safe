@@ -338,6 +338,9 @@ class ConfigMulti:
         "target_corruption_policy",
         "target_max_heal_hours",
         "target_anchor_zone_hours",
+        "target_qc_deviation_mw",
+        "target_qc_deviation_ref",
+        "target_qc_deviation_slots",
     )
 
     def __init__(
@@ -426,18 +429,26 @@ class ConfigMulti:
         exog_provider_window: Literal["full", "train"] = "full",
         # Target-side corruption detector knobs.
         # Detector active only when target_qc_window_days AND at least one of
-        # target_qc_range_mw / target_qc_step_mw are set.  Defaults are all
-        # None / off, so the pipeline is byte-identical to the pre-feature baseline.
+        # target_qc_range_mw / target_qc_step_mw / target_qc_deviation_mw are
+        # set.  Defaults are all None / off, so the pipeline is byte-identical
+        # to the pre-feature baseline.
         # Recommended episode policy: "truncate" (auto-extends predict_size).
         # "heal" under the default anchor_zone_hours=168 with a <=7-day QC window
         # never engages (refusal by design — lowering the zone is a deliberate
         # operator decision).
+        # The deviation rule (dropout-only, vs a published reference column
+        # such as "Forecasted Load") catches corruption that stays below the
+        # dynamics thresholds; when enabling it, scope `targets` to the
+        # actuals so heal/truncate leave the reference column intact.
         target_qc_range_mw: Optional[float] = None,
         target_qc_step_mw: Optional[float] = None,
         target_qc_window_days: Optional[int] = None,
         target_corruption_policy: str = "abort",
         target_max_heal_hours: int = 0,
         target_anchor_zone_hours: int = 168,
+        target_qc_deviation_mw: Optional[float] = None,
+        target_qc_deviation_ref: Optional[str] = None,
+        target_qc_deviation_slots: int = 2,
     ):
         """Initialize ConfigMulti with specified or default parameters."""
         self.country_code = country_code
@@ -563,6 +574,9 @@ class ConfigMulti:
         self.target_corruption_policy = target_corruption_policy
         self.target_max_heal_hours = target_max_heal_hours
         self.target_anchor_zone_hours = target_anchor_zone_hours
+        self.target_qc_deviation_mw = target_qc_deviation_mw
+        self.target_qc_deviation_ref = target_qc_deviation_ref
+        self.target_qc_deviation_slots = target_qc_deviation_slots
         validate_config(self)
 
     def get_params(self, deep: bool = True) -> Dict[str, object]:
