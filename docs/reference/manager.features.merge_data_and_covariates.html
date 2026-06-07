@@ -1593,7 +1593,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    cov_end,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    forecast_horizon,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    cast_dtype<span class="op">=</span><span class="st">'float32'</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    end_train<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Merge target data with exogenous features and split into train/predict slices.</p>
 <p>Performs an inner join of the selected <em>target_columns</em> from <em>data</em> with the selected <em>exog_features</em> from <em>exogenous_features</em> over the training window <code>[start, end]</code>. A separate prediction covariate slice <code>(end+1h, cov_end]</code> is also returned for use during inference.</p>
 <p>String timestamps are converted to UTC-aware <code>Timestamp</code> objects automatically.</p>
@@ -1663,6 +1664,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>NumPy dtype string applied to the merged training DataFrame via <code>astype()</code>. Pass <code>None</code> to skip casting. Defaults to <code>"float32"</code>.</td>
 <td><code>'float32'</code></td>
 </tr>
+<tr class="even">
+<td>end_train</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]]</td>
+<td>Inclusive end of the <em>training</em> window when it is earlier than <em>end</em> (the data extent). The forecaster starts predicting at <code>end_train + 1h</code>, so the prediction slice must start there too; anchoring it on <em>end</em> instead shifts the exogenous features against the prediction window whenever a consumer pins the training cutoff before the last observed target row (e.g.&nbsp;an only partially published frontier hour — the 2026-06-06 live incident). <code>None</code> (default) and any value at or after <em>end</em> keep the historical behaviour: the slice starts at <code>end + 1h</code>.</td>
+<td><code>None</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1700,7 +1707,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
-<td>- <strong>exo_pred</strong> — forecast-window exogenous slice over <code>(end+1h, cov_end]</code> (all columns).</td>
+<td>- <strong>exo_pred</strong> — forecast-window exogenous slice over <code>(min(end, end_train)+1h, cov_end]</code> (all columns), so that its first row is always the first prediction step.</td>
 </tr>
 </tbody>
 </table>
@@ -1708,7 +1715,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Merge a toy target series with calendar features over a 3-day window:</p>
-<div id="584b68d5" class="cell" data-execution_count="1">
+<div id="27ab234d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> merge_data_and_covariates</span>
