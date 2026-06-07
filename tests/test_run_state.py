@@ -8,12 +8,12 @@ Covers:
 - After prepare_data() the 6 window fields + targets are populated on run_state.
 - After _setup_training_window() the 2 training-window fields are populated.
 - Derived fields are NOT declared params on config (_PARAM_NAMES, get_params()).
-- Mirror shim: config.data_start etc. are accessible via the shim after prepare_data.
+- Derived fields are NOT accessible on config after pipeline runs (no mirror shim).
 - set_params() raises ValueError for derived fields.
 - Clamp semantics: user end_train_default beyond data extent → end_train_ts clamps
   to data end; an explicitly earlier cutoff is honoured unchanged.
 - config.targets is unchanged by the pipeline (user input preserved).
-- DeprecationWarning emitted once per task instance on first _set_derived call.
+- No DeprecationWarning is emitted by the pipeline.
 """
 
 import warnings
@@ -106,9 +106,7 @@ class TestRunStateAfterPrepareData:
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path):
         self.task = _make_task(tmp_path)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.task.prepare_data()
+        self.task.prepare_data()
 
     def test_start_download_populated(self):
         assert self.task.run_state.start_download is not None
@@ -158,10 +156,8 @@ class TestRunStateAfterTrainingWindow:
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path):
         self.task = _make_task(tmp_path)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.task.prepare_data()
-            self.task._setup_training_window()
+        self.task.prepare_data()
+        self.task._setup_training_window()
 
     def test_end_train_ts_is_timestamp(self):
         assert isinstance(self.task.run_state.end_train_ts, pd.Timestamp)
@@ -219,66 +215,87 @@ class TestDerivedFieldsRemovedFromConfig:
 
 
 # ---------------------------------------------------------------------------
-# Mirror shim: derived values are also accessible via config
+# No config mirror: derived values are NOT accessible via config
 # ---------------------------------------------------------------------------
 
 
-class TestMirrorShim:
-    """The one-cycle shim must mirror derived values onto config via setattr."""
+class TestNoConfigMirror:
+    """After pipeline runs, derived fields must NOT be set on config (shim removed)."""
+
+    # All 8 derived fields — including the two set only by _setup_training_window.
+    DERIVED = [
+        "start_download",
+        "end_download",
+        "data_start",
+        "data_end",
+        "cov_start",
+        "cov_end",
+        "end_train_ts",
+        "start_train_ts",
+    ]
 
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path):
         self.task = _make_task(tmp_path)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.task.prepare_data()
+        self.task.prepare_data()
+        # Also run _setup_training_window so end_train_ts / start_train_ts are
+        # populated on run_state — the assertion checks they are still absent
+        # from config even after both pipeline phases complete.
+        self.task._setup_training_window()
 
-    def test_data_start_on_config_via_shim(self):
-        assert self.task.config.data_start == self.task.run_state.data_start
+    @pytest.mark.parametrize("field", DERIVED)
+    def test_derived_field_not_on_config(self, field):
+        """After prepare_data() + _setup_training_window(), config must NOT carry any derived field."""
+        assert not hasattr(self.task.config, field), (
+            f"config.{field} is set after the pipeline ran; "
+            "the mirror shim has been removed — derived fields live only on run_state."
+        )
 
-    def test_data_end_on_config_via_shim(self):
-        assert self.task.config.data_end == self.task.run_state.data_end
+    def test_run_state_carries_derived_values(self):
+        """run_state must carry all populated derived values."""
+        assert self.task.run_state.data_start is not None
+        assert self.task.run_state.data_end is not None
+        assert self.task.run_state.cov_end is not None
+        assert self.task.run_state.start_download is not None
+        assert self.task.run_state.end_train_ts is not None
+        assert self.task.run_state.start_train_ts is not None
 
-    def test_cov_end_on_config_via_shim(self):
-        assert self.task.config.cov_end == self.task.run_state.cov_end
-
-    def test_targets_not_mirrored_to_config(self):
-        """targets is intentionally NOT mirrored onto config (would overwrite user input)."""
+    def test_targets_not_on_config_after_pipeline(self):
+        """targets is not mirrored onto config — config.targets keeps user input (None)."""
         # config.targets must remain as the user passed it (None here)
         assert self.task.config.targets is None
         # run_state.targets holds the resolved list
         assert self.task.run_state.targets == ["load"]
 
-    def test_start_download_on_config_via_shim(self):
-        assert self.task.config.start_download == self.task.run_state.start_download
-
 
 # ---------------------------------------------------------------------------
-# DeprecationWarning emitted exactly once per task instance
+# No DeprecationWarning emitted by the pipeline
 # ---------------------------------------------------------------------------
 
 
-class TestDeprecationWarning:
-    """The shim must emit one DeprecationWarning per task instance."""
+class TestNoDeprecationWarning:
+    """The pipeline must not emit any DeprecationWarning after shim removal."""
 
-    def test_deprecation_warning_emitted(self, tmp_path):
+    def test_no_deprecation_warning_on_prepare_data(self, tmp_path):
         task = _make_task(tmp_path)
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             task.prepare_data()
         dep_warnings = [x for x in w if issubclass(x.category, DeprecationWarning)]
-        assert len(dep_warnings) >= 1
+        assert len(dep_warnings) == 0, (
+            f"prepare_data() emitted {len(dep_warnings)} DeprecationWarning(s); "
+            "the mirror shim has been removed so no such warnings should be emitted."
+        )
 
-    def test_deprecation_warning_only_once(self, tmp_path):
-        """Only one DeprecationWarning per task instance (not per field)."""
+    def test_no_deprecation_warning_on_setup_training_window(self, tmp_path):
+        """_setup_training_window must not emit DeprecationWarning either."""
         task = _make_task(tmp_path)
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             task.prepare_data()
             task._setup_training_window()
         dep_warnings = [x for x in w if issubclass(x.category, DeprecationWarning)]
-        # Exactly one warning for the whole task's lifecycle.
-        assert len(dep_warnings) == 1
+        assert len(dep_warnings) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -292,10 +309,8 @@ class TestClampSemantics:
     def test_stale_end_train_default_clamped_to_data_end(self, tmp_path):
         """When end_train_default is far in the future, end_train_ts == data_end."""
         task = _make_task(tmp_path, end_train_default="2099-12-31 00:00+00:00")
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            task.prepare_data()
-            task._setup_training_window()
+        task.prepare_data()
+        task._setup_training_window()
         # The clamp should prevent end_train_ts from exceeding data_end.
         assert task.run_state.end_train_ts <= task.run_state.data_end
 
@@ -303,10 +318,8 @@ class TestClampSemantics:
         """An explicit end_train_default earlier than the data is honoured."""
         # Data covers 2023-01; set cutoff to early 2023-01
         task = _make_task(tmp_path, end_train_default="2023-01-07 00:00+00:00")
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            task.prepare_data()
-            task._setup_training_window()
+        task.prepare_data()
+        task._setup_training_window()
         expected = pd.Timestamp("2023-01-07 00:00+00:00")
         assert task.run_state.end_train_ts == expected
 
@@ -314,9 +327,7 @@ class TestClampSemantics:
         """prepare_data must never mutate config.end_train_default."""
         original = "2099-12-31 00:00+00:00"
         task = _make_task(tmp_path, end_train_default=original)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            task.prepare_data()
+        task.prepare_data()
         assert task.config.end_train_default == original
 
 
@@ -331,24 +342,18 @@ class TestConfigTargetsPreserved:
     def test_none_targets_preserved(self, tmp_path):
         """When user passes no targets, config.targets remains None."""
         task = _make_task(tmp_path, targets=None)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            task.prepare_data()
+        task.prepare_data()
         assert task.config.targets is None
 
     def test_explicit_targets_preserved(self, tmp_path):
         """When user passes explicit targets, config.targets is unchanged."""
         task = _make_task(tmp_path, targets=["load"])
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            task.prepare_data()
+        task.prepare_data()
         assert task.config.targets == ["load"]
 
     def test_run_state_targets_has_resolved_list(self, tmp_path):
         """The resolved list (after column reconciliation) lives on run_state."""
         task = _make_task(tmp_path, targets=None)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            task.prepare_data()
+        task.prepare_data()
         assert task.run_state.targets is not None
         assert len(task.run_state.targets) > 0

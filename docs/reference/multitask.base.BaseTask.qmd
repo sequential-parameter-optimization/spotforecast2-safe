@@ -345,7 +345,6 @@ splitter uses a sliding fixed-size training window
 
 ```{python}
 import tempfile
-import warnings
 import numpy as np
 import pandas as pd
 from spotforecast2_safe.multitask import MultiTask
@@ -367,9 +366,7 @@ with tempfile.TemporaryDirectory() as tmp:
         verbose=False,
     )
     mt = MultiTask(cfg, dataframe=df)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+    mt.prepare_data().detect_outliers().impute().build_exogenous_features()
     y_train = mt.df_pipeline["a"]
     cv = mt.cv_ts(y_train)
     print(f"TimeSeriesFold steps: {cv.steps}")
@@ -405,7 +402,6 @@ advisory: detected outliers are logged per column but not removed.
 
 ```{python}
 import tempfile
-import warnings
 import numpy as np
 import pandas as pd
 from spotforecast2_safe.multitask import MultiTask
@@ -426,10 +422,8 @@ with tempfile.TemporaryDirectory() as tmp:
         verbose=False,
     )
     mt = MultiTask(cfg, dataframe=df)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        mt.prepare_data()
-        mt.detect_outliers()
+    mt.prepare_data()
+    mt.detect_outliers()
     print(f"Pipeline shape: {mt.df_pipeline.shape}")
     assert mt.df_pipeline_original is not None
 ```
@@ -458,7 +452,6 @@ Fill missing values using the configured imputation strategy.
 
 ```{python}
 import tempfile
-import warnings
 import numpy as np
 import pandas as pd
 from spotforecast2_safe.multitask import MultiTask
@@ -481,9 +474,7 @@ with tempfile.TemporaryDirectory() as tmp:
         verbose=False,
     )
     mt = MultiTask(cfg, dataframe=df)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        mt.prepare_data().detect_outliers().impute()
+    mt.prepare_data().detect_outliers().impute()
     missing = mt.df_pipeline["a"].isna().sum()
     print(f"Missing values after imputation: {missing}")
     assert missing == 0
@@ -611,7 +602,6 @@ Log a summary of the current pipeline configuration.
 
 ```{python}
 import tempfile
-import warnings
 import numpy as np
 import pandas as pd
 from spotforecast2_safe.multitask import MultiTask
@@ -632,9 +622,7 @@ with tempfile.TemporaryDirectory() as tmp:
         verbose=False,
     )
     mt = MultiTask(cfg, dataframe=df)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        mt.prepare_data().detect_outliers().impute().build_exogenous_features()
+    mt.prepare_data().detect_outliers().impute().build_exogenous_features()
     # log_summary writes to the pipeline logger; call it to confirm
     # it runs without error.
     mt.log_summary()
@@ -660,7 +648,6 @@ Visualise original vs. cleaned data with outlier markers.
 
 ```{python}
 import tempfile
-import warnings
 import numpy as np
 import pandas as pd
 from spotforecast2_safe.multitask import MultiTask
@@ -681,9 +668,7 @@ with tempfile.TemporaryDirectory() as tmp:
         verbose=False,
     )
     mt = MultiTask(cfg, dataframe=df)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        mt.prepare_data().detect_outliers()
+    mt.prepare_data().detect_outliers()
     try:
         mt.plot_with_outliers()
     except NotImplementedError as exc:
