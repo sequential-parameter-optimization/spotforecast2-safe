@@ -8,31 +8,41 @@ manager.features.get_target_data(
     data_with_exog=None,
     exog_feature_names=None,
     exo_pred=None,
+    start_train_ts=None,
+    end_train_ts=None,
 )
 ```
 
 Extract the training series and exogenous slices for one target column.
 
 Clips the target column of *df_pipeline* to the training window defined by
-``config.start_train_ts`` and ``config.end_train_ts``.  When exogenous
-features are enabled (``config.use_exogenous_features is True``) and
-*data_with_exog* is provided, the matching exogenous training slice and
-forecast-horizon slice are also returned; otherwise both are ``None``.
+*start_train_ts* and *end_train_ts*.  When exogenous features are enabled
+(``config.use_exogenous_features is True``) and *data_with_exog* is
+provided, the matching exogenous training slice and forecast-horizon slice
+are also returned; otherwise both are ``None``.
 
 This function is the canonical way to extract per-target data from the
 shared pipeline state so that outlier removal, imputation, and feature
 engineering are applied consistently across all forecasting tasks.
 
+The training-window timestamps are supplied as explicit parameters so that
+this helper stays decoupled from ``RunState`` (ADR
+``adr-multitask-configmulti-merge``, step 5).  When either is ``None``
+the function falls back to the corresponding attribute on *config* for
+backward compatibility with existing direct callers.
+
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name               | Type                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                         | Default    |
-|--------------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| target             | [str](`str`)                                                                    | Name of the target column to extract from *df_pipeline*.                                                                                                                                                                                                                                                                                                                            | _required_ |
-| df_pipeline        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                  | DataFrame with a tz-aware `DatetimeIndex` containing all target columns produced by the preprocessing pipeline.                                                                                                                                                                                                                                                                     | _required_ |
-| config             | \'ConfigMulti\'                                                                 | Pipeline configuration object.  Must have the following attributes set before calling this function:  - ``start_train_ts`` — inclusive start of the training window   (`Timestamp`, tz-aware). - ``end_train_ts`` — inclusive end of the training window   (`Timestamp`, tz-aware). - ``use_exogenous_features`` — ``bool`` flag controlling whether   exogenous features are used. | _required_ |
-| data_with_exog     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | Merged DataFrame of target and exogenous columns covering at least ``[config.start_train_ts, config.end_train_ts]``. Required when ``config.use_exogenous_features`` is ``True``. Pass ``None`` (default) to skip exogenous slicing.                                                                                                                                                | `None`     |
-| exog_feature_names | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[str](`str`)\]\]          | Column names to select from *data_with_exog* and *exo_pred*.  Required when *data_with_exog* is not ``None``. Pass ``None`` (default) when exogenous features are disabled.                                                                                                                                                                                                         | `None`     |
-| exo_pred           | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | Exogenous feature DataFrame covering the forecast horizon ``(config.end_train_ts, config.cov_end]``.  Required when *data_with_exog* is not ``None``.  Pass ``None`` (default) when exogenous features are disabled.                                                                                                                                                                | `None`     |
+| Name               | Type                                                                            | Description                                                                                                                                                                                                                                                                                                        | Default    |
+|--------------------|---------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| target             | [str](`str`)                                                                    | Name of the target column to extract from *df_pipeline*.                                                                                                                                                                                                                                                           | _required_ |
+| df_pipeline        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                  | DataFrame with a tz-aware `DatetimeIndex` containing all target columns produced by the preprocessing pipeline.                                                                                                                                                                                                    | _required_ |
+| config             | \'ConfigMulti\'                                                                 | Pipeline configuration object.  ``use_exogenous_features`` must be set.  ``start_train_ts`` / ``end_train_ts`` are only read from *config* when the explicit parameters are not supplied.                                                                                                                          | _required_ |
+| data_with_exog     | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | Merged DataFrame of target and exogenous columns covering at least the training window.  Required when ``config.use_exogenous_features`` is ``True``. Pass ``None`` (default) to skip exogenous slicing.                                                                                                           | `None`     |
+| exog_feature_names | [Optional](`typing.Optional`)\[[List](`typing.List`)\[[str](`str`)\]\]          | Column names to select from *data_with_exog* and *exo_pred*.  Required when *data_with_exog* is not ``None``. Pass ``None`` (default) when exogenous features are disabled.                                                                                                                                        | `None`     |
+| exo_pred           | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | Exogenous feature DataFrame covering the forecast horizon. Required when *data_with_exog* is not ``None``.  Pass ``None`` (default) when exogenous features are disabled.                                                                                                                                          | `None`     |
+| start_train_ts     | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive start of the training window (tz-aware ``pd.Timestamp``).  **Required** — pass ``task.run_state.start_train_ts`` after the pipeline has been prepared.  Omitting this argument raises ``ValueError``; reading the value from ``config.start_train_ts`` is deprecated and emits a ``DeprecationWarning``. | `None`     |
+| end_train_ts       | [Optional](`typing.Optional`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end of the training window (tz-aware ``pd.Timestamp``).  **Required** — pass ``task.run_state.end_train_ts`` after the pipeline has been prepared.  Omitting this argument raises ``ValueError``; reading the value from ``config.end_train_ts`` is deprecated and emits a ``DeprecationWarning``.       | `None`     |
 
 ## Returns {.doc-section .doc-section-returns}
 
@@ -40,7 +50,7 @@ engineering are applied consistently across all forecasting tasks.
 |--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |        | [pd](`pandas`).[Series](`pandas.Series`)                                                                                                                                                                                              | Tuple[pd.Series, Optional[pd.DataFrame], Optional[pd.DataFrame]]:                                                                                                                          |
 |        | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                                                                                                                                                       | A three-tuple ``(y_train, exog_train, exog_future)`` where:                                                                                                                                |
-|        | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                                                                                                                                                       | - **y_train** — 1-D Series with the target values over the training window ``[config.start_train_ts, config.end_train_ts]``, squeezed to a plain `Series`.                                 |
+|        | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                                                                                                                                                       | - **y_train** — 1-D Series with the target values over the training window, squeezed to a plain `Series`.                                                                                  |
 |        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[Series](`pandas.Series`), [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\], [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]\] | - **exog_train** — DataFrame of selected exogenous features over the training window, cast to ``float32``.  ``None`` when exogenous features are disabled or *data_with_exog* is ``None``. |
 |        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[Series](`pandas.Series`), [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\], [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]\] | - **exog_future** — DataFrame of selected exogenous features covering the forecast horizon, cast to ``float32``.  ``None`` when exogenous features are disabled or *exo_pred* is ``None``. |
 
@@ -61,13 +71,15 @@ config = ConfigMulti(
     targets=["load"],
     use_exogenous_features=False,
 )
-config.start_train_ts = pd.Timestamp("2024-01-01 00:00", tz="UTC")
-config.end_train_ts   = pd.Timestamp("2024-01-07 23:00", tz="UTC")
+start_ts = pd.Timestamp("2024-01-01 00:00", tz="UTC")
+end_ts   = pd.Timestamp("2024-01-07 23:00", tz="UTC")
 
 y_train, exog_train, exog_future = get_target_data(
     target="load",
     df_pipeline=df_pipeline,
     config=config,
+    start_train_ts=start_ts,
+    end_train_ts=end_ts,
 )
 print(f"y_train length: {len(y_train)}")
 print(f"exog_train:     {exog_train}")
@@ -104,9 +116,9 @@ exo_pred = pd.DataFrame(
     index=idx_future,
 )
 
+start_ts = pd.Timestamp("2024-01-01 00:00", tz="UTC")
+end_ts   = pd.Timestamp("2024-01-07 23:00", tz="UTC")
 config = ConfigMulti(targets=["load"], use_exogenous_features=True)
-config.start_train_ts = pd.Timestamp("2024-01-01 00:00", tz="UTC")
-config.end_train_ts   = pd.Timestamp("2024-01-07 23:00", tz="UTC")
 
 y_train, exog_train, exog_future = get_target_data(
     target="load",
@@ -115,6 +127,8 @@ y_train, exog_train, exog_future = get_target_data(
     data_with_exog=data_with_exog,
     exog_feature_names=["hour_sin", "hour_cos"],
     exo_pred=exo_pred,
+    start_train_ts=start_ts,
+    end_train_ts=end_ts,
 )
 print(f"y_train length:     {len(y_train)}")
 print(f"exog_train shape:   {exog_train.shape}")
