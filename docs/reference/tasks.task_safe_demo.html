@@ -1554,32 +1554,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.tasks.task_safe_demo" id="toc-spotforecast2_safe.tasks.task_safe_demo" class="nav-link active" data-scroll-target="#spotforecast2_safe.tasks.task_safe_demo">tasks.task_safe_demo</a>
-  <ul class="collapse">
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  </ul></li>
-  <li><a href="#run-with-default-settings-force-training" id="toc-run-with-default-settings-force-training" class="nav-link" data-scroll-target="#run-with-default-settings-force-training">Run with default settings (force training)</a></li>
-  <li><a href="#skip-training-use-cached-models-if-available" id="toc-skip-training-use-cached-models-if-available" class="nav-link" data-scroll-target="#skip-training-use-cached-models-if-available">Skip training (use cached models if available)</a></li>
-  <li><a href="#specify-custom-data-path" id="toc-specify-custom-data-path" class="nav-link" data-scroll-target="#specify-custom-data-path">Specify custom data path</a></li>
-  <li><a href="#enable-logging" id="toc-enable-logging" class="nav-link" data-scroll-target="#enable-logging">Enable logging</a>
-  <ul class="collapse">
+  <li><a href="#examples" id="toc-examples" class="nav-link active" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.tasks.task_safe_demo.main" id="toc-spotforecast2_safe.tasks.task_safe_demo.main" class="nav-link" data-scroll-target="#spotforecast2_safe.tasks.task_safe_demo.main">main</a></li>
-  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/tasks.task_safe_demo.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/tasks.task_safe_demo.html">Tasks API</a></li><li class="breadcrumb-item"><a href="../../docs/reference/tasks.task_safe_demo.html">task_safe_demo</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/tasks.task_safe_demo.html">Tasks API</a></li><li class="breadcrumb-item"><a href="../../docs/reference/tasks.task_safe_demo.html">task_safe_demo</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">tasks.task_safe_demo</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.tasks.task_safe_demo" class="level1">
-<h1>tasks.task_safe_demo</h1>
+</header>
+
+
 <p><code>tasks.task_safe_demo</code></p>
 <p>Task demo: compare baseline, covariate, and custom LightGBM forecasts against ground truth.</p>
 <p>This script executes the baseline N-to-1 task, the covariate-enhanced N-to-1 pipeline, and a custom LightGBM model with optimized hyperparameters, then loads the ground truth from a specified data directory. Logging Mechanism: This script uses a dual-handler logging system designed for safety-critical MLOps:</p>
@@ -1599,23 +1604,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="ad198359" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># These are shell commands; they cannot run inside a Python kernel.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with default settings (force training):</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   uv run spotforecast-safe-demo</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Skip training (use cached models if available):</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   uv run spotforecast-safe-demo --force_train false</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify a custom data path:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   uv run spotforecast-safe-demo --data_path /path/to/data.csv</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable logging:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   uv run spotforecast-safe-demo --logging true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-</section>
-<section id="run-with-default-settings-force-training" class="level1">
-<h1>Run with default settings (force training)</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> uv run spotforecast<span class="op">-</span>safe<span class="op">-</span>demo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="skip-training-use-cached-models-if-available" class="level1">
-<h1>Skip training (use cached models if available)</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> uv run spotforecast<span class="op">-</span>safe<span class="op">-</span>demo <span class="op">--</span>force_train false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="specify-custom-data-path" class="level1">
-<h1>Specify custom data path</h1>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> uv run spotforecast<span class="op">-</span>safe<span class="op">-</span>demo <span class="op">--</span>data_path <span class="op">/</span>path<span class="op">/</span>to<span class="op">/</span>data.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="enable-logging" class="level1">
-<h1>Enable logging</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> uv run spotforecast<span class="op">-</span>safe<span class="op">-</span>demo <span class="op">--</span>logging true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="caption-top table">
@@ -1634,12 +1634,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.tasks.task_safe_demo.main" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.tasks.task_safe_demo.main">main</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tasks.task_safe_demo.main(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    force_train<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    data_path<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    logging_enabled<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tasks.task_safe_demo.main(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    force_train<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    data_path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    logging_enabled<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Main execution entry point. Returns 0 on success, non-zero on failure.</p>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div id="fbf1ae16" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.tasks.task_safe_demo <span class="im">import</span> main</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fail-fast path: when the ground truth file does not exist,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># main() returns 1 immediately without attempting any training.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> main(</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    force_train<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    data_path<span class="op">=</span>Path(<span class="st">"/nonexistent/path/data.csv"</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    logging_enabled<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Return code (missing data): </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> result <span class="op">==</span> <span class="dv">1</span>, <span class="ss">f"Expected 1, got </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Return code (missing data): 1</code></pre>
+</div>
+</div>
 
 
 </section>

@@ -1554,27 +1554,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder" id="toc-spotforecast2_safe.preprocessing.exog_builder.ExogBuilder" class="nav-link active" data-scroll-target="#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder">preprocessing.exog_builder.ExogBuilder</a>
-  <ul class="collapse">
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link active" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder.build" id="toc-spotforecast2_safe.preprocessing.exog_builder.ExogBuilder.build" class="nav-link" data-scroll-target="#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder.build">build</a></li>
   </ul></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/preprocessing.exog_builder.ExogBuilder.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.html">Preprocessing</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.exog_builder.ExogBuilder.html">ExogBuilder</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.html">Preprocessing</a></li><li class="breadcrumb-item"><a href="../../docs/reference/preprocessing.exog_builder.ExogBuilder.html">ExogBuilder</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">preprocessing.exog_builder.ExogBuilder</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2_safe.preprocessing.exog_builder.ExogBuilder" class="level1">
-<h1>preprocessing.exog_builder.ExogBuilder</h1>
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>preprocessing.exog_builder.ExogBuilder(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    periods<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="va">None</span>,</span>
@@ -1583,7 +1594,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Builds a set of exogenous features for a given date range.</p>
 <p>This builder combines temporal features (day of year, day of week, hour, etc.) with cyclical features encoded via RepeatingBasisFunctions and optional holiday indicators.</p>
-<p>Optional :class:<code>~spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider</code> objects extend the built frame with additional drivers (e.g.&nbsp;ENTSO-E day-ahead forecasts, COVID infection rate). Each provider returns numeric, NaN-free columns aligned to the same hourly index; a provider that cannot cover the range is either re-raised or skipped according to <em>on_provider_failure</em>.</p>
+<p>Optional <code>ExogFeatureProvider</code> objects extend the built frame with additional drivers (e.g.&nbsp;ENTSO-E day-ahead forecasts, COVID infection rate). Each provider returns numeric, NaN-free columns aligned to the same hourly index; a provider that cannot cover the range is either re-raised or skipped according to <em>on_provider_failure</em>.</p>
 <section id="attributes" class="level2 doc-section doc-section-attributes">
 <h2 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
@@ -1625,16 +1636,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.data.data_classes <span class="im">import</span> Period</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing.exog_builder <span class="im">import</span> ExogBuilder</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> periods <span class="op">=</span> [Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))]</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> builder <span class="op">=</span> ExogBuilder(periods<span class="op">=</span>periods, country_code<span class="op">=</span><span class="st">"DE"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> start <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> end <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-02"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog <span class="op">=</span> builder.build(start, end)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog.shape[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7c6793b1" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.data_classes <span class="im">import</span> Period</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.exog_builder <span class="im">import</span> ExogBuilder</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>periods <span class="op">=</span> [Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>builder <span class="op">=</span> ExogBuilder(periods<span class="op">=</span>periods, country_code<span class="op">=</span><span class="st">"DE"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-02"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>exog <span class="op">=</span> builder.build(start, end)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"shape: </span><span class="sc">{</span>exog<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> exog.shape[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>shape: (25, 26)</code></pre>
+</div>
+</div>
 </section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
@@ -1654,7 +1671,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.preprocessing.exog_builder.ExogBuilder.build" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.preprocessing.exog_builder.ExogBuilder.build">build</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>preprocessing.exog_builder.ExogBuilder.build(start_date, end_date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>preprocessing.exog_builder.ExogBuilder.build(start_date, end_date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Build the exogenous feature DataFrame for a date range.</p>
 <p>The generated DataFrame has an hourly frequency.</p>
 <section id="parameters" class="level4 doc-section doc-section-parameters">
@@ -1724,19 +1741,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.data.data_classes <span class="im">import</span> Period</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> spotforecast2_safe.preprocessing.exog_builder <span class="im">import</span> ExogBuilder</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> periods <span class="op">=</span> [Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> builder <span class="op">=</span> ExogBuilder(periods<span class="op">=</span>periods, country_code<span class="op">=</span><span class="st">"DE"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> start <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> end <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-02"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog <span class="op">=</span> builder.build(start, end)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exog.shape[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="49d73f21" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.data.data_classes <span class="im">import</span> Period</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.exog_builder <span class="im">import</span> ExogBuilder</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>periods <span class="op">=</span> [Period(name<span class="op">=</span><span class="st">"hour"</span>, n_periods<span class="op">=</span><span class="dv">24</span>, column<span class="op">=</span><span class="st">"hour"</span>, input_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">23</span>))]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>builder <span class="op">=</span> ExogBuilder(periods<span class="op">=</span>periods, country_code<span class="op">=</span><span class="st">"DE"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.Timestamp(<span class="st">"2025-01-02"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>exog <span class="op">=</span> builder.build(start, end)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"shape: </span><span class="sc">{</span>exog<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, columns: </span><span class="sc">{</span><span class="bu">list</span>(exog.columns[:<span class="dv">4</span>])<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> exog.shape <span class="op">==</span> (<span class="dv">25</span>, <span class="dv">26</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">"holidays"</span> <span class="kw">in</span> exog.columns</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">"is_weekend"</span> <span class="kw">in</span> exog.columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>shape: (25, 26), columns: ['hour_0', 'hour_1', 'hour_2', 'hour_3']</code></pre>
+</div>
+</div>
 
 
-</section>
 </section>
 </section>
 </section>

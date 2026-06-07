@@ -1635,85 +1635,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="8e7d8962" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherService</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherService(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>, cache_path<span class="op">=</span>Path(<span class="st">"weather_cache.parquet"</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp(<span class="st">"2023-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.Timestamp(<span class="st">"2023-01-07"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.get_dataframe(start<span class="op">=</span>start, end<span class="op">=</span>end, fill_missing<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.tail())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="738bb1c5" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Requires a live connection to Open-Meteo APIs.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherService</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherService(latitude<span class="op">=</span><span class="fl">52.52</span>, longitude<span class="op">=</span><span class="fl">13.405</span>, cache_path<span class="op">=</span>Path(<span class="st">"weather_cache.parquet"</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp(<span class="st">"2023-01-01"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.Timestamp(<span class="st">"2023-01-07"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.get_dataframe(start<span class="op">=</span>start, end<span class="op">=</span>end, fill_missing<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.tail())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Construction and configuration do not require a network call:</p>
+<div id="5041ab68" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather.client <span class="im">import</span> WeatherService</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>svc <span class="op">=</span> WeatherService(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    latitude<span class="op">=</span><span class="fl">51.03</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    longitude<span class="op">=</span><span class="fl">7.57</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    cache_path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    use_forecast<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> svc.latitude <span class="op">==</span> <span class="fl">51.03</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> svc.use_forecast <span class="kw">is</span> <span class="va">True</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> svc.cache_path <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"WeatherService at (</span><span class="sc">{</span>svc<span class="sc">.</span>latitude<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>svc<span class="sc">.</span>longitude<span class="sc">}</span><span class="ss">), use_forecast=</span><span class="sc">{</span>svc<span class="sc">.</span>use_forecast<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                           temperature_2m  relative_humidity_2m  \
-2023-01-01 00:00:00+00:00            15.2                    59   
-2023-01-01 01:00:00+00:00            15.6                    55   
-2023-01-01 02:00:00+00:00            15.7                    52   
-2023-01-01 03:00:00+00:00            15.8                    51   
-2023-01-01 04:00:00+00:00            15.8                    49   
-
-                           precipitation  rain  snowfall  weather_code  \
-2023-01-01 00:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-01 01:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-01 02:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-01 03:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-01 04:00:00+00:00            0.0   0.0       0.0             3   
-
-                           pressure_msl  surface_pressure  cloud_cover  \
-2023-01-01 00:00:00+00:00        1010.8            1006.4          100   
-2023-01-01 01:00:00+00:00        1010.9            1006.5          100   
-2023-01-01 02:00:00+00:00        1011.3            1006.9          100   
-2023-01-01 03:00:00+00:00        1011.3            1006.9          100   
-2023-01-01 04:00:00+00:00        1011.5            1007.1           85   
-
-                           cloud_cover_low  cloud_cover_mid  cloud_cover_high  \
-2023-01-01 00:00:00+00:00                0               14               100   
-2023-01-01 01:00:00+00:00               12               76               100   
-2023-01-01 02:00:00+00:00                8               25               100   
-2023-01-01 03:00:00+00:00                1              100                97   
-2023-01-01 04:00:00+00:00                0               32                78   
-
-                           wind_speed_10m  wind_direction_10m  wind_gusts_10m  
-2023-01-01 00:00:00+00:00            30.5                 232            49.7  
-2023-01-01 01:00:00+00:00            30.7                 231            52.2  
-2023-01-01 02:00:00+00:00            31.3                 232            52.2  
-2023-01-01 03:00:00+00:00            28.4                 231            52.2  
-2023-01-01 04:00:00+00:00            28.3                 223            47.9  
-                           temperature_2m  relative_humidity_2m  \
-2023-01-06 20:00:00+00:00             6.3                    93   
-2023-01-06 21:00:00+00:00             5.8                    96   
-2023-01-06 22:00:00+00:00             5.7                    96   
-2023-01-06 23:00:00+00:00             5.5                    96   
-2023-01-07 00:00:00+00:00             5.8                    95   
-
-                           precipitation  rain  snowfall  weather_code  \
-2023-01-06 20:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-06 21:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-06 22:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-06 23:00:00+00:00            0.0   0.0       0.0             3   
-2023-01-07 00:00:00+00:00            0.0   0.0       0.0             3   
-
-                           pressure_msl  surface_pressure  cloud_cover  \
-2023-01-06 20:00:00+00:00        1018.5            1013.9           98   
-2023-01-06 21:00:00+00:00        1018.9            1014.3          100   
-2023-01-06 22:00:00+00:00        1019.1            1014.5          100   
-2023-01-06 23:00:00+00:00        1019.2            1014.6           99   
-2023-01-07 00:00:00+00:00        1018.9            1014.3          100   
-
-                           cloud_cover_low  cloud_cover_mid  cloud_cover_high  \
-2023-01-06 20:00:00+00:00               27                6                97   
-2023-01-06 21:00:00+00:00               14                8               100   
-2023-01-06 22:00:00+00:00                0               22               100   
-2023-01-06 23:00:00+00:00                0               46                99   
-2023-01-07 00:00:00+00:00                0               92                93   
-
-                           wind_speed_10m  wind_direction_10m  wind_gusts_10m  
-2023-01-06 20:00:00+00:00             9.2                 249            18.7  
-2023-01-06 21:00:00+00:00             9.2                 244            14.8  
-2023-01-06 22:00:00+00:00             9.5                 241            15.5  
-2023-01-06 23:00:00+00:00             9.6                 236            15.5  
-2023-01-07 00:00:00+00:00             9.2                 228            15.8  </code></pre>
+<pre><code>WeatherService at (51.03, 7.57), use_forecast=True</code></pre>
 </div>
 </div>
 </section>
@@ -1735,16 +1685,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="spotforecast2_safe.weather.client.WeatherService.get_dataframe" class="level3">
 <h3 class="anchored" data-anchor-id="spotforecast2_safe.weather.client.WeatherService.get_dataframe">get_dataframe</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>weather.client.WeatherService.get_dataframe(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    start,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    end,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    fill_missing<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>weather.client.WeatherService.get_dataframe(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    start,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    end,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    fallback_on_failure<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    fill_missing<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get weather DataFrame for a specified range using best available methods.</p>
-<p>Refactored from spotpredict.create_weather_df. Since the 1.0 major release, remaining gaps after fetch are <strong>rejected</strong> by default so that synthesised values never reach downstream consumers labelled as measurements. Pass <code>fill_missing=True</code> to opt into the legacy forward/back-fill behavior.</p>
+<p>Refactored from spotpredict.create_weather_df. Since the 1.0 major release, remaining gaps after fetch are rejected by default so that synthesised values never reach downstream consumers labelled as measurements. Pass <code>fill_missing=True</code> to opt into the legacy forward/back-fill behavior.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
@@ -1817,85 +1767,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="e1480c09" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherService</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherService(latitude<span class="op">=</span><span class="fl">51.0267</span>, longitude<span class="op">=</span><span class="fl">7.5693</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># get the weather data for the last week, using the cache if available, and filling any remaining gaps</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp.now(tz<span class="op">=</span><span class="st">"UTC"</span>) <span class="op">-</span> pd.Timedelta(days<span class="op">=</span><span class="dv">7</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.Timestamp.now(tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.get_dataframe(start<span class="op">=</span>start, end<span class="op">=</span>end, fill_missing<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.tail())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7abb81b1" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Requires a live connection to Open-Meteo APIs.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather <span class="im">import</span> WeatherService</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> WeatherService(latitude<span class="op">=</span><span class="fl">51.0267</span>, longitude<span class="op">=</span><span class="fl">7.5693</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp.now(tz<span class="op">=</span><span class="st">"UTC"</span>) <span class="op">-</span> pd.Timedelta(days<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.Timestamp.now(tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> client.get_dataframe(start<span class="op">=</span>start, end<span class="op">=</span>end, fill_missing<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.tail())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>fill_missing=False</code> default rejects frames with gaps. The ValueError path can be exercised offline using <code>_finalize_df</code> directly with a synthetic frame that has NaN rows:</p>
+<div id="aec26469" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.weather.client <span class="im">import</span> WeatherService</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>svc <span class="op">=</span> WeatherService(latitude<span class="op">=</span><span class="fl">51.03</span>, longitude<span class="op">=</span><span class="fl">7.57</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2024-01-01"</span>, periods<span class="op">=</span><span class="dv">4</span>, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">"temperature_2m"</span>: [<span class="fl">1.0</span>, <span class="bu">float</span>(<span class="st">"nan"</span>), <span class="fl">3.0</span>, <span class="fl">4.0</span>]}, index<span class="op">=</span>idx)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    svc._finalize_df(df, freq<span class="op">=</span><span class="st">"h"</span>, fill_missing<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> exc:</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"ValueError raised as expected: </span><span class="sc">{</span>exc<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># With fill_missing=True the gap is imputed silently</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>filled <span class="op">=</span> svc._finalize_df(df.copy(), freq<span class="op">=</span><span class="st">"h"</span>, fill_missing<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> filled.isna().<span class="bu">any</span>().<span class="bu">any</span>()</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"fill_missing=True: no NaNs remain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                           temperature_2m  relative_humidity_2m  \
-2026-05-26 22:00:00+00:00            18.1                    82   
-2026-05-26 23:00:00+00:00            17.3                    82   
-2026-05-27 00:00:00+00:00            17.2                    79   
-2026-05-27 01:00:00+00:00            17.8                    66   
-2026-05-27 02:00:00+00:00            17.7                    69   
-
-                           precipitation  rain  snowfall  weather_code  \
-2026-05-26 22:00:00+00:00            0.0   0.0       0.0             0   
-2026-05-26 23:00:00+00:00            0.0   0.0       0.0             0   
-2026-05-27 00:00:00+00:00            0.0   0.0       0.0             0   
-2026-05-27 01:00:00+00:00            0.0   0.0       0.0             0   
-2026-05-27 02:00:00+00:00            0.0   0.0       0.0             0   
-
-                           pressure_msl  surface_pressure  cloud_cover  \
-2026-05-26 22:00:00+00:00        1024.1             993.1            0   
-2026-05-26 23:00:00+00:00        1023.7             992.6            0   
-2026-05-27 00:00:00+00:00        1023.7             992.6            0   
-2026-05-27 01:00:00+00:00        1023.4             992.4            0   
-2026-05-27 02:00:00+00:00        1023.3             992.3            0   
-
-                           cloud_cover_low  cloud_cover_mid  cloud_cover_high  \
-2026-05-26 22:00:00+00:00                0                0                 0   
-2026-05-26 23:00:00+00:00                0                0                 0   
-2026-05-27 00:00:00+00:00                0                0                 0   
-2026-05-27 01:00:00+00:00                0                0                 0   
-2026-05-27 02:00:00+00:00                0                0                 0   
-
-                           wind_speed_10m  wind_direction_10m  wind_gusts_10m  
-2026-05-26 22:00:00+00:00             7.1                  38            14.4  
-2026-05-26 23:00:00+00:00             5.9                  31            13.0  
-2026-05-27 00:00:00+00:00             8.1                  24            17.3  
-2026-05-27 01:00:00+00:00            11.6                  19            20.5  
-2026-05-27 02:00:00+00:00            11.8                  26            21.6  
-                           temperature_2m  relative_humidity_2m  \
-2026-06-02 17:00:00+00:00            15.3                    87   
-2026-06-02 18:00:00+00:00            14.7                    94   
-2026-06-02 19:00:00+00:00            14.7                    96   
-2026-06-02 20:00:00+00:00            14.7                    93   
-2026-06-02 21:00:00+00:00            14.7                    93   
-
-                           precipitation  rain  snowfall  weather_code  \
-2026-06-02 17:00:00+00:00            0.1   0.1       0.0            51   
-2026-06-02 18:00:00+00:00            0.9   0.9       0.0            53   
-2026-06-02 19:00:00+00:00            0.7   0.7       0.0            53   
-2026-06-02 20:00:00+00:00            0.0   0.0       0.0             3   
-2026-06-02 21:00:00+00:00            0.0   0.0       0.0             2   
-
-                           pressure_msl  surface_pressure  cloud_cover  \
-2026-06-02 17:00:00+00:00        1005.1             974.4          100   
-2026-06-02 18:00:00+00:00        1006.2             975.3          100   
-2026-06-02 19:00:00+00:00        1006.4             975.5          100   
-2026-06-02 20:00:00+00:00        1006.8             975.8          100   
-2026-06-02 21:00:00+00:00        1007.0             976.0           71   
-
-                           cloud_cover_low  cloud_cover_mid  cloud_cover_high  \
-2026-06-02 17:00:00+00:00                1              100               100   
-2026-06-02 18:00:00+00:00              100              100               100   
-2026-06-02 19:00:00+00:00              100              100               100   
-2026-06-02 20:00:00+00:00                1              100                90   
-2026-06-02 21:00:00+00:00               11               68                 0   
-
-                           wind_speed_10m  wind_direction_10m  wind_gusts_10m  
-2026-06-02 17:00:00+00:00             7.9                 275            16.2  
-2026-06-02 18:00:00+00:00             3.2                 143            15.5  
-2026-06-02 19:00:00+00:00             6.1                 236            15.5  
-2026-06-02 20:00:00+00:00             8.3                 250            21.2  
-2026-06-02 21:00:00+00:00             9.7                 248            20.2  </code></pre>
+<pre><code>ValueError raised as expected: 1 missing row(s) in weather frame after resample at freq='h'. First gaps: [2024-01-01 01:00:00+00:00]. Pass fill_missing=True to opt into legacy ffill/bfill imputation.
+fill_missing=True: no NaNs remain</code></pre>
 </div>
 </div>
 
