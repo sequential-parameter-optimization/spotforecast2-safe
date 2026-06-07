@@ -1590,15 +1590,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    range_mw,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    step_mw,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    window_days,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    deviation_mw<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    deviation_ref<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    deviation_slots<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Detect physically-impossible target-column corruption in the native frame.</p>
 <p>Applies two independent rules on the native-cadence (e.g.&nbsp;15-min) series within a rolling look-back window ending at the last observed target timestamp:</p>
 <ul>
 <li><strong>Range rule</strong> (sub-hourly cadence only): an hour is flagged when <code>intra-hour max - intra-hour min &gt; range_mw</code> for any target column. Vacuously skipped for hourly-or-coarser cadence (intra-hour range is undefined on a single slot per hour).</li>
 <li><strong>Step rule</strong>: an hour is flagged when any <code>|adjacent-slot diff|</code> that <em>touches</em> that hour exceeds <code>step_mw</code> for any target column. Applies to all cadences.</li>
+<li><strong>Deviation rule</strong> (dropout-only, all cadences): an hour is flagged when <code>target − reference &lt; -deviation_mw</code> holds for at least <code>deviation_slots</code> <em>consecutive</em> native-cadence slots within the scan window, where the reference is a published companion column such as the ENTSO-E day-ahead <code>"Forecasted Load"</code>. The rule is asymmetric by design: the known corruption class is exclusively a dropout <em>below</em> the day-ahead forecast, while actuals above the forecast are ordinary under-forecasting. <code>NaN</code> in either column yields a <code>NaN</code> difference, which compares <code>False</code> — so the publication-lag frontier (forecast published, actual not yet) never flags, and a data gap breaks a consecutive run. On hourly-or-coarser cadence the sustained requirement collapses to a single slot. The rule is silently skipped when <code>deviation_ref</code> is missing from the frame (mirroring how absent target columns are skipped).</li>
 </ul>
 <p>Flags are OR-ed across target columns. ALL native-cadence slots of a flagged calendar hour are marked <code>True</code> in the returned boolean <code>Series</code>, so downstream NaN-ing operates on full hours rather than individual sub-hourly slots.</p>
-<p>The detector is <strong>inert</strong> (returns all-<code>False</code>) unless <code>window_days</code> is set AND at least one of <code>range_mw</code> / <code>step_mw</code> is set. If the data is shorter than <code>window_days</code>, the window is clamped to <code>df.index.min()</code> without raising.</p>
+<p>The detector is <strong>inert</strong> (returns all-<code>False</code>) unless <code>window_days</code> is set AND at least one of <code>range_mw</code> / <code>step_mw</code> / <code>deviation_mw</code> is set. If the data is shorter than <code>window_days</code>, the window is clamped to <code>df.index.min()</code> without raising.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1641,6 +1645,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Number of days before the last observed target to include in the scan. <code>None</code> makes the detector inert.</td>
 <td><em>required</em></td>
 </tr>
+<tr class="even">
+<td>deviation_mw</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]</td>
+<td>Maximum allowed dropout below the reference column (MW, positive magnitude): slots with <code>target − reference &lt; -deviation_mw</code> are candidates. <code>None</code> skips the deviation rule.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>deviation_ref</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
+<td>Name of the reference column (e.g.&nbsp;<code>"Forecasted Load"</code>). The rule is skipped when <code>None</code> or when the column is absent from <code>df</code>. The reference column itself is never checked as a target by this rule.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>deviation_slots</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Minimum number of <em>consecutive</em> sub-hourly slots the dropout must sustain before any hour is flagged (default <code>2</code> — a single-slot blip is more likely a metering glitch than the oscillating dropout class). Clamped to <code>1</code> on hourly-or-coarser cadence.</td>
+<td><code>2</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1675,7 +1697,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="3f53049f" class="cell" data-execution_count="1">
+<div id="9614d907" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.target_corruption <span class="im">import</span> (</span>
@@ -1697,6 +1719,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"flagged:"</span>, mask.<span class="bu">sum</span>(), <span class="st">"slots"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>flagged: 4 slots</code></pre>
+</div>
+</div>
+<div id="d7b6c2b5" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Deviation rule: a sub-threshold dropout the dynamics rules miss.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.preprocessing.target_corruption <span class="im">import</span> (</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    detect_target_corruption,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2026-06-07"</span>, periods<span class="op">=</span><span class="dv">16</span>, freq<span class="op">=</span><span class="st">"15min"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> pd.Series(<span class="fl">48_000.0</span>, index<span class="op">=</span>idx)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> forecast.copy()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Two consecutive slots 11.6 GW below the forecast, stepping by</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># only 5.8 GW per slot — below a 6 GW step rule, no range breach.</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>actual.iloc[<span class="dv">4</span>] <span class="op">=</span> forecast.iloc[<span class="dv">4</span>] <span class="op">-</span> <span class="fl">5_800.0</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>actual.iloc[<span class="dv">5</span>] <span class="op">=</span> forecast.iloc[<span class="dv">5</span>] <span class="op">-</span> <span class="fl">11_600.0</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>actual.iloc[<span class="dv">6</span>] <span class="op">=</span> forecast.iloc[<span class="dv">6</span>] <span class="op">-</span> <span class="fl">11_600.0</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>actual.iloc[<span class="dv">7</span>] <span class="op">=</span> forecast.iloc[<span class="dv">7</span>] <span class="op">-</span> <span class="fl">5_800.0</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Publication-lag frontier: forecast published, actual not yet.</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>actual.iloc[<span class="dv">12</span>:] <span class="op">=</span> np.nan</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">"Actual Load"</span>: actual, <span class="st">"Forecasted Load"</span>: forecast})</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>dyn_only <span class="op">=</span> detect_target_corruption(</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    df, targets<span class="op">=</span>[<span class="st">"Actual Load"</span>],</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    range_mw<span class="op">=</span><span class="dv">15_000</span>, step_mw<span class="op">=</span><span class="dv">6_000</span>, window_days<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>with_dev <span class="op">=</span> detect_target_corruption(</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    df, targets<span class="op">=</span>[<span class="st">"Actual Load"</span>],</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    range_mw<span class="op">=</span><span class="dv">15_000</span>, step_mw<span class="op">=</span><span class="dv">6_000</span>, window_days<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    deviation_mw<span class="op">=</span><span class="dv">8_000</span>, deviation_ref<span class="op">=</span><span class="st">"Forecasted Load"</span>,</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> dyn_only.<span class="bu">any</span>(), <span class="st">"dynamics rules miss the dropout"</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> with_dev.iloc[<span class="dv">4</span>:<span class="dv">8</span>].<span class="bu">any</span>(), <span class="st">"deviation rule catches it"</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> with_dev.iloc[<span class="dv">12</span>:].<span class="bu">any</span>(), <span class="st">"NaN frontier never flags"</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"dynamics-only:"</span>, <span class="bu">int</span>(dyn_only.<span class="bu">sum</span>()), <span class="st">"| with deviation:"</span>,</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>      <span class="bu">int</span>(with_dev.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>dynamics-only: 0 | with deviation: 4</code></pre>
 </div>
 </div>
 

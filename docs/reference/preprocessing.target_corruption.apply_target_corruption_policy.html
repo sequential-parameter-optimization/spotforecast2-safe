@@ -1596,7 +1596,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    anchor_zone_hours,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    cutoff,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    logger,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    deviation_mw<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    deviation_ref<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    deviation_slots<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Apply the configured corruption policy to the native-cadence frame.</p>
 <p>This is the single entry point for the target-corruption sub-pipeline. It runs :func:<code>detect_target_corruption</code> and then dispatches to the <code>policy</code> branch. The function always acts only on target columns; exogenous columns are never modified.</p>
 <p>Policy semantics:</p>
@@ -1678,6 +1681,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Standard-library logger for WARNING/INFO messages.</td>
 <td><em>required</em></td>
 </tr>
+<tr class="odd">
+<td>deviation_mw</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]</td>
+<td>Deviation-rule threshold (MW, positive magnitude): flags sustained dropouts <code>target − reference &lt; -deviation_mw</code>. <code>None</code> skips that rule. See <code>detect_target_corruption</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>deviation_ref</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
+<td>Reference column name for the deviation rule (e.g.&nbsp;<code>"Forecasted Load"</code>). When enabling this rule, scope <code>targets</code> to the actuals only (e.g.&nbsp;<code>["Actual Load"]</code>) so that <code>heal</code>/<code>truncate</code> NaN only the actual and the reference survives as an exogenous prior.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>deviation_slots</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>Minimum consecutive sub-hourly slots for the deviation rule (default <code>2</code>).</td>
+<td><code>2</code></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -1731,7 +1752,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="b1aad9db" class="cell" data-execution_count="1">
+<div id="da976093" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
