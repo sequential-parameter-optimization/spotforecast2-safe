@@ -34,6 +34,9 @@ def test_defaults(factory):
     assert cfg.target_corruption_policy == "abort"
     assert cfg.target_max_heal_hours == 0
     assert cfg.target_anchor_zone_hours == 168
+    assert cfg.target_qc_deviation_mw is None
+    assert cfg.target_qc_deviation_ref is None
+    assert cfg.target_qc_deviation_slots == 2
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +53,9 @@ def test_explicit_values_round_trip(factory):
         target_corruption_policy="truncate",
         target_max_heal_hours=24,
         target_anchor_zone_hours=48,
+        target_qc_deviation_mw=5_000.0,
+        target_qc_deviation_ref="Forecasted Load",
+        target_qc_deviation_slots=3,
     )
     assert cfg.target_qc_range_mw == 5_000.0
     assert cfg.target_qc_step_mw == 8_000.0
@@ -57,6 +63,9 @@ def test_explicit_values_round_trip(factory):
     assert cfg.target_corruption_policy == "truncate"
     assert cfg.target_max_heal_hours == 24
     assert cfg.target_anchor_zone_hours == 48
+    assert cfg.target_qc_deviation_mw == 5_000.0
+    assert cfg.target_qc_deviation_ref == "Forecasted Load"
+    assert cfg.target_qc_deviation_slots == 3
 
 
 # ---------------------------------------------------------------------------
@@ -74,6 +83,9 @@ def test_set_params_round_trip(factory):
         target_corruption_policy="heal",
         target_max_heal_hours=12,
         target_anchor_zone_hours=72,
+        target_qc_deviation_mw=4_000.0,
+        target_qc_deviation_ref="Forecasted Load",
+        target_qc_deviation_slots=1,
     )
     assert cfg.target_qc_range_mw == 3_000.0
     assert cfg.target_qc_step_mw == 6_000.0
@@ -81,6 +93,9 @@ def test_set_params_round_trip(factory):
     assert cfg.target_corruption_policy == "heal"
     assert cfg.target_max_heal_hours == 12
     assert cfg.target_anchor_zone_hours == 72
+    assert cfg.target_qc_deviation_mw == 4_000.0
+    assert cfg.target_qc_deviation_ref == "Forecasted Load"
+    assert cfg.target_qc_deviation_slots == 1
 
 
 # ---------------------------------------------------------------------------
@@ -117,6 +132,18 @@ def test_window_days_1_accepted(factory):
 def test_zero_anchor_zone_accepted(factory):
     cfg = factory(target_anchor_zone_hours=0)
     assert cfg.target_anchor_zone_hours == 0
+
+
+@pytest.mark.parametrize("factory", [_entsoe, _multi])
+def test_zero_deviation_mw_accepted(factory):
+    cfg = factory(target_qc_deviation_mw=0.0)
+    assert cfg.target_qc_deviation_mw == 0.0
+
+
+@pytest.mark.parametrize("factory", [_entsoe, _multi])
+def test_deviation_slots_1_accepted(factory):
+    cfg = factory(target_qc_deviation_slots=1)
+    assert cfg.target_qc_deviation_slots == 1
 
 
 # ---------------------------------------------------------------------------
@@ -161,6 +188,25 @@ def test_negative_anchor_zone_rejected(factory):
         factory(target_anchor_zone_hours=-5)
 
 
+@pytest.mark.parametrize("factory", [_entsoe, _multi])
+def test_negative_deviation_mw_rejected(factory):
+    with pytest.raises(ValueError, match="target_qc_deviation_mw"):
+        factory(target_qc_deviation_mw=-1.0)
+
+
+@pytest.mark.parametrize("factory", [_entsoe, _multi])
+def test_non_string_deviation_ref_rejected(factory):
+    with pytest.raises(ValueError, match="target_qc_deviation_ref"):
+        factory(target_qc_deviation_ref=123)
+
+
+@pytest.mark.parametrize("factory", [_entsoe, _multi])
+@pytest.mark.parametrize("bad", [0, -1])
+def test_non_positive_deviation_slots_rejected(factory, bad):
+    with pytest.raises(ValueError, match="target_qc_deviation_slots"):
+        factory(target_qc_deviation_slots=bad)
+
+
 # ---------------------------------------------------------------------------
 # get_params includes new knobs
 # ---------------------------------------------------------------------------
@@ -176,4 +222,7 @@ def test_get_params_includes_knobs(factory):
     assert "target_corruption_policy" in p
     assert "target_max_heal_hours" in p
     assert "target_anchor_zone_hours" in p
+    assert "target_qc_deviation_mw" in p
+    assert "target_qc_deviation_ref" in p
+    assert "target_qc_deviation_slots" in p
     assert p["target_qc_range_mw"] == 4_000.0

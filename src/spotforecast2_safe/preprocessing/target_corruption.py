@@ -6,8 +6,15 @@
 ENTSO-E 15-min Actual Load occasionally contains physically-impossible
 multi-GW intra-hour dropouts (e.g. 2026-06-03..05 incident) that poison
 the recursive forecaster's anchor and lag features.  This module provides
-a shared dynamics detector over the native-cadence (15-min) series and a
+a shared detector over the native-cadence (15-min) series — two dynamics
+rules (intra-hour range, adjacent-slot step) plus a deviation rule against
+a published reference column such as the day-ahead load forecast — and a
 policy knob to handle detected corruptions.
+
+The deviation rule exists because the dropout class can stay *below* the
+dynamics thresholds while sitting many GW under the day-ahead forecast
+(observed 2026-06-07: 5.6 GW steps under a 6 GW limit at Actual − Forecast
+= −11.6 GW).  Level-vs-reference is the discriminator dynamics cannot see.
 
 Empirical gating: ENTSO-E does not retroactively correct gross intra-hour
 dropouts of this class.  The recommended episode policy is ``"truncate"``;
@@ -15,7 +22,7 @@ dropouts of this class.  The recommended episode policy is ``"truncate"``;
 (and is refused by design when either condition is violated); ``"abort"``
 surfaces the error immediately for manual review.
 
-By default all six knobs are off / at safe defaults, so the pipeline is
+By default all knobs are off / at safe defaults, so the pipeline is
 byte-identical to the pre-feature baseline.
 
 Public API (re-exported from ``preprocessing.__init__``):
@@ -126,6 +133,9 @@ def detect_target_corruption(
     range_mw: Optional[float],
     step_mw: Optional[float],
     window_days: Optional[int],
+    deviation_mw: Optional[float] = None,
+    deviation_ref: Optional[str] = None,
+    deviation_slots: int = 2,
 ) -> pd.Series:
     """Detect physically-impossible target-column corruption in the native frame.
 
@@ -140,6 +150,20 @@ def detect_target_corruption(
     - **Step rule**: an hour is flagged when any ``|adjacent-slot diff|``
       that *touches* that hour exceeds ``step_mw`` for any target column.
       Applies to all cadences.
+    - **Deviation rule** (dropout-only, all cadences): an hour is flagged
+      when ``target − reference < -deviation_mw`` holds for at least
+      ``deviation_slots`` *consecutive* native-cadence slots within the
+      scan window, where the reference is a published companion column
+      such as the ENTSO-E day-ahead ``"Forecasted Load"``.  The rule is
+      asymmetric by design: the known corruption class is exclusively a
+      dropout *below* the day-ahead forecast, while actuals above the
+      forecast are ordinary under-forecasting.  ``NaN`` in either column
+      yields a ``NaN`` difference, which compares ``False`` — so the
+      publication-lag frontier (forecast published, actual not yet) never
+      flags, and a data gap breaks a consecutive run.  On hourly-or-coarser
+      cadence the sustained requirement collapses to a single slot.  The
+      rule is silently skipped when ``deviation_ref`` is missing from the
+      frame (mirroring how absent target columns are skipped).
 
     Flags are OR-ed across target columns.  ALL native-cadence slots of a
     flagged calendar hour are marked ``True`` in the returned boolean
@@ -147,9 +171,9 @@ def detect_target_corruption(
     individual sub-hourly slots.
 
     The detector is **inert** (returns all-``False``) unless ``window_days``
-    is set AND at least one of ``range_mw`` / ``step_mw`` is set.  If the
-    data is shorter than ``window_days``, the window is clamped to
-    ``df.index.min()`` without raising.
+    is set AND at least one of ``range_mw`` / ``step_mw`` / ``deviation_mw``
+    is set.  If the data is shorter than ``window_days``, the window is
+    clamped to ``df.index.min()`` without raising.
 
     Args:
         df: Native-cadence ``DataFrame`` indexed by a ``DatetimeIndex``.
@@ -161,6 +185,19 @@ def detect_target_corruption(
             ``None`` skips the step rule.
         window_days: Number of days before the last observed target to
             include in the scan.  ``None`` makes the detector inert.
+        deviation_mw: Maximum allowed dropout below the reference column
+            (MW, positive magnitude): slots with
+            ``target − reference < -deviation_mw`` are candidates.
+            ``None`` skips the deviation rule.
+        deviation_ref: Name of the reference column (e.g.
+            ``"Forecasted Load"``).  The rule is skipped when ``None`` or
+            when the column is absent from ``df``.  The reference column
+            itself is never checked as a target by this rule.
+        deviation_slots: Minimum number of *consecutive* sub-hourly slots
+            the dropout must sustain before any hour is flagged (default
+            ``2`` — a single-slot blip is more likely a metering glitch
+            than the oscillating dropout class).  Clamped to ``1`` on
+            hourly-or-coarser cadence.
 
     Returns:
         Boolean ``pd.Series`` aligned to ``df.index``.  ``True`` means the
@@ -189,9 +226,48 @@ def detect_target_corruption(
         assert not mask.iloc[8:].any(), "Subsequent clean slots must be False"
         print("flagged:", mask.sum(), "slots")
         ```
+
+        ```{python}
+        # Deviation rule: a sub-threshold dropout the dynamics rules miss.
+        import pandas as pd
+        import numpy as np
+        from spotforecast2_safe.preprocessing.target_corruption import (
+            detect_target_corruption,
+        )
+
+        idx = pd.date_range("2026-06-07", periods=16, freq="15min", tz="UTC")
+        forecast = pd.Series(48_000.0, index=idx)
+        actual = forecast.copy()
+        # Two consecutive slots 11.6 GW below the forecast, stepping by
+        # only 5.8 GW per slot — below a 6 GW step rule, no range breach.
+        actual.iloc[4] = forecast.iloc[4] - 5_800.0
+        actual.iloc[5] = forecast.iloc[5] - 11_600.0
+        actual.iloc[6] = forecast.iloc[6] - 11_600.0
+        actual.iloc[7] = forecast.iloc[7] - 5_800.0
+        # Publication-lag frontier: forecast published, actual not yet.
+        actual.iloc[12:] = np.nan
+        df = pd.DataFrame({"Actual Load": actual, "Forecasted Load": forecast})
+
+        dyn_only = detect_target_corruption(
+            df, targets=["Actual Load"],
+            range_mw=15_000, step_mw=6_000, window_days=3,
+        )
+        with_dev = detect_target_corruption(
+            df, targets=["Actual Load"],
+            range_mw=15_000, step_mw=6_000, window_days=3,
+            deviation_mw=8_000, deviation_ref="Forecasted Load",
+        )
+        assert not dyn_only.any(), "dynamics rules miss the dropout"
+        assert with_dev.iloc[4:8].any(), "deviation rule catches it"
+        assert not with_dev.iloc[12:].any(), "NaN frontier never flags"
+        print("dynamics-only:", int(dyn_only.sum()), "| with deviation:",
+              int(with_dev.sum()))
+        ```
     """
     # Detector is inert when the caller has not configured it.
-    if window_days is None or (range_mw is None and step_mw is None):
+    if window_days is None or (
+        range_mw is None and step_mw is None and deviation_mw is None
+    ):
         return pd.Series(False, index=df.index)
 
     # Derive cadence via mode of consecutive diffs (robust to irregular index).
@@ -207,7 +283,17 @@ def detect_target_corruption(
         return pd.Series(False, index=df.index)
 
     window_start = max(df.index.min(), last_target_ts - pd.Timedelta(days=window_days))
-    scan = df.loc[window_start:last_target_ts, list(targets)]
+    # The deviation rule needs its reference column inside the scan slice
+    # (same window, same UTC view) even when it is not a target.
+    scan_cols = list(targets)
+    if (
+        deviation_mw is not None
+        and deviation_ref is not None
+        and deviation_ref in df.columns
+        and deviation_ref not in scan_cols
+    ):
+        scan_cols.append(deviation_ref)
+    scan = df.loc[window_start:last_target_ts, scan_cols]
     # DST safety: floor("h")/resample("h") on a tz-aware non-UTC index can
     # raise on ambiguous wall times (fall-back hour).  All hour bucketing is
     # therefore done on a UTC view; positions are unchanged, and for the
@@ -250,6 +336,42 @@ def detect_target_corruption(
                 flagged_hours.add(ts.floor("h"))
                 flagged_hours.add((ts - cadence).floor("h"))
 
+    # --- deviation rule (dropout vs reference, all cadences) ---
+    # Silently skipped when the ref column is absent, mirroring the
+    # `col not in scan.columns: continue` treatment of target columns.
+    if (
+        deviation_mw is not None
+        and deviation_ref is not None
+        and deviation_ref in scan.columns
+    ):
+        ref = scan[deviation_ref]
+        # A single hourly slot already aggregates the dropout; the
+        # consecutive-slots requirement is meaningful sub-hourly only.
+        eff_slots = max(1, int(deviation_slots)) if is_sub_hourly else 1
+        for col in targets:
+            if col not in scan.columns or col == deviation_ref:
+                continue
+            # NaN in either column -> NaN difference -> compares False, so
+            # the publication-lag frontier (forecast published, actual not
+            # yet) never flags and a gap breaks a consecutive run.
+            below = (scan[col] - ref < -float(deviation_mw)).to_numpy()
+            if eff_slots > 1:
+                # sustained[i]: slots i-eff_slots+1 .. i are all below.
+                sustained = below.copy()
+                for k in range(1, eff_slots):
+                    sustained[k:] &= below[:-k]
+                sustained[: eff_slots - 1] = False
+                # Flag every slot of each qualifying run, not just its end.
+                run_mask = sustained.copy()
+                for k in range(1, eff_slots):
+                    run_mask[:-k] |= sustained[k:]
+            else:
+                run_mask = below
+            # A deviation is a level property of the slot itself — no
+            # predecessor-hour semantics (unlike the step rule).
+            for ts in scan.index[run_mask]:
+                flagged_hours.add(ts.floor("h"))
+
     if not flagged_hours:
         return pd.Series(False, index=df.index)
 
@@ -279,6 +401,9 @@ def apply_target_corruption_policy(
     anchor_zone_hours: int,
     cutoff: Optional[pd.Timestamp],
     logger: logging.Logger,
+    deviation_mw: Optional[float] = None,
+    deviation_ref: Optional[str] = None,
+    deviation_slots: int = 2,
 ) -> Tuple[pd.DataFrame, TargetCorruptionReport]:
     """Apply the configured corruption policy to the native-cadence frame.
 
@@ -319,6 +444,16 @@ def apply_target_corruption_policy(
         cutoff: The effective training cutoff timestamp used for the
             anchor-zone check.  ``None`` disables the zone check.
         logger: Standard-library logger for WARNING/INFO messages.
+        deviation_mw: Deviation-rule threshold (MW, positive magnitude):
+            flags sustained dropouts ``target − reference < -deviation_mw``.
+            ``None`` skips that rule.  See `detect_target_corruption`.
+        deviation_ref: Reference column name for the deviation rule (e.g.
+            ``"Forecasted Load"``).  When enabling this rule, scope
+            ``targets`` to the actuals only (e.g. ``["Actual Load"]``) so
+            that ``heal``/``truncate`` NaN only the actual and the
+            reference survives as an exogenous prior.
+        deviation_slots: Minimum consecutive sub-hourly slots for the
+            deviation rule (default ``2``).
 
     Returns:
         Tuple of ``(df_out, report)`` where ``df_out`` is either the
@@ -371,6 +506,9 @@ def apply_target_corruption_policy(
         range_mw=range_mw,
         step_mw=step_mw,
         window_days=window_days,
+        deviation_mw=deviation_mw,
+        deviation_ref=deviation_ref,
+        deviation_slots=deviation_slots,
     )
 
     if not flag_mask.any():

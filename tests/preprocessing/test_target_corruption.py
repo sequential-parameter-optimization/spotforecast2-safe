@@ -744,3 +744,240 @@ class TestDetectorPredecessorHour:
         assert mask.loc[
             slots_h01
         ].all(), "All slots in the step's own hour (01:00) must be flagged."
+
+
+# ---------------------------------------------------------------------------
+# Deviation rule (dropout vs reference column)
+# ---------------------------------------------------------------------------
+
+# Chapter-style thresholds: the injected dropout is deliberately
+# SUB-THRESHOLD for the dynamics rules (steps 5.8 GW < 6 GW, intra-hour
+# range 5.8 GW < 8 GW) while sitting 11.6 GW under the reference — the
+# 2026-06-07 frontier pattern that motivated the rule.
+DEV_RANGE_MW = 8_000
+DEV_STEP_MW = 6_000
+DEV_MW = 8_000
+
+
+def _make_deviation_frame(
+    *,
+    offsets=(5_800, 11_600, 11_600, 5_800),
+    dropout_day: int = 2,
+    dropout_hour: int = 7,
+    nan_tail_slots: int = 8,
+) -> pd.DataFrame:
+    """Two-column frame: constant forecast, actual with a dropout + NaN tail.
+
+    Constant base values keep the injected dynamics exact (deterministic
+    sub-threshold steps); ``offsets`` are subtracted from the forecast at
+    the four slots of ``dropout_hour`` on ``dropout_day``.  The last
+    ``nan_tail_slots`` actual slots are NaN while the forecast continues —
+    the ENTSO-E publication-lag frontier.
+    """
+    idx = pd.date_range(
+        "2026-06-05", periods=3 * 24 * SLOTS_PER_HOUR, freq=CADENCE, tz="UTC"
+    )
+    forecast = pd.Series(BASE_MW, index=idx)
+    actual = forecast.copy()
+    start = dropout_day * 24 * SLOTS_PER_HOUR + dropout_hour * SLOTS_PER_HOUR
+    for i, off in enumerate(offsets):
+        actual.iloc[start + i] = BASE_MW - off
+    if nan_tail_slots:
+        actual.iloc[-nan_tail_slots:] = np.nan
+    return pd.DataFrame({"Actual Load": actual, "Forecasted Load": forecast})
+
+
+class TestDetectorDeviation:
+    """Deviation rule: sustained dropout below a published reference."""
+
+    def _detect(self, df, **kwargs):
+        params = dict(
+            targets=["Actual Load"],
+            range_mw=DEV_RANGE_MW,
+            step_mw=DEV_STEP_MW,
+            window_days=3,
+            deviation_mw=DEV_MW,
+            deviation_ref="Forecasted Load",
+        )
+        params.update(kwargs)
+        return detect_target_corruption(df, **params)
+
+    def test_dynamics_rules_miss_the_dropout(self):
+        """Control: range/step alone must NOT flag the sub-threshold dropout."""
+        df = _make_deviation_frame()
+        mask = self._detect(df, deviation_mw=None, deviation_ref=None)
+        assert not mask.any(), "sub-threshold dropout must evade dynamics rules"
+
+    def test_deviation_rule_flags_sustained_dropout(self):
+        df = _make_deviation_frame()
+        mask = self._detect(df)
+        dropout_hour = pd.Timestamp("2026-06-07 07:00:00", tz="UTC")
+        slots = df.index[
+            (df.index >= dropout_hour)
+            & (df.index < dropout_hour + pd.Timedelta(hours=1))
+        ]
+        assert mask.loc[slots].all(), "deviation rule must flag the dropout hour"
+        # Nothing else flags: the surrounding clean hours stay clean.
+        assert mask.sum() == SLOTS_PER_HOUR
+
+    def test_detector_inert_with_only_deviation_and_no_window(self):
+        df = _make_deviation_frame()
+        mask = detect_target_corruption(
+            df,
+            targets=["Actual Load"],
+            range_mw=None,
+            step_mw=None,
+            window_days=None,
+            deviation_mw=DEV_MW,
+            deviation_ref="Forecasted Load",
+        )
+        assert not mask.any(), "window_days=None must keep the detector inert"
+
+    def test_deviation_only_configuration_activates_detector(self):
+        """deviation_mw alone (range/step None) must activate the detector."""
+        df = _make_deviation_frame()
+        mask = self._detect(df, range_mw=None, step_mw=None)
+        assert mask.any()
+
+    def test_single_slot_dip_not_flagged_with_slots_2(self):
+        df = _make_deviation_frame(offsets=(11_600,))
+        # One isolated slot 11.6 GW below: steps are 5.8+5.8 GW? No — a
+        # single 11.6 GW offset creates 11.6 GW steps, so disable the step
+        # rule to isolate the deviation-slots semantics.
+        mask = self._detect(df, range_mw=None, step_mw=None, deviation_slots=2)
+        assert not mask.any(), "single-slot blip must not flag at deviation_slots=2"
+
+    def test_single_slot_dip_flagged_with_slots_1(self):
+        df = _make_deviation_frame(offsets=(11_600,))
+        mask = self._detect(df, range_mw=None, step_mw=None, deviation_slots=1)
+        assert mask.any(), "deviation_slots=1 must flag a single-slot dropout"
+
+    def test_missing_ref_column_is_inert(self):
+        df = _make_deviation_frame()
+        mask = self._detect(df, deviation_ref="NoSuchColumn")
+        assert not mask.any(), "absent reference column must skip the rule silently"
+
+    def test_ref_none_is_inert(self):
+        df = _make_deviation_frame()
+        mask = self._detect(df, deviation_ref=None)
+        assert not mask.any()
+
+    def test_frontier_nan_not_flagged(self):
+        """Publication-lag tail (forecast published, actual NaN) never flags."""
+        df = _make_deviation_frame()
+        mask = self._detect(df)
+        tail = df.index[df["Actual Load"].isna()]
+        assert len(tail) > 0
+        assert not mask.loc[
+            tail
+        ].any(), "NaN-actual frontier slots must never be flagged"
+
+    def test_nan_breaks_consecutive_run(self):
+        """A NaN between two below-threshold slots must break the run."""
+        df = _make_deviation_frame(offsets=(11_600, 11_600))
+        start = 2 * 24 * SLOTS_PER_HOUR + 7 * SLOTS_PER_HOUR
+        df.iloc[start + 1, df.columns.get_loc("Actual Load")] = np.nan
+        mask = self._detect(df, range_mw=None, step_mw=None, deviation_slots=2)
+        assert not mask.any(), "a NaN gap must break the consecutive-slot requirement"
+
+    def test_positive_deviation_not_flagged(self):
+        """Actuals far ABOVE the forecast are under-forecasting, not corruption."""
+        df = _make_deviation_frame(offsets=(-12_000, -12_000, -12_000, -12_000))
+        mask = self._detect(df, range_mw=None, step_mw=None)
+        assert not mask.any(), "the deviation rule is dropout-only by design"
+
+    def test_hourly_cadence_clamps_slots_to_one(self):
+        """On hourly data the sustained requirement collapses to one slot."""
+        idx = pd.date_range("2026-06-05", periods=3 * 24, freq="h", tz="UTC")
+        forecast = pd.Series(BASE_MW, index=idx)
+        actual = forecast.copy()
+        actual.iloc[60] = BASE_MW - 12_000  # one corrupt hour
+        df = pd.DataFrame({"Actual Load": actual, "Forecasted Load": forecast})
+        mask = detect_target_corruption(
+            df,
+            targets=["Actual Load"],
+            range_mw=None,
+            step_mw=None,
+            window_days=3,
+            deviation_mw=DEV_MW,
+            deviation_ref="Forecasted Load",
+            deviation_slots=2,
+        )
+        assert mask.any(), "hourly cadence: a single corrupt hour must flag"
+
+    def test_truncate_keeps_reference_column(self):
+        """policy='truncate' with scoped targets NaNs the actual only."""
+        df = _make_deviation_frame()
+        n_forecast_obs = int(df["Forecasted Load"].notna().sum())
+        df_out, report = apply_target_corruption_policy(
+            df,
+            targets=["Actual Load"],
+            policy="truncate",
+            range_mw=DEV_RANGE_MW,
+            step_mw=DEV_STEP_MW,
+            window_days=3,
+            max_heal_hours=0,
+            anchor_zone_hours=168,
+            cutoff=None,
+            logger=logging.getLogger("test-deviation"),
+            deviation_mw=DEV_MW,
+            deviation_ref="Forecasted Load",
+        )
+        assert report.fired
+        assert report.action == "truncate"
+        assert report.first_flagged_hour == pd.Timestamp(
+            "2026-06-07 07:00:00", tz="UTC"
+        )
+        assert (
+            df_out.loc[report.first_flagged_hour :, "Actual Load"].isna().all()
+        ), "actual must be NaN from the first flagged hour onward"
+        assert (
+            int(df_out["Forecasted Load"].notna().sum()) == n_forecast_obs
+        ), "the reference column must survive truncate untouched"
+
+    def test_abort_on_deviation(self):
+        df = _make_deviation_frame()
+        with pytest.raises(TargetCorruptionError, match="corrupt hour"):
+            apply_target_corruption_policy(
+                df,
+                targets=["Actual Load"],
+                policy="abort",
+                range_mw=DEV_RANGE_MW,
+                step_mw=DEV_STEP_MW,
+                window_days=3,
+                max_heal_hours=0,
+                anchor_zone_hours=168,
+                cutoff=None,
+                logger=logging.getLogger("test-deviation"),
+                deviation_mw=DEV_MW,
+                deviation_ref="Forecasted Load",
+            )
+
+    def test_dst_fall_back_deviation_flagged(self):
+        """Deviation rule works on a Europe/Berlin frame across fall-back."""
+        idx = pd.date_range(
+            "2025-10-24 00:00",
+            periods=4 * 24 * 4,
+            freq=CADENCE,
+            tz="Europe/Berlin",
+        )
+        forecast = pd.Series(BASE_MW, index=idx)
+        actual = forecast.copy()
+        # Sustained 12 GW dropout in the 01:00 UTC hour of the fall-back day.
+        idx_utc = idx.tz_convert("UTC")
+        target_hour_utc = pd.Timestamp("2025-10-26 01:00:00", tz="UTC")
+        slots = [i for i, ts in enumerate(idx_utc) if ts.floor("h") == target_hour_utc]
+        assert len(slots) >= 2
+        for i in slots[:2]:
+            actual.iloc[i] = BASE_MW - 12_000
+        df = pd.DataFrame({"Actual Load": actual, "Forecasted Load": forecast})
+        mask = detect_target_corruption(
+            df,
+            targets=["Actual Load"],
+            range_mw=None,
+            step_mw=None,
+            window_days=7,
+            deviation_mw=DEV_MW,
+            deviation_ref="Forecasted Load",
+        )
+        assert mask.any(), "deviation dropout on the DST day must be flagged"
