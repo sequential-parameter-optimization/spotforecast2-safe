@@ -182,6 +182,8 @@ strategies, and a one-call runner.
 | [multitask.predict.PredictTask](multitask.predict.PredictTask.qmd#spotforecast2_safe.multitask.predict.PredictTask) | Task 5 — Predict-only using previously saved models. |
 | [multitask.clean.CleanTask](multitask.clean.CleanTask.qmd#spotforecast2_safe.multitask.clean.CleanTask) | Cache-cleaning task — removes all cached data from the pipeline cache. |
 | [multitask.factories.default_lgbm_forecaster_factory](multitask.factories.default_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.default_lgbm_forecaster_factory) | Return a fresh, unfitted LightGBM ``ForecasterRecursive``. |
+| [multitask.factories.quantile_lgbm_forecaster_factory](multitask.factories.quantile_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.quantile_lgbm_forecaster_factory) | Return one quantile-regression LightGBM ``ForecasterRecursive`` per quantile. |
+| [multitask.factories.predict_quantile_band](multitask.factories.predict_quantile_band.qmd#spotforecast2_safe.multitask.factories.predict_quantile_band) | Assemble per-quantile forecasts into one non-crossing band. |
 | [multitask.strategies.TrainingStrategy](multitask.strategies.TrainingStrategy.qmd#spotforecast2_safe.multitask.strategies.TrainingStrategy) | Strategy interface for preparing a forecaster before the final fit. |
 | [multitask.strategies.LazyStrategy](multitask.strategies.LazyStrategy.qmd#spotforecast2_safe.multitask.strategies.LazyStrategy) | Approach 1 — Lazy fitting with optional cached tuning. |
 | [multitask.strategies.DefaultsStrategy](multitask.strategies.DefaultsStrategy.qmd#spotforecast2_safe.multitask.strategies.DefaultsStrategy) | Approach 2 — Train with defaults, no tuning, no cached params. |
