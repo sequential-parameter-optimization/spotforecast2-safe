@@ -1366,12 +1366,6 @@ window.Quarto = {
  <span class="menu-text">task_safe_demo</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">task_safe_n_to_1_with_covariates_and_dataframe</span></a>
-  </div>
-</li>
       </ul>
   </li>
       </ul>
@@ -1601,7 +1595,7 @@ window.Quarto = {
 </section>
 <section id="positive-list-retained-components" class="level2">
 <h2 class="anchored" data-anchor-id="positive-list-retained-components">Positive List (Retained Components)</h2>
-<p>The following files are essential for the execution of the primary workflows: <code>task_safe_demo.py</code> and <code>task_safe_n_to_1_with_covariates_and_dataframe.py</code>.</p>
+<p>The following files are essential for the execution of the primary workflow <code>task_safe_demo.py</code>. (The <code>task_safe_n_to_1_with_covariates_and_dataframe.py</code> console task was removed in 20.0.0; the <code>multitask</code> pipeline it wrapped — <code>BaseTask</code>/<code>MultiTask</code>/<code>runner.run</code> — is retained as public API and is exercised by the downstream <code>spotforecast2</code> package.)</p>
 <section id="orchestration-pipelines" class="level3">
 <h3 class="anchored" data-anchor-id="orchestration-pipelines">Orchestration &amp; Pipelines</h3>
 <ul>
@@ -1690,14 +1684,14 @@ window.Quarto = {
 </section>
 <section id="essential-classes-and-functions-positive-list" class="level2">
 <h2 class="anchored" data-anchor-id="essential-classes-and-functions-positive-list">Essential Classes and Functions (Positive List)</h2>
-<p>The following classes and functions (including internal helpers) are strictly required for the execution of <code>task_safe_demo.py</code> and <code>task_safe_n_to_1_with_covariates_and_dataframe.py</code>:</p>
+<p>The following classes and functions (including internal helpers) are strictly required for the execution of <code>task_safe_demo.py</code> and the public <code>multitask</code> pipeline:</p>
 <section id="orchestration-processing" class="level3">
 <h3 class="anchored" data-anchor-id="orchestration-processing">Orchestration &amp; Processing</h3>
 <ul>
 <li><code>agg_predict</code> (Function)</li>
 <li><code>n2n_predict</code> (Function)</li>
 <li><code>n2n_predict_with_covariates</code> (Function) — used by <code>task_safe_demo</code></li>
-<li><code>run_pipeline</code> (Function, <code>task_safe_n_to_1_with_covariates_and_dataframe</code>) — delegates to <code>multitask.runner.run</code></li>
+<li><code>run</code> (Function, <code>multitask.runner</code>) — public single-call pipeline entry point</li>
 </ul>
 </section>
 <section id="multitask-pipeline-n-to-1-task" class="level3">

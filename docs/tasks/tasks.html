@@ -1372,12 +1372,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">task_safe_demo</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">task_safe_n_to_1_with_covariates_and_dataframe</span></a>
-  </div>
-</li>
       </ul>
   </li>
       </ul>
@@ -1562,12 +1556,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#exit-codes" id="toc-exit-codes" class="nav-link" data-scroll-target="#exit-codes">Exit Codes</a></li>
   </ul></li>
-  <li><a href="#n-to-1-with-covariates-and-dataframe" id="toc-n-to-1-with-covariates-and-dataframe" class="nav-link" data-scroll-target="#n-to-1-with-covariates-and-dataframe">N-to-1 with Covariates and DataFrame</a>
-  <ul class="collapse">
-  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
-  <li><a href="#usage-1" id="toc-usage-1" class="nav-link" data-scroll-target="#usage-1">Usage</a></li>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
   <li><a href="#configuration" id="toc-configuration" class="nav-link" data-scroll-target="#configuration">Configuration</a></li>
   <li><a href="#model-persistence" id="toc-model-persistence" class="nav-link" data-scroll-target="#model-persistence">Model Persistence</a></li>
   <li><a href="#logging" id="toc-logging" class="nav-link" data-scroll-target="#logging">Logging</a></li>
@@ -1602,10 +1590,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td><code>spotforecast-safe-demo</code></td>
 <td>Demo task comparing baseline, covariate, and custom LightGBM forecasts</td>
-</tr>
-<tr class="even">
-<td><code>spotforecast-safe-n2o1-cov-df</code></td>
-<td>N-to-1 forecasting with exogenous covariates and DataFrame input</td>
 </tr>
 </tbody>
 </table>
@@ -1665,111 +1649,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 </section>
 </section>
-<section id="n-to-1-with-covariates-and-dataframe" class="level2">
-<h2 class="anchored" data-anchor-id="n-to-1-with-covariates-and-dataframe">N-to-1 with Covariates and DataFrame</h2>
-<p>The <code>spotforecast-safe-n2o1-cov-df</code> command runs the <code>ConfigMulti</code>-driven multitask pipeline. It delegates to <code>spotforecast2_safe.multitask.runner.run</code> with <code>task="lazy"</code>. All pipeline parameters are centralised in a <code>ConfigMulti</code> object; aggregation weights come from <code>ConfigMulti.agg_weights</code> (replacing the former hard-coded <code>DEFAULT_WEIGHTS</code> constant).</p>
-<p>See the <code>run_pipeline</code> and <code>_build_config_from_cli</code> API reference for a full description of the pipeline stages and <code>ConfigMulti</code> field mappings.</p>
-<section id="features" class="level3">
-<h3 class="anchored" data-anchor-id="features">Features</h3>
-<ul>
-<li><code>ConfigMulti</code> as single source of truth — horizon, training window, outlier policy, feature flags, and aggregation weights in one object.</li>
-<li>Multitask pipeline stages: prepare_data, detect_outliers, impute, build_exogenous_features, run(task=“lazy”).</li>
-<li>Model persistence: fitted models are saved under <code>cache_home/models/</code> and can be reloaded with <code>task="predict"</code>.</li>
-</ul>
-</section>
-<section id="usage-1" class="level3">
-<h3 class="anchored" data-anchor-id="usage-1">Usage</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with custom settings (a ConfigMulti and explicit data path are required)</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom forecast horizon</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--forecast_horizon</span> 48</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable holiday features and verbose output</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--include_holiday_features</span> true <span class="at">--verbose</span> true</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom aggregation weights</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--weights</span> 1.0 1.0 <span class="at">-1.0</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify cache directory for models and logs</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--log_dir</span> ~/my_cache</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="parameters" class="level3">
-<h3 class="anchored" data-anchor-id="parameters">Parameters</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 27%">
-<col style="width: 39%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Parameter</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>--forecast_horizon</code></td>
-<td>24</td>
-<td>Number of steps ahead to forecast (<code>predict_size</code>)</td>
-</tr>
-<tr class="even">
-<td><code>--lags</code></td>
-<td>24</td>
-<td>Lag depth N; expands to <code>lags_consider=range(1, N+1)</code></td>
-</tr>
-<tr class="odd">
-<td><code>--train_ratio</code></td>
-<td>0.8</td>
-<td>Fraction of data used for training</td>
-</tr>
-<tr class="even">
-<td><code>--contamination</code></td>
-<td>0.01</td>
-<td>Outlier contamination parameter</td>
-</tr>
-<tr class="odd">
-<td><code>--window_size</code></td>
-<td>72</td>
-<td>Rolling window size for imputation (hours)</td>
-</tr>
-<tr class="even">
-<td><code>--include_holiday_features</code></td>
-<td>false</td>
-<td>Enable holiday indicator features</td>
-</tr>
-<tr class="odd">
-<td><code>--include_holiday_adjacency_features</code></td>
-<td>false</td>
-<td>Enable Brückentag features</td>
-</tr>
-<tr class="even">
-<td><code>--poly_features_degree</code></td>
-<td>1</td>
-<td>Polynomial interaction degree (1 = off)</td>
-</tr>
-<tr class="odd">
-<td><code>--weights</code></td>
-<td>None</td>
-<td>Space-separated aggregation weights (<code>agg_weights</code>)</td>
-</tr>
-<tr class="even">
-<td><code>--verbose</code></td>
-<td>false</td>
-<td>Enable detailed output</td>
-</tr>
-<tr class="odd">
-<td><code>--log_dir</code></td>
-<td>None</td>
-<td>Cache directory for models and logs (<code>cache_home</code>)</td>
-</tr>
-</tbody>
-</table>
-<hr>
-</section>
-</section>
 <section id="configuration" class="level2">
 <h2 class="anchored" data-anchor-id="configuration">Configuration</h2>
 <p>All tasks use sensible defaults but can be customized via:</p>
@@ -1778,9 +1657,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Environment variables</strong> for API keys and paths</li>
 <li><strong>Configuration files</strong> stored in <code>~/spotforecast2_data/</code></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View available options for any command</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-demo <span class="at">--help</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View available options for any command</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-demo <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 <section id="model-persistence" class="level2">
@@ -1797,11 +1675,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="logging" class="level2">
 <h2 class="anchored" data-anchor-id="logging">Logging</h2>
 <p>Safety-critical tasks support comprehensive logging:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable logging to default directory</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-demo <span class="at">--logging</span> true</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify custom log directory</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-n2o1-cov-df <span class="at">--log_dir</span> /var/log/spotforecast</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable logging to default directory</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run spotforecast-safe-demo <span class="at">--logging</span> true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Log files include:</p>
 <ul>
 <li>Execution timestamps</li>
