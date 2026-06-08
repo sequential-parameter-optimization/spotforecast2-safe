@@ -1,3 +1,10 @@
+## [19.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.2.0...v19.3.0) (2026-06-08)
+
+
+### Features
+
+* **calendar:** ephemeris solar-geometry features + day-type refinement ([6bb3359](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/6bb3359552768aa4c46d054ed05bf490eaf059e5)), closes [#1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/1) [#2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/2) [#2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/2)
+
 ## [19.3.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.2.0...v19.3.0-rc.1) (2026-06-08)
 
 
