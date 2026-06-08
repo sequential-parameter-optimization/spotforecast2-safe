@@ -1,0 +1,63 @@
+# calendar.holiday.create_day_type_df { #spotforecast2_safe.calendar.holiday.create_day_type_df }
+
+```python
+calendar.holiday.create_day_type_df(
+    start,
+    end,
+    tz='UTC',
+    freq='h',
+    country_code='DE',
+    state='NW',
+)
+```
+
+Create a day-type refinement of the public-holiday column.
+
+Returns two integer columns derived purely from the weekday and the
+public-holiday calendar (pure calendar arithmetic — known years ahead,
+leakage-free):
+
+- ``is_workday``: ``1`` when the day is Monday–Friday **and** not a public
+  holiday, else ``0``.
+- ``day_type``: an integer class with public-holiday precedence —
+  ``0`` working day, ``1`` Saturday (non-holiday), ``2`` Sunday
+  (non-holiday), ``3`` public holiday (any weekday). A public holiday that
+  falls on a weekend is still classed as ``3``.
+
+These remove some of the worst single-day errors a plain holiday flag
+leaves behind (Ziel 2018, ``ziel18a``).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                           | Description                                          | Default    |
+|--------------|----------------------------------------------------------------|------------------------------------------------------|------------|
+| start        | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date/datetime.                                 | _required_ |
+| end          | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date/datetime.                                   | _required_ |
+| tz           | [str](`str`)                                                   | Timezone to use if not inferred from start/end.      | `'UTC'`    |
+| freq         | [str](`str`)                                                   | Frequency of the resulting DataFrame.                | `'h'`      |
+| country_code | [str](`str`)                                                   | Country code for holidays (e.g. ``"DE"``, ``"US"``). | `'DE'`     |
+| state        | [str](`str`)                                                   | State code for holidays (e.g. ``"NW"``, ``"CA"``).   | `'NW'`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                          |
+|--------|------------------------------------------------|----------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Index covering ``[start, end]`` at *freq* with integer |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | columns ``is_workday`` and ``day_type``; no NaNs.                    |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.calendar import create_day_type_df
+
+# 2024-01-01 Mon = New Year (holiday), 02 Tue = workday,
+# 06 Sat, 07 Sun.
+df = create_day_type_df("2024-01-01", "2024-01-07", freq="D")
+print(df["is_workday"].tolist())
+print(df["day_type"].tolist())
+assert df.loc["2024-01-01", "day_type"] == 3  # holiday
+assert df.loc["2024-01-02", "is_workday"] == 1
+assert df.loc["2024-01-06", "day_type"] == 1  # Saturday
+assert df.loc["2024-01-07", "day_type"] == 2  # Sunday
+```

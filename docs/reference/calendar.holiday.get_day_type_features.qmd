@@ -1,0 +1,71 @@
+# calendar.holiday.get_day_type_features { #spotforecast2_safe.calendar.holiday.get_day_type_features }
+
+```python
+calendar.holiday.get_day_type_features(
+    data,
+    start,
+    cov_end,
+    forecast_horizon,
+    tz='UTC',
+    freq='h',
+    country_code='DE',
+    state='NW',
+)
+```
+
+Build day-type indicators and align them to a regular time grid.
+
+Generates ``is_workday`` and ``day_type`` via `create_day_type_df()`,
+validates temporal coverage with `curate_holidays()`, and reindexes onto
+the full ``[start, cov_end]`` grid. Trailing/leading grid cells outside the
+generated range are filled with the working-day defaults
+(``is_workday=0`` is wrong for a workday, so the grid is generated to fully
+cover the request and no fill is expected; ``fill_value`` only guards the
+degenerate empty-overlap case).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                                                    | Description                                                                                                   | Default    |
+|------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|------------|
+| data             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | Reference time series DataFrame used for temporal coverage validation inside `curate_holidays()`.             | _required_ |
+| start            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start timestamp. String values are parsed with ``utc=True``.                                                  | _required_ |
+| cov_end          | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end timestamp (should cover the full forecast horizon). String values are parsed with ``utc=True``. | _required_ |
+| forecast_horizon | [int](`int`)                                                                            | Number of forecast steps ahead; passed to `curate_holidays()`.                                                | _required_ |
+| tz               | [str](`str`)                                                                            | Timezone applied to the generated index. Defaults to ``"UTC"``.                                               | `'UTC'`    |
+| freq             | [str](`str`)                                                                            | Pandas-compatible frequency string. Defaults to ``"h"``.                                                      | `'h'`      |
+| country_code     | [str](`str`)                                                                            | ISO 3166-1 alpha-2 country code. Defaults to ``"DE"``.                                                        | `'DE'`     |
+| state            | [str](`str`)                                                                            | Sub-national state/region code. Defaults to ``"NW"``.                                                         | `'NW'`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                             |
+|--------|------------------------------------------------|-------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Integer columns ``is_workday`` and ``day_type``; tz-aware |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | `DatetimeIndex` with the requested *freq*.                              |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.calendar import get_day_type_features
+
+forecast_horizon = 24
+n_data = 48
+data = pd.DataFrame(
+    {"load": range(n_data)},
+    index=pd.date_range("2024-01-01", periods=n_data, freq="h", tz="UTC"),
+)
+start = data.index[0]
+cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
+
+feats = get_day_type_features(
+    data=data, start=start, cov_end=cov_end,
+    forecast_horizon=forecast_horizon,
+)
+print("columns:", feats.columns.tolist())
+print("shape:", feats.shape)
+# 2024-01-01 is New Year (holiday) → day_type 3, not a workday.
+assert feats.loc["2024-01-01 00:00:00+00:00", "day_type"] == 3
+assert feats.loc["2024-01-01 00:00:00+00:00", "is_workday"] == 0
+assert feats.shape == (n_data + forecast_horizon, 2)
+```
