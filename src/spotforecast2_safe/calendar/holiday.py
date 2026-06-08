@@ -16,6 +16,10 @@ Provides:
   ``is_after_holiday``, all disjoint from ``is_holiday``.
 - `get_holiday_adjacency_features()` — align those adjacency indicators to a
   forecast grid, mirroring the contract of `get_holiday_features()`.
+- `create_day_type_df()` / `get_day_type_features()` — a day-type refinement
+  of the holiday column: a binary working-day indicator and an integer
+  day-type class (working day / Saturday / Sunday / public holiday), derived
+  purely from the weekday and the public-holiday calendar.
 """
 
 from typing import Union
@@ -425,3 +429,181 @@ def get_holiday_adjacency_features(
 
     extended_index = pd.date_range(start=start, end=cov_end, freq=freq, tz=tz)
     return adjacency_df.reindex(extended_index, fill_value=0).astype(int)
+
+
+# Integer codes for the ``day_type`` column. Ordering is by "working intensity"
+# (a working day differs most from a holiday), but tree models split on the
+# values regardless of order.
+DAY_TYPE_WORKDAY = 0
+DAY_TYPE_SATURDAY = 1
+DAY_TYPE_SUNDAY = 2
+DAY_TYPE_HOLIDAY = 3
+
+
+def create_day_type_df(
+    start: str | pd.Timestamp,
+    end: str | pd.Timestamp,
+    tz: str = "UTC",
+    freq: str = "h",
+    country_code: str = "DE",
+    state: str = "NW",
+) -> pd.DataFrame:
+    """Create a day-type refinement of the public-holiday column.
+
+    Returns two integer columns derived purely from the weekday and the
+    public-holiday calendar (pure calendar arithmetic — known years ahead,
+    leakage-free):
+
+    - ``is_workday``: ``1`` when the day is Monday–Friday **and** not a public
+      holiday, else ``0``.
+    - ``day_type``: an integer class with public-holiday precedence —
+      ``0`` working day, ``1`` Saturday (non-holiday), ``2`` Sunday
+      (non-holiday), ``3`` public holiday (any weekday). A public holiday that
+      falls on a weekend is still classed as ``3``.
+
+    These remove some of the worst single-day errors a plain holiday flag
+    leaves behind (Ziel 2018, ``ziel18a``).
+
+    Args:
+        start: Start date/datetime.
+        end: End date/datetime.
+        tz: Timezone to use if not inferred from start/end.
+        freq: Frequency of the resulting DataFrame.
+        country_code: Country code for holidays (e.g. ``"DE"``, ``"US"``).
+        state: State code for holidays (e.g. ``"NW"``, ``"CA"``).
+
+    Returns:
+        pd.DataFrame: Index covering ``[start, end]`` at *freq* with integer
+        columns ``is_workday`` and ``day_type``; no NaNs.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.calendar import create_day_type_df
+
+        # 2024-01-01 Mon = New Year (holiday), 02 Tue = workday,
+        # 06 Sat, 07 Sun.
+        df = create_day_type_df("2024-01-01", "2024-01-07", freq="D")
+        print(df["is_workday"].tolist())
+        print(df["day_type"].tolist())
+        assert df.loc["2024-01-01", "day_type"] == 3  # holiday
+        assert df.loc["2024-01-02", "is_workday"] == 1
+        assert df.loc["2024-01-06", "day_type"] == 1  # Saturday
+        assert df.loc["2024-01-07", "day_type"] == 2  # Sunday
+        ```
+    """
+    inferred_tz = None
+    if isinstance(start, pd.Timestamp) and start.tz is not None:
+        inferred_tz = str(start.tz)
+    elif isinstance(end, pd.Timestamp) and end.tz is not None:
+        inferred_tz = str(end.tz)
+
+    if inferred_tz is not None:
+        full_index = pd.date_range(start=start, end=end, freq=freq)
+    else:
+        full_index = pd.date_range(start=start, end=end, freq=freq, tz=tz)
+
+    cal = holidays.country_holidays(country_code, subdiv=state)
+    unique_days = pd.DatetimeIndex(full_index.normalize().unique())
+
+    def _day_type(d: pd.Timestamp) -> int:
+        if d.date() in cal:
+            return DAY_TYPE_HOLIDAY
+        dow = d.dayofweek
+        if dow == 5:
+            return DAY_TYPE_SATURDAY
+        if dow == 6:
+            return DAY_TYPE_SUNDAY
+        return DAY_TYPE_WORKDAY
+
+    day_type_series = pd.Series({d: _day_type(d) for d in unique_days}, dtype="int64")
+    is_workday_series = (day_type_series == DAY_TYPE_WORKDAY).astype(int)
+
+    df_full = pd.DataFrame(index=full_index)
+    norm = full_index.normalize()
+    df_full["is_workday"] = norm.map(is_workday_series).fillna(0).astype(int)
+    df_full["day_type"] = norm.map(day_type_series).fillna(DAY_TYPE_WORKDAY).astype(int)
+    return df_full
+
+
+def get_day_type_features(
+    data: pd.DataFrame,
+    start: Union[str, pd.Timestamp],
+    cov_end: Union[str, pd.Timestamp],
+    forecast_horizon: int,
+    tz: str = "UTC",
+    freq: str = "h",
+    country_code: str = "DE",
+    state: str = "NW",
+) -> pd.DataFrame:
+    """Build day-type indicators and align them to a regular time grid.
+
+    Generates ``is_workday`` and ``day_type`` via `create_day_type_df()`,
+    validates temporal coverage with `curate_holidays()`, and reindexes onto
+    the full ``[start, cov_end]`` grid. Trailing/leading grid cells outside the
+    generated range are filled with the working-day defaults
+    (``is_workday=0`` is wrong for a workday, so the grid is generated to fully
+    cover the request and no fill is expected; ``fill_value`` only guards the
+    degenerate empty-overlap case).
+
+    Args:
+        data: Reference time series DataFrame used for temporal coverage
+            validation inside `curate_holidays()`.
+        start: Start timestamp. String values are parsed with ``utc=True``.
+        cov_end: Inclusive end timestamp (should cover the full forecast
+            horizon). String values are parsed with ``utc=True``.
+        forecast_horizon: Number of forecast steps ahead; passed to
+            `curate_holidays()`.
+        tz: Timezone applied to the generated index. Defaults to ``"UTC"``.
+        freq: Pandas-compatible frequency string. Defaults to ``"h"``.
+        country_code: ISO 3166-1 alpha-2 country code. Defaults to ``"DE"``.
+        state: Sub-national state/region code. Defaults to ``"NW"``.
+
+    Returns:
+        pd.DataFrame: Integer columns ``is_workday`` and ``day_type``; tz-aware
+        `DatetimeIndex` with the requested *freq*.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.calendar import get_day_type_features
+
+        forecast_horizon = 24
+        n_data = 48
+        data = pd.DataFrame(
+            {"load": range(n_data)},
+            index=pd.date_range("2024-01-01", periods=n_data, freq="h", tz="UTC"),
+        )
+        start = data.index[0]
+        cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
+
+        feats = get_day_type_features(
+            data=data, start=start, cov_end=cov_end,
+            forecast_horizon=forecast_horizon,
+        )
+        print("columns:", feats.columns.tolist())
+        print("shape:", feats.shape)
+        # 2024-01-01 is New Year (holiday) → day_type 3, not a workday.
+        assert feats.loc["2024-01-01 00:00:00+00:00", "day_type"] == 3
+        assert feats.loc["2024-01-01 00:00:00+00:00", "is_workday"] == 0
+        assert feats.shape == (n_data + forecast_horizon, 2)
+        ```
+    """
+    from spotforecast2_safe.preprocessing.curate_data import curate_holidays
+
+    start = to_utc_timestamp(start)
+    cov_end = to_utc_timestamp(cov_end)
+
+    day_type_df = create_day_type_df(
+        start=start,
+        end=cov_end,
+        tz=tz,
+        freq=freq,
+        country_code=country_code,
+        state=state,
+    )
+
+    curate_holidays(day_type_df, data, forecast_horizon=forecast_horizon)
+
+    extended_index = pd.date_range(start=start, end=cov_end, freq=freq, tz=tz)
+    return day_type_df.reindex(extended_index, fill_value=0).astype(int)
