@@ -238,7 +238,9 @@ construction.
 
 ## Weather
 
-Weather data integration using the Open-Meteo API.
+Weather data integration using the Open-Meteo API, derived weather
+features (degree-hours, apparent temperature, dew point), and
+population-weighted multi-city spatial aggregation.
 
 
 | | |
@@ -246,6 +248,16 @@ Weather data integration using the Open-Meteo API.
 | [weather.client.WeatherClient](weather.client.WeatherClient.qmd#spotforecast2_safe.weather.client.WeatherClient) | Client for fetching weather data from Open-Meteo API. |
 | [weather.client.WeatherService](weather.client.WeatherService.qmd#spotforecast2_safe.weather.client.WeatherService) | High-level service for weather data generation. |
 | [weather.features.get_weather_features](weather.features.get_weather_features.qmd#spotforecast2_safe.weather.features.get_weather_features) | Fetch weather data and compute rolling-window features. |
+| [weather.derived.heating_degree_hours](weather.derived.heating_degree_hours.qmd#spotforecast2_safe.weather.derived.heating_degree_hours) | Heating degree-hours :math:`\max(base - T, 0)`. |
+| [weather.derived.cooling_degree_hours](weather.derived.cooling_degree_hours.qmd#spotforecast2_safe.weather.derived.cooling_degree_hours) | Cooling degree-hours :math:`\max(T - base, 0)`. |
+| [weather.derived.dew_point](weather.derived.dew_point.qmd#spotforecast2_safe.weather.derived.dew_point) | Dew-point temperature via the Magnus-Tetens approximation. |
+| [weather.derived.apparent_temperature](weather.derived.apparent_temperature.qmd#spotforecast2_safe.weather.derived.apparent_temperature) | Steadman apparent ("feels-like") temperature. |
+| [weather.derived.population_weighted_average](weather.derived.population_weighted_average.qmd#spotforecast2_safe.weather.derived.population_weighted_average) | Combine per-location weather frames into one demand-weighted index. |
+| [weather.derived.add_derived_weather_features](weather.derived.add_derived_weather_features.qmd#spotforecast2_safe.weather.derived.add_derived_weather_features) | Append the requested derived columns to a raw weather frame (fail-safe). |
+| [weather.locations.WeatherLocation](weather.locations.WeatherLocation.qmd#spotforecast2_safe.weather.locations.WeatherLocation) | A single weather sampling location with a population weight. |
+| [weather.locations.default_german_locations](weather.locations.default_german_locations.qmd#spotforecast2_safe.weather.locations.default_german_locations) | Return the default population-weighted German load-centre registry. |
+| [weather.locations.coordinates](weather.locations.coordinates.qmd#spotforecast2_safe.weather.locations.coordinates) | Extract ``(latitude, longitude)`` pairs in order. |
+| [weather.locations.weights](weather.locations.weights.qmd#spotforecast2_safe.weather.locations.weights) | Extract the raw (un-normalised) weights in order. |
 
 ## Downloader
 

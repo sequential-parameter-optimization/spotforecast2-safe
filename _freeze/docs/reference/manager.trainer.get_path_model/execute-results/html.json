@@ -1,0 +1,12 @@
+{
+  "hash": "71b72677e4f2cc9c44b60c46bb2350c2",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: manager.trainer.get_path_model\n---\n\n\n\n```python\nmanager.trainer.get_path_model(name, iteration, model_dir=None)\n```\n\nYield the path to a model file for a given iteration and model name.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                                                                                             | Description                                                                   | Default    |\n|-----------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|------------|\n| name      | [str](`str`)                                                                                     | Model name (e.g. ``\"lgbm\"``, ``\"xgb\"``).                                      | _required_ |\n| iteration | [int](`int`)                                                                                     | Iteration of the model.                                                       | _required_ |\n| model_dir | [Optional](`typing.Optional`)\\[[Union](`typing.Union`)\\[[str](`str`), [Path](`pathlib.Path`)\\]\\] | Directory where models are stored. If *None*, defaults to `get_cache_home()`. | `None`     |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                   | Description                                      |\n|--------|------------------------|--------------------------------------------------|\n| Path   | [Path](`pathlib.Path`) | Full path where the model file should be stored. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#dc5148a6 .cell execution_count=1}\n``` {.python .cell-code}\nimport tempfile\nfrom pathlib import Path\nfrom spotforecast2_safe.manager.trainer import get_path_model\n\nwith tempfile.TemporaryDirectory() as tmpdir:\n    p = get_path_model(\"lgbm\", 3, model_dir=tmpdir)\n    print(p.name)\n    assert p.name == \"lgbm_forecaster_3.joblib\"\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nlgbm_forecaster_3.joblib\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "manager.trainer.get_path_model_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

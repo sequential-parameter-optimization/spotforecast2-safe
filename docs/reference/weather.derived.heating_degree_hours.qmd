@@ -1,0 +1,37 @@
+# weather.derived.heating_degree_hours { #spotforecast2_safe.weather.derived.heating_degree_hours }
+
+```python
+weather.derived.heating_degree_hours(temperature, base=DEFAULT_HDH_BASE_C)
+```
+
+Heating degree-hours :math:`\max(base - T, 0)`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                     | Description                                           | Default              |
+|-------------|------------------------------------------|-------------------------------------------------------|----------------------|
+| temperature | [pd](`pandas`).[Series](`pandas.Series`) | Hourly air temperature in °C.                         | _required_           |
+| base        | [float](`float`)                         | Heating base temperature in °C. Defaults to ``15.0``. | `DEFAULT_HDH_BASE_C` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                  |
+|--------|------------------------------------------|--------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: ``hdh`` per timestamp, ``float64``, same index as |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | *temperature*. Zero whenever it is warmer than *base*.       |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                        |
+|--------|----------------------------|----------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *temperature* is not a NaN-free numeric Series. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather.derived import heating_degree_hours
+
+t = pd.Series([5.0, 15.0, 25.0])
+print(heating_degree_hours(t, base=15.0).tolist())
+```

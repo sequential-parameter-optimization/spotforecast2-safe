@@ -67,6 +67,11 @@ from spotforecast2_safe.preprocessing.target_corruption import (
 from spotforecast2_safe.processing.agg_predict import agg_predict
 from spotforecast2_safe.splitter.split_ts_cv import TimeSeriesFold
 from spotforecast2_safe.weather import WeatherFetchError, get_weather_features
+from spotforecast2_safe.weather.locations import coordinates as _weather_coordinates
+from spotforecast2_safe.weather.locations import (
+    default_german_locations as _default_german_locations,
+)
+from spotforecast2_safe.weather.locations import weights as _weather_weights
 
 logger = logging.getLogger(__name__)
 
@@ -1034,6 +1039,20 @@ class BaseTask:
         self.logger.info("Building exogenous features...")
 
         # 4a. Weather (with opt-in fail-safe handling for Open-Meteo failures)
+        # Optional global, population-weighted multi-city sampling and derived
+        # weather features (degree-hours / apparent temperature / dew point).
+        # getattr defaults keep configs that predate these fields working.
+        weather_locations = None
+        weather_location_weights = None
+        if getattr(self.config, "use_population_weighted_weather", False):
+            centers = _default_german_locations()
+            weather_locations = _weather_coordinates(centers)
+            weather_location_weights = _weather_weights(centers)
+        weather_derived: list[str] = []
+        if getattr(self.config, "include_degree_hours", False):
+            weather_derived.extend(["hdh", "cdh"])
+        if getattr(self.config, "include_apparent_temperature", False):
+            weather_derived.extend(["apparent_temperature", "dew_point"])
         try:
             weather_features, self.weather_aligned = get_weather_features(
                 data=self.df_pipeline,
@@ -1046,6 +1065,11 @@ class BaseTask:
                 freq="h",
                 cache_home=self.config.cache_home,
                 verbose=self.config.verbose,
+                locations=weather_locations,
+                location_weights=weather_location_weights,
+                derived_features=weather_derived or None,
+                hdh_base=getattr(self.config, "degree_hours_base_heating", 15.0),
+                cdh_base=getattr(self.config, "degree_hours_base_cooling", 22.0),
             )
         except WeatherFetchError as exc:
             if self.config.on_weather_failure == "raise":

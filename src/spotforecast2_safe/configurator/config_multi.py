@@ -311,6 +311,20 @@ class ConfigMulti:
     include_weather_windows: bool = False
     include_holiday_features: bool = False
     include_holiday_adjacency_features: bool = False
+    # Global / population-weighted weather and derived weather features
+    # (consumed by spotforecast2.multitask.base.build_exogenous_features via
+    # spotforecast2_safe.weather.get_weather_features). All default off so the
+    # pipeline stays byte-identical to the single-point baseline.
+    # ``use_population_weighted_weather`` fetches the fixed German load-centre
+    # registry (spotforecast2_safe.weather.locations) and combines the cities
+    # by population weight instead of sampling the single latitude/longitude.
+    # ``include_degree_hours`` adds heating/cooling degree-hours (hdh/cdh) and
+    # ``include_apparent_temperature`` adds apparent temperature + dew point.
+    use_population_weighted_weather: bool = False
+    include_degree_hours: bool = False
+    include_apparent_temperature: bool = False
+    degree_hours_base_heating: float = 15.0
+    degree_hours_base_cooling: float = 22.0
     poly_features_degree: int = 1
     max_poly_features: int = 10
     poly_mi_n_jobs: Optional[int] = -1
