@@ -7,7 +7,6 @@
 | Command | Description |
 |---------|-------------|
 | `spotforecast-safe-demo` | Demo task comparing baseline, covariate, and custom LightGBM forecasts |
-| `spotforecast-safe-n2o1-cov-df` | N-to-1 forecasting with exogenous covariates and DataFrame input |
 
 ---
 
@@ -49,63 +48,6 @@ uv run spotforecast-safe-demo --logging true
 
 ---
 
-## N-to-1 with Covariates and DataFrame
-
-The `spotforecast-safe-n2o1-cov-df` command runs the `ConfigMulti`-driven
-multitask pipeline.  It delegates to `spotforecast2_safe.multitask.runner.run`
-with `task="lazy"`.  All pipeline parameters are centralised in a `ConfigMulti`
-object; aggregation weights come from `ConfigMulti.agg_weights` (replacing the
-former hard-coded `DEFAULT_WEIGHTS` constant).
-
-See the `run_pipeline` and `_build_config_from_cli` API reference for a full
-description of the pipeline stages and `ConfigMulti` field mappings.
-
-### Features
-
-- `ConfigMulti` as single source of truth — horizon, training window, outlier
-  policy, feature flags, and aggregation weights in one object.
-- Multitask pipeline stages: prepare_data, detect_outliers, impute,
-  build_exogenous_features, run(task="lazy").
-- Model persistence: fitted models are saved under `cache_home/models/` and
-  can be reloaded with `task="predict"`.
-
-### Usage
-
-```bash
-# Run with custom settings (a ConfigMulti and explicit data path are required)
-uv run spotforecast-safe-n2o1-cov-df
-
-# Custom forecast horizon
-uv run spotforecast-safe-n2o1-cov-df --forecast_horizon 48
-
-# Enable holiday features and verbose output
-uv run spotforecast-safe-n2o1-cov-df --include_holiday_features true --verbose true
-
-# Custom aggregation weights
-uv run spotforecast-safe-n2o1-cov-df --weights 1.0 1.0 -1.0
-
-# Specify cache directory for models and logs
-uv run spotforecast-safe-n2o1-cov-df --log_dir ~/my_cache
-```
-
-### Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--forecast_horizon` | 24 | Number of steps ahead to forecast (`predict_size`) |
-| `--lags` | 24 | Lag depth N; expands to `lags_consider=range(1, N+1)` |
-| `--train_ratio` | 0.8 | Fraction of data used for training |
-| `--contamination` | 0.01 | Outlier contamination parameter |
-| `--window_size` | 72 | Rolling window size for imputation (hours) |
-| `--include_holiday_features` | false | Enable holiday indicator features |
-| `--include_holiday_adjacency_features` | false | Enable Brückentag features |
-| `--poly_features_degree` | 1 | Polynomial interaction degree (1 = off) |
-| `--weights` | None | Space-separated aggregation weights (`agg_weights`) |
-| `--verbose` | false | Enable detailed output |
-| `--log_dir` | None | Cache directory for models and logs (`cache_home`) |
-
----
-
 ## Configuration
 
 All tasks use sensible defaults but can be customized via:
@@ -117,7 +59,6 @@ All tasks use sensible defaults but can be customized via:
 ```bash
 # View available options for any command
 uv run spotforecast-safe-demo --help
-uv run spotforecast-safe-n2o1-cov-df --help
 ```
 
 ---
@@ -142,9 +83,6 @@ Safety-critical tasks support comprehensive logging:
 ```bash
 # Enable logging to default directory
 uv run spotforecast-safe-demo --logging true
-
-# Specify custom log directory
-uv run spotforecast-safe-n2o1-cov-df --log_dir /var/log/spotforecast
 ```
 
 Log files include:
