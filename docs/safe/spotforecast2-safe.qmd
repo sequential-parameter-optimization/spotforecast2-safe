@@ -11,7 +11,7 @@ In safety-critical environments, reducing the "dead code" and unnecessary depend
 ---
 
 ## Positive List (Retained Components)
-The following files are essential for the execution of the primary workflows: `task_safe_demo.py` and `task_safe_n_to_1_with_covariates_and_dataframe.py`.
+The following files are essential for the execution of the primary workflow `task_safe_demo.py`. (The `task_safe_n_to_1_with_covariates_and_dataframe.py` console task was removed in 20.0.0; the `multitask` pipeline it wrapped — `BaseTask`/`MultiTask`/`runner.run` — is retained as public API and is exercised by the downstream `spotforecast2` package.)
 
 ### Orchestration & Pipelines
 - `src/spotforecast2_safe/processing/n2n_predict_with_covariates.py`
@@ -74,13 +74,13 @@ To maintain a green build and avoid import errors, the following non-essential t
 The resulting `spotforecast2_safe` project is a hardened version of the original, with $0$ unreachable code paths for the specified tasks and $100\%$ test coverage on the remaining logic.
 
 ## Essential Classes and Functions (Positive List)
-The following classes and functions (including internal helpers) are strictly required for the execution of `task_safe_demo.py` and `task_safe_n_to_1_with_covariates_and_dataframe.py`:
+The following classes and functions (including internal helpers) are strictly required for the execution of `task_safe_demo.py` and the public `multitask` pipeline:
 
 ### Orchestration & Processing
 - `agg_predict` (Function)
 - `n2n_predict` (Function)
 - `n2n_predict_with_covariates` (Function) — used by `task_safe_demo`
-- `run_pipeline` (Function, `task_safe_n_to_1_with_covariates_and_dataframe`) — delegates to `multitask.runner.run`
+- `run` (Function, `multitask.runner`) — public single-call pipeline entry point
 
 ### Multitask Pipeline (n-to-1 task)
 - `BaseTask` (Class) — shared prepare/detect/impute/exog steps

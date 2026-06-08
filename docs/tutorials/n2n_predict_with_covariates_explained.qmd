@@ -714,11 +714,11 @@ convention is used with the eleven-element vector
 aggregation in which the first, second, fifth, seventh, eighth, ninth, and
 eleventh columns are added and the remaining columns are subtracted.
 
-The n2n pipeline remains available and is used by `task_safe_demo`.  The n-to-1
-task (`tasks/task_safe_n_to_1_with_covariates_and_dataframe.py`) now runs on
-`spotforecast2_safe.multitask`; see the
-[API reference](../reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.qmd)
-for its `ConfigMulti`-driven workflow and `agg_weights` configuration.
+The n2n pipeline remains available and is used by `task_safe_demo`.  The
+`ConfigMulti`-driven, `agg_weights`-configurable n-to-1 workflow it describes now
+runs directly on `spotforecast2_safe.multitask` (`MultiTask` /
+`multitask.runner.run`); the former `spotforecast-safe-n2o1-cov-df` console task
+was removed in 20.0.0.
 
 ```{python}
 from spotforecast2_safe.processing.agg_predict import agg_predict
