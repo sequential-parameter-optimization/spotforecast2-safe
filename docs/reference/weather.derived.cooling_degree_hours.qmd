@@ -1,0 +1,37 @@
+# weather.derived.cooling_degree_hours { #spotforecast2_safe.weather.derived.cooling_degree_hours }
+
+```python
+weather.derived.cooling_degree_hours(temperature, base=DEFAULT_CDH_BASE_C)
+```
+
+Cooling degree-hours :math:`\max(T - base, 0)`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                     | Description                                           | Default              |
+|-------------|------------------------------------------|-------------------------------------------------------|----------------------|
+| temperature | [pd](`pandas`).[Series](`pandas.Series`) | Hourly air temperature in °C.                         | _required_           |
+| base        | [float](`float`)                         | Cooling base temperature in °C. Defaults to ``22.0``. | `DEFAULT_CDH_BASE_C` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                  |
+|--------|------------------------------------------|--------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: ``cdh`` per timestamp, ``float64``, same index as |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | *temperature*. Zero whenever it is cooler than *base*.       |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                        |
+|--------|----------------------------|----------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *temperature* is not a NaN-free numeric Series. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather.derived import cooling_degree_hours
+
+t = pd.Series([5.0, 22.0, 30.0])
+print(cooling_degree_hours(t, base=22.0).tolist())
+```

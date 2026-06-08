@@ -1,0 +1,46 @@
+# weather.derived.population_weighted_average { #spotforecast2_safe.weather.derived.population_weighted_average }
+
+```python
+weather.derived.population_weighted_average(frames, weights)
+```
+
+Combine per-location weather frames into one demand-weighted index.
+
+Forms :math:`\sum_i \tilde{w}_i X_i` where :math:`\tilde{w}` are the
+*weights* normalised to sum to one. All frames must share the same index and
+the same columns (the identical Open-Meteo schema fetched per location), so
+the result is a single frame with that schema representing a national,
+population-weighted weather signal (Zimmermann & Ziel 2025, ``zimm25a``).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                                                            | Description                                                                                                                   | Default    |
+|---------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------|
+| frames  | [Sequence](`typing.Sequence`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | One weather frame per location, all with the same ``DatetimeIndex`` and the same columns.                                     | _required_ |
+| weights | [Sequence](`typing.Sequence`)\[[float](`float`)\]                               | One non-negative weight per frame (e.g. city population). They are normalised internally; their absolute scale is irrelevant. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                             |
+|--------|------------------------------------------------|-------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: The weighted-average frame, same index and columns as the |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | inputs (column order taken from ``frames[0]``).                         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                              |
+|--------|----------------------------|--------------------------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *frames* is empty, lengths mismatch, weights are negative or sum to zero, or the frames disagree on index or columns. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather.derived import population_weighted_average
+
+idx = pd.date_range("2023-06-01", periods=3, freq="h", tz="UTC")
+a = pd.DataFrame({"temperature_2m": [10.0, 10.0, 10.0]}, index=idx)
+b = pd.DataFrame({"temperature_2m": [20.0, 20.0, 20.0]}, index=idx)
+out = population_weighted_average([a, b], [3.0, 1.0])
+print(out["temperature_2m"].tolist())  # (3*10 + 1*20)/4 == 12.5
+```

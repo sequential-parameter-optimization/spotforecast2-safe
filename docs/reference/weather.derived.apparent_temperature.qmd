@@ -1,0 +1,53 @@
+# weather.derived.apparent_temperature { #spotforecast2_safe.weather.derived.apparent_temperature }
+
+```python
+weather.derived.apparent_temperature(
+    temperature,
+    relative_humidity,
+    wind_speed,
+    *,
+    wind_speed_unit='ms',
+)
+```
+
+Steadman apparent ("feels-like") temperature.
+
+:math:`AT = T + 0.33 e - 0.70 w - 4.00`, where the water-vapour pressure
+:math:`e = (rh/100)\,6.105\,\exp(17.27 T/(237.7+T))` in hPa and ``w`` is
+the 10 m wind speed in m/s. This is the Australian Bureau of Meteorology
+formulation and captures the humidity load-driver that dry-bulb temperature
+misses (Maia-Silva et al. 2020, ``maia20a``).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                     | Description                                                                                                                                         | Default    |
+|-------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| temperature       | [pd](`pandas`).[Series](`pandas.Series`) | Hourly air temperature in °C.                                                                                                                       | _required_ |
+| relative_humidity | [pd](`pandas`).[Series](`pandas.Series`) | Relative humidity in percent, ``0 ≤ rh ≤ 100``.                                                                                                     | _required_ |
+| wind_speed        | [pd](`pandas`).[Series](`pandas.Series`) | 10 m wind speed; unit set by *wind_speed_unit*.                                                                                                     | _required_ |
+| wind_speed_unit   | [str](`str`)                             | ``"ms"`` (metres per second, the formula's native unit, default) or ``"kmh"`` (kilometres per hour — the Open-Meteo default, converted internally). | `'ms'`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                           |
+|--------|------------------------------------------|-----------------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: ``apparent_temperature`` in °C, ``float64``, same index as |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | the inputs.                                                           |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                                                             |
+|--------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If any input is not a NaN-free numeric Series, the indices differ, humidity is outside ``[0, 100]``, or *wind_speed_unit* is not ``"ms"`` or ``"kmh"``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather.derived import apparent_temperature
+
+t = pd.Series([30.0])
+rh = pd.Series([70.0])
+w = pd.Series([2.0])  # m/s
+print(round(apparent_temperature(t, rh, w).iloc[0], 2))
+```

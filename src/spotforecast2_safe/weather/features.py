@@ -10,7 +10,7 @@ variables in recursive forecasting models.
 """
 
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -19,6 +19,12 @@ from feature_engine.timeseries.forecasting import WindowFeatures
 from spotforecast2_safe.preprocessing.curate_data import curate_weather
 from spotforecast2_safe.utils.convert_to_utc import to_utc_timestamp
 from spotforecast2_safe.weather.client import WeatherFetchError
+from spotforecast2_safe.weather.derived import (
+    DEFAULT_CDH_BASE_C,
+    DEFAULT_HDH_BASE_C,
+    add_derived_weather_features,
+    population_weighted_average,
+)
 
 # Longest run of consecutive missing ``freq`` steps that ``get_weather_features``
 # will forward-fill during alignment. A longer gap (e.g. the recent window the
@@ -56,6 +62,12 @@ def get_weather_features(
     fallback_on_failure: bool = True,
     cache_home: Optional[Union[str, Path]] = None,
     verbose: bool = False,
+    locations: Optional[Sequence[Tuple[float, float]]] = None,
+    location_weights: Optional[Sequence[float]] = None,
+    derived_features: Optional[Sequence[str]] = None,
+    hdh_base: float = DEFAULT_HDH_BASE_C,
+    cdh_base: float = DEFAULT_CDH_BASE_C,
+    wind_speed_unit: str = "kmh",
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Fetch weather data and compute rolling-window features.
 
@@ -99,6 +111,29 @@ def get_weather_features(
             no caching is performed.
         verbose: If ``True``, print progress messages to stdout.
             Defaults to ``False``.
+        locations: Optional sequence of ``(latitude, longitude)`` pairs for a
+            **population-weighted multi-city** weather index. When ``None``
+            (default) the single ``latitude``/``longitude`` point is used,
+            preserving prior behaviour exactly. When given, each location is
+            fetched and the raw frames are combined via
+            `population_weighted_average`
+            using *location_weights*. See
+            `spotforecast2_safe.weather.locations`.
+        location_weights: Non-negative weight per entry in *locations* (e.g.
+            city population). Required when *locations* is given; normalised
+            internally.
+        derived_features: Optional subset of ``{"hdh", "cdh",
+            "apparent_temperature", "dew_point"}``. When given, those columns
+            are derived from the (weighted) weather and rolled up alongside the
+            raw fields. ``None`` (default) adds nothing. See
+            `add_derived_weather_features`.
+        hdh_base: Heating base temperature (°C) for ``hdh``. Defaults to
+            ``15.0``.
+        cdh_base: Cooling base temperature (°C) for ``cdh``. Defaults to
+            ``22.0``.
+        wind_speed_unit: Unit of the fetched ``wind_speed_10m`` column for
+            apparent-temperature, ``"ms"`` or ``"kmh"``. Defaults to ``"kmh"``
+            (the Open-Meteo default).
 
     Returns:
         tuple[pd.DataFrame, pd.DataFrame]: A two-element tuple:
@@ -165,24 +200,40 @@ def get_weather_features(
     if verbose:
         print("Fetching weather data...")
 
-    weather_df = fetch_weather_data(
-        cov_start=start,
-        cov_end=cov_end,
-        latitude=latitude,
-        longitude=longitude,
-        timezone=timezone,
-        freq=freq,
-        fallback_on_failure=fallback_on_failure,
-        cache_home=cache_home,
-    )
+    def _fetch_one(lat: float, lon: float) -> pd.DataFrame:
+        """Fetch one location and trim to the exact ``[start, cov_end]`` window.
 
-    # Open-Meteo returns whole-day forecast blocks aligned to its own clock,
-    # so the raw payload can extend a few hours past ``cov_end``. Trim to the
-    # exact ``[start, cov_end]`` window before ``curate_weather`` so the
-    # row-count assertion compares against the window actually used by the
-    # downstream reindex; otherwise it prints a spurious "wrong shape"
-    # warning even though alignment will repair the count.
-    weather_df = weather_df.loc[start:cov_end]
+        Open-Meteo returns whole-day forecast blocks aligned to its own clock,
+        so the raw payload can extend a few hours past ``cov_end``. Trimming
+        here keeps the row-count assertion in ``curate_weather`` honest and
+        guarantees every location shares one index before any weighted combine.
+        """
+        frame = fetch_weather_data(
+            cov_start=start,
+            cov_end=cov_end,
+            latitude=lat,
+            longitude=lon,
+            timezone=timezone,
+            freq=freq,
+            fallback_on_failure=fallback_on_failure,
+            cache_home=cache_home,
+        )
+        return frame.loc[start:cov_end]
+
+    if locations is not None:
+        if location_weights is None:
+            raise ValueError("location_weights is required when locations is supplied.")
+        if len(locations) != len(location_weights):
+            raise ValueError(
+                f"locations ({len(locations)}) and location_weights "
+                f"({len(location_weights)}) must have equal length."
+            )
+        frames = [_fetch_one(lat, lon) for (lat, lon) in locations]
+        # population_weighted_average is fail-safe: it raises if the per-city
+        # frames disagree on index or columns rather than silently aligning.
+        weather_df = population_weighted_average(frames, list(location_weights))
+    else:
+        weather_df = _fetch_one(latitude, longitude)
 
     curate_weather(weather_df, data, forecast_horizon=forecast_horizon)
 
@@ -223,6 +274,19 @@ def get_weather_features(
         weather_aligned_filled = weather_aligned_filled.bfill()
         if weather_aligned_filled.isnull().any().any():
             raise ValueError("Missing values in weather data could not be filled")
+
+    # Derive degree-hours / apparent-temperature / dew-point on the NaN-free
+    # frame (fail-safe: raises if a source column is missing) so they are rolled
+    # up alongside the raw fields by WindowFeatures below.
+    if derived_features:
+        weather_aligned_filled = add_derived_weather_features(
+            weather_aligned_filled,
+            list(derived_features),
+            hdh_base=hdh_base,
+            cdh_base=cdh_base,
+            wind_speed_unit=wind_speed_unit,
+        )
+        weather_columns = weather_aligned_filled.columns.tolist()
 
     wf_transformer = WindowFeatures(
         variables=weather_columns,
