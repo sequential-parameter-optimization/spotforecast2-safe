@@ -1,3 +1,11 @@
+## [19.4.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.3.0...v19.4.0-rc.1) (2026-06-08)
+
+
+### Features
+
+* **configurator:** mirror new feature flags onto ConfigEntsoe (parity) ([a211271](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a211271021926b02aa89235d7c421cf7a2797361))
+* **forecaster:** quantile-LightGBM probabilistic head factory ([d44093f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d44093f0e60489d121f636d92bcb80d6431b1a38)), closes [#3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/3)
+
 ## [19.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.2.0...v19.3.0) (2026-06-08)
 
 
