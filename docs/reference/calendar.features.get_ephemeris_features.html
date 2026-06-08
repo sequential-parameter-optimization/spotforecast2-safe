@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>index – spotforecast2-safe</title>
+<title>calendar.features.get_ephemeris_features – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -270,7 +305,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/index.html">Overview</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">calendar.features.get_ephemeris_features</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -296,16 +331,16 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">API Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
@@ -1519,752 +1554,152 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#function-reference" id="toc-function-reference" class="nav-link active" data-scroll-target="#function-reference">Function reference</a>
-  <ul class="collapse">
-  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
-  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
-  <li><a href="#processing" id="toc-processing" class="nav-link" data-scroll-target="#processing">Processing</a></li>
-  <li><a href="#forecaster" id="toc-forecaster" class="nav-link" data-scroll-target="#forecaster">Forecaster</a></li>
-  <li><a href="#splitter" id="toc-splitter" class="nav-link" data-scroll-target="#splitter">Splitter</a></li>
-  <li><a href="#backtesting" id="toc-backtesting" class="nav-link" data-scroll-target="#backtesting">Backtesting</a></li>
-  <li><a href="#configurator" id="toc-configurator" class="nav-link" data-scroll-target="#configurator">Configurator</a></li>
-  <li><a href="#manager" id="toc-manager" class="nav-link" data-scroll-target="#manager">Manager</a></li>
-  <li><a href="#multitask" id="toc-multitask" class="nav-link" data-scroll-target="#multitask">Multitask</a></li>
-  <li><a href="#utils" id="toc-utils" class="nav-link" data-scroll-target="#utils">Utils</a></li>
-  <li><a href="#stats" id="toc-stats" class="nav-link" data-scroll-target="#stats">Stats</a></li>
-  <li><a href="#security" id="toc-security" class="nav-link" data-scroll-target="#security">Security</a></li>
-  <li><a href="#calendar" id="toc-calendar" class="nav-link" data-scroll-target="#calendar">Calendar</a></li>
-  <li><a href="#weather" id="toc-weather" class="nav-link" data-scroll-target="#weather">Weather</a></li>
-  <li><a href="#downloader" id="toc-downloader" class="nav-link" data-scroll-target="#downloader">Downloader</a></li>
-  <li><a href="#exceptions" id="toc-exceptions" class="nav-link" data-scroll-target="#exceptions">Exceptions</a></li>
-  <li><a href="#tasks" id="toc-tasks" class="nav-link" data-scroll-target="#tasks">Tasks</a></li>
-  </ul></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/calendar.features.get_ephemeris_features.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/index.html">Overview</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">calendar.features.get_ephemeris_features</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="function-reference" class="level1 doc doc-index">
-<h1 class="doc doc-index">Function reference</h1>
-<section id="data" class="level2">
-<h2 class="anchored" data-anchor-id="data">Data</h2>
-<p>Utilities for fetching and loading time series, weather, and holiday data.</p>
+</header>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>calendar.features.get_ephemeris_features(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    start,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    cov_end,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    location,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    freq<span class="op">=</span><span class="st">'h'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    timezone<span class="op">=</span><span class="st">'UTC'</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create continuous solar-geometry features from the ephemeris.</p>
+<p>Unlike <code>get_day_night_features</code> (which rounds sunrise/sunset to whole hours and emits a binary daylight flag), this builder exposes the <em>continuous</em> solar geometry the hour-of-day RBFs only encode implicitly: the per-hour solar elevation, the exact daylight duration, and the signed time relative to sunrise and sunset. These linearise lighting-load timing and the midday PV offset, are purely deterministic from the date and the fixed coordinates, add no dependency, and leak nothing for any forecast hour (Xie &amp; Hong 2018, <code>xieh18a</code>; López 2020, <code>lope20a</code>).</p>
+<p>The returned DataFrame contains four <code>float64</code> columns:</p>
+<ul>
+<li><code>solar_elevation</code> — solar elevation angle in degrees (negative at night, peaking at solar noon).</li>
+<li><code>daylight_duration_h</code> — exact sunset−sunrise span for the date, hours.</li>
+<li><code>hours_since_sunrise</code> — signed hours since that date’s sunrise (negative before sunrise).</li>
+<li><code>hours_to_sunset</code> — signed hours until that date’s sunset (negative after sunset).</li>
+</ul>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
 <tbody>
 <tr class="odd">
-<td><a href="../../docs/reference/data.fetch_data.fetch_data.html#spotforecast2_safe.data.fetch_data.fetch_data">data.fetch_data.fetch_data</a></td>
-<td>Fetches a dataset from a CSV file or processes a DataFrame.</td>
+<td>start</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Start of the time range. String values are parsed with <code>utc=True</code>.</td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><a href="../../docs/reference/data.fetch_data.fetch_holiday_data.html#spotforecast2_safe.data.fetch_data.fetch_holiday_data">data.fetch_data.fetch_holiday_data</a></td>
-<td>Fetches holiday data for the dataset period.</td>
+<td>cov_end</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]</td>
+<td>Inclusive end of the time range. String values are parsed with <code>utc=True</code>.</td>
+<td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs/reference/data.fetch_data.fetch_weather_data.html#spotforecast2_safe.data.fetch_data.fetch_weather_data">data.fetch_data.fetch_weather_data</a></td>
-<td>Fetch weather data for the dataset period plus forecast horizon.</td>
+<td>location</td>
+<td><code>LocationInfo</code></td>
+<td><code>LocationInfo</code> describing the geographic location.</td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><a href="../../docs/reference/data.fetch_data.get_cache_home.html#spotforecast2_safe.data.fetch_data.get_cache_home">data.fetch_data.get_cache_home</a></td>
-<td>Return the location where persistent models are to be cached.</td>
+<td>freq</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Pandas-compatible frequency string for the output index. Defaults to <code>"h"</code> (hourly).</td>
+<td><code>'h'</code></td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs/reference/data.fetch_data.get_data_home.html#spotforecast2_safe.data.fetch_data.get_data_home">data.fetch_data.get_data_home</a></td>
-<td>Return the location where datasets are to be stored.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/data.fetch_data.get_package_data_home.html#spotforecast2_safe.data.fetch_data.get_package_data_home">data.fetch_data.get_package_data_home</a></td>
-<td>Return the location of the internal package datasets.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/data.fetch_data.load_timeseries.html#spotforecast2_safe.data.fetch_data.load_timeseries">data.fetch_data.load_timeseries</a></td>
-<td>Load the actual-load time series from <code>interim/energy_load.csv</code>.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/data.fetch_data.load_timeseries_forecast.html#spotforecast2_safe.data.fetch_data.load_timeseries_forecast">data.fetch_data.load_timeseries_forecast</a></td>
-<td>Load the day-ahead forecast time series from <code>interim/energy_load.csv</code>.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/data.fetch_data.load_renewable_forecast.html#spotforecast2_safe.data.fetch_data.load_renewable_forecast">data.fetch_data.load_renewable_forecast</a></td>
-<td>Load the ENTSO-E day-ahead wind/solar generation forecast.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/data.fetch_data.load_day_ahead_price.html#spotforecast2_safe.data.fetch_data.load_day_ahead_price">data.fetch_data.load_day_ahead_price</a></td>
-<td>Load the ENTSO-E day-ahead spot price (DE/LU) as an hourly series.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/data.data_classes.html#spotforecast2_safe.data.data_classes">data.data_classes</a></td>
-<td>Data structures for input and processed data.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/data.demo_loader.html#spotforecast2_safe.data.demo_loader">data.demo_loader</a></td>
-<td>Demo data loader for safety-critical forecasting tasks.</td>
+<td>timezone</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Timezone label applied to the generated index. Defaults to <code>"UTC"</code>.</td>
+<td><code>'UTC'</code></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="preprocessing" class="level2">
-<h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
-<p>Hardened tools for data curation, resampling, outlier detection, feature engineering, and temporal train/test splitting.</p>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
 <tbody>
 <tr class="odd">
-<td><a href="../../docs/reference/preprocessing.curate_data.agg_and_resample_data.html#spotforecast2_safe.preprocessing.curate_data.agg_and_resample_data">preprocessing.curate_data.agg_and_resample_data</a></td>
-<td>Aggregates and resamples the data to (e.g., hourly) frequency by computing the specified aggregation (e.g.&nbsp;for each hour).</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.curate_data.basic_ts_checks.html#spotforecast2_safe.preprocessing.curate_data.basic_ts_checks">preprocessing.curate_data.basic_ts_checks</a></td>
-<td>Checks if the time series data has a datetime index and is sorted.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.curate_data.curate_holidays.html#spotforecast2_safe.preprocessing.curate_data.curate_holidays">preprocessing.curate_data.curate_holidays</a></td>
-<td>Checks if the holiday dataframe has the correct shape.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.curate_data.curate_weather.html#spotforecast2_safe.preprocessing.curate_data.curate_weather">preprocessing.curate_data.curate_weather</a></td>
-<td>Checks if the weather dataframe has the correct shape.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.curate_data.get_start_end.html#spotforecast2_safe.preprocessing.curate_data.get_start_end">preprocessing.curate_data.get_start_end</a></td>
-<td>Get start and end date strings for data and covariate ranges.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.curate_data.remove_duplicate_timestamps.html#spotforecast2_safe.preprocessing.curate_data.remove_duplicate_timestamps">preprocessing.curate_data.remove_duplicate_timestamps</a></td>
-<td>Resolve duplicate timestamps across all data columns.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.curate_data.reset_index.html#spotforecast2_safe.preprocessing.curate_data.reset_index">preprocessing.curate_data.reset_index</a></td>
-<td>Resets the index of the dataframe and assigns a name to the index column.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.outlier.get_outliers.html#spotforecast2_safe.preprocessing.outlier.get_outliers">preprocessing.outlier.get_outliers</a></td>
-<td>Detect outliers in each column using Isolation Forest.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.outlier.manual_outlier_removal.html#spotforecast2_safe.preprocessing.outlier.manual_outlier_removal">preprocessing.outlier.manual_outlier_removal</a></td>
-<td>Manual outlier removal function.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.outlier.mark_outliers.html#spotforecast2_safe.preprocessing.outlier.mark_outliers">preprocessing.outlier.mark_outliers</a></td>
-<td>Marks outliers as NaN in the dataset using Isolation Forest.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.checking.check_exog.html#spotforecast2_safe.preprocessing.checking.check_exog">preprocessing.checking.check_exog</a></td>
-<td>Validate that exog is a pandas Series or DataFrame.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.checking.check_exog_dtypes.html#spotforecast2_safe.preprocessing.checking.check_exog_dtypes">preprocessing.checking.check_exog_dtypes</a></td>
-<td>Check that exogenous variables have valid data types (int, float, category).</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.checking.check_interval.html#spotforecast2_safe.preprocessing.checking.check_interval">preprocessing.checking.check_interval</a></td>
-<td>Validate that a confidence interval specification is valid.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.checking.check_predict_input.html#spotforecast2_safe.preprocessing.checking.check_predict_input">preprocessing.checking.check_predict_input</a></td>
-<td>Check all inputs of predict method. This is a helper function to validate</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.checking.check_residuals_input.html#spotforecast2_safe.preprocessing.checking.check_residuals_input">preprocessing.checking.check_residuals_input</a></td>
-<td>Check residuals input arguments in Forecasters.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.checking.check_y.html#spotforecast2_safe.preprocessing.checking.check_y">preprocessing.checking.check_y</a></td>
-<td>Validate that y is a pandas Series without missing values.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.checking.get_exog_dtypes.html#spotforecast2_safe.preprocessing.checking.get_exog_dtypes">preprocessing.checking.get_exog_dtypes</a></td>
-<td>Extract and store the data types of exogenous variables.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.checking.set_cpu_gpu_device.html#spotforecast2_safe.preprocessing.checking.set_cpu_gpu_device">preprocessing.checking.set_cpu_gpu_device</a></td>
-<td>Set the device for the estimator to either ‘cpu’, ‘gpu’, ‘cuda’, or None.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.exog_builder.ExogBuilder.html#spotforecast2_safe.preprocessing.exog_builder.ExogBuilder">preprocessing.exog_builder.ExogBuilder</a></td>
-<td>Builds a set of exogenous features for a given date range.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.exog_providers.ExogFeatureProvider.html#spotforecast2_safe.preprocessing.exog_providers.ExogFeatureProvider">preprocessing.exog_providers.ExogFeatureProvider</a></td>
-<td>Contract for a pluggable exogenous-feature source.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.exog_providers.CovidInfectionRateProvider.html#spotforecast2_safe.preprocessing.exog_providers.CovidInfectionRateProvider">preprocessing.exog_providers.CovidInfectionRateProvider</a></td>
-<td>German national COVID-19 7-day incidence as an exogenous level regressor.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.exog_providers.EntsoeForecastLoadProvider.html#spotforecast2_safe.preprocessing.exog_providers.EntsoeForecastLoadProvider">preprocessing.exog_providers.EntsoeForecastLoadProvider</a></td>
-<td>ENTSO-E day-ahead Forecasted Load as an exogenous near-oracle prior.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.exog_providers.EntsoeRenewableForecastProvider.html#spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider">preprocessing.exog_providers.EntsoeRenewableForecastProvider</a></td>
-<td>ENTSO-E day-ahead wind and solar generation forecast.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.exog_providers.EntsoeNetLoadProvider.html#spotforecast2_safe.preprocessing.exog_providers.EntsoeNetLoadProvider">preprocessing.exog_providers.EntsoeNetLoadProvider</a></td>
-<td>ENTSO-E day-ahead net load = Forecasted Load − (wind + solar) forecast.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.exog_providers.EntsoeDayAheadPriceProvider.html#spotforecast2_safe.preprocessing.exog_providers.EntsoeDayAheadPriceProvider">preprocessing.exog_providers.EntsoeDayAheadPriceProvider</a></td>
-<td>ENTSO-E day-ahead spot price (DE/LU) as an exogenous input.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.exog_providers.build_providers.html#spotforecast2_safe.preprocessing.exog_providers.build_providers">preprocessing.exog_providers.build_providers</a></td>
-<td>Construct the providers whose flags are truthy, in registry order.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.exog_providers.build_providers_from_config.html#spotforecast2_safe.preprocessing.exog_providers.build_providers_from_config">preprocessing.exog_providers.build_providers_from_config</a></td>
-<td>Construct providers by reading the registry flags off a config object.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.imputation.apply_imputation.html#spotforecast2_safe.preprocessing.imputation.apply_imputation">preprocessing.imputation.apply_imputation</a></td>
-<td>Apply imputation to a DataFrame based on the method specified in config.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.imputation.WeightFunction.html#spotforecast2_safe.preprocessing.imputation.WeightFunction">preprocessing.imputation.WeightFunction</a></td>
-<td>Callable class for sample weights that can be pickled.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.target_corruption.TargetCorruptionReport.html#spotforecast2_safe.preprocessing.target_corruption.TargetCorruptionReport">preprocessing.target_corruption.TargetCorruptionReport</a></td>
-<td>Immutable summary of a target-corruption detection and policy run.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.target_corruption.detect_target_corruption.html#spotforecast2_safe.preprocessing.target_corruption.detect_target_corruption">preprocessing.target_corruption.detect_target_corruption</a></td>
-<td>Detect physically-impossible target-column corruption in the native frame.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.target_corruption.apply_target_corruption_policy.html#spotforecast2_safe.preprocessing.target_corruption.apply_target_corruption_policy">preprocessing.target_corruption.apply_target_corruption_policy</a></td>
-<td>Apply the configured corruption policy to the native-cadence frame.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.imputation.custom_weights.html#spotforecast2_safe.preprocessing.imputation.custom_weights">preprocessing.imputation.custom_weights</a></td>
-<td>Return 0 if index is in or near any gap.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.imputation.get_missing_weights.html#spotforecast2_safe.preprocessing.imputation.get_missing_weights">preprocessing.imputation.get_missing_weights</a></td>
-<td>Return imputed DataFrame and a series indicating missing weights.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.data_transform.html#spotforecast2_safe.preprocessing.data_transform">preprocessing.data_transform</a></td>
-<td>Data transformation utilities for time series forecasting.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.forecaster_config.html#spotforecast2_safe.preprocessing.forecaster_config">preprocessing.forecaster_config</a></td>
-<td>Forecaster configuration utilities.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.linearly_interpolate_ts.html#spotforecast2_safe.preprocessing.linearly_interpolate_ts">preprocessing.linearly_interpolate_ts</a></td>
-<td>Linear interpolation transformer for time series data.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/preprocessing.repeating_basis_function.html#spotforecast2_safe.preprocessing.repeating_basis_function">preprocessing.repeating_basis_function</a></td>
-<td>Repeating Basis Function transformer for cyclical features.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/preprocessing.rolling.RollingFeatures.html#spotforecast2_safe.preprocessing.rolling.RollingFeatures">preprocessing.rolling.RollingFeatures</a></td>
-<td>Compute rolling window statistics over time series data.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="processing" class="level2">
-<h2 class="anchored" data-anchor-id="processing">Processing</h2>
-<p>Utilities for aggregated and n-to-n predictions.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/processing.agg_predict.agg_predict.html#spotforecast2_safe.processing.agg_predict.agg_predict">processing.agg_predict.agg_predict</a></td>
-<td>Aggregates multiple prediction columns into a single combined prediction series.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/processing.n2n_predict.n2n_predict.html#spotforecast2_safe.processing.n2n_predict.n2n_predict">processing.n2n_predict.n2n_predict</a></td>
-<td>End-to-end baseline forecasting using equivalent date method.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/processing.n2n_predict_with_covariates.n2n_predict_with_covariates.html#spotforecast2_safe.processing.n2n_predict_with_covariates.n2n_predict_with_covariates">processing.n2n_predict_with_covariates.n2n_predict_with_covariates</a></td>
-<td>End-to-end recursive forecasting with exogenous covariates.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="forecaster" class="level2">
-<h2 class="anchored" data-anchor-id="forecaster">Forecaster</h2>
-<p>Recursive forecasting classes, seasonal baselines, and metrics.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.base.html#spotforecast2_safe.forecaster.base">forecaster.base</a></td>
-<td>ForecasterBase class.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/forecaster.recursive._forecaster_recursive.ForecasterRecursive.html#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive">forecaster.recursive._forecaster_recursive.ForecasterRecursive</a></td>
-<td>Recursive autoregressive forecaster for scikit-learn compatible estimators.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate.html#spotforecast2_safe.forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate">forecaster.recursive._forecaster_equivalent_date.ForecasterEquivalentDate</a></td>
-<td>This forecaster predicts future values based on the most recent equivalent</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/forecaster.recursive._forecaster_recursive_multiseries.html#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries">forecaster.recursive._forecaster_recursive_multiseries</a></td>
 <td></td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.metrics.add_y_train_argument.html#spotforecast2_safe.forecaster.metrics.add_y_train_argument">forecaster.metrics.add_y_train_argument</a></td>
-<td>Add <code>y_train</code> argument to a function if it is not already present.</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
+<td>pd.DataFrame: Columns <code>solar_elevation</code>, <code>daylight_duration_h</code>,</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs/reference/forecaster.metrics.calculate_coverage.html#spotforecast2_safe.forecaster.metrics.calculate_coverage">forecaster.metrics.calculate_coverage</a></td>
-<td>Calculate coverage of a given interval.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.metrics.create_mean_pinball_loss.html#spotforecast2_safe.forecaster.metrics.create_mean_pinball_loss">forecaster.metrics.create_mean_pinball_loss</a></td>
-<td>Create pinball loss for a given quantile.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/forecaster.metrics.crps_from_predictions.html#spotforecast2_safe.forecaster.metrics.crps_from_predictions">forecaster.metrics.crps_from_predictions</a></td>
-<td>Compute the Continuous Ranked Probability Score (CRPS) from predictions.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.metrics.crps_from_quantiles.html#spotforecast2_safe.forecaster.metrics.crps_from_quantiles">forecaster.metrics.crps_from_quantiles</a></td>
-<td>Calculate the Continuous Ranked Probability Score (CRPS) from quantiles.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/forecaster.metrics.mean_absolute_scaled_error.html#spotforecast2_safe.forecaster.metrics.mean_absolute_scaled_error">forecaster.metrics.mean_absolute_scaled_error</a></td>
-<td>Mean Absolute Scaled Error (MASE).</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.metrics.root_mean_squared_scaled_error.html#spotforecast2_safe.forecaster.metrics.root_mean_squared_scaled_error">forecaster.metrics.root_mean_squared_scaled_error</a></td>
-<td>Root Mean Squared Scaled Error (RMSSE).</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/forecaster.metrics.symmetric_mean_absolute_percentage_error.html#spotforecast2_safe.forecaster.metrics.symmetric_mean_absolute_percentage_error">forecaster.metrics.symmetric_mean_absolute_percentage_error</a></td>
-<td>Compute the Symmetric Mean Absolute Percentage Error (SMAPE).</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.wrappers.model.html#spotforecast2_safe.forecaster.wrappers.model">forecaster.wrappers.model</a></td>
-<td>Recursive forecaster model wrappers for different estimators.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/forecaster.wrappers.lgbm.html#spotforecast2_safe.forecaster.wrappers.lgbm">forecaster.wrappers.lgbm</a></td>
-<td>Recursive forecaster wrapper using LightGBM.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/forecaster.wrappers.xgb.html#spotforecast2_safe.forecaster.wrappers.xgb">forecaster.wrappers.xgb</a></td>
-<td>Recursive forecaster model wrappers for different estimators.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="splitter" class="level2">
-<h2 class="anchored" data-anchor-id="splitter">Splitter</h2>
-<p>Time-series-aware cross-validation folds and train/val/test holdout helpers.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/splitter.split_base.html#spotforecast2_safe.splitter.split_base">splitter.split_base</a></td>
-<td>Base class for time series cross-validation splitting.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/splitter.split_one_step.html#spotforecast2_safe.splitter.split_one_step">splitter.split_one_step</a></td>
-<td>One step ahead cross-validation splitting.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/splitter.split_ts_cv.html#spotforecast2_safe.splitter.split_ts_cv">splitter.split_ts_cv</a></td>
-<td>Time series cross-validation splitting.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/splitter.split.split_abs_train_val_test.html#spotforecast2_safe.splitter.split.split_abs_train_val_test">splitter.split.split_abs_train_val_test</a></td>
-<td>Splits a time series DataFrame into training, validation, and test sets based on absolute timestamps.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/splitter.split.split_rel_train_val_test.html#spotforecast2_safe.splitter.split.split_rel_train_val_test">splitter.split.split_rel_train_val_test</a></td>
-<td>Splits a time series DataFrame into training, validation, and test sets by percentages.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/splitter.utils_common.html#spotforecast2_safe.splitter.utils_common">splitter.utils_common</a></td>
-<td>Common validation and initialization utilities for model selection.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="backtesting" class="level2">
-<h2 class="anchored" data-anchor-id="backtesting">Backtesting</h2>
-<p>Backtesting orchestration for time series forecasters.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/backtesting.validation.backtesting_forecaster.html#spotforecast2_safe.backtesting.validation.backtesting_forecaster">backtesting.validation.backtesting_forecaster</a></td>
-<td>Backtesting of forecaster model following the folds generated by the TimeSeriesFold</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/backtesting.validation.backtesting_forecaster_one_step.html#spotforecast2_safe.backtesting.validation.backtesting_forecaster_one_step">backtesting.validation.backtesting_forecaster_one_step</a></td>
-<td>Backtesting of forecaster model using one-step-ahead predictions.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/backtesting.validation.html#spotforecast2_safe.backtesting.validation">backtesting.validation</a></td>
 <td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="configurator" class="level2">
-<h2 class="anchored" data-anchor-id="configurator">Configurator</h2>
-<p>Task-level configuration objects for the forecasting pipelines.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/configurator.config_demo.ConfigDemo.html#spotforecast2_safe.configurator.config_demo.ConfigDemo">configurator.config_demo.ConfigDemo</a></td>
-<td>Configuration for the safety-critical demo task.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/configurator.config_entsoe.ConfigEntsoe.html#spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe">configurator.config_entsoe.ConfigEntsoe</a></td>
-<td>Configuration for the ENTSO-E forecasting pipeline.</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
+<td><code>hours_since_sunrise</code>, <code>hours_to_sunset</code>; tz-aware</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs/reference/configurator.config_multi.ConfigMulti.html#spotforecast2_safe.configurator.config_multi.ConfigMulti">configurator.config_multi.ConfigMulti</a></td>
-<td>Configuration for the multi-input forecasting pipeline.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="manager" class="level2">
-<h2 class="anchored" data-anchor-id="manager">Manager</h2>
-<p>High-level training, prediction, and model persistence orchestration.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.demo_metrics.calculate_metrics.html#spotforecast2_safe.manager.demo_metrics.calculate_metrics">manager.demo_metrics.calculate_metrics</a></td>
-<td>Calculate MAE and MSE for numeric evaluation.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.trainer.get_last_model.html#spotforecast2_safe.manager.trainer.get_last_model">manager.trainer.get_last_model</a></td>
-<td>Get the latest trained model from the cache.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.trainer.get_path_model.html#spotforecast2_safe.manager.trainer.get_path_model">manager.trainer.get_path_model</a></td>
-<td>Yield the path to a model file for a given iteration and model name.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.trainer.load_iteration.html#spotforecast2_safe.manager.trainer.load_iteration">manager.trainer.load_iteration</a></td>
-<td>Load a saved model at a given iteration.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.trainer.should_retrain.html#spotforecast2_safe.manager.trainer.should_retrain">manager.trainer.should_retrain</a></td>
-<td>Decide whether a forecaster should be retrained.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.predictor.build_prediction_package.html#spotforecast2_safe.manager.predictor.build_prediction_package">manager.predictor.build_prediction_package</a></td>
-<td>Build a prediction package for downstream plotting/reporting consumers.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.predictor.get_model_prediction.html#spotforecast2_safe.manager.predictor.get_model_prediction">manager.predictor.get_model_prediction</a></td>
-<td>Get the prediction package from the latest trained model.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.logger.html#spotforecast2_safe.manager.logger">manager.logger</a></td>
-<td>Audit-grade logging for spotforecast2-safe.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.persistence.html#spotforecast2_safe.manager.persistence">manager.persistence</a></td>
 <td></td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.features.apply_cyclical_encoding.html#spotforecast2_safe.manager.features.apply_cyclical_encoding">manager.features.apply_cyclical_encoding</a></td>
-<td>Apply cyclical (sine/cosine) encoding to periodic integer features.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.features.create_interaction_features.html#spotforecast2_safe.manager.features.create_interaction_features">manager.features.create_interaction_features</a></td>
-<td>Append bilinear interaction terms to an exogenous feature matrix.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.features.select_exogenous_features.html#spotforecast2_safe.manager.features.select_exogenous_features">manager.features.select_exogenous_features</a></td>
-<td>Select and deduplicate exogenous feature columns for model training.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.features.merge_data_and_covariates.html#spotforecast2_safe.manager.features.merge_data_and_covariates">manager.features.merge_data_and_covariates</a></td>
-<td>Merge target data with exogenous features and split into train/predict slices.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/manager.features.get_target_data.html#spotforecast2_safe.manager.features.get_target_data">manager.features.get_target_data</a></td>
-<td>Extract the training series and exogenous slices for one target column.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/manager.features.select_top_poly_features.html#spotforecast2_safe.manager.features.select_top_poly_features">manager.features.select_top_poly_features</a></td>
-<td>Rank polynomial interaction columns by mutual information, keep the top K.</td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
+<td><code>DatetimeIndex</code> with the requested <code>freq</code>.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="multitask" class="level2">
-<h2 class="anchored" data-anchor-id="multitask">Multitask</h2>
-<p>Config-driven multi-target forecasting orchestrator. Tuning-free and plotting-free safe subset of the sibling spotforecast2.multitask. Provides BaseTask (shared pipeline steps), MultiTask (task dispatcher), task-specific classes (LazyTask, DefaultsTask, PredictTask, CleanTask), the module-level agg_predictor helper, a LightGBM factory, training strategies, and a one-call runner.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/multitask.base.BaseTask.html#spotforecast2_safe.multitask.base.BaseTask">multitask.base.BaseTask</a></td>
-<td>Shared base for all multi-target forecasting pipeline tasks.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/multitask.base.agg_predictor.html#spotforecast2_safe.multitask.base.agg_predictor">multitask.base.agg_predictor</a></td>
-<td>Aggregate per-target prediction packages into a weighted forecast.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/multitask.multi.MultiTask.html#spotforecast2_safe.multitask.multi.MultiTask">multitask.multi.MultiTask</a></td>
-<td>Orchestrates a multi-target time-series forecasting pipeline.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/multitask.lazy.LazyTask.html#spotforecast2_safe.multitask.lazy.LazyTask">multitask.lazy.LazyTask</a></td>
-<td>Task 1 — Lazy Fitting with default LightGBM parameters.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/multitask.defaults.DefaultsTask.html#spotforecast2_safe.multitask.defaults.DefaultsTask">multitask.defaults.DefaultsTask</a></td>
-<td>Task 2 — Defaults fitting (no tuning, no cached params).</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/multitask.predict.PredictTask.html#spotforecast2_safe.multitask.predict.PredictTask">multitask.predict.PredictTask</a></td>
-<td>Task 5 — Predict-only using previously saved models.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/multitask.clean.CleanTask.html#spotforecast2_safe.multitask.clean.CleanTask">multitask.clean.CleanTask</a></td>
-<td>Cache-cleaning task — removes all cached data from the pipeline cache.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/multitask.factories.default_lgbm_forecaster_factory.html#spotforecast2_safe.multitask.factories.default_lgbm_forecaster_factory">multitask.factories.default_lgbm_forecaster_factory</a></td>
-<td>Return a fresh, unfitted LightGBM <code>ForecasterRecursive</code>.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/multitask.strategies.TrainingStrategy.html#spotforecast2_safe.multitask.strategies.TrainingStrategy">multitask.strategies.TrainingStrategy</a></td>
-<td>Strategy interface for preparing a forecaster before the final fit.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/multitask.strategies.LazyStrategy.html#spotforecast2_safe.multitask.strategies.LazyStrategy">multitask.strategies.LazyStrategy</a></td>
-<td>Approach 1 — Lazy fitting with optional cached tuning.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/multitask.strategies.DefaultsStrategy.html#spotforecast2_safe.multitask.strategies.DefaultsStrategy">multitask.strategies.DefaultsStrategy</a></td>
-<td>Approach 2 — Train with defaults, no tuning, no cached params.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/multitask.runner.run.html#spotforecast2_safe.multitask.runner.run">multitask.runner.run</a></td>
-<td>Run the MultiTask forecasting pipeline and return predictions.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="utils" class="level2">
-<h2 class="anchored" data-anchor-id="utils">Utils</h2>
-<p>General-purpose utility functions: CPE generation, validation, and data transforms.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/utils.cpe.get_cpe_identifier.html#spotforecast2_safe.utils.cpe.get_cpe_identifier">utils.cpe.get_cpe_identifier</a></td>
-<td>Generates the CPE 2.3 identifier for the spotforecast2-safe project.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/utils.convert_to_utc.html#spotforecast2_safe.utils.convert_to_utc">utils.convert_to_utc</a></td>
-<td>Utility functions for timezone conversion.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/utils.parse.parse_bool.html#spotforecast2_safe.utils.parse.parse_bool">utils.parse.parse_bool</a></td>
-<td>Parse case-insensitive boolean strings for CLI arguments.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="stats" class="level2">
-<h2 class="anchored" data-anchor-id="stats">Stats</h2>
-<p>Statistical primitives for time-series diagnostics. Pure compute, no plotting dependencies — safety-critical-friendly.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/stats.stationarity.augmented_dickey_fuller.html#spotforecast2_safe.stats.stationarity.augmented_dickey_fuller">stats.stationarity.augmented_dickey_fuller</a></td>
-<td>Run an Augmented Dickey-Fuller test on a time series.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/stats.spectral.compute_periodogram.html#spotforecast2_safe.stats.spectral.compute_periodogram">stats.spectral.compute_periodogram</a></td>
-<td>Compute the periodogram of a time series.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/stats.spectral.PeriodogramResult.html#spotforecast2_safe.stats.spectral.PeriodogramResult">stats.spectral.PeriodogramResult</a></td>
-<td>Container for the output of <code>compute_periodogram()</code>.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="security" class="level2">
-<h2 class="anchored" data-anchor-id="security">Security</h2>
-<p>Masking and PII-protection utilities for safe logging (CWE-532, CWE-312).</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/security.masking.mask_estimator.html#spotforecast2_safe.security.masking.mask_estimator">security.masking.mask_estimator</a></td>
-<td>Return a non-sensitive string representation of an estimator.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="calendar" class="level2">
-<h2 class="anchored" data-anchor-id="calendar">Calendar</h2>
-<p>Calendar, holiday, and day/night feature engineering for covariate construction.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/calendar.holiday.create_holiday_df.html#spotforecast2_safe.calendar.holiday.create_holiday_df">calendar.holiday.create_holiday_df</a></td>
-<td>Create a DataFrame with datetime index and a binary holiday indicator column.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/calendar.holiday.get_holiday_features.html#spotforecast2_safe.calendar.holiday.get_holiday_features">calendar.holiday.get_holiday_features</a></td>
-<td>Build public-holiday indicators and align them to a regular time grid.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/calendar.holiday.create_holiday_adjacency_df.html#spotforecast2_safe.calendar.holiday.create_holiday_adjacency_df">calendar.holiday.create_holiday_adjacency_df</a></td>
-<td>Create a DataFrame with binary adjacency indicators for public holidays.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/calendar.holiday.get_holiday_adjacency_features.html#spotforecast2_safe.calendar.holiday.get_holiday_adjacency_features">calendar.holiday.get_holiday_adjacency_features</a></td>
-<td>Build holiday-adjacency indicators and align them to a regular time grid.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/calendar.holiday.create_day_type_df.html#spotforecast2_safe.calendar.holiday.create_day_type_df">calendar.holiday.create_day_type_df</a></td>
-<td>Create a day-type refinement of the public-holiday column.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/calendar.holiday.get_day_type_features.html#spotforecast2_safe.calendar.holiday.get_day_type_features">calendar.holiday.get_day_type_features</a></td>
-<td>Build day-type indicators and align them to a regular time grid.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/calendar.features.get_calendar_features.html#spotforecast2_safe.calendar.features.get_calendar_features">calendar.features.get_calendar_features</a></td>
-<td>Create calendar-based features for a contiguous time range.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/calendar.features.get_day_night_features.html#spotforecast2_safe.calendar.features.get_day_night_features">calendar.features.get_day_night_features</a></td>
-<td>Create day/night features using astronomical sunrise and sunset times.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/calendar.features.get_ephemeris_features.html#spotforecast2_safe.calendar.features.get_ephemeris_features">calendar.features.get_ephemeris_features</a></td>
-<td>Create continuous solar-geometry features from the ephemeris.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="weather" class="level2">
-<h2 class="anchored" data-anchor-id="weather">Weather</h2>
-<p>Weather data integration using the Open-Meteo API, derived weather features (degree-hours, apparent temperature, dew point), and population-weighted multi-city spatial aggregation.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.client.WeatherClient.html#spotforecast2_safe.weather.client.WeatherClient">weather.client.WeatherClient</a></td>
-<td>Client for fetching weather data from Open-Meteo API.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/weather.client.WeatherService.html#spotforecast2_safe.weather.client.WeatherService">weather.client.WeatherService</a></td>
-<td>High-level service for weather data generation.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.features.get_weather_features.html#spotforecast2_safe.weather.features.get_weather_features">weather.features.get_weather_features</a></td>
-<td>Fetch weather data and compute rolling-window features.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/weather.derived.heating_degree_hours.html#spotforecast2_safe.weather.derived.heating_degree_hours">weather.derived.heating_degree_hours</a></td>
-<td>Heating degree-hours :math:<code>\max(base - T, 0)</code>.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.derived.cooling_degree_hours.html#spotforecast2_safe.weather.derived.cooling_degree_hours">weather.derived.cooling_degree_hours</a></td>
-<td>Cooling degree-hours :math:<code>\max(T - base, 0)</code>.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/weather.derived.dew_point.html#spotforecast2_safe.weather.derived.dew_point">weather.derived.dew_point</a></td>
-<td>Dew-point temperature via the Magnus-Tetens approximation.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.derived.apparent_temperature.html#spotforecast2_safe.weather.derived.apparent_temperature">weather.derived.apparent_temperature</a></td>
-<td>Steadman apparent (“feels-like”) temperature.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/weather.derived.population_weighted_average.html#spotforecast2_safe.weather.derived.population_weighted_average">weather.derived.population_weighted_average</a></td>
-<td>Combine per-location weather frames into one demand-weighted index.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.derived.add_derived_weather_features.html#spotforecast2_safe.weather.derived.add_derived_weather_features">weather.derived.add_derived_weather_features</a></td>
-<td>Append the requested derived columns to a raw weather frame (fail-safe).</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/weather.locations.WeatherLocation.html#spotforecast2_safe.weather.locations.WeatherLocation">weather.locations.WeatherLocation</a></td>
-<td>A single weather sampling location with a population weight.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.locations.default_german_locations.html#spotforecast2_safe.weather.locations.default_german_locations">weather.locations.default_german_locations</a></td>
-<td>Return the default population-weighted German load-centre registry.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/weather.locations.coordinates.html#spotforecast2_safe.weather.locations.coordinates">weather.locations.coordinates</a></td>
-<td>Extract <code>(latitude, longitude)</code> pairs in order.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/weather.locations.weights.html#spotforecast2_safe.weather.locations.weights">weather.locations.weights</a></td>
-<td>Extract the raw (un-normalised) weights in order.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="downloader" class="level2">
-<h2 class="anchored" data-anchor-id="downloader">Downloader</h2>
-<p>Data downloaders for external data sources (e.g.&nbsp;ENTSO-E).</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/downloader.entsoe.download_new_data.html#spotforecast2_safe.downloader.entsoe.download_new_data">downloader.entsoe.download_new_data</a></td>
-<td>Download new load and forecast data from ENTSO-E.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/downloader.entsoe.download_renewable_forecast.html#spotforecast2_safe.downloader.entsoe.download_renewable_forecast">downloader.entsoe.download_renewable_forecast</a></td>
-<td>Download the ENTSO-E day-ahead wind/solar generation forecast.</td>
-</tr>
-<tr class="odd">
-<td><a href="../../docs/reference/downloader.entsoe.download_day_ahead_price.html#spotforecast2_safe.downloader.entsoe.download_day_ahead_price">downloader.entsoe.download_day_ahead_price</a></td>
-<td>Download the ENTSO-E day-ahead spot price (DE/LU).</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/downloader.entsoe.merge_build_manual.html#spotforecast2_safe.downloader.entsoe.merge_build_manual">downloader.entsoe.merge_build_manual</a></td>
-<td>Merge all raw CSV files from the ‘raw’ directory into a single interim file.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="exceptions" class="level2">
-<h2 class="anchored" data-anchor-id="exceptions">Exceptions</h2>
-<p>Custom exception types for safety-critical failure signalling.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/exceptions.html#spotforecast2_safe.exceptions">exceptions</a></td>
-<td>Custom exceptions and warnings for spotforecast2.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="tasks" class="level2">
-<h2 class="anchored" data-anchor-id="tasks">Tasks</h2>
-<p>Executable tasks for demonstration and production pipelines.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../../docs/reference/tasks.task_safe_demo.html#spotforecast2_safe.tasks.task_safe_demo">tasks.task_safe_demo</a></td>
-<td>Task demo: compare baseline, covariate, and custom LightGBM forecasts against ground truth.</td>
-</tr>
-<tr class="even">
-<td><a href="../../docs/reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.html#spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe">tasks.task_safe_n_to_1_with_covariates_and_dataframe</a></td>
-<td>Thin ConfigMulti-driven entry point for N-to-1 forecasting.</td>
-</tr>
-</tbody>
-</table>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="dddd0d03" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> astral <span class="im">import</span> LocationInfo</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.calendar <span class="im">import</span> get_ephemeris_features</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> pd.Timestamp(<span class="st">"2024-06-21"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>cov_end <span class="op">=</span> pd.Timestamp(<span class="st">"2024-06-21 23:00"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> LocationInfo(latitude<span class="op">=</span><span class="fl">51.5136</span>, longitude<span class="op">=</span><span class="fl">7.4653</span>, timezone<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>feats <span class="op">=</span> get_ephemeris_features(start, cov_end, location)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"columns:"</span>, feats.columns.tolist())</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"shape:"</span>, feats.shape)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Summer solstice: long day and a high midday sun in Dortmund.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"max elevation:"</span>, <span class="bu">round</span>(feats[<span class="st">"solar_elevation"</span>].<span class="bu">max</span>(), <span class="dv">1</span>))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> feats.shape <span class="op">==</span> (<span class="dv">24</span>, <span class="dv">4</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> feats[<span class="st">"solar_elevation"</span>].<span class="bu">max</span>() <span class="op">&gt;</span> <span class="fl">50.0</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> feats[<span class="st">"daylight_duration_h"</span>].iloc[<span class="dv">0</span>] <span class="op">&gt;</span> <span class="fl">14.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>columns: ['solar_elevation', 'daylight_duration_h', 'hours_since_sunrise', 'hours_to_sunset']
+shape: (24, 4)
+max elevation: 61.4</code></pre>
+</div>
+</div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -2695,7 +2130,7 @@ ul.task-list li input[type="checkbox"] {
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/calendar.features.get_ephemeris_features.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
