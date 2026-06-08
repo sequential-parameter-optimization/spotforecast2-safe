@@ -1,0 +1,71 @@
+# calendar.features.get_ephemeris_features { #spotforecast2_safe.calendar.features.get_ephemeris_features }
+
+```python
+calendar.features.get_ephemeris_features(
+    start,
+    cov_end,
+    location,
+    freq='h',
+    timezone='UTC',
+)
+```
+
+Create continuous solar-geometry features from the ephemeris.
+
+Unlike `get_day_night_features` (which rounds sunrise/sunset to whole
+hours and emits a binary daylight flag), this builder exposes the
+*continuous* solar geometry the hour-of-day RBFs only encode implicitly:
+the per-hour solar elevation, the exact daylight duration, and the signed
+time relative to sunrise and sunset. These linearise lighting-load timing
+and the midday PV offset, are purely deterministic from the date and the
+fixed coordinates, add no dependency, and leak nothing for any forecast
+hour (Xie & Hong 2018, ``xieh18a``; López 2020, ``lope20a``).
+
+The returned DataFrame contains four ``float64`` columns:
+
+- ``solar_elevation`` — solar elevation angle in degrees (negative at
+  night, peaking at solar noon).
+- ``daylight_duration_h`` — exact sunset−sunrise span for the date, hours.
+- ``hours_since_sunrise`` — signed hours since that date's sunrise
+  (negative before sunrise).
+- ``hours_to_sunset`` — signed hours until that date's sunset
+  (negative after sunset).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                                                                    | Description                                                                            | Default    |
+|----------|-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|------------|
+| start    | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start of the time range. String values are parsed with ``utc=True``.                   | _required_ |
+| cov_end  | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end of the time range. String values are parsed with ``utc=True``.           | _required_ |
+| location | [LocationInfo](`astral.LocationInfo`)                                                   | `LocationInfo` describing the geographic location.                                     | _required_ |
+| freq     | [str](`str`)                                                                            | Pandas-compatible frequency string for the output index. Defaults to ``"h"`` (hourly). | `'h'`      |
+| timezone | [str](`str`)                                                                            | Timezone label applied to the generated index. Defaults to ``"UTC"``.                  | `'UTC'`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                         |
+|--------|------------------------------------------------|---------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Columns ``solar_elevation``, ``daylight_duration_h``, |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``hours_since_sunrise``, ``hours_to_sunset``; tz-aware              |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | `DatetimeIndex` with the requested ``freq``.                        |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from astral import LocationInfo
+from spotforecast2_safe.calendar import get_ephemeris_features
+
+start = pd.Timestamp("2024-06-21", tz="UTC")
+cov_end = pd.Timestamp("2024-06-21 23:00", tz="UTC")
+location = LocationInfo(latitude=51.5136, longitude=7.4653, timezone="UTC")
+
+feats = get_ephemeris_features(start, cov_end, location)
+print("columns:", feats.columns.tolist())
+print("shape:", feats.shape)
+# Summer solstice: long day and a high midday sun in Dortmund.
+print("max elevation:", round(feats["solar_elevation"].max(), 1))
+assert feats.shape == (24, 4)
+assert feats["solar_elevation"].max() > 50.0
+assert feats["daylight_duration_h"].iloc[0] > 14.0
+```

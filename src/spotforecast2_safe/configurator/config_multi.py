@@ -325,6 +325,14 @@ class ConfigMulti:
     include_apparent_temperature: bool = False
     degree_hours_base_heating: float = 15.0
     degree_hours_base_cooling: float = 22.0
+    # Ephemeris (continuous solar geometry) and day-type calendar refinements
+    # (consumed by spotforecast2.multitask.base.build_exogenous_features). Both
+    # default off so the pipeline stays byte-identical to the baseline.
+    # ``include_ephemeris_features`` adds solar_elevation + daylight_duration_h
+    # + signed sunrise/sunset-relative time; ``include_day_type_features`` adds
+    # is_workday + day_type (workday/Saturday/Sunday/holiday class).
+    include_ephemeris_features: bool = False
+    include_day_type_features: bool = False
     poly_features_degree: int = 1
     max_poly_features: int = 10
     poly_mi_n_jobs: Optional[int] = -1

@@ -31,6 +31,8 @@ from sklearn.model_selection import TimeSeriesSplit as _SklearnTimeSeriesSplit
 from spotforecast2_safe.calendar import (
     get_calendar_features,
     get_day_night_features,
+    get_day_type_features,
+    get_ephemeris_features,
     get_holiday_adjacency_features,
     get_holiday_features,
 )
@@ -1107,6 +1109,18 @@ class BaseTask:
         )
         self.logger.info("  Day/night features: %s", sun_light_features.shape)
 
+        # 4c-bis. Ephemeris (continuous solar geometry), opt-in.
+        ephemeris_features = None
+        if getattr(self.config, "include_ephemeris_features", False):
+            ephemeris_features = get_ephemeris_features(
+                start=self.run_state.data_start,
+                cov_end=self.run_state.cov_end,
+                location=location,
+                freq="h",
+                timezone=self.config.timezone,
+            )
+            self.logger.info("  Ephemeris features: %s", ephemeris_features.shape)
+
         # 4d. Holidays
         holiday_features = get_holiday_features(
             data=self.df_pipeline,
@@ -1127,6 +1141,21 @@ class BaseTask:
             weather_features,
             holiday_features,
         ]
+        if ephemeris_features is not None:
+            concat_frames.append(ephemeris_features)
+        if getattr(self.config, "include_day_type_features", False):
+            day_type_features = get_day_type_features(
+                data=self.df_pipeline,
+                start=self.run_state.data_start,
+                cov_end=self.run_state.cov_end,
+                forecast_horizon=self.config.predict_size,
+                tz=self.config.timezone,
+                freq="h",
+                country_code=self.config.country_code,
+                state=self.config.state,
+            )
+            self.logger.info("  Day-type features: %s", day_type_features.shape)
+            concat_frames.append(day_type_features)
         if self.config.include_holiday_adjacency_features:
             holiday_adjacency_features = get_holiday_adjacency_features(
                 data=self.df_pipeline,
