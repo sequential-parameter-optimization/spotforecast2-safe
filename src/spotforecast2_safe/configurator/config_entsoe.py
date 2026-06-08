@@ -257,6 +257,23 @@ class ConfigEntsoe:
     include_weather_windows: bool = False
     include_holiday_features: bool = False
     include_holiday_adjacency_features: bool = False
+    # Global / derived weather and calendar refinements (parity with ConfigMulti;
+    # consumed by spotforecast2.multitask.base.build_exogenous_features). All
+    # default off → byte-identical to the single-point baseline.
+    # ``use_population_weighted_weather`` samples the fixed German load-centre
+    # registry and combines cities by population weight;
+    # ``include_degree_hours`` adds heating/cooling degree-hours;
+    # ``include_apparent_temperature`` adds apparent temperature + dew point;
+    # ``include_ephemeris_features`` adds continuous solar geometry
+    # (solar_elevation, daylight_duration_h, signed sunrise/sunset-relative time);
+    # ``include_day_type_features`` adds is_workday + a day_type class.
+    use_population_weighted_weather: bool = False
+    include_degree_hours: bool = False
+    include_apparent_temperature: bool = False
+    degree_hours_base_heating: float = 15.0
+    degree_hours_base_cooling: float = 22.0
+    include_ephemeris_features: bool = False
+    include_day_type_features: bool = False
     poly_features_degree: int = 1
     max_poly_features: int = 10
     poly_mi_n_jobs: Optional[int] = -1
