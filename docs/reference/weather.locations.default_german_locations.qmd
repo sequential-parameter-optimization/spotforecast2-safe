@@ -1,0 +1,23 @@
+# weather.locations.default_german_locations { #spotforecast2_safe.weather.locations.default_german_locations }
+
+```python
+weather.locations.default_german_locations()
+```
+
+Return the default population-weighted German load-centre registry.
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                      | Description                                                           |
+|--------|---------------------------------------------------------------------------|-----------------------------------------------------------------------|
+|        | [WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`) | Tuple[WeatherLocation, ...]: :data:`GERMAN_LOAD_CENTERS`, in a fixed, |
+|        | ...                                                                       | deterministic order.                                                  |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.weather.locations import default_german_locations
+
+locs = default_german_locations()
+print(len(locs), locs[0].name)
+```

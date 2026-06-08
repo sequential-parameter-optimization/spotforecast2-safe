@@ -1,0 +1,12 @@
+{
+  "hash": "e1cc9a695238b319db14c18a95c14a48",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: stats.spectral.PeriodogramResult\n---\n\n\n\n```python\nstats.spectral.PeriodogramResult(spectrum, top_periods)\n```\n\nContainer for the output of `compute_periodogram()`.\n\n## Attributes {.doc-section .doc-section-attributes}\n\n| Name        | Type                                           | Description                                                                                                                                                                     |\n|-------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| spectrum    | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``pd.DataFrame`` indexed by frequency with one column ``\"power\"``.  Frequency is expressed in units of \"cycles per sample\" (the convention used by `scipy.signal.periodogram`). |\n| top_periods | [pd](`pandas`).[Series](`pandas.Series`)       | ``pd.Series`` of the top-k periods (1 / frequency) indexed by their spectral power, sorted from strongest to weakest peak.                                                      |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#37acbe0f .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nimport pandas as pd\n\nfrom spotforecast2_safe.stats.spectral import compute_periodogram\n\nrng = np.random.default_rng(0)\nt = np.arange(256)\ny = pd.Series(np.sin(2 * np.pi * t / 24) + 0.1 * rng.standard_normal(256))\nresult = compute_periodogram(y, max_peaks=3)\nprint(type(result).__name__)\nprint(result.spectrum.columns.tolist())\nassert isinstance(result.top_periods, pd.Series)\nassert len(result.top_periods) == 3\nprint(f\"Dominant period: {result.top_periods.index[0]:.1f} samples\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nPeriodogramResult\n['power']\nDominant period: 23.3 samples\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "stats.spectral.PeriodogramResult_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,3 +1,10 @@
+## [19.2.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.1.0...v19.2.0-rc.1) (2026-06-08)
+
+
+### Features
+
+* **weather:** population-weighted multi-city index + degree-hours/apparent-temperature/dew-point features ([1942c7b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1942c7bfe417624bae308c45f7023923fbcd8ea6))
+
 ## [19.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.0.0...v19.1.0) (2026-06-07)
 
 

@@ -1,0 +1,33 @@
+# weather.locations.weights { #spotforecast2_safe.weather.locations.weights }
+
+```python
+weather.locations.weights(locations)
+```
+
+Extract the raw (un-normalised) weights in order.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                                                       | Description            | Default    |
+|-----------|------------------------------------------------------------------------------------------------------------|------------------------|------------|
+| locations | [Sequence](`typing.Sequence`)\[[WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`)\] | The locations to read. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                      | Description                                                             |
+|--------|-------------------------------------------|-------------------------------------------------------------------------|
+|        | [List](`typing.List`)\[[float](`float`)\] | List[float]: One weight per location, in the same order. Consumers      |
+|        | [List](`typing.List`)\[[float](`float`)\] | normalise these (e.g.                                                   |
+|        | [List](`typing.List`)\[[float](`float`)\] | func:`spotforecast2_safe.weather.derived.population_weighted_average`). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.weather.locations import (
+    default_german_locations,
+    weights,
+)
+
+w = weights(default_german_locations())
+print(len(w), w[0])
+```

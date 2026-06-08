@@ -745,11 +745,23 @@ quartodoc:
     # ── Weather ───────────────────────────────────────────────────────────────
     - title: "Weather"
       desc: |
-        Weather data integration using the Open-Meteo API.
+        Weather data integration using the Open-Meteo API, derived weather
+        features (degree-hours, apparent temperature, dew point), and
+        population-weighted multi-city spatial aggregation.
       contents:
         - weather.client.WeatherClient
         - weather.client.WeatherService
         - weather.features.get_weather_features
+        - weather.derived.heating_degree_hours
+        - weather.derived.cooling_degree_hours
+        - weather.derived.dew_point
+        - weather.derived.apparent_temperature
+        - weather.derived.population_weighted_average
+        - weather.derived.add_derived_weather_features
+        - weather.locations.WeatherLocation
+        - weather.locations.default_german_locations
+        - weather.locations.coordinates
+        - weather.locations.weights
 
     # ── Downloader ────────────────────────────────────────────────────────────
     - title: "Downloader"

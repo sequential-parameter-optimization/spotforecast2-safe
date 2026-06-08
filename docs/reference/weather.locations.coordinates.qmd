@@ -1,0 +1,31 @@
+# weather.locations.coordinates { #spotforecast2_safe.weather.locations.coordinates }
+
+```python
+weather.locations.coordinates(locations)
+```
+
+Extract ``(latitude, longitude)`` pairs in order.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                                                       | Description            | Default    |
+|-----------|------------------------------------------------------------------------------------------------------------|------------------------|------------|
+| locations | [Sequence](`typing.Sequence`)\[[WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`)\] | The locations to read. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                   | Description                                                             |
+|--------|----------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+|        | [List](`typing.List`)\[[Tuple](`typing.Tuple`)\[[float](`float`), [float](`float`)\]\] | List[Tuple[float, float]]: One ``(lat, lon)`` pair per location, in the |
+|        | [List](`typing.List`)\[[Tuple](`typing.Tuple`)\[[float](`float`), [float](`float`)\]\] | same order.                                                             |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.weather.locations import (
+    coordinates,
+    default_german_locations,
+)
+
+print(coordinates(default_german_locations())[:2])
+```

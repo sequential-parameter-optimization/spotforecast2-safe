@@ -59,11 +59,40 @@ Threat model (STRIDE).
 """
 
 from .client import WeatherClient, WeatherFetchError, WeatherService
+from .derived import (
+    add_derived_weather_features,
+    apparent_temperature,
+    cooling_degree_hours,
+    dew_point,
+    heating_degree_hours,
+    population_weighted_average,
+)
 from .features import get_weather_features
+from .locations import (
+    GERMAN_LOAD_CENTERS,
+    WeatherLocation,
+    coordinates,
+    default_german_locations,
+    weights,
+)
 
 __all__ = [
     "WeatherClient",
     "WeatherFetchError",
     "WeatherService",
     "get_weather_features",
+    # Derived features (degree-hours, apparent temperature, dew point) and
+    # population-weighted spatial aggregation.
+    "add_derived_weather_features",
+    "apparent_temperature",
+    "cooling_degree_hours",
+    "dew_point",
+    "heating_degree_hours",
+    "population_weighted_average",
+    # German population-weighted load-centre registry.
+    "GERMAN_LOAD_CENTERS",
+    "WeatherLocation",
+    "coordinates",
+    "default_german_locations",
+    "weights",
 ]

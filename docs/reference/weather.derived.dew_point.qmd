@@ -1,0 +1,43 @@
+# weather.derived.dew_point { #spotforecast2_safe.weather.derived.dew_point }
+
+```python
+weather.derived.dew_point(temperature, relative_humidity)
+```
+
+Dew-point temperature via the Magnus-Tetens approximation.
+
+Uses :math:`\gamma = \ln(rh/100) + aT/(b+T)` and
+:math:`T_d = b\gamma/(a-\gamma)` with ``a = 17.625``, ``b = 243.04`` °C,
+valid for ``-40 °C ≤ T ≤ 60 °C``. The humidity ratio is floored at a tiny
+epsilon purely to keep the logarithm finite at ``rh = 0`` (a numerical
+domain guard, not measurement imputation).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                     | Description                                     | Default    |
+|-------------------|------------------------------------------|-------------------------------------------------|------------|
+| temperature       | [pd](`pandas`).[Series](`pandas.Series`) | Hourly air temperature in °C.                   | _required_ |
+| relative_humidity | [pd](`pandas`).[Series](`pandas.Series`) | Relative humidity in percent, ``0 ≤ rh ≤ 100``. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                            |
+|--------|------------------------------------------|------------------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: ``dew_point`` in °C, ``float64``, same index as the inputs. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                              |
+|--------|----------------------------|--------------------------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If either input is not a NaN-free numeric Series, their indices differ, or any humidity value lies outside ``[0, 100]``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather.derived import dew_point
+
+t = pd.Series([20.0, 20.0])
+rh = pd.Series([100.0, 50.0])
+print([round(v, 2) for v in dew_point(t, rh).tolist()])
+```
