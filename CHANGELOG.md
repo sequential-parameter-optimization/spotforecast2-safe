@@ -1,3 +1,24 @@
+## [20.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.4.0...v20.0.0-rc.1) (2026-06-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **tasks:** the `spotforecast-safe-n2o1-cov-df` console entry point and the
+`spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe` module
+(incl. `run_pipeline`, `main`, and the `n2o1_cov_df_main` export) are removed.
+Use `spotforecast2_safe.multitask.MultiTask` / `multitask.runner.run` directly.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **tasks:** remove the spotforecast-safe-n2o1-cov-df console task ([5893fc5](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5893fc5764744f31fcebe0773941a7e8289beea1))
+
+
+### Code Refactoring
+
+* **configurator:** ConfigEntsoe inherits ConfigMulti ([defdca7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/defdca73e300d9fd956652400ecd8981cec8cac6))
+
 ## [19.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v19.3.0...v19.4.0) (2026-06-08)
 
 
