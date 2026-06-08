@@ -1,0 +1,73 @@
+# multitask.factories.predict_quantile_band { #spotforecast2_safe.multitask.factories.predict_quantile_band }
+
+```python
+multitask.factories.predict_quantile_band(
+    forecasters,
+    steps,
+    *,
+    last_window=None,
+    exog=None,
+    enforce_monotonic=True,
+)
+```
+
+Assemble per-quantile forecasts into one non-crossing band.
+
+Calls ``predict`` on each fitted forecaster from
+:func:`quantile_lgbm_forecaster_factory` and stacks the results into columns
+named ``q_<level>`` (e.g. ``q_0.1``), in ascending quantile order. Because the
+quantile heads are fitted independently they can *cross* (a higher quantile
+predicting below a lower one); with ``enforce_monotonic`` the rows are sorted
+ascending (the Chernozhukov rearrangement), a deterministic post-hoc fix that
+restores monotonicity without changing the marginal quantile levels.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                                                                                                                  | Description                                                                                                                           | Default    |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|------------|
+| forecasters       | [Mapping](`typing.Mapping`)\[[float](`float`), [ForecasterRecursive](`spotforecast2_safe.forecaster.recursive.ForecasterRecursive`)\] | Map from quantile level to a **fitted** ``ForecasterRecursive`` (as returned by :func:`quantile_lgbm_forecaster_factory`, after fit). | _required_ |
+| steps             | [int](`int`)                                                                                                                          | Forecast horizon passed to each ``predict``.                                                                                          | _required_ |
+| last_window       | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                                                  | Optional last-window override forwarded to ``predict``.                                                                               | `None`     |
+| exog              | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\]                                                                                  | Optional exogenous frame forwarded to ``predict``.                                                                                    | `None`     |
+| enforce_monotonic | [bool](`bool`)                                                                                                                        | When ``True`` (default), sort each row ascending so the band never crosses.                                                           | `True`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                           |
+|--------|------------------------------------------------|-----------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: One column per quantile (``q_<level>``), indexed by the |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | forecast horizon.                                                     |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                          |
+|--------|----------------------------|------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *forecasters* is empty or its levels are invalid. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+import types
+from spotforecast2_safe.multitask.factories import (
+    quantile_lgbm_forecaster_factory,
+    predict_quantile_band,
+)
+
+idx = pd.date_range("2023-01-01", periods=300, freq="h")
+y = pd.Series(
+    50 + 10 * np.sin(np.arange(300) * 2 * np.pi / 24), index=idx, name="y"
+)
+config = types.SimpleNamespace(
+    random_state=0, lags_consider=[1, 24], window_size=24
+)
+heads = quantile_lgbm_forecaster_factory(config, quantiles=[0.1, 0.5, 0.9])
+for fc in heads.values():
+    fc.fit(y=y)
+band = predict_quantile_band(heads, steps=6)
+print(band.columns.tolist())
+# Non-crossing after rearrangement.
+assert (band["q_0.1"] <= band["q_0.5"] + 1e-9).all()
+assert (band["q_0.5"] <= band["q_0.9"] + 1e-9).all()
+```

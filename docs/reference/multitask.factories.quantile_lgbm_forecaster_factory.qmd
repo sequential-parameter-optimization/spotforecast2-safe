@@ -1,0 +1,58 @@
+# multitask.factories.quantile_lgbm_forecaster_factory { #spotforecast2_safe.multitask.factories.quantile_lgbm_forecaster_factory }
+
+```python
+multitask.factories.quantile_lgbm_forecaster_factory(
+    config,
+    *,
+    quantiles=DEFAULT_QUANTILES,
+    weight_func=None,
+    target=None,
+)
+```
+
+Return one quantile-regression LightGBM ``ForecasterRecursive`` per quantile.
+
+Each forecaster uses ``LGBMRegressor(objective="quantile", alpha=q)`` and the
+same lag/rolling configuration as :func:`default_lgbm_forecaster_factory`, so a
+caller can fit the lower/median/upper heads independently and assemble a band
+with :func:`predict_quantile_band`. Deterministic given ``config.random_state``;
+sf2-safe (LightGBM only, no torch/optuna). Refs ``hong16b``, ``roma19a``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                                 | Description                                                                                                    | Default             |
+|-------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|---------------------|
+| config      | [Any](`typing.Any`)                                  | Object satisfying the ``PipelineConfig`` protocol; reads ``random_state``, ``lags_consider``, ``window_size``. | _required_          |
+| quantiles   | [Sequence](`typing.Sequence`)\[[float](`float`)\]    | Quantile levels in the open interval ``(0, 1)``. Defaults to ``(0.1, 0.5, 0.9)``.                              | `DEFAULT_QUANTILES` |
+| weight_func | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\] | Optional per-sample weight function.                                                                           | `None`              |
+| target      | [Optional](`typing.Optional`)\[[str](`str`)\]        | Accepted and ignored (parity with the default factory).                                                        | `None`              |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                            | Description                                                           |
+|--------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[float](`float`), [ForecasterRecursive](`spotforecast2_safe.forecaster.recursive.ForecasterRecursive`)\] | Dict[float, ForecasterRecursive]: Map from quantile level to a fresh, |
+|        | [Dict](`typing.Dict`)\[[float](`float`), [ForecasterRecursive](`spotforecast2_safe.forecaster.recursive.ForecasterRecursive`)\] | unfitted forecaster, in ascending quantile order.                     |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                    |
+|--------|----------------------------|----------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *quantiles* is empty, out of ``(0, 1)``, or has duplicates. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import types
+from spotforecast2_safe.multitask.factories import (
+    quantile_lgbm_forecaster_factory,
+)
+
+config = types.SimpleNamespace(
+    random_state=42, lags_consider=[1, 2, 3], window_size=3
+)
+heads = quantile_lgbm_forecaster_factory(config, quantiles=[0.1, 0.5, 0.9])
+print(sorted(heads))
+print(heads[0.1].regressor.get_params()["objective"])
+print(heads[0.1].regressor.get_params()["alpha"])
+```
