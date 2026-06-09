@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>spotforecast2-safe – spotforecast2-safe</title>
+<title>downloader.entsoe.assemble_zone_loads – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -72,35 +107,6 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -299,7 +305,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/safe/spotforecast2-safe.html">Safety &amp; Security</a></li><li class="breadcrumb-item"><a href="../../docs/safe/spotforecast2-safe.html">Streamlining Process</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.assemble_zone_loads.html">assemble_zone_loads</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -325,13 +331,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">API Reference</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/index.html" class="sidebar-item-text sidebar-link">
@@ -1312,13 +1318,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="true">
  <span class="menu-text">Downloader</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/downloader.entsoe.download_new_data.html" class="sidebar-item-text sidebar-link">
@@ -1351,7 +1357,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/downloader.entsoe.assemble_zone_loads.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/reference/downloader.entsoe.assemble_zone_loads.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">assemble_zone_loads</span></a>
   </div>
 </li>
@@ -1465,16 +1471,16 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false">
  <span class="menu-text">Safety &amp; Security</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../docs/safe/spotforecast2-safe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Streamlining Process</span></a>
   </div>
 </li>
@@ -1560,264 +1566,156 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spotforecast2-safe-safety-critical-streamlining" id="toc-spotforecast2-safe-safety-critical-streamlining" class="nav-link active" data-scroll-target="#spotforecast2-safe-safety-critical-streamlining">spotforecast2-safe: Safety-Critical Streamlining</a>
-  <ul class="collapse">
-  <li><a href="#rationale" id="toc-rationale" class="nav-link" data-scroll-target="#rationale">Rationale</a></li>
-  <li><a href="#positive-list-retained-components" id="toc-positive-list-retained-components" class="nav-link" data-scroll-target="#positive-list-retained-components">Positive List (Retained Components)</a>
-  <ul class="collapse">
-  <li><a href="#orchestration-pipelines" id="toc-orchestration-pipelines" class="nav-link" data-scroll-target="#orchestration-pipelines">Orchestration &amp; Pipelines</a></li>
-  <li><a href="#data-environmental-services" id="toc-data-environmental-services" class="nav-link" data-scroll-target="#data-environmental-services">Data &amp; Environmental Services</a></li>
-  <li><a href="#forecaster-engine" id="toc-forecaster-engine" class="nav-link" data-scroll-target="#forecaster-engine">Forecaster Engine</a></li>
-  <li><a href="#preprocessing-signal-cleaning" id="toc-preprocessing-signal-cleaning" class="nav-link" data-scroll-target="#preprocessing-signal-cleaning">Preprocessing &amp; Signal Cleaning</a></li>
-  <li><a href="#core-utilities" id="toc-core-utilities" class="nav-link" data-scroll-target="#core-utilities">Core Utilities</a></li>
-  </ul></li>
-  <li><a href="#negative-list-removed-components" id="toc-negative-list-removed-components" class="nav-link" data-scroll-target="#negative-list-removed-components">Negative List (Removed Components)</a>
-  <ul class="collapse">
-  <li><a href="#removed-modules" id="toc-removed-modules" class="nav-link" data-scroll-target="#removed-modules">Removed Modules</a></li>
-  <li><a href="#associated-test-deletions" id="toc-associated-test-deletions" class="nav-link" data-scroll-target="#associated-test-deletions">Associated Test Deletions</a></li>
-  </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
-  <li><a href="#essential-classes-and-functions-positive-list" id="toc-essential-classes-and-functions-positive-list" class="nav-link" data-scroll-target="#essential-classes-and-functions-positive-list">Essential Classes and Functions (Positive List)</a>
-  <ul class="collapse">
-  <li><a href="#orchestration-processing" id="toc-orchestration-processing" class="nav-link" data-scroll-target="#orchestration-processing">Orchestration &amp; Processing</a></li>
-  <li><a href="#multitask-pipeline-n-to-1-task" id="toc-multitask-pipeline-n-to-1-task" class="nav-link" data-scroll-target="#multitask-pipeline-n-to-1-task">Multitask Pipeline (n-to-1 task)</a></li>
-  <li><a href="#data-environmental-services-1" id="toc-data-environmental-services-1" class="nav-link" data-scroll-target="#data-environmental-services-1">Data &amp; Environmental Services</a></li>
-  <li><a href="#forecasting-engine" id="toc-forecasting-engine" class="nav-link" data-scroll-target="#forecasting-engine">Forecasting Engine</a></li>
-  <li><a href="#preprocessing-validation" id="toc-preprocessing-validation" class="nav-link" data-scroll-target="#preprocessing-validation">Preprocessing &amp; Validation</a></li>
-  <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link" data-scroll-target="#feature-engineering">Feature Engineering</a></li>
-  </ul></li>
-  <li><a href="#unused-classes-and-functions-negative-list" id="toc-unused-classes-and-functions-negative-list" class="nav-link" data-scroll-target="#unused-classes-and-functions-negative-list">Unused Classes and Functions (Negative List)</a>
-  <ul class="collapse">
-  <li><a href="#utilities" id="toc-utilities" class="nav-link" data-scroll-target="#utilities">Utilities</a></li>
-  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
-  <li><a href="#internal-details" id="toc-internal-details" class="nav-link" data-scroll-target="#internal-details">Internal Details</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/safe/spotforecast2-safe.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.assemble_zone_loads.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/safe/spotforecast2-safe.html">Safety &amp; Security</a></li><li class="breadcrumb-item"><a href="../../docs/safe/spotforecast2-safe.html">Streamlining Process</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.assemble_zone_loads.html">assemble_zone_loads</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">downloader.entsoe.assemble_zone_loads</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="spotforecast2-safe-safety-critical-streamlining" class="level1">
-<h1>spotforecast2-safe: Safety-Critical Streamlining</h1>
-<p>As part of the MLOps engineering for safety-critical systems, the <code>spotforecast2_safe</code> package has been meticulously streamlined. This document outlines the rationale and the specific changes made to ensure the package contains only the necessary components for the defined forecasting tasks.</p>
-<section id="rationale" class="level2">
-<h2 class="anchored" data-anchor-id="rationale">Rationale</h2>
-<p>In safety-critical environments, reducing the “dead code” and unnecessary dependencies is paramount. By removing unreachable or unused modules, we: 1. <strong>Minimize Attack Surface</strong>: Fewer lines of code mean fewer potential vulnerabilities. 2. <strong>Improve Predictability</strong>: Removing complex model search and statistical heuristics ensures the system behaves exactly as expected for its primary workload. 3. <strong>Streamline Compliance</strong>: Auditing and validating a smaller codebase is more efficient and reliable.</p>
-<hr>
-</section>
-<section id="positive-list-retained-components" class="level2">
-<h2 class="anchored" data-anchor-id="positive-list-retained-components">Positive List (Retained Components)</h2>
-<p>The following files are essential for the execution of the primary workflow <code>task_safe_demo.py</code>. (The <code>task_safe_n_to_1_with_covariates_and_dataframe.py</code> console task was removed in 20.0.0; the <code>multitask</code> pipeline it wrapped — <code>BaseTask</code>/<code>MultiTask</code>/<code>runner.run</code> — is retained as public API and is exercised by the downstream <code>spotforecast2</code> package.)</p>
-<section id="orchestration-pipelines" class="level3">
-<h3 class="anchored" data-anchor-id="orchestration-pipelines">Orchestration &amp; Pipelines</h3>
-<ul>
-<li><code>src/spotforecast2_safe/processing/n2n_predict_with_covariates.py</code></li>
-<li><code>src/spotforecast2_safe/processing/n2n_predict.py</code></li>
-<li><code>src/spotforecast2_safe/processing/agg_predict.py</code></li>
-</ul>
-</section>
-<section id="data-environmental-services" class="level3">
-<h3 class="anchored" data-anchor-id="data-environmental-services">Data &amp; Environmental Services</h3>
-<ul>
-<li><code>src/spotforecast2_safe/data/data_classes.py</code></li>
-<li><code>src/spotforecast2_safe/data/fetch_data.py</code></li>
-<li><code>src/spotforecast2_safe/weather/client.py</code></li>
-<li><code>src/spotforecast2_safe/weather/features.py</code></li>
-<li><code>src/spotforecast2_safe/holiday/generate_holiday.py</code></li>
-</ul>
-</section>
-<section id="forecaster-engine" class="level3">
-<h3 class="anchored" data-anchor-id="forecaster-engine">Forecaster Engine</h3>
-<ul>
-<li><code>src/spotforecast2_safe/forecaster/base.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/recursive/_forecaster_recursive.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/recursive/_forecaster_equivalent_date.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/recursive/_warnings.py</code></li>
-<li><code>src/spotforecast2_safe/forecaster/utils.py</code></li>
-</ul>
-</section>
-<section id="preprocessing-signal-cleaning" class="level3">
-<h3 class="anchored" data-anchor-id="preprocessing-signal-cleaning">Preprocessing &amp; Signal Cleaning</h3>
-<ul>
-<li><code>src/spotforecast2_safe/preprocessing/curate_data.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/imputation.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/outlier.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/split.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_rolling.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_differentiator.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_binner.py</code></li>
-<li><code>src/spotforecast2_safe/preprocessing/_common.py</code></li>
-</ul>
-</section>
-<section id="core-utilities" class="level3">
-<h3 class="anchored" data-anchor-id="core-utilities">Core Utilities</h3>
-<ul>
-<li><code>src/spotforecast2_safe/utils/validation.py</code></li>
-<li><code>src/spotforecast2_safe/utils/data_transform.py</code></li>
-<li><code>src/spotforecast2_safe/utils/forecaster_config.py</code></li>
-<li><code>src/spotforecast2_safe/utils/convert_to_utc.py</code></li>
-<li><code>src/spotforecast2_safe/exceptions.py</code></li>
-</ul>
-<hr>
-</section>
-</section>
-<section id="negative-list-removed-components" class="level2">
-<h2 class="anchored" data-anchor-id="negative-list-removed-components">Negative List (Removed Components)</h2>
-<p>The following directories and files were present in the original <code>spotforecast2</code> package but have been removed from <code>spotforecast2_safe</code> as they are not required for the target safety-critical tasks.</p>
-<section id="removed-modules" class="level3">
-<h3 class="anchored" data-anchor-id="removed-modules">Removed Modules</h3>
-<ul>
-<li><strong><code>src/spotforecast2_safe/model_selection/</code></strong> (Entire directory)
-<ul>
-<li><em>Reason</em>: Bayesian, Grid, and Random search are too complex and non-deterministic for these specific safety-critical deployment targets.</li>
-</ul></li>
-<li><strong><code>src/spotforecast2_safe/stats/</code></strong> (Entire directory)
-<ul>
-<li><em>Reason</em>: Contains autocorrelation and secondary statistical tools not used in the automated pipeline.</li>
-</ul></li>
-<li><strong><code>src/spotforecast2_safe/forecaster/metrics.py</code></strong>
-<ul>
-<li><em>Reason</em>: Specialized custom metrics that were not invoked by the core pipelines.</li>
-</ul></li>
-<li><strong><code>src/spotforecast2_safe/preprocessing/time_series_visualization.py</code></strong>
-<ul>
-<li><em>Reason</em>: Headless production environments do not require Plotly or Matplotlib-based visualizations.</li>
-</ul></li>
-</ul>
-</section>
-<section id="associated-test-deletions" class="level3">
-<h3 class="anchored" data-anchor-id="associated-test-deletions">Associated Test Deletions</h3>
-<p>To maintain a green build and avoid import errors, the following non-essential tests were also removed: - <code>tests/test_model_selection_utils.py</code> - <code>tests/test_time_series_fold.py</code> - <code>tests/test_ts_visualization.py</code></p>
-</section>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>The resulting <code>spotforecast2_safe</code> project is a hardened version of the original, with <span class="math inline">\(0\)</span> unreachable code paths for the specified tasks and <span class="math inline">\(100\%\)</span> test coverage on the remaining logic.</p>
-</section>
-<section id="essential-classes-and-functions-positive-list" class="level2">
-<h2 class="anchored" data-anchor-id="essential-classes-and-functions-positive-list">Essential Classes and Functions (Positive List)</h2>
-<p>The following classes and functions (including internal helpers) are strictly required for the execution of <code>task_safe_demo.py</code> and the public <code>multitask</code> pipeline:</p>
-<section id="orchestration-processing" class="level3">
-<h3 class="anchored" data-anchor-id="orchestration-processing">Orchestration &amp; Processing</h3>
-<ul>
-<li><code>agg_predict</code> (Function)</li>
-<li><code>n2n_predict</code> (Function)</li>
-<li><code>n2n_predict_with_covariates</code> (Function) — used by <code>task_safe_demo</code></li>
-<li><code>run</code> (Function, <code>multitask.runner</code>) — public single-call pipeline entry point</li>
-</ul>
-</section>
-<section id="multitask-pipeline-n-to-1-task" class="level3">
-<h3 class="anchored" data-anchor-id="multitask-pipeline-n-to-1-task">Multitask Pipeline (n-to-1 task)</h3>
-<ul>
-<li><code>BaseTask</code> (Class) — shared prepare/detect/impute/exog steps</li>
-<li><code>MultiTask</code> (Class) — task dispatcher</li>
-<li><code>LazyTask</code> (Class) — lazy fitting with optional cached tuning</li>
-<li><code>DefaultsTask</code> (Class) — deterministic defaults baseline</li>
-<li><code>PredictTask</code> (Class) — prediction from saved models</li>
-<li><code>CleanTask</code> (Class) — cache removal</li>
-<li><code>agg_predictor</code> (Function) — weighted aggregation of per-target packages</li>
-<li><code>default_lgbm_forecaster_factory</code> (Function) — LightGBM forecaster factory</li>
-<li><code>runner.run</code> (Function) — one-call pipeline entry point</li>
-</ul>
-</section>
-<section id="data-environmental-services-1" class="level3">
-<h3 class="anchored" data-anchor-id="data-environmental-services-1">Data &amp; Environmental Services</h3>
-<ul>
-<li><code>fetch_data</code> (Function)</li>
-<li><code>fetch_holiday_data</code> (Function)</li>
-<li><code>fetch_weather_data</code> (Function)</li>
-<li><code>WeatherClient</code> (Class)</li>
-<li><code>create_holiday_df</code> (Function)</li>
-<li><code>convert_to_utc</code> (Function)</li>
-</ul>
-</section>
-<section id="forecasting-engine" class="level3">
-<h3 class="anchored" data-anchor-id="forecasting-engine">Forecasting Engine</h3>
-<ul>
-<li><code>ForecasterRecursive</code> (Class)</li>
-<li><code>ForecasterEquivalentDate</code> (Class)</li>
-<li><code>ForecasterBase</code> (Class)</li>
-<li><code>predict_multivariate</code> (Function)</li>
-<li><code>initialize_lags</code> (Function)</li>
-<li><code>initialize_weights</code> (Function)</li>
-<li><code>initialize_estimator</code> (Function)</li>
-<li><code>initialize_window_features</code> (Function)</li>
-</ul>
-</section>
-<section id="preprocessing-validation" class="level3">
-<h3 class="anchored" data-anchor-id="preprocessing-validation">Preprocessing &amp; Validation</h3>
-<ul>
-<li><code>agg_and_resample_data</code> (Function)</li>
-<li><code>basic_ts_checks</code> (Function)</li>
-<li><code>curate_holidays</code> (Function)</li>
-<li><code>curate_weather</code> (Function)</li>
-<li><code>get_start_end</code> (Function)</li>
-<li><code>mark_outliers</code> (Function)</li>
-<li><code>get_missing_weights</code> (Function)</li>
-<li><code>split_rel_train_val_test</code> (Function)</li>
-<li><code>check_y</code> (Function)</li>
-<li><code>check_exog</code> (Function)</li>
-<li><code>check_predict_input</code> (Function)</li>
-<li><code>check_interval</code> (Function)</li>
-<li><code>input_to_frame</code> (Function)</li>
-<li><code>expand_index</code> (Function)</li>
-<li><code>transform_dataframe</code> (Function)</li>
-<li><code>check_extract_values_and_index</code> (Function)</li>
-</ul>
-</section>
-<section id="feature-engineering" class="level3">
-<h3 class="anchored" data-anchor-id="feature-engineering">Feature Engineering</h3>
-<ul>
-<li><code>RollingFeatures</code> (Class)</li>
-<li><code>TimeSeriesDifferentiator</code> (Class)</li>
-<li><code>QuantileBinner</code> (Class)</li>
-</ul>
-</section>
-</section>
-<section id="unused-classes-and-functions-negative-list" class="level2">
-<h2 class="anchored" data-anchor-id="unused-classes-and-functions-negative-list">Unused Classes and Functions (Negative List)</h2>
-<p>The following components are present in the <code>spotforecast2_safe</code> codebase but are <strong>not invoked</strong> by the primary safety-critical tasks mentioned above.</p>
-<section id="utilities" class="level3">
-<h3 class="anchored" data-anchor-id="utilities">Utilities</h3>
-<ul>
-<li><code>check_preprocess_series</code> (Function)</li>
-<li><code>check_preprocess_exog_multiseries</code> (Function)</li>
-<li><code>set_skforecast_warnings</code> (Function)</li>
-<li><code>initialize_transformer_series</code> (Function)</li>
-<li><code>date_to_index_position</code> (Function)</li>
-<li><code>prepare_steps_direct</code> (Function)</li>
-<li><code>exog_to_direct</code> (Function)</li>
-<li><code>exog_to_direct_numpy</code> (Function)</li>
-<li><code>transform_numpy</code> (Function)</li>
-<li><code>select_n_jobs_fit_forecaster</code> (Function)</li>
-<li><code>get_style_repr_html</code> (Function)</li>
-</ul>
-</section>
-<section id="preprocessing" class="level3">
-<h3 class="anchored" data-anchor-id="preprocessing">Preprocessing</h3>
-<ul>
-<li><code>manual_outlier_removal</code> (Function)</li>
-<li><code>get_outliers</code> (Function)</li>
-<li><code>custom_weights</code> (Function)</li>
-<li><code>WeightFunction</code> (Class)</li>
-<li><code>split_abs_train_val_test</code> (Function)</li>
-</ul>
-</section>
-<section id="internal-details" class="level3">
-<h3 class="anchored" data-anchor-id="internal-details">Internal Details</h3>
-<ul>
-<li><code>check_residuals_input</code> (Function)</li>
-</ul>
+</header>
 
 
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>downloader.entsoe.assemble_zone_loads(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    zones<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    output_file<span class="op">=</span><span class="st">'energy_load_zones.csv'</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    on_missing<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Join the per-zone interim load files into one aligned, validated frame.</p>
+<p>Reads each <code>interim/zone_&lt;col&gt;.csv</code> written by <code>download_zone_loads</code>, takes the actual-load column, and outer-joins the zones onto a single complete hourly UTC index (gaps surface as <code>NaN</code> rows). The combined frame is written to <code>interim/&lt;output_file&gt;</code> and returned. The columns are the zone keys, so their sum is the bottom-up total German load.</p>
+<p>Fail-safe contract: with <code>on_missing="raise"</code> (the default), any missing hour in any zone raises <code>ValueError</code> (via <code>spotforecast2_safe.preprocessing.checking.check_y</code>) rather than being silently filled. Pass <code>on_missing="passthrough"</code> to return the frame with <code>NaN</code> left in place, so a downstream caller can opt into imputation explicitly (e.g.&nbsp;via the <code>MultiTask</code> <code>impute</code> step).</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>zones</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Dict">Dict</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]]</td>
+<td>Mapping of column name to <code>Area</code> identifier. When <code>None</code>, uses <code>GERMAN_TSO_ZONES</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>output_file</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>Interim filename to write under <code>interim/</code>. Defaults to <code>"energy_load_zones.csv"</code>.</td>
+<td><code>'energy_load_zones.csv'</code></td>
+</tr>
+<tr class="odd">
+<td>on_missing</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td><code>"raise"</code> (default) to reject any gap; <code>"passthrough"</code> to keep <code>NaN</code> for explicit downstream imputation.</td>
+<td><code>'raise'</code></td>
+</tr>
+</tbody>
+</table>
 </section>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></td>
+<td>The aligned 4-column load frame (index <code>"Time (UTC)"</code>).</td>
+</tr>
+</tbody>
+</table>
 </section>
+<section id="raises" class="level2 doc-section doc-section-raises">
+<h2 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
+<td>If <code>on_missing</code> is unknown, if a per-zone file lacks its zone column, or (when <code>on_missing="raise"</code>) if any zone has a gap.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError">FileNotFoundError</a></td>
+<td>If a per-zone interim file is missing.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="9b9de37d" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> assemble_zone_loads</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>zones <span class="op">=</span> {<span class="st">"load_a"</span>: <span class="st">"AREA_A"</span>, <span class="st">"load_b"</span>: <span class="st">"AREA_B"</span>}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> pd.date_range(<span class="st">"2023-01-01"</span>, periods<span class="op">=</span><span class="dv">6</span>, freq<span class="op">=</span><span class="st">"h"</span>, tz<span class="op">=</span><span class="st">"UTC"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tempfile.TemporaryDirectory() <span class="im">as</span> tmp:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> os</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    os.environ[<span class="st">"SPOTFORECAST2_DATA"</span>] <span class="op">=</span> tmp</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    interim <span class="op">=</span> Path(tmp) <span class="op">/</span> <span class="st">"interim"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    interim.mkdir(parents<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col, level <span class="kw">in</span> {<span class="st">"load_a"</span>: <span class="fl">100.0</span>, <span class="st">"load_b"</span>: <span class="fl">50.0</span>}.items():</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        pd.DataFrame({col: level}, index<span class="op">=</span>idx).rename_axis(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Time (UTC)"</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        ).to_csv(interim <span class="op">/</span> <span class="ss">f"zone_</span><span class="sc">{</span>col<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> assemble_zone_loads(zones<span class="op">=</span>zones)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    total <span class="op">=</span> frame.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(frame.columns.tolist())</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"bottom-up total (first hour): </span><span class="sc">{</span>total<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> total.iloc[<span class="dv">0</span>] <span class="op">==</span> <span class="fl">150.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['load_a', 'load_b']
+bottom-up total (first hour): 150.0</code></pre>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -2248,7 +2146,7 @@ window.Quarto = {
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/safe/spotforecast2-safe.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.assemble_zone_loads.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
