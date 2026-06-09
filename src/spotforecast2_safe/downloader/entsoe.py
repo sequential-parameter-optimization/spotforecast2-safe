@@ -24,7 +24,13 @@ Threat model (STRIDE).
     (``query_day_ahead_prices``). All three are read-only day-ahead queries
     that share the same TLS, retry, and schema-validation countermeasures
     below; the day-ahead side-tables are merged into their own namespaced
-    interim files and never alter the ``energy_load.csv`` schema.
+    interim files and never alter the ``energy_load.csv`` schema. The load
+    query is additionally issued once per German TSO control area (Amprion,
+    TenneT, TransnetBW, 50Hertz; see ``download_zone_loads``) through the same
+    ``query_load_and_forecast`` endpoint, sharing these countermeasures; each
+    zone response is written to a namespaced ``raw/zones/<zone>/`` file and
+    assembled into ``energy_load_zones.csv`` without touching the
+    single-zone ``energy_load.csv`` schema.
 
     - Spoofing: a forged endpoint could serve crafted load data. Mitigated by
       default TLS certificate verification in ``requests`` (used by the
@@ -73,14 +79,29 @@ Threat model (STRIDE).
 
 import logging
 import time
-from typing import Callable, Optional, Union
+from typing import Callable, Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_data, get_data_home
+from spotforecast2_safe.preprocessing.checking import check_y
 
 logger = logging.getLogger(__name__)
+
+# ENTSO-E control-area (EIC) codes for the four German TSO zones, keyed by the
+# column name each zone's "Actual Load" series receives in the assembled frame.
+# The values are ``entsoe-py`` ``Area`` identifiers (verified against
+# ``entsoe.mappings``); ``query_load_and_forecast`` resolves them to the
+# control-area EIC code, so Actual Total Load is fetched per control area
+# rather than for the single DE-LU bidding zone. Used by
+# ``download_zone_loads`` / ``assemble_zone_loads``.
+GERMAN_TSO_ZONES: Dict[str, str] = {
+    "load_amprion": "DE_AMPRION",  # 10YDE-RWENET---I
+    "load_tennet": "DE_TENNET",  # 10YDE-EON------1
+    "load_transnetbw": "DE_TRANSNET",  # 10YDE-ENBW-----N
+    "load_50hertz": "DE_50HZ",  # 10YDE-VE-------2
+}
 
 
 def _make_client(client_cls: type, api_key: str, timeout: Optional[float]) -> object:
@@ -532,6 +553,7 @@ def _download_entsoe_table(
     output_file: str,
     file_prefix: str,
     column_name: Optional[str] = None,
+    keep_forecast_future: bool = True,
     force: bool = False,
     timeout: Optional[float] = 60.0,
 ) -> None:
@@ -559,6 +581,11 @@ def _download_entsoe_table(
         file_prefix: Prefix for the raw filename.
         column_name: If the query returns a ``pd.Series``, the column name to
             give it in the saved table. Ignored for ``pd.DataFrame`` results.
+        keep_forecast_future: Forwarded to `merge_build_manual`. ``True`` (the
+            default) retains future rows so a published day-ahead forecast
+            survives -- correct for the day-ahead side-tables. Pass ``False``
+            for actuals-only tables (e.g. per-zone load) so rows after the
+            current UTC moment are dropped.
         force: If True, bypass the small-window cooldown check.
         timeout: Per-socket-operation read timeout in seconds.  ``None``
             disables the timeout.  Defaults to ``60.0``.
@@ -647,7 +674,9 @@ def _download_entsoe_table(
     logger.info("Downloaded data saved to %s", output_path)
 
     merge_build_manual(
-        output_file=output_file, keep_forecast_future=True, raw_subdir=raw_subdir
+        output_file=output_file,
+        keep_forecast_future=keep_forecast_future,
+        raw_subdir=raw_subdir,
     )
 
 
@@ -769,3 +798,202 @@ def download_day_ahead_price(
         force=force,
         timeout=timeout,
     )
+
+
+def download_zone_loads(
+    api_key: str,
+    zones: Optional[Dict[str, str]] = None,
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    force: bool = False,
+    keep_forecast_future: bool = False,
+    timeout: Optional[float] = 60.0,
+) -> None:
+    """Download Actual Total Load separately for each German TSO control area.
+
+    Instead of the single aggregated DE / DE-LU series fetched by
+    `download_new_data`, this issues one ``query_load_and_forecast`` per control
+    area in *zones* (default `GERMAN_TSO_ZONES`: Amprion, TenneT, TransnetBW,
+    50Hertz). Each zone's ``"Actual Load"`` / ``"Forecasted Load"`` columns are
+    renamed to the zone's column / ``"<col>_forecast"`` and written to a
+    namespaced ``raw/zones/<col>/`` directory, then merged into a per-zone
+    interim file ``interim/zone_<col>.csv``. Call `assemble_zone_loads`
+    afterwards to join the per-zone actuals into one aligned, validated frame
+    suitable for the bottom-up (sum-of-zones) forecasting pipeline.
+
+    Each zone is fetched through the shared `_download_entsoe_table` helper, so
+    it inherits the same bounded retry loop, timeout, and raw/interim
+    namespacing. Unlike the day-ahead side-tables, ``keep_forecast_future``
+    defaults to ``False`` here because the zone series are training *actuals*.
+
+    Args:
+        api_key: ENTSO-E Web API security token.
+        zones: Mapping of column name to ``entsoe-py`` ``Area`` identifier. When
+            ``None``, uses `GERMAN_TSO_ZONES`.
+        start: Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to
+            seven days ago.
+        end: End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the
+            start of tomorrow.
+        force: If True, bypass the small-window cooldown check.
+        keep_forecast_future: If True, retain rows after the current UTC moment
+            (preserving each zone's day-ahead ``Forecasted Load``). Defaults to
+            ``False`` (actuals-only, leakage-free training input).
+        timeout: Per-socket-operation read timeout in seconds. ``None`` disables
+            the timeout. Defaults to ``60.0``.
+
+    Raises:
+        ImportError: If ``entsoe-py`` is not installed.
+        ValueError: If ``start`` or ``end`` cannot be parsed.
+        RuntimeError: If a zone download fails after ``_MAX_RETRIES`` attempts.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import (
+            download_zone_loads,
+            assemble_zone_loads,
+        )
+
+        # Fetch all four German control-zone loads, then assemble the aligned
+        # 4-column frame (raises on any gap with the default on_missing="raise").
+        download_zone_loads(api_key="YOUR_API_KEY", force=True)
+        frame = assemble_zone_loads()
+        print(frame.columns.tolist())
+        ```
+    """
+    zones = dict(GERMAN_TSO_ZONES if zones is None else zones)
+
+    for column, area in zones.items():
+        forecast_col = f"{column}_forecast"
+
+        def query(client, cc, s, e, _col=column, _fc=forecast_col):  # type: ignore[no-untyped-def]
+            frame = client.query_load_and_forecast(country_code=cc, start=s, end=e)
+            return frame.rename(columns={"Actual Load": _col, "Forecasted Load": _fc})
+
+        logger.info("Downloading control-zone load %s (%s)...", column, area)
+        _download_entsoe_table(
+            api_key,
+            area,
+            start,
+            end,
+            query=query,
+            raw_subdir=f"zones/{column}",
+            output_file=f"zone_{column}.csv",
+            file_prefix=f"entsoe_load_{column}",
+            keep_forecast_future=keep_forecast_future,
+            force=force,
+            timeout=timeout,
+        )
+
+
+def assemble_zone_loads(
+    zones: Optional[Dict[str, str]] = None,
+    output_file: str = "energy_load_zones.csv",
+    on_missing: str = "raise",
+) -> pd.DataFrame:
+    """Join the per-zone interim load files into one aligned, validated frame.
+
+    Reads each ``interim/zone_<col>.csv`` written by `download_zone_loads`,
+    takes the actual-load column, and outer-joins the zones onto a single
+    complete hourly UTC index (gaps surface as ``NaN`` rows). The combined frame
+    is written to ``interim/<output_file>`` and returned. The columns are the
+    zone keys, so their sum is the bottom-up total German load.
+
+    Fail-safe contract: with ``on_missing="raise"`` (the default), any missing
+    hour in any zone raises `ValueError` (via
+    `spotforecast2_safe.preprocessing.checking.check_y`) rather than being
+    silently filled. Pass ``on_missing="passthrough"`` to return the frame with
+    ``NaN`` left in place, so a downstream caller can opt into imputation
+    explicitly (e.g. via the `MultiTask` ``impute`` step).
+
+    Args:
+        zones: Mapping of column name to ``Area`` identifier. When ``None``,
+            uses `GERMAN_TSO_ZONES`.
+        output_file: Interim filename to write under ``interim/``. Defaults to
+            ``"energy_load_zones.csv"``.
+        on_missing: ``"raise"`` (default) to reject any gap; ``"passthrough"``
+            to keep ``NaN`` for explicit downstream imputation.
+
+    Returns:
+        The aligned 4-column load frame (index ``"Time (UTC)"``).
+
+    Raises:
+        ValueError: If ``on_missing`` is unknown, if a per-zone file lacks its
+            zone column, or (when ``on_missing="raise"``) if any zone has a gap.
+        FileNotFoundError: If a per-zone interim file is missing.
+
+    Examples:
+        ```{python}
+        import tempfile
+        from pathlib import Path
+
+        import pandas as pd
+
+        from spotforecast2_safe.downloader.entsoe import assemble_zone_loads
+
+        zones = {"load_a": "AREA_A", "load_b": "AREA_B"}
+        idx = pd.date_range("2023-01-01", periods=6, freq="h", tz="UTC")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            import os
+
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+            for col, level in {"load_a": 100.0, "load_b": 50.0}.items():
+                pd.DataFrame({col: level}, index=idx).rename_axis(
+                    "Time (UTC)"
+                ).to_csv(interim / f"zone_{col}.csv")
+
+            frame = assemble_zone_loads(zones=zones)
+            total = frame.sum(axis=1)
+            print(frame.columns.tolist())
+            print(f"bottom-up total (first hour): {total.iloc[0]}")
+            assert total.iloc[0] == 150.0
+        ```
+    """
+    if on_missing not in ("raise", "passthrough"):
+        raise ValueError(
+            f"on_missing={on_missing!r} is invalid; use 'raise' or 'passthrough'."
+        )
+    zones = dict(GERMAN_TSO_ZONES if zones is None else zones)
+
+    interim_dir = get_data_home() / "interim"
+    series_list = []
+    for column in zones:
+        path = interim_dir / f"zone_{column}.csv"
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Per-zone interim file not found: {path}. "
+                "Run download_zone_loads first."
+            )
+        frame = pd.read_csv(path)
+        time_col = "Time (UTC)" if "Time (UTC)" in frame.columns else frame.columns[0]
+        frame[time_col] = pd.to_datetime(frame[time_col], utc=True)
+        frame = frame.set_index(time_col)
+        if column not in frame.columns:
+            raise ValueError(
+                f"Column {column!r} missing from {path} "
+                f"(found {list(frame.columns)})."
+            )
+        series_list.append(frame[column].rename(column))
+
+    combined = pd.concat(series_list, axis=1, sort=False).sort_index()
+    # Enforce a complete, regular hourly UTC index so a missing hour in any zone
+    # becomes an explicit NaN row rather than a silently shorter series.
+    full_index = pd.date_range(combined.index.min(), combined.index.max(), freq="h")
+    combined = combined.reindex(full_index)
+    combined.index.name = "Time (UTC)"
+
+    if on_missing == "raise":
+        for column in combined.columns:
+            check_y(combined[column], series_id=f"`{column}`")
+
+    interim_dir.mkdir(parents=True, exist_ok=True)
+    combined.to_csv(interim_dir / output_file)
+    logger.info(
+        "Assembled %d-zone load frame -> %s",
+        len(combined.columns),
+        interim_dir / output_file,
+    )
+    return combined
