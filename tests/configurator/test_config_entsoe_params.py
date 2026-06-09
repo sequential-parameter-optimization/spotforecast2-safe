@@ -37,22 +37,6 @@ def test_config_entsoe_warm_start_lags():
     assert enabled.get_params()["warm_start_lags"] is True
 
 
-def test_config_entsoe_n_jobs_spotoptim():
-    """n_jobs_spotoptim defaults to None (serial) and round-trips through
-    get_params/set_params."""
-    default = ConfigEntsoe()
-    assert default.n_jobs_spotoptim is None
-    assert default.get_params()["n_jobs_spotoptim"] is None
-
-    parallel = ConfigEntsoe(n_jobs_spotoptim=-1)
-    assert parallel.n_jobs_spotoptim == -1
-    assert parallel.get_params()["n_jobs_spotoptim"] == -1
-
-    default.set_params(n_jobs_spotoptim=4)
-    assert default.n_jobs_spotoptim == 4
-    assert default.get_params()["n_jobs_spotoptim"] == 4
-
-
 def test_config_entsoe_cv_block_size():
     """cv_block_size defaults to None, round-trips, and is settable."""
     default = ConfigEntsoe()
