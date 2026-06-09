@@ -1,3 +1,18 @@
+## [21.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v20.0.0...v21.0.0) (2026-06-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* ConfigMulti and ConfigEntsoe no longer accept the
+`n_jobs_spotoptim` argument; passing it now raises TypeError. (spotforecast2
+>= 7 no longer reads it.)
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* remove n_jobs_spotoptim config field (spotoptim 1.0 is sequential-only) ([8e79324](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8e79324ace64a2243ae4e623d8460be33485add5))
+
 ## [21.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v20.0.0...v21.0.0-rc.1) (2026-06-09)
 
 
