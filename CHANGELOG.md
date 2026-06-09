@@ -1,3 +1,10 @@
+## [21.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v21.0.0...v21.1.0-rc.1) (2026-06-09)
+
+
+### Features
+
+* **downloader:** four-German-TSO-zone bottom-up total-load forecast ([711e109](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/711e109ea9af2eb9592c2b38c1af4ce89f61eb77))
+
 ## [21.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v20.0.0...v21.0.0) (2026-06-09)
 
 
