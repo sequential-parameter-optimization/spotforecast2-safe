@@ -1,0 +1,79 @@
+# tasks.task_safe_zone_load_demo { #spotforecast2_safe.tasks.task_safe_zone_load_demo }
+
+`tasks.task_safe_zone_load_demo`
+
+Task demo: four-zone bottom-up total-load forecast vs. a direct aggregate.
+
+This task demonstrates the four-German-TSO-zone forecasting design: fit one
+model per control-zone load series (Amprion, TenneT, TransnetBW, 50Hertz) and
+sum the four forecasts into the total-German-load forecast (bottom-up
+aggregation), then compare it against a single model trained on the aggregate
+load directly. The bottom-up combination reuses the existing multi-target
+machinery -- the four zones become `ConfigMulti.targets` and the per-target
+forecasts are summed via the `MultiTask` aggregation with
+``agg_weights=[1.0, ...]``.
+
+Data source. With ``data_path`` pointing at the assembled four-column interim
+file (see `spotforecast2_safe.downloader.entsoe.assemble_zone_loads`), the task
+runs on real ENTSO-E control-zone load. With ``data_path=None`` (the default) it
+builds a deterministic, seeded synthetic four-zone dataset so the demo and its
+smoke test run offline without an ENTSO-E API key.
+
+The comparison uses the project's own backtesting engine
+(`backtesting_forecaster` + `TimeSeriesFold`) over a 24-hour horizon and reports
+MAE / RMSE / MAPE for both methods.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+# Shell commands; they cannot run inside a Python kernel.
+# Synthetic offline demo (no API key needed):
+#   uv run spotforecast-safe-zone-load-demo
+# Run on assembled real ENTSO-E zone data:
+#   uv run spotforecast-safe-zone-load-demo     #       --data_path ~/spotforecast2_data/interim/energy_load_zones.csv
+```
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [main](#spotforecast2_safe.tasks.task_safe_zone_load_demo.main) | Run the four-zone bottom-up load demo. Returns 0 on success, 1 on failure. |
+
+### main { #spotforecast2_safe.tasks.task_safe_zone_load_demo.main }
+
+```python
+tasks.task_safe_zone_load_demo.main(
+    synthetic=True,
+    data_path=None,
+    predict_size=24,
+    history_hours=24 * 100,
+    random_seed=314159,
+    logging_enabled=False,
+)
+```
+
+Run the four-zone bottom-up load demo. Returns 0 on success, 1 on failure.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type                                                    | Description                                                                                                 | Default    |
+|-----------------|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|------------|
+| synthetic       | [bool](`bool`)                                          | If True (and ``data_path`` is None), use seeded synthetic data. Ignored when ``data_path`` is provided.     | `True`     |
+| data_path       | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Path to an assembled four-column zone-load CSV. When given, real data is used and ``synthetic`` is ignored. | `None`     |
+| predict_size    | [int](`int`)                                            | Forecast horizon in hours (also the backtest fold size).                                                    | `24`       |
+| history_hours   | [int](`int`)                                            | Length of the synthetic series in hours.                                                                    | `24 * 100` |
+| random_seed     | [int](`int`)                                            | Seed for the synthetic data and the estimators.                                                             | `314159`   |
+| logging_enabled | [bool](`bool`)                                          | If True, attach the dual console/file handlers.                                                             | `False`    |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.tasks.task_safe_zone_load_demo import main
+
+# Fail-fast: a non-existent data_path returns 1 without computing.
+from pathlib import Path
+rc = main(data_path=Path("/nonexistent/zones.csv"))
+print(f"Return code (missing data): {rc}")
+assert rc == 1
+```

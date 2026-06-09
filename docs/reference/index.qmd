@@ -275,6 +275,8 @@ Data downloaders for external data sources (e.g. ENTSO-E).
 | [downloader.entsoe.download_renewable_forecast](downloader.entsoe.download_renewable_forecast.qmd#spotforecast2_safe.downloader.entsoe.download_renewable_forecast) | Download the ENTSO-E day-ahead wind/solar generation forecast. |
 | [downloader.entsoe.download_day_ahead_price](downloader.entsoe.download_day_ahead_price.qmd#spotforecast2_safe.downloader.entsoe.download_day_ahead_price) | Download the ENTSO-E day-ahead spot price (DE/LU). |
 | [downloader.entsoe.merge_build_manual](downloader.entsoe.merge_build_manual.qmd#spotforecast2_safe.downloader.entsoe.merge_build_manual) | Merge all raw CSV files from the 'raw' directory into a single interim file. |
+| [downloader.entsoe.download_zone_loads](downloader.entsoe.download_zone_loads.qmd#spotforecast2_safe.downloader.entsoe.download_zone_loads) | Download Actual Total Load separately for each German TSO control area. |
+| [downloader.entsoe.assemble_zone_loads](downloader.entsoe.assemble_zone_loads.qmd#spotforecast2_safe.downloader.entsoe.assemble_zone_loads) | Join the per-zone interim load files into one aligned, validated frame. |
 
 ## Exceptions
 
@@ -293,3 +295,4 @@ Executable tasks for demonstration and production pipelines.
 | | |
 | --- | --- |
 | [tasks.task_safe_demo](tasks.task_safe_demo.qmd#spotforecast2_safe.tasks.task_safe_demo) | Task demo: compare baseline, covariate, and custom LightGBM forecasts against ground truth. |
+| [tasks.task_safe_zone_load_demo](tasks.task_safe_zone_load_demo.qmd#spotforecast2_safe.tasks.task_safe_zone_load_demo) | Task demo: four-zone bottom-up total-load forecast vs. a direct aggregate. |
