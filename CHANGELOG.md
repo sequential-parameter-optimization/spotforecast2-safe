@@ -1,3 +1,20 @@
+## [22.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v21.2.0...v22.0.0-rc.1) (2026-06-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **configurator:** warm_start_lags=True/False is no longer meaningful;
+pass the seed lag list itself (or None to disable). The default
+changed from off (False) to DEFAULT_WARM_START_LAGS, so SpotOptim
+searches warm-start by default. Consumed by
+spotforecast2.multitask.strategies.SpotOptimStrategy >= 8.0.0.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+### Features
+
+* **configurator:** warm_start_lags is now the seed lag list ([ce5c579](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/ce5c5792eb63c4f756e3e8a377c40b2ea8df8eb7))
+
 ## [21.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v21.1.0...v21.2.0) (2026-06-10)
 
 
