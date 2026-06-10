@@ -52,7 +52,7 @@ configurator.config_entsoe.ConfigEntsoe(
     n_trials_spotoptim=10,
     n_initial_spotoptim=5,
     max_time_spotoptim=None,
-    warm_start_lags=False,
+    warm_start_lags=(lambda: list(DEFAULT_WARM_START_LAGS))(),
     task='lazy',
     agg_weights=None,
     forecaster_factory=None,

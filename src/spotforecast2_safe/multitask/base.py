@@ -140,6 +140,8 @@ class PipelineConfig(Protocol):
     n_initial_spotoptim: int
     # Wall-clock budget for the SpotOptim search in minutes; None = no limit
     max_time_spotoptim: Optional[float]
+    # Seed lag set for the SpotOptim warm start; None/empty = cold start
+    warm_start_lags: Optional[List[int]]
     # Cross-validation
     number_folds: int
     # Optional CV block width; ``None`` => fall back to ``predict_size``.
