@@ -713,6 +713,12 @@ class TestConfigMultiPipelineAttributes:
     def test_n_initial_spotoptim_default(self):
         assert ConfigMulti().n_initial_spotoptim == 5
 
+    def test_max_time_spotoptim_default_is_none(self):
+        assert ConfigMulti().max_time_spotoptim is None
+
+    def test_custom_max_time_spotoptim(self):
+        assert ConfigMulti(max_time_spotoptim=2.5).max_time_spotoptim == 2.5
+
     def test_task_default_is_lazy(self):
         assert ConfigMulti().task == "lazy"
 

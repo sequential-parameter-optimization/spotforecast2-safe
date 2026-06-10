@@ -49,6 +49,7 @@ PIPELINE_PROTOCOL_FIELDS = [
     ("n_trials_optuna", 15),
     ("n_trials_spotoptim", 10),
     ("n_initial_spotoptim", 5),
+    ("max_time_spotoptim", None),
     # Hooks
     ("forecaster_factory", None),
     ("data_loader", None),
