@@ -16,6 +16,13 @@ from spotforecast2_safe.configurator._base_config import (
 )
 from spotforecast2_safe.data import Period
 
+# Default seed lag set for the SpotOptim warm start: short-range (1-3 h),
+# around-daily (23-25 h), two-day (47-48 h), around-weekly (167-169 h), and
+# two-week (336 h) structure of hourly load series.
+DEFAULT_WARM_START_LAGS: List[int] = [
+    1, 2, 3, 23, 24, 25, 47, 48, 167, 168, 169, 336,
+]
+
 
 @dataclass
 class ConfigMulti:
@@ -100,9 +107,12 @@ class ConfigMulti:
             search in minutes (task 4). The search stops when either
             ``n_trials_spotoptim`` evaluations or this time limit is reached,
             whichever comes first. ``None`` (the default) disables the limit.
-        warm_start_lags (bool): When True, the SpotOptim task injects
-            ``lags_consider`` as a candidate lag set and seeds the optimizer's
-            first evaluation with it. Defaults to ``False``.
+        warm_start_lags (Optional[List[int]]): Lag set the SpotOptim task
+            injects as a search-space candidate and uses to seed the
+            optimizer's first evaluation. Defaults to
+            ``DEFAULT_WARM_START_LAGS``
+            (``[1, 2, 3, 23, 24, 25, 47, 48, 167, 168, 169, 336]``).
+            ``None`` or an empty list disables the warm start.
         task (str): Active prediction task — one of ``"lazy"``, ``"training"``,
             ``"optuna"``, or ``"spotoptim"``. Defaults to ``"lazy"``.
         agg_weights (Optional[List[float]]): Per-target aggregation weights used
@@ -203,7 +213,8 @@ class ConfigMulti:
         n_initial_spotoptim (int): Number of initial SpotOptim evaluations.
         max_time_spotoptim (Optional[float]): Wall-clock budget for the SpotOptim
             search in minutes; ``None`` disables the limit.
-        warm_start_lags (bool): Seed the SpotOptim search with ``lags_consider``.
+        warm_start_lags (Optional[List[int]]): Seed lag set for the SpotOptim
+            search; ``None`` or empty disables the warm start.
         task (str): Active prediction task (``"lazy"``, ``"training"``,
             ``"optuna"``, or ``"spotoptim"``).
         agg_weights (Optional[List[float]]): Per-target aggregation weights.
@@ -357,9 +368,12 @@ class ConfigMulti:
     # spotforecast2.multitask.strategies.SpotOptimStrategy). ``None`` means no
     # time limit: the search runs until ``n_trials_spotoptim`` is exhausted.
     max_time_spotoptim: Optional[float] = None
-    # Seed the SpotOptim search with ``lags_consider`` (consumed by
-    # spotforecast2.multitask.strategies.SpotOptimStrategy)
-    warm_start_lags: bool = False
+    # Seed lag set for the SpotOptim search (consumed by
+    # spotforecast2.multitask.strategies.SpotOptimStrategy). ``None`` or an
+    # empty list disables the warm start.
+    warm_start_lags: Optional[List[int]] = field(
+        default_factory=lambda: list(DEFAULT_WARM_START_LAGS)
+    )
     # Active task
     task: str = "lazy"
     # Aggregation weights (one per target, in target order)
