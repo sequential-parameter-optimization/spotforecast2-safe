@@ -76,9 +76,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-655808e3c14d9b59497a1b5a58e1ce29.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-2dd548ee3eab68bd851dd9e3d9c9a811.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-655808e3c14d9b59497a1b5a58e1ce29.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-9e38c0292fcf4c4fbca14a115feca65c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-7d8e07e1acd2a64c27a3b965bab9f207.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-9e38c0292fcf4c4fbca14a115feca65c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1652,7 +1652,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    n_trials_spotoptim<span class="op">=</span><span class="dv">10</span>,</span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    n_initial_spotoptim<span class="op">=</span><span class="dv">5</span>,</span>
 <span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    max_time_spotoptim<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    warm_start_lags<span class="op">=</span>(<span class="kw">lambda</span>: <span class="bu">list</span>(DEFAULT_WARM_START_LAGS))(),</span>
 <span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span><span class="st">'lazy'</span>,</span>
 <span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    agg_weights<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    forecaster_factory<span class="op">=</span><span class="va">None</span>,</span>
@@ -1915,9 +1915,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>warm_start_lags</td>
-<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>When True, the SpotOptim task injects <code>lags_consider</code> as a candidate lag set and seeds the optimizer’s first evaluation with it. Defaults to <code>False</code>.</td>
-<td><code>False</code></td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]]</td>
+<td>Lag set the SpotOptim task injects as a search-space candidate and uses to seed the optimizer’s first evaluation. Defaults to <code>DEFAULT_WARM_START_LAGS</code> (<code>[1, 2, 3, 23, 24, 25, 47, 48, 167, 168, 169, 336]</code>). <code>None</code> or an empty list disables the warm start.</td>
+<td><code>(lambda: list(DEFAULT_WARM_START_LAGS))()</code></td>
 </tr>
 <tr class="odd">
 <td>task</td>
@@ -2183,8 +2183,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td>warm_start_lags</td>
-<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>Seed the SpotOptim search with <code>lags_consider</code>.</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/functions.html#int">int</a>]]</td>
+<td>Seed lag set for the SpotOptim search; <code>None</code> or empty disables the warm start.</td>
 </tr>
 <tr class="even">
 <td>task</td>
@@ -2241,7 +2241,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="66ce6c1e" class="cell" data-execution_count="1">
+<div id="ff800288" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
@@ -2364,7 +2364,7 @@ First period name: daily</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="722a3f2e" class="cell" data-execution_count="2">
+<div id="ea4fc5e7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti(country_code<span class="op">=</span><span class="st">"FR"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> config.get_params()</span>
@@ -2437,7 +2437,7 @@ agg_weights: None</code></pre>
 </section>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="30b0f38e" class="cell" data-execution_count="3">
+<div id="74373197" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> ConfigMulti()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> config.set_params(country_code<span class="op">=</span><span class="st">"FR"</span>, predict_size<span class="op">=</span><span class="dv">48</span>)</span>
