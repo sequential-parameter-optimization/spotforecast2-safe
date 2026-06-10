@@ -1,3 +1,15 @@
+## [21.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v21.1.0...v21.2.0) (2026-06-10)
+
+
+### Features
+
+* **configurator:** add max_time_spotoptim wall-clock budget field ([e0a0621](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e0a06210a9a2e222ec0d0f684278fc2ba39ffbcb))
+
+
+### Documentation
+
+* **configurator:** refresh rendered reference for max_time_spotoptim ([7cd5965](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7cd5965f8aa2577bd3f20d9f8f191c5b807253db))
+
 ## [21.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v21.0.0...v21.1.0) (2026-06-09)
 
 
