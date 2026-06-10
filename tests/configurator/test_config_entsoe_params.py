@@ -27,14 +27,21 @@ def test_config_entsoe_get_params():
 
 
 def test_config_entsoe_warm_start_lags():
-    """warm_start_lags defaults to False and round-trips through get_params."""
-    default = ConfigEntsoe()
-    assert default.warm_start_lags is False
-    assert default.get_params()["warm_start_lags"] is False
+    """warm_start_lags defaults to the package seed list and round-trips."""
+    from spotforecast2_safe.configurator.config_multi import (
+        DEFAULT_WARM_START_LAGS,
+    )
 
-    enabled = ConfigEntsoe(warm_start_lags=True)
-    assert enabled.warm_start_lags is True
-    assert enabled.get_params()["warm_start_lags"] is True
+    default = ConfigEntsoe()
+    assert default.warm_start_lags == DEFAULT_WARM_START_LAGS
+    assert default.get_params()["warm_start_lags"] == DEFAULT_WARM_START_LAGS
+
+    custom = ConfigEntsoe(warm_start_lags=[1, 24, 168])
+    assert custom.warm_start_lags == [1, 24, 168]
+    assert custom.get_params()["warm_start_lags"] == [1, 24, 168]
+
+    disabled = ConfigEntsoe(warm_start_lags=None)
+    assert disabled.warm_start_lags is None
 
 
 def test_config_entsoe_cv_block_size():

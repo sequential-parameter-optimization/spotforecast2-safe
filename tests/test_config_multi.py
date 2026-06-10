@@ -124,10 +124,25 @@ class TestConfigMultiCustomInit:
         assert cfg.lags_consider == lags
 
     def test_warm_start_lags_default_and_override(self):
-        assert ConfigMulti().warm_start_lags is False
-        cfg = ConfigMulti(warm_start_lags=True)
-        assert cfg.warm_start_lags is True
-        assert cfg.get_params()["warm_start_lags"] is True
+        from spotforecast2_safe.configurator.config_multi import (
+            DEFAULT_WARM_START_LAGS,
+        )
+
+        assert ConfigMulti().warm_start_lags == DEFAULT_WARM_START_LAGS
+        assert DEFAULT_WARM_START_LAGS == [
+            1, 2, 3, 23, 24, 25, 47, 48, 167, 168, 169, 336,
+        ]
+        cfg = ConfigMulti(warm_start_lags=[1, 24, 168])
+        assert cfg.warm_start_lags == [1, 24, 168]
+        assert cfg.get_params()["warm_start_lags"] == [1, 24, 168]
+        # Disable the warm start with None.
+        assert ConfigMulti(warm_start_lags=None).warm_start_lags is None
+
+    def test_warm_start_lags_default_instances_independent(self):
+        """default_factory must hand each instance its own list."""
+        a, b = ConfigMulti(), ConfigMulti()
+        a.warm_start_lags.append(999)
+        assert 999 not in b.warm_start_lags
 
     def test_custom_periods(self):
         custom = [
