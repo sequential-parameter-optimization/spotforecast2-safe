@@ -96,6 +96,10 @@ class ConfigMulti:
             Defaults to ``10``.
         n_initial_spotoptim (int): Number of initial random evaluations for SpotOptim
             (task 4). Defaults to ``5``.
+        max_time_spotoptim (Optional[float]): Wall-clock budget for the SpotOptim
+            search in minutes (task 4). The search stops when either
+            ``n_trials_spotoptim`` evaluations or this time limit is reached,
+            whichever comes first. ``None`` (the default) disables the limit.
         warm_start_lags (bool): When True, the SpotOptim task injects
             ``lags_consider`` as a candidate lag set and seeds the optimizer's
             first evaluation with it. Defaults to ``False``.
@@ -197,6 +201,8 @@ class ConfigMulti:
         n_trials_optuna (int): Number of Optuna hyperparameter-search trials.
         n_trials_spotoptim (int): Number of SpotOptim search trials.
         n_initial_spotoptim (int): Number of initial SpotOptim evaluations.
+        max_time_spotoptim (Optional[float]): Wall-clock budget for the SpotOptim
+            search in minutes; ``None`` disables the limit.
         warm_start_lags (bool): Seed the SpotOptim search with ``lags_consider``.
         task (str): Active prediction task (``"lazy"``, ``"training"``,
             ``"optuna"``, or ``"spotoptim"``).
@@ -347,6 +353,10 @@ class ConfigMulti:
     n_trials_optuna: int = 15
     n_trials_spotoptim: int = 10
     n_initial_spotoptim: int = 5
+    # Wall-clock budget for the SpotOptim search in MINUTES (consumed by
+    # spotforecast2.multitask.strategies.SpotOptimStrategy). ``None`` means no
+    # time limit: the search runs until ``n_trials_spotoptim`` is exhausted.
+    max_time_spotoptim: Optional[float] = None
     # Seed the SpotOptim search with ``lags_consider`` (consumed by
     # spotforecast2.multitask.strategies.SpotOptimStrategy)
     warm_start_lags: bool = False
