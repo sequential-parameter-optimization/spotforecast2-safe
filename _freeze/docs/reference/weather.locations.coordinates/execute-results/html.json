@@ -1,0 +1,12 @@
+{
+  "hash": "b3ee9fbe9359f1c2c7593f4cb991240f",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: weather.locations.coordinates\n---\n\n\n\n```python\nweather.locations.coordinates(locations)\n```\n\nExtract ``(latitude, longitude)`` pairs in order.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                                                                                                       | Description            | Default    |\n|-----------|------------------------------------------------------------------------------------------------------------|------------------------|------------|\n| locations | [Sequence](`typing.Sequence`)\\[[WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`)\\] | The locations to read. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                                                                   | Description                                                             |\n|--------|----------------------------------------------------------------------------------------|-------------------------------------------------------------------------|\n|        | [List](`typing.List`)\\[[Tuple](`typing.Tuple`)\\[[float](`float`), [float](`float`)\\]\\] | List[Tuple[float, float]]: One ``(lat, lon)`` pair per location, in the |\n|        | [List](`typing.List`)\\[[Tuple](`typing.Tuple`)\\[[float](`float`), [float](`float`)\\]\\] | same order.                                                             |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#36dad814 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.weather.locations import (\n    coordinates,\n    default_german_locations,\n)\n\nprint(coordinates(default_german_locations())[:2])\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[(52.52, 13.405), (53.5511, 9.9937)]\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "weather.locations.coordinates_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

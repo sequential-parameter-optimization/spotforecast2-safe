@@ -1,0 +1,12 @@
+{
+  "hash": "9ef6a0c142ad01dd538f1bd69c5cd11b",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: weather.locations.WeatherLocation\n---\n\n\n\n```python\nweather.locations.WeatherLocation(name, latitude, longitude, weight)\n```\n\nA single weather sampling location with a population weight.\n\n## Attributes {.doc-section .doc-section-attributes}\n\n| Name      | Type             | Description                                                                                                                                      |\n|-----------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|\n| name      | [str](`str`)     | Human-readable city name (used for logs/inspection only).                                                                                        |\n| latitude  | [float](`float`) | Latitude in decimal degrees.                                                                                                                     |\n| longitude | [float](`float`) | Longitude in decimal degrees.                                                                                                                    |\n| weight    | [float](`float`) | Non-negative relative weight (here, approximate population in thousands). Absolute scale is irrelevant — weights are normalised by the consumer. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#6b4e4980 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.weather.locations import WeatherLocation\n\nloc = WeatherLocation(\"Köln\", 50.9375, 6.9603, 1073.0)\nprint(loc.name, loc.latitude, loc.weight)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nKöln 50.9375 1073.0\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "weather.locations.WeatherLocation_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

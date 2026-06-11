@@ -1,0 +1,12 @@
+{
+  "hash": "6233401b3059d252203a9d5c908034fc",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: weather.derived.heating_degree_hours\n---\n\n\n\n```python\nweather.derived.heating_degree_hours(temperature, base=DEFAULT_HDH_BASE_C)\n```\n\nHeating degree-hours :math:`\\max(base - T, 0)`.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name        | Type                                     | Description                                           | Default              |\n|-------------|------------------------------------------|-------------------------------------------------------|----------------------|\n| temperature | [pd](`pandas`).[Series](`pandas.Series`) | Hourly air temperature in °C.                         | _required_           |\n| base        | [float](`float`)                         | Heating base temperature in °C. Defaults to ``15.0``. | `DEFAULT_HDH_BASE_C` |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                     | Description                                                  |\n|--------|------------------------------------------|--------------------------------------------------------------|\n|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: ``hdh`` per timestamp, ``float64``, same index as |\n|        | [pd](`pandas`).[Series](`pandas.Series`) | *temperature*. Zero whenever it is warmer than *base*.       |\n\n## Raises {.doc-section .doc-section-raises}\n\n| Name   | Type                       | Description                                        |\n|--------|----------------------------|----------------------------------------------------|\n|        | [ValueError](`ValueError`) | If *temperature* is not a NaN-free numeric Series. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#6b186462 .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.weather.derived import heating_degree_hours\n\nt = pd.Series([5.0, 15.0, 25.0])\nprint(heating_degree_hours(t, base=15.0).tolist())\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[10.0, 0.0, 0.0]\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "weather.derived.heating_degree_hours_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

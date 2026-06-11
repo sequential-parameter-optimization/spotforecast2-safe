@@ -1,0 +1,12 @@
+{
+  "hash": "e89d290894356c17d55e496701d1f95c",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: weather.locations.weights\n---\n\n\n\n```python\nweather.locations.weights(locations)\n```\n\nExtract the raw (un-normalised) weights in order.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name      | Type                                                                                                       | Description            | Default    |\n|-----------|------------------------------------------------------------------------------------------------------------|------------------------|------------|\n| locations | [Sequence](`typing.Sequence`)\\[[WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`)\\] | The locations to read. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                      | Description                                                             |\n|--------|-------------------------------------------|-------------------------------------------------------------------------|\n|        | [List](`typing.List`)\\[[float](`float`)\\] | List[float]: One weight per location, in the same order. Consumers      |\n|        | [List](`typing.List`)\\[[float](`float`)\\] | normalise these (e.g.                                                   |\n|        | [List](`typing.List`)\\[[float](`float`)\\] | func:`spotforecast2_safe.weather.derived.population_weighted_average`). |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#0e01f7e4 .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.weather.locations import (\n    default_german_locations,\n    weights,\n)\n\nw = weights(default_german_locations())\nprint(len(w), w[0])\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n13 3677.0\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "weather.locations.weights_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
