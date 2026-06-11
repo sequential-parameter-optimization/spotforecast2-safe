@@ -401,11 +401,8 @@ def select_exogenous_features(
         exog_list.extend(adjacency_cols)
 
     if include_school_holiday_features:
-        school_holiday_allowlist = ["is_school_holiday"]
-        school_holiday_cols = [
-            col for col in school_holiday_allowlist if col in exogenous_features.columns
-        ]
-        exog_list.extend(school_holiday_cols)
+        if "is_school_holiday" in exogenous_features.columns:
+            exog_list.append("is_school_holiday")
 
     if poly_features_degree >= 2:
         poly_features_list = [

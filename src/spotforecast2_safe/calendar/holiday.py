@@ -622,8 +622,8 @@ _SCHOOL_HOLIDAY_COUNTRY_SUPPORTED = ("DE",)
 
 
 def create_school_holiday_df(
-    start_date: str | pd.Timestamp,
-    end_date: str | pd.Timestamp,
+    start: str | pd.Timestamp,
+    end: str | pd.Timestamp,
     tz: str = "UTC",
     freq: str = "h",
     country_code: str = "DE",
@@ -631,10 +631,10 @@ def create_school_holiday_df(
 ) -> pd.DataFrame:
     """Create a DataFrame with a binary school-holiday indicator for a German state.
 
-    Builds a tz-aware time grid over ``[start_date, end_date]`` at *freq* and
-    marks every timestamp that falls within a school-holiday period of the
-    requested Bundesland as ``1``; all others are ``0``.  Both edges of each
-    interval are inclusive.
+    Builds a tz-aware time grid over ``[start, end]`` at *freq* and marks
+    every timestamp that falls within a school-holiday period of the requested
+    Bundesland as ``1``; all others are ``0``.  Both edges of each interval
+    are inclusive.
 
     Data source: OpenHolidays API (https://openholidaysapi.org), ODbL-1.0.
     Coverage: 2022-01-01 to 2027-12-31 for all 16 German Bundesländer.
@@ -644,10 +644,10 @@ def create_school_holiday_df(
     no fill or extrapolation.
 
     Args:
-        start_date: Start date/datetime of the requested grid.
-        end_date: End date/datetime of the requested grid (inclusive).
-        tz: Timezone for the resulting index. Ignored when *start_date* or
-            *end_date* is already a tz-aware ``pd.Timestamp``.
+        start: Start date/datetime of the requested grid.
+        end: End date/datetime of the requested grid (inclusive).
+        tz: Timezone for the resulting index. Ignored when *start* or *end*
+            is already a tz-aware ``pd.Timestamp``.
         freq: Pandas-compatible frequency string. Defaults to ``"h"``
             (hourly).
         country_code: Must be ``"DE"`` (Germany). Any other value raises
@@ -690,17 +690,17 @@ def create_school_holiday_df(
     intervals_df, valid_from, valid_to = load_school_holidays_de()
 
     # Normalise start/end to timezone-naive dates for range check.
-    start_ts = pd.Timestamp(start_date)
-    end_ts = pd.Timestamp(end_date)
+    start_ts = pd.Timestamp(start)
+    end_ts = pd.Timestamp(end)
     start_date_only = (
         start_ts.normalize().tz_localize(None)
         if start_ts.tz is None
-        else start_ts.tz_localize(None)
+        else start_ts.tz_convert(None).normalize()
     )
     end_date_only = (
         end_ts.normalize().tz_localize(None)
         if end_ts.tz is None
-        else end_ts.tz_localize(None)
+        else end_ts.tz_convert(None).normalize()
     )
 
     if start_date_only < valid_from or end_date_only > valid_to:
@@ -712,16 +712,28 @@ def create_school_holiday_df(
         )
 
     # Build the time grid.
+    # When either endpoint is already tz-aware, normalise both to a consistent
+    # tz-aware form so pd.date_range gets two compatible endpoints.
     inferred_tz = None
-    if isinstance(start_date, pd.Timestamp) and start_date.tz is not None:
-        inferred_tz = str(start_date.tz)
-    elif isinstance(end_date, pd.Timestamp) and end_date.tz is not None:
-        inferred_tz = str(end_date.tz)
+    if isinstance(start, pd.Timestamp) and start.tz is not None:
+        inferred_tz = str(start.tz)
+    elif isinstance(end, pd.Timestamp) and end.tz is not None:
+        inferred_tz = str(end.tz)
 
     if inferred_tz is not None:
-        full_index = pd.date_range(start=start_date, end=end_date, freq=freq)
+        start_grid = (
+            pd.Timestamp(start).tz_localize(inferred_tz)
+            if pd.Timestamp(start).tz is None
+            else pd.Timestamp(start)
+        )
+        end_grid = (
+            pd.Timestamp(end).tz_localize(inferred_tz)
+            if pd.Timestamp(end).tz is None
+            else pd.Timestamp(end)
+        )
+        full_index = pd.date_range(start=start_grid, end=end_grid, freq=freq)
     else:
-        full_index = pd.date_range(start=start_date, end=end_date, freq=freq, tz=tz)
+        full_index = pd.date_range(start=start, end=end, freq=freq, tz=tz)
 
     # Filter intervals to the requested state.
     state_intervals = intervals_df[intervals_df["state"] == state].copy()
@@ -833,8 +845,8 @@ def get_school_holiday_features(
     cov_end = to_utc_timestamp(cov_end)
 
     school_holiday_df = create_school_holiday_df(
-        start_date=start,
-        end_date=cov_end,
+        start=start,
+        end=cov_end,
         tz=tz,
         freq=freq,
         country_code=country_code,

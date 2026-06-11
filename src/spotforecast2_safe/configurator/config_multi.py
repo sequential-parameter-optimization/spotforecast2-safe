@@ -85,6 +85,10 @@ class ConfigMulti:
         include_holiday_adjacency_features (bool): If True, include Brückentag and
             before/after-holiday indicators (``is_brueckentag``, ``is_before_holiday``,
             ``is_after_holiday``).  Defaults to ``False``.
+        include_ephemeris_features (bool): If True, include solar-elevation and
+            daylight-duration features.  Defaults to ``False``.
+        include_day_type_features (bool): If True, include working-day and day-type
+            class features (``is_workday``, ``day_type``).  Defaults to ``False``.
         include_school_holiday_features (bool): Append the ``is_school_holiday``
             binary indicator from the bundled OpenHolidays API dataset (ODbL-1.0).
             Coverage 2022-01-01 to 2027-12-31 for all 16 German Bundesländer.
@@ -203,6 +207,10 @@ class ConfigMulti:
         include_holiday_features (bool): Holiday feature toggle.
         include_holiday_adjacency_features (bool): Brückentag and
             before/after-holiday indicator toggle.  Defaults to ``False``.
+        include_ephemeris_features (bool): Solar-elevation and daylight-duration
+            feature toggle.  Defaults to ``False``.
+        include_day_type_features (bool): Working-day / day-type class feature
+            toggle.  Defaults to ``False``.
         include_school_holiday_features (bool): Per-Bundesland school-holiday
             indicator toggle.  Defaults to ``False``.
         poly_features_degree (int): Polynomial-interaction degree (1 = off).

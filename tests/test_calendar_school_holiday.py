@@ -98,6 +98,26 @@ class TestCreateSchoolHolidayDf:
         assert df.columns.tolist() == ["is_school_holiday"]
         assert df.shape[1] == 1
 
+    def test_he_weihnachtsferien_2027(self):
+        # HE Weihnachtsferien 2027: 2027-12-23 → 2028-01-11.
+        # 2027-12-22 (day before) must be 0; 2027-12-23 → 2027-12-31 must all be 1.
+        df = create_school_holiday_df("2027-12-22", "2027-12-31", freq="D", state="HE")
+        assert df.loc["2027-12-22", "is_school_holiday"] == 0
+        assert (df.loc["2027-12-23":, "is_school_holiday"] == 1).all()
+
+    def test_tz_aware_boundary_does_not_raise(self):
+        # A tz-aware intra-day timestamp on the boundary date (2027-12-31 23:00 UTC)
+        # normalises to 2027-12-31, which is within valid_to → must NOT raise.
+        end_ts = pd.Timestamp("2027-12-31 23:00", tz="UTC")
+        df = create_school_holiday_df("2027-12-01", end_ts, freq="D", state="NW")
+        assert df is not None
+
+    def test_tz_aware_beyond_valid_to_raises(self):
+        # 2028-01-01 00:00 UTC normalises to 2028-01-01 → beyond valid_to → must raise.
+        end_ts = pd.Timestamp("2028-01-01 00:00", tz="UTC")
+        with pytest.raises(ValueError, match="2027-12-31"):
+            create_school_holiday_df("2027-12-01", end_ts, freq="D", state="NW")
+
 
 class TestGetSchoolHolidayFeatures:
     """Unit tests for get_school_holiday_features."""

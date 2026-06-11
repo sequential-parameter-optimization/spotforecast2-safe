@@ -2,8 +2,8 @@
 
 ```python
 calendar.holiday.create_school_holiday_df(
-    start_date,
-    end_date,
+    start,
+    end,
     tz='UTC',
     freq='h',
     country_code='DE',
@@ -13,10 +13,10 @@ calendar.holiday.create_school_holiday_df(
 
 Create a DataFrame with a binary school-holiday indicator for a German state.
 
-Builds a tz-aware time grid over ``[start_date, end_date]`` at *freq* and
-marks every timestamp that falls within a school-holiday period of the
-requested Bundesland as ``1``; all others are ``0``.  Both edges of each
-interval are inclusive.
+Builds a tz-aware time grid over ``[start, end]`` at *freq* and marks
+every timestamp that falls within a school-holiday period of the requested
+Bundesland as ``1``; all others are ``0``.  Both edges of each interval
+are inclusive.
 
 Data source: OpenHolidays API (https://openholidaysapi.org), ODbL-1.0.
 Coverage: 2022-01-01 to 2027-12-31 for all 16 German Bundesländer.
@@ -29,9 +29,9 @@ no fill or extrapolation.
 
 | Name         | Type                                                           | Description                                                                                                                              | Default    |
 |--------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| start_date   | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date/datetime of the requested grid.                                                                                               | _required_ |
-| end_date     | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date/datetime of the requested grid (inclusive).                                                                                     | _required_ |
-| tz           | [str](`str`)                                                   | Timezone for the resulting index. Ignored when *start_date* or *end_date* is already a tz-aware ``pd.Timestamp``.                        | `'UTC'`    |
+| start        | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date/datetime of the requested grid.                                                                                               | _required_ |
+| end          | [str](`str`) \| [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date/datetime of the requested grid (inclusive).                                                                                     | _required_ |
+| tz           | [str](`str`)                                                   | Timezone for the resulting index. Ignored when *start* or *end* is already a tz-aware ``pd.Timestamp``.                                  | `'UTC'`    |
 | freq         | [str](`str`)                                                   | Pandas-compatible frequency string. Defaults to ``"h"`` (hourly).                                                                        | `'h'`      |
 | country_code | [str](`str`)                                                   | Must be ``"DE"`` (Germany). Any other value raises ``ValueError``.                                                                       | `'DE'`     |
 | state        | [str](`str`)                                                   | ISO 3166-2 subdivision short code for the Bundesland, e.g. ``"NW"`` (North Rhine-Westphalia), ``"BY"`` (Bavaria).  Defaults to ``"NW"``. | `'NW'`     |

@@ -1176,7 +1176,7 @@ class BaseTask:
                 "  Holiday adjacency features: %s", holiday_adjacency_features.shape
             )
             concat_frames.append(holiday_adjacency_features)
-        if getattr(self.config, "include_school_holiday_features", False):
+        if self.config.include_school_holiday_features:
             school_holiday_features = get_school_holiday_features(
                 data=self.df_pipeline,
                 start=self.run_state.data_start,
@@ -1325,9 +1325,7 @@ class BaseTask:
             include_weather_windows=self.config.include_weather_windows,
             include_holiday_features=self.config.include_holiday_features,
             include_holiday_adjacency_features=self.config.include_holiday_adjacency_features,
-            include_school_holiday_features=getattr(
-                self.config, "include_school_holiday_features", False
-            ),
+            include_school_holiday_features=self.config.include_school_holiday_features,
             poly_features_degree=self.config.poly_features_degree,
         )
         # ``select_exogenous_features`` matches calendar/weather/holiday/poly
