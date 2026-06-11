@@ -1,0 +1,45 @@
+# downloader.entsoe.ZoneResult { #spotforecast2_safe.downloader.entsoe.ZoneResult }
+
+```python
+downloader.entsoe.ZoneResult(column, area, ok, error, interim_path)
+```
+
+Structured result record for one zone in a ``download_zone_loads`` collect run.
+
+This dataclass is returned (one per zone, keyed by column name) when
+``download_zone_loads`` is called with ``on_zone_failure="collect"``.  It
+carries enough information for the caller to decide whether to proceed with
+`build_zone_qc_frame` or to report / retry failed zones.
+
+Fail-safe invariant: collect mode is pure structured reporting.  This class
+carries no fallback data, no cached values, and no retry state.  A zone
+that failed is represented exactly by ``ok=False`` with the original
+exception in ``error`` — the caller owns the recovery policy.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name         | Type                                                      | Description                                                                                                                                                                                                                                                           |
+|--------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| column       | [str](`str`)                                              | Column name for the zone's Actual Load series (e.g. ``"load_tennet"``).                                                                                                                                                                                               |
+| area         | [str](`str`)                                              | ``entsoe-py`` ``Area`` identifier used for the download (e.g. ``"DE_TENNET"``).                                                                                                                                                                                       |
+| ok           | [bool](`bool`)                                            | ``True`` if the zone downloaded and its interim file was written successfully; ``False`` otherwise.                                                                                                                                                                   |
+| error        | [Optional](`typing.Optional`)\[[Exception](`Exception`)\] | The exception raised during download, or ``None`` on success. On failure the interim file for this zone was *not* written (or may be incomplete); on success it is ``None``.                                                                                          |
+| interim_path | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]   | Absolute path to the per-zone interim CSV written on success (``interim/zone_<column>.csv`` under the data home); ``None`` on failure.  Files written by successful zones are **not** rolled back if another zone fails — the caller must account for partial writes. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+from spotforecast2_safe.downloader.entsoe import download_zone_loads
+
+results = download_zone_loads(
+    api_key="YOUR_API_KEY",
+    start="202301010000",
+    end="202301050000",
+    force=True,
+    on_zone_failure="collect",
+)
+for col, r in results.items():
+    status = "ok" if r.ok else f"FAILED ({r.error})"
+    print(f"{col}: {status}")
+```
