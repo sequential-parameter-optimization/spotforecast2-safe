@@ -805,3 +805,78 @@ def load_day_ahead_price(
             f"Available columns: {list(df.columns)}."
         )
     return _apply_on_missing(df[column], on_missing, column, csv_path)
+
+
+def load_school_holidays_de(
+    data_home: Optional[Union[str, Path]] = None,
+) -> tuple[pd.DataFrame, pd.Timestamp, pd.Timestamp]:
+    """Load the bundled German school-holiday interval table.
+
+    Reads ``datasets/csv/school_holidays_de.csv`` (ODbL-1.0) from the package
+    data directory and the companion validity-range metadata from
+    ``school_holidays_de_meta.csv``.  No download is needed; both files ship
+    with the package.
+
+    The CSV has four columns: ``state`` (ISO 3166-2 subdivision short code,
+    e.g. ``"NW"``), ``name`` (German name of the holiday period), ``start_date``
+    and ``end_date`` (both inclusive, parsed as ``datetime64[ns]``).  Coverage
+    is 2022-01-01 to 2027-12-31 (all 16 German Bundesländer).
+
+    Data provenance: OpenHolidays API (https://openholidaysapi.org), database
+    https://github.com/openpotato/openholidaysapi.data, ODC Open Database
+    License (ODbL-1.0).
+
+    Regeneration command (requires network access):
+
+    ```text
+    for code in BW BY BE BB HB HH HE MV NI NW RP SL SN ST SH TH:
+        GET https://openholidaysapi.org/SchoolHolidays?countryIsoCode=DE
+            &subdivisionCode=DE-<code>&validFrom=2022-01-01&validTo=2024-12-31
+            &languageIsoCode=DE  (split into two 3-year windows to respect the
+            1095-day API limit; second window: validFrom=2025-01-01,
+            validTo=2027-12-31).  Exclude records whose endDate > 2028-01-08.
+    ```
+
+    Args:
+        data_home: Unused; accepted for API symmetry with other loaders.
+            The bundled CSV is always read from the package data directory.
+
+    Returns:
+        tuple: A three-tuple ``(df, valid_from, valid_to)`` where:
+
+        - **df** — DataFrame with columns ``state``, ``name``,
+          ``start_date`` (``datetime64[ns]``), ``end_date``
+          (``datetime64[ns]``), sorted by ``(state, start_date)``.
+        - **valid_from** — `pd.Timestamp` for the first covered day
+          (``2022-01-01``).
+        - **valid_to** — `pd.Timestamp` for the last covered day
+          (``2027-12-31``).
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.data.fetch_data import load_school_holidays_de
+
+        df, valid_from, valid_to = load_school_holidays_de()
+        print("states:", sorted(df["state"].unique()))
+        print("valid_from:", valid_from.date())
+        print("valid_to:", valid_to.date())
+        print("shape:", df.shape)
+        assert len(df["state"].unique()) == 16
+        assert valid_from == pd.Timestamp("2022-01-01")
+        assert valid_to == pd.Timestamp("2027-12-31")
+        ```
+    """
+    pkg_dir = get_package_data_home()
+    csv_path = pkg_dir / "school_holidays_de.csv"
+    meta_path = pkg_dir / "school_holidays_de_meta.csv"
+
+    df = pd.read_csv(
+        csv_path,
+        parse_dates=["start_date", "end_date"],
+    )
+
+    meta = pd.read_csv(meta_path, parse_dates=["valid_from", "valid_to"])
+    valid_from = pd.Timestamp(meta.at[0, "valid_from"])
+    valid_to = pd.Timestamp(meta.at[0, "valid_to"])
+
+    return df, valid_from, valid_to
