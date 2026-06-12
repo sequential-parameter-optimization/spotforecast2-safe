@@ -1,3 +1,10 @@
+## [22.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.2.0...v22.3.0) (2026-06-12)
+
+
+### Features
+
+* **data:** add ENTSO-E interim-CSV loaders (ported from spotforecast2.tasks) ([39cfa84](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/39cfa8489432146f4d5b51c29c79921c704dd873))
+
 ## [22.3.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.2.0...v22.3.0-rc.1) (2026-06-12)
 
 
