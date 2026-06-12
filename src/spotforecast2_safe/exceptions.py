@@ -568,6 +568,59 @@ class TargetCorruptionError(RuntimeError):
     """
 
 
+class CoverageError(RuntimeError):
+    """Exception raised when operational data-coverage requirements are violated.
+
+    Raised by the guards in `spotforecast2_safe.preprocessing.coverage` when
+    a freshness, lag, or interior-gap invariant is broken and the pipeline
+    cannot safely produce a forecast.
+
+    Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+    working; the dedicated class lets safety-critical callers distinguish
+    coverage violations from generic runtime errors.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.exceptions import CoverageError
+
+        try:
+            raise CoverageError("Actual Load is stale: last published 2026-06-10 12:00 UTC")
+        except CoverageError as e:
+            print(type(e).__name__, str(e))
+
+        assert issubclass(CoverageError, RuntimeError)
+        ```
+    """
+
+
+class LeakageError(RuntimeError):
+    """Exception raised when forbidden columns are detected in model inputs.
+
+    Raised by `spotforecast2_safe.multitask.guards.assert_no_leakage` when a
+    forbidden column name appears in the training frame, the selected exogenous
+    feature set, or the fitted model's feature list.
+
+    Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+    working; the dedicated class lets safety-critical callers distinguish
+    data-governance violations from generic runtime errors.
+
+    Examples:
+        ```{python}
+        from spotforecast2_safe.exceptions import LeakageError
+
+        try:
+            raise LeakageError(
+                "Forbidden column 'Forecasted Load' found in training frame"
+            )
+        except LeakageError as e:
+            print(type(e).__name__, str(e))
+
+        assert issubclass(LeakageError, RuntimeError)
+        ```
+    """
+
+
 warn_skforecast_categories = [
     DataTypeWarning,
     DataTransformationWarning,

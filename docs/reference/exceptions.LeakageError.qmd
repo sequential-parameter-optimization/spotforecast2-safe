@@ -1,0 +1,30 @@
+# exceptions.LeakageError { #spotforecast2_safe.exceptions.LeakageError }
+
+```python
+exceptions.LeakageError()
+```
+
+Exception raised when forbidden columns are detected in model inputs.
+
+Raised by `spotforecast2_safe.multitask.guards.assert_no_leakage` when a
+forbidden column name appears in the training frame, the selected exogenous
+feature set, or the fitted model's feature list.
+
+Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+working; the dedicated class lets safety-critical callers distinguish
+data-governance violations from generic runtime errors.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.exceptions import LeakageError
+
+try:
+    raise LeakageError(
+        "Forbidden column 'Forecasted Load' found in training frame"
+    )
+except LeakageError as e:
+    print(type(e).__name__, str(e))
+
+assert issubclass(LeakageError, RuntimeError)
+```

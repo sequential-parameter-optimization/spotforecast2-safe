@@ -169,6 +169,16 @@ website:
                     file: docs/reference/preprocessing.imputation.get_missing_weights.qmd
                   - text: "custom_weights"
                     file: docs/reference/preprocessing.imputation.custom_weights.qmd
+              - section: "Coverage Guards"
+                contents:
+                  - text: "assert_frontier_fresh"
+                    file: docs/reference/preprocessing.coverage.assert_frontier_fresh.qmd
+                  - text: "assert_actual_lag_within"
+                    file: docs/reference/preprocessing.coverage.assert_actual_lag_within.qmd
+                  - text: "assert_no_interior_gaps"
+                    file: docs/reference/preprocessing.coverage.assert_no_interior_gaps.qmd
+                  - text: "last_complete_hour"
+                    file: docs/reference/preprocessing.coverage.last_complete_hour.qmd
               - section: "Target Corruption"
                 contents:
                   - text: "TargetCorruptionReport"
@@ -214,6 +224,10 @@ website:
                 file: docs/reference/processing.n2n_predict.n2n_predict.qmd
               - text: "n2n_predict_with_covariates"
                 file: docs/reference/processing.n2n_predict_with_covariates.n2n_predict_with_covariates.qmd
+              - text: "ShapeCheckReport"
+                file: docs/reference/processing.shape_check.ShapeCheckReport.qmd
+              - text: "check_forecast_shape"
+                file: docs/reference/processing.shape_check.check_forecast_shape.qmd
 
           - section: "Forecaster"
             contents:
@@ -341,6 +355,10 @@ website:
                 file: docs/reference/multitask.clean.CleanTask.qmd
               - text: "default_lgbm_forecaster_factory"
                 file: docs/reference/multitask.factories.default_lgbm_forecaster_factory.qmd
+              - section: "Guards"
+                contents:
+                  - text: "assert_no_leakage"
+                    file: docs/reference/multitask.guards.assert_no_leakage.qmd
               - section: "Strategies"
                 contents:
                   - text: "TrainingStrategy"
@@ -560,6 +578,10 @@ quartodoc:
         Hardened tools for data curation, resampling, outlier detection,
         feature engineering, and temporal train/test splitting.
       contents:
+        - preprocessing.coverage.assert_frontier_fresh
+        - preprocessing.coverage.assert_actual_lag_within
+        - preprocessing.coverage.assert_no_interior_gaps
+        - preprocessing.coverage.last_complete_hour
         - preprocessing.curate_data.agg_and_resample_data
         - preprocessing.curate_data.basic_ts_checks
         - preprocessing.curate_data.curate_holidays
@@ -608,6 +630,8 @@ quartodoc:
         - processing.agg_predict.agg_predict
         - processing.n2n_predict.n2n_predict
         - processing.n2n_predict_with_covariates.n2n_predict_with_covariates
+        - processing.shape_check.ShapeCheckReport
+        - processing.shape_check.check_forecast_shape
 
     # ── Forecaster ────────────────────────────────────────────────────────────
     - title: "Forecaster"
@@ -702,6 +726,7 @@ quartodoc:
         - multitask.factories.default_lgbm_forecaster_factory
         - multitask.factories.quantile_lgbm_forecaster_factory
         - multitask.factories.predict_quantile_band
+        - multitask.guards.assert_no_leakage
         - multitask.strategies.TrainingStrategy
         - multitask.strategies.LazyStrategy
         - multitask.strategies.DefaultsStrategy
@@ -790,6 +815,8 @@ quartodoc:
         Custom exception types for safety-critical failure signalling.
       contents:
         - exceptions
+        - exceptions.CoverageError
+        - exceptions.LeakageError
 
     # ── Tasks ─────────────────────────────────────────────────────────────────
     - title: "Tasks"

@@ -1,0 +1,49 @@
+# processing.shape_check.ShapeCheckReport { #spotforecast2_safe.processing.shape_check.ShapeCheckReport }
+
+```python
+processing.shape_check.ShapeCheckReport(
+    n_overlap,
+    corr,
+    range_ratio,
+    min_corr,
+    min_range_ratio,
+)
+```
+
+Immutable result of a forecast shape plausibility check.
+
+All numeric fields reflect the overlap intersection of ``y`` and
+``reference``; ``n_overlap`` is the count of aligned index positions.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name            | Type             | Description                                                                                                                                                                                                        |
+|-----------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| n_overlap       | [int](`int`)     | Number of aligned (overlapping) index positions used for the computation.  When this is below the evaluable minimum the ``skipped`` property returns ``True`` and ``corr`` / ``range_ratio`` are ``float('nan')``. |
+| corr            | [float](`float`) | Pearson correlation between ``y`` and ``reference`` over the overlap.  ``float('nan')`` when ``n_overlap < min_overlap`` or when the computation fails (e.g. zero-variance series).                                |
+| range_ratio     | [float](`float`) | ``(y.max() - y.min()) / (reference.max() - reference.min())`` over the overlap.  ``float('nan')`` when ``n_overlap < min_overlap`` or when the reference range is zero.                                            |
+| min_corr        | [float](`float`) | Minimum acceptable Pearson correlation (passed through from ``check_forecast_shape``).                                                                                                                             |
+| min_range_ratio | [float](`float`) | Minimum acceptable range ratio (passed through from ``check_forecast_shape``).                                                                                                                                     |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.processing.shape_check import ShapeCheckReport
+import math
+
+r = ShapeCheckReport(
+    n_overlap=24, corr=0.85, range_ratio=0.9,
+    min_corr=0.6, min_range_ratio=0.5,
+)
+assert r.plausible
+assert not r.skipped
+print("plausible:", r.plausible, "skipped:", r.skipped)
+
+# NaN correlation -> not plausible
+r_nan = ShapeCheckReport(
+    n_overlap=24, corr=float("nan"), range_ratio=0.9,
+    min_corr=0.6, min_range_ratio=0.5,
+)
+assert not r_nan.plausible
+print("NaN corr -> plausible:", r_nan.plausible)
+```

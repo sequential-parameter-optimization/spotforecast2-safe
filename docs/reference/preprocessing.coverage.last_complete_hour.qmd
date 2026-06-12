@@ -1,0 +1,64 @@
+# preprocessing.coverage.last_complete_hour { #spotforecast2_safe.preprocessing.coverage.last_complete_hour }
+
+```python
+preprocessing.coverage.last_complete_hour(actual, *, samples_per_hour=None)
+```
+
+Return the latest hour having a complete set of intra-hour samples.
+
+Implements the frontier-completeness guard from the operational
+``assert_coverage`` (script lines ~485-497): only an hour with all of its
+quarter-hour samples published may safely anchor a live recursion.  A
+partial frontier hour averages to an anomalous level and drags the first
+forecast day (observed on the 2026-06-05 forecast).
+
+The expected sample count per hour is derived from the feed's own cadence
+(modal index difference) when ``samples_per_hour`` is ``None``.  For a
+15-min feed this evaluates to 4; for an hourly feed it evaluates to 1.
+
+The returned timestamp is the *floor* of the last complete hour (e.g.
+``2026-06-11 10:00 UTC`` for a 15-min feed whose last complete hour ended
+at ``2026-06-11 10:45``).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                     | Description                                                                                                                                                  | Default    |
+|------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| actual           | [pd](`pandas`).[Series](`pandas.Series`) | Series of Actual Load (or equivalent) values.  NaN values are excluded before computing the cadence and per-hour counts.                                     | _required_ |
+| samples_per_hour | [int](`int`) \| None                     | Override for the expected sample count per hour. Pass ``None`` (default) to infer from the modal index difference. Must be a positive integer when provided. | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                   |
+|--------|------------------------------------------------|---------------------------------------------------------------|
+|        | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Timezone-aware `pd.Timestamp` floored to the hour of the last |
+|        | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | complete hour.                                                |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                                   |
+|--------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``actual`` is empty or all-NaN after dropping NaNs, or when ``samples_per_hour`` is provided but not a positive integer. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.coverage import last_complete_hour
+
+# 15-min feed: last hour has only 2 of 4 samples -> step back.
+idx_full = pd.date_range("2026-06-10 00:00", periods=24 * 4, freq="15min", tz="UTC")
+actual = pd.Series(1.0, index=idx_full)
+# Remove the last two slots of the last hour.
+partial = actual.iloc[:-2]
+result = last_complete_hour(partial)
+assert result == pd.Timestamp("2026-06-10 22:00", tz="UTC"), result
+print("last_complete_hour:", result)
+
+# Hourly feed: each hour has exactly 1 sample -> last hour is complete.
+idx_h = pd.date_range("2026-06-10 00:00", periods=24, freq="h", tz="UTC")
+actual_h = pd.Series(1.0, index=idx_h)
+result_h = last_complete_hour(actual_h)
+assert result_h == pd.Timestamp("2026-06-10 23:00", tz="UTC"), result_h
+print("last_complete_hour (hourly):", result_h)
+```

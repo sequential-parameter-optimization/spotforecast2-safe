@@ -20,7 +20,18 @@ from spotforecast2_safe.data import Period
 # around-daily (23-25 h), two-day (47-48 h), around-weekly (167-169 h), and
 # two-week (336 h) structure of hourly load series.
 DEFAULT_WARM_START_LAGS: List[int] = [
-    1, 2, 3, 23, 24, 25, 47, 48, 167, 168, 169, 336,
+    1,
+    2,
+    3,
+    23,
+    24,
+    25,
+    47,
+    48,
+    167,
+    168,
+    169,
+    336,
 ]
 
 

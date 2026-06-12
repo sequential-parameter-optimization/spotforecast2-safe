@@ -1,0 +1,77 @@
+# multitask.guards.assert_no_leakage { #spotforecast2_safe.multitask.guards.assert_no_leakage }
+
+```python
+multitask.guards.assert_no_leakage(mt, forbidden, *, task)
+```
+
+Raise `~spotforecast2_safe.exceptions.LeakageError` if any forbidden column reached the model.
+
+Checks three surfaces independently:
+
+1. **Training frame** — ``mt.data_with_exog.columns``
+2. **Selected exogenous features** — ``mt.exog_feature_names``
+3. **Fitted model features** — ``estimator.feature_name_`` for every
+   target in ``mt.run_state.targets``
+
+The check raises on the *first* surface where a violation is found.  All
+three surfaces are checked so a single call reports every violation at once.
+If reading the fitted features fails (``estimator`` missing, not fitted,
+etc.) a ``RuntimeError`` is raised immediately rather than silently
+skipping: an unreadable feature list is itself a verifiability violation.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                         | Description                                                                                                                                                                                                                                                 | Default    |
+|-----------|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| mt        | [object](`object`)           | A duck-typed pipeline object exposing the protocol described in the module docstring.  Any ``BaseTask`` subclass after training satisfies it.                                                                                                               | _required_ |
+| forbidden | [set](`set`)\[[str](`str`)\] | Set of column names that must not appear in any model surface.  The operator constructs this set based on the pipeline mode (e.g. ``{"Forecasted Load", "Actual Load"}`` for a combined variant, plus per-zone forecast columns for the four-zone variant). | _required_ |
+| task      | [str](`str`)                 | Key identifying the task result to inspect inside ``mt.results`` (e.g. ``"spotoptim"`` or ``"defaults"``).                                                                                                                                                  | _required_ |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                         | Description                                                                                                                                                                                       |
+|--------|--------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [LeakageError](`spotforecast2_safe.exceptions.LeakageError`) | When any forbidden column appears in the training frame, the selected exogenous feature names, or any fitted model's feature list.  The message names the surface and the offending columns.      |
+|        | [RuntimeError](`RuntimeError`)                               | When ``mt.results[task][target]["forecaster"].estimator`` cannot be read or does not expose ``feature_name_``.  This signals a verifiability invariant violation rather than a leakage violation. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from types import SimpleNamespace
+from spotforecast2_safe.multitask.guards import assert_no_leakage
+from spotforecast2_safe.exceptions import LeakageError
+import pandas as pd
+
+# Build a minimal duck-typed stub that passes the guard.
+run_state = SimpleNamespace(targets=["load"])
+estimator = SimpleNamespace(feature_name_=["lag_1", "lag_24", "hour_sin"])
+forecaster = SimpleNamespace(estimator=estimator)
+results = {"defaults": {"load": {"forecaster": forecaster}}}
+idx = pd.date_range("2026-06-01", periods=3, freq="h", tz="UTC")
+data_with_exog = pd.DataFrame(
+    {"load": [1.0, 2.0, 3.0], "lag_1": [0.0, 1.0, 2.0]}, index=idx
+)
+mt = SimpleNamespace(
+    run_state=run_state,
+    results=results,
+    data_with_exog=data_with_exog,
+    exog_feature_names=["lag_1"],
+)
+assert_no_leakage(mt, forbidden={"Forecasted Load"}, task="defaults")
+print("clean mt: leakage guard passed")
+
+# Inject a forbidden column into the training frame -> raises.
+mt_leak = SimpleNamespace(
+    run_state=run_state,
+    results=results,
+    data_with_exog=pd.DataFrame(
+        {"load": [1.0], "Forecasted Load": [50000.0]},
+        index=idx[:1],
+    ),
+    exog_feature_names=["lag_1"],
+)
+try:
+    assert_no_leakage(mt_leak, forbidden={"Forecasted Load"}, task="defaults")
+except LeakageError as exc:
+    print(exc)
+```

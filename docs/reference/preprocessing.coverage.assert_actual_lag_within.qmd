@@ -1,0 +1,49 @@
+# preprocessing.coverage.assert_actual_lag_within { #spotforecast2_safe.preprocessing.coverage.assert_actual_lag_within }
+
+```python
+preprocessing.coverage.assert_actual_lag_within(actual, now, max_lag)
+```
+
+Raise `~spotforecast2_safe.exceptions.CoverageError` if the last published actual is too old.
+
+Corresponds to the second guard in the operational ``assert_coverage``
+(script line ~462): the last non-NaN Actual Load observation is older than
+``now - max_lag``, indicating ENTSO-E's publication pipeline has stalled.
+
+The comparison is strict (``<``): ``last_actual == now - max_lag`` is a
+passing boundary (lag is exactly at the tolerance).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                           | Description                                                                                                      | Default    |
+|---------|------------------------------------------------|------------------------------------------------------------------------------------------------------------------|------------|
+| actual  | [pd](`pandas`).[Series](`pandas.Series`)       | Series of Actual Load (or equivalent) values.  NaNs are stripped before computing the last published timestamp.  | _required_ |
+| now     | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference timestamp representing the current wall-clock time (tz-aware).                                         | _required_ |
+| max_lag | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) | Maximum acceptable age of the last published observation. The operational default is ``pd.Timedelta(hours=36)``. | _required_ |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                           | Description                                                                                                   |
+|--------|----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+|        | [CoverageError](`spotforecast2_safe.exceptions.CoverageError`) | When the last non-NaN observation is older than ``now - max_lag``, reporting the observed lag in whole hours. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.coverage import assert_actual_lag_within
+from spotforecast2_safe.exceptions import CoverageError
+
+now = pd.Timestamp("2026-06-11 12:00", tz="UTC")
+idx = pd.date_range("2026-06-10 00:00", periods=24, freq="h", tz="UTC")
+actual = pd.Series(range(24), index=idx, dtype=float)
+
+# Passing: last observation is 36 h old, tolerance is exactly 36 h.
+assert_actual_lag_within(actual, now, pd.Timedelta(hours=36))
+
+# Failing: tolerance is 35 h but last observation is 36 h old.
+try:
+    assert_actual_lag_within(actual, now, pd.Timedelta(hours=35))
+except CoverageError as exc:
+    print(exc)
+```
