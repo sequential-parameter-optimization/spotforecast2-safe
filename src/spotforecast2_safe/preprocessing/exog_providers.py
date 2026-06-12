@@ -1058,6 +1058,13 @@ class EventWindowProvider(ExogFeatureProvider):
             the bundled location derived from ``csv_filename``.
         column: Output column name. Defaults to the subclass ``column`` class
             attribute.
+        max_gap: Accepted for provider-factory API uniformity; has no effect.
+            Values are structurally ``0.0`` outside event windows (no NaN can
+            arise), so gap healing is not applicable.
+        max_tail_gap: Accepted for provider-factory API uniformity; has no
+            effect (same reasoning as ``max_gap``).
+        provider_window: Accepted for provider-factory API uniformity; has no
+            effect (same reasoning as ``max_gap``).
 
     Notes:
         Rejected / deferred drivers documented here for the record:
@@ -1107,9 +1114,13 @@ class EventWindowProvider(ExogFeatureProvider):
         self.data_home = data_home
         self.csv_path = Path(csv_path) if csv_path is not None else None
         self.column = column if column is not None else self.__class__.column
-        # gap/window knobs not used: values are structurally 0.0 outside
-        # any event window (no NaN can arise), so healing and windowed
-        # validation are not applicable.
+        self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
+        self.provider_window = provider_window
+        # gap/window knobs are stored for provider-factory API uniformity but
+        # have no effect: values are structurally 0.0 outside any event window
+        # (no NaN can arise), so healing and windowed validation are not
+        # applicable.
 
     def _load_windows(self) -> pd.DataFrame:
         """Load and validate the event-window CSV.
@@ -1193,7 +1204,9 @@ class EventWindowProvider(ExogFeatureProvider):
         values = pd.Series(0.0, index=idx_utc, dtype="float64")
         for _, row in windows.iterrows():
             mask = (idx_utc >= row["start_utc"]) & (idx_utc <= row["end_utc"])
-            values[mask] = values[mask].clip(lower=row["intensity"])
+            values[mask] = values[mask].clip(
+                lower=row["intensity"]
+            )  # clip(lower=x) == max(current, x); valid because values start at 0.0
 
         result = pd.DataFrame(
             {self.column: values.to_numpy(dtype="float32")}, index=index
@@ -1226,6 +1239,11 @@ class FootballMatchWindowProvider(EventWindowProvider):
         csv_path: Optional explicit path to the football-match CSV, overriding
             the bundled ``football_match_windows_de.csv``.
         column: Output column name. Defaults to ``"football_match_window"``.
+        max_gap: Accepted for provider-factory API uniformity; has no effect.
+        max_tail_gap: Accepted for provider-factory API uniformity; has no
+            effect.
+        provider_window: Accepted for provider-factory API uniformity; has no
+            effect.
 
     Examples:
         ```{python}
@@ -1272,6 +1290,11 @@ class EnergyCrisisWindowProvider(EventWindowProvider):
         csv_path: Optional explicit path to the energy-saving CSV, overriding
             the bundled ``energy_saving_windows_de.csv``.
         column: Output column name. Defaults to ``"energy_saving_window"``.
+        max_gap: Accepted for provider-factory API uniformity; has no effect.
+        max_tail_gap: Accepted for provider-factory API uniformity; has no
+            effect.
+        provider_window: Accepted for provider-factory API uniformity; has no
+            effect.
 
     Notes:
         An open-ended Ukraine-invasion step dummy (2022-02-24 onward) was
@@ -1301,7 +1324,7 @@ class EnergyCrisisWindowProvider(EventWindowProvider):
         ```
     """
 
-    name = "energy_crisis_window"
+    name = "energy_saving_window"
     csv_filename = "energy_saving_windows_de.csv"
     column = "energy_saving_window"
 

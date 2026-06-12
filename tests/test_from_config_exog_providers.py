@@ -105,7 +105,7 @@ def test_from_config_default_max_tail_gap_is_zero(config_cls):
     "flag, expected_name",
     [
         ("include_football_match_window", "football_match_window"),
-        ("include_energy_saving_window", "energy_crisis_window"),
+        ("include_energy_saving_window", "energy_saving_window"),
     ],
 )
 @pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
@@ -126,4 +126,4 @@ def test_event_window_flags_registry_order(config_cls):
     )
     model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
     names = [p.name for p in model.preprocessor.providers]
-    assert names == ["football_match_window", "energy_crisis_window"]
+    assert names == ["football_match_window", "energy_saving_window"]

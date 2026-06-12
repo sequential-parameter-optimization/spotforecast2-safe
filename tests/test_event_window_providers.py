@@ -311,3 +311,37 @@ class TestRegistryNewKeys:
             "include_football_match_window",
             "include_energy_saving_window",
         }
+
+
+# ---------------------------------------------------------------------------
+# Timezone robustness (non-UTC tz-aware index)
+# ---------------------------------------------------------------------------
+
+
+class TestTimezoneRobustness:
+    def test_non_utc_tz_aware_index_football(self):
+        """A Europe/Berlin index is handled correctly: membership is evaluated in
+        UTC, but the returned frame retains the original index (same tz, not
+        silently converted).
+
+        EURO 2024 GER vs SCO kicked off at 21:00 CEST = 19:00 UTC on
+        2024-06-14.  The bundled window is 18:00–22:00 UTC (= 20:00–00:00
+        CEST).  With a Europe/Berlin index the in-window hour is therefore
+        21:00 local time (= 19:00 UTC).
+        """
+        tz_berlin = "Europe/Berlin"
+        idx = pd.date_range("2024-06-14", periods=48, freq="h", tz=tz_berlin)
+        out = FootballMatchWindowProvider().build(idx)
+
+        # Index identity: same timezone, not converted to UTC.
+        assert out.index.tz is not None
+        assert str(out.index.tz) == tz_berlin
+        pd.testing.assert_index_equal(out.index, idx)
+
+        # 2024-06-14T19:00 UTC = 2024-06-14T21:00 Europe/Berlin is in-window.
+        in_window_local = pd.Timestamp("2024-06-14T21:00:00", tz=tz_berlin)
+        assert float(out.loc[in_window_local, "football_match_window"]) == 1.0
+
+        # Well outside the window: 06:00 local (= 04:00 UTC).
+        outside_local = pd.Timestamp("2024-06-14T06:00:00", tz=tz_berlin)
+        assert float(out.loc[outside_local, "football_match_window"]) == 0.0
