@@ -164,9 +164,10 @@ Unparseable filenames are logged as WARNING and skipped.
 
 #### Returns {.doc-section .doc-section-returns}
 
-| Name   | Type         | Description              |
-|--------|--------------|--------------------------|
-|        | [int](`int`) | Number of files deleted. |
+| Name   | Type         | Description                                                    |
+|--------|--------------|----------------------------------------------------------------|
+|        | [int](`int`) | Number of files deleted (expired .csv snapshots plus any stale |
+|        | [int](`int`) | .tmp files).                                                   |
 
 #### Examples {.doc-section .doc-section-examples}
 
@@ -285,6 +286,12 @@ Writes to a ``.tmp`` file in the destination directory, then replaces
 the final target via ``os.replace``.  A crash between the two steps
 leaves any pre-existing snapshot intact; the ``.tmp`` is ignored by
 all read operations.
+
+Timestamps are formatted as ``%Y%m%dT%H%M%SZ`` (second precision).
+Sub-second components of ``ts`` are silently truncated.  Two calls for
+the same ``kind`` within the same UTC second produce the same filename;
+the second call overwrites the first (last-writer-wins via
+``os.replace``).
 
 #### Parameters {.doc-section .doc-section-parameters}
 
