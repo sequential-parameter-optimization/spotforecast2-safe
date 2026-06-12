@@ -28,9 +28,9 @@ feature engineering, and temporal train/test splitting.
 
 | | |
 | --- | --- |
-| [preprocessing.coverage.assert_frontier_fresh](preprocessing.coverage.assert_frontier_fresh.qmd#spotforecast2_safe.preprocessing.coverage.assert_frontier_fresh) | Raise `~spotforecast2_safe.exceptions.CoverageError` if the data frontier is stale. |
-| [preprocessing.coverage.assert_actual_lag_within](preprocessing.coverage.assert_actual_lag_within.qmd#spotforecast2_safe.preprocessing.coverage.assert_actual_lag_within) | Raise `~spotforecast2_safe.exceptions.CoverageError` if the last published actual is too old. |
-| [preprocessing.coverage.assert_no_interior_gaps](preprocessing.coverage.assert_no_interior_gaps.qmd#spotforecast2_safe.preprocessing.coverage.assert_no_interior_gaps) | Raise `~spotforecast2_safe.exceptions.CoverageError` if the recent actuals contain large holes. |
+| [preprocessing.coverage.assert_frontier_fresh](preprocessing.coverage.assert_frontier_fresh.qmd#spotforecast2_safe.preprocessing.coverage.assert_frontier_fresh) | Raise `CoverageError` if the data frontier is stale. |
+| [preprocessing.coverage.assert_actual_lag_within](preprocessing.coverage.assert_actual_lag_within.qmd#spotforecast2_safe.preprocessing.coverage.assert_actual_lag_within) | Raise `CoverageError` if the last published actual is too old. |
+| [preprocessing.coverage.assert_no_interior_gaps](preprocessing.coverage.assert_no_interior_gaps.qmd#spotforecast2_safe.preprocessing.coverage.assert_no_interior_gaps) | Raise `CoverageError` if the recent actuals contain large holes. |
 | [preprocessing.coverage.last_complete_hour](preprocessing.coverage.last_complete_hour.qmd#spotforecast2_safe.preprocessing.coverage.last_complete_hour) | Return the latest hour having a complete set of intra-hour samples. |
 | [preprocessing.curate_data.agg_and_resample_data](preprocessing.curate_data.agg_and_resample_data.qmd#spotforecast2_safe.preprocessing.curate_data.agg_and_resample_data) | Aggregates and resamples the data to (e.g., hourly) frequency by computing the specified aggregation (e.g. for each hour). |
 | [preprocessing.curate_data.basic_ts_checks](preprocessing.curate_data.basic_ts_checks.qmd#spotforecast2_safe.preprocessing.curate_data.basic_ts_checks) | Checks if the time series data has a datetime index and is sorted. |
@@ -190,7 +190,7 @@ strategies, and a one-call runner.
 | [multitask.factories.default_lgbm_forecaster_factory](multitask.factories.default_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.default_lgbm_forecaster_factory) | Return a fresh, unfitted LightGBM ``ForecasterRecursive``. |
 | [multitask.factories.quantile_lgbm_forecaster_factory](multitask.factories.quantile_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.quantile_lgbm_forecaster_factory) | Return one quantile-regression LightGBM ``ForecasterRecursive`` per quantile. |
 | [multitask.factories.predict_quantile_band](multitask.factories.predict_quantile_band.qmd#spotforecast2_safe.multitask.factories.predict_quantile_band) | Assemble per-quantile forecasts into one non-crossing band. |
-| [multitask.guards.assert_no_leakage](multitask.guards.assert_no_leakage.qmd#spotforecast2_safe.multitask.guards.assert_no_leakage) | Raise `~spotforecast2_safe.exceptions.LeakageError` if any forbidden column reached the model. |
+| [multitask.guards.assert_no_leakage](multitask.guards.assert_no_leakage.qmd#spotforecast2_safe.multitask.guards.assert_no_leakage) | Raise `LeakageError` if any forbidden column reached the model. |
 | [multitask.strategies.TrainingStrategy](multitask.strategies.TrainingStrategy.qmd#spotforecast2_safe.multitask.strategies.TrainingStrategy) | Strategy interface for preparing a forecaster before the final fit. |
 | [multitask.strategies.LazyStrategy](multitask.strategies.LazyStrategy.qmd#spotforecast2_safe.multitask.strategies.LazyStrategy) | Approach 1 — Lazy fitting with optional cached tuning. |
 | [multitask.strategies.DefaultsStrategy](multitask.strategies.DefaultsStrategy.qmd#spotforecast2_safe.multitask.strategies.DefaultsStrategy) | Approach 2 — Train with defaults, no tuning, no cached params. |

@@ -4,7 +4,7 @@
 preprocessing.coverage.assert_actual_lag_within(actual, now, max_lag)
 ```
 
-Raise `~spotforecast2_safe.exceptions.CoverageError` if the last published actual is too old.
+Raise `CoverageError` if the last published actual is too old.
 
 Corresponds to the second guard in the operational ``assert_coverage``
 (script line ~462): the last non-NaN Actual Load observation is older than

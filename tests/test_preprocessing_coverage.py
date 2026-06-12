@@ -289,3 +289,13 @@ class TestLastCompleteHour:
         r1 = last_complete_hour(clean_15min_24h)
         r2 = last_complete_hour(clean_15min_24h)
         assert r1 == r2
+
+    def test_raises_on_single_non_nan_row(self):
+        """A single non-NaN row makes diff all-NaT; mode is empty -> ValueError."""
+        idx = pd.date_range("2026-06-10 00:00", periods=1, freq="h", tz="UTC")
+        single = pd.Series(50_000.0, index=idx)
+        with pytest.raises(
+            ValueError,
+            match="actual has only one non-NaN row; cannot infer cadence",
+        ):
+            last_complete_hour(single)

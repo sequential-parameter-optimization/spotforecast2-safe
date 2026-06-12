@@ -188,7 +188,7 @@ class TestMultipleSurfaceViolations:
                 "fitted model features",
             )
         )
-        assert surfaces_mentioned >= 2
+        assert surfaces_mentioned == 3
 
 
 # ---------------------------------------------------------------------------

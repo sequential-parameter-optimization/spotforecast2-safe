@@ -130,18 +130,7 @@ class TestConfigMultiCustomInit:
 
         assert ConfigMulti().warm_start_lags == DEFAULT_WARM_START_LAGS
         assert DEFAULT_WARM_START_LAGS == [
-            1,
-            2,
-            3,
-            23,
-            24,
-            25,
-            47,
-            48,
-            167,
-            168,
-            169,
-            336,
+            1, 2, 3, 23, 24, 25, 47, 48, 167, 168, 169, 336,
         ]
         cfg = ConfigMulti(warm_start_lags=[1, 24, 168])
         assert cfg.warm_start_lags == [1, 24, 168]
@@ -1063,3 +1052,5 @@ def test_config_multi_imputation_window_size_in_get_params():
     """imputation_window_size is exposed via get_params()."""
     params = ConfigMulti(imputation_window_size=6).get_params()
     assert params["imputation_window_size"] == 6
+
+

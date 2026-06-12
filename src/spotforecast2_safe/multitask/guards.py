@@ -39,7 +39,7 @@ def assert_no_leakage(
     *,
     task: str,
 ) -> None:
-    """Raise `~spotforecast2_safe.exceptions.LeakageError` if any forbidden column reached the model.
+    """Raise `LeakageError` if any forbidden column reached the model.
 
     Checks three surfaces independently:
 
@@ -48,8 +48,7 @@ def assert_no_leakage(
     3. **Fitted model features** — ``estimator.feature_name_`` for every
        target in ``mt.run_state.targets``
 
-    The check raises on the *first* surface where a violation is found.  All
-    three surfaces are checked so a single call reports every violation at once.
+    All three surfaces are checked so a single call reports every violation at once.
     If reading the fitted features fails (``estimator`` missing, not fitted,
     etc.) a ``RuntimeError`` is raised immediately rather than silently
     skipping: an unreadable feature list is itself a verifiability violation.

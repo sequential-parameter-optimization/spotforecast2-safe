@@ -90,6 +90,10 @@ class ShapeCheckReport:
         This happens when ``n_overlap < min_overlap`` (the threshold passed to
         `check_forecast_shape`).  In that case both ``corr`` and
         ``range_ratio`` are ``float('nan')``.
+
+        By construction, ``check_forecast_shape`` always stores ``n_overlap=0``
+        when skipping; manually-constructed reports with ``n_overlap > 0`` and
+        NaN metrics report ``skipped=False``.
         """
         return (
             math.isnan(self.corr)

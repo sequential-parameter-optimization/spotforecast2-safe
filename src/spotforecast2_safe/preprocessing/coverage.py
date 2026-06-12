@@ -14,7 +14,7 @@ intra-hour range / adjacent-step / deviation rules) is already provided by
 `spotforecast2_safe.preprocessing.target_corruption.apply_target_corruption_policy`
 and is intentionally **not** duplicated here.
 
-Binding invariant: every guard **raises** `~spotforecast2_safe.exceptions.CoverageError`
+Binding invariant: every guard **raises** `CoverageError`
 on violation.  `last_complete_hour` is a pure computation helper with no
 side-effects; it raises `ValueError` on invalid input.
 """
@@ -34,7 +34,7 @@ def assert_frontier_fresh(
     index: pd.DatetimeIndex,
     required_last: pd.Timestamp,
 ) -> None:
-    """Raise `~spotforecast2_safe.exceptions.CoverageError` if the data frontier is stale.
+    """Raise `CoverageError` if the data frontier is stale.
 
     Corresponds to the first guard in the operational ``assert_coverage``
     (script line ~457): ``index.max() < required_last`` means no new data has
@@ -85,7 +85,7 @@ def assert_actual_lag_within(
     now: pd.Timestamp,
     max_lag: pd.Timedelta,
 ) -> None:
-    """Raise `~spotforecast2_safe.exceptions.CoverageError` if the last published actual is too old.
+    """Raise `CoverageError` if the last published actual is too old.
 
     Corresponds to the second guard in the operational ``assert_coverage``
     (script line ~462): the last non-NaN Actual Load observation is older than
@@ -147,7 +147,7 @@ def assert_no_interior_gaps(
     scan_window: pd.Timedelta,
     max_gap: pd.Timedelta,
 ) -> None:
-    """Raise `~spotforecast2_safe.exceptions.CoverageError` if the recent actuals contain large holes.
+    """Raise `CoverageError` if the recent actuals contain large holes.
 
     Corresponds to the third guard in the operational ``assert_coverage``
     (script lines ~471-483): a publication outage can hole the *middle* of
@@ -297,7 +297,12 @@ def last_complete_hour(
             )
         sph = samples_per_hour
     else:
-        cadence = clean.index.to_series().diff().mode().iloc[0]
+        modes = clean.index.to_series().diff().mode()
+        if modes.empty:
+            raise ValueError(
+                "actual has only one non-NaN row; cannot infer cadence."
+            )
+        cadence = modes.iloc[0]
         sph = int(pd.Timedelta(hours=1) / cadence)
 
     samples_by_hour = clean.resample("h").count()
