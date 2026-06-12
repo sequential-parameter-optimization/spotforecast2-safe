@@ -1,3 +1,15 @@
+## [22.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.0.0...v22.1.0-rc.1) (2026-06-12)
+
+
+### Features
+
+* **calendar:** add per-Bundesland school-holiday features (roadmap [#6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/6)) ([3a3deb3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3a3deb3c8a6ca91029463f0a376ede7910b9a377))
+
+
+### Bug Fixes
+
+* **calendar:** apply code-review fixes for school-holiday feature branch ([5e46c40](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5e46c40142ab77c692fb4a28e5be0d0c4317e928))
+
 ## [22.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v21.2.0...v22.0.0) (2026-06-10)
 
 
