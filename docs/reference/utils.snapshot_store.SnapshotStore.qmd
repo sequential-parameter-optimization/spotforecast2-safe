@@ -1,0 +1,319 @@
+# utils.snapshot_store.SnapshotStore { #spotforecast2_safe.utils.snapshot_store.SnapshotStore }
+
+```python
+utils.snapshot_store.SnapshotStore(root, ttl)
+```
+
+Generic TTL-aware atomic snapshot store.
+
+Manages timestamped CSV snapshots under ``root/<kind>/`` directories.
+Directories are created lazily.  All read operations respect a caller-supplied
+TTL; expired snapshots are invisible to `newest_valid` and deleted by `prune`.
+
+The store is a pure mechanism — it knows nothing about what the files
+represent or when restoring them is appropriate.  Restoring is always an
+explicit caller action via `restore`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                           | Description                                                                             | Default    |
+|--------|------------------------------------------------|-----------------------------------------------------------------------------------------|------------|
+| root   | [Path](`pathlib.Path`)                         | Parent directory under which per-kind subdirectories are created.                       | _required_ |
+| ttl    | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) | Maximum age of a snapshot for it to be considered valid by `newest_valid` and `age_of`. | _required_ |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+import pandas as pd
+from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    store = SnapshotStore(root=root, ttl=pd.Timedelta(hours=72))
+    now = pd.Timestamp("2026-06-11 04:00:00", tz="UTC")
+
+    source = root / "source.csv"
+    source.write_text("x,y\n1,2\n")
+
+    snap = store.write("mydata", source, now)
+    print("snapshot path:", snap)
+
+    valid = store.newest_valid("mydata", now)
+    print("newest valid:", valid)
+
+    dest = root / "restored.csv"
+    store.restore(valid, dest)
+    print("restored content:", dest.read_text())
+
+    n = store.prune(now + pd.Timedelta(hours=73))
+    print("pruned:", n)
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [age_of](#spotforecast2_safe.utils.snapshot_store.SnapshotStore.age_of) | Return the age of ``snapshot`` relative to ``now``. |
+| [newest_valid](#spotforecast2_safe.utils.snapshot_store.SnapshotStore.newest_valid) | Return the newest valid snapshot for ``kind``, or ``None``. |
+| [prune](#spotforecast2_safe.utils.snapshot_store.SnapshotStore.prune) | Delete expired snapshots and stale ``.tmp`` files under ``root``. |
+| [restore](#spotforecast2_safe.utils.snapshot_store.SnapshotStore.restore) | Copy ``snapshot`` to ``dest`` atomically. |
+| [seed_from_file](#spotforecast2_safe.utils.snapshot_store.SnapshotStore.seed_from_file) | Bootstrap: snapshot ``source`` using its mtime if no newer snapshot exists. |
+| [write](#spotforecast2_safe.utils.snapshot_store.SnapshotStore.write) | Atomically copy ``source`` into the snapshot store for ``kind``. |
+
+### age_of { #spotforecast2_safe.utils.snapshot_store.SnapshotStore.age_of }
+
+```python
+utils.snapshot_store.SnapshotStore.age_of(snapshot, now)
+```
+
+Return the age of ``snapshot`` relative to ``now``.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                           | Description                                     | Default    |
+|----------|------------------------------------------------|-------------------------------------------------|------------|
+| snapshot | [Path](`pathlib.Path`)                         | Snapshot file whose stem encodes the timestamp. | _required_ |
+| now      | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference time.                                 | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                   | Description                                                     |
+|--------|--------------------------------------------------------|-----------------------------------------------------------------|
+|        | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) \| None | ``now - snapshot_ts``, or ``None`` when the timestamp cannot be |
+|        | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) \| None | parsed.                                                         |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> from pathlib import Path
+>>> import pandas as pd
+>>> from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+>>> store = SnapshotStore(root=Path("/tmp"), ttl=pd.Timedelta(hours=24))
+>>> now = pd.Timestamp("2026-06-11 04:00:00", tz="UTC")
+>>> snap = Path("20260610T040000Z.csv")
+>>> store.age_of(snap, now)
+Timedelta('1 days 00:00:00')
+```
+
+### newest_valid { #spotforecast2_safe.utils.snapshot_store.SnapshotStore.newest_valid }
+
+```python
+utils.snapshot_store.SnapshotStore.newest_valid(kind, now)
+```
+
+Return the newest valid snapshot for ``kind``, or ``None``.
+
+A snapshot is *valid* when its filename-encoded timestamp is parseable
+and within ``ttl`` of ``now``.  Files ending in ``.tmp`` and files whose
+stem cannot be parsed are silently skipped (with a WARNING for the
+latter).
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                           | Description                       | Default    |
+|--------|------------------------------------------------|-----------------------------------|------------|
+| kind   | [str](`str`)                                   | Logical category name.            | _required_ |
+| now    | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference time for the TTL check. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                           | Description                                                    |
+|--------|--------------------------------|----------------------------------------------------------------|
+|        | [Path](`pathlib.Path`) \| None | Path of the newest valid snapshot, or ``None`` if none exists. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> import tempfile, os
+>>> from pathlib import Path
+>>> import pandas as pd
+>>> from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     store = SnapshotStore(root=Path(tmp), ttl=pd.Timedelta(hours=24))
+...     src = Path(tmp) / "d.csv"; src.write_text("x\n1\n")
+...     now = pd.Timestamp("2026-06-11 04:00:00", tz="UTC")
+...     _ = store.write("demo", src, now)
+...     result = store.newest_valid("demo", now)
+...     result is not None
+True
+```
+
+### prune { #spotforecast2_safe.utils.snapshot_store.SnapshotStore.prune }
+
+```python
+utils.snapshot_store.SnapshotStore.prune(now)
+```
+
+Delete expired snapshots and stale ``.tmp`` files under ``root``.
+
+Walks every kind subdirectory under ``root`` and removes:
+
+* ``.csv`` snapshots whose filename-encoded timestamp is older than
+  ``now - ttl``.
+* Any ``.tmp`` files (left by interrupted writes).
+
+Unparseable filenames are logged as WARNING and skipped.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                           | Description                             | Default    |
+|--------|------------------------------------------------|-----------------------------------------|------------|
+| now    | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference time for the age calculation. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description              |
+|--------|--------------|--------------------------|
+|        | [int](`int`) | Number of files deleted. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> import tempfile
+>>> from pathlib import Path
+>>> import pandas as pd
+>>> from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     store = SnapshotStore(root=Path(tmp), ttl=pd.Timedelta(hours=24))
+...     src = Path(tmp) / "d.csv"; src.write_text("x\n1\n")
+...     old_ts = pd.Timestamp("2026-06-09 04:00:00", tz="UTC")
+...     now = pd.Timestamp("2026-06-11 04:00:00", tz="UTC")
+...     _ = store.write("demo", src, old_ts)
+...     store.prune(now)
+1
+```
+
+### restore { #spotforecast2_safe.utils.snapshot_store.SnapshotStore.restore }
+
+```python
+utils.snapshot_store.SnapshotStore.restore(snapshot, dest)
+```
+
+Copy ``snapshot`` to ``dest`` atomically.
+
+Creates parent directories as needed.  The copy is atomic at the
+filesystem level: the file is written to a ``.tmp`` sibling in
+``dest``'s directory, then renamed into place via ``os.replace``.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                   | Description               | Default    |
+|----------|------------------------|---------------------------|------------|
+| snapshot | [Path](`pathlib.Path`) | Snapshot file to restore. | _required_ |
+| dest     | [Path](`pathlib.Path`) | Destination path.         | _required_ |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> import tempfile
+>>> from pathlib import Path
+>>> import pandas as pd
+>>> from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     store = SnapshotStore(root=Path(tmp), ttl=pd.Timedelta(hours=24))
+...     snap = Path(tmp) / "snap.csv"; snap.write_text("a\n1\n")
+...     dest = Path(tmp) / "sub" / "out.csv"
+...     store.restore(snap, dest)
+...     dest.read_text()
+'a\n1\n'
+```
+
+### seed_from_file { #spotforecast2_safe.utils.snapshot_store.SnapshotStore.seed_from_file }
+
+```python
+utils.snapshot_store.SnapshotStore.seed_from_file(kind, source, now)
+```
+
+Bootstrap: snapshot ``source`` using its mtime if no newer snapshot exists.
+
+Seeds the snapshot store from a pre-existing file.  Useful on the first
+run after the store is introduced so that history already on disk is
+preserved.  The seeded snapshot is stamped with the file's mtime (UTC),
+not with ``now``.
+
+Conditions for seeding (all must hold):
+
+* ``source`` exists.
+* The file's mtime converted to UTC is within ``ttl`` of ``now``.
+* No existing snapshot for ``kind`` has a timestamp >= the file's mtime.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                           | Description                       | Default    |
+|--------|------------------------------------------------|-----------------------------------|------------|
+| kind   | [str](`str`)                                   | Logical category name.            | _required_ |
+| source | [Path](`pathlib.Path`)                         | File to seed from.                | _required_ |
+| now    | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference time for the TTL check. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                           | Description                                                       |
+|--------|--------------------------------|-------------------------------------------------------------------|
+|        | [Path](`pathlib.Path`) \| None | The written snapshot path when seeding occurred, or ``None`` when |
+|        | [Path](`pathlib.Path`) \| None | any condition was not met.                                        |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> import tempfile, os
+>>> from pathlib import Path
+>>> import pandas as pd
+>>> from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     store = SnapshotStore(root=Path(tmp), ttl=pd.Timedelta(hours=72))
+...     src = Path(tmp) / "src.csv"; src.write_text("v\n1\n")
+...     # Back-date mtime to 10 h ago
+...     now = pd.Timestamp("2026-06-11 04:00:00", tz="UTC")
+...     mtime = (now - pd.Timedelta(hours=10)).timestamp()
+...     os.utime(str(src), (mtime, mtime))
+...     snap = store.seed_from_file("demo", src, now)
+...     snap is not None
+True
+```
+
+### write { #spotforecast2_safe.utils.snapshot_store.SnapshotStore.write }
+
+```python
+utils.snapshot_store.SnapshotStore.write(kind, source, ts)
+```
+
+Atomically copy ``source`` into the snapshot store for ``kind``.
+
+Writes to a ``.tmp`` file in the destination directory, then replaces
+the final target via ``os.replace``.  A crash between the two steps
+leaves any pre-existing snapshot intact; the ``.tmp`` is ignored by
+all read operations.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                           | Description                                                    | Default    |
+|--------|------------------------------------------------|----------------------------------------------------------------|------------|
+| kind   | [str](`str`)                                   | Logical category name; controls the subdirectory used.         | _required_ |
+| source | [Path](`pathlib.Path`)                         | File to snapshot.                                              | _required_ |
+| ts     | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Timestamp to embed in the snapshot filename (UTC recommended). | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                           | Description                                                        |
+|--------|--------------------------------|--------------------------------------------------------------------|
+|        | [Path](`pathlib.Path`) \| None | Path of the written snapshot file, or ``None`` (with a WARNING) if |
+|        | [Path](`pathlib.Path`) \| None | ``source`` does not exist.                                         |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> import tempfile
+>>> from pathlib import Path
+>>> import pandas as pd
+>>> from spotforecast2_safe.utils.snapshot_store import SnapshotStore
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     store = SnapshotStore(root=Path(tmp), ttl=pd.Timedelta(hours=24))
+...     src = Path(tmp) / "data.csv"
+...     src.write_text("a,b\n1,2\n")
+...     now = pd.Timestamp("2026-06-11 04:00:00", tz="UTC")
+...     snap = store.write("demo", src, now)
+...     snap.name
+'20260611T040000Z.csv'
+```
