@@ -299,9 +299,7 @@ def last_complete_hour(
     else:
         modes = clean.index.to_series().diff().mode()
         if modes.empty:
-            raise ValueError(
-                "actual has only one non-NaN row; cannot infer cadence."
-            )
+            raise ValueError("actual has only one non-NaN row; cannot infer cadence.")
         cadence = modes.iloc[0]
         sph = int(pd.Timedelta(hours=1) / cadence)
 
