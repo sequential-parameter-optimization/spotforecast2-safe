@@ -3,6 +3,10 @@
 
 from spotforecast2_safe.data.data_classes import Data, Period
 from spotforecast2_safe.data.demo_loader import load_actual_combined
+from spotforecast2_safe.data.entsoe_loader import (
+    entsoe_data_loader,
+    entsoe_test_data_loader,
+)
 from spotforecast2_safe.data.fetch_data import (
     fetch_data,
     fetch_holiday_data,
@@ -14,6 +18,8 @@ from spotforecast2_safe.data.fetch_data import (
 __all__ = [
     "Data",
     "Period",
+    "entsoe_data_loader",
+    "entsoe_test_data_loader",
     "fetch_data",
     "fetch_holiday_data",
     "fetch_weather_data",
