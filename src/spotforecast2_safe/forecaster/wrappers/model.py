@@ -74,6 +74,8 @@ class ForecasterRecursiveModel:
         include_entsoe_renewable_forecast: bool = False,
         include_entsoe_net_load: bool = False,
         include_entsoe_day_ahead_price: bool = False,
+        include_football_match_window: bool = False,
+        include_energy_saving_window: bool = False,
         on_exog_provider_failure: str = "raise",
         exog_max_gap_hours: int = 0,
         exog_max_tail_gap_hours: int = 0,
@@ -119,6 +121,14 @@ class ForecasterRecursiveModel:
             include_entsoe_day_ahead_price:
                 Append the ENTSO-E day-ahead spot price (DE/LU). Defaults to
                 False.
+            include_football_match_window:
+                Append the bundled German football-match event-window feature
+                (1.0 during configured match windows, 0.0 otherwise). Defaults
+                to False.
+            include_energy_saving_window:
+                Append the bundled German energy-saving regulatory window
+                feature (1.0 during the EnSikuMaV and EU Regulation 2022/1854
+                periods, 0.0 otherwise). Defaults to False.
             on_exog_provider_failure:
                 ``"raise"`` (default) propagates an exogenous-provider failure;
                 ``"skip"`` logs a warning and omits that provider's columns.
@@ -193,6 +203,8 @@ class ForecasterRecursiveModel:
                     ),
                     "include_entsoe_net_load": include_entsoe_net_load,
                     "include_entsoe_day_ahead_price": include_entsoe_day_ahead_price,
+                    "include_football_match_window": include_football_match_window,
+                    "include_energy_saving_window": include_energy_saving_window,
                 },
                 max_gap=exog_max_gap_hours,
                 max_tail_gap=exog_max_tail_gap_hours,

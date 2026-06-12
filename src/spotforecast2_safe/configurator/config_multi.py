@@ -229,6 +229,14 @@ class ConfigMulti:
             (Forecasted Load minus wind/solar forecast).
         include_entsoe_day_ahead_price (bool): Append the ENTSO-E day-ahead
             spot price (DE/LU).
+        include_football_match_window (bool): Append the bundled German
+            football-match event-window feature (1.0 during configured
+            match windows, 0.0 otherwise). Covers German national-team
+            matches and tournament finals from UEFA Euro 2016 through
+            FIFA World Cup 2026.
+        include_energy_saving_window (bool): Append the bundled German
+            energy-saving regulatory window feature (1.0 during the
+            EnSikuMaV and EU Regulation 2022/1854 periods, 0.0 otherwise).
         index_name (str): Datetime column name used when resetting the index.
         bounds (Optional[List[tuple]]): Per-column outlier bounds ``(lower, upper)``.
         verbose (bool): Verbose output toggle.
@@ -379,6 +387,8 @@ class ConfigMulti:
     include_entsoe_renewable_forecast: bool = False
     include_entsoe_net_load: bool = False
     include_entsoe_day_ahead_price: bool = False
+    include_football_match_window: bool = False
+    include_energy_saving_window: bool = False
     # Data source and index
     index_name: str = "DateTime"
     # Per-column outlier bounds [(lower, upper), ...]
