@@ -1030,6 +1030,305 @@ class EntsoeDayAheadPriceProvider(ExogFeatureProvider):
         )
 
 
+class EventWindowProvider(ExogFeatureProvider):
+    """Generic event-window provider driven by a bundled CSV file.
+
+    Reads a CSV with columns ``event``, ``start_utc``, ``end_utc``, and an
+    optional ``intensity`` column (extra columns such as ``match_kickoff_utc``
+    or ``provisional`` are silently ignored — they are documentation only).
+    For each timestamp ``t`` in the requested ``DatetimeIndex`` the output
+    value is ``max(intensity)`` over all CSV rows whose window contains ``t``
+    (inclusive: ``start_utc <= t <= end_utc``), or ``0.0`` when no window
+    covers ``t``.
+
+    The ``intensity`` column defaults to ``1.0`` when absent. Membership is
+    evaluated directly on the provided index timestamps so the provider works
+    at any cadence (hourly, 15-minute, etc.). Timestamps in the CSV are
+    ISO-8601 with UTC offset; timezone harmonisation follows the same logic as
+    the other providers in this module. No ``fill_outside`` knob exists:
+    outside any window the value is structurally ``0.0``.
+
+    Subclasses set ``csv_filename`` and the default ``column`` name; they do
+    not need to override any method.
+
+    Args:
+        data_home: Unused (kept for a uniform provider signature); the dataset
+            is package data located via ``get_package_data_home()``.
+        csv_path: Optional explicit path to the event-window CSV, overriding
+            the bundled location derived from ``csv_filename``.
+        column: Output column name. Defaults to the subclass ``column`` class
+            attribute.
+        max_gap: Accepted for provider-factory API uniformity; has no effect.
+            Values are structurally ``0.0`` outside event windows (no NaN can
+            arise), so gap healing is not applicable.
+        max_tail_gap: Accepted for provider-factory API uniformity; has no
+            effect (same reasoning as ``max_gap``).
+        provider_window: Accepted for provider-factory API uniformity; has no
+            effect (same reasoning as ``max_gap``).
+
+    Notes:
+        Rejected / deferred drivers documented here for the record:
+
+        - Open-ended Ukraine-invasion step dummy (2022-02-24 onward): rejected
+          — the shift is gradual and non-permanent, and in recent training
+          windows the signal is near-constant and uninformative to GBDT.
+        - Monthly Destatis PPI proxy: deferred — ``include_entsoe_day_ahead_price``
+          already covers the price channel.
+        - Population / refugee level index: deferred — effect is 0.3–1 % of
+          mean load, below day-ahead noise; any future build must use YoY
+          growth rates to avoid the Zensus-2022 −1.4 M rebase hazard.
+        - Half-time TV-pickup sub-column, eclipse / strike / nuclear-phase-out
+          flags: rejected.
+        - Christmas-shutdown and DST days: already covered by the existing
+          holiday / day-type features.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            FootballMatchWindowProvider,
+        )
+
+        idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+        out = FootballMatchWindowProvider().build(idx)
+        print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+        assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+        assert out.loc["2024-06-14T17:00:00Z", "football_match_window"] == 0.0
+        ```
+    """
+
+    name: str = "event_window"
+    csv_filename: str = ""
+    column: str = "event_window"
+
+    def __init__(
+        self,
+        *,
+        data_home: DataHome = None,
+        csv_path: Optional[Union[str, Path]] = None,
+        column: Optional[str] = None,
+        max_gap: int = 0,  # accepted for uniform factory signature; unused
+        max_tail_gap: int = 0,  # accepted for uniform factory signature; unused
+        provider_window: Optional[pd.DatetimeIndex] = None,  # accepted; unused
+    ) -> None:
+        self.data_home = data_home
+        self.csv_path = Path(csv_path) if csv_path is not None else None
+        self.column = column if column is not None else self.__class__.column
+        self.max_gap = max_gap
+        self.max_tail_gap = max_tail_gap
+        self.provider_window = provider_window
+        # gap/window knobs are stored for provider-factory API uniformity but
+        # have no effect: values are structurally 0.0 outside any event window
+        # (no NaN can arise), so healing and windowed validation are not
+        # applicable.
+
+    def _load_windows(self) -> pd.DataFrame:
+        """Load and validate the event-window CSV.
+
+        Returns:
+            pd.DataFrame: Validated frame with columns ``start_utc``,
+                ``end_utc``, and ``intensity`` (float), all timestamps
+                tz-aware UTC.
+
+        Raises:
+            ExogProviderError: If the file is absent or missing required
+                columns.
+        """
+        from spotforecast2_safe.data.fetch_data import get_package_data_home
+
+        path = self.csv_path or (get_package_data_home() / self.csv_filename)
+        if not path.exists():
+            raise ExogProviderError(
+                f"{self.name}: bundled dataset not found at {path}."
+            )
+        df = pd.read_csv(path)
+        for required in ("event", "start_utc", "end_utc"):
+            if required not in df.columns:
+                raise ExogProviderError(
+                    f"{self.name}: {path} must have '{required}' column; "
+                    f"got {list(df.columns)}."
+                )
+        df["start_utc"] = pd.to_datetime(df["start_utc"], utc=True)
+        df["end_utc"] = pd.to_datetime(df["end_utc"], utc=True)
+        if "intensity" not in df.columns:
+            df["intensity"] = 1.0
+        else:
+            df["intensity"] = df["intensity"].astype(float)
+        return df[["start_utc", "end_utc", "intensity"]]
+
+    def build(self, index: pd.DatetimeIndex) -> pd.DataFrame:
+        """Return a single-column ``float32`` frame with event-window values.
+
+        For each timestamp ``t`` in *index* the value is
+        ``max(intensity)`` over all rows whose window contains ``t``
+        (``start_utc <= t <= end_utc``), or ``0.0`` when no row covers ``t``.
+
+        Args:
+            index: ``DatetimeIndex`` (any cadence, tz-aware or tz-naive)
+                covering the training-plus-forecast window.
+
+        Returns:
+            pd.DataFrame: One column (named by ``self.column``), ``float32``,
+                indexed exactly by *index*. NaN-free; ``0.0`` outside all
+                event windows.
+
+        Raises:
+            ExogProviderError: If the bundled CSV is absent or malformed.
+
+        Examples:
+            ```{python}
+            import pandas as pd
+            from spotforecast2_safe.preprocessing.exog_providers import (
+                FootballMatchWindowProvider,
+            )
+
+            idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+            provider = FootballMatchWindowProvider()
+            out = provider.build(idx)
+            print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+            assert out.shape == (48, 1)
+            assert not out.isna().any().any()
+            assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+            ```
+        """
+        windows = self._load_windows()
+        if len(index) == 0:
+            return pd.DataFrame({self.column: pd.Series(dtype="float32")}, index=index)
+
+        # Normalise the index to UTC for membership testing.
+        if index.tz is not None:
+            idx_utc = index.tz_convert("UTC")
+        else:
+            idx_utc = index.tz_localize("UTC")
+
+        values = pd.Series(0.0, index=idx_utc, dtype="float64")
+        for _, row in windows.iterrows():
+            mask = (idx_utc >= row["start_utc"]) & (idx_utc <= row["end_utc"])
+            values[mask] = values[mask].clip(
+                lower=row["intensity"]
+            )  # clip(lower=x) == max(current, x); valid because values start at 0.0
+
+        result = pd.DataFrame(
+            {self.column: values.to_numpy(dtype="float32")}, index=index
+        )
+        return result
+
+
+class FootballMatchWindowProvider(EventWindowProvider):
+    """German football match event-window provider.
+
+    Produces a single ``float32`` column ``football_match_window`` whose value
+    is ``1.0`` during configured match windows (pre-kickoff to post-final-whistle
+    including overtime allowance) and ``0.0`` otherwise. The bundled CSV covers
+    all German national-team matches and every tournament final from UEFA Euro
+    2016 through FIFA World Cup 2026.
+
+    Row-selection rule: every match involving the German national team plus
+    every tournament final (Euro 2016 → WC 2026). Window rule: [kickoff −
+    30 min floored to the hour, kickoff + D + 60 min ceiled to the hour] where
+    D = 120 min for group-stage matches and D = 165 min for knockout matches.
+
+    Rows with ``provisional = 1`` mark WC-2026 knockout slots on Germany's two
+    potential bracket paths (slot times fixed, teams unresolved at the time of
+    publication). The provider uses these rows identically to resolved rows.
+    They may be revised when the bracket is finalised; the ``provisional``
+    column is documentation only and is not read by the provider.
+
+    Args:
+        data_home: Unused (kept for a uniform provider signature).
+        csv_path: Optional explicit path to the football-match CSV, overriding
+            the bundled ``football_match_windows_de.csv``.
+        column: Output column name. Defaults to ``"football_match_window"``.
+        max_gap: Accepted for provider-factory API uniformity; has no effect.
+        max_tail_gap: Accepted for provider-factory API uniformity; has no
+            effect.
+        provider_window: Accepted for provider-factory API uniformity; has no
+            effect.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            FootballMatchWindowProvider,
+        )
+
+        # EURO 2024: Germany vs Scotland kicked off 2024-06-14 21:00 CEST
+        # = 2024-06-14 19:00 UTC; window 18:00–22:00 UTC.
+        idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+        out = FootballMatchWindowProvider().build(idx)
+        print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+        assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+        assert out.loc["2024-06-14T17:00:00Z", "football_match_window"] == 0.0
+        ```
+    """
+
+    name = "football_match_window"
+    csv_filename = "football_match_windows_de.csv"
+    column = "football_match_window"
+
+
+class EnergyCrisisWindowProvider(EventWindowProvider):
+    """German energy-saving regulatory window provider.
+
+    Produces a single ``float32`` column ``energy_saving_window`` whose value
+    is ``1.0`` during the two regulatory energy-saving periods in force during
+    the 2022–2023 European energy crisis and ``0.0`` otherwise.
+
+    The two bundled windows are:
+
+    - **EnSikuMaV** (Kurzfristenergieversorgungssicherungsmaßnahmenverordnung):
+      in force 2022-09-01 00:00 CEST through 2023-04-15 23:00 CEST, including
+      the February 2023 extension.
+    - **EU Council Regulation 2022/1854**: mandatory −5 % peak-hour consumption
+      reduction 2022-12-01 00:00 CET through 2023-03-31 23:00 CEST.
+
+    The ``intensity`` values are ``1.0`` for both rows; overlapping hours
+    (December 2022 through March 2023) therefore also yield ``1.0``.
+
+    Args:
+        data_home: Unused (kept for a uniform provider signature).
+        csv_path: Optional explicit path to the energy-saving CSV, overriding
+            the bundled ``energy_saving_windows_de.csv``.
+        column: Output column name. Defaults to ``"energy_saving_window"``.
+        max_gap: Accepted for provider-factory API uniformity; has no effect.
+        max_tail_gap: Accepted for provider-factory API uniformity; has no
+            effect.
+        provider_window: Accepted for provider-factory API uniformity; has no
+            effect.
+
+    Notes:
+        An open-ended Ukraine-invasion step dummy (2022-02-24 onward) was
+        considered and rejected: the load effect is gradual and non-permanent,
+        and in recent training windows the signal would be near-constant and
+        uninformative to tree-based models. The ``include_entsoe_day_ahead_price``
+        flag already captures the energy-price channel that the invasion
+        primarily affected.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.preprocessing.exog_providers import (
+            EnergyCrisisWindowProvider,
+        )
+
+        # Window is active: 2022-10-01 is inside ENSIKUMAV_DE
+        idx_in = pd.date_range("2022-10-01", periods=24, freq="h", tz="UTC")
+        out_in = EnergyCrisisWindowProvider().build(idx_in)
+        print(out_in.columns.tolist(), out_in.shape)
+        assert (out_in["energy_saving_window"] == 1.0).all()
+
+        # Window is inactive: 2022-07-01 predates both regulatory periods
+        idx_out = pd.date_range("2022-07-01", periods=24, freq="h", tz="UTC")
+        out_out = EnergyCrisisWindowProvider().build(idx_out)
+        assert (out_out["energy_saving_window"] == 0.0).all()
+        ```
+    """
+
+    name = "energy_saving_window"
+    csv_filename = "energy_saving_windows_de.csv"
+    column = "energy_saving_window"
+
+
 # Maps a configuration flag name -> the provider constructed when it is True.
 # To add a new exogenous driver: implement an ExogFeatureProvider and add one
 # entry here, then declare the matching boolean flag on the config classes.
@@ -1039,6 +1338,8 @@ EXOG_PROVIDER_REGISTRY: Dict[str, Callable[..., ExogFeatureProvider]] = {
     "include_entsoe_renewable_forecast": EntsoeRenewableForecastProvider,
     "include_entsoe_net_load": EntsoeNetLoadProvider,
     "include_entsoe_day_ahead_price": EntsoeDayAheadPriceProvider,
+    "include_football_match_window": FootballMatchWindowProvider,
+    "include_energy_saving_window": EnergyCrisisWindowProvider,
 }
 
 

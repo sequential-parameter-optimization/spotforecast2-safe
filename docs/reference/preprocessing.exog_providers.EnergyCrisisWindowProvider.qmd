@@ -1,0 +1,69 @@
+# preprocessing.exog_providers.EnergyCrisisWindowProvider { #spotforecast2_safe.preprocessing.exog_providers.EnergyCrisisWindowProvider }
+
+```python
+preprocessing.exog_providers.EnergyCrisisWindowProvider(
+    data_home=None,
+    csv_path=None,
+    column=None,
+    max_gap=0,
+    max_tail_gap=0,
+    provider_window=None,
+)
+```
+
+German energy-saving regulatory window provider.
+
+Produces a single ``float32`` column ``energy_saving_window`` whose value
+is ``1.0`` during the two regulatory energy-saving periods in force during
+the 2022–2023 European energy crisis and ``0.0`` otherwise.
+
+The two bundled windows are:
+
+- **EnSikuMaV** (Kurzfristenergieversorgungssicherungsmaßnahmenverordnung):
+  in force 2022-09-01 00:00 CEST through 2023-04-15 23:00 CEST, including
+  the February 2023 extension.
+- **EU Council Regulation 2022/1854**: mandatory −5 % peak-hour consumption
+  reduction 2022-12-01 00:00 CET through 2023-03-31 23:00 CEST.
+
+The ``intensity`` values are ``1.0`` for both rows; overlapping hours
+(December 2022 through March 2023) therefore also yield ``1.0``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type                                                                                             | Description                                                                                               | Default   |
+|-----------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------|
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                           | Unused (kept for a uniform provider signature).                                                           | `None`    |
+| csv_path        | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional explicit path to the energy-saving CSV, overriding the bundled ``energy_saving_windows_de.csv``. | `None`    |
+| column          | [Optional](`typing.Optional`)\[[str](`str`)\]                                                    | Output column name. Defaults to ``"energy_saving_window"``.                                               | `None`    |
+| max_gap         | [int](`int`)                                                                                     | Accepted for provider-factory API uniformity; has no effect.                                              | `0`       |
+| max_tail_gap    | [int](`int`)                                                                                     | Accepted for provider-factory API uniformity; has no effect.                                              | `0`       |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\]          | Accepted for provider-factory API uniformity; has no effect.                                              | `None`    |
+
+## Notes {.doc-section .doc-section-notes}
+
+An open-ended Ukraine-invasion step dummy (2022-02-24 onward) was
+considered and rejected: the load effect is gradual and non-permanent,
+and in recent training windows the signal would be near-constant and
+uninformative to tree-based models. The ``include_entsoe_day_ahead_price``
+flag already captures the energy-price channel that the invasion
+primarily affected.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    EnergyCrisisWindowProvider,
+)
+
+# Window is active: 2022-10-01 is inside ENSIKUMAV_DE
+idx_in = pd.date_range("2022-10-01", periods=24, freq="h", tz="UTC")
+out_in = EnergyCrisisWindowProvider().build(idx_in)
+print(out_in.columns.tolist(), out_in.shape)
+assert (out_in["energy_saving_window"] == 1.0).all()
+
+# Window is inactive: 2022-07-01 predates both regulatory periods
+idx_out = pd.date_range("2022-07-01", periods=24, freq="h", tz="UTC")
+out_out = EnergyCrisisWindowProvider().build(idx_out)
+assert (out_out["energy_saving_window"] == 0.0).all()
+```

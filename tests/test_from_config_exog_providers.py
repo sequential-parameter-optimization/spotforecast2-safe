@@ -94,3 +94,36 @@ def test_from_config_default_max_tail_gap_is_zero(config_cls):
     model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
     assert len(model.preprocessor.providers) == 1
     assert model.preprocessor.providers[0].max_tail_gap == 0
+
+
+# ---------------------------------------------------------------------------
+# New event-window flags flow through from_config in registry order
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "flag, expected_name",
+    [
+        ("include_football_match_window", "football_match_window"),
+        ("include_energy_saving_window", "energy_saving_window"),
+    ],
+)
+@pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
+def test_event_window_flags_produce_providers(config_cls, flag, expected_name):
+    """Setting an event-window flag produces the correct provider."""
+    cfg = config_cls(**{flag: True})
+    model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
+    names = [p.name for p in model.preprocessor.providers]
+    assert expected_name in names
+
+
+@pytest.mark.parametrize("config_cls", [ConfigEntsoe, ConfigMulti])
+def test_event_window_flags_registry_order(config_cls):
+    """Both new flags enabled → providers appear in registry order (football before energy)."""
+    cfg = config_cls(
+        include_football_match_window=True,
+        include_energy_saving_window=True,
+    )
+    model = ForecasterRecursiveModel.from_config(iteration=0, config=cfg)
+    names = [p.name for p in model.preprocessor.providers]
+    assert names == ["football_match_window", "energy_saving_window"]

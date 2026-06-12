@@ -1,0 +1,25 @@
+SPDX-FileCopyrightText: The openfootball contributors
+
+SPDX-License-Identifier: CC0-1.0
+
+Dataset: German national team matches and tournament finals, UEFA Euro 2016
+through FIFA World Cup 2026.
+
+Provenance: Derived from the openfootball project
+(https://github.com/openfootball/worldcup and
+https://github.com/openfootball/euro, CC0-1.0), which explicitly waives EU
+sui-generis database rights. WC-2026 knockout slot times sourced from the
+official FIFA match schedule as published on Wikipedia (kickoff facts, not
+copyrightable).
+
+Row-selection rule: every match involving the German national team plus every
+tournament final, UEFA Euro 2016 to FIFA World Cup 2026.
+
+Window rule: [kickoff − 30 min floored to the hour, kickoff + D + 60 min
+ceiled to the hour], where D = 120 min for group-stage matches and 165 min for
+knockout matches.
+
+Provisional rows (provisional = 1): WC-2026 knockout slots are recorded at
+fixed slot times with unresolved team placeholders (E1_PATH, E2_PATH). These
+rows are used by the provider identically to resolved rows and may be revised
+when the bracket is finalised.

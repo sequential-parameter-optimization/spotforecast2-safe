@@ -1,0 +1,59 @@
+# preprocessing.exog_providers.FootballMatchWindowProvider { #spotforecast2_safe.preprocessing.exog_providers.FootballMatchWindowProvider }
+
+```python
+preprocessing.exog_providers.FootballMatchWindowProvider(
+    data_home=None,
+    csv_path=None,
+    column=None,
+    max_gap=0,
+    max_tail_gap=0,
+    provider_window=None,
+)
+```
+
+German football match event-window provider.
+
+Produces a single ``float32`` column ``football_match_window`` whose value
+is ``1.0`` during configured match windows (pre-kickoff to post-final-whistle
+including overtime allowance) and ``0.0`` otherwise. The bundled CSV covers
+all German national-team matches and every tournament final from UEFA Euro
+2016 through FIFA World Cup 2026.
+
+Row-selection rule: every match involving the German national team plus
+every tournament final (Euro 2016 → WC 2026). Window rule: [kickoff −
+30 min floored to the hour, kickoff + D + 60 min ceiled to the hour] where
+D = 120 min for group-stage matches and D = 165 min for knockout matches.
+
+Rows with ``provisional = 1`` mark WC-2026 knockout slots on Germany's two
+potential bracket paths (slot times fixed, teams unresolved at the time of
+publication). The provider uses these rows identically to resolved rows.
+They may be revised when the bracket is finalised; the ``provisional``
+column is documentation only and is not read by the provider.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type                                                                                             | Description                                                                                                 | Default   |
+|-----------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|-----------|
+| data_home       | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                           | Unused (kept for a uniform provider signature).                                                             | `None`    |
+| csv_path        | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional explicit path to the football-match CSV, overriding the bundled ``football_match_windows_de.csv``. | `None`    |
+| column          | [Optional](`typing.Optional`)\[[str](`str`)\]                                                    | Output column name. Defaults to ``"football_match_window"``.                                                | `None`    |
+| max_gap         | [int](`int`)                                                                                     | Accepted for provider-factory API uniformity; has no effect.                                                | `0`       |
+| max_tail_gap    | [int](`int`)                                                                                     | Accepted for provider-factory API uniformity; has no effect.                                                | `0`       |
+| provider_window | [Optional](`typing.Optional`)\[[pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)\]          | Accepted for provider-factory API uniformity; has no effect.                                                | `None`    |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    FootballMatchWindowProvider,
+)
+
+# EURO 2024: Germany vs Scotland kicked off 2024-06-14 21:00 CEST
+# = 2024-06-14 19:00 UTC; window 18:00–22:00 UTC.
+idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+out = FootballMatchWindowProvider().build(idx)
+print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+assert out.loc["2024-06-14T17:00:00Z", "football_match_window"] == 0.0
+```

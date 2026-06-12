@@ -11,8 +11,10 @@ from spotforecast2_safe.configurator._base_config import default_periods
 from spotforecast2_safe.preprocessing.exog_builder import ExogBuilder
 from spotforecast2_safe.preprocessing.exog_providers import (
     CovidInfectionRateProvider,
+    EnergyCrisisWindowProvider,
     EntsoeDayAheadPriceProvider,
     EntsoeForecastLoadProvider,
+    FootballMatchWindowProvider,
 )
 
 START = pd.Timestamp("2021-12-01", tz="UTC")
@@ -81,6 +83,26 @@ def test_skip_keeps_other_providers(tmp_path):
     out = builder.build(START, END)
     assert "entsoe_forecasted_load" not in out.columns
     assert "covid_infection_rate" in out.columns
+
+
+def test_event_window_columns_appended():
+    """FootballMatchWindowProvider and EnergyCrisisWindowProvider columns are
+    appended to the ExogBuilder output without NaN."""
+    builder = ExogBuilder(
+        periods=default_periods(),
+        country_code="DE",
+        providers=[FootballMatchWindowProvider(), EnergyCrisisWindowProvider()],
+    )
+    out = builder.build(START, END)
+    assert "football_match_window" in out.columns
+    assert "energy_saving_window" in out.columns
+    base_cols = _columns_without_providers()
+    assert (
+        set(out.columns) - {"football_match_window", "energy_saving_window"}
+        == base_cols
+    )
+    assert not out["football_match_window"].isna().any()
+    assert not out["energy_saving_window"].isna().any()
 
 
 def test_invalid_on_provider_failure_rejected():
