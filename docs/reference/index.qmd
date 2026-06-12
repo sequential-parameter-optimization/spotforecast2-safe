@@ -191,8 +191,8 @@ strategies, and a one-call runner.
 
 ## Utils
 
-General-purpose utility functions: CPE generation, validation,
-data transforms, and generic TTL-aware atomic snapshot store.
+General-purpose utility functions: CPE generation, validation, and
+data transforms.
 
 
 | | |
@@ -200,8 +200,6 @@ data transforms, and generic TTL-aware atomic snapshot store.
 | [utils.cpe.get_cpe_identifier](utils.cpe.get_cpe_identifier.qmd#spotforecast2_safe.utils.cpe.get_cpe_identifier) | Generates the CPE 2.3 identifier for the spotforecast2-safe project. |
 | [utils.convert_to_utc](utils.convert_to_utc.qmd#spotforecast2_safe.utils.convert_to_utc) | Utility functions for timezone conversion. |
 | [utils.parse.parse_bool](utils.parse.parse_bool.qmd#spotforecast2_safe.utils.parse.parse_bool) | Parse case-insensitive boolean strings for CLI arguments. |
-| [utils.snapshot_store.SnapshotStore](utils.snapshot_store.SnapshotStore.qmd#spotforecast2_safe.utils.snapshot_store.SnapshotStore) | Generic TTL-aware atomic snapshot store. |
-| [utils.snapshot_store.parse_snapshot_timestamp](utils.snapshot_store.parse_snapshot_timestamp.qmd#spotforecast2_safe.utils.snapshot_store.parse_snapshot_timestamp) | Parse the UTC timestamp encoded in a snapshot filename stem. |
 
 ## Stats
 
@@ -279,6 +277,8 @@ Data downloaders for external data sources (e.g. ENTSO-E).
 | [downloader.entsoe.merge_build_manual](downloader.entsoe.merge_build_manual.qmd#spotforecast2_safe.downloader.entsoe.merge_build_manual) | Merge all raw CSV files from the 'raw' directory into a single interim file. |
 | [downloader.entsoe.download_zone_loads](downloader.entsoe.download_zone_loads.qmd#spotforecast2_safe.downloader.entsoe.download_zone_loads) | Download Actual Total Load separately for each German TSO control area. |
 | [downloader.entsoe.assemble_zone_loads](downloader.entsoe.assemble_zone_loads.qmd#spotforecast2_safe.downloader.entsoe.assemble_zone_loads) | Join the per-zone interim load files into one aligned, validated frame. |
+| [downloader.entsoe.ZoneResult](downloader.entsoe.ZoneResult.qmd#spotforecast2_safe.downloader.entsoe.ZoneResult) | Structured result record for one zone in a ``download_zone_loads`` collect run. |
+| [downloader.entsoe.build_zone_qc_frame](downloader.entsoe.build_zone_qc_frame.qmd#spotforecast2_safe.downloader.entsoe.build_zone_qc_frame) | Build a bottom-up QC frame from per-zone interim CSVs. |
 
 ## Exceptions
 
