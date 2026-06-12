@@ -326,3 +326,21 @@ def test_build_zone_qc_frame_uses_default_german_zones(data_home):
     """Calling without zones= uses GERMAN_TSO_ZONES (fails fast on missing file)."""
     with pytest.raises(FileNotFoundError):
         build_zone_qc_frame()  # no zones= → uses GERMAN_TSO_ZONES → files missing
+
+
+def test_build_zone_qc_frame_explicit_data_home_no_env_var(tmp_path, monkeypatch):
+    """data_home= kwarg works without SPOTFORECAST2_DATA env var being set."""
+    monkeypatch.delenv("SPOTFORECAST2_DATA", raising=False)
+    zones = {"load_a": "AREA_A", "load_b": "AREA_B"}
+    idx = pd.date_range("2023-01-01", periods=4, freq="h", tz="UTC")
+    interim = tmp_path / "interim"
+    interim.mkdir(parents=True)
+    for col, actual, forecast in [("load_a", 100.0, 105.0), ("load_b", 50.0, 52.0)]:
+        pd.DataFrame(
+            {col: actual, f"{col}_forecast": forecast}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(interim / f"zone_{col}.csv")
+
+    qc = build_zone_qc_frame(zones=zones, data_home=tmp_path)
+
+    assert qc["Actual Load"].iloc[0] == pytest.approx(150.0)
+    assert qc["Forecasted Load"].iloc[0] == pytest.approx(157.0)
