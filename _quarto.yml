@@ -362,6 +362,10 @@ website:
                 file: docs/reference/utils.convert_to_utc.qmd
               - text: "parse_bool"
                 file: docs/reference/utils.parse.parse_bool.qmd
+              - text: "SnapshotStore"
+                file: docs/reference/utils.snapshot_store.SnapshotStore.qmd
+              - text: "parse_snapshot_timestamp"
+                file: docs/reference/utils.snapshot_store.parse_snapshot_timestamp.qmd
 
           - section: "Stats"
             contents:
@@ -722,12 +726,14 @@ quartodoc:
     # ── Utils ─────────────────────────────────────────────────────────────────
     - title: "Utils"
       desc: |
-        General-purpose utility functions: CPE generation, validation, and
-        data transforms.
+        General-purpose utility functions: CPE generation, validation,
+        data transforms, and generic TTL-aware atomic snapshot store.
       contents:
         - utils.cpe.get_cpe_identifier
         - utils.convert_to_utc
         - utils.parse.parse_bool
+        - utils.snapshot_store.SnapshotStore
+        - utils.snapshot_store.parse_snapshot_timestamp
 
     # ── Stats ─────────────────────────────────────────────────────────────────
     - title: "Stats"

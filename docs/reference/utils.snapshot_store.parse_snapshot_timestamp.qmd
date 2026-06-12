@@ -1,0 +1,35 @@
+# utils.snapshot_store.parse_snapshot_timestamp { #spotforecast2_safe.utils.snapshot_store.parse_snapshot_timestamp }
+
+```python
+utils.snapshot_store.parse_snapshot_timestamp(path)
+```
+
+Parse the UTC timestamp encoded in a snapshot filename stem.
+
+The stem must be formatted as ``%Y%m%dT%H%M%SZ`` (e.g. ``20260611T040000Z``),
+which is valid ISO-8601-basic and parseable by ``pd.Timestamp``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                   | Description                                     | Default    |
+|--------|------------------------|-------------------------------------------------|------------|
+| path   | [Path](`pathlib.Path`) | File whose stem encodes the snapshot timestamp. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                   | Description                                                         |
+|--------|--------------------------------------------------------|---------------------------------------------------------------------|
+|        | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) \| None | A timezone-aware ``pd.Timestamp`` in UTC, or ``None`` when the stem |
+|        | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) \| None | cannot be parsed (a WARNING is logged naming the file).             |
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> from pathlib import Path
+>>> from spotforecast2_safe.utils.snapshot_store import parse_snapshot_timestamp
+>>> ts = parse_snapshot_timestamp(Path("20260611T040000Z.csv"))
+>>> ts
+Timestamp('2026-06-11 04:00:00+0000', tz='UTC')
+>>> parse_snapshot_timestamp(Path("bad_name.csv")) is None
+True
+```
