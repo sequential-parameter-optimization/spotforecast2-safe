@@ -169,6 +169,16 @@ website:
                     file: docs/reference/preprocessing.imputation.get_missing_weights.qmd
                   - text: "custom_weights"
                     file: docs/reference/preprocessing.imputation.custom_weights.qmd
+              - section: "Coverage Guards"
+                contents:
+                  - text: "assert_frontier_fresh"
+                    file: docs/reference/preprocessing.coverage.assert_frontier_fresh.qmd
+                  - text: "assert_actual_lag_within"
+                    file: docs/reference/preprocessing.coverage.assert_actual_lag_within.qmd
+                  - text: "assert_no_interior_gaps"
+                    file: docs/reference/preprocessing.coverage.assert_no_interior_gaps.qmd
+                  - text: "last_complete_hour"
+                    file: docs/reference/preprocessing.coverage.last_complete_hour.qmd
               - section: "Target Corruption"
                 contents:
                   - text: "TargetCorruptionReport"
@@ -214,6 +224,10 @@ website:
                 file: docs/reference/processing.n2n_predict.n2n_predict.qmd
               - text: "n2n_predict_with_covariates"
                 file: docs/reference/processing.n2n_predict_with_covariates.n2n_predict_with_covariates.qmd
+              - text: "ShapeCheckReport"
+                file: docs/reference/processing.shape_check.ShapeCheckReport.qmd
+              - text: "check_forecast_shape"
+                file: docs/reference/processing.shape_check.check_forecast_shape.qmd
 
           - section: "Forecaster"
             contents:
@@ -341,6 +355,10 @@ website:
                 file: docs/reference/multitask.clean.CleanTask.qmd
               - text: "default_lgbm_forecaster_factory"
                 file: docs/reference/multitask.factories.default_lgbm_forecaster_factory.qmd
+              - section: "Guards"
+                contents:
+                  - text: "assert_no_leakage"
+                    file: docs/reference/multitask.guards.assert_no_leakage.qmd
               - section: "Strategies"
                 contents:
                   - text: "TrainingStrategy"
@@ -362,6 +380,10 @@ website:
                 file: docs/reference/utils.convert_to_utc.qmd
               - text: "parse_bool"
                 file: docs/reference/utils.parse.parse_bool.qmd
+              - text: "SnapshotStore"
+                file: docs/reference/utils.snapshot_store.SnapshotStore.qmd
+              - text: "parse_snapshot_timestamp"
+                file: docs/reference/utils.snapshot_store.parse_snapshot_timestamp.qmd
 
           - section: "Stats"
             contents:
@@ -387,6 +409,14 @@ website:
                 file: docs/reference/calendar.holiday.create_holiday_adjacency_df.qmd
               - text: "get_holiday_adjacency_features"
                 file: docs/reference/calendar.holiday.get_holiday_adjacency_features.qmd
+              - text: "create_day_type_df"
+                file: docs/reference/calendar.holiday.create_day_type_df.qmd
+              - text: "get_day_type_features"
+                file: docs/reference/calendar.holiday.get_day_type_features.qmd
+              - text: "create_school_holiday_df"
+                file: docs/reference/calendar.holiday.create_school_holiday_df.qmd
+              - text: "get_school_holiday_features"
+                file: docs/reference/calendar.holiday.get_school_holiday_features.qmd
               - text: "get_calendar_features"
                 file: docs/reference/calendar.features.get_calendar_features.qmd
               - text: "get_day_night_features"
@@ -417,6 +447,10 @@ website:
                 file: docs/reference/downloader.entsoe.download_zone_loads.qmd
               - text: "assemble_zone_loads"
                 file: docs/reference/downloader.entsoe.assemble_zone_loads.qmd
+              - text: "ZoneResult"
+                file: docs/reference/downloader.entsoe.ZoneResult.qmd
+              - text: "build_zone_qc_frame"
+                file: docs/reference/downloader.entsoe.build_zone_qc_frame.qmd
 
           - text: "Exceptions"
             file: docs/reference/exceptions.qmd
@@ -560,6 +594,10 @@ quartodoc:
         Hardened tools for data curation, resampling, outlier detection,
         feature engineering, and temporal train/test splitting.
       contents:
+        - preprocessing.coverage.assert_frontier_fresh
+        - preprocessing.coverage.assert_actual_lag_within
+        - preprocessing.coverage.assert_no_interior_gaps
+        - preprocessing.coverage.last_complete_hour
         - preprocessing.curate_data.agg_and_resample_data
         - preprocessing.curate_data.basic_ts_checks
         - preprocessing.curate_data.curate_holidays
@@ -608,6 +646,8 @@ quartodoc:
         - processing.agg_predict.agg_predict
         - processing.n2n_predict.n2n_predict
         - processing.n2n_predict_with_covariates.n2n_predict_with_covariates
+        - processing.shape_check.ShapeCheckReport
+        - processing.shape_check.check_forecast_shape
 
     # ── Forecaster ────────────────────────────────────────────────────────────
     - title: "Forecaster"
@@ -702,6 +742,7 @@ quartodoc:
         - multitask.factories.default_lgbm_forecaster_factory
         - multitask.factories.quantile_lgbm_forecaster_factory
         - multitask.factories.predict_quantile_band
+        - multitask.guards.assert_no_leakage
         - multitask.strategies.TrainingStrategy
         - multitask.strategies.LazyStrategy
         - multitask.strategies.DefaultsStrategy
@@ -710,12 +751,14 @@ quartodoc:
     # ── Utils ─────────────────────────────────────────────────────────────────
     - title: "Utils"
       desc: |
-        General-purpose utility functions: CPE generation, validation, and
-        data transforms.
+        General-purpose utility functions: CPE generation, validation,
+        data transforms, and generic TTL-aware atomic snapshot store.
       contents:
         - utils.cpe.get_cpe_identifier
         - utils.convert_to_utc
         - utils.parse.parse_bool
+        - utils.snapshot_store.SnapshotStore
+        - utils.snapshot_store.parse_snapshot_timestamp
 
     # ── Stats ─────────────────────────────────────────────────────────────────
     - title: "Stats"
@@ -747,6 +790,8 @@ quartodoc:
         - calendar.holiday.get_holiday_adjacency_features
         - calendar.holiday.create_day_type_df
         - calendar.holiday.get_day_type_features
+        - calendar.holiday.create_school_holiday_df
+        - calendar.holiday.get_school_holiday_features
         - calendar.features.get_calendar_features
         - calendar.features.get_day_night_features
         - calendar.features.get_ephemeris_features
@@ -783,6 +828,8 @@ quartodoc:
         - downloader.entsoe.merge_build_manual
         - downloader.entsoe.download_zone_loads
         - downloader.entsoe.assemble_zone_loads
+        - downloader.entsoe.ZoneResult
+        - downloader.entsoe.build_zone_qc_frame
 
     # ── Exceptions ────────────────────────────────────────────────────────────
     - title: "Exceptions"
@@ -790,6 +837,8 @@ quartodoc:
         Custom exception types for safety-critical failure signalling.
       contents:
         - exceptions
+        - exceptions.CoverageError
+        - exceptions.LeakageError
 
     # ── Tasks ─────────────────────────────────────────────────────────────────
     - title: "Tasks"

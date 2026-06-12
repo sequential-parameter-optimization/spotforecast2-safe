@@ -28,6 +28,10 @@ feature engineering, and temporal train/test splitting.
 
 | | |
 | --- | --- |
+| [preprocessing.coverage.assert_frontier_fresh](preprocessing.coverage.assert_frontier_fresh.qmd#spotforecast2_safe.preprocessing.coverage.assert_frontier_fresh) | Raise `CoverageError` if the data frontier is stale. |
+| [preprocessing.coverage.assert_actual_lag_within](preprocessing.coverage.assert_actual_lag_within.qmd#spotforecast2_safe.preprocessing.coverage.assert_actual_lag_within) | Raise `CoverageError` if the last published actual is too old. |
+| [preprocessing.coverage.assert_no_interior_gaps](preprocessing.coverage.assert_no_interior_gaps.qmd#spotforecast2_safe.preprocessing.coverage.assert_no_interior_gaps) | Raise `CoverageError` if the recent actuals contain large holes. |
+| [preprocessing.coverage.last_complete_hour](preprocessing.coverage.last_complete_hour.qmd#spotforecast2_safe.preprocessing.coverage.last_complete_hour) | Return the latest hour having a complete set of intra-hour samples. |
 | [preprocessing.curate_data.agg_and_resample_data](preprocessing.curate_data.agg_and_resample_data.qmd#spotforecast2_safe.preprocessing.curate_data.agg_and_resample_data) | Aggregates and resamples the data to (e.g., hourly) frequency by computing the specified aggregation (e.g. for each hour). |
 | [preprocessing.curate_data.basic_ts_checks](preprocessing.curate_data.basic_ts_checks.qmd#spotforecast2_safe.preprocessing.curate_data.basic_ts_checks) | Checks if the time series data has a datetime index and is sorted. |
 | [preprocessing.curate_data.curate_holidays](preprocessing.curate_data.curate_holidays.qmd#spotforecast2_safe.preprocessing.curate_data.curate_holidays) | Checks if the holiday dataframe has the correct shape. |
@@ -78,6 +82,8 @@ Utilities for aggregated and n-to-n predictions.
 | [processing.agg_predict.agg_predict](processing.agg_predict.agg_predict.qmd#spotforecast2_safe.processing.agg_predict.agg_predict) | Aggregates multiple prediction columns into a single combined prediction series. |
 | [processing.n2n_predict.n2n_predict](processing.n2n_predict.n2n_predict.qmd#spotforecast2_safe.processing.n2n_predict.n2n_predict) | End-to-end baseline forecasting using equivalent date method. |
 | [processing.n2n_predict_with_covariates.n2n_predict_with_covariates](processing.n2n_predict_with_covariates.n2n_predict_with_covariates.qmd#spotforecast2_safe.processing.n2n_predict_with_covariates.n2n_predict_with_covariates) | End-to-end recursive forecasting with exogenous covariates. |
+| [processing.shape_check.ShapeCheckReport](processing.shape_check.ShapeCheckReport.qmd#spotforecast2_safe.processing.shape_check.ShapeCheckReport) | Immutable result of a forecast shape plausibility check. |
+| [processing.shape_check.check_forecast_shape](processing.shape_check.check_forecast_shape.qmd#spotforecast2_safe.processing.shape_check.check_forecast_shape) | Measure correlation and daily-range ratio between a forecast and its reference. |
 
 ## Forecaster
 
@@ -184,6 +190,7 @@ strategies, and a one-call runner.
 | [multitask.factories.default_lgbm_forecaster_factory](multitask.factories.default_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.default_lgbm_forecaster_factory) | Return a fresh, unfitted LightGBM ``ForecasterRecursive``. |
 | [multitask.factories.quantile_lgbm_forecaster_factory](multitask.factories.quantile_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.quantile_lgbm_forecaster_factory) | Return one quantile-regression LightGBM ``ForecasterRecursive`` per quantile. |
 | [multitask.factories.predict_quantile_band](multitask.factories.predict_quantile_band.qmd#spotforecast2_safe.multitask.factories.predict_quantile_band) | Assemble per-quantile forecasts into one non-crossing band. |
+| [multitask.guards.assert_no_leakage](multitask.guards.assert_no_leakage.qmd#spotforecast2_safe.multitask.guards.assert_no_leakage) | Raise `LeakageError` if any forbidden column reached the model. |
 | [multitask.strategies.TrainingStrategy](multitask.strategies.TrainingStrategy.qmd#spotforecast2_safe.multitask.strategies.TrainingStrategy) | Strategy interface for preparing a forecaster before the final fit. |
 | [multitask.strategies.LazyStrategy](multitask.strategies.LazyStrategy.qmd#spotforecast2_safe.multitask.strategies.LazyStrategy) | Approach 1 — Lazy fitting with optional cached tuning. |
 | [multitask.strategies.DefaultsStrategy](multitask.strategies.DefaultsStrategy.qmd#spotforecast2_safe.multitask.strategies.DefaultsStrategy) | Approach 2 — Train with defaults, no tuning, no cached params. |
@@ -191,8 +198,8 @@ strategies, and a one-call runner.
 
 ## Utils
 
-General-purpose utility functions: CPE generation, validation, and
-data transforms.
+General-purpose utility functions: CPE generation, validation,
+data transforms, and generic TTL-aware atomic snapshot store.
 
 
 | | |
@@ -200,6 +207,8 @@ data transforms.
 | [utils.cpe.get_cpe_identifier](utils.cpe.get_cpe_identifier.qmd#spotforecast2_safe.utils.cpe.get_cpe_identifier) | Generates the CPE 2.3 identifier for the spotforecast2-safe project. |
 | [utils.convert_to_utc](utils.convert_to_utc.qmd#spotforecast2_safe.utils.convert_to_utc) | Utility functions for timezone conversion. |
 | [utils.parse.parse_bool](utils.parse.parse_bool.qmd#spotforecast2_safe.utils.parse.parse_bool) | Parse case-insensitive boolean strings for CLI arguments. |
+| [utils.snapshot_store.SnapshotStore](utils.snapshot_store.SnapshotStore.qmd#spotforecast2_safe.utils.snapshot_store.SnapshotStore) | Generic TTL-aware atomic snapshot store. |
+| [utils.snapshot_store.parse_snapshot_timestamp](utils.snapshot_store.parse_snapshot_timestamp.qmd#spotforecast2_safe.utils.snapshot_store.parse_snapshot_timestamp) | Parse the UTC timestamp encoded in a snapshot filename stem. |
 
 ## Stats
 
@@ -237,6 +246,8 @@ construction.
 | [calendar.holiday.get_holiday_adjacency_features](calendar.holiday.get_holiday_adjacency_features.qmd#spotforecast2_safe.calendar.holiday.get_holiday_adjacency_features) | Build holiday-adjacency indicators and align them to a regular time grid. |
 | [calendar.holiday.create_day_type_df](calendar.holiday.create_day_type_df.qmd#spotforecast2_safe.calendar.holiday.create_day_type_df) | Create a day-type refinement of the public-holiday column. |
 | [calendar.holiday.get_day_type_features](calendar.holiday.get_day_type_features.qmd#spotforecast2_safe.calendar.holiday.get_day_type_features) | Build day-type indicators and align them to a regular time grid. |
+| [calendar.holiday.create_school_holiday_df](calendar.holiday.create_school_holiday_df.qmd#spotforecast2_safe.calendar.holiday.create_school_holiday_df) | Create a DataFrame with a binary school-holiday indicator for a German state. |
+| [calendar.holiday.get_school_holiday_features](calendar.holiday.get_school_holiday_features.qmd#spotforecast2_safe.calendar.holiday.get_school_holiday_features) | Build per-Bundesland school-holiday indicators and align them to a forecast grid. |
 | [calendar.features.get_calendar_features](calendar.features.get_calendar_features.qmd#spotforecast2_safe.calendar.features.get_calendar_features) | Create calendar-based features for a contiguous time range. |
 | [calendar.features.get_day_night_features](calendar.features.get_day_night_features.qmd#spotforecast2_safe.calendar.features.get_day_night_features) | Create day/night features using astronomical sunrise and sunset times. |
 | [calendar.features.get_ephemeris_features](calendar.features.get_ephemeris_features.qmd#spotforecast2_safe.calendar.features.get_ephemeris_features) | Create continuous solar-geometry features from the ephemeris. |
@@ -277,6 +288,8 @@ Data downloaders for external data sources (e.g. ENTSO-E).
 | [downloader.entsoe.merge_build_manual](downloader.entsoe.merge_build_manual.qmd#spotforecast2_safe.downloader.entsoe.merge_build_manual) | Merge all raw CSV files from the 'raw' directory into a single interim file. |
 | [downloader.entsoe.download_zone_loads](downloader.entsoe.download_zone_loads.qmd#spotforecast2_safe.downloader.entsoe.download_zone_loads) | Download Actual Total Load separately for each German TSO control area. |
 | [downloader.entsoe.assemble_zone_loads](downloader.entsoe.assemble_zone_loads.qmd#spotforecast2_safe.downloader.entsoe.assemble_zone_loads) | Join the per-zone interim load files into one aligned, validated frame. |
+| [downloader.entsoe.ZoneResult](downloader.entsoe.ZoneResult.qmd#spotforecast2_safe.downloader.entsoe.ZoneResult) | Structured result record for one zone in a ``download_zone_loads`` collect run. |
+| [downloader.entsoe.build_zone_qc_frame](downloader.entsoe.build_zone_qc_frame.qmd#spotforecast2_safe.downloader.entsoe.build_zone_qc_frame) | Build a bottom-up QC frame from per-zone interim CSVs. |
 
 ## Exceptions
 
@@ -286,6 +299,8 @@ Custom exception types for safety-critical failure signalling.
 | | |
 | --- | --- |
 | [exceptions](exceptions.qmd#spotforecast2_safe.exceptions) | Custom exceptions and warnings for spotforecast2. |
+| [exceptions.CoverageError](exceptions.CoverageError.qmd#spotforecast2_safe.exceptions.CoverageError) | Exception raised when operational data-coverage requirements are violated. |
+| [exceptions.LeakageError](exceptions.LeakageError.qmd#spotforecast2_safe.exceptions.LeakageError) | Exception raised when forbidden columns are detected in model inputs. |
 
 ## Tasks
 

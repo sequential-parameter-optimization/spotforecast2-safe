@@ -1,0 +1,12 @@
+{
+  "hash": "ced2761fc03c099ff9a8cd6bf1a327f6",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: weather.derived.cooling_degree_hours\n---\n\n\n\n```python\nweather.derived.cooling_degree_hours(temperature, base=DEFAULT_CDH_BASE_C)\n```\n\nCooling degree-hours :math:`\\max(T - base, 0)`.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name        | Type                                     | Description                                           | Default              |\n|-------------|------------------------------------------|-------------------------------------------------------|----------------------|\n| temperature | [pd](`pandas`).[Series](`pandas.Series`) | Hourly air temperature in °C.                         | _required_           |\n| base        | [float](`float`)                         | Cooling base temperature in °C. Defaults to ``22.0``. | `DEFAULT_CDH_BASE_C` |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                     | Description                                                  |\n|--------|------------------------------------------|--------------------------------------------------------------|\n|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: ``cdh`` per timestamp, ``float64``, same index as |\n|        | [pd](`pandas`).[Series](`pandas.Series`) | *temperature*. Zero whenever it is cooler than *base*.       |\n\n## Raises {.doc-section .doc-section-raises}\n\n| Name   | Type                       | Description                                        |\n|--------|----------------------------|----------------------------------------------------|\n|        | [ValueError](`ValueError`) | If *temperature* is not a NaN-free numeric Series. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#c5d65dde .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.weather.derived import cooling_degree_hours\n\nt = pd.Series([5.0, 22.0, 30.0])\nprint(cooling_degree_hours(t, base=22.0).tolist())\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[0.0, 0.0, 8.0]\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "weather.derived.cooling_degree_hours_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

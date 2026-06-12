@@ -9,6 +9,7 @@ downloader.entsoe.download_zone_loads(
     force=False,
     keep_forecast_future=False,
     timeout=60.0,
+    on_zone_failure='raise',
 )
 ```
 
@@ -29,25 +30,40 @@ it inherits the same bounded retry loop, timeout, and raw/interim
 namespacing. Unlike the day-ahead side-tables, ``keep_forecast_future``
 defaults to ``False`` here because the zone series are training *actuals*.
 
+Fail-safe invariant: collect mode is pure structured reporting.  It never
+substitutes data, fills gaps, or retries failed zones.  Files written by
+successful zones remain on disk exactly as in raise mode; no rollback is
+performed.  The caller owns the recovery policy for failed zones.
+
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name                 | Type                                                                                 | Description                                                                                                                                                                  | Default    |
-|----------------------|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| api_key              | [str](`str`)                                                                         | ENTSO-E Web API security token.                                                                                                                                              | _required_ |
-| zones                | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [str](`str`)\]\] | Mapping of column name to ``entsoe-py`` ``Area`` identifier. When ``None``, uses `GERMAN_TSO_ZONES`.                                                                         | `None`     |
-| start                | [Optional](`typing.Optional`)\[[str](`str`)\]                                        | Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to seven days ago.                                                                                                | `None`     |
-| end                  | [Optional](`typing.Optional`)\[[str](`str`)\]                                        | End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the start of tomorrow.                                                                                           | `None`     |
-| force                | [bool](`bool`)                                                                       | If True, bypass the small-window cooldown check.                                                                                                                             | `False`    |
-| keep_forecast_future | [bool](`bool`)                                                                       | If True, retain rows after the current UTC moment (preserving each zone's day-ahead ``Forecasted Load``). Defaults to ``False`` (actuals-only, leakage-free training input). | `False`    |
-| timeout              | [Optional](`typing.Optional`)\[[float](`float`)\]                                    | Per-socket-operation read timeout in seconds. ``None`` disables the timeout. Defaults to ``60.0``.                                                                           | `60.0`     |
+| Name                 | Type                                                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Default    |
+|----------------------|--------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| api_key              | [str](`str`)                                                                         | ENTSO-E Web API security token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | _required_ |
+| zones                | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [str](`str`)\]\] | Mapping of column name to ``entsoe-py`` ``Area`` identifier. When ``None``, uses `GERMAN_TSO_ZONES`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | `None`     |
+| start                | [Optional](`typing.Optional`)\[[str](`str`)\]                                        | Start in ``'YYYYMMDDHH00'`` format, or ``None`` to default to seven days ago.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `None`     |
+| end                  | [Optional](`typing.Optional`)\[[str](`str`)\]                                        | End in ``'YYYYMMDDHH00'`` format, or ``None`` to default to the start of tomorrow.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `None`     |
+| force                | [bool](`bool`)                                                                       | If True, bypass the small-window cooldown check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `False`    |
+| keep_forecast_future | [bool](`bool`)                                                                       | If True, retain rows after the current UTC moment (preserving each zone's day-ahead ``Forecasted Load``). Defaults to ``False`` (actuals-only, leakage-free training input).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `False`    |
+| timeout              | [Optional](`typing.Optional`)\[[float](`float`)\]                                    | Per-socket-operation read timeout in seconds. ``None`` disables the timeout. Defaults to ``60.0``.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `60.0`     |
+| on_zone_failure      | [Literal](`typing.Literal`)\[\'raise\', \'collect\'\]                                | How to handle a per-zone download failure.  * ``"raise"`` (default): re-raises the first exception encountered,   identical to the pre-collect behaviour. Returns ``None``. * ``"collect"``: wraps each zone's download in a try/except; on   failure records a `ZoneResult` with ``ok=False`` and continues   with the next zone; on success records ``ok=True`` with the path   to the interim CSV. Returns a ``dict[str, ZoneResult]`` keyed by   zone column in zone-dict order. Each failure is logged at WARNING.   No substitution, caching, or retry is performed beyond what the   underlying ``_download_entsoe_table`` already does.  Argument-validation errors (unparseable ``start``/``end``, unknown ``on_zone_failure`` value) always raise regardless of the mode — they are caller bugs, not download failures. | `'raise'`  |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                                    | Description                                                           |
+|--------|-----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+|        | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [ZoneResult](`spotforecast2_safe.downloader.entsoe.ZoneResult`)\]\] | ``None`` in ``"raise"`` mode (unconditionally). A                     |
+|        | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [ZoneResult](`spotforecast2_safe.downloader.entsoe.ZoneResult`)\]\] | ``dict[str, ZoneResult]`` in ``"collect"`` mode, keyed by zone column |
+|        | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [ZoneResult](`spotforecast2_safe.downloader.entsoe.ZoneResult`)\]\] | in zones-dict order, containing one entry per zone regardless of      |
+|        | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [ZoneResult](`spotforecast2_safe.downloader.entsoe.ZoneResult`)\]\] | success or failure.                                                   |
 
 ## Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                           | Description                                               |
-|--------|--------------------------------|-----------------------------------------------------------|
-|        | [ImportError](`ImportError`)   | If ``entsoe-py`` is not installed.                        |
-|        | [ValueError](`ValueError`)     | If ``start`` or ``end`` cannot be parsed.                 |
-|        | [RuntimeError](`RuntimeError`) | If a zone download fails after ``_MAX_RETRIES`` attempts. |
+| Name   | Type                           | Description                                                                                              |
+|--------|--------------------------------|----------------------------------------------------------------------------------------------------------|
+|        | [ImportError](`ImportError`)   | If ``entsoe-py`` is not installed.                                                                       |
+|        | [ValueError](`ValueError`)     | If ``start`` or ``end`` cannot be parsed, or if ``on_zone_failure`` is not ``"raise"`` or ``"collect"``. |
+|        | [RuntimeError](`RuntimeError`) | In ``"raise"`` mode, if a zone download fails after ``_MAX_RETRIES`` attempts.                           |
 
 ## Examples {.doc-section .doc-section-examples}
 
@@ -58,9 +74,35 @@ from spotforecast2_safe.downloader.entsoe import (
     assemble_zone_loads,
 )
 
-# Fetch all four German control-zone loads, then assemble the aligned
-# 4-column frame (raises on any gap with the default on_missing="raise").
+# Default raise mode: fetch all four German control-zone loads, then
+# assemble the aligned 4-column frame (raises on any zone failure or gap).
 download_zone_loads(api_key="YOUR_API_KEY", force=True)
 frame = assemble_zone_loads()
 print(frame.columns.tolist())
+```
+
+```{python}
+#| eval: false
+from spotforecast2_safe.downloader.entsoe import (
+    download_zone_loads,
+    build_zone_qc_frame,
+)
+
+# Collect mode: continue past a failing zone; inspect per-zone results.
+results = download_zone_loads(
+    api_key="YOUR_API_KEY",
+    start="202301010000",
+    end="202301050000",
+    force=True,
+    on_zone_failure="collect",
+)
+for col, r in results.items():
+    status = "ok" if r.ok else f"FAILED ({r.error})"
+    print(f"{col}: {status}")
+
+# Build a QC frame from the zones that succeeded.
+ok_zones = {col: r.area for col, r in results.items() if r.ok}
+if ok_zones:
+    qc = build_zone_qc_frame(zones=ok_zones)
+    print(qc[["Actual Load", "Forecasted Load"]].tail())
 ```

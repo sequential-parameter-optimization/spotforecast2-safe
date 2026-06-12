@@ -1,0 +1,88 @@
+# calendar.holiday.get_school_holiday_features { #spotforecast2_safe.calendar.holiday.get_school_holiday_features }
+
+```python
+calendar.holiday.get_school_holiday_features(
+    data,
+    start,
+    cov_end,
+    forecast_horizon,
+    tz='UTC',
+    freq='h',
+    country_code='DE',
+    state='NW',
+)
+```
+
+Build per-Bundesland school-holiday indicators and align them to a forecast grid.
+
+Generates the ``is_school_holiday`` binary indicator via
+`create_school_holiday_df()`, validates temporal coverage with
+`curate_holidays()`, and reindexes onto the full ``[start, cov_end]``
+grid with ``fill_value=0``.
+
+The requested span ``[start, cov_end]`` must lie entirely within the
+dataset validity range 2022-01-01 to 2027-12-31.  If either edge falls
+outside this range a ``ValueError`` is raised immediately — there is no
+fill or extrapolation.
+
+Only ``country_code="DE"`` is supported; passing any other value raises
+``ValueError``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                                                    | Description                                                                                             | Default    |
+|------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|------------|
+| data             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                          | Reference time series DataFrame used for temporal coverage validation inside `curate_holidays()`.       | _required_ |
+| start            | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Start timestamp.  String values are parsed with ``utc=True``.                                           | _required_ |
+| cov_end          | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\] | Inclusive end timestamp covering the full forecast horizon. String values are parsed with ``utc=True``. | _required_ |
+| forecast_horizon | [int](`int`)                                                                            | Number of forecast steps ahead; passed to `curate_holidays()`.                                          | _required_ |
+| tz               | [str](`str`)                                                                            | Timezone applied to the generated index. Defaults to ``"UTC"``.                                         | `'UTC'`    |
+| freq             | [str](`str`)                                                                            | Pandas-compatible frequency string. Defaults to ``"h"``.                                                | `'h'`      |
+| country_code     | [str](`str`)                                                                            | Must be ``"DE"``. Any other value raises ``ValueError``.                                                | `'DE'`     |
+| state            | [str](`str`)                                                                            | ISO 3166-2 subdivision short code for the Bundesland. Defaults to ``"NW"`` (North Rhine-Westphalia).    | `'NW'`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                           |
+|--------|------------------------------------------------|-----------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Single integer column ``is_school_holiday`` (values in  |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``{0, 1}``; no NaNs).  The index is a tz-aware `DatetimeIndex` with   |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | the requested *freq* and shape ``(len(data) + forecast_horizon, 1)``. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                                         |
+|--------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If *country_code* is not ``"DE"``, or if the requested span extends beyond the dataset validity range ``[2022-01-01, 2027-12-31]``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.calendar import get_school_holiday_features
+
+forecast_horizon = 24
+n_data = 48
+data = pd.DataFrame(
+    {"load": range(n_data)},
+    index=pd.date_range("2024-07-06", periods=n_data, freq="h", tz="UTC"),
+)
+start = data.index[0]
+cov_end = start + pd.Timedelta(hours=(n_data + forecast_horizon - 1))
+
+feats = get_school_holiday_features(
+    data=data,
+    start=start,
+    cov_end=cov_end,
+    forecast_horizon=forecast_horizon,
+    state="NW",
+)
+print("shape:", feats.shape)
+print("columns:", feats.columns.tolist())
+# NW Sommerferien 2024: 2024-07-08 is a school holiday (is_school_holiday=1).
+print("2024-07-07 00:00 UTC:", feats.loc["2024-07-07 00:00:00+00:00", "is_school_holiday"])
+print("2024-07-08 00:00 UTC:", feats.loc["2024-07-08 00:00:00+00:00", "is_school_holiday"])
+assert feats.shape == (n_data + forecast_horizon, 1)
+assert feats.loc["2024-07-07 00:00:00+00:00", "is_school_holiday"] == 0
+assert feats.loc["2024-07-08 00:00:00+00:00", "is_school_holiday"] == 1
+```

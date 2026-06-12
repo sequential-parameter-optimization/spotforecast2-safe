@@ -1,0 +1,70 @@
+# preprocessing.coverage.assert_no_interior_gaps { #spotforecast2_safe.preprocessing.coverage.assert_no_interior_gaps }
+
+```python
+preprocessing.coverage.assert_no_interior_gaps(
+    actual,
+    now,
+    *,
+    scan_window,
+    max_gap,
+)
+```
+
+Raise `CoverageError` if the recent actuals contain large holes.
+
+Corresponds to the third guard in the operational ``assert_coverage``
+(script lines ~471-483): a publication outage can hole the *middle* of
+the feed while both edge checks pass.  The 2026-06-02 incident — a full
+day of actuals published more than a day late — motivated this guard.
+
+The scan covers ``[now - scan_window, now]``; consecutive index differences
+exceeding ``max_gap`` are counted and the worst gap is reported.
+
+The comparison is strict (``>``): a difference exactly equal to ``max_gap``
+is acceptable.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                           | Description                                                                                                                     | Default    |
+|-------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|------------|
+| actual      | [pd](`pandas`).[Series](`pandas.Series`)       | Series of Actual Load (or equivalent) values, NaNs excluded internally for gap detection.                                       | _required_ |
+| now         | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference timestamp for the scan window's right boundary.                                                                       | _required_ |
+| scan_window | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) | How far back to look for interior gaps.  The operational default corresponds to ``pd.Timedelta(days=28)``.                      | _required_ |
+| max_gap     | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) | Maximum acceptable consecutive index difference inside the scan window.  The operational default is ``pd.Timedelta(hours=12)``. | _required_ |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                           | Description                                                                                                                                                                                         |
+|--------|----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [CoverageError](`spotforecast2_safe.exceptions.CoverageError`) | When at least one gap exceeds ``max_gap``, reporting the count of oversized gaps and the worst gap's start/end pair. The message mirrors the operational script's format so operators recognise it. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.coverage import assert_no_interior_gaps
+from spotforecast2_safe.exceptions import CoverageError
+
+now = pd.Timestamp("2026-06-11 12:00", tz="UTC")
+# Clean hourly data for 30 days — no gaps.
+idx = pd.date_range("2026-05-12 00:00", periods=30 * 24, freq="h", tz="UTC")
+actual = pd.Series(1.0, index=idx)
+assert_no_interior_gaps(
+    actual, now,
+    scan_window=pd.Timedelta(days=28),
+    max_gap=pd.Timedelta(hours=12),
+)
+
+# Inject a 24-hour interior gap (2026-06-02 incident pattern).
+gapped = actual.copy()
+drop = (gapped.index >= pd.Timestamp("2026-06-02 00:00", tz="UTC")) &                (gapped.index <  pd.Timestamp("2026-06-03 00:00", tz="UTC"))
+gapped = gapped[~drop]
+try:
+    assert_no_interior_gaps(
+        gapped, now,
+        scan_window=pd.Timedelta(days=28),
+        max_gap=pd.Timedelta(hours=12),
+    )
+except CoverageError as exc:
+    print(exc)
+```

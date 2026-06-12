@@ -1,0 +1,47 @@
+# preprocessing.coverage.assert_frontier_fresh { #spotforecast2_safe.preprocessing.coverage.assert_frontier_fresh }
+
+```python
+preprocessing.coverage.assert_frontier_fresh(index, required_last)
+```
+
+Raise `CoverageError` if the data frontier is stale.
+
+Corresponds to the first guard in the operational ``assert_coverage``
+(script line ~457): ``index.max() < required_last`` means no new data has
+arrived since the required cutoff and forecasting would extrapolate into
+a data void.
+
+The comparison is strict (``<``): ``index.max() == required_last`` is a
+passing boundary (data is exactly as fresh as required).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name          | Type                                                   | Description                                                                                                                                                      | Default    |
+|---------------|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| index         | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | DatetimeIndex of the interim data frame whose maximum timestamp is compared against the freshness requirement.                                                   | _required_ |
+| required_last | [pd](`pandas`).[Timestamp](`pandas.Timestamp`)         | Minimum acceptable value for ``index.max()``.  Callers typically pass ``today - pd.Timedelta(hours=1)`` (the last publishable complete UTC hour before ``now``). | _required_ |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                           | Description                                                                                    |
+|--------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+|        | [CoverageError](`spotforecast2_safe.exceptions.CoverageError`) | When ``index.max() < required_last``, naming both the observed maximum and the required value. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.coverage import assert_frontier_fresh
+from spotforecast2_safe.exceptions import CoverageError
+
+# Passing: index reaches the required timestamp.
+idx = pd.date_range("2026-06-10 00:00", periods=24, freq="h", tz="UTC")
+required = pd.Timestamp("2026-06-10 00:00", tz="UTC")
+assert_frontier_fresh(idx, required)   # no exception
+
+# Failing: data ends one hour before the requirement.
+try:
+    assert_frontier_fresh(idx, pd.Timestamp("2026-06-10 23:00", tz="UTC"))
+except CoverageError as exc:
+    print(exc)
+```

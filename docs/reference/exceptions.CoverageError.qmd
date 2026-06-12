@@ -1,0 +1,29 @@
+# exceptions.CoverageError { #spotforecast2_safe.exceptions.CoverageError }
+
+```python
+exceptions.CoverageError()
+```
+
+Exception raised when operational data-coverage requirements are violated.
+
+Raised by the guards in `spotforecast2_safe.preprocessing.coverage` when
+a freshness, lag, or interior-gap invariant is broken and the pipeline
+cannot safely produce a forecast.
+
+Inherits from `RuntimeError` so callers that catch `RuntimeError` keep
+working; the dedicated class lets safety-critical callers distinguish
+coverage violations from generic runtime errors.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.exceptions import CoverageError
+
+try:
+    raise CoverageError("Actual Load is stale: last published 2026-06-10 12:00 UTC")
+except CoverageError as e:
+    print(type(e).__name__, str(e))
+
+assert issubclass(CoverageError, RuntimeError)
+```

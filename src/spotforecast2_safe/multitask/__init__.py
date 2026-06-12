@@ -28,6 +28,7 @@ All classes are importable directly from ``spotforecast2_safe.multitask``.
 from spotforecast2_safe.multitask.base import BaseTask, agg_predictor
 from spotforecast2_safe.multitask.clean import CleanTask
 from spotforecast2_safe.multitask.defaults import DefaultsTask
+from spotforecast2_safe.multitask.guards import assert_no_leakage
 from spotforecast2_safe.multitask.lazy import LazyTask
 from spotforecast2_safe.multitask.multi import MultiTask
 from spotforecast2_safe.multitask.predict import PredictTask
@@ -44,6 +45,7 @@ __all__ = [
     "RunState",
     "SAFE_PIPELINE_TASKS",
     "agg_predictor",
+    "assert_no_leakage",
     "run",
     "run_with",
 ]

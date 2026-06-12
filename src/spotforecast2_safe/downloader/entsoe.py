@@ -79,7 +79,9 @@ Threat model (STRIDE).
 
 import logging
 import time
-from typing import Callable, Dict, Optional, Union
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Callable, Dict, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -102,6 +104,62 @@ GERMAN_TSO_ZONES: Dict[str, str] = {
     "load_transnetbw": "DE_TRANSNET",  # 10YDE-ENBW-----N
     "load_50hertz": "DE_50HZ",  # 10YDE-VE-------2
 }
+
+
+@dataclass(frozen=True)
+class ZoneResult:
+    """Structured result record for one zone in a ``download_zone_loads`` collect run.
+
+    This dataclass is returned (one per zone, keyed by column name) when
+    ``download_zone_loads`` is called with ``on_zone_failure="collect"``.  It
+    carries enough information for the caller to decide whether to proceed with
+    `build_zone_qc_frame` or to report / retry failed zones.
+
+    Fail-safe invariant: collect mode is pure structured reporting.  This class
+    carries no fallback data, no cached values, and no retry state.  A zone
+    that failed is represented exactly by ``ok=False`` with the original
+    exception in ``error`` — the caller owns the recovery policy.
+
+    Attributes:
+        column: Column name for the zone's Actual Load series (e.g.
+            ``"load_tennet"``).
+        area: String area code passed to ``download_zone_loads`` (e.g.
+            ``"DE_TENNET"``).  This is the raw string key from the zones
+            mapping — not an ``entsoe-py`` ``Area`` enum instance.
+        ok: ``True`` if the zone downloaded and its interim file was written
+            successfully; ``False`` otherwise.
+        error: The exception raised during download, or ``None`` on success.
+            On failure the interim file for this zone was *not* written (or may
+            be incomplete); on success it is ``None``.
+        interim_path: Absolute path to the per-zone interim CSV written on
+            success (``interim/zone_<column>.csv`` under the data home); ``None``
+            on failure.  Files written by successful zones are **not** rolled
+            back if another zone fails — the caller must account for partial
+            writes.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import download_zone_loads
+
+        results = download_zone_loads(
+            api_key="YOUR_API_KEY",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+            on_zone_failure="collect",
+        )
+        for col, r in results.items():
+            status = "ok" if r.ok else f"FAILED ({r.error})"
+            print(f"{col}: {status}")
+        ```
+    """
+
+    column: str
+    area: str
+    ok: bool
+    error: Optional[Exception]
+    interim_path: Optional[Path]
 
 
 def _make_client(client_cls: type, api_key: str, timeout: Optional[float]) -> object:
@@ -808,7 +866,8 @@ def download_zone_loads(
     force: bool = False,
     keep_forecast_future: bool = False,
     timeout: Optional[float] = 60.0,
-) -> None:
+    on_zone_failure: Literal["raise", "collect"] = "raise",
+) -> Optional[Dict[str, "ZoneResult"]]:
     """Download Actual Total Load separately for each German TSO control area.
 
     Instead of the single aggregated DE / DE-LU series fetched by
@@ -826,6 +885,11 @@ def download_zone_loads(
     namespacing. Unlike the day-ahead side-tables, ``keep_forecast_future``
     defaults to ``False`` here because the zone series are training *actuals*.
 
+    Fail-safe invariant: collect mode is pure structured reporting.  It never
+    substitutes data, fills gaps, or retries failed zones.  Files written by
+    successful zones remain on disk exactly as in raise mode; no rollback is
+    performed.  The caller owns the recovery policy for failed zones.
+
     Args:
         api_key: ENTSO-E Web API security token.
         zones: Mapping of column name to ``entsoe-py`` ``Area`` identifier. When
@@ -840,11 +904,34 @@ def download_zone_loads(
             ``False`` (actuals-only, leakage-free training input).
         timeout: Per-socket-operation read timeout in seconds. ``None`` disables
             the timeout. Defaults to ``60.0``.
+        on_zone_failure: How to handle a per-zone download failure.
+
+            * ``"raise"`` (default): re-raises the first exception encountered,
+              identical to the pre-collect behaviour. Returns ``None``.
+            * ``"collect"``: wraps each zone's download in a try/except; on
+              failure records a `ZoneResult` with ``ok=False`` and continues
+              with the next zone; on success records ``ok=True`` with the path
+              to the interim CSV. Returns a ``dict[str, ZoneResult]`` keyed by
+              zone column in zone-dict order. Each failure is logged at WARNING.
+              No substitution, caching, or retry is performed beyond what the
+              underlying ``_download_entsoe_table`` already does.
+
+            Argument-validation errors (unparseable ``start``/``end``, unknown
+            ``on_zone_failure`` value) always raise regardless of the mode —
+            they are caller bugs, not download failures.
+
+    Returns:
+        ``None`` in ``"raise"`` mode (unconditionally). A
+        ``dict[str, ZoneResult]`` in ``"collect"`` mode, keyed by zone column
+        in zones-dict order, containing one entry per zone regardless of
+        success or failure.
 
     Raises:
         ImportError: If ``entsoe-py`` is not installed.
-        ValueError: If ``start`` or ``end`` cannot be parsed.
-        RuntimeError: If a zone download fails after ``_MAX_RETRIES`` attempts.
+        ValueError: If ``start`` or ``end`` cannot be parsed, or if
+            ``on_zone_failure`` is not ``"raise"`` or ``"collect"``.
+        RuntimeError: In ``"raise"`` mode, if a zone download fails after
+            ``_MAX_RETRIES`` attempts.
 
     Examples:
         ```{python}
@@ -854,36 +941,135 @@ def download_zone_loads(
             assemble_zone_loads,
         )
 
-        # Fetch all four German control-zone loads, then assemble the aligned
-        # 4-column frame (raises on any gap with the default on_missing="raise").
+        # Default raise mode: fetch all four German control-zone loads, then
+        # assemble the aligned 4-column frame (raises on any zone failure or gap).
         download_zone_loads(api_key="YOUR_API_KEY", force=True)
         frame = assemble_zone_loads()
         print(frame.columns.tolist())
         ```
+
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import (
+            download_zone_loads,
+            build_zone_qc_frame,
+        )
+
+        # Collect mode: continue past a failing zone; inspect per-zone results.
+        results = download_zone_loads(
+            api_key="YOUR_API_KEY",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+            on_zone_failure="collect",
+        )
+        for col, r in results.items():
+            status = "ok" if r.ok else f"FAILED ({r.error})"
+            print(f"{col}: {status}")
+
+        # Build a QC frame from the zones that succeeded.
+        ok_zones = {col: r.area for col, r in results.items() if r.ok}
+        if ok_zones:
+            qc = build_zone_qc_frame(zones=ok_zones)
+            print(qc[["Actual Load", "Forecasted Load"]].tail())
+        ```
     """
+    if on_zone_failure not in ("raise", "collect"):
+        raise ValueError(
+            f"on_zone_failure={on_zone_failure!r} is invalid; "
+            "use 'raise' or 'collect'."
+        )
+
+    # Validate start/end before entering the per-zone loop so that a bogus
+    # format raises in both raise and collect mode (argument bugs, not download
+    # failures).  The same parse logic is used by _download_entsoe_table.
+    if start is not None:
+        _parsed_start = pd.to_datetime(start, utc=True, errors="coerce")
+        if pd.isna(_parsed_start):
+            raise ValueError(f"start={start!r} did not parse to a valid timestamp")
+    if end is not None:
+        _parsed_end = pd.to_datetime(end, utc=True, errors="coerce")
+        if pd.isna(_parsed_end):
+            raise ValueError(f"end={end!r} did not parse to a valid timestamp")
+
     zones = dict(GERMAN_TSO_ZONES if zones is None else zones)
+
+    results: Dict[str, ZoneResult] = {}
 
     for column, area in zones.items():
         forecast_col = f"{column}_forecast"
 
+        # query defined once per zone; used identically by both modes below.
         def query(client, cc, s, e, _col=column, _fc=forecast_col):  # type: ignore[no-untyped-def]
             frame = client.query_load_and_forecast(country_code=cc, start=s, end=e)
             return frame.rename(columns={"Actual Load": _col, "Forecasted Load": _fc})
 
         logger.info("Downloading control-zone load %s (%s)...", column, area)
-        _download_entsoe_table(
-            api_key,
-            area,
-            start,
-            end,
-            query=query,
-            raw_subdir=f"zones/{column}",
-            output_file=f"zone_{column}.csv",
-            file_prefix=f"entsoe_load_{column}",
-            keep_forecast_future=keep_forecast_future,
-            force=force,
-            timeout=timeout,
-        )
+
+        if on_zone_failure == "raise":
+            _download_entsoe_table(
+                api_key,
+                area,
+                start,
+                end,
+                query=query,
+                raw_subdir=f"zones/{column}",
+                output_file=f"zone_{column}.csv",
+                file_prefix=f"entsoe_load_{column}",
+                keep_forecast_future=keep_forecast_future,
+                force=force,
+                timeout=timeout,
+            )
+        else:
+            # collect mode: argument validation is done above; this catch is
+            # intentionally limited to download-layer failures.
+            try:
+                _download_entsoe_table(
+                    api_key,
+                    area,
+                    start,
+                    end,
+                    query=query,
+                    raw_subdir=f"zones/{column}",
+                    output_file=f"zone_{column}.csv",
+                    file_prefix=f"entsoe_load_{column}",
+                    keep_forecast_future=keep_forecast_future,
+                    force=force,
+                    timeout=timeout,
+                )
+                # Resolve the path fresh after a successful download so that any
+                # change to SPOTFORECAST2_DATA between iterations is reflected,
+                # and assert the file was actually written to disk.
+                interim_path = get_data_home() / "interim" / f"zone_{column}.csv"
+                if not interim_path.exists():
+                    raise FileNotFoundError(
+                        f"Interim file not found after download: {interim_path}"
+                    )
+                results[column] = ZoneResult(
+                    column=column,
+                    area=area,
+                    ok=True,
+                    error=None,
+                    interim_path=interim_path,
+                )
+            except Exception as exc:  # noqa: BLE001 — limited to download-layer failures after argument validation
+                logger.warning(
+                    "Zone %s (%s) download failed in collect mode: %s",
+                    column,
+                    area,
+                    exc,
+                )
+                results[column] = ZoneResult(
+                    column=column,
+                    area=area,
+                    ok=False,
+                    error=exc,
+                    interim_path=None,
+                )
+
+    if on_zone_failure == "raise":
+        return None
+    return results
 
 
 def assemble_zone_loads(
@@ -997,3 +1183,133 @@ def assemble_zone_loads(
         interim_dir / output_file,
     )
     return combined
+
+
+def build_zone_qc_frame(
+    zones: Optional[Dict[str, str]] = None,
+    *,
+    data_home: Optional[Union[Path, str]] = None,
+) -> pd.DataFrame:
+    """Build a bottom-up QC frame from per-zone interim CSVs.
+
+    Reads each ``interim/zone_<col>.csv`` written by `download_zone_loads`,
+    outer-joins the actual-load columns, and appends two aggregate columns:
+
+    * ``"Actual Load"``: sum of the per-zone actual columns with
+      ``min_count=len(zones)``.  A row where **any** zone's value is missing
+      yields ``NaN`` in the total — partial sums are never silently reported.
+    * ``"Forecasted Load"``: sum of the per-zone ``<col>_forecast`` columns
+      with the same ``min_count``, **only** if every zone has a forecast column
+      present in its CSV; otherwise the column is all-NaN.  This mirrors the
+      operational behaviour in the chapter-14 four-zone pipeline.
+
+    Fail-safe contract: a missing interim file raises `FileNotFoundError`
+    naming the path rather than silently skipping the zone.  No fallback, no
+    substitution.
+
+    Args:
+        zones: Mapping of column name to ``entsoe-py`` ``Area`` identifier. When
+            ``None``, uses `GERMAN_TSO_ZONES`.
+        data_home: Override for the data home directory (a ``Path``-like or
+            ``str``).  When ``None``, ``get_data_home()`` is used (reads the
+            ``SPOTFORECAST2_DATA`` environment variable).
+
+    Returns:
+        A ``pd.DataFrame`` with:
+
+        * One column per zone containing the per-zone actual load values.
+        * An ``"Actual Load"`` column with the bottom-up total (``NaN`` if any
+          zone is missing for that timestamp).
+        * A ``"Forecasted Load"`` column with the sum of per-zone forecasts if
+          all zones provide a forecast column, else all-``NaN``.
+        * Index: UTC datetimes parsed from the ``"Time (UTC)"`` CSV column,
+          sorted ascending.
+
+    Raises:
+        FileNotFoundError: If a per-zone interim file does not exist.
+
+    Notes:
+        Files written by successful zones in a partial collect run are **not**
+        rolled back.  Call ``build_zone_qc_frame`` with the subset of
+        *succeeded* zones to avoid triggering the ``FileNotFoundError`` guard
+        for zones whose download failed.
+
+    Examples:
+        ```{python}
+        import os
+        import tempfile
+        from pathlib import Path
+
+        import pandas as pd
+
+        from spotforecast2_safe.downloader.entsoe import build_zone_qc_frame
+
+        zones = {"load_a": "AREA_A", "load_b": "AREA_B"}
+        idx = pd.date_range("2023-01-01", periods=4, freq="h", tz="UTC")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            os.environ["SPOTFORECAST2_DATA"] = tmp
+            interim = Path(tmp) / "interim"
+            interim.mkdir(parents=True)
+            # Write synthetic per-zone CSVs with actual and forecast columns.
+            for col, (actual, forecast) in {
+                "load_a": (100.0, 105.0),
+                "load_b": (50.0, 52.0),
+            }.items():
+                pd.DataFrame(
+                    {col: actual, f"{col}_forecast": forecast}, index=idx
+                ).rename_axis("Time (UTC)").to_csv(interim / f"zone_{col}.csv")
+
+            qc = build_zone_qc_frame(zones=zones)
+            print(qc.columns.tolist())
+            print(f"Actual Load (first row): {qc['Actual Load'].iloc[0]}")
+            print(f"Forecasted Load (first row): {qc['Forecasted Load'].iloc[0]}")
+            assert qc["Actual Load"].iloc[0] == 150.0
+            assert qc["Forecasted Load"].iloc[0] == 157.0
+        ```
+    """
+    zones = dict(GERMAN_TSO_ZONES if zones is None else zones)
+    n = len(zones)
+
+    interim_dir = (
+        Path(data_home) if data_home is not None else get_data_home()
+    ) / "interim"
+
+    actuals: list[pd.Series] = []
+    forecasts: list[pd.Series] = []
+
+    for column in zones:
+        path = interim_dir / f"zone_{column}.csv"
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Per-zone interim file not found: {path}. "
+                "Run download_zone_loads first."
+            )
+        frame = pd.read_csv(path)
+        time_col = "Time (UTC)" if "Time (UTC)" in frame.columns else frame.columns[0]
+        frame[time_col] = pd.to_datetime(frame[time_col], utc=True)
+        frame = frame.set_index(time_col)
+
+        actuals.append(frame[column].rename(column))
+
+        forecast_col = f"{column}_forecast"
+        if forecast_col in frame.columns:
+            forecasts.append(frame[forecast_col].rename(column))
+
+    zones_df = pd.concat(actuals, axis=1, sort=False).sort_index()
+
+    result = zones_df.copy()
+    result["Actual Load"] = zones_df.sum(axis=1, min_count=n)
+
+    if len(forecasts) == n:
+        forecast_df = pd.concat(forecasts, axis=1, sort=False).reindex(zones_df.index)
+        result["Forecasted Load"] = forecast_df.sum(axis=1, min_count=n)
+    else:
+        logger.warning(
+            "Per-zone day-ahead Forecasted Load missing for some zones; "
+            "'Forecasted Load' column will be all-NaN."
+        )
+        result["Forecasted Load"] = float("nan")
+
+    result.index.name = "Time (UTC)"
+    return result
