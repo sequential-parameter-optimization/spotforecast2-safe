@@ -336,9 +336,9 @@ def test_build_zone_qc_frame_explicit_data_home_no_env_var(tmp_path, monkeypatch
     interim = tmp_path / "interim"
     interim.mkdir(parents=True)
     for col, actual, forecast in [("load_a", 100.0, 105.0), ("load_b", 50.0, 52.0)]:
-        pd.DataFrame(
-            {col: actual, f"{col}_forecast": forecast}, index=idx
-        ).rename_axis("Time (UTC)").to_csv(interim / f"zone_{col}.csv")
+        pd.DataFrame({col: actual, f"{col}_forecast": forecast}, index=idx).rename_axis(
+            "Time (UTC)"
+        ).to_csv(interim / f"zone_{col}.csv")
 
     qc = build_zone_qc_frame(zones=zones, data_home=tmp_path)
 
