@@ -1,0 +1,96 @@
+# preprocessing.exog_providers.EventWindowProvider { #spotforecast2_safe.preprocessing.exog_providers.EventWindowProvider }
+
+```python
+preprocessing.exog_providers.EventWindowProvider(
+    data_home=None,
+    csv_path=None,
+    column=None,
+)
+```
+
+Generic event-window provider driven by a bundled CSV file.
+
+Reads a CSV with columns ``event``, ``start_utc``, ``end_utc``, and an
+optional ``intensity`` column (extra columns such as ``match_kickoff_utc``
+or ``provisional`` are silently ignored — they are documentation only).
+For each timestamp ``t`` in the requested ``DatetimeIndex`` the output
+value is ``max(intensity)`` over all CSV rows whose window contains ``t``
+(inclusive: ``start_utc <= t <= end_utc``), or ``0.0`` when no window
+covers ``t``.
+
+The ``intensity`` column defaults to ``1.0`` when absent. Membership is
+evaluated directly on the provided index timestamps so the provider works
+at any cadence (hourly, 15-minute, etc.). No ``fill_outside`` knob exists:
+outside any window the value is structurally ``0.0``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                                             | Description                                                                                                     | Default |
+|-----------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|---------|
+| data_home | [DataHome](`spotforecast2_safe.preprocessing.exog_providers.DataHome`)                           | Unused (kept for a uniform provider signature); the dataset is package data located via ``get_package_data_home()``. | `None`  |
+| csv_path  | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional explicit path to the event-window CSV, overriding the bundled location.                               | `None`  |
+| column    | [Optional](`typing.Optional`)\[[str](`str`)\]                                                   | Output column name. Defaults to the subclass ``column`` class attribute.                                        | `None`  |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    FootballMatchWindowProvider,
+)
+
+idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+out = FootballMatchWindowProvider().build(idx)
+print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+assert out.loc["2024-06-14T17:00:00Z", "football_match_window"] == 0.0
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [build](#spotforecast2_safe.preprocessing.exog_providers.EventWindowProvider.build) | Return a single-column ``float32`` frame with event-window values. |
+
+### build { #spotforecast2_safe.preprocessing.exog_providers.EventWindowProvider.build }
+
+```python
+preprocessing.exog_providers.EventWindowProvider.build(index)
+```
+
+Return a single-column ``float32`` frame with event-window values.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                   | Description                                                                   | Default    |
+|--------|--------------------------------------------------------|-------------------------------------------------------------------------------|------------|
+| index  | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | ``DatetimeIndex`` (any cadence, tz-aware or tz-naive) covering the window.    | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                                                                                       |
+|--------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | One column (named by ``self.column``), ``float32``, indexed exactly by *index*. NaN-free; ``0.0`` outside all event windows.     |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                                     | Description                                   |
+|--------|------------------------------------------------------------------------------------------|-----------------------------------------------|
+|        | [ExogProviderError](`spotforecast2_safe.preprocessing.exog_providers.ExogProviderError`) | If the bundled CSV is absent or malformed.     |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    FootballMatchWindowProvider,
+)
+
+idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+provider = FootballMatchWindowProvider()
+out = provider.build(idx)
+print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+assert out.shape == (48, 1)
+assert not out.isna().any().any()
+assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+```

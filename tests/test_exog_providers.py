@@ -221,7 +221,18 @@ class TestRegistry:
             "include_entsoe_renewable_forecast",
             "include_entsoe_net_load",
             "include_entsoe_day_ahead_price",
+            "include_football_match_window",
+            "include_energy_saving_window",
         }
+
+    def test_registry_order_new_keys_after_price(self):
+        """Football and energy-saving keys follow include_entsoe_day_ahead_price."""
+        keys = list(EXOG_PROVIDER_REGISTRY.keys())
+        price_idx = keys.index("include_entsoe_day_ahead_price")
+        football_idx = keys.index("include_football_match_window")
+        energy_idx = keys.index("include_energy_saving_window")
+        assert football_idx > price_idx
+        assert energy_idx > football_idx
 
     def test_build_providers_respects_flags_and_order(self):
         providers = build_providers(

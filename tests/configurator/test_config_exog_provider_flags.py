@@ -108,3 +108,41 @@ def test_exog_tail_gap_get_set_round_trip(config_cls):
     cfg2 = config_cls()
     cfg2.set_params(exog_max_tail_gap_hours=48)
     assert cfg2.exog_max_tail_gap_hours == 48
+
+
+# ---------------------------------------------------------------------------
+# New event-window flags
+# ---------------------------------------------------------------------------
+
+
+def test_new_event_window_flags_default_false(config_cls):
+    """include_football_match_window and include_energy_saving_window default to False."""
+    cfg = config_cls()
+    assert cfg.include_football_match_window is False
+    assert cfg.include_energy_saving_window is False
+
+
+def test_new_event_window_flags_in_param_names(config_cls):
+    """New flags appear in _PARAM_NAMES."""
+    assert "include_football_match_window" in config_cls._PARAM_NAMES
+    assert "include_energy_saving_window" in config_cls._PARAM_NAMES
+
+
+def test_new_event_window_flags_get_params_round_trip(config_cls):
+    """New flags are round-tripped through get_params/set_params."""
+    cfg = config_cls(
+        include_football_match_window=True,
+        include_energy_saving_window=True,
+    )
+    params = cfg.get_params()
+    assert params["include_football_match_window"] is True
+    assert params["include_energy_saving_window"] is True
+    assert params["include_covid_infection_rate"] is False
+
+    cfg2 = config_cls()
+    cfg2.set_params(
+        include_football_match_window=True,
+        include_energy_saving_window=True,
+    )
+    assert cfg2.include_football_match_window is True
+    assert cfg2.include_energy_saving_window is True
