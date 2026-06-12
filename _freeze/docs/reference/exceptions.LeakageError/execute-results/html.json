@@ -1,0 +1,12 @@
+{
+  "hash": "27c7f298a939e85e0f434c2d2a5f0117",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: exceptions.LeakageError\n---\n\n\n\n```python\nexceptions.LeakageError()\n```\n\nException raised when forbidden columns are detected in model inputs.\n\nRaised by `spotforecast2_safe.multitask.guards.assert_no_leakage` when a\nforbidden column name appears in the training frame, the selected exogenous\nfeature set, or the fitted model's feature list.\n\nInherits from `RuntimeError` so callers that catch `RuntimeError` keep\nworking; the dedicated class lets safety-critical callers distinguish\ndata-governance violations from generic runtime errors.\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#7c7c39cb .cell execution_count=1}\n``` {.python .cell-code}\nfrom spotforecast2_safe.exceptions import LeakageError\n\ntry:\n    raise LeakageError(\n        \"Forbidden column 'Forecasted Load' found in training frame\"\n    )\nexcept LeakageError as e:\n    print(type(e).__name__, str(e))\n\nassert issubclass(LeakageError, RuntimeError)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nLeakageError Forbidden column 'Forecasted Load' found in training frame\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "exceptions.LeakageError_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

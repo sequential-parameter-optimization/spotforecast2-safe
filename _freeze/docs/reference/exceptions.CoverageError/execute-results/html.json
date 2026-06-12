@@ -1,0 +1,12 @@
+{
+  "hash": "634d29fbe671f6a4b1e7c7f1b54f3b23",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: exceptions.CoverageError\n---\n\n\n\n```python\nexceptions.CoverageError()\n```\n\nException raised when operational data-coverage requirements are violated.\n\nRaised by the guards in `spotforecast2_safe.preprocessing.coverage` when\na freshness, lag, or interior-gap invariant is broken and the pipeline\ncannot safely produce a forecast.\n\nInherits from `RuntimeError` so callers that catch `RuntimeError` keep\nworking; the dedicated class lets safety-critical callers distinguish\ncoverage violations from generic runtime errors.\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#9a56f10e .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.exceptions import CoverageError\n\ntry:\n    raise CoverageError(\"Actual Load is stale: last published 2026-06-10 12:00 UTC\")\nexcept CoverageError as e:\n    print(type(e).__name__, str(e))\n\nassert issubclass(CoverageError, RuntimeError)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nCoverageError Actual Load is stale: last published 2026-06-10 12:00 UTC\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "exceptions.CoverageError_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
