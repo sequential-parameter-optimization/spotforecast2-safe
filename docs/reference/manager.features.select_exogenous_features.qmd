@@ -8,6 +8,7 @@ manager.features.select_exogenous_features(
     include_weather_windows=False,
     include_holiday_features=False,
     include_holiday_adjacency_features=False,
+    include_school_holiday_features=False,
     poly_features_degree=1,
 )
 ```
@@ -25,7 +26,9 @@ forecaster.  The selection order is:
    with ``"holiday"`` (optional, ``include_holiday_features``).
 5. Holiday-adjacency columns: ``is_brueckentag``, ``is_before_holiday``,
    ``is_after_holiday`` (optional, ``include_holiday_adjacency_features``).
-6. Polynomial interaction columns starting with ``"poly_"`` (included
+6. School-holiday column: ``is_school_holiday`` (optional,
+   ``include_school_holiday_features``).
+7. Polynomial interaction columns starting with ``"poly_"`` (included
    when ``poly_features_degree >= 2``).
 
 Duplicates are removed while preserving insertion order.
@@ -40,6 +43,7 @@ Duplicates are removed while preserving insertion order.
 | include_weather_windows            | [bool](`bool`)                                 | If ``True``, include rolling-window weather columns (those containing ``"_window_"`` plus ``"_mean"``, ``"_min"``, or ``"_max"``).  Defaults to ``False``.                        | `False`         |
 | include_holiday_features           | [bool](`bool`)                                 | If ``True``, include the ``is_holiday`` column and any column whose name starts with ``"holiday"``. Defaults to ``False``.                                                        | `False`         |
 | include_holiday_adjacency_features | [bool](`bool`)                                 | If ``True``, include the three adjacency columns ``is_brueckentag``, ``is_before_holiday``, and ``is_after_holiday`` when present in *exogenous_features*. Defaults to ``False``. | `False`         |
+| include_school_holiday_features    | [bool](`bool`)                                 | If ``True``, include the ``is_school_holiday`` column when present in *exogenous_features*. Defaults to ``False``.                                                                | `False`         |
 | poly_features_degree               | [int](`int`)                                   | Polynomial-interaction degree. Interaction columns (names starting with ``"poly_"``) are included only when this is ``>= 2``; at ``1`` no interactions exist. Defaults to ``1``.  | `1`             |
 
 ## Returns {.doc-section .doc-section-returns}

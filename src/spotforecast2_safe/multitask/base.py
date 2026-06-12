@@ -35,6 +35,7 @@ from spotforecast2_safe.calendar import (
     get_ephemeris_features,
     get_holiday_adjacency_features,
     get_holiday_features,
+    get_school_holiday_features,
 )
 from spotforecast2_safe.configurator.config_multi import (  # noqa: F401  (re-exported for subclasses)
     ConfigMulti,
@@ -1175,6 +1176,21 @@ class BaseTask:
                 "  Holiday adjacency features: %s", holiday_adjacency_features.shape
             )
             concat_frames.append(holiday_adjacency_features)
+        if self.config.include_school_holiday_features:
+            school_holiday_features = get_school_holiday_features(
+                data=self.df_pipeline,
+                start=self.run_state.data_start,
+                cov_end=self.run_state.cov_end,
+                forecast_horizon=self.config.predict_size,
+                tz=self.config.timezone,
+                freq="h",
+                country_code=self.config.country_code,
+                state=self.config.state,
+            )
+            self.logger.info(
+                "  School holiday features: %s", school_holiday_features.shape
+            )
+            concat_frames.append(school_holiday_features)
 
         # Step 5 — Combine
         self.exogenous_features = pd.concat(
@@ -1309,6 +1325,7 @@ class BaseTask:
             include_weather_windows=self.config.include_weather_windows,
             include_holiday_features=self.config.include_holiday_features,
             include_holiday_adjacency_features=self.config.include_holiday_adjacency_features,
+            include_school_holiday_features=self.config.include_school_holiday_features,
             poly_features_degree=self.config.poly_features_degree,
         )
         # ``select_exogenous_features`` matches calendar/weather/holiday/poly

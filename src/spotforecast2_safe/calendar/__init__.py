@@ -19,19 +19,23 @@ from spotforecast2_safe.calendar.holiday import (
     create_day_type_df,
     create_holiday_adjacency_df,
     create_holiday_df,
+    create_school_holiday_df,
     get_day_type_features,
     get_holiday_adjacency_features,
     get_holiday_features,
+    get_school_holiday_features,
 )
 
 __all__ = [
     "create_day_type_df",
     "create_holiday_adjacency_df",
     "create_holiday_df",
+    "create_school_holiday_df",
     "get_calendar_features",
     "get_day_night_features",
     "get_day_type_features",
     "get_ephemeris_features",
     "get_holiday_adjacency_features",
     "get_holiday_features",
+    "get_school_holiday_features",
 ]
