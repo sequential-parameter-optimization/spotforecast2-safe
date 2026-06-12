@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-FileCopyrightText: 2024-2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 """Generic TTL-aware atomic snapshot store.
@@ -133,6 +133,12 @@ class SnapshotStore:
     root: Path
     ttl: pd.Timedelta
 
+    def __post_init__(self) -> None:
+        if self.ttl <= pd.Timedelta(0):
+            raise ValueError(f"ttl must be positive; got {self.ttl!r}")
+        if not self.root.is_absolute():
+            raise ValueError(f"root must be an absolute path; got {self.root!r}")
+
     def _kind_dir(self, kind: str) -> Path:
         return self.root / kind
 
@@ -143,6 +149,12 @@ class SnapshotStore:
         the final target via ``os.replace``.  A crash between the two steps
         leaves any pre-existing snapshot intact; the ``.tmp`` is ignored by
         all read operations.
+
+        Timestamps are formatted as ``%Y%m%dT%H%M%SZ`` (second precision).
+        Sub-second components of ``ts`` are silently truncated.  Two calls for
+        the same ``kind`` within the same UTC second produce the same filename;
+        the second call overwrites the first (last-writer-wins via
+        ``os.replace``).
 
         Args:
             kind: Logical category name; controls the subdirectory used.
@@ -215,7 +227,7 @@ class SnapshotStore:
         cutoff = now - self.ttl
         best: tuple[pd.Timestamp, Path] | None = None
         for p in kind_dir.iterdir():
-            if p.suffix != ".csv" or p.name.endswith(".tmp"):
+            if p.suffix != ".csv":
                 continue
             ts = parse_snapshot_timestamp(p)
             if ts is None:
@@ -271,7 +283,8 @@ class SnapshotStore:
             now: Reference time for the age calculation.
 
         Returns:
-            Number of files deleted.
+            Number of files deleted (expired .csv snapshots plus any stale
+            .tmp files).
 
         Examples:
             >>> import tempfile
@@ -374,7 +387,7 @@ class SnapshotStore:
         kind_dir = self._kind_dir(kind)
         if kind_dir.is_dir():
             for p in kind_dir.iterdir():
-                if p.suffix != ".csv" or p.name.endswith(".tmp"):
+                if p.suffix != ".csv":
                     continue
                 ts = parse_snapshot_timestamp(p)
                 if ts is None:

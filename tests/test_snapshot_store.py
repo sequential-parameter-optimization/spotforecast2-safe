@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2026 bartzbeielstein
+# SPDX-FileCopyrightText: 2024-2026 bartzbeielstein
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 """Tests for spotforecast2_safe.utils.snapshot_store.
@@ -54,6 +54,21 @@ def _write_snap_direct(
     dest = kind_dir / filename
     dest.write_text(content)
     return dest
+
+
+# ---------------------------------------------------------------------------
+# SnapshotStore.__post_init__ validation
+# ---------------------------------------------------------------------------
+
+
+def test_snapshot_store_rejects_non_positive_ttl(tmp_path):
+    with pytest.raises(ValueError, match="ttl must be positive"):
+        SnapshotStore(root=tmp_path, ttl=pd.Timedelta(0))
+
+
+def test_snapshot_store_rejects_relative_root():
+    with pytest.raises(ValueError, match="root must be an absolute path"):
+        SnapshotStore(root=Path("relative/path"), ttl=TTL)
 
 
 # ---------------------------------------------------------------------------
@@ -235,6 +250,16 @@ def test_newest_valid_skips_unparseable_with_warning(tmp_path, caplog):
     assert any("garbage_name.csv" in r.message for r in caplog.records)
 
 
+def test_newest_valid_exact_boundary_is_valid(tmp_path):
+    """A snapshot stamped exactly NOW - TTL is still valid (strict < cutoff)."""
+    store = _store(tmp_path / "snaps")
+    exact_ts = NOW - TTL  # age == TTL exactly
+    snap = _write_snap_direct(store, "demo", exact_ts)
+
+    result = store.newest_valid("demo", NOW)
+    assert result == snap, "snapshot at exact TTL boundary must be returned as valid"
+
+
 # ---------------------------------------------------------------------------
 # restore — round-trip
 # ---------------------------------------------------------------------------
@@ -328,6 +353,17 @@ def test_prune_deletes_stale_tmp_files(tmp_path):
     assert not tmp_file.exists()
 
 
+def test_prune_exact_boundary_keeps_snapshot(tmp_path):
+    """A snapshot stamped exactly NOW - TTL must NOT be pruned (strict < cutoff)."""
+    store = _store(tmp_path / "snaps")
+    exact_ts = NOW - TTL  # age == TTL exactly
+    snap = _write_snap_direct(store, "demo", exact_ts)
+
+    count = store.prune(NOW)
+    assert count == 0, "snapshot at exact TTL boundary must be kept"
+    assert snap.exists(), "snapshot file must still be present after prune"
+
+
 def test_prune_returns_zero_when_nothing_expired(tmp_path):
     store = _store(tmp_path / "snaps")
     src = _make_csv(tmp_path / "src.csv")
@@ -393,6 +429,20 @@ def test_seed_from_file_skips_when_mtime_older_than_ttl(tmp_path):
     kind_dir = store.root / "demo"
     if kind_dir.exists():
         assert not any(kind_dir.glob("*.csv"))
+
+
+def test_seed_from_file_exact_boundary_mtime_is_accepted(tmp_path):
+    """A source file whose mtime is exactly NOW - TTL must be accepted (strict <)."""
+    store = _store(tmp_path / "snaps")
+    src = _make_csv(tmp_path / "src.csv")
+
+    # Set mtime to exactly NOW - TTL (boundary, should still be within TTL)
+    exact_mtime = (NOW - TTL).timestamp()
+    os.utime(str(src), (exact_mtime, exact_mtime))
+
+    snap = store.seed_from_file("demo", src, NOW)
+    assert snap is not None, "source file at exact TTL boundary mtime must be seeded"
+    assert snap.exists()
 
 
 def test_seed_from_file_skips_when_newer_snapshot_exists(tmp_path):
