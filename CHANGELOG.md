@@ -1,3 +1,21 @@
+## [22.2.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.1.0...v22.2.0) (2026-06-12)
+
+
+### Features
+
+* **data:** add CC0-1.0 licence + event-window CSV datasets ([f4171f6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f4171f61012514e643852862ac98b34258b143eb))
+* **providers:** EventWindowProvider + Football/EnergyCrisis subclasses ([d785f5b](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/d785f5bb1015d1f3155e651a42a685d7bb2e3dc4))
+
+
+### Bug Fixes
+
+* **providers:** review fixes — uniform provider contract, exports, name alignment ([4d3b31c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4d3b31cca764751e271ba219ec2ab051235d61ea))
+
+
+### Documentation
+
+* register event-window providers in quartodoc, track freeze outputs ([57567b7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/57567b79751bfa236278045c753bb040153c544d))
+
 ## [22.2.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.1.0...v22.2.0-rc.1) (2026-06-12)
 
 
