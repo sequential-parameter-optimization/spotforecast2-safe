@@ -1,3 +1,28 @@
+## [22.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.0.0...v22.1.0) (2026-06-12)
+
+
+### Features
+
+* **calendar:** add per-Bundesland school-holiday features (roadmap [#6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/6)) ([3a3deb3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3a3deb3c8a6ca91029463f0a376ede7910b9a377))
+* **downloader:** per-zone collect mode for download_zone_loads + bottom-up zone QC frame ([48b96a7](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/48b96a7957cac27215eb6d5b18d2b576328d87a2)), closes [#363](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/363)
+* **preprocessing:** coverage guards, forecast shape report, leakage guard ([34a7a0c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/34a7a0cb1f9d61a3043f12ed86343ed062d2ce94))
+* **utils:** generic TTL'd atomic snapshot store ([cfeeda4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/cfeeda4095b60d004121b01e23eed60c8c72beda))
+
+
+### Bug Fixes
+
+* **calendar:** apply code-review fixes for school-holiday feature branch ([5e46c40](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5e46c40142ab77c692fb4a28e5be0d0c4317e928))
+* **docs:** drop cross-branch snapshot-store entries from _quarto.yml ([de7f3ca](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/de7f3caefae01a6188140ff73e32681b976df4fe))
+* **downloader:** apply code-review fixes to zone-collect-mode ([f40cf41](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f40cf4187bd7d0b6fc5811cf851f327c54cbef23))
+* **preprocessing,guards:** six surgical code-review fixes ([1d7d0ab](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/1d7d0ab6c53977bb242b862e430e1b10e6619b97))
+* **utils:** code-review fixes for SnapshotStore ([9e2710a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9e2710a217cdb5f7543e0b2230a4719d872e164e))
+
+
+### Documentation
+
+* **downloader:** regenerate reference pages after docstring fixes ([6e22a12](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/6e22a129bd7ddd6cbe9e9fa4f8ea24ef013b8d40))
+* **utils:** regenerate reference pages after docstring fixes ([2d7f2d6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2d7f2d60e8404df7341b0b5be10e7be25b0c387c))
+
 ## [22.1.0-rc.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.1.0-rc.1...v22.1.0-rc.2) (2026-06-12)
 
 
