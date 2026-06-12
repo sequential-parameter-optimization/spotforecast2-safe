@@ -1,0 +1,87 @@
+# downloader.entsoe.build_zone_qc_frame { #spotforecast2_safe.downloader.entsoe.build_zone_qc_frame }
+
+```python
+downloader.entsoe.build_zone_qc_frame(zones=None, *, data_home=None)
+```
+
+Build a bottom-up QC frame from per-zone interim CSVs.
+
+Reads each ``interim/zone_<col>.csv`` written by `download_zone_loads`,
+outer-joins the actual-load columns, and appends two aggregate columns:
+
+* ``"Actual Load"``: sum of the per-zone actual columns with
+  ``min_count=len(zones)``.  A row where **any** zone's value is missing
+  yields ``NaN`` in the total — partial sums are never silently reported.
+* ``"Forecasted Load"``: sum of the per-zone ``<col>_forecast`` columns
+  with the same ``min_count``, **only** if every zone has a forecast column
+  present in its CSV; otherwise the column is all-NaN.  This mirrors the
+  operational behaviour in the chapter-14 four-zone pipeline.
+
+Fail-safe contract: a missing interim file raises `FileNotFoundError`
+naming the path rather than silently skipping the zone.  No fallback, no
+substitution.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                                             | Description                                                                                                                                                             | Default   |
+|-----------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| zones     | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [str](`str`)\]\]             | Mapping of column name to ``entsoe-py`` ``Area`` identifier. When ``None``, uses `GERMAN_TSO_ZONES`.                                                                    | `None`    |
+| data_home | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[Path](`pathlib.Path`), [str](`str`)\]\] | Override for the data home directory (a ``Path``-like or ``str``).  When ``None``, ``get_data_home()`` is used (reads the ``SPOTFORECAST2_DATA`` environment variable). | `None`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                                                                                   |
+|--------|------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | A ``pd.DataFrame`` with:                                                                                                      |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | * One column per zone containing the per-zone actual load values.                                                             |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | * An ``"Actual Load"`` column with the bottom-up total (``NaN`` if any zone is missing for that timestamp).                   |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | * A ``"Forecasted Load"`` column with the sum of per-zone forecasts if all zones provide a forecast column, else all-``NaN``. |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | * Index: UTC datetimes parsed from the ``"Time (UTC)"`` CSV column, sorted ascending.                                         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                     | Description                                |
+|--------|------------------------------------------|--------------------------------------------|
+|        | [FileNotFoundError](`FileNotFoundError`) | If a per-zone interim file does not exist. |
+
+## Notes {.doc-section .doc-section-notes}
+
+Files written by successful zones in a partial collect run are **not**
+rolled back.  Call ``build_zone_qc_frame`` with the subset of
+*succeeded* zones to avoid triggering the ``FileNotFoundError`` guard
+for zones whose download failed.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os
+import tempfile
+from pathlib import Path
+
+import pandas as pd
+
+from spotforecast2_safe.downloader.entsoe import build_zone_qc_frame
+
+zones = {"load_a": "AREA_A", "load_b": "AREA_B"}
+idx = pd.date_range("2023-01-01", periods=4, freq="h", tz="UTC")
+
+with tempfile.TemporaryDirectory() as tmp:
+    os.environ["SPOTFORECAST2_DATA"] = tmp
+    interim = Path(tmp) / "interim"
+    interim.mkdir(parents=True)
+    # Write synthetic per-zone CSVs with actual and forecast columns.
+    for col, (actual, forecast) in {
+        "load_a": (100.0, 105.0),
+        "load_b": (50.0, 52.0),
+    }.items():
+        pd.DataFrame(
+            {col: actual, f"{col}_forecast": forecast}, index=idx
+        ).rename_axis("Time (UTC)").to_csv(interim / f"zone_{col}.csv")
+
+    qc = build_zone_qc_frame(zones=zones)
+    print(qc.columns.tolist())
+    print(f"Actual Load (first row): {qc['Actual Load'].iloc[0]}")
+    print(f"Forecasted Load (first row): {qc['Forecasted Load'].iloc[0]}")
+    assert qc["Actual Load"].iloc[0] == 150.0
+    assert qc["Forecasted Load"].iloc[0] == 157.0
+```
