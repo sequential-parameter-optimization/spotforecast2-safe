@@ -1052,7 +1052,9 @@ def download_zone_loads(
                     error=None,
                     interim_path=interim_path,
                 )
-            except Exception as exc:  # noqa: BLE001 — limited to download-layer failures after argument validation
+            except (
+                Exception
+            ) as exc:  # noqa: BLE001 — limited to download-layer failures after argument validation
                 logger.warning(
                     "Zone %s (%s) download failed in collect mode: %s",
                     column,

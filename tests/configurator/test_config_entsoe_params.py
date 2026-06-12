@@ -28,9 +28,7 @@ def test_config_entsoe_get_params():
 
 def test_config_entsoe_warm_start_lags():
     """warm_start_lags defaults to the package seed list and round-trips."""
-    from spotforecast2_safe.configurator.config_multi import (
-        DEFAULT_WARM_START_LAGS,
-    )
+    from spotforecast2_safe.configurator.config_multi import DEFAULT_WARM_START_LAGS
 
     default = ConfigEntsoe()
     assert default.warm_start_lags == DEFAULT_WARM_START_LAGS
