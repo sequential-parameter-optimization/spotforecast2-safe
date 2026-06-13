@@ -1,3 +1,15 @@
+## [22.4.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.3.0...v22.4.0-rc.1) (2026-06-13)
+
+
+### Features
+
+* **weather:** per-zone weather for the ENTSO-E four-zone pipeline ([260a084](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/260a08432177181f8cec78a7d1a679379888a16f))
+
+
+### Documentation
+
+* **tasks:** drop stale n-to-1 task wrapper references from task_multi ([00e9dab](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/00e9dabfeba10cc975397aef6aef800630f47cb8))
+
 ## [22.3.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.2.0...v22.3.0) (2026-06-12)
 
 
