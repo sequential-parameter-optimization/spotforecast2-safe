@@ -229,9 +229,23 @@ def get_weather_features(
                 f"({len(location_weights)}) must have equal length."
             )
         frames = [_fetch_one(lat, lon) for (lat, lon) in locations]
-        # population_weighted_average is fail-safe: it raises if the per-city
-        # frames disagree on index or columns rather than silently aligning.
-        weather_df = population_weighted_average(frames, list(location_weights))
+        # population_weighted_average is fail-safe: it raises a plain ValueError
+        # if the per-city frames disagree on index or columns rather than
+        # silently aligning. That disagreement is, in practice, a transient
+        # per-city fetch failure (e.g. a 429 sending one city to differently
+        # ranged fallback data). Re-raise it as WeatherFetchError so the
+        # `on_weather_failure` policy can govern it — a bare ValueError would
+        # otherwise escape "skip" and crash the whole run (per-zone weather).
+        try:
+            weather_df = population_weighted_average(frames, list(location_weights))
+        except WeatherFetchError:
+            raise
+        except ValueError as exc:
+            raise WeatherFetchError(
+                "Multi-city weather frames could not be combined "
+                f"({len(frames)} locations); this usually means a transient "
+                f"per-city fetch failure or fallback range mismatch: {exc}"
+            ) from exc
     else:
         weather_df = _fetch_one(latitude, longitude)
 

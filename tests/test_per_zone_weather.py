@@ -583,6 +583,68 @@ class TestPerZonePipelineIntegration:
         assert task.zone_weather_aligned == {}
         assert "temperature_2m" not in task.exog_feature_names
 
+    def test_multicity_combine_mismatch_raises_weatherfetcherror(self, monkeypatch):
+        """A transient per-city fetch (mismatched index) must surface as a
+        CATCHABLE WeatherFetchError, not a bare ValueError that escapes
+        on_weather_failure='skip' (the 22.4.0 per-zone crash, fixed in 22.4.1)."""
+        from spotforecast2_safe.weather import WeatherFetchError, get_weather_features
+
+        start = pd.Timestamp("2024-01-01", tz="UTC")
+        cov_end = pd.Timestamp("2024-01-06", tz="UTC")
+        full = pd.date_range(start, cov_end, freq="h")
+
+        def fake_fetch(*, cov_start, cov_end, latitude, longitude, **kwargs):
+            # The northern city (lat ~53) returns a SHORTER range, mimicking a
+            # 429 fallback that doesn't cover the full window -> mismatched index.
+            idx = full[:-12] if latitude > 53.0 else full
+            return pd.DataFrame(
+                {"temperature_2m": np.arange(len(idx), dtype="float64")}, index=idx
+            )
+
+        # get_weather_features imports fetch_weather_data lazily from this module.
+        # The data package re-exports a `fetch_data` function that shadows the
+        # submodule name, so fetch the real module object from sys.modules.
+        import sys
+
+        fd_mod = sys.modules["spotforecast2_safe.data.fetch_data"]
+        monkeypatch.setattr(fd_mod, "fetch_weather_data", fake_fetch)
+        ref = pd.DataFrame({"load": np.zeros(len(full))}, index=full)
+        with pytest.raises(WeatherFetchError, match="Multi-city"):
+            get_weather_features(
+                data=ref,
+                start=start,
+                cov_end=cov_end,
+                forecast_horizon=24,
+                locations=[(52.52, 13.40), (53.55, 9.99)],
+                location_weights=[1.0, 1.0],
+            )
+
+    def test_throttle_spaces_open_meteo_requests(self, monkeypatch):
+        """_throttle_open_meteo sleeps to maintain the minimum request spacing."""
+        import spotforecast2_safe.weather.client as wc
+
+        monkeypatch.setattr(wc, "_MIN_REQUEST_INTERVAL_S", 0.5)
+        monkeypatch.setattr(wc, "_LAST_REQUEST_MONOTONIC", 0.0)
+        clock = [1000.0]
+        sleeps: list[float] = []
+        monkeypatch.setattr(wc, "monotonic", lambda: clock[0])
+        monkeypatch.setattr(wc, "sleep", lambda s: sleeps.append(s))
+
+        wc._throttle_open_meteo()  # first call after a long idle -> no sleep
+        assert sleeps == []
+        wc._throttle_open_meteo()  # immediate second call -> must wait ~0.5 s
+        assert len(sleeps) == 1 and abs(sleeps[0] - 0.5) < 1e-9
+
+    def test_throttle_noop_when_disabled(self, monkeypatch):
+        import spotforecast2_safe.weather.client as wc
+
+        sleeps: list[float] = []
+        monkeypatch.setattr(wc, "_MIN_REQUEST_INTERVAL_S", 0.0)
+        monkeypatch.setattr(wc, "sleep", lambda s: sleeps.append(s))
+        wc._throttle_open_meteo()
+        wc._throttle_open_meteo()
+        assert sleeps == []
+
     def test_non_zone_target_raises_value_error(self, monkeypatch, tmp_path):
         """per_zone_weather=True with a target that is not a TSO zone must raise."""
         import spotforecast2_safe.multitask.base as mt_base

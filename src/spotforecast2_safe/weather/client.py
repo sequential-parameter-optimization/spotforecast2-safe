@@ -2,13 +2,43 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 import logging
+import os
+import threading
 from pathlib import Path
+from time import monotonic, sleep
 from typing import Any
 
 import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+# Process-wide proactive throttle for Open-Meteo requests.  Per-zone / global
+# population-weighted weather fetch many cities, each through a fresh client and
+# session, so a burst can trip Open-Meteo's archive rate limit (HTTP 429) faster
+# than per-request retry/backoff can recover.  A minimum spacing between any two
+# requests (process-wide) spreads the burst under the limit.  Overridable via the
+# SPOTFORECAST2_WEATHER_MIN_REQUEST_INTERVAL env var (seconds; "0" disables).
+# Only request *timing* is affected, never the returned data — determinism of
+# results is preserved.
+_MIN_REQUEST_INTERVAL_S = float(
+    os.environ.get("SPOTFORECAST2_WEATHER_MIN_REQUEST_INTERVAL", "0.5")
+)
+_THROTTLE_LOCK = threading.Lock()
+_LAST_REQUEST_MONOTONIC = 0.0
+
+
+def _throttle_open_meteo() -> None:
+    """Block until at least ``_MIN_REQUEST_INTERVAL_S`` has passed since the last
+    Open-Meteo request (process-wide). No-op when the interval is non-positive."""
+    global _LAST_REQUEST_MONOTONIC
+    if _MIN_REQUEST_INTERVAL_S <= 0:
+        return
+    with _THROTTLE_LOCK:
+        wait = _MIN_REQUEST_INTERVAL_S - (monotonic() - _LAST_REQUEST_MONOTONIC)
+        if wait > 0:
+            sleep(wait)
+        _LAST_REQUEST_MONOTONIC = monotonic()
 
 
 class WeatherFetchError(ValueError):
@@ -116,10 +146,15 @@ class WeatherClient:
     def _create_session(self) -> requests.Session:
         """Create a requests session with retry logic."""
         session = requests.Session()
+        # Reactive backoff: on 429 / 5xx, retry up to 5 times with exponential
+        # backoff and honour the server's Retry-After header (Open-Meteo sends
+        # one). Pairs with the proactive _throttle_open_meteo() spacing below.
         retry_strategy = Retry(
-            total=3,
-            backoff_factor=1,
+            total=5,
+            backoff_factor=2,
             status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=frozenset({"GET"}),
+            respect_retry_after_header=True,
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
         session.mount("https://", adapter)
@@ -128,6 +163,7 @@ class WeatherClient:
 
     def _fetch(self, url: str, params: dict[str, Any]) -> pd.DataFrame:
         """Execute API request and return parsed DataFrame."""
+        _throttle_open_meteo()  # proactive burst spacing (see module top)
         try:
             response = self._session.get(url, params=params, timeout=30)
             response.raise_for_status()
