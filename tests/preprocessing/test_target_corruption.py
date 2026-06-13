@@ -650,14 +650,11 @@ class TestDetectorDST:
         )
         vals = [BASE_MW] * len(idx)
         df = pd.DataFrame({"load": vals}, index=idx)
-        try:
-            mask = detect_target_corruption(
-                df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
-            )
-        except Exception as exc:
-            pytest.fail(
-                f"detect_target_corruption raised on fall-back DST index: {exc}"
-            )
+        # A raise here fails the test (with a full traceback); that is exactly
+        # the "must not raise" guarantee this case is asserting.
+        mask = detect_target_corruption(
+            df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
+        )
         assert not mask.any(), "Clean DST week must produce no flags."
 
     def test_fall_back_dropout_is_flagged(self):
@@ -694,14 +691,11 @@ class TestDetectorDST:
         )
         vals = [BASE_MW] * len(idx)
         df = pd.DataFrame({"load": vals}, index=idx)
-        try:
-            mask = detect_target_corruption(
-                df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
-            )
-        except Exception as exc:
-            pytest.fail(
-                f"detect_target_corruption raised on spring-forward DST index: {exc}"
-            )
+        # A raise here fails the test (with a full traceback); that is exactly
+        # the "must not raise" guarantee this case is asserting.
+        mask = detect_target_corruption(
+            df, targets=["load"], range_mw=5_000, step_mw=8_000, window_days=7
+        )
         assert not mask.any(), "Clean spring-forward DST week must produce no flags."
 
 
