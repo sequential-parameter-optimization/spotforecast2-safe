@@ -686,6 +686,7 @@ def get_target_data(
     data_with_exog: Optional[pd.DataFrame] = None,
     exog_feature_names: Optional[List[str]] = None,
     exo_pred: Optional[pd.DataFrame] = None,
+    zone_weather: Optional[pd.DataFrame] = None,
     start_train_ts: pd.Timestamp,
     end_train_ts: pd.Timestamp,
 ) -> Tuple[pd.Series, Optional[pd.DataFrame], Optional[pd.DataFrame]]:
@@ -723,6 +724,13 @@ def get_target_data(
         exo_pred: Exogenous feature DataFrame covering the forecast horizon.
             Required when *data_with_exog* is not ``None``.  Pass ``None``
             (default) when exogenous features are disabled.
+        zone_weather: Per-zone weather frame whose columns, where present in
+            ``exog_feature_names``, overwrite the shared weather values for this
+            target.  Used by the per-zone weather feature
+            (``config.per_zone_weather=True``).  ``None`` (default) means the
+            shared weather columns are used unchanged.  The overwrite is
+            in-place on the sliced copies; column order and shape are
+            preserved.
         start_train_ts: Inclusive start of the training window (tz-aware
             ``pd.Timestamp``).  **Keyword-only, required** — pass
             ``task.run_state.start_train_ts`` after the pipeline has been
@@ -863,6 +871,19 @@ def get_target_data(
             else:
                 raise TypeError(
                     "exo_pred must be a pandas DataFrame when using exogenous features."
+                )
+
+    if zone_weather is not None and exog_feature_names is not None:
+        overwrite = [c for c in exog_feature_names if c in zone_weather.columns]
+        if overwrite and exog_train is not None:
+            for c in overwrite:
+                exog_train[c] = (
+                    zone_weather[c].reindex(exog_train.index).astype("float32")
+                )
+        if overwrite and exog_future is not None:
+            for c in overwrite:
+                exog_future[c] = (
+                    zone_weather[c].reindex(exog_future.index).astype("float32")
                 )
 
     return y_train, exog_train, exog_future

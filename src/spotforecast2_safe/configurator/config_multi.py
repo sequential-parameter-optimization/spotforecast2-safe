@@ -93,6 +93,17 @@ class ConfigMulti:
             binary indicator from the bundled OpenHolidays API dataset (ODbL-1.0).
             Coverage 2022-01-01 to 2027-12-31 for all 16 German Bundesländer.
             Only ``country_code="DE"`` is supported.  Defaults to ``False``.
+        per_zone_weather (bool): When True, each target is treated as a German
+            TSO control zone and receives weather from its own regional cities
+            via ``weather.locations.locations_for_zone``.  Mutually exclusive
+            with ``use_population_weighted_weather``; requires
+            ``use_exogenous_features=True``; not compatible with
+            ``poly_features_degree >= 2``.  Default ``False`` → byte-identical
+            to the shared-weather baseline.
+        zone_weather_locations (Optional[Dict[str, Any]]): Optional override
+            mapping from zone key (e.g. ``"load_50hertz"``) to a list of
+            ``WeatherLocation`` objects.  ``None`` (default) uses the built-in
+            registry partition from ``GERMAN_TSO_ZONE_CITIES``.
         poly_features_degree (int): Polynomial-interaction degree. ``1`` (default)
             generates no interactions; ``2`` adds pairwise bilinear terms; ``3+``
             higher order.
@@ -213,6 +224,15 @@ class ConfigMulti:
             toggle.  Defaults to ``False``.
         include_school_holiday_features (bool): Per-Bundesland school-holiday
             indicator toggle.  Defaults to ``False``.
+        per_zone_weather (bool): When True, each target is a TSO control zone
+            that fetches its own regional weather via
+            ``weather.locations.locations_for_zone``.  Mutually exclusive with
+            ``use_population_weighted_weather``; requires
+            ``use_exogenous_features=True``; not compatible with
+            ``poly_features_degree >= 2``.  Default ``False``.
+        zone_weather_locations (Optional[Dict[str, Any]]): Override mapping
+            from zone key to a list of ``WeatherLocation`` objects.  ``None``
+            uses the built-in ``GERMAN_TSO_ZONE_CITIES`` partition.
         poly_features_degree (int): Polynomial-interaction degree (1 = off).
         max_poly_features (int): Cap on kept ``poly_*`` columns (top-K by MI).
         poly_mi_n_jobs (Optional[int]): Parallel jobs for the MI ranking
@@ -363,6 +383,18 @@ class ConfigMulti:
     # ``include_degree_hours`` adds heating/cooling degree-hours (hdh/cdh) and
     # ``include_apparent_temperature`` adds apparent temperature + dew point.
     use_population_weighted_weather: bool = False
+    # Per-zone weather: when True, each target is resolved as a TSO control
+    # zone and fetches weather from its own regional cities (via
+    # spotforecast2_safe.weather.locations.locations_for_zone). Mutually
+    # exclusive with use_population_weighted_weather; requires
+    # use_exogenous_features=True; not compatible with
+    # poly_features_degree>=2 (polynomial interactions are precomputed from
+    # the shared weather frame). Default OFF → byte-identical to today.
+    per_zone_weather: bool = False
+    # Optional override mapping zone key → list of WeatherLocation objects;
+    # None uses the built-in registry partition (GERMAN_TSO_ZONE_CITIES).
+    # Not a mutable default — the field is None, not [].
+    zone_weather_locations: Optional[Dict[str, Any]] = None
     include_degree_hours: bool = False
     include_apparent_temperature: bool = False
     degree_hours_base_heating: float = 15.0
