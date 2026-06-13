@@ -1,3 +1,20 @@
+## [22.5.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.4.1...v22.5.0-rc.1) (2026-06-13)
+
+
+### Features
+
+* **multitask:** configurable LightGBM n_jobs via config.lgbm_n_jobs ([1163478](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/11634786c8e3d790a53f6669fdec4f05e571cd7a))
+
+
+### Bug Fixes
+
+* **weather:** hold throttle timestamp in a container (py/unused-global-variable) ([7860fe2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7860fe20f45947aab9b01c5bbd51ee5a33eb1374)), closes [#214](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/214)
+
+
+### Documentation
+
+* **reference:** regenerate quartodoc reference for lgbm_n_jobs ([a7aeee4](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/a7aeee4fe25cbee4483c1c8ca7b3797c114469da))
+
 ## [22.4.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.4.0...v22.4.1) (2026-06-13)
 
 

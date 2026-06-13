@@ -47,7 +47,9 @@ def default_lgbm_forecaster_factory(
     Args:
         config: Any object satisfying the ``PipelineConfig`` protocol from
             ``spotforecast2_safe.multitask.base``.  Reads ``random_state``,
-            ``lags_consider``, and ``window_size``.
+            ``lags_consider``, ``window_size`` and ``lgbm_n_jobs`` (the
+            LightGBM thread count, ``getattr`` default ``1`` for config-like
+            objects that predate the field; see ``ConfigMulti.lgbm_n_jobs``).
         weight_func: Optional per-sample weight function produced by the
             imputation step (``apply_imputation``).
         target: Target column name.  Ignored by this default factory; provided
@@ -79,7 +81,11 @@ def default_lgbm_forecaster_factory(
     """
     del target  # default factory does not specialise per target
     return ForecasterRecursive(
-        estimator=LGBMRegressor(random_state=config.random_state, verbose=-1),
+        estimator=LGBMRegressor(
+            random_state=config.random_state,
+            verbose=-1,
+            n_jobs=getattr(config, "lgbm_n_jobs", 1),
+        ),
         lags=config.lags_consider[-1],
         window_features=RollingFeaturesUnified(
             stats=["mean"], window_sizes=config.window_size
@@ -117,7 +123,8 @@ def quantile_lgbm_forecaster_factory(
 
     Args:
         config: Object satisfying the ``PipelineConfig`` protocol; reads
-            ``random_state``, ``lags_consider``, ``window_size``.
+            ``random_state``, ``lags_consider``, ``window_size`` and
+            ``lgbm_n_jobs`` (LightGBM thread count, ``getattr`` default ``1``).
         quantiles: Quantile levels in the open interval ``(0, 1)``. Defaults to
             ``(0.1, 0.5, 0.9)``.
         weight_func: Optional per-sample weight function.
@@ -155,6 +162,7 @@ def quantile_lgbm_forecaster_factory(
                 alpha=q,
                 random_state=config.random_state,
                 verbose=-1,
+                n_jobs=getattr(config, "lgbm_n_jobs", 1),
             ),
             lags=config.lags_consider[-1],
             window_features=RollingFeaturesUnified(

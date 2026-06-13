@@ -624,7 +624,7 @@ class TestPerZonePipelineIntegration:
         import spotforecast2_safe.weather.client as wc
 
         monkeypatch.setattr(wc, "_MIN_REQUEST_INTERVAL_S", 0.5)
-        monkeypatch.setattr(wc, "_LAST_REQUEST_MONOTONIC", 0.0)
+        monkeypatch.setattr(wc, "_LAST_REQUEST_MONOTONIC", [0.0])
         clock = [1000.0]
         sleeps: list[float] = []
         monkeypatch.setattr(wc, "monotonic", lambda: clock[0])
