@@ -156,6 +156,10 @@ class PipelineConfig(Protocol):
     random_state: int
     verbose: bool
     cache_home: Optional[Any]
+    # LightGBM estimator thread count for the lgbm forecaster factories
+    # (LGBMRegressor(n_jobs=...)); default 1 favours per-fold process
+    # parallelism over in-model OpenMP. See ConfigMulti.lgbm_n_jobs.
+    lgbm_n_jobs: int
     # Optional callables
     forecaster_factory: Optional[Any]
     data_loader: Optional[Any]

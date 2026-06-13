@@ -50,6 +50,21 @@ class TestQuantileFactory:
         with pytest.raises(ValueError):
             quantile_lgbm_forecaster_factory(_config(), quantiles=bad)
 
+    def test_lgbm_n_jobs_defaults_to_one(self):
+        """Configs without the field (getattr default) pin LightGBM to 1 thread."""
+        heads = quantile_lgbm_forecaster_factory(_config(), quantiles=[0.1, 0.9])
+        for q in (0.1, 0.9):
+            assert heads[q].estimator.get_params()["n_jobs"] == 1
+
+    def test_lgbm_n_jobs_honoured(self):
+        """config.lgbm_n_jobs flows through to every quantile head."""
+        cfg = types.SimpleNamespace(
+            random_state=0, lags_consider=[1, 24], window_size=24, lgbm_n_jobs=-1
+        )
+        heads = quantile_lgbm_forecaster_factory(cfg, quantiles=[0.1, 0.9])
+        for q in (0.1, 0.9):
+            assert heads[q].estimator.get_params()["n_jobs"] == -1
+
 
 class _StubForecaster:
     """Minimal fitted-forecaster stand-in returning fixed predictions."""
