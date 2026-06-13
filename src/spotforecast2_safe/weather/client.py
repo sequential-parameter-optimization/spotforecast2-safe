@@ -25,20 +25,23 @@ _MIN_REQUEST_INTERVAL_S = float(
     os.environ.get("SPOTFORECAST2_WEATHER_MIN_REQUEST_INTERVAL", "0.5")
 )
 _THROTTLE_LOCK = threading.Lock()
-_LAST_REQUEST_MONOTONIC = 0.0
+# One-element list holding the monotonic timestamp of the most recent Open-Meteo
+# request. A mutable container is updated in place under the lock, so
+# ``_throttle_open_meteo`` needs no module-level ``global`` rebind (which static
+# analysis flags as an unused global, py/unused-global-variable).
+_LAST_REQUEST_MONOTONIC = [0.0]
 
 
 def _throttle_open_meteo() -> None:
     """Block until at least ``_MIN_REQUEST_INTERVAL_S`` has passed since the last
     Open-Meteo request (process-wide). No-op when the interval is non-positive."""
-    global _LAST_REQUEST_MONOTONIC
     if _MIN_REQUEST_INTERVAL_S <= 0:
         return
     with _THROTTLE_LOCK:
-        wait = _MIN_REQUEST_INTERVAL_S - (monotonic() - _LAST_REQUEST_MONOTONIC)
+        wait = _MIN_REQUEST_INTERVAL_S - (monotonic() - _LAST_REQUEST_MONOTONIC[0])
         if wait > 0:
             sleep(wait)
-        _LAST_REQUEST_MONOTONIC = monotonic()
+        _LAST_REQUEST_MONOTONIC[0] = monotonic()
 
 
 class WeatherFetchError(ValueError):
