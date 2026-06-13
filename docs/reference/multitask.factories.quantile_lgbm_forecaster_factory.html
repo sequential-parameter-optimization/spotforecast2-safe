@@ -1738,7 +1738,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>config</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></td>
-<td>Object satisfying the <code>PipelineConfig</code> protocol; reads <code>random_state</code>, <code>lags_consider</code>, <code>window_size</code>.</td>
+<td>Object satisfying the <code>PipelineConfig</code> protocol; reads <code>random_state</code>, <code>lags_consider</code>, <code>window_size</code> and <code>lgbm_n_jobs</code> (LightGBM thread count, <code>getattr</code> default <code>1</code>).</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
@@ -1807,7 +1807,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="96e15378" class="cell" data-execution_count="1">
+<div id="c1d877b1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> types</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask.factories <span class="im">import</span> (</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    quantile_lgbm_forecaster_factory,</span>
