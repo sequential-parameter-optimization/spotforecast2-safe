@@ -202,6 +202,86 @@ _COOLDOWN_HOURS = 24
 # transparency-platform outages). Bounds the heal window so a structurally
 # empty column cannot trigger an unbounded re-pull.
 _MAX_BACKFILL_DAYS = 7
+_INTERIM_FILENAME = "energy_load.csv"
+
+OnUnavailable = Literal["raise", "use_existing"]
+
+
+def _interim_path() -> Path:
+    """Return the canonical interim energy-load file path."""
+    return get_data_home() / "interim" / _INTERIM_FILENAME
+
+
+def _validate_on_unavailable(on_unavailable: str) -> None:
+    """Reject unknown ``on_unavailable`` values (fail-safe contract)."""
+    if on_unavailable not in ("raise", "use_existing"):
+        raise ValueError(
+            f"on_unavailable must be 'raise' or 'use_existing'; "
+            f"got {on_unavailable!r}."
+        )
+
+
+def _hours_since_last_download(raw_dir: Path) -> float | None:
+    """Return hours since the newest raw ENTSO-E file was written.
+
+    Recency is derived from the modification time of the newest
+    ``entsoe_load_*.csv`` file in ``raw_dir``, i.e. only files written by
+    `download_new_data()` count as downloads. Returns None when no such
+    file exists (no download has happened yet).
+    """
+    if not raw_dir.exists():
+        return None
+    mtimes = [f.stat().st_mtime for f in raw_dir.glob("entsoe_load_*.csv")]
+    if not mtimes:
+        return None
+    now_epoch = pd.Timestamp.now(tz="UTC").timestamp()
+    return max(0.0, (now_epoch - max(mtimes)) / 3600.0)
+
+
+def _interim_gaps() -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+    """Return interior gaps of the observed part of the interim file.
+
+    A timestamp counts as missing when its row is absent from the interim
+    file or when its ``Actual Load`` value is NaN, restricted to rows at
+    or before the current UTC moment: future day-ahead forecast rows
+    carry no actuals by design (see `merge_build_manual`) and are not
+    gaps.
+
+    Raises:
+        FileNotFoundError: If the interim file does not exist yet.
+    """
+    data = fetch_data(filename=_interim_path())
+    observed = data.loc[data.index <= pd.Timestamp.now(tz="UTC")]
+    if "Actual Load" in observed.columns:
+        observed = observed.loc[observed["Actual Load"].notna()]
+    return find_missing_intervals(observed.index)
+
+
+def _range_overlaps_gap(start_date: pd.Timestamp, end_date: pd.Timestamp) -> bool:
+    """Whether ``[start_date, end_date]`` intersects a known interior gap.
+
+    Used only as a cooldown-bypass heuristic; when the gaps cannot be
+    determined (no interim file yet, unreadable index), the answer is
+    False and the regular cooldown decision applies.
+    """
+    try:
+        gaps = _interim_gaps()
+    except (FileNotFoundError, ValueError, IndexError):
+        return False
+    return any(gs <= end_date and ge >= start_date for gs, ge in gaps)
+
+
+def _staleness_hours() -> float | None:
+    """Hours between now and the last observed interim timestamp, if known."""
+    try:
+        data = fetch_data(filename=_interim_path())
+        now = pd.Timestamp.now(tz="UTC")
+        observed = data.loc[data.index <= now]
+        if observed.empty:
+            return None
+        return (now - observed.index[-1]).total_seconds() / 3600.0
+    except (FileNotFoundError, ValueError, IndexError):
+        return None
 
 
 def merge_build_manual(
@@ -356,12 +436,13 @@ def merge_build_manual(
 
 def download_new_data(
     api_key: str,
-    country_code: str = "FR",
-    start: str | None = None,
-    end: str | None = None,
+    country_code: str = "DE",
+    start: str | pd.Timestamp | None = None,
+    end: str | pd.Timestamp | None = None,
     force: bool = False,
     keep_forecast_future: bool = False,
     timeout: Optional[float] = 60.0,
+    on_unavailable: OnUnavailable = "raise",
 ) -> None:
     """
     Download new load and forecast data from ENTSO-E.
@@ -377,11 +458,20 @@ def download_new_data(
 
     Args:
         api_key: The ENTSO-E API key.
-        country_code: The country code to query (e.g., 'FR', 'DE').
-            Defaults to "FR".
-        start: Start date in 'YYYYMMDDHH00' format.
-        end: End date in 'YYYYMMDDHH00' format.
-        force: If True, bypass the 24h cooldown check.
+        country_code: The country code to query (e.g., 'DE', 'FR').
+            Defaults to "DE".
+        start: Start of the query window ('YYYYMMDDHH00' or a timestamp). If
+            None, resumes from the last observed timestamp in the interim file,
+            extending back to heal still-missing actuals (bounded by
+            ``_MAX_BACKFILL_DAYS``) and falling back to seven days ago when no
+            prior data exists.
+        end: End of the query window ('YYYYMMDDHH00' or a timestamp). If None,
+            the current UTC moment is used.
+        force: If True, bypass the cooldown that skips a download when the last
+            successful download is younger than ``_COOLDOWN_HOURS`` (24) hours.
+            The cooldown is bypassed automatically when the requested window
+            overlaps a known gap in the interim data, so gap backfills are
+            never silently skipped.
         keep_forecast_future: If True, retain rows after the current UTC
             moment when building the interim file, preserving ENTSO-E's
             day-ahead `Forecasted Load` for tomorrow. Defaults to False (future
@@ -394,14 +484,22 @@ def download_new_data(
             ``requests.exceptions.Timeout``, caught by the existing retry loop,
             then ``RuntimeError`` after retries) without bounding long live
             transfers.  ``None`` disables the timeout.  Defaults to ``60.0``.
+        on_unavailable: What to do when ENTSO-E stays unreachable after the
+            retry budget is exhausted. ``"raise"`` (default) raises
+            ``RuntimeError``; ``"use_existing"`` logs how stale the interim
+            data is and returns so the caller can continue on existing data
+            (requires an existing interim file, else ``RuntimeError``).
 
     Raises:
         ImportError:
             If the Python package 'entsoe-py' is not installed.
         ValueError:
-            If ``start`` or ``end`` cannot be parsed as a valid timestamp.
+            If ``start`` or ``end`` cannot be parsed as a valid timestamp, if
+            both are given explicitly but ``end`` is not after ``start``, or if
+            ``on_unavailable`` is not a recognized value.
         RuntimeError:
-            If data fetching fails after ``_MAX_RETRIES`` attempts.
+            If data fetching fails after ``_MAX_RETRIES`` attempts and
+            ``on_unavailable='raise'``.
 
     Notes:
         Logging information can be selected by setting the log level for the
@@ -437,7 +535,7 @@ def download_new_data(
         )
 
         # Incremental download (automatically resumes from last data point)
-        download_new_data(api_key="YOUR_API_KEY", country_code="FR")
+        download_new_data(api_key="YOUR_API_KEY", country_code="DE")
 
         # Forced download bypassing the 24-hour cooldown check
         download_new_data(
@@ -459,6 +557,8 @@ def download_new_data(
         ```
     """
 
+    _validate_on_unavailable(on_unavailable)
+
     try:
         from entsoe import EntsoePandasClient
     except ImportError as e:
@@ -475,7 +575,11 @@ def download_new_data(
     # Determine start date
     if start is None:
         try:
-            current_data = fetch_data()  # This might look at interim or a specific file
+            # Resume from the interim file. (A bare ``fetch_data()`` call here
+            # used to raise ValueError unconditionally -- "filename must be
+            # specified" -- so resume silently fell into the 7-day fallback on
+            # every incremental run, and the backfill heal below was dead code.)
+            current_data = fetch_data(filename=_interim_path())
             # Resume from the last row at or before now, not the raw index max:
             # with keep_forecast_future=True the interim can carry future
             # forecast rows, and resuming from those would skip real history.
@@ -531,22 +635,54 @@ def download_new_data(
 
     # Determine end date
     if end is None:
-        end_date = pd.Timestamp.now(tz="UTC").floor("D")
-        logger.info("No end date provided. Using current date: %s", end_date)
+        end_date = pd.Timestamp.now(tz="UTC")
+        logger.info("No end date provided. Using current time: %s", end_date)
     else:
         end_date = pd.to_datetime(end, utc=True, errors="coerce")
         if pd.isna(end_date):
             raise ValueError(f"end={end!r} did not parse to a valid timestamp")
         logger.info("Using provided end date: %s", end_date)
 
-    # Safety check: avoid redundant small downloads
-    hours_diff = (end_date - start_date).total_seconds() / 3600
-    if hours_diff < _COOLDOWN_HOURS and not force:
+    # An empty window means there is nothing new to fetch. When both bounds
+    # were given explicitly this is invalid input (fail-safe: raise); when at
+    # least one bound was derived it is the normal "already up to date" outcome
+    # of an incremental run.
+    if end_date <= start_date:
+        if start is not None and end is not None:
+            raise ValueError(
+                f"end={end!r} is not after start={start!r}; an empty download "
+                "window is invalid when both bounds are given explicitly."
+            )
         logger.info(
-            "Last download was too recent (%.1f hours ago). Skipping.",
-            _COOLDOWN_HOURS - hours_diff,
+            "Nothing to download: requested window is empty (start %s >= end %s).",
+            start_date,
+            end_date,
         )
         return
+
+    # Cooldown: skip only when a successful download happened within the last
+    # _COOLDOWN_HOURS. Recency comes from the newest raw file written by this
+    # function, NOT from the width of the requested window (the old check
+    # silently skipped small backfills). A window that overlaps a known gap in
+    # the interim data always bypasses the cooldown so gaps repair immediately.
+    if not force:
+        hours_since = _hours_since_last_download(get_data_home() / "raw")
+        if hours_since is not None and hours_since < _COOLDOWN_HOURS:
+            if _range_overlaps_gap(start_date, end_date):
+                logger.info(
+                    "Cooldown bypassed: requested window %s to %s overlaps a "
+                    "known gap in the interim data.",
+                    start_date,
+                    end_date,
+                )
+            else:
+                logger.info(
+                    "Last successful download was %.1f hours ago (< %d h "
+                    "cooldown). Skipping. Pass force=True to override.",
+                    hours_since,
+                    _COOLDOWN_HOURS,
+                )
+                return
 
     client = _make_client(EntsoePandasClient, api_key=api_key, timeout=timeout)
 
@@ -579,9 +715,39 @@ def download_new_data(
             time.sleep(_RETRY_BACKOFF_SECONDS)
 
     if not success or downloaded_df is None:
+        if on_unavailable == "use_existing" and _interim_path().exists():
+            staleness = _staleness_hours()
+            staleness_msg = (
+                f"last observed data is {staleness:.1f} hours old"
+                if staleness is not None
+                else "staleness unknown"
+            )
+            logger.warning(
+                "ENTSO-E unavailable after %d attempts. Proceeding with the "
+                "existing interim data (%s) because on_unavailable="
+                "'use_existing'. Downstream results are based on stale data.",
+                _MAX_RETRIES,
+                staleness_msg,
+            )
+            return
         raise RuntimeError(
             f"Failed to download data from ENTSO-E after {_MAX_RETRIES} attempts."
         )
+
+    # An empty response (or one that only carries fully-NaN rows) means
+    # ENTSO-E has no data for the window yet. Writing a raw file for it would
+    # hide the gap behind an apparently successful download, so the condition
+    # is logged loudly and nothing is saved.
+    downloaded_df = downloaded_df.dropna(how="all")
+    if downloaded_df.empty:
+        logger.warning(
+            "ENTSO-E returned no data for %s to %s (%s). Nothing was saved; "
+            "the requested interval is still missing upstream.",
+            start_date,
+            end_date,
+            country_code,
+        )
+        return
 
     # Save to raw
     data_home = get_data_home()
@@ -598,6 +764,204 @@ def download_new_data(
 
     # Final merge to integrate new data
     merge_build_manual(keep_forecast_future=keep_forecast_future)
+
+
+def find_missing_intervals(
+    index: pd.DatetimeIndex,
+) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+    """Find interior gaps in a datetime index.
+
+    Compares the index against the complete date range spanning its first
+    and last timestamp -- the same completeness notion as
+    `spotforecast2_safe.preprocessing.curate_data.basic_ts_checks`, which
+    raises on an incomplete index; this function reports the gaps instead
+    so callers can repair them. The expected spacing is the most common
+    step between consecutive timestamps, so the function works for hourly
+    as well as 15-minute ENTSO-E data.
+
+    Args:
+        index (pd.DatetimeIndex): Sorted, duplicate-free datetime index to
+            inspect. Indexes with fewer than 3 entries cannot contain a
+            detectable interior gap and yield an empty list.
+
+    Returns:
+        list[tuple[pd.Timestamp, pd.Timestamp]]: One ``(first_missing,
+            last_missing)`` pair per contiguous gap, both bounds
+            inclusive. Empty list when the index is complete.
+
+    Raises:
+        ValueError: If ``index`` is not sorted in increasing order.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import find_missing_intervals
+
+        full = pd.date_range("2026-06-01", periods=96, freq="h", tz="UTC")
+        gappy = full.delete(list(range(48, 72)))  # June 3rd is missing
+        print(find_missing_intervals(gappy))
+        ```
+    """
+    if len(index) < 3:
+        return []
+    if not index.is_monotonic_increasing:
+        raise ValueError("index must be sorted in increasing order.")
+    deltas = index.to_series().diff().dropna()
+    deltas = deltas[deltas > pd.Timedelta(0)]
+    if deltas.empty:
+        return []
+    step = deltas.mode().iloc[0]
+    expected = pd.date_range(start=index.min(), end=index.max(), freq=step)
+    missing = expected.difference(index)
+
+    gaps: list[tuple[pd.Timestamp, pd.Timestamp]] = []
+    gap_start: pd.Timestamp | None = None
+    gap_end: pd.Timestamp | None = None
+    for ts in missing:
+        if gap_end is not None and ts - gap_end == step:
+            gap_end = ts
+        else:
+            if gap_start is not None and gap_end is not None:
+                gaps.append((gap_start, gap_end))
+            gap_start = gap_end = ts
+    if gap_start is not None and gap_end is not None:
+        gaps.append((gap_start, gap_end))
+    return gaps
+
+
+def repair_data_gaps(
+    api_key: str,
+    country_code: str = "DE",
+    keep_forecast_future: bool = False,
+    on_unavailable: OnUnavailable = "raise",
+) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+    """Detect and repair interior gaps in the interim energy-load file.
+
+    Repairs prefer data that is already on disk over the network:
+
+    1. Re-merge every raw CSV under ``get_data_home() / "raw"`` via
+       `merge_build_manual()`. When a previously downloaded file already
+       covers a hole, this fixes the interim file without any network
+       access.
+    2. For every interval still missing, issue a targeted
+       `download_new_data()` call restricted to that interval (padded by
+       one hour on each side; overlaps deduplicate during the merge).
+       ENTSO-E sometimes publishes data late, so a gap that existed
+       yesterday may be fillable today.
+
+    Values are never invented: a gap that ENTSO-E still cannot fill stays
+    a gap, and the function raises by default so the caller decides
+    explicitly. Downstream imputation (e.g.
+    `spotforecast2_safe.preprocessing.LinearlyInterpolateTS`) remains a
+    separate, opt-in step.
+
+    Args:
+        api_key (str): The ENTSO-E API key.
+        country_code (str, optional): The country code to query (e.g.,
+            'DE', 'FR'). Defaults to "DE".
+        keep_forecast_future (bool, optional): Forwarded to
+            `merge_build_manual()` and `download_new_data()`; see their
+            docstrings. Defaults to False.
+        on_unavailable (str, optional): What to do when gaps remain after
+            both repair steps. Options:
+            * "raise": Raise ``ValueError`` listing the remaining gaps
+              (fail-safe default).
+            * "use_existing": Log a prominent warning and return the
+              remaining gaps so the caller can explicitly continue with
+              the data already on disk.
+            Defaults to "raise".
+
+    Returns:
+        list[tuple[pd.Timestamp, pd.Timestamp]]: Gaps that could not be
+            repaired, as ``(first_missing, last_missing)`` pairs with both
+            bounds inclusive. An empty list means the observed part of the
+            interim file is complete.
+
+    Raises:
+        FileNotFoundError: If no interim file exists even after merging
+            the raw directory (nothing to repair; run
+            `download_new_data()` first).
+        ValueError: If gaps remain and ``on_unavailable='raise'``, or if
+            ``on_unavailable`` is not a recognized value.
+        ImportError: If gaps require a download and the Python package
+            'entsoe-py' is not installed.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import repair_data_gaps
+
+        # Repair a hole like the June 1st-2nd 2026 incident: re-merge
+        # local raw files first, then download only the still-missing
+        # interval from ENTSO-E.
+        unrepaired = repair_data_gaps(api_key="YOUR_API_KEY", country_code="DE")
+        print(unrepaired)  # [] when everything could be filled
+
+        # Keep operating on stale data when ENTSO-E is down (logged loudly)
+        unrepaired = repair_data_gaps(
+            api_key="YOUR_API_KEY",
+            country_code="DE",
+            on_unavailable="use_existing",
+        )
+        ```
+    """
+    _validate_on_unavailable(on_unavailable)
+
+    # Step 1: repair from data that is already on disk.
+    merge_build_manual(keep_forecast_future=keep_forecast_future)
+    gaps = _interim_gaps()
+    if not gaps:
+        logger.info("No gaps detected in the interim file.")
+        return []
+    logger.info(
+        "Detected %d gap(s) in the interim file after re-merging raw files: %s",
+        len(gaps),
+        "; ".join(f"{gs} -> {ge}" for gs, ge in gaps),
+    )
+
+    # Step 2: targeted downloads for the intervals still missing.
+    for gap_start, gap_end in gaps:
+        try:
+            download_new_data(
+                api_key=api_key,
+                country_code=country_code,
+                start=gap_start - pd.Timedelta(hours=1),
+                end=gap_end + pd.Timedelta(hours=1),
+                force=True,
+                keep_forecast_future=keep_forecast_future,
+            )
+        except RuntimeError as exc:
+            logger.warning(
+                "Targeted download for gap %s to %s failed: %s",
+                gap_start,
+                gap_end,
+                exc,
+            )
+
+    remaining = _interim_gaps()
+    if not remaining:
+        logger.info("All %d gap(s) repaired.", len(gaps))
+        return []
+
+    preview = "; ".join(f"{gs} -> {ge}" for gs, ge in remaining[:5])
+    more = f" (+{len(remaining) - 5} more)" if len(remaining) > 5 else ""
+    if on_unavailable == "raise":
+        raise ValueError(
+            f"{len(remaining)} gap(s) in {_interim_path()} could not be "
+            f"repaired from raw files or ENTSO-E: [{preview}]{more}. "
+            "ENTSO-E has not published data for these intervals yet. Pass "
+            "on_unavailable='use_existing' to proceed with the gapped "
+            "data, or handle the gaps explicitly downstream (e.g. "
+            "preprocessing.LinearlyInterpolateTS)."
+        )
+    logger.warning(
+        "Proceeding despite %d unrepaired gap(s): [%s]%s "
+        "(on_unavailable='use_existing').",
+        len(remaining),
+        preview,
+        more,
+    )
+    return remaining
 
 
 def _download_entsoe_table(

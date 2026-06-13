@@ -220,19 +220,26 @@ def test_download_new_data_resume_skips_future_rows(tmp_path):
 
 
 def test_download_new_data_cooldown_skips(tmp_path):
-    # Patch get_data_home, fetch_data, and sys.modules["entsoe"]
+    # A recent successful download (newest entsoe_load_* mtime) skips a
+    # force=False call; recency, not window width, drives the cooldown.
     raw_dir = tmp_path / "raw"
     raw_dir.mkdir()
     interim_dir = tmp_path / "interim"
     interim_dir.mkdir()
+    (raw_dir / "entsoe_load_202601010000_202601020000.csv").write_text(
+        "Time (UTC),Actual Load\n2026-01-01 00:00,1.0\n"
+    )
     with (
         patch(
             "spotforecast2_safe.downloader.entsoe.get_data_home", return_value=tmp_path
         ),
         patch("spotforecast2_safe.downloader.entsoe.fetch_data") as mock_fetch,
     ):
-        now = pd.Timestamp.now(tz="UTC")
-        mock_fetch.return_value = pd.DataFrame(index=[now - pd.Timedelta(hours=2)])
+        now = pd.Timestamp.now(tz="UTC").floor("h")
+        mock_fetch.return_value = pd.DataFrame(
+            {"Actual Load": [1.0, 2.0, 3.0]},
+            index=pd.DatetimeIndex([now - pd.Timedelta(hours=h) for h in (5, 4, 3)]),
+        )
         import sys
 
         mock_entsoe_mod = MagicMock()

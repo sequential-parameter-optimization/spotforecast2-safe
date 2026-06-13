@@ -98,12 +98,24 @@ class TestEntsoeDownloader(unittest.TestCase):
     @patch("spotforecast2_safe.downloader.entsoe.get_data_home")
     @patch("spotforecast2_safe.downloader.entsoe.fetch_data")
     def test_download_new_data_cooldown(self, mock_fetch, mock_get_home):
-        """Test that download is skipped if too recent."""
+        """A download younger than 24h skips a force=False call.
+
+        Recency comes from the newest ``entsoe_load_*.csv`` raw-file mtime --
+        NOT from the width of the requested window (the old, buggy semantics
+        that silently skipped small backfills).
+        """
         mock_get_home.return_value = self.test_dir
 
-        # Last index is very recent
-        now = pd.Timestamp.now(tz="UTC")
-        mock_fetch.return_value = pd.DataFrame(index=[now - pd.Timedelta(hours=2)])
+        # A freshly written raw file marks a recent successful download.
+        (self.raw_dir / "entsoe_load_202601010000_202601020000.csv").write_text(
+            "Time (UTC),Actual Load\n2026-01-01 00:00,1.0\n"
+        )
+        # Contiguous interim data: no gap-based cooldown bypass applies.
+        now = pd.Timestamp.now(tz="UTC").floor("h")
+        mock_fetch.return_value = pd.DataFrame(
+            {"Actual Load": [1.0, 2.0, 3.0]},
+            index=pd.DatetimeIndex([now - pd.Timedelta(hours=h) for h in (5, 4, 3)]),
+        )
 
         import sys
         from unittest.mock import MagicMock
