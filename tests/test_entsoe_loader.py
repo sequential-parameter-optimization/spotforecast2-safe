@@ -8,10 +8,6 @@ import pytest
 
 import spotforecast2_safe.data.entsoe_loader as entsoe_loader
 from spotforecast2_safe.configurator import ConfigEntsoe
-from spotforecast2_safe.data.entsoe_loader import (
-    entsoe_data_loader,
-    entsoe_test_data_loader,
-)
 
 
 def _write_interim_csv(path, start: str, periods: int, tz: str | None = "UTC"):
@@ -29,7 +25,7 @@ class TestEntsoeDataLoader:
 
         config = ConfigEntsoe()
         config.data_filename = str(csv_path)
-        df = entsoe_data_loader(config)
+        df = entsoe_loader.entsoe_data_loader(config)
 
         assert df.shape == (48, 1)
         assert df.index.name == "Time (UTC)"
@@ -41,7 +37,7 @@ class TestEntsoeDataLoader:
 
         config = ConfigEntsoe()
         config.data_filename = "energy_load.csv"
-        df = entsoe_data_loader(config)
+        df = entsoe_loader.entsoe_data_loader(config)
 
         assert df.shape == (24, 1)
 
@@ -50,7 +46,7 @@ class TestEntsoeDataLoader:
         config.data_filename = str(tmp_path / "does_not_exist.csv")
 
         with pytest.raises(FileNotFoundError, match="spotforecast2-entsoe"):
-            entsoe_data_loader(config)
+            entsoe_loader.entsoe_data_loader(config)
 
 
 class TestEntsoeTestDataLoader:
@@ -66,7 +62,7 @@ class TestEntsoeTestDataLoader:
         _write_interim_csv(csv_path, "2025-12-29 00:00", 120)
         config = self._config(csv_path, "2025-12-31 00:00+00:00")
 
-        test_df = entsoe_test_data_loader(config)
+        test_df = entsoe_loader.entsoe_test_data_loader(config)
 
         assert test_df.shape == (24, 1)
         assert test_df.index[0] == pd.Timestamp("2025-12-31 01:00", tz="UTC")
@@ -77,7 +73,7 @@ class TestEntsoeTestDataLoader:
         _write_interim_csv(csv_path, "2025-12-29 00:00", 120)
         config = self._config(csv_path, "2025-12-31 00:00")  # no tz marker
 
-        test_df = entsoe_test_data_loader(config)
+        test_df = entsoe_loader.entsoe_test_data_loader(config)
 
         assert test_df.shape == (24, 1)
         assert test_df.index[0] == pd.Timestamp("2025-12-31 01:00", tz="UTC")
@@ -87,7 +83,7 @@ class TestEntsoeTestDataLoader:
         _write_interim_csv(csv_path, "2025-12-29 00:00", 120, tz=None)
         config = self._config(csv_path, "2025-12-31 00:00+00:00")
 
-        test_df = entsoe_test_data_loader(config)
+        test_df = entsoe_loader.entsoe_test_data_loader(config)
 
         assert test_df.shape == (24, 1)
         assert test_df.index[0] == pd.Timestamp("2025-12-31 01:00")
@@ -98,6 +94,6 @@ class TestEntsoeTestDataLoader:
         _write_interim_csv(csv_path, "2025-12-29 00:00", 60)  # ends 12-31 11:00
         config = self._config(csv_path, "2025-12-31 00:00+00:00")
 
-        test_df = entsoe_test_data_loader(config)
+        test_df = entsoe_loader.entsoe_test_data_loader(config)
 
         assert len(test_df) == 11  # only the rows that exist after the cutoff
