@@ -1,0 +1,44 @@
+# downloader.entsoe.find_missing_intervals { #spotforecast2_safe.downloader.entsoe.find_missing_intervals }
+
+```python
+downloader.entsoe.find_missing_intervals(index)
+```
+
+Find interior gaps in a datetime index.
+
+Compares the index against the complete date range spanning its first
+and last timestamp -- the same completeness notion as
+`spotforecast2_safe.preprocessing.curate_data.basic_ts_checks`, which
+raises on an incomplete index; this function reports the gaps instead
+so callers can repair them. The expected spacing is the most common
+step between consecutive timestamps, so the function works for hourly
+as well as 15-minute ENTSO-E data.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                   | Description                                                                                                                                           | Default    |
+|--------|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| index  | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | Sorted, duplicate-free datetime index to inspect. Indexes with fewer than 3 entries cannot contain a detectable interior gap and yield an empty list. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                                 | Description                                                                                                                                                           |
+|--------|--------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [list](`list`)\[[tuple](`tuple`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]\] | list[tuple[pd.Timestamp, pd.Timestamp]]: One ``(first_missing, last_missing)`` pair per contiguous gap, both bounds inclusive. Empty list when the index is complete. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                     |
+|--------|----------------------------|-------------------------------------------------|
+|        | [ValueError](`ValueError`) | If ``index`` is not sorted in increasing order. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.downloader.entsoe import find_missing_intervals
+
+full = pd.date_range("2026-06-01", periods=96, freq="h", tz="UTC")
+gappy = full.delete(list(range(48, 72)))  # June 3rd is missing
+print(find_missing_intervals(gappy))
+```

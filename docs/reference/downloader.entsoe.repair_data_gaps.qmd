@@ -1,0 +1,73 @@
+# downloader.entsoe.repair_data_gaps { #spotforecast2_safe.downloader.entsoe.repair_data_gaps }
+
+```python
+downloader.entsoe.repair_data_gaps(
+    api_key,
+    country_code='DE',
+    keep_forecast_future=False,
+    on_unavailable='raise',
+)
+```
+
+Detect and repair interior gaps in the interim energy-load file.
+
+Repairs prefer data that is already on disk over the network:
+
+1. Re-merge every raw CSV under ``get_data_home() / "raw"`` via
+   `merge_build_manual()`. When a previously downloaded file already
+   covers a hole, this fixes the interim file without any network
+   access.
+2. For every interval still missing, issue a targeted
+   `download_new_data()` call restricted to that interval (padded by
+   one hour on each side; overlaps deduplicate during the merge).
+   ENTSO-E sometimes publishes data late, so a gap that existed
+   yesterday may be fillable today.
+
+Values are never invented: a gap that ENTSO-E still cannot fill stays
+a gap, and the function raises by default so the caller decides
+explicitly. Downstream imputation (e.g.
+`spotforecast2_safe.preprocessing.LinearlyInterpolateTS`) remains a
+separate, opt-in step.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                 | Type           | Description                                                                                                                                                                                                                                                                                                           | Default    |
+|----------------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| api_key              | [str](`str`)   | The ENTSO-E API key.                                                                                                                                                                                                                                                                                                  | _required_ |
+| country_code         | [str](`str`)   | The country code to query (e.g., 'DE', 'FR'). Defaults to "DE".                                                                                                                                                                                                                                                       | `'DE'`     |
+| keep_forecast_future | [bool](`bool`) | Forwarded to `merge_build_manual()` and `download_new_data()`; see their docstrings. Defaults to False.                                                                                                                                                                                                               | `False`    |
+| on_unavailable       | [str](`str`)   | What to do when gaps remain after both repair steps. Options: * "raise": Raise ``ValueError`` listing the remaining gaps   (fail-safe default). * "use_existing": Log a prominent warning and return the   remaining gaps so the caller can explicitly continue with   the data already on disk. Defaults to "raise". | `'raise'`  |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                                 | Description                                                                                                                                                                                                             |
+|--------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [list](`list`)\[[tuple](`tuple`)\[[pd](`pandas`).[Timestamp](`pandas.Timestamp`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]\] | list[tuple[pd.Timestamp, pd.Timestamp]]: Gaps that could not be repaired, as ``(first_missing, last_missing)`` pairs with both bounds inclusive. An empty list means the observed part of the interim file is complete. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                     | Description                                                                                                          |
+|--------|------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+|        | [FileNotFoundError](`FileNotFoundError`) | If no interim file exists even after merging the raw directory (nothing to repair; run `download_new_data()` first). |
+|        | [ValueError](`ValueError`)               | If gaps remain and ``on_unavailable='raise'``, or if ``on_unavailable`` is not a recognized value.                   |
+|        | [ImportError](`ImportError`)             | If gaps require a download and the Python package 'entsoe-py' is not installed.                                      |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+from spotforecast2_safe.downloader.entsoe import repair_data_gaps
+
+# Repair a hole like the June 1st-2nd 2026 incident: re-merge
+# local raw files first, then download only the still-missing
+# interval from ENTSO-E.
+unrepaired = repair_data_gaps(api_key="YOUR_API_KEY", country_code="DE")
+print(unrepaired)  # [] when everything could be filled
+
+# Keep operating on stale data when ENTSO-E is down (logged loudly)
+unrepaired = repair_data_gaps(
+    api_key="YOUR_API_KEY",
+    country_code="DE",
+    on_unavailable="use_existing",
+)
+```
