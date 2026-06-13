@@ -1721,9 +1721,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    data_with_exog<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    exog_feature_names<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    exo_pred<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    start_train_ts,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    end_train_ts,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    zone_weather<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    start_train_ts,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    end_train_ts,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Extract the training series and exogenous slices for one target column.</p>
 <p>Clips the target column of <em>df_pipeline</em> to the training window defined by <em>start_train_ts</em> and <em>end_train_ts</em>. When exogenous features are enabled (<code>config.use_exogenous_features is True</code>) and <em>data_with_exog</em> is provided, the matching exogenous training slice and forecast-horizon slice are also returned; otherwise both are <code>None</code>.</p>
 <p>This function is the canonical way to extract per-target data from the shared pipeline state so that outlier removal, imputation, and feature engineering are applied consistently across all forecasting tasks.</p>
@@ -1777,12 +1778,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
+<td>zone_weather</td>
+<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>]</td>
+<td>Per-zone weather frame whose columns, where present in <code>exog_feature_names</code>, overwrite the shared weather values for this target. Used by the per-zone weather feature (<code>config.per_zone_weather=True</code>). <code>None</code> (default) means the shared weather columns are used unchanged. The overwrite is in-place on the sliced copies; column order and shape are preserved.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
 <td>start_train_ts</td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Inclusive start of the training window (tz-aware <code>pd.Timestamp</code>). <strong>Keyword-only, required</strong> — pass <code>task.run_state.start_train_ts</code> after the pipeline has been prepared. Passing <code>None</code> raises <code>ValueError</code>.</td>
 <td><em>required</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>end_train_ts</td>
 <td><a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a></td>
 <td>Inclusive end of the training window (tz-aware <code>pd.Timestamp</code>). <strong>Keyword-only, required</strong> — pass <code>task.run_state.end_train_ts</code> after the pipeline has been prepared. Passing <code>None</code> raises <code>ValueError</code>.</td>
@@ -1833,7 +1840,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Extract training data for a single target without exogenous features:</p>
-<div id="3359b1e6" class="cell" data-execution_count="1">
+<div id="a192ff6c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> get_target_data</span>
@@ -1866,7 +1873,7 @@ exog_future:    None</code></pre>
 </div>
 </div>
 <p>Extract training data with exogenous features enabled:</p>
-<div id="6bf931b2" class="cell" data-execution_count="2">
+<div id="b2bdcc5d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> get_target_data</span>
