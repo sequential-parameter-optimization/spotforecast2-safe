@@ -206,29 +206,6 @@ instead of silent dropping) and to plotting:
 `MultiTask.plot_with_outliers()` raises `NotImplementedError` because no
 plotting library is permitted in this package.
 
-## The n-to-1 task entry point
-
-[`run_pipeline`](../reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.qmd) from
-`task_safe_n_to_1_with_covariates_and_dataframe`
-wraps exactly this pipeline with `task="lazy"` — one call from config and
-DataFrame to combined forecast:
-
-```{python}
-from spotforecast2_safe.tasks.task_safe_n_to_1_with_covariates_and_dataframe import (
-    run_pipeline,
-)
-
-forecast = run_pipeline(config=cfg, dataframe=df, cache_home=cache)
-forecast.head(3)
-```
-
-The matching console script accepts the same knobs as flags:
-
-```bash
-uv run spotforecast-safe-n2o1-cov-df --forecast_horizon 24 --lags 24 \
-    --include_holiday_features true
-```
-
 ## Scaling up from the toy example
 
 For a real run, switch the feature machinery on instead of off:
@@ -263,5 +240,4 @@ design, absent.
 
 ## Where to go next
 
-- API reference: [`run_pipeline`](../reference/tasks.task_safe_n_to_1_with_covariates_and_dataframe.qmd) — the CLI-facing wrapper around this pipeline.
 - API reference: [`MultiTask`](../reference/multitask.multi.MultiTask.qmd), [`BaseTask`](../reference/multitask.base.BaseTask.qmd), [`ConfigMulti`](../reference/configurator.config_multi.ConfigMulti.qmd), [`runner.run`](../reference/multitask.runner.run.qmd).
