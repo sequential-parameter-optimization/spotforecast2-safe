@@ -492,6 +492,18 @@ class TestCreateForecaster:
         fc = task.create_forecaster()
         assert fc.weight_func is None
 
+    def test_lgbm_n_jobs_defaults_to_one(self, tmp_path):
+        """The default factory pins LightGBM to a single thread by default."""
+        task = LazyTask(_minimal_cfg(cache_home=tmp_path))
+        fc = task.create_forecaster()
+        assert fc.estimator.get_params()["n_jobs"] == 1
+
+    def test_lgbm_n_jobs_honoured_from_config(self, tmp_path):
+        """config.lgbm_n_jobs flows through to the LightGBM estimator."""
+        task = LazyTask(_minimal_cfg(cache_home=tmp_path, lgbm_n_jobs=-1))
+        fc = task.create_forecaster()
+        assert fc.estimator.get_params()["n_jobs"] == -1
+
     def test_custom_factory_override(self, tmp_path):
         """config.forecaster_factory replaces the default factory."""
         sentinel = object()

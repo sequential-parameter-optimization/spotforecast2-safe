@@ -114,6 +114,12 @@ class ConfigMulti:
             ranking that enforces ``max_poly_features``. ``-1`` (default) uses
             all cores; ``None`` runs single-threaded. Parallelism does not
             change the selection.
+        lgbm_n_jobs (int): Thread count for the LightGBM estimators built by the
+            lgbm forecaster factories (``LGBMRegressor(n_jobs=...)``). Defaults
+            to ``1`` so the backtester parallelises CV folds across processes
+            instead of relying on LightGBM's in-model OpenMP, which anti-scales
+            on heterogeneous-core CPUs (e.g. Apple Silicon). Set ``-1`` / a
+            larger value on many-core homogeneous machines (e.g. Linux Xeon).
         poly_mi_sample_size (Optional[int]): Row cap for that ranking; longer
             series are scored on a reproducible random subsample of this size
             (seeded by ``random_state``), which can change which borderline
@@ -237,6 +243,10 @@ class ConfigMulti:
         max_poly_features (int): Cap on kept ``poly_*`` columns (top-K by MI).
         poly_mi_n_jobs (Optional[int]): Parallel jobs for the MI ranking
             (``-1`` = all cores; selection-invariant).
+        lgbm_n_jobs (int): LightGBM estimator thread count for the lgbm
+            forecaster factories (default ``1``; favours per-fold process
+            parallelism over in-model OpenMP, which anti-scales on Apple
+            Silicon). Raise on many-core homogeneous CPUs.
         poly_mi_sample_size (Optional[int]): Row cap for the MI ranking
             (``None`` = score every row).
         include_covid_infection_rate (bool): Append the bundled RKI German
@@ -451,6 +461,17 @@ class ConfigMulti:
     # ``BaseTask.create_forecaster`` falls back to
     # ``default_lgbm_forecaster_factory``.
     forecaster_factory: Optional[Any] = None
+    # Thread count for the LightGBM estimators built by the lgbm forecaster
+    # factories (``default_lgbm_forecaster_factory`` /
+    # ``quantile_lgbm_forecaster_factory``), forwarded as ``LGBMRegressor(n_jobs=...)``.
+    # Default ``1``: on heterogeneous-core CPUs (e.g. Apple Silicon's
+    # performance + efficiency cores) LightGBM's all-core OpenMP *anti-scales*
+    # (the fork-join barrier stalls on the slow E-cores). With ``n_jobs=1`` the
+    # backtesting heuristic (``select_n_jobs_backtesting``) instead parallelises
+    # the CV folds across processes, which scales cleanly. Raise it (or set
+    # ``-1`` for all cores) on many-core homogeneous machines (e.g. Linux Xeon)
+    # where in-model threading scales well.
+    lgbm_n_jobs: int = 1
     # Data-loader hook (consumed by ``BaseTask.prepare_data``):
     # ``data_loader(config) -> pd.DataFrame``. Invoked iff no DataFrame is
     # supplied via the constructor or ``prepare_data``.
