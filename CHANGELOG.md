@@ -1,3 +1,10 @@
+## [22.4.1-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.4.0...v22.4.1-rc.1) (2026-06-13)
+
+
+### Bug Fixes
+
+* **weather:** make per-zone/multi-city weather resilient to Open-Meteo 429 ([3142092](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3142092d63069e128dc49e3e03dab7e3a6339a81))
+
 ## [22.4.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.3.0...v22.4.0) (2026-06-13)
 
 
