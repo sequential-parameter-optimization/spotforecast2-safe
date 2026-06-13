@@ -20,12 +20,12 @@ sf2-safe (LightGBM only, no torch/optuna). Refs ``hong16b``, ``roma19a``.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                                                 | Description                                                                                                    | Default             |
-|-------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|---------------------|
-| config      | [Any](`typing.Any`)                                  | Object satisfying the ``PipelineConfig`` protocol; reads ``random_state``, ``lags_consider``, ``window_size``. | _required_          |
-| quantiles   | [Sequence](`typing.Sequence`)\[[float](`float`)\]    | Quantile levels in the open interval ``(0, 1)``. Defaults to ``(0.1, 0.5, 0.9)``.                              | `DEFAULT_QUANTILES` |
-| weight_func | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\] | Optional per-sample weight function.                                                                           | `None`              |
-| target      | [Optional](`typing.Optional`)\[[str](`str`)\]        | Accepted and ignored (parity with the default factory).                                                        | `None`              |
+| Name        | Type                                                 | Description                                                                                                                                                                           | Default             |
+|-------------|------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| config      | [Any](`typing.Any`)                                  | Object satisfying the ``PipelineConfig`` protocol; reads ``random_state``, ``lags_consider``, ``window_size`` and ``lgbm_n_jobs`` (LightGBM thread count, ``getattr`` default ``1``). | _required_          |
+| quantiles   | [Sequence](`typing.Sequence`)\[[float](`float`)\]    | Quantile levels in the open interval ``(0, 1)``. Defaults to ``(0.1, 0.5, 0.9)``.                                                                                                     | `DEFAULT_QUANTILES` |
+| weight_func | [Optional](`typing.Optional`)\[[Any](`typing.Any`)\] | Optional per-sample weight function.                                                                                                                                                  | `None`              |
+| target      | [Optional](`typing.Optional`)\[[str](`str`)\]        | Accepted and ignored (parity with the default factory).                                                                                                                               | `None`              |
 
 ## Returns {.doc-section .doc-section-returns}
 
