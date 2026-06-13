@@ -391,6 +391,7 @@ class BaseTask:
         self.weight_func: Optional[Any] = None
         self.exogenous_features: Optional[pd.DataFrame] = None
         self.weather_aligned: Optional[pd.DataFrame] = None
+        self.zone_weather_aligned: Dict[str, pd.DataFrame] = {}
         self.exog_feature_names: List[str] = []
         self.data_with_exog: Optional[pd.DataFrame] = None
         self.exo_pred: Optional[pd.DataFrame] = None
@@ -989,6 +990,13 @@ class BaseTask:
         Attributes:
             weather_aligned (pd.DataFrame): Weather frame aligned to the
                 pipeline index, reused by the interaction and selection steps.
+            zone_weather_aligned (Dict[str, pd.DataFrame]): Per-zone weather
+                frames keyed by target name, indexed over ``[data_start,
+                cov_end]`` (covering the forecast horizon). Populated only when
+                ``config.per_zone_weather`` is True and every zone fetch
+                succeeded; empty otherwise (including the fail-safe "skip"
+                degradation). Consumed at the per-target seam in
+                ``_get_target_data`` to overwrite the shared weather columns.
             exogenous_features (pd.DataFrame): Full combined, encoded, and
                 capped exogenous feature matrix.
             exog_feature_names (List[str]): Names of the exogenous features
@@ -1089,6 +1097,90 @@ class BaseTask:
             weather_features = pd.DataFrame(index=self.df_pipeline.index)
             self.weather_aligned = pd.DataFrame(index=self.df_pipeline.index)
         self.logger.info("  Weather features: %s", weather_features.shape)
+
+        # 4a-bis. Per-zone weather (opt-in, default OFF).
+        # The global weather frame above stays as the shared SCHEMA/baseline;
+        # here we build a zone-specific frame for each target.  At the per-target
+        # seam (_get_target_data) the zone values overwrite the shared weather
+        # columns — column names and schema are identical, only values differ.
+        self.zone_weather_aligned = {}
+        if getattr(self.config, "per_zone_weather", False):
+            from spotforecast2_safe.weather.locations import coordinates as _coords
+            from spotforecast2_safe.weather.locations import locations_for_zone
+            from spotforecast2_safe.weather.locations import weights as _wts
+
+            override = getattr(self.config, "zone_weather_locations", None)
+            zone_frames: Dict[str, pd.DataFrame] = {}
+            failed: list[tuple[str, Exception]] = []
+            shared_seed: Optional[tuple[pd.DataFrame, pd.DataFrame]] = None
+            for tgt in self.run_state.targets:
+                locs = locations_for_zone(
+                    tgt, override=override
+                )  # raises ValueError on unknown zone (fail-safe)
+                try:
+                    wf_z, wa_z = get_weather_features(
+                        data=self.df_pipeline,
+                        start=self.run_state.data_start,
+                        cov_end=self.run_state.cov_end,
+                        forecast_horizon=self.config.predict_size,
+                        latitude=self.config.latitude,
+                        longitude=self.config.longitude,
+                        timezone=self.config.timezone,
+                        freq="h",
+                        cache_home=self.config.cache_home,
+                        verbose=self.config.verbose,
+                        locations=_coords(locs),
+                        location_weights=_wts(locs),
+                        derived_features=weather_derived or None,
+                        hdh_base=getattr(
+                            self.config, "degree_hours_base_heating", 15.0
+                        ),
+                        cdh_base=getattr(
+                            self.config, "degree_hours_base_cooling", 22.0
+                        ),
+                    )
+                except WeatherFetchError as exc:
+                    if self.config.on_weather_failure == "raise":
+                        raise WeatherFetchError(
+                            f"Per-zone weather fetch failed for zone {tgt!r}: {exc}"
+                        ) from exc
+                    failed.append((tgt, exc))
+                    continue
+                # wf_z (the WindowFeatures output) already carries the raw +
+                # derived + window columns NaN-free; list it FIRST so the
+                # duplicate-column drop keeps its fully-filled raw columns over
+                # wa_z's ffill-only (possibly leading-NaN) ones.  Keep the native
+                # [start, cov_end] index — it spans the forecast horizon
+                # (cov_end > data_end), which df_pipeline.index does NOT.  The
+                # per-target seam reindexes per slice, so reindexing to
+                # df_pipeline.index here would NaN-out the per-zone exog_future.
+                combined = pd.concat([wf_z, wa_z], axis=1)
+                combined = combined.loc[:, ~combined.columns.duplicated()]
+                combined = combined.bfill().ffill()
+                zone_frames[tgt] = combined
+                if shared_seed is None:
+                    shared_seed = (wf_z, wa_z)
+            if failed:
+                # Fail-safe: any zone failure under 'skip' degrades the WHOLE
+                # pipeline to no-weather (never substitute the global index for
+                # a failed zone).
+                self.logger.warning(
+                    "Per-zone weather fetch failed for %s; on_weather_failure="
+                    "'skip' -> continuing with NO weather features for any target.",
+                    ", ".join(t for t, _ in failed),
+                )
+                weather_features = pd.DataFrame(index=self.df_pipeline.index)
+                self.weather_aligned = pd.DataFrame(index=self.df_pipeline.index)
+                self.zone_weather_aligned = {}
+            else:
+                self.zone_weather_aligned = zone_frames
+                # Seed the SHARED weather matrix/schema from the first zone so the
+                # weather columns enter the shared exog (and the per-target seam
+                # has columns to overwrite) regardless of the global step-4a
+                # fetch — which, under on_weather_failure="skip", may have failed
+                # and left self.weather_aligned empty.
+                if shared_seed is not None:
+                    weather_features, self.weather_aligned = shared_seed
 
         # 4b. Calendar
         calendar_features = get_calendar_features(
@@ -1978,6 +2070,7 @@ class BaseTask:
                 self.exog_feature_names if self.exog_feature_names else None
             ),
             exo_pred=self.exo_pred,
+            zone_weather=self.zone_weather_aligned.get(target),
             start_train_ts=self.run_state.start_train_ts,
             end_train_ts=self.run_state.end_train_ts,
         )

@@ -17,7 +17,7 @@ from spotforecast2_safe.weather.locations import (
 class TestRegistry:
     def test_default_returns_registry(self):
         assert default_german_locations() is GERMAN_LOAD_CENTERS
-        assert len(GERMAN_LOAD_CENTERS) == 13
+        assert len(GERMAN_LOAD_CENTERS) == 15
 
     def test_all_weights_positive(self):
         assert all(loc.weight > 0 for loc in GERMAN_LOAD_CENTERS)

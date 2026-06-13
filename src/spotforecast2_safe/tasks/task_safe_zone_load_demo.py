@@ -22,6 +22,14 @@ The comparison uses the project's own backtesting engine
 (`backtesting_forecaster` + `TimeSeriesFold`) over a 24-hour horizon and reports
 MAE / RMSE / MAPE for both methods.
 
+Per-zone weather (``--per_zone_weather``). When enabled, each zone model
+receives weather from its own TSO control-area cities instead of the shared
+single-point baseline. The pipeline uses ``on_weather_failure="skip"`` so the
+smoke test stays network-free: if Open-Meteo is unreachable the per-zone
+weather degrades to no-weather rather than failing. The default path
+(``per_zone_weather=False``) is exactly the pre-feature baseline
+(``use_exogenous_features=False``).
+
 Examples:
     ```{python}
     #| eval: false
@@ -31,6 +39,8 @@ Examples:
     # Run on assembled real ENTSO-E zone data:
     #   uv run spotforecast-safe-zone-load-demo \
     #       --data_path ~/spotforecast2_data/interim/energy_load_zones.csv
+    # Enable per-zone weather (requires Open-Meteo access; degrades gracefully):
+    #   uv run spotforecast-safe-zone-load-demo --per_zone_weather true
     ```
 """
 
@@ -207,6 +217,7 @@ def main(
     history_hours: int = 24 * 100,
     random_seed: int = 314159,
     logging_enabled: bool = False,
+    per_zone_weather: bool = False,
 ) -> int:
     """Run the four-zone bottom-up load demo. Returns 0 on success, 1 on failure.
 
@@ -219,6 +230,11 @@ def main(
         history_hours: Length of the synthetic series in hours.
         random_seed: Seed for the synthetic data and the estimators.
         logging_enabled: If True, attach the dual console/file handlers.
+        per_zone_weather: If True, each zone model fetches weather from its own
+            TSO control-area cities (``config.per_zone_weather=True``,
+            ``on_weather_failure="skip"``). Requires Open-Meteo access; if
+            unreachable the pipeline degrades to no-weather. Default ``False``
+            keeps the pipeline byte-identical to the pre-feature baseline.
 
     Examples:
         ```{python}
@@ -263,17 +279,32 @@ def main(
 
         # --- Operational bottom-up forecast (one model per zone, summed) ---
         with tempfile.TemporaryDirectory() as tmp:
-            config = ConfigMulti(
-                targets=zones,
-                agg_weights=[1.0] * len(zones),  # SUM -> total (not the mean)
-                predict_size=predict_size,
-                use_exogenous_features=False,
-                use_outlier_detection=False,
-                auto_save_models=False,
-                number_folds=2,
-                random_state=random_seed,
-                cache_home=tmp,
-            )
+            if per_zone_weather:
+                config = ConfigMulti(
+                    targets=zones,
+                    agg_weights=[1.0] * len(zones),
+                    predict_size=predict_size,
+                    use_exogenous_features=True,
+                    per_zone_weather=True,
+                    on_weather_failure="skip",
+                    use_outlier_detection=False,
+                    auto_save_models=False,
+                    number_folds=2,
+                    random_state=random_seed,
+                    cache_home=tmp,
+                )
+            else:
+                config = ConfigMulti(
+                    targets=zones,
+                    agg_weights=[1.0] * len(zones),  # SUM -> total (not the mean)
+                    predict_size=predict_size,
+                    use_exogenous_features=False,
+                    use_outlier_detection=False,
+                    auto_save_models=False,
+                    number_folds=2,
+                    random_state=random_seed,
+                    cache_home=tmp,
+                )
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 task = MultiTask(config, dataframe=df, task="lazy")
@@ -345,6 +376,15 @@ if __name__ == "__main__":
         default=False,
         help="Enable logging (both console and file).",
     )
+    parser.add_argument(
+        "--per_zone_weather",
+        type=parse_bool,
+        default=False,
+        help="When true, each zone model fetches weather from its own TSO "
+        "control-area cities. Requires Open-Meteo access; if unreachable "
+        "the pipeline degrades to no-weather (on_weather_failure='skip'). "
+        "Default false keeps the pre-feature baseline.",
+    )
     args = parser.parse_args()
 
     specified_data_path = Path(args.data_path) if args.data_path else None
@@ -354,5 +394,6 @@ if __name__ == "__main__":
             data_path=specified_data_path,
             predict_size=args.predict_size,
             logging_enabled=args.logging,
+            per_zone_weather=args.per_zone_weather,
         )
     )
