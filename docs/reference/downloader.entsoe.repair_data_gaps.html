@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>downloader.entsoe.download_renewable_forecast – spotforecast2-safe</title>
+<title>downloader.entsoe.repair_data_gaps – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -305,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_renewable_forecast.html">download_renewable_forecast</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.repair_data_gaps.html">repair_data_gaps</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -1439,7 +1439,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/downloader.entsoe.download_renewable_forecast.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../docs/reference/downloader.entsoe.download_renewable_forecast.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">download_renewable_forecast</span></a>
   </div>
 </li>
@@ -1457,7 +1457,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/downloader.entsoe.repair_data_gaps.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/reference/downloader.entsoe.repair_data_gaps.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">repair_data_gaps</span></a>
   </div>
 </li>
@@ -1697,18 +1697,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.download_renewable_forecast.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.repair_data_gaps.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_renewable_forecast.html">download_renewable_forecast</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.download_new_data.html">Downloader</a></li><li class="breadcrumb-item"><a href="../../docs/reference/downloader.entsoe.repair_data_gaps.html">repair_data_gaps</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">downloader.entsoe.download_renewable_forecast</h1>
+<h1 class="title">downloader.entsoe.repair_data_gaps</h1>
 </div>
 
 
@@ -1725,16 +1726,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>downloader.entsoe.download_renewable_forecast(</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>downloader.entsoe.repair_data_gaps(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    api_key,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">'DE'</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    start<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    end<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    force<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    timeout<span class="op">=</span><span class="fl">60.0</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Download the ENTSO-E day-ahead wind/solar generation forecast.</p>
-<p>Queries <code>query_wind_and_solar_forecast</code> and merges the result into <code>interim/renewable_forecast.csv</code> (columns such as <code>"Solar"</code>, <code>"Wind Onshore"</code>, <code>"Wind Offshore"</code>). The day-ahead forecast is leakage-clean (published D-1); the realised generation must not be used. Consumed downstream by <code>spotforecast2_safe.preprocessing.exog_providers.EntsoeRenewableForecastProvider</code> via <code>spotforecast2_safe.data.fetch_data.load_renewable_forecast</code>.</p>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    keep_forecast_future<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    on_unavailable<span class="op">=</span><span class="st">'raise'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Detect and repair interior gaps in the interim energy-load file.</p>
+<p>Repairs prefer data that is already on disk over the network:</p>
+<ol type="1">
+<li>Re-merge every raw CSV under <code>get_data_home() / "raw"</code> via <code>merge_build_manual()</code>. When a previously downloaded file already covers a hole, this fixes the interim file without any network access.</li>
+<li>For every interval still missing, issue a targeted <code>download_new_data()</code> call restricted to that interval (padded by one hour on each side; overlaps deduplicate during the merge). ENTSO-E sometimes publishes data late, so a gap that existed yesterday may be fillable today.</li>
+</ol>
+<p>Values are never invented: a gap that ENTSO-E still cannot fill stays a gap, and the function raises by default so the caller decides explicitly. Downstream imputation (e.g. <code>spotforecast2_safe.preprocessing.LinearlyInterpolateTS</code>) remains a separate, opt-in step.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
@@ -1750,38 +1754,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>api_key</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>ENTSO-E Web API security token.</td>
+<td>The ENTSO-E API key.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>country_code</td>
 <td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
-<td>Country / bidding-zone code. Defaults to <code>"DE"</code>.</td>
+<td>The country code to query (e.g., ‘DE’, ‘FR’). Defaults to “DE”.</td>
 <td><code>'DE'</code></td>
 </tr>
 <tr class="odd">
-<td>start</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
-<td>Start in <code>'YYYYMMDDHH00'</code> format, or <code>None</code> to default to seven days ago.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>end</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
-<td>End in <code>'YYYYMMDDHH00'</code> format, or <code>None</code> to default to the start of tomorrow.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>force</td>
+<td>keep_forecast_future</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
-<td>If True, bypass the small-window cooldown check.</td>
+<td>Forwarded to <code>merge_build_manual()</code> and <code>download_new_data()</code>; see their docstrings. Defaults to False.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
-<td>timeout</td>
-<td><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3/library/functions.html#float">float</a>]</td>
-<td>Per-socket-operation read timeout in seconds. <code>None</code> disables the timeout. Defaults to <code>60.0</code>.</td>
-<td><code>60.0</code></td>
+<td>on_unavailable</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>What to do when gaps remain after both repair steps. Options: * “raise”: Raise <code>ValueError</code> listing the remaining gaps (fail-safe default). * “use_existing”: Log a prominent warning and return the remaining gaps so the caller can explicitly continue with the data already on disk. Defaults to “raise”.</td>
+<td><code>'raise'</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>, <a href="https://pandas.pydata.org/docs/index.html#module-pandas">pd</a>.<a href="https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html#pandas.Timestamp">Timestamp</a>]]</td>
+<td>list[tuple[pd.Timestamp, pd.Timestamp]]: Gaps that could not be repaired, as <code>(first_missing, last_missing)</code> pairs with both bounds inclusive. An empty list means the observed part of the interim file is complete.</td>
 </tr>
 </tbody>
 </table>
@@ -1799,28 +1810,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#ImportError">ImportError</a></td>
-<td>If <code>entsoe-py</code> is not installed.</td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError">FileNotFoundError</a></td>
+<td>If no interim file exists even after merging the raw directory (nothing to repair; run <code>download_new_data()</code> first).</td>
 </tr>
 <tr class="even">
 <td></td>
 <td><a href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></td>
-<td>If <code>start</code> or <code>end</code> cannot be parsed.</td>
+<td>If gaps remain and <code>on_unavailable='raise'</code>, or if <code>on_unavailable</code> is not a recognized value.</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td><a href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></td>
-<td>If the download fails after <code>_MAX_RETRIES</code> attempts.</td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#ImportError">ImportError</a></td>
+<td>If gaps require a download and the Python package ‘entsoe-py’ is not installed.</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="75d5f9c7" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> download_renewable_forecast</span>
+<div id="31028f8e" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.downloader.entsoe <span class="im">import</span> repair_data_gaps</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>download_renewable_forecast(api_key<span class="op">=</span><span class="st">"YOUR_API_KEY"</span>, country_code<span class="op">=</span><span class="st">"DE"</span>, force<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Repair a hole like the June 1st-2nd 2026 incident: re-merge</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># local raw files first, then download only the still-missing</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># interval from ENTSO-E.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>unrepaired <span class="op">=</span> repair_data_gaps(api_key<span class="op">=</span><span class="st">"YOUR_API_KEY"</span>, country_code<span class="op">=</span><span class="st">"DE"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(unrepaired)  <span class="co"># [] when everything could be filled</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep operating on stale data when ENTSO-E is down (logged loudly)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>unrepaired <span class="op">=</span> repair_data_gaps(</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    api_key<span class="op">=</span><span class="st">"YOUR_API_KEY"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    country_code<span class="op">=</span><span class="st">"DE"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    on_unavailable<span class="op">=</span><span class="st">"use_existing"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
@@ -2254,7 +2276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.download_renewable_forecast.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/downloader.entsoe.repair_data_gaps.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
