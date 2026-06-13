@@ -1,3 +1,10 @@
+## [22.6.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.5.0...v22.6.0) (2026-06-13)
+
+
+### Features
+
+* **downloader:** ENTSO-E gap repair + resume/cooldown fixes; default country_code DE ([848027f](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/848027fa7be0ee072bf6fd976a2016e61f4c41d6))
+
 ## [22.6.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.5.0...v22.6.0-rc.1) (2026-06-13)
 
 
