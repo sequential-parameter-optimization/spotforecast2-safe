@@ -376,3 +376,30 @@ def validate_config(config: object) -> None:
         raise ValueError(
             f"target_qc_deviation_slots must be >= 1; got {target_qc_deviation_slots}."
         )
+
+    per_zone_weather = getattr(config, "per_zone_weather", False)
+    if per_zone_weather:
+        if getattr(config, "use_population_weighted_weather", False):
+            raise ValueError(
+                "per_zone_weather and use_population_weighted_weather are mutually "
+                "exclusive (zones use regional weather, not the global index)."
+            )
+        if not getattr(config, "use_exogenous_features", True):
+            raise ValueError(
+                "per_zone_weather requires exogenous features "
+                "(use_exogenous_features must be True)."
+            )
+        if getattr(config, "poly_features_degree", 1) >= 2:
+            raise ValueError(
+                "per-zone weather does not support polynomial interaction features "
+                "(poly_features_degree>=2), whose products are precomputed from the "
+                "shared weather."
+            )
+        zone_weather_locations = getattr(config, "zone_weather_locations", None)
+        if zone_weather_locations is not None and not isinstance(
+            zone_weather_locations, dict
+        ):
+            raise TypeError(
+                "zone_weather_locations must be a dict or None; "
+                f"got {type(zone_weather_locations).__name__!r}."
+            )
