@@ -1416,6 +1416,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/downloader.entsoe.download_side_tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">download_side_tables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../docs/reference/downloader.entsoe.merge_build_manual.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">merge_build_manual</span></a>
   </div>
@@ -1454,6 +1460,18 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../../docs/reference/downloader.entsoe.build_zone_qc_frame.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">build_zone_qc_frame</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/downloader.entsoe.derive_download_window.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">derive_download_window</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/downloader.entsoe.extract_entsoe_hourly_forecast.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">extract_entsoe_hourly_forecast</span></a>
   </div>
 </li>
       </ul>
@@ -2439,32 +2457,44 @@ ul.task-list li input[type="checkbox"] {
 <td>Download the ENTSO-E day-ahead spot price (DE/LU).</td>
 </tr>
 <tr class="even">
+<td><a href="../../docs/reference/downloader.entsoe.download_side_tables.html#spotforecast2_safe.downloader.entsoe.download_side_tables">downloader.entsoe.download_side_tables</a></td>
+<td>Download both ENTSO-E day-ahead side tables in one call.</td>
+</tr>
+<tr class="odd">
 <td><a href="../../docs/reference/downloader.entsoe.merge_build_manual.html#spotforecast2_safe.downloader.entsoe.merge_build_manual">downloader.entsoe.merge_build_manual</a></td>
 <td>Merge all raw CSV files from the ‘raw’ directory into a single interim file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../../docs/reference/downloader.entsoe.repair_data_gaps.html#spotforecast2_safe.downloader.entsoe.repair_data_gaps">downloader.entsoe.repair_data_gaps</a></td>
 <td>Detect and repair interior gaps in the interim energy-load file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../docs/reference/downloader.entsoe.find_missing_intervals.html#spotforecast2_safe.downloader.entsoe.find_missing_intervals">downloader.entsoe.find_missing_intervals</a></td>
 <td>Find interior gaps in a datetime index.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../../docs/reference/downloader.entsoe.download_zone_loads.html#spotforecast2_safe.downloader.entsoe.download_zone_loads">downloader.entsoe.download_zone_loads</a></td>
 <td>Download Actual Total Load separately for each German TSO control area.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../docs/reference/downloader.entsoe.assemble_zone_loads.html#spotforecast2_safe.downloader.entsoe.assemble_zone_loads">downloader.entsoe.assemble_zone_loads</a></td>
 <td>Join the per-zone interim load files into one aligned, validated frame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../../docs/reference/downloader.entsoe.ZoneResult.html#spotforecast2_safe.downloader.entsoe.ZoneResult">downloader.entsoe.ZoneResult</a></td>
 <td>Structured result record for one zone in a <code>download_zone_loads</code> collect run.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../docs/reference/downloader.entsoe.build_zone_qc_frame.html#spotforecast2_safe.downloader.entsoe.build_zone_qc_frame">downloader.entsoe.build_zone_qc_frame</a></td>
 <td>Build a bottom-up QC frame from per-zone interim CSVs.</td>
+</tr>
+<tr class="even">
+<td><a href="../../docs/reference/downloader.entsoe.derive_download_window.html#spotforecast2_safe.downloader.entsoe.derive_download_window">downloader.entsoe.derive_download_window</a></td>
+<td>Derive the <code>(start_dl, end_dl)</code> string pair for an ENTSO-E download.</td>
+</tr>
+<tr class="odd">
+<td><a href="../../docs/reference/downloader.entsoe.extract_entsoe_hourly_forecast.html#spotforecast2_safe.downloader.entsoe.extract_entsoe_hourly_forecast">downloader.entsoe.extract_entsoe_hourly_forecast</a></td>
+<td>Resample a sub-hourly ENTSO-E interim frame to a clean hourly series.</td>
 </tr>
 </tbody>
 </table>
