@@ -1,9 +1,3 @@
-## [22.8.0] (2026-06-14)
-
-### Features
-
-* **downloader:** add `resilience` as a first-class public module (`spotforecast2_safe.downloader.resilience`); exposes `download_with_fallback`, `DownloadResult`, `ZoneOutcome`, `make_store`, `ZONE_COLUMNS`, `SNAPSHOT_TTL` — the snapshot-fallback decision tree ported from `bart26l-vorlesung/scripts/_team4_resilience.py` with logic unchanged; top-level re-exports added to `spotforecast2_safe.__init__`; 18 unit/scenario tests added to `tests/downloader/test_resilience.py`.
-
 ## [22.7.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.6.0...v22.7.0) (2026-06-14)
 
 
