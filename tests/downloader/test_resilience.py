@@ -94,7 +94,6 @@ def _patched_dl_zone(
 ) -> None:
     """Monkeypatch download_zone_loads to return ZoneResult dicts (collect mode)."""
     import spotforecast2_safe.downloader.entsoe as entsoe_mod
-    from spotforecast2_safe.downloader.entsoe import ZoneResult
 
     def _fake_download_zone_loads(
         api_key,
@@ -122,7 +121,7 @@ def _patched_dl_zone(
             results = {}
             for col in zones:
                 if fail_zones and col in fail_zones:
-                    results[col] = ZoneResult(
+                    results[col] = entsoe_mod.ZoneResult(
                         column=col,
                         area=str(zones.get(col, "")),
                         ok=False,
@@ -132,7 +131,7 @@ def _patched_dl_zone(
                 else:
                     path = data_home / "interim" / f"zone_{col}.csv"
                     _make_zone_csv(path, col)
-                    results[col] = ZoneResult(
+                    results[col] = entsoe_mod.ZoneResult(
                         column=col,
                         area=str(zones.get(col, "")),
                         ok=True,
@@ -595,7 +594,6 @@ def test_retry_zone_succeeds_on_second_attempt(monkeypatch, tmp_path):
     data_home = _setup_env(monkeypatch, tmp_path)
 
     import spotforecast2_safe.downloader.entsoe as entsoe_mod
-    from spotforecast2_safe.downloader.entsoe import ZoneResult
 
     call_count = {"n": 0}
 
@@ -614,7 +612,7 @@ def test_retry_zone_succeeds_on_second_attempt(monkeypatch, tmp_path):
         for col in zones:
             if col == "load_tennet" and call_count["n"] == 1:
                 # First call: tennet fails
-                results[col] = ZoneResult(
+                results[col] = entsoe_mod.ZoneResult(
                     column=col,
                     area=str(zones.get(col, "")),
                     ok=False,
@@ -625,7 +623,7 @@ def test_retry_zone_succeeds_on_second_attempt(monkeypatch, tmp_path):
                 # All others succeed; tennet succeeds on call 2+
                 path = data_home / "interim" / f"zone_{col}.csv"
                 _make_zone_csv(path, col)
-                results[col] = ZoneResult(
+                results[col] = entsoe_mod.ZoneResult(
                     column=col,
                     area=str(zones.get(col, "")),
                     ok=True,
@@ -668,7 +666,6 @@ def test_retry_only_retries_failed_zones(monkeypatch, tmp_path):
     data_home = _setup_env(monkeypatch, tmp_path)
 
     import spotforecast2_safe.downloader.entsoe as entsoe_mod
-    from spotforecast2_safe.downloader.entsoe import ZoneResult
 
     # Track which zone sets were requested each call
     requested_zones_per_call: list[set[str]] = []
@@ -688,7 +685,7 @@ def test_retry_only_retries_failed_zones(monkeypatch, tmp_path):
         for col in zones:
             if col == "load_tennet":
                 # tennet fails on every call (to force snapshot fallback)
-                results[col] = ZoneResult(
+                results[col] = entsoe_mod.ZoneResult(
                     column=col,
                     area=str(zones.get(col, "")),
                     ok=False,
@@ -698,7 +695,7 @@ def test_retry_only_retries_failed_zones(monkeypatch, tmp_path):
             else:
                 path = data_home / "interim" / f"zone_{col}.csv"
                 _make_zone_csv(path, col)
-                results[col] = ZoneResult(
+                results[col] = entsoe_mod.ZoneResult(
                     column=col,
                     area=str(zones.get(col, "")),
                     ok=True,
