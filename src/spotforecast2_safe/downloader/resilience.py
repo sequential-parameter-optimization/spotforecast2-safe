@@ -4,56 +4,60 @@
 """Download-resilience decision tree for the spotforecast2-safe downloader.
 
 This module is a first-class public submodule of
-``spotforecast2_safe.downloader``.  Consumers import it as::
+``spotforecast2_safe.downloader``.  Consumers import it as:
 
-    from spotforecast2_safe.downloader import resilience as resil
+```python
+from spotforecast2_safe.downloader import resilience as resil
 
-    result = resil.download_with_fallback(
-        api_key, start=..., end=..., now=..., max_retries=3,
-        backoff=5.0, timeout=60.0, fallback_enabled=True,
-    )
+result = resil.download_with_fallback(
+    api_key, start=..., end=..., now=..., max_retries=3,
+    backoff=5.0, timeout=60.0, fallback_enabled=True,
+)
+```
 
-Design rationale
-----------------
-ENTSO-E's per-zone endpoint (``download_zone_loads``) can fail for individual
-control areas; ``on_zone_failure="collect"`` mode returns a structured
-``ZoneResult`` per zone rather than raising.  This module consumes that API
-and adds the snapshot-fallback policy:
+Design rationale.
+    ENTSO-E's per-zone endpoint (``download_zone_loads``) can fail for
+    individual control areas; ``on_zone_failure="collect"`` mode returns a
+    structured ``ZoneResult`` per zone rather than raising.  This module
+    consumes that API and adds the snapshot-fallback policy:
 
-1. Bootstrap the snapshot store by seeding from existing interim files
-   (``SnapshotStore.seed_from_file`` per kind).
-2. Per outer retry round (``max_retries`` rounds total), call
-   ``download_zone_loads(..., on_zone_failure="collect")`` for the zones that
-   have not yet succeeded; one ``backoff * 2**(round-1)`` sleep after each
-   failed round before the next; merge ``ZoneResult``\\s across rounds.
-3. Zone failure after all attempts: if a valid snapshot exists (within TTL),
-   restore it and record status ``"cache"`` with age; otherwise ``"missing"``.
-4. If all four zones are in {live, cache}: ``mode="four_zone"``, done.
-5. Else (>= 1 ``"missing"``): try the live aggregated DE-total
-   (``download_new_data``).  Success: snapshot + status ``"live"``.
-   Fail + valid snapshot: restore + status ``"cache"``.
-   Fail + no snapshot: status ``"missing"``.
-6. Combined in {live, cache}: ``mode="combined"``; else ``mode=None``
-   (caller raises ``Abort(5, result.report())``).
-7. Prune the snapshot store at the end.
+    1. Bootstrap the snapshot store by seeding from existing interim files
+       (``SnapshotStore.seed_from_file`` per kind).
+    2. Per outer retry round (``max_retries`` rounds total), call
+       ``download_zone_loads(..., on_zone_failure="collect")`` for the zones
+       that have not yet succeeded; one ``backoff * 2**(round-1)`` sleep after
+       each failed round before the next; merge ``ZoneResult`` objects across
+       rounds.
+    3. Zone failure after all attempts: if a valid snapshot exists (within
+       TTL), restore it and record status ``"cache"`` with age; otherwise
+       ``"missing"``.
+    4. If all four zones are in {live, cache}: ``mode="four_zone"``, done.
+    5. Else (>= 1 ``"missing"``): try the live aggregated DE-total
+       (``download_new_data``).  Success: snapshot + status ``"live"``.
+       Fail + valid snapshot: restore + status ``"cache"``.
+       Fail + no snapshot: status ``"missing"``.
+    6. Combined in {live, cache}: ``mode="combined"``; else ``mode=None``
+       (caller raises ``Abort(5, result.report())``).
+    7. Prune the snapshot store at the end.
 
-The library (``spotforecast2_safe``) owns the mechanics: atomic writes,
-TTL checks, seed-from-file, restore.  This module owns the policy: when to
-fall back, what to log, what the decision tree means for the submission.
+    The library (``spotforecast2_safe``) owns the mechanics: atomic writes,
+    TTL checks, seed-from-file, restore.  This module owns the policy: when to
+    fall back, what to log, what the decision tree means for the submission.
 
-Snapshot store location
------------------------
-``<data_home>/snapshots/``, NOT the cache home (the multitask clean task
-rmtrees the cache home; data home survives across cleaning runs).
-Sub-directories: ``snapshots/zone_<col>/`` for the four zones,
-``snapshots/combined/`` for the combined series.  The ``SnapshotStore``
-manages timestamps, TTL, and atomicity.
+Snapshot store location.
+    ``<data_home>/snapshots/``, NOT the cache home (the multitask clean task
+    rmtrees the cache home; data home survives across cleaning runs).
+    Sub-directories: ``snapshots/zone_<col>/`` for the four zones,
+    ``snapshots/combined/`` for the combined series.  The ``SnapshotStore``
+    manages timestamps, TTL, and atomicity.
 
-Note: this module MUST NOT import anything from ``spotforecast2`` (the full
-package) and MUST NOT import ``spotforecast2_safe`` at module top level (sf2-safe
-reads environment variables at call time; ``configure_environment()`` must run
-first). All sf2-safe imports are inside functions, referenced as attribute
-lookups on the lazily-imported module so monkeypatching works in tests.
+Note:
+    This module MUST NOT import anything from ``spotforecast2`` (the full
+    package) and MUST NOT import ``spotforecast2_safe`` at module top level
+    (sf2-safe reads environment variables at call time;
+    ``configure_environment()`` must run first). All sf2-safe imports are
+    inside functions, referenced as attribute lookups on the lazily-imported
+    module so monkeypatching works in tests.
 """
 
 from __future__ import annotations
@@ -96,11 +100,16 @@ _ZONE_AREAS: dict[str, str] = {
 
 
 def make_store() -> "SnapshotStore":  # type: ignore[name-defined]  # noqa: F821
-    """Build a SnapshotStore rooted at ``<data_home>/snapshots/``.
+    """Build a ``SnapshotStore`` rooted at ``<data_home>/snapshots/``.
 
     Lazy so that ``configure_environment()`` runs before ``get_data_home()``
     is called. Public: ``chronos.py`` builds its combined-DE-total fallback
-    on the same store (root + TTL conventions stay defined once, here).
+    on the same store, so the snapshot root and TTL conventions stay defined
+    once, here.
+
+    Returns:
+        SnapshotStore: A TTL-aware atomic snapshot store rooted at
+        ``<data_home>/snapshots`` with a time-to-live of ``SNAPSHOT_TTL``.
     """
     from spotforecast2_safe.data.fetch_data import get_data_home
     from spotforecast2_safe.utils.snapshot_store import SnapshotStore
@@ -262,7 +271,30 @@ def download_with_fallback(
             pass ``sleep=lambda s: None`` for instant execution.
 
     Returns:
-        ``DownloadResult`` describing every zone's outcome and the overall mode.
+        DownloadResult: A record describing every zone's outcome and the
+        overall ``mode`` (``"four_zone"``, ``"combined"``, or ``None``).
+
+    Examples:
+        ```{python}
+        #| eval: false
+        import pandas as pd
+
+        from spotforecast2_safe.downloader import resilience as resil
+
+        result = resil.download_with_fallback(
+            api_key="YOUR_API_KEY",
+            start="202301010000",
+            end="202301050000",
+            now=pd.Timestamp.now(tz="UTC"),
+            max_retries=3,
+            backoff=5.0,
+            timeout=60.0,
+            fallback_enabled=True,
+        )
+        print(result.report())
+        if result.mode is None:
+            raise SystemExit("unrecoverable: no live data and no valid snapshot")
+        ```
     """
     # Lazy imports inside the function (sf2-safe reads env at call time;
     # configure_environment must run before this function is called).

@@ -1,0 +1,19 @@
+# downloader.resilience.make_store { #spotforecast2_safe.downloader.resilience.make_store }
+
+```python
+downloader.resilience.make_store()
+```
+
+Build a ``SnapshotStore`` rooted at ``<data_home>/snapshots/``.
+
+Lazy so that ``configure_environment()`` runs before ``get_data_home()``
+is called. Public: ``chronos.py`` builds its combined-DE-total fallback
+on the same store, so the snapshot root and TTL conventions stay defined
+once, here.
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name          | Type              | Description                                                        |
+|---------------|-------------------|--------------------------------------------------------------------|
+| SnapshotStore | \'SnapshotStore\' | A TTL-aware atomic snapshot store rooted at                        |
+|               | \'SnapshotStore\' | ``<data_home>/snapshots`` with a time-to-live of ``SNAPSHOT_TTL``. |

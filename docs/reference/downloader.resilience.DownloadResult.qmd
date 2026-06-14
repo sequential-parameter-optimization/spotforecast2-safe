@@ -1,0 +1,42 @@
+# downloader.resilience.DownloadResult { #spotforecast2_safe.downloader.resilience.DownloadResult }
+
+```python
+downloader.resilience.DownloadResult(
+    zones,
+    combined_status='n/a',
+    combined_age=None,
+    mode=None,
+)
+```
+
+Aggregate result of ``download_with_fallback``.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name            | Type                                                                                                  | Description                                                                                                                                                              |
+|-----------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| zones           | [dict](`dict`)\[[str](`str`), [ZoneOutcome](`spotforecast2_safe.downloader.resilience.ZoneOutcome`)\] | Per-zone outcome, keyed by column name.                                                                                                                                  |
+| combined_status | [str](`str`)                                                                                          | Status of the combined DE-total interim (``"n/a"`` when not attempted, ``"live"``, ``"cache"``, or ``"missing"``).                                                       |
+| combined_age    | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) \| None                                                | Age of the combined snapshot if restored, else ``None``.                                                                                                                 |
+| mode            | [str](`str`) \| None                                                                                  | ``"four_zone"`` when all zones are in {live, cache}, ``"combined"`` when at least one zone is missing but the combined series is available, or ``None`` (unrecoverable). |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [report](#spotforecast2_safe.downloader.resilience.DownloadResult.report) | Multi-line status report for log messages and Abort messages. |
+
+### report { #spotforecast2_safe.downloader.resilience.DownloadResult.report }
+
+```python
+downloader.resilience.DownloadResult.report()
+```
+
+Multi-line status report for log messages and Abort messages.
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                                          |
+|--------|--------------|----------------------------------------------------------------------|
+|        | [str](`str`) | Human-readable summary of every zone's status (with snapshot age     |
+|        | [str](`str`) | for cache hits), the combined-series status, and what was attempted. |

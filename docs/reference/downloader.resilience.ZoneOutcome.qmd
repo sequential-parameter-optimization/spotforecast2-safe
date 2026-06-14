@@ -1,0 +1,15 @@
+# downloader.resilience.ZoneOutcome { #spotforecast2_safe.downloader.resilience.ZoneOutcome }
+
+```python
+downloader.resilience.ZoneOutcome(column, status, age=None)
+```
+
+Result for one zone's download attempt.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name   | Type                                                   | Description                                                                                                       |
+|--------|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| column | [str](`str`)                                           | Zone column name (e.g. ``"load_amprion"``).                                                                       |
+| status | [str](`str`)                                           | One of ``"live"`` (fresh download), ``"cache"`` (snapshot restored), or ``"missing"`` (neither source available). |
+| age    | [pd](`pandas`).[Timedelta](`pandas.Timedelta`) \| None | Age of the snapshot at the time of restore, or ``None`` when status is ``"live"`` or ``"missing"``.               |
