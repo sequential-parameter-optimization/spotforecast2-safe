@@ -228,7 +228,7 @@ def test_tennet_fails_valid_snapshot(monkeypatch, tmp_path, caplog):
     snap_ts = NOW - pd.Timedelta(hours=48)
     _write_snap("zone_load_tennet", data_home, snap_ts, col="load_tennet")
 
-    with caplog.at_level(logging.WARNING, logger="team4_resilience"):
+    with caplog.at_level(logging.WARNING, logger="spotforecast2_safe.downloader.resilience"):
         result = resil.download_with_fallback(
             "fake_key",
             start="202206100000",
@@ -583,3 +583,161 @@ def test_zone_columns_constant():
 def test_snapshot_ttl_is_72h():
     """SNAPSHOT_TTL is 72 hours."""
     assert resil.SNAPSHOT_TTL == pd.Timedelta(hours=72)
+
+
+# ---------------------------------------------------------------------------
+# Retry / backoff tests (max_retries > 1)
+# ---------------------------------------------------------------------------
+
+
+def test_retry_zone_succeeds_on_second_attempt(monkeypatch, tmp_path):
+    """Zone fails attempt 1 then succeeds attempt 2 -> status live, sleep called once."""
+    data_home = _setup_env(monkeypatch, tmp_path)
+
+    import spotforecast2_safe.downloader.entsoe as entsoe_mod
+    from spotforecast2_safe.downloader.entsoe import ZoneResult
+
+    call_count = {"n": 0}
+
+    def _fake_dl_zone(
+        api_key,
+        zones=None,
+        start=None,
+        end=None,
+        force=False,
+        keep_forecast_future=False,
+        timeout=60.0,
+        on_zone_failure="raise",
+    ):
+        call_count["n"] += 1
+        results = {}
+        for col in zones:
+            if col == "load_tennet" and call_count["n"] == 1:
+                # First call: tennet fails
+                results[col] = ZoneResult(
+                    column=col,
+                    area=str(zones.get(col, "")),
+                    ok=False,
+                    error=RuntimeError("transient failure"),
+                    interim_path=None,
+                )
+            else:
+                # All others succeed; tennet succeeds on call 2+
+                path = data_home / "interim" / f"zone_{col}.csv"
+                _make_zone_csv(path, col)
+                results[col] = ZoneResult(
+                    column=col,
+                    area=str(zones.get(col, "")),
+                    ok=True,
+                    error=None,
+                    interim_path=path,
+                )
+        return results
+
+    monkeypatch.setattr(entsoe_mod, "download_zone_loads", _fake_dl_zone)
+    _patched_dl_combined(monkeypatch, data_home)
+
+    sleep_calls: list[float] = []
+
+    result = resil.download_with_fallback(
+        "fake_key",
+        start="202206100000",
+        end="202206120000",
+        now=NOW,
+        max_retries=2,
+        backoff=5.0,
+        timeout=None,
+        fallback_enabled=True,
+        sleep=sleep_calls.append,
+    )
+
+    assert result.mode == "four_zone"
+    assert result.zones["load_tennet"].status == "live", (
+        f"expected 'live' after retry, got {result.zones['load_tennet'].status!r}"
+    )
+    # sleep should have been called exactly once (between attempt 1 and attempt 2)
+    assert len(sleep_calls) == 1, f"expected 1 sleep call, got {sleep_calls}"
+    # backoff * 2**(attempt-1) = 5.0 * 2**0 = 5.0
+    assert sleep_calls[0] == pytest.approx(5.0), (
+        f"expected sleep(5.0), got sleep({sleep_calls[0]})"
+    )
+
+
+def test_retry_only_retries_failed_zones(monkeypatch, tmp_path):
+    """On the second attempt only still-failing zones are passed to download_zone_loads."""
+    data_home = _setup_env(monkeypatch, tmp_path)
+
+    import spotforecast2_safe.downloader.entsoe as entsoe_mod
+    from spotforecast2_safe.downloader.entsoe import ZoneResult
+
+    # Track which zone sets were requested each call
+    requested_zones_per_call: list[set[str]] = []
+
+    def _fake_dl_zone(
+        api_key,
+        zones=None,
+        start=None,
+        end=None,
+        force=False,
+        keep_forecast_future=False,
+        timeout=60.0,
+        on_zone_failure="raise",
+    ):
+        requested_zones_per_call.append(set(zones.keys()))
+        results = {}
+        for col in zones:
+            if col == "load_tennet":
+                # tennet fails on every call (to force snapshot fallback)
+                results[col] = ZoneResult(
+                    column=col,
+                    area=str(zones.get(col, "")),
+                    ok=False,
+                    error=RuntimeError("persistent failure"),
+                    interim_path=None,
+                )
+            else:
+                path = data_home / "interim" / f"zone_{col}.csv"
+                _make_zone_csv(path, col)
+                results[col] = ZoneResult(
+                    column=col,
+                    area=str(zones.get(col, "")),
+                    ok=True,
+                    error=None,
+                    interim_path=path,
+                )
+        return results
+
+    monkeypatch.setattr(entsoe_mod, "download_zone_loads", _fake_dl_zone)
+    _patched_dl_combined(monkeypatch, data_home)
+
+    # Pre-seed a valid snapshot for tennet so the result is four_zone (not combined)
+    snap_ts = NOW - pd.Timedelta(hours=12)
+    _write_snap("zone_load_tennet", data_home, snap_ts, col="load_tennet")
+
+    result = resil.download_with_fallback(
+        "fake_key",
+        start="202206100000",
+        end="202206120000",
+        now=NOW,
+        max_retries=2,
+        backoff=1.0,
+        timeout=None,
+        fallback_enabled=True,
+        sleep=lambda s: None,
+    )
+
+    # Both calls should have been made (tennet always fails)
+    assert len(requested_zones_per_call) == 2, (
+        f"expected 2 download_zone_loads calls, got {len(requested_zones_per_call)}"
+    )
+    # First call: all four zones
+    assert requested_zones_per_call[0] == set(resil.ZONE_COLUMNS), (
+        f"first call should request all zones, got {requested_zones_per_call[0]}"
+    )
+    # Second call: only tennet (the only one that failed on attempt 1)
+    assert requested_zones_per_call[1] == {"load_tennet"}, (
+        f"second call should request only load_tennet, got {requested_zones_per_call[1]}"
+    )
+    # tennet ends as cache (snapshot restored), others live
+    assert result.zones["load_tennet"].status == "cache"
+    assert result.mode == "four_zone"

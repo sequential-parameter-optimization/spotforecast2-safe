@@ -8,11 +8,6 @@
 
 from spotforecast2_safe.data import Period
 from spotforecast2_safe.configurator import ConfigEntsoe
-from spotforecast2_safe.downloader.resilience import (
-    DownloadResult,
-    ZoneOutcome,
-    download_with_fallback,
-)
 from spotforecast2_safe.forecaster.wrappers import (
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
@@ -53,7 +48,4 @@ __all__ = [
     "ForecasterRecursiveXGB",
     "ConfigEntsoe",
     "Config",
-    "download_with_fallback",
-    "DownloadResult",
-    "ZoneOutcome",
 ]

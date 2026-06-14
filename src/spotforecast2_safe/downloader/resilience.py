@@ -4,16 +4,14 @@
 """Download-resilience decision tree for the spotforecast2-safe downloader.
 
 This module is a first-class public submodule of
-``spotforecast2_safe.downloader``.  Consumers import it as:
+``spotforecast2_safe.downloader``.  Consumers import it as::
 
-```python
-from spotforecast2_safe.downloader import resilience as resil
+    from spotforecast2_safe.downloader import resilience as resil
 
-result = resil.download_with_fallback(
-    api_key, start=..., end=..., now=..., max_retries=3,
-    backoff=5.0, timeout=60.0, fallback_enabled=True,
-)
-```
+    result = resil.download_with_fallback(
+        api_key, start=..., end=..., now=..., max_retries=3,
+        backoff=5.0, timeout=60.0, fallback_enabled=True,
+    )
 
 Design rationale.
     ENTSO-E's per-zone endpoint (``download_zone_loads``) can fail for
@@ -51,6 +49,55 @@ Snapshot store location.
     ``snapshots/combined/`` for the combined series.  The ``SnapshotStore``
     manages timestamps, TTL, and atomicity.
 
+Threat model (STRIDE).
+    This module indirectly crosses a network boundary (by delegating to
+    ``entsoe_module.download_zone_loads`` and ``download_new_data``) and
+    directly crosses a local-filesystem trust boundary (by delegating to
+    ``SnapshotStore.restore`` which writes a cached file into the trusted
+    interim directory).  Contributors who change either surface MUST update
+    this table in the same pull request; the rule is anchored in
+    CONTRIBUTING.md ("Threat-model update rule").
+
+    Data flow 1: outbound ENTSO-E HTTPS requests — delegated to
+    ``entsoe_module.download_zone_loads`` / ``download_new_data`` (see
+    ``downloader/entsoe.py``).  All TLS, retry, schema-validation, and
+    token-redaction countermeasures live in ``entsoe.py``; the STRIDE analysis
+    for that flow is recorded there.  This module's role is purely
+    orchestration: it invokes those functions, catches every exception, and
+    decides which fallback path to take.
+
+    - Spoofing: delegated to entsoe.py (TLS + fixed endpoint).
+    - Tampering: delegated to entsoe.py (TLS integrity + schema parser).
+    - Repudiation: this module emits ``logging`` records for every attempt,
+      retry, fallback decision, and snapshot restore.  No request-audit log;
+      operators needing non-repudiation must capture these records at the
+      host/SIEM level.
+    - Information Disclosure: the ``api_key`` is passed directly to the
+      entsoe module and is never logged by this module.
+    - Denial of Service: bounded by the caller-supplied ``max_retries`` and
+      ``backoff`` parameters; after the budget is exhausted the function
+      returns a ``DownloadResult`` rather than looping silently.
+    - Elevation of Privilege: no setuid boundary.  Not applicable.
+
+    Data flow 2: local filesystem write — ``SnapshotStore.restore`` copies a
+    cached snapshot back into ``interim/``, which is consumed by the
+    downstream pipeline as trusted data.
+
+    - Tampering: an attacker with write access to ``<data_home>/snapshots/``
+      could plant a forged or stale snapshot file.  Countermeasures: (a) the
+      TTL bound (``SNAPSHOT_TTL = 72 h``) rejects files whose embedded
+      timestamp is too old; (b) snapshot filenames embed the UTC write
+      timestamp so age forgery requires modifying the filename; (c) atomic
+      writes in ``SnapshotStore`` prevent torn reads; (d) the data-home
+      directory is under user control — operators must restrict write
+      permissions to the pipeline user.  This module does not set filesystem
+      permissions on behalf of the caller.
+    - Information Disclosure: snapshot files may contain timestamped load
+      series.  Not sensitive in isolation; operators running against non-public
+      data must configure data-directory permissions.
+    - Other STRIDE categories: not applicable for a local filesystem flow
+      whose threat model is owned by the host operating system.
+
 Note:
     This module MUST NOT import anything from ``spotforecast2`` (the full
     package) and MUST NOT import ``spotforecast2_safe`` at module top level
@@ -65,12 +112,11 @@ from __future__ import annotations
 import logging
 import time as _time_module
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Callable
 
 import pandas as pd
 
-logger = logging.getLogger("team4_resilience")
+logger = logging.getLogger(__name__)
 
 # Single source of truth for the four zone column names.
 # The scripts import this instead of defining their own ZONE_COLUMNS constant.
