@@ -1,3 +1,20 @@
+## [22.8.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.7.0...v22.8.0-rc.1) (2026-06-14)
+
+
+### Features
+
+* **downloader:** add resilience module as first-class public API (v22.8.0) ([2b97504](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/2b97504b1fdce4acc3d293cd6e48116507a5e9ff))
+
+
+### Documentation
+
+* **downloader:** document resilience module for 22.8.0 ([8167959](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8167959ca3ad27f97393b3440bf110934aef6f76))
+
+
+### Code Refactoring
+
+* **downloader:** address review — drop root re-export, add STRIDE table, retry tests ([5bbec51](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5bbec517955bcede0b66a76e83813f92f034bf79))
+
 ## [22.7.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.6.0...v22.7.0) (2026-06-14)
 
 
