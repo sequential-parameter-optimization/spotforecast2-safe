@@ -16,6 +16,7 @@ from spotforecast2_safe.data.fetch_data import (
 from spotforecast2_safe.downloader.entsoe import (
     download_day_ahead_price,
     download_renewable_forecast,
+    download_side_tables,
     merge_build_manual,
 )
 
@@ -42,10 +43,42 @@ class _FakeClient:
         return pd.Series(50.0, index=idx, name="ignored")
 
 
+class _FailingRenewableClient(_FakeClient):
+    """Fake client whose renewable query always raises RuntimeError."""
+
+    def query_wind_and_solar_forecast(self, country_code, start, end):
+        raise RuntimeError("synthetic renewable failure")
+
+
+class _FailingPriceClient(_FakeClient):
+    """Fake client whose day-ahead price query always raises RuntimeError."""
+
+    def query_day_ahead_prices(self, country_code, start, end):
+        raise RuntimeError("synthetic price failure")
+
+
 @pytest.fixture
 def fake_entsoe(monkeypatch):
     module = types.ModuleType("entsoe")
     module.EntsoePandasClient = _FakeClient
+    monkeypatch.setitem(sys.modules, "entsoe", module)
+    return module
+
+
+@pytest.fixture
+def failing_entsoe(monkeypatch):
+    """entsoe module whose renewable client always raises."""
+    module = types.ModuleType("entsoe")
+    module.EntsoePandasClient = _FailingRenewableClient
+    monkeypatch.setitem(sys.modules, "entsoe", module)
+    return module
+
+
+@pytest.fixture
+def failing_price_entsoe(monkeypatch):
+    """entsoe module whose day-ahead price client always raises."""
+    module = types.ModuleType("entsoe")
+    module.EntsoePandasClient = _FailingPriceClient
     monkeypatch.setitem(sys.modules, "entsoe", module)
     return module
 
@@ -194,3 +227,142 @@ def test_load_day_ahead_price_missing_column(data_home):
     )
     with pytest.raises(KeyError):
         load_day_ahead_price()
+
+
+# ---------------------------------------------------------------------------
+# download_side_tables
+# ---------------------------------------------------------------------------
+
+
+def test_download_side_tables_raise_mode_both_providers_called(data_home, fake_entsoe):
+    """Raise-mode (default): both providers succeed, both interim files written."""
+    download_side_tables(
+        api_key="x",
+        start="202301010000",
+        end="202301050000",
+        force=True,
+    )
+    assert (data_home / "interim" / "renewable_forecast.csv").exists()
+    assert (data_home / "interim" / "day_ahead_price.csv").exists()
+
+
+def test_download_side_tables_raise_mode_propagates(
+    data_home, failing_entsoe, monkeypatch
+):
+    """Raise-mode: a failing renewable query propagates as RuntimeError."""
+    # Speed up the retry loop so the test doesn't take 25 s.
+    monkeypatch.setattr(
+        "spotforecast2_safe.downloader.entsoe._RETRY_BACKOFF_SECONDS", 0
+    )
+    with pytest.raises(RuntimeError):
+        download_side_tables(
+            api_key="x",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+        )
+
+
+def test_download_side_tables_skip_mode_renewable_fails_price_succeeds(
+    data_home, failing_entsoe, monkeypatch, caplog
+):
+    """Skip-mode: renewable failure is logged; price still written; no raise."""
+    monkeypatch.setattr(
+        "spotforecast2_safe.downloader.entsoe._RETRY_BACKOFF_SECONDS", 0
+    )
+    import logging
+
+    with caplog.at_level(
+        logging.WARNING, logger="spotforecast2_safe.downloader.entsoe"
+    ):
+        download_side_tables(
+            api_key="x",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+            on_provider_failure="skip",
+        )
+    # WARNING must mention the failing provider
+    assert any("renewable forecast" in r.message for r in caplog.records)
+    # Price file should be written despite the renewable failure.
+    assert (data_home / "interim" / "day_ahead_price.csv").exists()
+    # Renewable interim file should NOT exist.
+    assert not (data_home / "interim" / "renewable_forecast.csv").exists()
+
+
+def test_download_side_tables_skip_mode_price_fails_renewable_succeeds(
+    data_home, failing_price_entsoe, monkeypatch, caplog
+):
+    """Skip-mode (symmetric): price failure is logged; renewable still written."""
+    monkeypatch.setattr(
+        "spotforecast2_safe.downloader.entsoe._RETRY_BACKOFF_SECONDS", 0
+    )
+    import logging
+
+    with caplog.at_level(
+        logging.WARNING, logger="spotforecast2_safe.downloader.entsoe"
+    ):
+        download_side_tables(
+            api_key="x",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+            on_provider_failure="skip",
+        )
+    assert any("day-ahead price" in r.message for r in caplog.records)
+    # Renewable file written despite the price failure.
+    assert (data_home / "interim" / "renewable_forecast.csv").exists()
+    assert not (data_home / "interim" / "day_ahead_price.csv").exists()
+
+
+def test_download_side_tables_invalid_on_provider_failure_raises_before_download(
+    data_home, monkeypatch
+):
+    """Invalid on_provider_failure raises ValueError before any download."""
+    # Use no fake entsoe so that if a download is attempted the import fails —
+    # but the ValueError should fire first.
+    monkeypatch.setitem(sys.modules, "entsoe", None)
+    with pytest.raises(ValueError, match="on_provider_failure"):
+        download_side_tables(
+            api_key="x",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+            on_provider_failure="ignore",
+        )
+    # Neither interim file should have been created.
+    assert not (data_home / "interim" / "renewable_forecast.csv").exists()
+    assert not (data_home / "interim" / "day_ahead_price.csv").exists()
+
+
+def test_download_side_tables_country_code_routing(data_home, fake_entsoe, monkeypatch):
+    """Renewable receives country_code='DE'; price receives 'DE_LU'."""
+    all_calls: list[tuple[str, str]] = []
+    original_renewable = _FakeClient.query_wind_and_solar_forecast
+    original_price = _FakeClient.query_day_ahead_prices
+
+    def patched_renewable(self, country_code, start, end):
+        all_calls.append(("renewable", country_code))
+        return original_renewable(self, country_code, start, end)
+
+    def patched_price(self, country_code, start, end):
+        all_calls.append(("price", country_code))
+        return original_price(self, country_code, start, end)
+
+    # monkeypatch.setattr auto-reverts after the test (no manual try/finally).
+    monkeypatch.setattr(_FakeClient, "query_wind_and_solar_forecast", patched_renewable)
+    monkeypatch.setattr(_FakeClient, "query_day_ahead_prices", patched_price)
+
+    download_side_tables(
+        api_key="x",
+        start="202301010000",
+        end="202301050000",
+        force=True,
+        country_code="DE",
+        price_country_code="DE_LU",
+    )
+
+    renewable_codes = [cc for (name, cc) in all_calls if name == "renewable"]
+    price_codes = [cc for (name, cc) in all_calls if name == "price"]
+    assert renewable_codes == ["DE"]
+    assert price_codes == ["DE_LU"]

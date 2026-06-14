@@ -1,3 +1,10 @@
+## [22.7.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.6.0...v22.7.0-rc.1) (2026-06-14)
+
+
+### Features
+
+* **downloader:** add derive_download_window, extract_entsoe_hourly_forecast, download_side_tables ([8f68b38](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/8f68b38184966eea029da37721138db7abff31d6))
+
 ## [22.6.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.5.0...v22.6.0) (2026-06-13)
 
 

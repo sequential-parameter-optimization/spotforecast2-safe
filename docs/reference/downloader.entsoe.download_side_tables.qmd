@@ -1,0 +1,80 @@
+# downloader.entsoe.download_side_tables { #spotforecast2_safe.downloader.entsoe.download_side_tables }
+
+```python
+downloader.entsoe.download_side_tables(
+    api_key,
+    *,
+    start=None,
+    end=None,
+    country_code='DE',
+    price_country_code='DE_LU',
+    force=False,
+    timeout=60.0,
+    on_provider_failure='raise',
+)
+```
+
+Download both ENTSO-E day-ahead side tables in one call.
+
+Calls `download_renewable_forecast` (with *country_code*) followed by
+`download_day_ahead_price` (with *price_country_code*). Both providers
+share the same *start*, *end*, *force*, and *timeout* arguments.
+
+The library default is **fail-loud**: when *on_provider_failure* is
+``"raise"`` (the default), the first provider exception propagates
+immediately and the second provider is never attempted.  Pass
+``on_provider_failure="skip"`` to opt into degraded-but-continuing
+behaviour: each provider failure is logged at WARNING level and the
+next provider is still attempted.  ``"skip"`` is intended for
+opportunistic refreshes where a partial update is better than no
+update; it must **not** be used in safety-critical pipelines where
+missing a table is a hard error.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                | Type                                              | Description                                                                                                                                                                                                                                | Default    |
+|---------------------|---------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| api_key             | [str](`str`)                                      | ENTSO-E Web API security token.                                                                                                                                                                                                            | _required_ |
+| start               | [Optional](`typing.Optional`)\[[str](`str`)\]     | Start in ``'YYYYMMDDHHMM'`` format, or ``None`` to use each downloader's own default (seven days ago).                                                                                                                                     | `None`     |
+| end                 | [Optional](`typing.Optional`)\[[str](`str`)\]     | End in ``'YYYYMMDDHHMM'`` format, or ``None`` to use each downloader's own default (start of tomorrow).                                                                                                                                    | `None`     |
+| country_code        | [str](`str`)                                      | Bidding-zone or country code for the renewable forecast query. Defaults to ``"DE"``.                                                                                                                                                       | `'DE'`     |
+| price_country_code  | [str](`str`)                                      | Bidding-zone code for the day-ahead price query. Defaults to ``"DE_LU"``.                                                                                                                                                                  | `'DE_LU'`  |
+| force               | [bool](`bool`)                                    | If ``True``, bypass the small-window cooldown check in each downloader.                                                                                                                                                                    | `False`    |
+| timeout             | [Optional](`typing.Optional`)\[[float](`float`)\] | Per-socket-operation read timeout in seconds passed to each downloader.  ``None`` disables the timeout.  Defaults to ``60.0``.                                                                                                             | `60.0`     |
+| on_provider_failure | [str](`str`)                                      | How to handle a provider-level exception. ``"raise"`` (default) — let the exception propagate immediately. ``"skip"`` — log a WARNING and continue to the next provider. Any other value raises ``ValueError`` before any download begins. | `'raise'`  |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description   |
+|--------|--------|---------------|
+|        | None   | None          |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                                                                                                               |
+|--------|--------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`)     | If *on_provider_failure* is not ``"raise"`` or ``"skip"``.                                                                |
+|        | [ImportError](`ImportError`)   | If ``entsoe-py`` is not installed (propagated from the individual downloaders when *on_provider_failure* is ``"raise"``). |
+|        | [RuntimeError](`RuntimeError`) | If a download fails after ``_MAX_RETRIES`` attempts and *on_provider_failure* is ``"raise"``.                             |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+from spotforecast2_safe.downloader.entsoe import download_side_tables
+
+# Fail-loud (default): any provider error propagates immediately.
+download_side_tables(
+    api_key="YOUR_API_KEY",
+    start="202301010000",
+    end="202301050000",
+    force=True,
+)
+
+# Opt-in degradation: renewable failure is logged but price is still
+# attempted.  Use only in non-safety-critical refresh workflows.
+download_side_tables(
+    api_key="YOUR_API_KEY",
+    on_provider_failure="skip",
+)
+```
