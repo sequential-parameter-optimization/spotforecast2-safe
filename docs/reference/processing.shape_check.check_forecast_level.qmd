@@ -1,0 +1,67 @@
+# processing.shape_check.check_forecast_level { #spotforecast2_safe.processing.shape_check.check_forecast_level }
+
+```python
+processing.shape_check.check_forecast_level(
+    y,
+    reference,
+    *,
+    statistic='median',
+    tol=0.02,
+    min_overlap=12,
+)
+```
+
+Measure the systematic level offset between a forecast and its reference.
+
+Complements `check_forecast_shape`: a forecast can track the daily profile
+perfectly (high correlation, good range ratio) yet sit at the wrong level —
+a flat over- or under-prediction.  This returns the signed offset of the
+forecast's central level against the reference's, in absolute and relative
+terms, and flags it as ``biased`` when the relative offset exceeds ``tol``.
+
+Like `check_forecast_shape`, this function is **pure**: no logging, no
+warning, no raising on a biased result.  Only invalid inputs raise.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                     | Description                                                                               | Default    |
+|-------------|------------------------------------------|-------------------------------------------------------------------------------------------|------------|
+| y           | [pd](`pandas`).[Series](`pandas.Series`) | Forecast series (e.g. the 24-h submission).                                               | _required_ |
+| reference   | [pd](`pandas`).[Series](`pandas.Series`) | Reference profile (e.g. ENTSO-E day-ahead forecast or actuals one week earlier).          | _required_ |
+| statistic   | [str](`str`)                             | Central-tendency statistic, ``"median"`` (default, robust) or ``"mean"``.                 | `'median'` |
+| tol         | [float](`float`)                         | Relative-offset tolerance for ``LevelCheckReport.biased``. Default ``0.02`` (2 %).        | `0.02`     |
+| min_overlap | [int](`int`)                             | Minimum overlap length to evaluate. Below this the report is ``skipped`` with NaN levels. | `12`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                             | Description                                                        |
+|--------|----------------------------------------------------------------------------------|--------------------------------------------------------------------|
+|        | [LevelCheckReport](`spotforecast2_safe.processing.shape_check.LevelCheckReport`) | `LevelCheckReport` with the computed levels, offsets, and ``tol``. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                              |
+|--------|----------------------------|------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``y`` or ``reference`` is not a ``pd.Series``.                                      |
+|        | [ValueError](`ValueError`) | When ``y`` or ``reference`` is empty, or ``statistic`` is not ``"median"`` / ``"mean"``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing.shape_check import check_forecast_level
+
+idx = pd.date_range("2026-06-13 00:00", periods=24, freq="h", tz="UTC")
+actual = pd.Series([43_000.0 + 3_000.0 * (i % 12) / 12 for i in range(24)],
+                   index=idx)
+
+# Forecast that sits a flat 1_800 MW too high -> biased.
+high = actual + 1_800.0
+rep = check_forecast_level(high, actual, tol=0.02)
+print(f"offset={rep.offset:.0f} MW  rel={rep.rel_offset:.3f}  biased={rep.biased}")
+assert rep.biased and rep.offset > 0
+
+# A well-centred forecast -> not biased.
+ok = actual + 50.0
+print("small offset biased:", check_forecast_level(ok, actual).biased)
+```

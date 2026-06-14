@@ -1,3 +1,10 @@
+## [22.9.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.8.0...v22.9.0) (2026-06-14)
+
+
+### Features
+
+* add forecast level/debias, prior blend, and approach scoring to processing ([#389](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/389)) ([165d5de](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/165d5de325d96956068f62f0424d919e9e135dcd))
+
 ## [22.8.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.7.0...v22.8.0) (2026-06-14)
 
 
