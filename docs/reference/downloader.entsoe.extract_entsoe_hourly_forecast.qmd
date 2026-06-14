@@ -1,0 +1,58 @@
+# downloader.entsoe.extract_entsoe_hourly_forecast { #spotforecast2_safe.downloader.entsoe.extract_entsoe_hourly_forecast }
+
+```python
+downloader.entsoe.extract_entsoe_hourly_forecast(
+    interim,
+    *,
+    column='Forecasted Load',
+)
+```
+
+Resample a sub-hourly ENTSO-E interim frame to a clean hourly series.
+
+Takes a ``pd.DataFrame`` with a ``DatetimeIndex`` (typically read from an
+ENTSO-E interim CSV that contains 15-minute data) and returns the named
+*column* resampled to hourly means, with ``NaN`` observations dropped.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                           | Description                                                                                    | Default             |
+|---------|------------------------------------------------|------------------------------------------------------------------------------------------------|---------------------|
+| interim | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | Source ``pd.DataFrame``.  The index must be a ``pd.DatetimeIndex``; any frequency is accepted. | _required_          |
+| column  | [str](`str`)                                   | Name of the column to extract and resample.  Defaults to ``"Forecasted Load"``.                | `'Forecasted Load'` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                     |
+|--------|------------------------------------------|-----------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | A ``pd.Series`` with a regular hourly ``DatetimeIndex`` and     |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | ``name == column``.  Only hours with at least one non-``NaN``   |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | sub-hourly observation are present (``dropna`` is applied after |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | ``resample("h").mean()``).                                      |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                |
+|--------|----------------------------|--------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | If *interim* is not a ``pd.DataFrame``.                                                    |
+|        | [TypeError](`TypeError`)   | If ``interim.index`` is not a ``pd.DatetimeIndex``.                                        |
+|        | [KeyError](`KeyError`)     | If *column* is not found in ``interim.columns``.                                           |
+|        | [ValueError](`ValueError`) | If the resampled series is empty (all observations are ``NaN`` or the column had no data). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.downloader.entsoe import extract_entsoe_hourly_forecast
+
+# Build a 15-minute DataFrame for two hours.
+idx = pd.date_range("2026-06-14 00:00", periods=8, freq="15min", tz="UTC")
+df = pd.DataFrame({"Forecasted Load": [100.0, 110.0, 90.0, 120.0,
+                                       80.0, 95.0, 105.0, 115.0]},
+                  index=idx)
+out = extract_entsoe_hourly_forecast(df)
+print(out)
+# 2026-06-14 00:00:00+00:00    105.0
+# 2026-06-14 01:00:00+00:00     98.75
+# Name: Forecasted Load, dtype: float64
+```
