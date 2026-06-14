@@ -4,14 +4,28 @@
 """Processing module for end-to-end forecasting pipelines."""
 
 from .agg_predict import agg_predict
+from .blend import blend_with_prior
+from .forecast_scoring import SUPPORTED_METRICS, score_forecasts
 from .n2n_predict import n2n_predict
 from .n2n_predict_with_covariates import n2n_predict_with_covariates
-from .shape_check import ShapeCheckReport, check_forecast_shape
+from .shape_check import (
+    LevelCheckReport,
+    ShapeCheckReport,
+    apply_level_correction,
+    check_forecast_level,
+    check_forecast_shape,
+)
 
 __all__ = [
     "agg_predict",
+    "blend_with_prior",
+    "score_forecasts",
+    "SUPPORTED_METRICS",
     "n2n_predict",
     "n2n_predict_with_covariates",
     "ShapeCheckReport",
     "check_forecast_shape",
+    "LevelCheckReport",
+    "check_forecast_level",
+    "apply_level_correction",
 ]

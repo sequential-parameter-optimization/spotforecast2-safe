@@ -1,0 +1,63 @@
+# processing.forecast_scoring.score_forecasts { #spotforecast2_safe.processing.forecast_scoring.score_forecasts }
+
+```python
+processing.forecast_scoring.score_forecasts(
+    forecasts,
+    actual,
+    *,
+    metrics=SUPPORTED_METRICS,
+)
+```
+
+Score several forecasts against a shared actual and rank them.
+
+Each forecast is aligned to ``actual`` on the index intersection and scored
+on the requested ``metrics``.  The result is a tidy table indexed by
+approach name, with one column per metric plus an ``n`` column (overlap
+length), sorted ascending by the first requested metric so the best
+approach is the top row.
+
+This is **pure**: no logging, no plotting, no mutation.  Use it to compare,
+for example, a four-zone bottom-up sum against a single combined model
+(compute each approach's forecast first, e.g. via ``backtesting_forecaster``).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                                           | Description                                                                                                                                                                                   | Default             |
+|-----------|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| forecasts | [Mapping](`collections.abc.Mapping`)\[[str](`str`), [pd](`pandas`).[Series](`pandas.Series`)\] | Mapping of approach name to its forecast series.                                                                                                                                              | _required_          |
+| actual    | [pd](`pandas`).[Series](`pandas.Series`)                                                       | The ground-truth series every forecast is scored against.                                                                                                                                     | _required_          |
+| metrics   | [tuple](`tuple`)\[[str](`str`), ...\]                                                          | Subset of `SUPPORTED_METRICS` to compute, in output order. ``"mae"``, ``"rmse"``, and ``"bias"`` are in the units of the series; ``"mape"`` is a percentage. The ranking uses ``metrics[0]``. | `SUPPORTED_METRICS` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                              |
+|--------|------------------------------------------------|----------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | A ``pd.DataFrame`` indexed by approach name with columns |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``[*metrics, "n"]``, sorted ascending by ``metrics[0]``. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                               |
+|--------|----------------------------|-----------------------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``actual`` is not a ``pd.Series`` or a forecast value is not a ``pd.Series``.                        |
+|        | [ValueError](`ValueError`) | When ``actual`` is empty, ``forecasts`` is empty, or ``metrics`` contains an unsupported name / is empty. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing.forecast_scoring import score_forecasts
+
+idx = pd.date_range("2026-06-13 00:00", periods=24, freq="h", tz="UTC")
+actual = pd.Series([43_858.0] * 24, index=idx)
+
+forecasts = {
+    "combined": actual + 300.0,        # small mixed-ish offset
+    "four_zone_sum": actual + 1_780.0,  # flat over-prediction
+}
+table = score_forecasts(forecasts, actual, metrics=("mae", "bias"))
+print(table.round(2).to_string())
+# combined ranks first (lower MAE).
+assert table.index[0] == "combined"
+```
