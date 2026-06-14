@@ -1,0 +1,87 @@
+# downloader.resilience.download_with_fallback { #spotforecast2_safe.downloader.resilience.download_with_fallback }
+
+```python
+downloader.resilience.download_with_fallback(
+    api_key,
+    *,
+    start,
+    end,
+    now,
+    max_retries,
+    backoff,
+    timeout,
+    fallback_enabled,
+    sleep=_time_module.sleep,
+)
+```
+
+Download zone loads with per-zone snapshot fallback.
+
+Per-zone decision tree:
+
+1. Bootstrap: ``SnapshotStore.seed_from_file`` for each zone kind and the
+   combined kind so the first run after adding this layer still has
+   snapshots for existing interim files.
+2. Per outer attempt (``max_retries``), call
+   ``download_zone_loads(..., on_zone_failure="collect")`` for the zones
+   still failing; wait ``backoff * 2**(attempt-1)`` between attempts.
+3. Success for a zone: write snapshot via ``SnapshotStore.write`` and
+   record status ``"live"``.
+4. All attempts exhausted for a zone: if ``fallback_enabled`` and a valid
+   snapshot exists: ``store.restore`` to ``interim/zone_<col>.csv``,
+   record status ``"cache"`` with age; else status ``"missing"``.
+5. All four zones in {live, cache}: ``mode="four_zone"``; done.
+6. Else (>= 1 missing): attempt the live combined download
+   (``download_new_data``, country_code="DE").  Success: snapshot + status
+   ``"live"``.  Fail + valid snapshot: restore + status ``"cache"`` + age.
+   Fail + no snapshot: status ``"missing"``.
+7. Combined in {live, cache}: ``mode="combined"``; else ``mode=None``
+   (caller should raise ``Abort(5, result.report())``).
+8. ``SnapshotStore.prune(now)`` at the end.
+
+This function never raises for download failures; it only returns the
+``DownloadResult`` describing what happened.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                        | Description                                                                                                                                                        | Default              |
+|------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
+| api_key          | [str](`str`)                                                | ENTSO-E Web API security token.                                                                                                                                    | _required_           |
+| start            | [str](`str`)                                                | Download start in ``"YYYYMMDDHHMM"`` format.                                                                                                                       | _required_           |
+| end              | [str](`str`)                                                | Download end in ``"YYYYMMDDHHMM"`` format.                                                                                                                         | _required_           |
+| now              | [pd](`pandas`).[Timestamp](`pandas.Timestamp`)              | Current UTC timestamp (used for snapshot naming and TTL checks).                                                                                                   | _required_           |
+| max_retries      | [int](`int`)                                                | Number of outer retry rounds (each round retries all still-failing zones via one collect-mode call; one ``backoff * 2**(round-1)`` sleep after each failed round). | _required_           |
+| backoff          | [float](`float`)                                            | Base wait in seconds (exponential: ``backoff * 2**(attempt-1)``).                                                                                                  | _required_           |
+| timeout          | [float](`float`) \| None                                    | Per-socket read timeout (seconds), or ``None`` to disable.                                                                                                         | _required_           |
+| fallback_enabled | [bool](`bool`)                                              | When ``False``, snapshots are never READ as a fallback (live data or ``"missing"``), but they are still WRITTEN on success.                                        | _required_           |
+| sleep            | [Callable](`typing.Callable`)\[\[[float](`float`)\], None\] | Callable used for inter-attempt waits; injected so tests can pass ``sleep=lambda s: None`` for instant execution.                                                  | `_time_module.sleep` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name           | Type                                                                        | Description                                                      |
+|----------------|-----------------------------------------------------------------------------|------------------------------------------------------------------|
+| DownloadResult | [DownloadResult](`spotforecast2_safe.downloader.resilience.DownloadResult`) | A record describing every zone's outcome and the                 |
+|                | [DownloadResult](`spotforecast2_safe.downloader.resilience.DownloadResult`) | overall ``mode`` (``"four_zone"``, ``"combined"``, or ``None``). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+import pandas as pd
+
+from spotforecast2_safe.downloader import resilience as resil
+
+result = resil.download_with_fallback(
+    api_key="YOUR_API_KEY",
+    start="202301010000",
+    end="202301050000",
+    now=pd.Timestamp.now(tz="UTC"),
+    max_retries=3,
+    backoff=5.0,
+    timeout=60.0,
+    fallback_enabled=True,
+)
+print(result.report())
+if result.mode is None:
+    raise SystemExit("unrecoverable: no live data and no valid snapshot")
+```
