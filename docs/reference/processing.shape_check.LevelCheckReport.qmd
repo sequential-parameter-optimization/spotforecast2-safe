@@ -1,0 +1,48 @@
+# processing.shape_check.LevelCheckReport { #spotforecast2_safe.processing.shape_check.LevelCheckReport }
+
+```python
+processing.shape_check.LevelCheckReport(
+    n_overlap,
+    statistic,
+    forecast_level,
+    reference_level,
+    offset,
+    rel_offset,
+    tol,
+)
+```
+
+Immutable result of a forecast *level* (systematic-bias) check.
+
+Where `ShapeCheckReport` answers "does the forecast track the daily
+*profile*", this answers "does the forecast sit at the right *level*".  It
+captures a near-constant offset of the whole forecast against a reference —
+the failure mode behind the 2026-06-13 team_4 miss, where the forecast
+over-predicted every hour by a flat ~1.8 GW (``bias == MAE``).
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name            | Type             | Description                                                                                                                                                  |
+|-----------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| n_overlap       | [int](`int`)     | Number of aligned (overlapping) index positions used. When below the evaluable minimum, ``skipped`` is ``True`` and the numeric fields are ``float('nan')``. |
+| statistic       | [str](`str`)     | Central-tendency statistic used for both levels — either ``"median"`` (robust, the default) or ``"mean"``.                                                   |
+| forecast_level  | [float](`float`) | ``statistic`` of the forecast over the overlap.                                                                                                              |
+| reference_level | [float](`float`) | ``statistic`` of the reference over the overlap.                                                                                                             |
+| offset          | [float](`float`) | ``forecast_level - reference_level`` (signed; positive means the forecast sits high, i.e. systematic over-prediction).                                       |
+| rel_offset      | [float](`float`) | ``offset / abs(reference_level)`` (signed). ``float('nan')`` when the reference level is zero.                                                               |
+| tol             | [float](`float`) | Relative-offset tolerance for ``biased`` (passed through from `check_forecast_level`).                                                                       |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.processing.shape_check import LevelCheckReport
+
+# Forecast sits 4 % high vs the reference -> biased at tol=0.02.
+r = LevelCheckReport(
+    n_overlap=24, statistic="median",
+    forecast_level=45_600.0, reference_level=43_858.0,
+    offset=1_742.0, rel_offset=0.0397, tol=0.02,
+)
+print("biased:", r.biased, "rel_offset:", round(r.rel_offset, 4))
+assert r.biased and not r.skipped
+```

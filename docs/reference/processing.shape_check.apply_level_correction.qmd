@@ -1,0 +1,62 @@
+# processing.shape_check.apply_level_correction { #spotforecast2_safe.processing.shape_check.apply_level_correction }
+
+```python
+processing.shape_check.apply_level_correction(
+    y,
+    reference,
+    *,
+    statistic='median',
+    min_overlap=12,
+)
+```
+
+Shift a forecast so its central level matches a reference (debias).
+
+Estimates the constant offset ``statistic(y) - statistic(reference)`` over
+the index overlap and subtracts it from **every** value of ``y``, removing a
+systematic flat bias while preserving the daily shape.  This is the
+post-hoc correction for the failure `check_forecast_level` detects.
+
+The returned series keeps ``y``'s full index, name, and ordering; only the
+level is shifted.  The function is pure (no mutation of the inputs).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                     | Description                                                                                              | Default    |
+|-------------|------------------------------------------|----------------------------------------------------------------------------------------------------------|------------|
+| y           | [pd](`pandas`).[Series](`pandas.Series`) | Forecast series to correct.                                                                              | _required_ |
+| reference   | [pd](`pandas`).[Series](`pandas.Series`) | Reference whose level ``y`` should be aligned to.                                                        | _required_ |
+| statistic   | [str](`str`)                             | ``"median"`` (default) or ``"mean"`` — must match the estimator you would use in `check_forecast_level`. | `'median'` |
+| min_overlap | [int](`int`)                             | Minimum overlap required to estimate the offset.                                                         | `12`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                             |
+|--------|------------------------------------------|-------------------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | A new ``pd.Series`` equal to ``y - offset`` (same index/name as ``y``). |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                                       |
+|--------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``y`` or ``reference`` is not a ``pd.Series``.                                                                               |
+|        | [ValueError](`ValueError`) | When ``y``/``reference`` is empty, ``statistic`` is invalid, or the overlap is smaller than ``min_overlap`` (no reliable offset). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing.shape_check import (
+    apply_level_correction, check_forecast_level,
+)
+
+idx = pd.date_range("2026-06-13 00:00", periods=24, freq="h", tz="UTC")
+actual = pd.Series([43_000.0 + 3_000.0 * (i % 12) / 12 for i in range(24)],
+                   index=idx)
+biased = actual + 1_800.0  # flat over-prediction
+
+corrected = apply_level_correction(biased, actual)
+print("offset before:", round(check_forecast_level(biased, actual).offset))
+print("offset after :", round(check_forecast_level(corrected, actual).offset))
+assert abs(check_forecast_level(corrected, actual).offset) < 1.0
+```

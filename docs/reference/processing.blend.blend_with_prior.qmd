@@ -1,0 +1,56 @@
+# processing.blend.blend_with_prior { #spotforecast2_safe.processing.blend.blend_with_prior }
+
+```python
+processing.blend.blend_with_prior(model_forecast, prior, *, weight)
+```
+
+Convex-blend a model forecast with an external prior.
+
+Returns ``(1 - weight) * model_forecast + weight * prior`` on the index
+intersection of the two series.  ``weight`` is the trust placed in the
+prior: ``0.0`` returns the model forecast unchanged (prior ignored),
+``1.0`` returns the prior, and intermediate values interpolate.  This is the
+correct lever for down-weighting a near-oracle prior whose influence a
+tree model cannot be tuned through feature scaling.
+
+The function is **pure**: it does not mutate its inputs and emits no
+warnings.  The result carries ``model_forecast``'s name.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type                                     | Description                                                                             | Default    |
+|----------------|------------------------------------------|-----------------------------------------------------------------------------------------|------------|
+| model_forecast | [pd](`pandas`).[Series](`pandas.Series`) | The trained model's forecast.                                                           | _required_ |
+| prior          | [pd](`pandas`).[Series](`pandas.Series`) | The external prior to blend in (e.g. the ENTSO-E day-ahead forecast), aligned by index. | _required_ |
+| weight         | [float](`float`)                         | Blend weight in ``[0.0, 1.0]`` — the trust placed in ``prior``.                         | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                 |
+|--------|------------------------------------------|-------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | A new ``pd.Series`` over the index intersection, named like |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | ``model_forecast``.                                         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                           |
+|--------|----------------------------|---------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``model_forecast`` or ``prior`` is not a ``pd.Series``.                          |
+|        | [ValueError](`ValueError`) | When ``weight`` is outside ``[0.0, 1.0]`` or the two series share no index positions. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing.blend import blend_with_prior
+
+idx = pd.date_range("2026-06-13 00:00", periods=4, freq="h", tz="UTC")
+model = pd.Series([100.0, 110.0, 120.0, 130.0], index=idx, name="y0")
+prior = pd.Series([140.0, 140.0, 140.0, 140.0], index=idx)
+
+# weight=0 -> model unchanged; weight=1 -> prior; 0.25 -> 75/25 mix.
+print(blend_with_prior(model, prior, weight=0.0).tolist())
+print(blend_with_prior(model, prior, weight=1.0).tolist())
+print(blend_with_prior(model, prior, weight=0.25).tolist())
+assert blend_with_prior(model, prior, weight=0.0).equals(model)
+```
