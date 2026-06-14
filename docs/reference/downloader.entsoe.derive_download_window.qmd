@@ -1,0 +1,63 @@
+# downloader.entsoe.derive_download_window { #spotforecast2_safe.downloader.entsoe.derive_download_window }
+
+```python
+downloader.entsoe.derive_download_window(
+    now,
+    *,
+    train_years,
+    start_margin_days=45,
+    data_end=None,
+)
+```
+
+Derive the ``(start_dl, end_dl)`` string pair for an ENTSO-E download.
+
+Computes the date window needed to cover *train_years* of history plus a
+*start_margin_days* buffer on the left, and optionally a caller-supplied
+upper bound on the right.  All computation is pure (no network, no
+filesystem access).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                           | Description                                                                                                                                                                                                                                                                                             | Default    |
+|-------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| now               | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference point for the window, typically ``pd.Timestamp.now(tz="UTC")``. Must be a ``pd.Timestamp`` — coercion is intentionally refused to prevent silent mistakes with string arguments.                                                                                                              | _required_ |
+| train_years       | [int](`int`)                                   | Number of full calendar years of history required.  Must be a positive ``int`` (``bool`` values are rejected even though ``bool`` is a subclass of ``int``).                                                                                                                                            | _required_ |
+| start_margin_days | [int](`int`)                                   | Extra days prepended to the window so that the training data survives the downstream lag-feature creation step. Defaults to ``45``.  Must be a non-negative ``int`` (bools rejected).                                                                                                                   | `45`       |
+| data_end          | [str](`str`) \| None                           | Upper bound of the window in ``'YYYYMMDDHHMM'`` format, or ``None`` (the default) to set the end to *now* + 2 days (i.e. today + tomorrow + one additional day — the standard day-ahead horizon).  When provided, the value is validated strictly; any deviation from the format raises ``ValueError``. | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                  |
+|--------|------------------------------------------------|--------------------------------------------------------------|
+|        | [str](`str`)                                   | A two-tuple ``(start_dl, end_dl)`` where both strings are in |
+|        | [str](`str`)                                   | ``'YYYYMMDDHHMM'`` format and can be passed directly to      |
+|        | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] | `download_new_data`, `download_renewable_forecast`, or       |
+|        | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] | `download_day_ahead_price`.                                  |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                               |
+|--------|----------------------------|---------------------------------------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | If *now* is not a ``pd.Timestamp``, or is timezone-naive (the window must be anchored to an explicit timezone, e.g. UTC). |
+|        | [ValueError](`ValueError`) | If *train_years* is not a positive ``int`` or is a ``bool``.                                                              |
+|        | [ValueError](`ValueError`) | If *start_margin_days* is negative, not an ``int``, or is a ``bool``.                                                     |
+|        | [ValueError](`ValueError`) | If *data_end* is not ``None`` and does not conform to the ``'YYYYMMDDHHMM'`` format.                                      |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.downloader.entsoe import derive_download_window
+
+now = pd.Timestamp("2026-06-14", tz="UTC")
+start, end = derive_download_window(now, train_years=3)
+print(start)  # 202305010000
+print(end)    # 202606160000
+
+# Explicit upper bound:
+start2, end2 = derive_download_window(
+    now, train_years=3, data_end="202612312300"
+)
+print(end2)  # 202612312300
+```

@@ -221,6 +221,15 @@ def _validate_on_unavailable(on_unavailable: str) -> None:
         )
 
 
+def _validate_on_provider_failure(on_provider_failure: str) -> None:
+    """Reject unknown ``on_provider_failure`` values (fail-safe contract)."""
+    if on_provider_failure not in ("raise", "skip"):
+        raise ValueError(
+            f"on_provider_failure must be 'raise' or 'skip'; "
+            f"got {on_provider_failure!r}."
+        )
+
+
 def _hours_since_last_download(raw_dir: Path) -> float | None:
     """Return hours since the newest raw ENTSO-E file was written.
 
@@ -1222,6 +1231,111 @@ def download_day_ahead_price(
     )
 
 
+def download_side_tables(
+    api_key: str,
+    *,
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    country_code: str = "DE",
+    price_country_code: str = "DE_LU",
+    force: bool = False,
+    timeout: Optional[float] = 60.0,
+    on_provider_failure: str = "raise",
+) -> None:
+    """Download both ENTSO-E day-ahead side tables in one call.
+
+    Calls `download_renewable_forecast` (with *country_code*) followed by
+    `download_day_ahead_price` (with *price_country_code*). Both providers
+    share the same *start*, *end*, *force*, and *timeout* arguments.
+
+    The library default is **fail-loud**: when *on_provider_failure* is
+    ``"raise"`` (the default), the first provider exception propagates
+    immediately and the second provider is never attempted.  Pass
+    ``on_provider_failure="skip"`` to opt into degraded-but-continuing
+    behaviour: each provider failure is logged at WARNING level and the
+    next provider is still attempted.  ``"skip"`` is intended for
+    opportunistic refreshes where a partial update is better than no
+    update; it must **not** be used in safety-critical pipelines where
+    missing a table is a hard error.
+
+    Args:
+        api_key: ENTSO-E Web API security token.
+        start: Start in ``'YYYYMMDDHHMM'`` format, or ``None`` to use each
+            downloader's own default (seven days ago).
+        end: End in ``'YYYYMMDDHHMM'`` format, or ``None`` to use each
+            downloader's own default (start of tomorrow).
+        country_code: Bidding-zone or country code for the renewable forecast
+            query. Defaults to ``"DE"``.
+        price_country_code: Bidding-zone code for the day-ahead price query.
+            Defaults to ``"DE_LU"``.
+        force: If ``True``, bypass the small-window cooldown check in each
+            downloader.
+        timeout: Per-socket-operation read timeout in seconds passed to each
+            downloader.  ``None`` disables the timeout.  Defaults to ``60.0``.
+        on_provider_failure: How to handle a provider-level exception.
+            ``"raise"`` (default) — let the exception propagate immediately.
+            ``"skip"`` — log a WARNING and continue to the next provider.
+            Any other value raises ``ValueError`` before any download begins.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If *on_provider_failure* is not ``"raise"`` or ``"skip"``.
+        ImportError: If ``entsoe-py`` is not installed (propagated from the
+            individual downloaders when *on_provider_failure* is ``"raise"``).
+        RuntimeError: If a download fails after ``_MAX_RETRIES`` attempts and
+            *on_provider_failure* is ``"raise"``.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        from spotforecast2_safe.downloader.entsoe import download_side_tables
+
+        # Fail-loud (default): any provider error propagates immediately.
+        download_side_tables(
+            api_key="YOUR_API_KEY",
+            start="202301010000",
+            end="202301050000",
+            force=True,
+        )
+
+        # Opt-in degradation: renewable failure is logged but price is still
+        # attempted.  Use only in non-safety-critical refresh workflows.
+        download_side_tables(
+            api_key="YOUR_API_KEY",
+            on_provider_failure="skip",
+        )
+        ```
+    """
+    _validate_on_provider_failure(on_provider_failure)
+
+    providers = [
+        ("renewable forecast", download_renewable_forecast, country_code),
+        ("day-ahead price", download_day_ahead_price, price_country_code),
+    ]
+
+    for name, fn, code in providers:
+        try:
+            fn(
+                api_key,
+                country_code=code,
+                start=start,
+                end=end,
+                force=force,
+                timeout=timeout,
+            )
+        except Exception as exc:  # noqa: BLE001
+            if on_provider_failure == "raise":
+                raise
+            logger.warning(
+                "side-table download failed (%s): %s -- skipping "
+                "(on_provider_failure='skip').",
+                name,
+                exc,
+            )
+
+
 def download_zone_loads(
     api_key: str,
     zones: Optional[Dict[str, str]] = None,
@@ -1679,3 +1793,178 @@ def build_zone_qc_frame(
 
     result.index.name = "Time (UTC)"
     return result
+
+
+# =============================================================================
+# Pure utilities (no network)
+# =============================================================================
+
+
+def derive_download_window(
+    now: pd.Timestamp,
+    *,
+    train_years: int,
+    start_margin_days: int = 45,
+    data_end: str | None = None,
+) -> tuple[str, str]:
+    """Derive the ``(start_dl, end_dl)`` string pair for an ENTSO-E download.
+
+    Computes the date window needed to cover *train_years* of history plus a
+    *start_margin_days* buffer on the left, and optionally a caller-supplied
+    upper bound on the right.  All computation is pure (no network, no
+    filesystem access).
+
+    Args:
+        now: Reference point for the window, typically ``pd.Timestamp.now(tz="UTC")``.
+            Must be a ``pd.Timestamp`` — coercion is intentionally refused to
+            prevent silent mistakes with string arguments.
+        train_years: Number of full calendar years of history required.  Must
+            be a positive ``int`` (``bool`` values are rejected even though
+            ``bool`` is a subclass of ``int``).
+        start_margin_days: Extra days prepended to the window so that the
+            training data survives the downstream lag-feature creation step.
+            Defaults to ``45``.  Must be a non-negative ``int`` (bools
+            rejected).
+        data_end: Upper bound of the window in ``'YYYYMMDDHHMM'`` format, or
+            ``None`` (the default) to set the end to *now* + 2 days (i.e.
+            today + tomorrow + one additional day — the standard day-ahead
+            horizon).  When provided, the value is validated strictly; any
+            deviation from the format raises ``ValueError``.
+
+    Returns:
+        A two-tuple ``(start_dl, end_dl)`` where both strings are in
+        ``'YYYYMMDDHHMM'`` format and can be passed directly to
+        `download_new_data`, `download_renewable_forecast`, or
+        `download_day_ahead_price`.
+
+    Raises:
+        TypeError: If *now* is not a ``pd.Timestamp``, or is timezone-naive
+            (the window must be anchored to an explicit timezone, e.g. UTC).
+        ValueError: If *train_years* is not a positive ``int`` or is a ``bool``.
+        ValueError: If *start_margin_days* is negative, not an ``int``, or is a
+            ``bool``.
+        ValueError: If *data_end* is not ``None`` and does not conform to the
+            ``'YYYYMMDDHHMM'`` format.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import derive_download_window
+
+        now = pd.Timestamp("2026-06-14", tz="UTC")
+        start, end = derive_download_window(now, train_years=3)
+        print(start)  # 202305010000
+        print(end)    # 202606160000
+
+        # Explicit upper bound:
+        start2, end2 = derive_download_window(
+            now, train_years=3, data_end="202612312300"
+        )
+        print(end2)  # 202612312300
+        ```
+    """
+    if not isinstance(now, pd.Timestamp):
+        raise TypeError(f"now must be a pd.Timestamp, got {type(now).__name__!r}")
+    if now.tzinfo is None:
+        raise TypeError(
+            "now must be timezone-aware (e.g. pd.Timestamp.now(tz='UTC')); "
+            "a tz-naive timestamp would derive the window from the runner's "
+            "local date rather than UTC."
+        )
+    if (
+        isinstance(train_years, bool)
+        or not isinstance(train_years, int)
+        or train_years < 1
+    ):
+        raise ValueError(f"train_years must be a positive integer; got {train_years!r}")
+    if (
+        isinstance(start_margin_days, bool)
+        or not isinstance(start_margin_days, int)
+        or start_margin_days < 0
+    ):
+        raise ValueError(
+            f"start_margin_days must be a non-negative integer; got {start_margin_days!r}"
+        )
+    if data_end is not None:
+        try:
+            pd.to_datetime(data_end, format="%Y%m%d%H%M", utc=True)
+        except Exception as exc:
+            raise ValueError(
+                f"data_end={data_end!r} is not in 'YYYYMMDDHHMM' format"
+            ) from exc
+
+    today = now.normalize()
+    start_dl = (
+        today - pd.Timedelta(days=365 * train_years + start_margin_days)
+    ).strftime("%Y%m%d%H%M")
+    end_dl = (
+        data_end if data_end else (today + pd.Timedelta(days=2)).strftime("%Y%m%d%H%M")
+    )
+    return start_dl, end_dl
+
+
+def extract_entsoe_hourly_forecast(
+    interim: pd.DataFrame,
+    *,
+    column: str = "Forecasted Load",
+) -> pd.Series:
+    """Resample a sub-hourly ENTSO-E interim frame to a clean hourly series.
+
+    Takes a ``pd.DataFrame`` with a ``DatetimeIndex`` (typically read from an
+    ENTSO-E interim CSV that contains 15-minute data) and returns the named
+    *column* resampled to hourly means, with ``NaN`` observations dropped.
+
+    Args:
+        interim: Source ``pd.DataFrame``.  The index must be a
+            ``pd.DatetimeIndex``; any frequency is accepted.
+        column: Name of the column to extract and resample.  Defaults to
+            ``"Forecasted Load"``.
+
+    Returns:
+        A ``pd.Series`` with a regular hourly ``DatetimeIndex`` and
+        ``name == column``.  Only hours with at least one non-``NaN``
+        sub-hourly observation are present (``dropna`` is applied after
+        ``resample("h").mean()``).
+
+    Raises:
+        TypeError: If *interim* is not a ``pd.DataFrame``.
+        TypeError: If ``interim.index`` is not a ``pd.DatetimeIndex``.
+        KeyError: If *column* is not found in ``interim.columns``.
+        ValueError: If the resampled series is empty (all observations are
+            ``NaN`` or the column had no data).
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import extract_entsoe_hourly_forecast
+
+        # Build a 15-minute DataFrame for two hours.
+        idx = pd.date_range("2026-06-14 00:00", periods=8, freq="15min", tz="UTC")
+        df = pd.DataFrame({"Forecasted Load": [100.0, 110.0, 90.0, 120.0,
+                                               80.0, 95.0, 105.0, 115.0]},
+                          index=idx)
+        out = extract_entsoe_hourly_forecast(df)
+        print(out)
+        # 2026-06-14 00:00:00+00:00    105.0
+        # 2026-06-14 01:00:00+00:00     98.75
+        # Name: Forecasted Load, dtype: float64
+        ```
+    """
+    if not isinstance(interim, pd.DataFrame):
+        raise TypeError(
+            f"interim must be a pd.DataFrame, got {type(interim).__name__!r}"
+        )
+    if not isinstance(interim.index, pd.DatetimeIndex):
+        raise TypeError(
+            f"interim index must be a DatetimeIndex, got {type(interim.index).__name__}"
+        )
+    if column not in interim.columns:
+        raise KeyError(column)
+
+    out = interim[column].resample("h").mean().dropna()
+    out.name = column
+
+    if out.empty:
+        raise ValueError(f"column {column!r} has no non-NaN hourly observations")
+
+    return out
