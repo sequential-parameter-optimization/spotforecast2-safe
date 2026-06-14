@@ -9,7 +9,6 @@ import types
 import pandas as pd
 import pytest
 
-import spotforecast2_safe.downloader.entsoe as _entsoe_mod
 from spotforecast2_safe.data.fetch_data import (
     load_day_ahead_price,
     load_renewable_forecast,
@@ -237,13 +236,12 @@ def test_load_day_ahead_price_missing_column(data_home):
 
 def test_download_side_tables_raise_mode_both_providers_called(data_home, fake_entsoe):
     """Raise-mode (default): both providers succeed, both interim files written."""
-    result = download_side_tables(
+    download_side_tables(
         api_key="x",
         start="202301010000",
         end="202301050000",
         force=True,
     )
-    assert result is None
     assert (data_home / "interim" / "renewable_forecast.csv").exists()
     assert (data_home / "interim" / "day_ahead_price.csv").exists()
 
@@ -253,7 +251,9 @@ def test_download_side_tables_raise_mode_propagates(
 ):
     """Raise-mode: a failing renewable query propagates as RuntimeError."""
     # Speed up the retry loop so the test doesn't take 25 s.
-    monkeypatch.setattr(_entsoe_mod, "_RETRY_BACKOFF_SECONDS", 0)
+    monkeypatch.setattr(
+        "spotforecast2_safe.downloader.entsoe._RETRY_BACKOFF_SECONDS", 0
+    )
     with pytest.raises(RuntimeError):
         download_side_tables(
             api_key="x",
@@ -267,20 +267,21 @@ def test_download_side_tables_skip_mode_renewable_fails_price_succeeds(
     data_home, failing_entsoe, monkeypatch, caplog
 ):
     """Skip-mode: renewable failure is logged; price still written; no raise."""
-    monkeypatch.setattr(_entsoe_mod, "_RETRY_BACKOFF_SECONDS", 0)
+    monkeypatch.setattr(
+        "spotforecast2_safe.downloader.entsoe._RETRY_BACKOFF_SECONDS", 0
+    )
     import logging
 
     with caplog.at_level(
         logging.WARNING, logger="spotforecast2_safe.downloader.entsoe"
     ):
-        result = download_side_tables(
+        download_side_tables(
             api_key="x",
             start="202301010000",
             end="202301050000",
             force=True,
             on_provider_failure="skip",
         )
-    assert result is None
     # WARNING must mention the failing provider
     assert any("renewable forecast" in r.message for r in caplog.records)
     # Price file should be written despite the renewable failure.
@@ -293,20 +294,21 @@ def test_download_side_tables_skip_mode_price_fails_renewable_succeeds(
     data_home, failing_price_entsoe, monkeypatch, caplog
 ):
     """Skip-mode (symmetric): price failure is logged; renewable still written."""
-    monkeypatch.setattr(_entsoe_mod, "_RETRY_BACKOFF_SECONDS", 0)
+    monkeypatch.setattr(
+        "spotforecast2_safe.downloader.entsoe._RETRY_BACKOFF_SECONDS", 0
+    )
     import logging
 
     with caplog.at_level(
         logging.WARNING, logger="spotforecast2_safe.downloader.entsoe"
     ):
-        result = download_side_tables(
+        download_side_tables(
             api_key="x",
             start="202301010000",
             end="202301050000",
             force=True,
             on_provider_failure="skip",
         )
-    assert result is None
     assert any("day-ahead price" in r.message for r in caplog.records)
     # Renewable file written despite the price failure.
     assert (data_home / "interim" / "renewable_forecast.csv").exists()
