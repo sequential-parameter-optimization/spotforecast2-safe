@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 import pandas as pd
 
@@ -345,7 +346,7 @@ class SubmissionCoverage:
 
 def assert_submission_coverage(
     interim: pd.DataFrame,
-    dates: "spotforecast2_safe.downloader.entsoe.SubmissionDates",  # type: ignore[name-defined]
+    dates: "Any",  # SubmissionDates from spotforecast2_safe.downloader.entsoe
     *,
     fallback: bool,
     corruption_mode: str = "preview",

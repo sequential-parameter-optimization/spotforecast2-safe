@@ -22,12 +22,8 @@ Behavior pins (per the ADR):
 
 from __future__ import annotations
 
-import os
-import shutil
-import tempfile
-import time
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
@@ -37,7 +33,6 @@ from spotforecast2_safe.downloader.entsoe import (
     compute_submission_dates,
 )
 from spotforecast2_safe.downloader.resilience import (
-    DownloadResult,
     download_combined_with_fallback,
 )
 from spotforecast2_safe.exceptions import CoverageError
