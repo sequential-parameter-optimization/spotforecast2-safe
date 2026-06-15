@@ -550,3 +550,179 @@ def download_with_fallback(
 
     store.prune(now)
     return result
+
+
+def download_combined_with_fallback(
+    api_key: str,
+    *,
+    start: str,
+    end: str,
+    now: pd.Timestamp,
+    max_retries: int,
+    backoff: float,
+    timeout: float | None,
+    fallback_enabled: bool,
+    country_code: str = "DE",
+    sleep: Callable[[float], None] = _time_module.sleep,
+) -> DownloadResult:
+    """Download the combined DE-total load series with snapshot fallback.
+
+    Single-series ("combined") counterpart of `download_with_fallback` for
+    scripts that target the aggregated DE-total endpoint
+    (``download_new_data``) rather than the four per-zone CSVs.  Reproduces
+    the ``download_with_fallback`` function defined identically in
+    ``chronos.py``, ``team4_optuna_submit.py``, and
+    ``team4_spotoptim_submit.py``.
+
+    Decision tree:
+
+    1. Seed the snapshot store from any existing ``interim/energy_load.csv``.
+    2. Attempt ``download_new_data`` up to ``max_retries`` times, with
+       exponential back-off ``backoff * 2**(attempt-1)`` between attempts.
+    3. On success: write a snapshot and return a ``DownloadResult`` with
+       ``mode="combined"`` and ``combined_status="live"``.
+    4. On exhaustion: if ``fallback_enabled`` and a valid snapshot exists
+       (within ``SNAPSHOT_TTL``), restore it and return
+       ``combined_status="cache"``; otherwise return
+       ``combined_status="missing"`` and ``mode=None``.
+    5. Prune stale snapshots before returning.
+
+    The caller is responsible for raising / aborting on ``mode=None``
+    (unrecoverable).
+
+    Args:
+        api_key: ENTSO-E Web API security token.
+        start: Download start in ``"YYYYMMDDHHMM"`` format.
+        end: Download end in ``"YYYYMMDDHHMM"`` format.
+        now: Current UTC timestamp (used for snapshot naming and TTL checks).
+        max_retries: Total number of download attempts.
+        backoff: Base wait in seconds between attempts (exponential:
+            ``backoff * 2**(attempt-1)``).
+        timeout: Per-socket read timeout in seconds, or ``None`` to disable.
+        fallback_enabled: When ``False``, cached snapshots are never READ as
+            a fallback (live data or ``"missing"``), but they are still
+            written on success.
+        country_code: ENTSO-E country code passed to ``download_new_data``.
+            Defaults to ``"DE"``.
+        sleep: Callable used for inter-attempt waits; injected so tests can
+            pass ``sleep=lambda s: None`` for instant execution.
+
+    Returns:
+        DownloadResult: ``mode="combined"`` on success (live or cache),
+        ``mode=None`` when unrecoverable.  ``zones`` is always an empty dict
+        (no per-zone download is attempted).  ``fallback_gate`` is ``True``
+        when ``combined_status="cache"``.
+
+    Examples:
+        ```{python}
+        #| eval: false
+        import pandas as pd
+        from spotforecast2_safe.downloader import resilience as resil
+
+        result = resil.download_combined_with_fallback(
+            api_key="YOUR_API_KEY",
+            start="202301010000",
+            end="202301050000",
+            now=pd.Timestamp.now(tz="UTC"),
+            max_retries=3,
+            backoff=5.0,
+            timeout=60.0,
+            fallback_enabled=True,
+        )
+        if result.mode is None:
+            raise SystemExit("unrecoverable: no live data and no valid snapshot")
+        print(result.report())
+        ```
+    """
+    import spotforecast2_safe.downloader.entsoe as entsoe_module
+    from spotforecast2_safe.data.fetch_data import get_data_home
+
+    store = make_store()
+    interim_dir = get_data_home() / "interim"
+    combined_interim = interim_dir / "energy_load.csv"
+
+    # Seed from existing interim file so the first run after adding this layer
+    # still has a snapshot to fall back to.
+    store.seed_from_file("combined", combined_interim, now)
+
+    combined_success = False
+    for attempt in range(1, max_retries + 1):
+        try:
+            entsoe_module.download_new_data(
+                api_key=api_key,
+                country_code=country_code,
+                start=start,
+                end=end,
+                force=True,
+                keep_forecast_future=True,
+                timeout=timeout,
+            )
+            combined_success = True
+            logger.info(
+                "combined DE-total download succeeded (attempt %d/%d)",
+                attempt,
+                max_retries,
+            )
+            break
+        except Exception as exc:  # noqa: BLE001
+            wait = backoff * (2 ** (attempt - 1))
+            logger.warning(
+                "download attempt %d/%d failed: %s",
+                attempt,
+                max_retries,
+                exc,
+            )
+            if attempt < max_retries:
+                logger.warning("retrying in %.0f s ...", wait)
+                sleep(wait)
+
+    if combined_success:
+        snapped = store.write("combined", combined_interim, now)
+        if snapped is None:
+            logger.warning(
+                "combined DE-total downloaded but interim file missing at %s; "
+                "no snapshot written — nothing to fall back to next run",
+                combined_interim,
+            )
+        store.prune(now)
+        return DownloadResult(
+            zones={},
+            combined_status="live",
+            mode="combined",
+        )
+
+    # All attempts failed — apply snapshot fallback policy.
+    snap = store.newest_valid("combined", now) if fallback_enabled else None
+    if snap is not None:
+        store.restore(snap, combined_interim)
+        age = store.age_of(snap, now)
+        logger.warning(
+            "live download failed; restored snapshot %s (%s old)",
+            snap.name,
+            f"{age / pd.Timedelta(hours=1):.1f} h" if age is not None else "unknown age",
+        )
+        store.prune(now)
+        return DownloadResult(
+            zones={},
+            combined_status="cache",
+            combined_age=age,
+            mode="combined",
+        )
+
+    if fallback_enabled:
+        logger.warning(
+            "combined DE-total: live download failed and no valid snapshot within %s; "
+            "mode=None (unrecoverable)",
+            SNAPSHOT_TTL,
+        )
+    else:
+        logger.warning(
+            "combined DE-total: live download failed and --no-fallback is set; "
+            "mode=None (unrecoverable)"
+        )
+    store.prune(now)
+    return DownloadResult(
+        zones={},
+        combined_status="missing",
+        mode=None,
+    )
