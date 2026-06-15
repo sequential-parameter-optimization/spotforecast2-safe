@@ -2157,8 +2157,6 @@ def load_interim(
         del os.environ["SPOTFORECAST2_DATA"]
         ```
     """
-    import logging
-
     _logger = logging.getLogger(__name__)
 
     if mode not in ("combined", "four_zone"):
