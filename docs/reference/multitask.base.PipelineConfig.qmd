@@ -1,0 +1,57 @@
+# multitask.base.PipelineConfig { #spotforecast2_safe.multitask.base.PipelineConfig }
+
+```python
+multitask.base.PipelineConfig()
+```
+
+Structural protocol describing the config surface ``BaseTask`` reads.
+
+``ConfigMulti`` and ``ConfigEntsoe`` both satisfy this protocol; any
+future config class only needs to expose the same field names with
+compatible types.  The protocol is the contract that lets a caller pass
+``MultiTask(config=ConfigEntsoe(...))`` (or any other ``PipelineConfig``)
+without subclassing or rebuilding kwargs.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.multitask import MultiTask
+
+# ConfigMulti satisfies PipelineConfig structurally; pass it directly
+# to MultiTask (which accepts any PipelineConfig-conforming object).
+cfg = ConfigMulti(predict_size=12, use_exogenous_features=False, verbose=False)
+print(f"predict_size: {cfg.predict_size}")
+print(f"use_exogenous_features: {cfg.use_exogenous_features}")
+# MultiTask accepts any PipelineConfig — no subclassing required.
+import tempfile
+with tempfile.TemporaryDirectory() as tmp:
+    cfg.set_params(cache_home=tmp)
+    task = MultiTask(cfg)
+    print(f"Task created: {type(task).__name__}")
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [set_params](#spotforecast2_safe.multitask.base.PipelineConfig.set_params) | Update one or more config fields in place and return ``self``. |
+
+### set_params { #spotforecast2_safe.multitask.base.PipelineConfig.set_params }
+
+```python
+multitask.base.PipelineConfig.set_params(params=None, **kwargs)
+```
+
+Update one or more config fields in place and return ``self``.
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+cfg = ConfigMulti(predict_size=12)
+cfg.set_params(predict_size=6, verbose=False)
+print(f"predict_size after set_params: {cfg.predict_size}")
+assert cfg.predict_size == 6
+```

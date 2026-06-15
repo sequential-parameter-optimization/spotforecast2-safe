@@ -1,0 +1,32 @@
+# downloader.entsoe.SubmissionDates { #spotforecast2_safe.downloader.entsoe.SubmissionDates }
+
+```python
+downloader.entsoe.SubmissionDates(
+    now,
+    today,
+    yesterday,
+    tomorrow,
+    last_target,
+    start_dl,
+    end_dl,
+)
+```
+
+Immutable bundle of timestamps and download-window strings for one submission run.
+
+Every ENTSO-E submission script captures these seven values once at startup
+(anchored to ``now``) to avoid clock-skew bugs across a multi-minute run.
+This dataclass replaces the script-local ``Dates`` namedtuple/dataclass that
+all four scripts define identically.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name        | Type                                           | Description                                                                                                           |
+|-------------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| now         | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | The reference wall-clock timestamp (tz-aware, typically UTC) as captured at script startup.                           |
+| today       | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Midnight of the current UTC day (``now.normalize()``).                                                                |
+| yesterday   | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Midnight of the previous UTC day (``today - 1 day``).                                                                 |
+| tomorrow    | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Midnight of the next UTC day (``today + 1 day``).                                                                     |
+| last_target | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Last target hour that must be covered by the submission (``tomorrow + 23 h``, i.e. the last hour of tomorrow in UTC). |
+| start_dl    | [str](`str`)                                   | ENTSO-E download start in ``'YYYYMMDDHHMM'`` format (derived from ``derive_download_window``).                        |
+| end_dl      | [str](`str`)                                   | ENTSO-E download end in ``'YYYYMMDDHHMM'`` format (``data_end`` when supplied; otherwise ``today + 2 days``).         |

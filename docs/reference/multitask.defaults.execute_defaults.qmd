@@ -1,0 +1,61 @@
+# multitask.defaults.execute_defaults { #spotforecast2_safe.multitask.defaults.execute_defaults }
+
+```python
+multitask.defaults.execute_defaults(task, show=False)
+```
+
+Execute defaults fitting for all targets on ``task``.
+
+Thin wrapper around ``BaseTask._run_strategy`` using ``DefaultsStrategy``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                     | Description                                               | Default    |
+|--------|----------------------------------------------------------|-----------------------------------------------------------|------------|
+| task   | [BaseTask](`spotforecast2_safe.multitask.base.BaseTask`) | A ``BaseTask`` (or subclass) instance with prepared data. | _required_ |
+| show   | [bool](`bool`)                                           | If ``True``, invoke the visualisation hooks.              | `False`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                             |
+|--------|------------------------------------------------------------|-------------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Aggregated prediction package (weighted combination of all targets,     |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | or the single-target package when ``len(config.targets) == 1``).        |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Per-target packages are stored on ``task.results["defaults"]``.         |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | When ``task.config.auto_save_models`` is ``True`` (the default), fitted |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | models are saved to disk so ``PredictTask(task_name="defaults")`` can   |
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | load them directly.                                                     |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from spotforecast2_safe.multitask.defaults import DefaultsTask, execute_defaults
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+rng = np.random.default_rng(0)
+idx = pd.date_range("2023-01-01", periods=24 * 14, freq="h", tz="UTC")
+df = pd.DataFrame({"load": rng.normal(100, 10, len(idx))}, index=idx)
+df.index.name = "DateTime"
+
+with tempfile.TemporaryDirectory() as tmp:
+    cfg = ConfigMulti(
+        predict_size=6,
+        use_exogenous_features=False,
+        use_outlier_detection=False,
+        auto_save_models=False,
+        number_folds=2,
+        cache_home=Path(tmp),
+        verbose=False,
+    )
+    task = DefaultsTask(cfg, dataframe=df)
+    task.prepare_data().detect_outliers().impute().build_exogenous_features()
+    result = execute_defaults(task)
+
+print(f"Future predictions: {len(result['future_pred'])} steps")
+assert isinstance(result["future_pred"], pd.Series)
+assert len(result["future_pred"]) == 6
+```

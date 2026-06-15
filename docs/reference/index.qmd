@@ -17,6 +17,7 @@ Utilities for fetching and loading time series, weather, and holiday data.
 | [data.fetch_data.load_timeseries_forecast](data.fetch_data.load_timeseries_forecast.qmd#spotforecast2_safe.data.fetch_data.load_timeseries_forecast) | Load the day-ahead forecast time series from ``interim/energy_load.csv``. |
 | [data.fetch_data.load_renewable_forecast](data.fetch_data.load_renewable_forecast.qmd#spotforecast2_safe.data.fetch_data.load_renewable_forecast) | Load the ENTSO-E day-ahead wind/solar generation forecast. |
 | [data.fetch_data.load_day_ahead_price](data.fetch_data.load_day_ahead_price.qmd#spotforecast2_safe.data.fetch_data.load_day_ahead_price) | Load the ENTSO-E day-ahead spot price (DE/LU) as an hourly series. |
+| [data.fetch_data.load_school_holidays_de](data.fetch_data.load_school_holidays_de.qmd#spotforecast2_safe.data.fetch_data.load_school_holidays_de) | Load the bundled German school-holiday interval table. |
 | [data.data_classes](data.data_classes.qmd#spotforecast2_safe.data.data_classes) | Data structures for input and processed data. |
 | [data.demo_loader](data.demo_loader.qmd#spotforecast2_safe.data.demo_loader) | Demo data loader for safety-critical forecasting tasks. |
 | [data.entsoe_loader](data.entsoe_loader.qmd#spotforecast2_safe.data.entsoe_loader) | ENTSO-E interim-CSV data loaders. |
@@ -33,6 +34,8 @@ feature engineering, and temporal train/test splitting.
 | [preprocessing.coverage.assert_actual_lag_within](preprocessing.coverage.assert_actual_lag_within.qmd#spotforecast2_safe.preprocessing.coverage.assert_actual_lag_within) | Raise `CoverageError` if the last published actual is too old. |
 | [preprocessing.coverage.assert_no_interior_gaps](preprocessing.coverage.assert_no_interior_gaps.qmd#spotforecast2_safe.preprocessing.coverage.assert_no_interior_gaps) | Raise `CoverageError` if the recent actuals contain large holes. |
 | [preprocessing.coverage.last_complete_hour](preprocessing.coverage.last_complete_hour.qmd#spotforecast2_safe.preprocessing.coverage.last_complete_hour) | Return the latest hour having a complete set of intra-hour samples. |
+| [preprocessing.coverage.SubmissionCoverage](preprocessing.coverage.SubmissionCoverage.qmd#spotforecast2_safe.preprocessing.coverage.SubmissionCoverage) | Coverage bookmarks computed by `assert_submission_coverage`. |
+| [preprocessing.coverage.assert_submission_coverage](preprocessing.coverage.assert_submission_coverage.qmd#spotforecast2_safe.preprocessing.coverage.assert_submission_coverage) | Orchestrate all operational coverage guards for one submission run. |
 | [preprocessing.curate_data.agg_and_resample_data](preprocessing.curate_data.agg_and_resample_data.qmd#spotforecast2_safe.preprocessing.curate_data.agg_and_resample_data) | Aggregates and resamples the data to (e.g., hourly) frequency by computing the specified aggregation (e.g. for each hour). |
 | [preprocessing.curate_data.basic_ts_checks](preprocessing.curate_data.basic_ts_checks.qmd#spotforecast2_safe.preprocessing.curate_data.basic_ts_checks) | Checks if the time series data has a datetime index and is sorted. |
 | [preprocessing.curate_data.curate_holidays](preprocessing.curate_data.curate_holidays.qmd#spotforecast2_safe.preprocessing.curate_data.curate_holidays) | Checks if the holiday dataframe has the correct shape. |
@@ -63,6 +66,7 @@ feature engineering, and temporal train/test splitting.
 | [preprocessing.exog_providers.EnergyCrisisWindowProvider](preprocessing.exog_providers.EnergyCrisisWindowProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.EnergyCrisisWindowProvider) | German energy-saving regulatory window provider. |
 | [preprocessing.exog_providers.build_providers](preprocessing.exog_providers.build_providers.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers) | Construct the providers whose flags are truthy, in registry order. |
 | [preprocessing.exog_providers.build_providers_from_config](preprocessing.exog_providers.build_providers_from_config.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers_from_config) | Construct providers by reading the registry flags off a config object. |
+| [preprocessing.exog_providers.ExogProviderError](preprocessing.exog_providers.ExogProviderError.qmd#spotforecast2_safe.preprocessing.exog_providers.ExogProviderError) | A provider could not produce features covering the requested index. |
 | [preprocessing.imputation.apply_imputation](preprocessing.imputation.apply_imputation.qmd#spotforecast2_safe.preprocessing.imputation.apply_imputation) | Apply imputation to a DataFrame based on the method specified in config. |
 | [preprocessing.imputation.WeightFunction](preprocessing.imputation.WeightFunction.qmd#spotforecast2_safe.preprocessing.imputation.WeightFunction) | Callable class for sample weights that can be pickled. |
 | [preprocessing.target_corruption.TargetCorruptionReport](preprocessing.target_corruption.TargetCorruptionReport.qmd#spotforecast2_safe.preprocessing.target_corruption.TargetCorruptionReport) | Immutable summary of a target-corruption detection and policy run. |
@@ -190,12 +194,17 @@ strategies, and a one-call runner.
 | | |
 | --- | --- |
 | [multitask.base.BaseTask](multitask.base.BaseTask.qmd#spotforecast2_safe.multitask.base.BaseTask) | Shared base for all multi-target forecasting pipeline tasks. |
+| [multitask.base.PipelineConfig](multitask.base.PipelineConfig.qmd#spotforecast2_safe.multitask.base.PipelineConfig) | Structural protocol describing the config surface ``BaseTask`` reads. |
 | [multitask.base.agg_predictor](multitask.base.agg_predictor.qmd#spotforecast2_safe.multitask.base.agg_predictor) | Aggregate per-target prediction packages into a weighted forecast. |
 | [multitask.multi.MultiTask](multitask.multi.MultiTask.qmd#spotforecast2_safe.multitask.multi.MultiTask) | Orchestrates a multi-target time-series forecasting pipeline. |
 | [multitask.lazy.LazyTask](multitask.lazy.LazyTask.qmd#spotforecast2_safe.multitask.lazy.LazyTask) | Task 1 — Lazy Fitting with default LightGBM parameters. |
+| [multitask.lazy.execute_lazy](multitask.lazy.execute_lazy.qmd#spotforecast2_safe.multitask.lazy.execute_lazy) | Execute lazy fitting for all targets on ``task``. |
 | [multitask.defaults.DefaultsTask](multitask.defaults.DefaultsTask.qmd#spotforecast2_safe.multitask.defaults.DefaultsTask) | Task 2 — Defaults fitting (no tuning, no cached params). |
+| [multitask.defaults.execute_defaults](multitask.defaults.execute_defaults.qmd#spotforecast2_safe.multitask.defaults.execute_defaults) | Execute defaults fitting for all targets on ``task``. |
 | [multitask.predict.PredictTask](multitask.predict.PredictTask.qmd#spotforecast2_safe.multitask.predict.PredictTask) | Task 5 — Predict-only using previously saved models. |
+| [multitask.predict.execute_predict](multitask.predict.execute_predict.qmd#spotforecast2_safe.multitask.predict.execute_predict) | Execute prediction-only mode using previously saved models. |
 | [multitask.clean.CleanTask](multitask.clean.CleanTask.qmd#spotforecast2_safe.multitask.clean.CleanTask) | Cache-cleaning task — removes all cached data from the pipeline cache. |
+| [multitask.clean.execute_clean](multitask.clean.execute_clean.qmd#spotforecast2_safe.multitask.clean.execute_clean) | Remove all cached data from the pipeline cache directory. |
 | [multitask.factories.default_lgbm_forecaster_factory](multitask.factories.default_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.default_lgbm_forecaster_factory) | Return a fresh, unfitted LightGBM ``ForecasterRecursive``. |
 | [multitask.factories.quantile_lgbm_forecaster_factory](multitask.factories.quantile_lgbm_forecaster_factory.qmd#spotforecast2_safe.multitask.factories.quantile_lgbm_forecaster_factory) | Return one quantile-regression LightGBM ``ForecasterRecursive`` per quantile. |
 | [multitask.factories.predict_quantile_band](multitask.factories.predict_quantile_band.qmd#spotforecast2_safe.multitask.factories.predict_quantile_band) | Assemble per-quantile forecasts into one non-crossing band. |
@@ -204,6 +213,7 @@ strategies, and a one-call runner.
 | [multitask.strategies.LazyStrategy](multitask.strategies.LazyStrategy.qmd#spotforecast2_safe.multitask.strategies.LazyStrategy) | Approach 1 — Lazy fitting with optional cached tuning. |
 | [multitask.strategies.DefaultsStrategy](multitask.strategies.DefaultsStrategy.qmd#spotforecast2_safe.multitask.strategies.DefaultsStrategy) | Approach 2 — Train with defaults, no tuning, no cached params. |
 | [multitask.runner.run](multitask.runner.run.qmd#spotforecast2_safe.multitask.runner.run) | Run the MultiTask forecasting pipeline and return predictions. |
+| [multitask.runner.run_with](multitask.runner.run_with.qmd#spotforecast2_safe.multitask.runner.run_with) | Parameterized core of the MultiTask pipeline orchestration. |
 
 ## Utils
 
@@ -272,6 +282,7 @@ population-weighted multi-city spatial aggregation.
 | --- | --- |
 | [weather.client.WeatherClient](weather.client.WeatherClient.qmd#spotforecast2_safe.weather.client.WeatherClient) | Client for fetching weather data from Open-Meteo API. |
 | [weather.client.WeatherService](weather.client.WeatherService.qmd#spotforecast2_safe.weather.client.WeatherService) | High-level service for weather data generation. |
+| [weather.client.WeatherFetchError](weather.client.WeatherFetchError.qmd#spotforecast2_safe.weather.client.WeatherFetchError) | Raised when Open-Meteo cannot be reached or returns no usable data. |
 | [weather.features.get_weather_features](weather.features.get_weather_features.qmd#spotforecast2_safe.weather.features.get_weather_features) | Fetch weather data and compute rolling-window features. |
 | [weather.derived.heating_degree_hours](weather.derived.heating_degree_hours.qmd#spotforecast2_safe.weather.derived.heating_degree_hours) | Heating degree-hours :math:`\max(base - T, 0)`. |
 | [weather.derived.cooling_degree_hours](weather.derived.cooling_degree_hours.qmd#spotforecast2_safe.weather.derived.cooling_degree_hours) | Cooling degree-hours :math:`\max(T - base, 0)`. |
@@ -283,6 +294,7 @@ population-weighted multi-city spatial aggregation.
 | [weather.locations.default_german_locations](weather.locations.default_german_locations.qmd#spotforecast2_safe.weather.locations.default_german_locations) | Return the default population-weighted German load-centre registry. |
 | [weather.locations.coordinates](weather.locations.coordinates.qmd#spotforecast2_safe.weather.locations.coordinates) | Extract ``(latitude, longitude)`` pairs in order. |
 | [weather.locations.weights](weather.locations.weights.qmd#spotforecast2_safe.weather.locations.weights) | Extract the raw (un-normalised) weights in order. |
+| [weather.locations.locations_for_zone](weather.locations.locations_for_zone.qmd#spotforecast2_safe.weather.locations.locations_for_zone) | Return the `WeatherLocation` objects assigned to a German TSO control zone. |
 
 ## Downloader
 
@@ -304,7 +316,11 @@ Data downloaders for external data sources (e.g. ENTSO-E).
 | [downloader.entsoe.build_zone_qc_frame](downloader.entsoe.build_zone_qc_frame.qmd#spotforecast2_safe.downloader.entsoe.build_zone_qc_frame) | Build a bottom-up QC frame from per-zone interim CSVs. |
 | [downloader.entsoe.derive_download_window](downloader.entsoe.derive_download_window.qmd#spotforecast2_safe.downloader.entsoe.derive_download_window) | Derive the ``(start_dl, end_dl)`` string pair for an ENTSO-E download. |
 | [downloader.entsoe.extract_entsoe_hourly_forecast](downloader.entsoe.extract_entsoe_hourly_forecast.qmd#spotforecast2_safe.downloader.entsoe.extract_entsoe_hourly_forecast) | Resample a sub-hourly ENTSO-E interim frame to a clean hourly series. |
+| [downloader.entsoe.SubmissionDates](downloader.entsoe.SubmissionDates.qmd#spotforecast2_safe.downloader.entsoe.SubmissionDates) | Immutable bundle of timestamps and download-window strings for one submission run. |
+| [downloader.entsoe.compute_submission_dates](downloader.entsoe.compute_submission_dates.qmd#spotforecast2_safe.downloader.entsoe.compute_submission_dates) | Compute all date bookmarks needed for one ENTSO-E submission run. |
+| [downloader.entsoe.load_interim](downloader.entsoe.load_interim.qmd#spotforecast2_safe.downloader.entsoe.load_interim) | Read the ENTSO-E interim CSV(s) written by the downloader. |
 | [downloader.resilience.download_with_fallback](downloader.resilience.download_with_fallback.qmd#spotforecast2_safe.downloader.resilience.download_with_fallback) | Download zone loads with per-zone snapshot fallback. |
+| [downloader.resilience.download_combined_with_fallback](downloader.resilience.download_combined_with_fallback.qmd#spotforecast2_safe.downloader.resilience.download_combined_with_fallback) | Download the combined DE-total load series with snapshot fallback. |
 | [downloader.resilience.DownloadResult](downloader.resilience.DownloadResult.qmd#spotforecast2_safe.downloader.resilience.DownloadResult) | Aggregate result of ``download_with_fallback``. |
 | [downloader.resilience.ZoneOutcome](downloader.resilience.ZoneOutcome.qmd#spotforecast2_safe.downloader.resilience.ZoneOutcome) | Result for one zone's download attempt. |
 | [downloader.resilience.make_store](downloader.resilience.make_store.qmd#spotforecast2_safe.downloader.resilience.make_store) | Build a ``SnapshotStore`` rooted at ``<data_home>/snapshots/``. |

@@ -1,0 +1,19 @@
+# preprocessing.coverage.SubmissionCoverage { #spotforecast2_safe.preprocessing.coverage.SubmissionCoverage }
+
+```python
+preprocessing.coverage.SubmissionCoverage(last_full_hour, first_pred, n_steps)
+```
+
+Coverage bookmarks computed by `assert_submission_coverage`.
+
+These three values are the minimal output the downstream forecasting step
+needs: where context ends, where predictions start, and how many hourly
+steps to produce.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name           | Type                                           | Description                                                                                                                                                                             |
+|----------------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| last_full_hour | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Latest hour having a complete set of intra-hour samples (and passing the value-sanity check when ``corruption_mode="authoritative"``).  This is the context end / ``end_train`` anchor. |
+| first_pred     | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | ``last_full_hour + 1 h``.  First prediction target.                                                                                                                                     |
+| n_steps        | [int](`int`)                                   | Number of hourly forecast steps from ``first_pred`` to ``last_target`` (inclusive), computed as ``(last_target - first_pred).total_seconds() / 3600 + 1``.                              |

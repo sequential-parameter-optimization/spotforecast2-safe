@@ -61,7 +61,71 @@ print(f"WeatherService at ({svc.latitude}, {svc.longitude}), use_forecast={svc.u
 
 | Name | Description |
 | --- | --- |
+| [fetch_archive](#spotforecast2_safe.weather.client.WeatherService.fetch_archive) | Fetch historical data from Archive API. |
+| [fetch_forecast](#spotforecast2_safe.weather.client.WeatherService.fetch_forecast) | Fetch forecast data from Forecast API. |
 | [get_dataframe](#spotforecast2_safe.weather.client.WeatherService.get_dataframe) | Get weather DataFrame for a specified range using best available methods. |
+
+### fetch_archive { #spotforecast2_safe.weather.client.WeatherService.fetch_archive }
+
+```python
+weather.client.WeatherService.fetch_archive(start, end, timezone='UTC')
+```
+
+Fetch historical data from Archive API.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                           | Description                            | Default    |
+|----------|------------------------------------------------|----------------------------------------|------------|
+| start    | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Start date for the historical data.    | _required_ |
+| end      | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | End date for the historical data.      | _required_ |
+| timezone | [str](`str`)                                   | Timezone for the data (default "UTC"). | `'UTC'`    |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+# Requires a live connection to archive-api.open-meteo.com.
+import pandas as pd
+from spotforecast2_safe.weather import WeatherClient
+client = WeatherClient(latitude=52.52, longitude=13.405)
+df = client.fetch_archive(
+    start=pd.Timestamp("2023-01-01", tz="UTC"),
+    end=pd.Timestamp("2023-01-02", tz="UTC"),
+)
+print(df.head())
+```
+
+### fetch_forecast { #spotforecast2_safe.weather.client.WeatherService.fetch_forecast }
+
+```python
+weather.client.WeatherService.fetch_forecast(
+    days_ahead,
+    timezone='UTC',
+    past_days=0,
+)
+```
+
+Fetch forecast data from Forecast API.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type         | Description                                                                                                                                                                                                                                                                                                                                              | Default    |
+|------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| days_ahead | [int](`int`) | Number of days ahead for the forecast.                                                                                                                                                                                                                                                                                                                   | _required_ |
+| timezone   | [str](`str`) | Timezone for the data (default "UTC").                                                                                                                                                                                                                                                                                                                   | `'UTC'`    |
+| past_days  | [int](`int`) | Recent past days to also request from the forecast endpoint via Open-Meteo's `past_days` parameter (0--92). The archive endpoint lags several days, so `past_days` lets the forecast endpoint backfill that recent window; without it the `[now - archive_lag, today]` range is fetched by neither endpoint and is later carried forward as a flat line. | `0`        |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+#| eval: false
+# Requires a live connection to api.open-meteo.com.
+from spotforecast2_safe.weather import WeatherClient
+client = WeatherClient(latitude=52.52, longitude=13.405)
+df = client.fetch_forecast(days_ahead=7)
+print(df.head())
+```
 
 ### get_dataframe { #spotforecast2_safe.weather.client.WeatherService.get_dataframe }
 

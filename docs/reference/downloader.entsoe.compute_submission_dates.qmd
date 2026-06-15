@@ -1,0 +1,62 @@
+# downloader.entsoe.compute_submission_dates { #spotforecast2_safe.downloader.entsoe.compute_submission_dates }
+
+```python
+downloader.entsoe.compute_submission_dates(
+    now,
+    *,
+    train_years,
+    start_margin_days=45,
+    data_end=None,
+)
+```
+
+Compute all date bookmarks needed for one ENTSO-E submission run.
+
+Encapsulates the ``compute_dates`` logic shared identically across
+``chronos.py``, ``team4_optuna_submit.py``, ``team4_spotoptim_submit.py``,
+and ``team4_4zones_submit.py``.  The download window
+``(start_dl, end_dl)`` is derived by delegating to
+`derive_download_window` with the same arguments, guaranteeing that the
+ENTSO-E pull window is identical for all callers that pass the same
+``train_years`` / ``start_margin_days`` / ``data_end``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                           | Description                                                                                                                                                                     | Default    |
+|-------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| now               | [pd](`pandas`).[Timestamp](`pandas.Timestamp`) | Reference wall-clock timestamp (tz-aware, typically ``pd.Timestamp.now(tz="UTC")``).  Must be a ``pd.Timestamp`` with timezone; coercion is refused to prevent clock-skew bugs. | _required_ |
+| train_years       | [int](`int`)                                   | Number of full calendar years of history the downstream model requires.  Forwarded to `derive_download_window`.                                                                 | _required_ |
+| start_margin_days | [int](`int`)                                   | Extra days prepended to the download window so lag features survive preprocessing.  Defaults to ``45``.  Forwarded to `derive_download_window`.                                 | `45`       |
+| data_end          | [str](`str`) \| None                           | Optional upper bound for the download window in ``'YYYYMMDDHHMM'`` format.  ``None`` (default) sets the end to ``today + 2 days``.  Forwarded to `derive_download_window`.      | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name            | Type                                                                      | Description                                                     |
+|-----------------|---------------------------------------------------------------------------|-----------------------------------------------------------------|
+| SubmissionDates | [SubmissionDates](`spotforecast2_safe.downloader.entsoe.SubmissionDates`) | Frozen dataclass with ``now``, ``today``,                       |
+|                 | [SubmissionDates](`spotforecast2_safe.downloader.entsoe.SubmissionDates`) | ``yesterday``, ``tomorrow``, ``last_target``, ``start_dl``, and |
+|                 | [SubmissionDates](`spotforecast2_safe.downloader.entsoe.SubmissionDates`) | ``end_dl``.                                                     |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                                                                                 |
+|--------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | If ``now`` is not a tz-aware ``pd.Timestamp``.                                                                                                              |
+|        | [ValueError](`ValueError`) | If ``train_years`` or ``start_margin_days`` violate the constraints of `derive_download_window`, or if ``data_end`` does not conform to ``'YYYYMMDDHHMM'``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.downloader.entsoe import compute_submission_dates
+
+now = pd.Timestamp("2026-06-14 08:30", tz="UTC")
+dates = compute_submission_dates(now, train_years=3)
+
+print(dates.today)       # 2026-06-14 00:00:00+00:00
+print(dates.yesterday)   # 2026-06-13 00:00:00+00:00
+print(dates.tomorrow)    # 2026-06-15 00:00:00+00:00
+print(dates.last_target) # 2026-06-15 23:00:00+00:00
+print(dates.start_dl)    # 202305010000  (3 years + 45 days back)
+print(dates.end_dl)      # 202606160000  (today + 2 days)
+```

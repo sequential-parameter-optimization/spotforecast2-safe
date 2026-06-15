@@ -1,0 +1,30 @@
+# weather.client.WeatherFetchError { #spotforecast2_safe.weather.client.WeatherFetchError }
+
+```python
+weather.client.WeatherFetchError()
+```
+
+Raised when Open-Meteo cannot be reached or returns no usable data.
+
+Distinguishes a transient external-API failure (network outage,
+rate-limit exhaustion, both the archive and forecast endpoints
+returning errors) from a real data-validity problem.  Subclasses
+`ValueError` so existing callers that catch `ValueError` keep
+working; consumers that want to react specifically to weather-API
+failures (e.g. `spotforecast2.multitask.base.BaseTask` with
+`config.on_weather_failure="skip"`) catch this class instead.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.weather.client import WeatherFetchError
+
+try:
+    raise WeatherFetchError("Archive and forecast endpoints both failed")
+except WeatherFetchError as exc:
+    print(f"Caught WeatherFetchError: {exc}")
+
+# WeatherFetchError is a subclass of ValueError
+assert issubclass(WeatherFetchError, ValueError)
+print("issubclass(WeatherFetchError, ValueError):", True)
+```

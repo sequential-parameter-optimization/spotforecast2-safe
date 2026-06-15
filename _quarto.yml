@@ -124,6 +124,8 @@ website:
                 file: docs/reference/data.fetch_data.load_timeseries.qmd
               - text: "load_timeseries_forecast"
                 file: docs/reference/data.fetch_data.load_timeseries_forecast.qmd
+              - text: "load_school_holidays_de"
+                file: docs/reference/data.fetch_data.load_school_holidays_de.qmd
               - text: "demo_loader"
                 file: docs/reference/data.demo_loader.qmd
               - text: "entsoe_loader"
@@ -145,6 +147,8 @@ website:
                 file: docs/reference/preprocessing.data_transform.qmd
               - text: "forecaster_config"
                 file: docs/reference/preprocessing.forecaster_config.qmd
+              - text: "ExogProviderError"
+                file: docs/reference/preprocessing.exog_providers.ExogProviderError.qmd
               - section: "Curate Data"
                 contents:
                   - text: "agg_and_resample_data"
@@ -181,6 +185,10 @@ website:
                     file: docs/reference/preprocessing.coverage.assert_no_interior_gaps.qmd
                   - text: "last_complete_hour"
                     file: docs/reference/preprocessing.coverage.last_complete_hour.qmd
+                  - text: "SubmissionCoverage"
+                    file: docs/reference/preprocessing.coverage.SubmissionCoverage.qmd
+                  - text: "assert_submission_coverage"
+                    file: docs/reference/preprocessing.coverage.assert_submission_coverage.qmd
               - section: "Target Corruption"
                 contents:
                   - text: "TargetCorruptionReport"
@@ -353,18 +361,28 @@ website:
             contents:
               - text: "BaseTask"
                 file: docs/reference/multitask.base.BaseTask.qmd
+              - text: "PipelineConfig"
+                file: docs/reference/multitask.base.PipelineConfig.qmd
               - text: "agg_predictor"
                 file: docs/reference/multitask.base.agg_predictor.qmd
               - text: "MultiTask"
                 file: docs/reference/multitask.multi.MultiTask.qmd
               - text: "LazyTask"
                 file: docs/reference/multitask.lazy.LazyTask.qmd
+              - text: "execute_lazy"
+                file: docs/reference/multitask.lazy.execute_lazy.qmd
               - text: "DefaultsTask"
                 file: docs/reference/multitask.defaults.DefaultsTask.qmd
+              - text: "execute_defaults"
+                file: docs/reference/multitask.defaults.execute_defaults.qmd
               - text: "PredictTask"
                 file: docs/reference/multitask.predict.PredictTask.qmd
+              - text: "execute_predict"
+                file: docs/reference/multitask.predict.execute_predict.qmd
               - text: "CleanTask"
                 file: docs/reference/multitask.clean.CleanTask.qmd
+              - text: "execute_clean"
+                file: docs/reference/multitask.clean.execute_clean.qmd
               - text: "default_lgbm_forecaster_factory"
                 file: docs/reference/multitask.factories.default_lgbm_forecaster_factory.qmd
               - section: "Guards"
@@ -381,6 +399,8 @@ website:
                     file: docs/reference/multitask.strategies.DefaultsStrategy.qmd
               - text: "run"
                 file: docs/reference/multitask.runner.run.qmd
+              - text: "run_with"
+                file: docs/reference/multitask.runner.run_with.qmd
 
           - section: "Utils"
             contents:
@@ -442,8 +462,12 @@ website:
                 file: docs/reference/weather.client.WeatherClient.qmd
               - text: "WeatherService"
                 file: docs/reference/weather.client.WeatherService.qmd
+              - text: "WeatherFetchError"
+                file: docs/reference/weather.client.WeatherFetchError.qmd
               - text: "get_weather_features"
                 file: docs/reference/weather.features.get_weather_features.qmd
+              - text: "locations_for_zone"
+                file: docs/reference/weather.locations.locations_for_zone.qmd
 
           - section: "Downloader"
             contents:
@@ -473,8 +497,16 @@ website:
                 file: docs/reference/downloader.entsoe.derive_download_window.qmd
               - text: "extract_entsoe_hourly_forecast"
                 file: docs/reference/downloader.entsoe.extract_entsoe_hourly_forecast.qmd
+              - text: "SubmissionDates"
+                file: docs/reference/downloader.entsoe.SubmissionDates.qmd
+              - text: "compute_submission_dates"
+                file: docs/reference/downloader.entsoe.compute_submission_dates.qmd
+              - text: "load_interim"
+                file: docs/reference/downloader.entsoe.load_interim.qmd
               - text: "download_with_fallback"
                 file: docs/reference/downloader.resilience.download_with_fallback.qmd
+              - text: "download_combined_with_fallback"
+                file: docs/reference/downloader.resilience.download_combined_with_fallback.qmd
               - text: "DownloadResult"
                 file: docs/reference/downloader.resilience.DownloadResult.qmd
               - text: "ZoneOutcome"
@@ -598,6 +630,9 @@ quartodoc:
   # Enable cross-package interlinks using @-style references in docstrings
   render_interlinks: true
 
+  options:
+    include_inherited: true
+
   sections:
 
     # ── Data ─────────────────────────────────────────────────────────────────
@@ -615,6 +650,7 @@ quartodoc:
         - data.fetch_data.load_timeseries_forecast
         - data.fetch_data.load_renewable_forecast
         - data.fetch_data.load_day_ahead_price
+        - data.fetch_data.load_school_holidays_de
         - data.data_classes
         - data.demo_loader
         - data.entsoe_loader
@@ -629,6 +665,8 @@ quartodoc:
         - preprocessing.coverage.assert_actual_lag_within
         - preprocessing.coverage.assert_no_interior_gaps
         - preprocessing.coverage.last_complete_hour
+        - preprocessing.coverage.SubmissionCoverage
+        - preprocessing.coverage.assert_submission_coverage
         - preprocessing.curate_data.agg_and_resample_data
         - preprocessing.curate_data.basic_ts_checks
         - preprocessing.curate_data.curate_holidays
@@ -659,6 +697,7 @@ quartodoc:
         - preprocessing.exog_providers.EnergyCrisisWindowProvider
         - preprocessing.exog_providers.build_providers
         - preprocessing.exog_providers.build_providers_from_config
+        - preprocessing.exog_providers.ExogProviderError
         - preprocessing.imputation.apply_imputation
         - preprocessing.imputation.WeightFunction
         - preprocessing.target_corruption.TargetCorruptionReport
@@ -772,12 +811,17 @@ quartodoc:
         strategies, and a one-call runner.
       contents:
         - multitask.base.BaseTask
+        - multitask.base.PipelineConfig
         - multitask.base.agg_predictor
         - multitask.multi.MultiTask
         - multitask.lazy.LazyTask
+        - multitask.lazy.execute_lazy
         - multitask.defaults.DefaultsTask
+        - multitask.defaults.execute_defaults
         - multitask.predict.PredictTask
+        - multitask.predict.execute_predict
         - multitask.clean.CleanTask
+        - multitask.clean.execute_clean
         - multitask.factories.default_lgbm_forecaster_factory
         - multitask.factories.quantile_lgbm_forecaster_factory
         - multitask.factories.predict_quantile_band
@@ -786,6 +830,7 @@ quartodoc:
         - multitask.strategies.LazyStrategy
         - multitask.strategies.DefaultsStrategy
         - multitask.runner.run
+        - multitask.runner.run_with
 
     # ── Utils ─────────────────────────────────────────────────────────────────
     - title: "Utils"
@@ -844,6 +889,7 @@ quartodoc:
       contents:
         - weather.client.WeatherClient
         - weather.client.WeatherService
+        - weather.client.WeatherFetchError
         - weather.features.get_weather_features
         - weather.derived.heating_degree_hours
         - weather.derived.cooling_degree_hours
@@ -855,6 +901,7 @@ quartodoc:
         - weather.locations.default_german_locations
         - weather.locations.coordinates
         - weather.locations.weights
+        - weather.locations.locations_for_zone
 
     # ── Downloader ────────────────────────────────────────────────────────────
     - title: "Downloader"
@@ -874,7 +921,11 @@ quartodoc:
         - downloader.entsoe.build_zone_qc_frame
         - downloader.entsoe.derive_download_window
         - downloader.entsoe.extract_entsoe_hourly_forecast
+        - downloader.entsoe.SubmissionDates
+        - downloader.entsoe.compute_submission_dates
+        - downloader.entsoe.load_interim
         - downloader.resilience.download_with_fallback
+        - downloader.resilience.download_combined_with_fallback
         - downloader.resilience.DownloadResult
         - downloader.resilience.ZoneOutcome
         - downloader.resilience.make_store
