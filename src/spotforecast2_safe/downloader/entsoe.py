@@ -87,6 +87,7 @@ import numpy as np
 import pandas as pd
 
 from spotforecast2_safe.data.fetch_data import fetch_data, get_data_home
+from spotforecast2_safe.downloader._zones import ZONE_COLUMNS, ZONE_MODEL_FILENAME
 from spotforecast2_safe.preprocessing.checking import check_y
 
 logger = logging.getLogger(__name__)
@@ -216,8 +217,7 @@ def _validate_on_unavailable(on_unavailable: str) -> None:
     """Reject unknown ``on_unavailable`` values (fail-safe contract)."""
     if on_unavailable not in ("raise", "use_existing"):
         raise ValueError(
-            f"on_unavailable must be 'raise' or 'use_existing'; "
-            f"got {on_unavailable!r}."
+            f"on_unavailable must be 'raise' or 'use_existing'; got {on_unavailable!r}."
         )
 
 
@@ -1454,8 +1454,7 @@ def download_zone_loads(
     """
     if on_zone_failure not in ("raise", "collect"):
         raise ValueError(
-            f"on_zone_failure={on_zone_failure!r} is invalid; "
-            "use 'raise' or 'collect'."
+            f"on_zone_failure={on_zone_failure!r} is invalid; use 'raise' or 'collect'."
         )
 
     # Validate start/end before entering the per-zone loop so that a bogus
@@ -1530,9 +1529,7 @@ def download_zone_loads(
                     error=None,
                     interim_path=interim_path,
                 )
-            except (
-                Exception
-            ) as exc:  # noqa: BLE001 — limited to download-layer failures after argument validation
+            except Exception as exc:  # noqa: BLE001 — limited to download-layer failures after argument validation
                 logger.warning(
                     "Zone %s (%s) download failed in collect mode: %s",
                     column,
@@ -1639,8 +1636,7 @@ def assemble_zone_loads(
         frame = frame.set_index(time_col)
         if column not in frame.columns:
             raise ValueError(
-                f"Column {column!r} missing from {path} "
-                f"(found {list(frame.columns)})."
+                f"Column {column!r} missing from {path} (found {list(frame.columns)})."
             )
         series_list.append(frame[column].rename(column))
 
@@ -1968,3 +1964,258 @@ def extract_entsoe_hourly_forecast(
         raise ValueError(f"column {column!r} has no non-NaN hourly observations")
 
     return out
+
+
+# =============================================================================
+# Submission date arithmetic
+# =============================================================================
+
+from dataclasses import dataclass as _dataclass  # noqa: E402  (post-import)
+
+
+@_dataclass(frozen=True)
+class SubmissionDates:
+    """Immutable bundle of timestamps and download-window strings for one submission run.
+
+    Every ENTSO-E submission script captures these seven values once at startup
+    (anchored to ``now``) to avoid clock-skew bugs across a multi-minute run.
+    This dataclass replaces the script-local ``Dates`` namedtuple/dataclass that
+    all four scripts define identically.
+
+    Attributes:
+        now: The reference wall-clock timestamp (tz-aware, typically UTC) as
+            captured at script startup.
+        today: Midnight of the current UTC day (``now.normalize()``).
+        yesterday: Midnight of the previous UTC day (``today - 1 day``).
+        tomorrow: Midnight of the next UTC day (``today + 1 day``).
+        last_target: Last target hour that must be covered by the submission
+            (``tomorrow + 23 h``, i.e. the last hour of tomorrow in UTC).
+        start_dl: ENTSO-E download start in ``'YYYYMMDDHHMM'`` format
+            (derived from ``derive_download_window``).
+        end_dl: ENTSO-E download end in ``'YYYYMMDDHHMM'`` format
+            (``data_end`` when supplied; otherwise ``today + 2 days``).
+    """
+
+    now: pd.Timestamp
+    today: pd.Timestamp
+    yesterday: pd.Timestamp
+    tomorrow: pd.Timestamp
+    last_target: pd.Timestamp
+    start_dl: str
+    end_dl: str
+
+
+def compute_submission_dates(
+    now: pd.Timestamp,
+    *,
+    train_years: int,
+    start_margin_days: int = 45,
+    data_end: str | None = None,
+) -> SubmissionDates:
+    """Compute all date bookmarks needed for one ENTSO-E submission run.
+
+    Encapsulates the ``compute_dates`` logic shared identically across
+    ``chronos.py``, ``team4_optuna_submit.py``, ``team4_spotoptim_submit.py``,
+    and ``team4_4zones_submit.py``.  The download window
+    ``(start_dl, end_dl)`` is derived by delegating to
+    `derive_download_window` with the same arguments, guaranteeing that the
+    ENTSO-E pull window is identical for all callers that pass the same
+    ``train_years`` / ``start_margin_days`` / ``data_end``.
+
+    Args:
+        now: Reference wall-clock timestamp (tz-aware, typically
+            ``pd.Timestamp.now(tz="UTC")``).  Must be a ``pd.Timestamp``
+            with timezone; coercion is refused to prevent clock-skew bugs.
+        train_years: Number of full calendar years of history the downstream
+            model requires.  Forwarded to `derive_download_window`.
+        start_margin_days: Extra days prepended to the download window so lag
+            features survive preprocessing.  Defaults to ``45``.  Forwarded
+            to `derive_download_window`.
+        data_end: Optional upper bound for the download window in
+            ``'YYYYMMDDHHMM'`` format.  ``None`` (default) sets the end to
+            ``today + 2 days``.  Forwarded to `derive_download_window`.
+
+    Returns:
+        SubmissionDates: Frozen dataclass with ``now``, ``today``,
+        ``yesterday``, ``tomorrow``, ``last_target``, ``start_dl``, and
+        ``end_dl``.
+
+    Raises:
+        TypeError: If ``now`` is not a tz-aware ``pd.Timestamp``.
+        ValueError: If ``train_years`` or ``start_margin_days`` violate the
+            constraints of `derive_download_window`, or if ``data_end`` does
+            not conform to ``'YYYYMMDDHHMM'``.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import compute_submission_dates
+
+        now = pd.Timestamp("2026-06-14 08:30", tz="UTC")
+        dates = compute_submission_dates(now, train_years=3)
+
+        print(dates.today)       # 2026-06-14 00:00:00+00:00
+        print(dates.yesterday)   # 2026-06-13 00:00:00+00:00
+        print(dates.tomorrow)    # 2026-06-15 00:00:00+00:00
+        print(dates.last_target) # 2026-06-15 23:00:00+00:00
+        print(dates.start_dl)    # 202305010000  (3 years + 45 days back)
+        print(dates.end_dl)      # 202606160000  (today + 2 days)
+        ```
+    """
+    # Delegate type and tz validation to derive_download_window which already
+    # enforces these constraints; this also validates train_years / start_margin_days.
+    # We call it first so that all parameter errors surface before we touch `now`.
+    start_dl, end_dl = derive_download_window(
+        now,
+        train_years=train_years,
+        start_margin_days=start_margin_days,
+        data_end=data_end,
+    )
+
+    today = now.normalize()
+    yesterday = today - pd.Timedelta(days=1)
+    tomorrow = today + pd.Timedelta(days=1)
+    last_target = tomorrow + pd.Timedelta(hours=23)
+
+    return SubmissionDates(
+        now=now,
+        today=today,
+        yesterday=yesterday,
+        tomorrow=tomorrow,
+        last_target=last_target,
+        start_dl=start_dl,
+        end_dl=end_dl,
+    )
+
+
+# =============================================================================
+# Interim-cache reader
+# =============================================================================
+
+
+def load_interim(
+    mode: str = "combined",
+    *,
+    data_home=None,
+) -> pd.DataFrame:
+    """Read the ENTSO-E interim CSV(s) written by the downloader.
+
+    This is the library-level counterpart of the inline ``load_interim()``
+    helpers that every submission script defines identically.  The two modes
+    reproduce the exact CSV-reading logic from those scripts so callers can
+    replace their local copies with a single import.
+
+    Args:
+        mode: Which interim layout to read.
+
+            ``"combined"`` (default) — reads ``<data_home>/interim/energy_load.csv``
+            (written by ``download_new_data``).  This is the single DE-total
+            series path used by chronos, optuna, and spotoptim submission
+            scripts.
+
+            ``"four_zone"`` — assembles the per-zone QC frame via
+            ``build_zone_qc_frame`` and also writes the zones-only modelling CSV
+            (``interim/energy_load_zones.csv``).  This is the normal four-zone
+            path used by team4_4zones_submit.
+
+        data_home: Root data directory.  If ``None``, resolved via
+            ``get_data_home()``.
+
+    Returns:
+        pd.DataFrame: A UTC-indexed interim frame ready for ``assert_submission_coverage``,
+        ``select_key_lags``, and ``entsoe_predictions``.  In ``"combined"`` mode the
+        frame contains at least ``Actual Load`` and ``Forecasted Load``.  In
+        ``"four_zone"`` mode the frame additionally contains the per-zone columns
+        (``load_amprion``, ``load_tennet``, ``load_transnetbw``, ``load_50hertz``).
+
+    Raises:
+        FileNotFoundError: When the required interim file(s) are missing.
+        ValueError: When ``mode`` is not ``"combined"`` or ``"four_zone"``.
+
+    Examples:
+        ```{python}
+        import os, shutil, tempfile
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import get_data_home, load_interim
+
+        tmp = tempfile.mkdtemp()
+        os.environ["SPOTFORECAST2_DATA"] = tmp
+        interim_dir = os.path.join(tmp, "interim")
+        os.makedirs(interim_dir, exist_ok=True)
+
+        idx = pd.date_range("2026-06-01", periods=48, freq="h", tz="UTC")
+        df = pd.DataFrame(
+            {"Actual Load": 40000.0, "Forecasted Load": 41000.0}, index=idx
+        )
+        df.index.name = "Time (UTC)"
+        df.to_csv(os.path.join(interim_dir, "energy_load.csv"))
+
+        frame = load_interim(mode="combined")
+        print(frame.index.tz, len(frame))
+
+        shutil.rmtree(tmp)
+        del os.environ["SPOTFORECAST2_DATA"]
+        ```
+    """
+    _logger = logging.getLogger(__name__)
+
+    if mode not in ("combined", "four_zone"):
+        raise ValueError(f"mode must be 'combined' or 'four_zone', got {mode!r}.")
+
+    interim_dir = get_data_home(data_home) / "interim"
+
+    if mode == "combined":
+        combined_csv = interim_dir / "energy_load.csv"
+        if not combined_csv.exists():
+            raise FileNotFoundError(
+                f"No interim cache at {combined_csv}; run the downloader first "
+                "(download_new_data) or drop --skip-download."
+            )
+        interim = pd.read_csv(combined_csv, index_col=0, parse_dates=True)
+        interim.index = pd.to_datetime(interim.index, utc=True)
+        _logger.info(
+            "interim (combined): %s  (%d rows, %s -> %s)",
+            combined_csv,
+            len(interim),
+            interim.index.min(),
+            interim.index.max(),
+        )
+        return interim
+
+    # --- four_zone mode ---
+    # build_zone_qc_frame is defined in the same module — no import needed.
+    # ZONE_COLUMNS and ZONE_MODEL_FILENAME are imported at module top from _zones.
+
+    try:
+        interim = build_zone_qc_frame()
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            "No per-zone interim cache found; cannot proceed without a "
+            f"successful four-zone download. Details: {exc}"
+        ) from exc
+
+    # Write the zones-only modelling CSV (build_zone_qc_frame does not do this).
+    # Contains only per-zone Actual Load columns so the bottom-up total cannot
+    # leak in as a feature.
+    zone_cols = [c for c in interim.columns if c in ZONE_COLUMNS]
+    model_csv = interim_dir / ZONE_MODEL_FILENAME
+    interim[zone_cols].rename_axis("Time (UTC)").to_csv(model_csv)
+
+    if (
+        "Forecasted Load" not in interim.columns
+        or interim["Forecasted Load"].isna().all()
+    ):
+        _logger.warning(
+            "per-zone day-ahead Forecasted Load missing for some zones; "
+            "the aggregate deviation QC and the ENTSO-E baseline degrade."
+        )
+
+    _logger.info(
+        "interim (four_zone): %s  (%d rows, %s -> %s; zones=%s)",
+        model_csv,
+        len(interim),
+        interim.index.min(),
+        interim.index.max(),
+        ZONE_COLUMNS,
+    )
+    return interim

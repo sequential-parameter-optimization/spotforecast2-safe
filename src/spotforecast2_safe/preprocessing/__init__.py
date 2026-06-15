@@ -4,9 +4,11 @@
 from ._binner import QuantileBinner
 from ._differentiator import TimeSeriesDifferentiator
 from .coverage import (
+    SubmissionCoverage,
     assert_actual_lag_within,
     assert_frontier_fresh,
     assert_no_interior_gaps,
+    assert_submission_coverage,
     last_complete_hour,
 )
 from .curate_data import (
@@ -54,9 +56,11 @@ from .target_corruption import (
 # No recursive models here anymore
 
 __all__ = [
+    "SubmissionCoverage",
     "assert_frontier_fresh",
     "assert_actual_lag_within",
     "assert_no_interior_gaps",
+    "assert_submission_coverage",
     "last_complete_hour",
     "remove_duplicate_timestamps",
     "get_start_end",
