@@ -72,7 +72,47 @@ assert fold["test_end"].iloc[0] == 120
 
 | Name | Description |
 | --- | --- |
+| [set_params](#spotforecast2_safe.splitter.split_one_step.OneStepAheadFold.set_params) | Set the parameters of the Fold object. Before overwriting the current |
 | [split](#spotforecast2_safe.splitter.split_one_step.OneStepAheadFold.split) | Split the time series data into train and test folds. |
+
+##### set_params { #spotforecast2_safe.splitter.split_one_step.OneStepAheadFold.set_params }
+
+```python
+splitter.split_one_step.OneStepAheadFold.set_params(params)
+```
+
+Set the parameters of the Fold object. Before overwriting the current
+parameters, the input parameters are validated to ensure correctness.
+
+###### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type           | Description                            | Default    |
+|--------|----------------|----------------------------------------|------------|
+| params | [dict](`dict`) | Dictionary with the parameters to set. | _required_ |
+
+###### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.splitter import TimeSeriesFold
+
+cv = TimeSeriesFold(steps=1)
+cv.set_params({
+    "steps": 2,
+    "initial_train_size": 10,
+    "fold_stride": 2,
+    "window_size": 5,
+    "differentiation": 1,
+    "refit": True,
+    "fixed_train_size": False,
+    "gap": 1,
+    "skip_folds": 2,
+    "allow_incomplete_fold": False,
+    "return_all_indexes": True,
+    "verbose": False,
+})
+assert cv.initial_train_size == 10
+assert cv.window_size == 5
+```
 
 ##### split { #spotforecast2_safe.splitter.split_one_step.OneStepAheadFold.split }
 

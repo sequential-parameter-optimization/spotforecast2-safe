@@ -1,0 +1,129 @@
+# multitask.runner.run_with { #spotforecast2_safe.multitask.runner.run_with }
+
+```python
+multitask.runner.run_with(
+    multitask_cls,
+    all_tasks,
+    unknown_task_message=None,
+    config=None,
+    task='lazy',
+    dataframe=None,
+    data_test=None,
+    project_name='test_project',
+    cache_home=None,
+    plot_with_outliers=False,
+    show=False,
+    show_progress=False,
+    dry_run=False,
+    log_level=40,
+    **overrides,
+)
+```
+
+Parameterized core of the MultiTask pipeline orchestration.
+
+This is the reusable seam that allows the sibling ``spotforecast2``
+package to bind an extended task class and a wider task set without
+duplicating the orchestration body.  All caller-visible behaviour is
+identical to ``run()``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                 | Type                                                                                                                                    | Description                                                                                                                                                                                                                                                  | Default          |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| multitask_cls        | [type](`type`)                                                                                                                          | The ``MultiTask``-compatible class to instantiate. ``spotforecast2-safe`` passes its own ``MultiTask``; the sibling package passes its subclass that adds tuning tasks.                                                                                      | _required_       |
+| all_tasks            | [FrozenSet](`typing.FrozenSet`)\[[str](`str`)\]                                                                                         | The complete frozenset of permitted task names for this binding.  ``run()`` passes ``_ALL_TASKS``; an extended binding includes additional task names (e.g. ``"optuna"``).                                                                                   | _required_       |
+| unknown_task_message | [Optional](`typing.Optional`)\[[Callable](`typing.Callable`)\[\[[str](`str`), [List](`typing.List`)\[[str](`str`)\]\], [str](`str`)\]\] | Optional callable ``(task, sorted_tasks) -> str`` that produces the ``ValueError`` message when ``task`` is not in ``all_tasks``.  When ``None``, a default message mentioning that auto-tuning tasks require the ``spotforecast2`` sibling package is used. | `None`           |
+| config               | [Optional](`typing.Optional`)\[[PipelineConfig](`spotforecast2_safe.multitask.base.PipelineConfig`)\]                                   | A ``PipelineConfig``-conforming object (typically ``ConfigMulti``).  When ``None``, a fresh ``ConfigMulti()`` is constructed with default fields.                                                                                                            | `None`           |
+| task                 | [str](`str`)                                                                                                                            | Pipeline mode.  Must be a member of ``all_tasks``. Defaults to ``"lazy"``.                                                                                                                                                                                   | `'lazy'`         |
+| dataframe            | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                                                         | Input time-series data.  Required for pipeline tasks; optional for ``"clean"``.                                                                                                                                                                              | `None`           |
+| data_test            | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\]                                                         | Ground-truth DataFrame covering the prediction horizon. Optional.                                                                                                                                                                                            | `None`           |
+| project_name         | [str](`str`)                                                                                                                            | Active-dataset identifier.  Sets ``config.data_frame_name``.                                                                                                                                                                                                 | `'test_project'` |
+| cache_home           | [Optional](`typing.Optional`)\[[str](`str`)\]                                                                                           | Cache directory override.  When ``None``, ``get_cache_home()`` is called to resolve the default.                                                                                                                                                             | `None`           |
+| plot_with_outliers   | [bool](`bool`)                                                                                                                          | When ``True``, calls ``mt.plot_with_outliers()`` between detect_outliers and impute.  Raises ``NotImplementedError`` in ``spotforecast2-safe``.                                                                                                              | `False`          |
+| show                 | [bool](`bool`)                                                                                                                          | Forwarded to ``mt.run(show=show)``.                                                                                                                                                                                                                          | `False`          |
+| show_progress        | [bool](`bool`)                                                                                                                          | Forwarded to ``multitask_cls`` constructor.                                                                                                                                                                                                                  | `False`          |
+| dry_run              | [bool](`bool`)                                                                                                                          | Forwarded to ``multitask_cls`` constructor.                                                                                                                                                                                                                  | `False`          |
+| log_level            | [int](`int`)                                                                                                                            | Logging level.  Defaults to 40 (ERROR).                                                                                                                                                                                                                      | `40`             |
+| **overrides          | [Any](`typing.Any`)                                                                                                                     | Forwarded to the ``multitask_cls`` constructor, which applies them via ``config.set_params(**overrides)`` in ``BaseTask.__init__``.  Mutates the caller's config object.                                                                                     | `{}`             |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                       |
+|--------|------------------------------------------------|-------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | DataFrame whose index is the forecast horizon timestamps and      |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | whose single column ``"forecast"`` contains the aggregated        |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | predicted values.  For the ``"clean"`` task an empty DataFrame is |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | returned.                                                         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                   |
+|--------|----------------------------|-----------------------------------------------|
+|        | [ValueError](`ValueError`) | If ``task`` is not a member of ``all_tasks``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+Run a lazy forecast via the low-level ``run_with`` seam, passing
+``MultiTask`` and the safe-package task set directly:
+
+```{python}
+import warnings
+import tempfile
+import pandas as pd
+warnings.filterwarnings("ignore")
+
+from spotforecast2_safe.multitask.runner import run_with, _ALL_TASKS
+from spotforecast2_safe.multitask.multi import MultiTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+from spotforecast2_safe.data.fetch_data import fetch_data, get_package_data_home
+
+data_home = get_package_data_home()
+df = fetch_data(filename=str(data_home / "demo02.csv"))
+cache_dir = tempfile.mkdtemp()
+
+cfg = ConfigMulti(
+    train_size=pd.Timedelta(days=30),
+    predict_size=6,
+    imputation_method="weighted",
+    use_exogenous_features=False,
+    auto_save_models=False,
+    targets=["A"],
+    number_folds=2,
+    verbose=False,
+)
+
+forecast = run_with(
+    multitask_cls=MultiTask,
+    all_tasks=_ALL_TASKS,
+    config=cfg,
+    task="lazy",
+    dataframe=df,
+    project_name="demo02_runner",
+    cache_home=cache_dir,
+    show=False,
+    show_progress=False,
+    log_level=40,
+)
+print(forecast)
+assert isinstance(forecast, pd.DataFrame)
+assert "forecast" in forecast.columns
+assert len(forecast) == 6
+```
+
+Passing an unsupported task name raises a ``ValueError`` with a
+descriptive message pointing to the sibling package:
+
+```{python}
+from spotforecast2_safe.multitask.runner import run_with, _ALL_TASKS
+from spotforecast2_safe.multitask.multi import MultiTask
+
+try:
+    run_with(
+        multitask_cls=MultiTask,
+        all_tasks=_ALL_TASKS,
+        task="optuna",
+    )
+except ValueError as exc:
+    print(exc)
+```

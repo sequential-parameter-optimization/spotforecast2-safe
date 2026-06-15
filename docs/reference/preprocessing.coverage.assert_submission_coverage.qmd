@@ -1,0 +1,126 @@
+# preprocessing.coverage.assert_submission_coverage { #spotforecast2_safe.preprocessing.coverage.assert_submission_coverage }
+
+```python
+preprocessing.coverage.assert_submission_coverage(
+    interim,
+    dates,
+    *,
+    fallback,
+    corruption_mode='preview',
+    deviation_ref=None,
+    mode='combined',
+    max_actual_lag_hours=36,
+    gap_scan_days=28,
+    max_actual_gap_hours=12,
+    corruption_policy='truncate',
+    range_mw=15000,
+    step_mw=13000,
+    qc_window_days=14,
+    deviation_mw=None,
+    deviation_slots=3,
+)
+```
+
+Orchestrate all operational coverage guards for one submission run.
+
+Encapsulates the ``assert_coverage`` function shared (with minor
+divergences) across all four ENTSO-E submission scripts, parameterized so
+callers can select the path they need.
+
+The four guards run in order:
+
+1. **Frontier freshness** (`assert_frontier_fresh`): the index must reach
+   at least ``today - 1 h`` (``dates.today - pd.Timedelta(hours=1)``).
+2. **Actual-load lag** (`assert_actual_lag_within`): the last non-NaN
+   ``Actual Load`` must be within ``max_actual_lag_hours`` of ``now``.
+3. **Interior-gap scan** (`assert_no_interior_gaps`): no consecutive gap
+   wider than ``max_actual_gap_hours`` h in the recent
+   ``gap_scan_days``-day window.
+4. **Frontier completeness** (`last_complete_hour`): only an hour with a
+   full set of intra-hour samples may anchor the context.
+
+After guard 4 an optional value-sanity check is applied:
+
+- ``corruption_mode="preview"`` (default, used by team4_optuna_submit,
+  team4_spotoptim_submit, and team4_4zones_submit): runs
+  `apply_target_corruption_policy` as a forward preview only; logs the
+  outcome but does **not** retract ``last_full_hour`` — the authoritative
+  retraction happens inside ``prepare_data`` downstream.
+- ``corruption_mode="authoritative"`` (used by chronos, which has no
+  ``prepare_data`` downstream): if the QC report fires, retracts
+  ``last_full_hour`` to ``first_flagged_hour - 1 h`` in-place before
+  computing ``first_pred`` and ``n_steps``.
+
+``deviation_ref`` must be a column name present in ``interim`` when the
+deviation rule is active; pass ``None`` to skip the deviation check
+(``deviation_mw`` is set to ``0`` internally, which disables it).
+
+The fallback gate is applied after guard 4 + QC:
+
+- When ``fallback=True`` (cache was restored), ``last_full_hour`` must be
+  ``>= dates.yesterday + 23 h`` ("yesterday 23:00 UTC"); a stale cache
+  raises `CoverageError`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                 | Type                                           | Description                                                                                                                                                                                                                                                            | Default      |
+|----------------------|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| interim              | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | UTC-indexed interim DataFrame containing at least ``"Actual Load"``.  Must be the frame returned by `load_interim`.                                                                                                                                                    | _required_   |
+| dates                | \'Any\'                                        | Submission date bookmarks (see `SubmissionDates`).  Provides ``now``, ``today``, ``yesterday``, and ``last_target``.                                                                                                                                                   | _required_   |
+| fallback             | [bool](`bool`)                                 | ``True`` when the download used a snapshot (i.e. the ``DownloadResult.fallback_gate`` of the preceding call to `download_with_fallback` or `download_combined_with_fallback` is ``True``).  Triggers the stricter D-1 23:00 freshness gate.                            | _required_   |
+| corruption_mode      | [str](`str`)                                   | ``"preview"`` (default) or ``"authoritative"``. See above for semantics.                                                                                                                                                                                               | `'preview'`  |
+| deviation_ref        | [str](`str`) \| None                           | Column name to use as the deviation reference for the value-sanity check.  ``None`` disables the deviation rule.                                                                                                                                                       | `None`       |
+| mode                 | [str](`str`)                                   | ``"combined"`` (default) or ``"four_zone"``.  Currently affects only logging labels; future versions may use it to select per-zone QC paths.                                                                                                                           | `'combined'` |
+| max_actual_lag_hours | [int](`int`)                                   | Maximum acceptable age of the last published Actual Load observation, in hours.  Defaults to ``36``.                                                                                                                                                                   | `36`         |
+| gap_scan_days        | [int](`int`)                                   | How many days back to scan for interior gaps. Defaults to ``28``.                                                                                                                                                                                                      | `28`         |
+| max_actual_gap_hours | [int](`int`)                                   | Maximum acceptable consecutive index difference inside the scan window, in hours.  Defaults to ``12``.                                                                                                                                                                 | `12`         |
+| corruption_policy    | [str](`str`)                                   | Policy forwarded to `apply_target_corruption_policy` for the value-sanity check (e.g. ``"truncate"`` or ``"abort"``). Defaults to ``"truncate"``.                                                                                                                      | `'truncate'` |
+| range_mw             | [float](`float`)                               | Intra-hour range threshold (MW) for the value-sanity QC. Defaults to ``15_000``.  The ENTSO-E submission scripts pass their own tuned value (``8_000``).                                                                                                               | `15000`      |
+| step_mw              | [float](`float`)                               | Adjacent-step threshold (MW) for the value-sanity QC. Defaults to ``13_000`` (scripts pass ``6_000``).                                                                                                                                                                 | `13000`      |
+| qc_window_days       | [int](`int`)                                   | Scan window (days) for the value-sanity QC.  Defaults to ``14`` (scripts pass ``3``).                                                                                                                                                                                  | `14`         |
+| deviation_mw         | [float](`float`) \| None                       | Deviation-rule magnitude (MW).  ``None`` (default) keeps the legacy behaviour — `MAX_DEVIATION_MW_DEFAULT` when a ``deviation_ref`` is given, else ``0`` (rule disabled).  An explicit value is honoured only when ``deviation_ref`` is set (scripts pass ``11_000``). | `None`       |
+| deviation_slots      | [int](`int`)                                   | Minimum number of flagged deviation slots before the rule fires.  Defaults to ``3`` (scripts pass ``1``).                                                                                                                                                              | `3`          |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name               | Type                                                                                 | Description                               |
+|--------------------|--------------------------------------------------------------------------------------|-------------------------------------------|
+| SubmissionCoverage | [SubmissionCoverage](`spotforecast2_safe.preprocessing.coverage.SubmissionCoverage`) | Frozen dataclass with ``last_full_hour``, |
+|                    | [SubmissionCoverage](`spotforecast2_safe.preprocessing.coverage.SubmissionCoverage`) | ``first_pred``, and ``n_steps``.          |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                           | Description                                                                                                                                               |
+|--------|----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [CoverageError](`spotforecast2_safe.exceptions.CoverageError`) | On any guard violation (frontier stale, actual too old, interior gap, partial frontier, fallback gate, or value-sanity abort when policy is ``"abort"``). |
+|        | [ValueError](`ValueError`)                                     | If ``corruption_mode`` is not ``"preview"`` or ``"authoritative"``.                                                                                       |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.downloader.entsoe import (
+    SubmissionDates,
+    compute_submission_dates,
+)
+from spotforecast2_safe.preprocessing.coverage import assert_submission_coverage
+
+# Build a synthetic hourly combined interim frame.
+now = pd.Timestamp("2026-06-14 10:00", tz="UTC")
+idx = pd.date_range(
+    "2026-06-10 00:00", "2026-06-14 09:00", freq="h", tz="UTC"
+)
+interim = pd.DataFrame(
+    {
+        "Actual Load": 40000.0,
+        "Forecasted Load": 41000.0,
+    },
+    index=idx,
+)
+
+dates = compute_submission_dates(now, train_years=3)
+cov = assert_submission_coverage(interim, dates, fallback=False)
+print(cov.last_full_hour)  # 2026-06-14 09:00:00+00:00
+print(cov.first_pred)      # 2026-06-14 10:00:00+00:00
+print(cov.n_steps)         # hours from 10:00 to tomorrow 23:00
+```

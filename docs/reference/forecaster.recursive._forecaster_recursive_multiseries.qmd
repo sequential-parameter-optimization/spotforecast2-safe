@@ -160,6 +160,7 @@ assert set(predictions["level"].unique()) == {"A", "B"}
 | [create_train_X_y](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.create_train_X_y) | Create training matrices from multiple time series and exogenous variables. |
 | [fit](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.fit) | Training Forecaster. |
 | [get_feature_importances](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.get_feature_importances) | Return feature importances of the estimator. |
+| [get_tags](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.get_tags) | Return the tags that characterize the behavior of the forecaster. |
 | [predict](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.predict) | Predict n steps ahead. |
 | [predict_bootstrapping](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.predict_bootstrapping) | Generate multiple forecasting predictions using a bootstrapping process. |
 | [predict_dist](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.predict_dist) | Fit a given probability distribution for each step. |
@@ -171,6 +172,7 @@ assert set(predictions["level"].unique()) == {"A", "B"}
 | [set_out_sample_residuals](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.set_out_sample_residuals) | Set new values to the attribute `out_sample_residuals_`. |
 | [set_params](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.set_params) | Set new values to the parameters of the scikit-learn model. |
 | [set_window_features](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.set_window_features) | Set new value to the attribute `window_features`. |
+| [summary](#spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.summary) | Show forecaster information. |
 
 ##### create_predict_X { #spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.create_predict_X }
 
@@ -477,6 +479,32 @@ assert "feature" in importances.columns
 assert "importance" in importances.columns
 assert abs(importances["importance"].sum() - 1.0) < 1e-10
 assert len(importances) == len(forecaster.X_train_features_names_out_)
+```
+
+##### get_tags { #spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.get_tags }
+
+```python
+forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.get_tags(
+)
+```
+
+Return the tags that characterize the behavior of the forecaster.
+
+###### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                | Description                                                           |
+|--------|-----------------------------------------------------|-----------------------------------------------------------------------|
+|        | [dict](`dict`)\[[str](`str`), [Any](`typing.Any`)\] | Dictionary with forecaster tags describing behavior and capabilities. |
+
+###### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+tags = forecaster.get_tags()
+print(tags['forecaster_task'])
 ```
 
 ##### predict { #spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.predict }
@@ -1132,4 +1160,29 @@ forecaster.set_window_features(RollingFeatures(stats="mean", window_sizes=4))
 print("window_features after:", forecaster.window_features_names)
 assert forecaster.window_features is not None
 assert "roll_mean_4" in forecaster.window_features_names
+```
+
+##### summary { #spotforecast2_safe.forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.summary }
+
+```python
+forecaster.recursive._forecaster_recursive_multiseries.ForecasterRecursiveMultiSeries.summary(
+)
+```
+
+Show forecaster information.
+
+###### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description   |
+|--------|--------|---------------|
+|        | None   | None          |
+
+###### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+forecaster.summary()
 ```

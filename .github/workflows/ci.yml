@@ -263,3 +263,6 @@ jobs:
             echo "::error::docs/reference is out of sync with quartodoc. Run 'uv run python docs/quartodoc_build.py && uv run quartodoc interlinks' locally and commit the result."
             exit 1
           fi
+
+      - name: Fail if any public API symbol is undocumented
+        run: uv run python docs/check_api_coverage.py

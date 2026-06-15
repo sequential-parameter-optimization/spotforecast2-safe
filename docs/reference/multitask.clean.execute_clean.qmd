@@ -1,0 +1,52 @@
+# multitask.clean.execute_clean { #spotforecast2_safe.multitask.clean.execute_clean }
+
+```python
+multitask.clean.execute_clean(task, cache_home=None, dry_run=False)
+```
+
+Remove all cached data from the pipeline cache directory.
+
+Deletes the entire target directory (models, tuning results, and any
+other artefacts).  When the directory does not exist the function
+returns without error.  When ``dry_run`` is ``True`` nothing is
+removed but details of what would be deleted are logged and returned.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                                                     | Description                                                                                                          | Default    |
+|------------|----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|------------|
+| task       | [BaseTask](`spotforecast2_safe.multitask.base.BaseTask`) | A ``BaseTask`` (or subclass) instance.  Used to resolve the default cache directory when ``cache_home`` is ``None``. | _required_ |
+| cache_home | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]  | Override the directory to clean.  ``None`` uses ``get_cache_home(task.config.cache_home)``.                          | `None`     |
+| dry_run    | [bool](`bool`)                                           | If ``True``, report what would be deleted without actually removing anything.                                        | `False`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                       | Description                                                                                                                                                                                                                                                                                                                     |
+|--------|------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [Dict](`typing.Dict`)\[[str](`str`), [Any](`typing.Any`)\] | Dict with keys: status: ``"success"`` after successful removal, ``"dry_run"``     when ``dry_run`` is ``True``, or ``"empty"`` when the     directory did not exist. cache_dir: The Path of the directory targeted for cleaning. deleted_items: Sorted list of top-level item names that were     (or would have been) removed. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                           | Description                                                                                         |
+|--------|--------------------------------|-----------------------------------------------------------------------------------------------------|
+|        | [RuntimeError](`RuntimeError`) | If the directory exists but cannot be removed due to a permissions error or other OS-level failure. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import tempfile
+from pathlib import Path
+from spotforecast2_safe.multitask import CleanTask
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+
+with tempfile.TemporaryDirectory() as tmp:
+    cache = Path(tmp) / "sf2_cache"
+    cache.mkdir()
+    (cache / "models").mkdir()
+    (cache / "tuning_results").mkdir()
+    cfg = ConfigMulti(cache_home=cache)
+    task = CleanTask(cfg)
+    result = execute_clean(task, dry_run=True)
+    print(result["status"])
+    print(sorted(result["deleted_items"]))
+```

@@ -1,0 +1,25 @@
+# preprocessing.exog_providers.ExogProviderError { #spotforecast2_safe.preprocessing.exog_providers.ExogProviderError }
+
+```python
+preprocessing.exog_providers.ExogProviderError()
+```
+
+A provider could not produce features covering the requested index.
+
+Raised when the backing data is missing, malformed, or does not cover every
+requested timestamp. ``ExogBuilder`` translates this into either a hard
+failure or a skipped provider depending on its ``on_provider_failure``
+policy, so the error is the single fail-safe signal for "this exogenous
+input is unavailable".
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.preprocessing.exog_providers import ExogProviderError
+
+try:
+    raise ExogProviderError("my_provider: data not found.")
+except ExogProviderError as exc:
+    print(type(exc).__name__, str(exc))
+assert issubclass(ExogProviderError, RuntimeError)
+```
