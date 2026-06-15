@@ -3,6 +3,8 @@
 
 from . import resilience
 from .entsoe import (
+    SubmissionDates,
+    compute_submission_dates,
     download_new_data,
     find_missing_intervals,
     merge_build_manual,
@@ -10,6 +12,8 @@ from .entsoe import (
 )
 
 __all__ = [
+    "SubmissionDates",
+    "compute_submission_dates",
     "download_new_data",
     "find_missing_intervals",
     "merge_build_manual",

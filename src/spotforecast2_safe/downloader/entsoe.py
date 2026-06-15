@@ -1968,3 +1968,122 @@ def extract_entsoe_hourly_forecast(
         raise ValueError(f"column {column!r} has no non-NaN hourly observations")
 
     return out
+
+
+# =============================================================================
+# Submission date arithmetic
+# =============================================================================
+
+from dataclasses import dataclass as _dataclass  # noqa: E402  (post-import)
+
+
+@_dataclass(frozen=True)
+class SubmissionDates:
+    """Immutable bundle of timestamps and download-window strings for one submission run.
+
+    Every ENTSO-E submission script captures these seven values once at startup
+    (anchored to ``now``) to avoid clock-skew bugs across a multi-minute run.
+    This dataclass replaces the script-local ``Dates`` namedtuple/dataclass that
+    all four scripts define identically.
+
+    Attributes:
+        now: The reference wall-clock timestamp (tz-aware, typically UTC) as
+            captured at script startup.
+        today: Midnight of the current UTC day (``now.normalize()``).
+        yesterday: Midnight of the previous UTC day (``today - 1 day``).
+        tomorrow: Midnight of the next UTC day (``today + 1 day``).
+        last_target: Last target hour that must be covered by the submission
+            (``tomorrow + 23 h``, i.e. the last hour of tomorrow in UTC).
+        start_dl: ENTSO-E download start in ``'YYYYMMDDHHMM'`` format
+            (derived from ``derive_download_window``).
+        end_dl: ENTSO-E download end in ``'YYYYMMDDHHMM'`` format
+            (``data_end`` when supplied; otherwise ``today + 2 days``).
+    """
+
+    now: pd.Timestamp
+    today: pd.Timestamp
+    yesterday: pd.Timestamp
+    tomorrow: pd.Timestamp
+    last_target: pd.Timestamp
+    start_dl: str
+    end_dl: str
+
+
+def compute_submission_dates(
+    now: pd.Timestamp,
+    *,
+    train_years: int,
+    start_margin_days: int = 45,
+    data_end: str | None = None,
+) -> SubmissionDates:
+    """Compute all date bookmarks needed for one ENTSO-E submission run.
+
+    Encapsulates the ``compute_dates`` logic shared identically across
+    ``chronos.py``, ``team4_optuna_submit.py``, ``team4_spotoptim_submit.py``,
+    and ``team4_4zones_submit.py``.  The download window
+    ``(start_dl, end_dl)`` is derived by delegating to
+    `derive_download_window` with the same arguments, guaranteeing that the
+    ENTSO-E pull window is identical for all callers that pass the same
+    ``train_years`` / ``start_margin_days`` / ``data_end``.
+
+    Args:
+        now: Reference wall-clock timestamp (tz-aware, typically
+            ``pd.Timestamp.now(tz="UTC")``).  Must be a ``pd.Timestamp``
+            with timezone; coercion is refused to prevent clock-skew bugs.
+        train_years: Number of full calendar years of history the downstream
+            model requires.  Forwarded to `derive_download_window`.
+        start_margin_days: Extra days prepended to the download window so lag
+            features survive preprocessing.  Defaults to ``45``.  Forwarded
+            to `derive_download_window`.
+        data_end: Optional upper bound for the download window in
+            ``'YYYYMMDDHHMM'`` format.  ``None`` (default) sets the end to
+            ``today + 2 days``.  Forwarded to `derive_download_window`.
+
+    Returns:
+        SubmissionDates: Frozen dataclass with ``now``, ``today``,
+        ``yesterday``, ``tomorrow``, ``last_target``, ``start_dl``, and
+        ``end_dl``.
+
+    Raises:
+        TypeError: If ``now`` is not a tz-aware ``pd.Timestamp``.
+        ValueError: If ``train_years`` or ``start_margin_days`` violate the
+            constraints of `derive_download_window`, or if ``data_end`` does
+            not conform to ``'YYYYMMDDHHMM'``.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import compute_submission_dates
+
+        now = pd.Timestamp("2026-06-14 08:30", tz="UTC")
+        dates = compute_submission_dates(now, train_years=3)
+
+        print(dates.today)       # 2026-06-14 00:00:00+00:00
+        print(dates.yesterday)   # 2026-06-13 00:00:00+00:00
+        print(dates.tomorrow)    # 2026-06-15 00:00:00+00:00
+        print(dates.last_target) # 2026-06-15 23:00:00+00:00
+        print(dates.start_dl)    # 202305010000  (3 years + 45 days back)
+        print(dates.end_dl)      # 202606160000  (today + 2 days)
+        ```
+    """
+    today = now.normalize()
+    yesterday = today - pd.Timedelta(days=1)
+    tomorrow = today + pd.Timedelta(days=1)
+    last_target = tomorrow + pd.Timedelta(hours=23)
+
+    start_dl, end_dl = derive_download_window(
+        now,
+        train_years=train_years,
+        start_margin_days=start_margin_days,
+        data_end=data_end,
+    )
+
+    return SubmissionDates(
+        now=now,
+        today=today,
+        yesterday=yesterday,
+        tomorrow=tomorrow,
+        last_target=last_target,
+        start_dl=start_dl,
+        end_dl=end_dl,
+    )
