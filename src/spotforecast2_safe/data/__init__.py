@@ -13,6 +13,7 @@ from spotforecast2_safe.data.fetch_data import (
     fetch_weather_data,
     get_cache_home,
     get_data_home,
+    load_interim,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "get_cache_home",
     "get_data_home",
     "load_actual_combined",
+    "load_interim",
 ]
