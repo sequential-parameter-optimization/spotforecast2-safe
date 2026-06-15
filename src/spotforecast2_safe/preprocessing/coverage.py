@@ -22,6 +22,7 @@ side-effects; it raises `ValueError` on invalid input.
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
 import pandas as pd
 
@@ -311,3 +312,275 @@ def last_complete_hour(
             f"{sph} sample(s)."
         )
     return complete.index.max()
+
+
+# =============================================================================
+# Orchestrated submission guard
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class SubmissionCoverage:
+    """Coverage bookmarks computed by `assert_submission_coverage`.
+
+    These three values are the minimal output the downstream forecasting step
+    needs: where context ends, where predictions start, and how many hourly
+    steps to produce.
+
+    Attributes:
+        last_full_hour: Latest hour having a complete set of intra-hour
+            samples (and passing the value-sanity check when
+            ``corruption_mode="authoritative"``).  This is the context end /
+            ``end_train`` anchor.
+        first_pred: ``last_full_hour + 1 h``.  First prediction target.
+        n_steps: Number of hourly forecast steps from ``first_pred`` to
+            ``last_target`` (inclusive), computed as
+            ``(last_target - first_pred).total_seconds() / 3600 + 1``.
+    """
+
+    last_full_hour: pd.Timestamp
+    first_pred: pd.Timestamp
+    n_steps: int
+
+
+def assert_submission_coverage(
+    interim: pd.DataFrame,
+    dates: "spotforecast2_safe.downloader.entsoe.SubmissionDates",  # type: ignore[name-defined]
+    *,
+    fallback: bool,
+    corruption_mode: str = "preview",
+    deviation_ref: str | None = None,
+    mode: str = "combined",
+    max_actual_lag_hours: int = 36,
+    gap_scan_days: int = 28,
+    max_actual_gap_hours: int = 12,
+) -> SubmissionCoverage:
+    """Orchestrate all operational coverage guards for one submission run.
+
+    Encapsulates the ``assert_coverage`` function shared (with minor
+    divergences) across all four ENTSO-E submission scripts, parameterized so
+    callers can select the path they need.
+
+    The four guards run in order:
+
+    1. **Frontier freshness** (`assert_frontier_fresh`): the index must reach
+       at least ``today - 1 h`` (``dates.today - pd.Timedelta(hours=1)``).
+    2. **Actual-load lag** (`assert_actual_lag_within`): the last non-NaN
+       ``Actual Load`` must be within ``max_actual_lag_hours`` of ``now``.
+    3. **Interior-gap scan** (`assert_no_interior_gaps`): no consecutive gap
+       wider than ``max_actual_gap_hours`` h in the recent
+       ``gap_scan_days``-day window.
+    4. **Frontier completeness** (`last_complete_hour`): only an hour with a
+       full set of intra-hour samples may anchor the context.
+
+    After guard 4 an optional value-sanity check is applied:
+
+    - ``corruption_mode="preview"`` (default, used by team4_optuna_submit,
+      team4_spotoptim_submit, and team4_4zones_submit): runs
+      `apply_target_corruption_policy` as a forward preview only; logs the
+      outcome but does **not** retract ``last_full_hour`` — the authoritative
+      retraction happens inside ``prepare_data`` downstream.
+    - ``corruption_mode="authoritative"`` (used by chronos, which has no
+      ``prepare_data`` downstream): if the QC report fires, retracts
+      ``last_full_hour`` to ``first_flagged_hour - 1 h`` in-place before
+      computing ``first_pred`` and ``n_steps``.
+
+    ``deviation_ref`` must be a column name present in ``interim`` when the
+    deviation rule is active; pass ``None`` to skip the deviation check
+    (``deviation_mw`` is set to ``0`` internally, which disables it).
+
+    The fallback gate is applied after guard 4 + QC:
+
+    - When ``fallback=True`` (cache was restored), ``last_full_hour`` must be
+      ``>= dates.yesterday + 23 h`` ("yesterday 23:00 UTC"); a stale cache
+      raises `CoverageError`.
+
+    Args:
+        interim: UTC-indexed interim DataFrame containing at least
+            ``"Actual Load"``.  Must be the frame returned by `load_interim`.
+        dates: Submission date bookmarks (see `SubmissionDates`).  Provides
+            ``now``, ``today``, ``yesterday``, and ``last_target``.
+        fallback: ``True`` when the download used a snapshot (i.e. the
+            ``DownloadResult.fallback_gate`` of the preceding call to
+            `download_with_fallback` or `download_combined_with_fallback`
+            is ``True``).  Triggers the stricter D-1 23:00 freshness gate.
+        corruption_mode: ``"preview"`` (default) or ``"authoritative"``.
+            See above for semantics.
+        deviation_ref: Column name to use as the deviation reference for the
+            value-sanity check.  ``None`` disables the deviation rule.
+        mode: ``"combined"`` (default) or ``"four_zone"``.  Currently affects
+            only logging labels; future versions may use it to select
+            per-zone QC paths.
+        max_actual_lag_hours: Maximum acceptable age of the last published
+            Actual Load observation, in hours.  Defaults to ``36``.
+        gap_scan_days: How many days back to scan for interior gaps.
+            Defaults to ``28``.
+        max_actual_gap_hours: Maximum acceptable consecutive index difference
+            inside the scan window, in hours.  Defaults to ``12``.
+
+    Returns:
+        SubmissionCoverage: Frozen dataclass with ``last_full_hour``,
+        ``first_pred``, and ``n_steps``.
+
+    Raises:
+        CoverageError: On any guard violation (frontier stale, actual too
+            old, interior gap, partial frontier, fallback gate, or value-sanity
+            abort when policy is ``"abort"``).
+        ValueError: If ``corruption_mode`` is not ``"preview"`` or
+            ``"authoritative"``.
+
+    Examples:
+        ```{python}
+        import pandas as pd
+        from spotforecast2_safe.downloader.entsoe import (
+            SubmissionDates,
+            compute_submission_dates,
+        )
+        from spotforecast2_safe.preprocessing.coverage import assert_submission_coverage
+
+        # Build a synthetic hourly combined interim frame.
+        now = pd.Timestamp("2026-06-14 10:00", tz="UTC")
+        idx = pd.date_range(
+            "2026-06-10 00:00", "2026-06-14 09:00", freq="h", tz="UTC"
+        )
+        interim = pd.DataFrame(
+            {
+                "Actual Load": 40000.0,
+                "Forecasted Load": 41000.0,
+            },
+            index=idx,
+        )
+
+        dates = compute_submission_dates(now, train_years=3)
+        cov = assert_submission_coverage(interim, dates, fallback=False)
+        print(cov.last_full_hour)  # 2026-06-14 09:00:00+00:00
+        print(cov.first_pred)      # 2026-06-14 10:00:00+00:00
+        print(cov.n_steps)         # hours from 10:00 to tomorrow 23:00
+        ```
+    """
+    if corruption_mode not in ("preview", "authoritative"):
+        raise ValueError(
+            f"corruption_mode must be 'preview' or 'authoritative', "
+            f"got {corruption_mode!r}."
+        )
+
+    # Guard 1: index frontier freshness.
+    required_last = dates.today - pd.Timedelta(hours=1)
+    assert_frontier_fresh(interim.index, required_last)
+
+    actual = interim["Actual Load"].dropna()
+    if actual.empty:
+        raise CoverageError("interim CSV has no published Actual Load values.")
+
+    # Guard 2: last published actual not too stale.
+    assert_actual_lag_within(
+        actual,
+        dates.now,
+        pd.Timedelta(hours=max_actual_lag_hours),
+    )
+
+    # Guard 3: no large interior gaps in the recent window.
+    assert_no_interior_gaps(
+        actual,
+        dates.now,
+        scan_window=pd.Timedelta(days=gap_scan_days),
+        max_gap=pd.Timedelta(hours=max_actual_gap_hours),
+    )
+
+    # Guard 4: frontier completeness.
+    last_full_hour = last_complete_hour(actual)
+    last_actual = actual.index.max()
+    if last_full_hour < last_actual.floor("h"):
+        logger.warning(
+            "frontier hour %s is incomplete; %s stepped back to %s",
+            last_actual.floor("h"),
+            "context end" if corruption_mode == "authoritative" else "end_train",
+            last_full_hour,
+        )
+
+    # Value-sanity corruption check (optional: only when deviation_ref is provided
+    # or the caller explicitly enables it).
+    from spotforecast2_safe.exceptions import TargetCorruptionError
+    from spotforecast2_safe.preprocessing.target_corruption import (
+        apply_target_corruption_policy,
+    )
+
+    # Build the QC input frame: always include Actual Load; add deviation_ref
+    # column when present.
+    qc_cols = ["Actual Load"]
+    if deviation_ref is not None and deviation_ref in interim.columns:
+        qc_cols.append(deviation_ref)
+    qc_frame = interim[qc_cols]
+
+    try:
+        _, qc_report = apply_target_corruption_policy(
+            qc_frame,
+            targets=["Actual Load"],
+            policy="truncate",
+            range_mw=15_000,
+            step_mw=13_000,
+            window_days=14,
+            max_heal_hours=0,
+            anchor_zone_hours=168,
+            cutoff=None,
+            logger=logger,
+            deviation_mw=MAX_DEVIATION_MW_DEFAULT if deviation_ref is not None else 0,
+            deviation_ref=deviation_ref,
+            deviation_slots=3,
+        )
+    except TargetCorruptionError as exc:
+        raise CoverageError(str(exc)) from exc
+
+    if qc_report.fired:
+        last_sound = qc_report.first_flagged_hour - pd.Timedelta(hours=1)
+        if corruption_mode == "authoritative":
+            logger.warning(
+                "value-sanity QC: %d corrupt hour(s) in %d span(s) -> "
+                "policy %r; context end retracted %s -> %s",
+                qc_report.n_flagged_hours,
+                len(qc_report.spans),
+                qc_report.action,
+                last_full_hour,
+                last_sound,
+            )
+            last_full_hour = min(last_full_hour, last_sound)
+        else:  # preview
+            logger.warning(
+                "value-sanity QC: %d corrupt hour(s) in %d span(s) -> "
+                "policy %r; prepare_data will retract data_end to %s "
+                "and auto-extend predict_size",
+                qc_report.n_flagged_hours,
+                len(qc_report.spans),
+                qc_report.action,
+                last_sound,
+            )
+
+    # Fallback gate: cached actuals must reach at least yesterday 23:00 UTC.
+    if fallback:
+        gate = dates.yesterday + pd.Timedelta(hours=23)
+        if last_full_hour < gate:
+            raise CoverageError(
+                f"cached actuals end {last_full_hour} < {gate} "
+                f"(yesterday 23:00 UTC); refusing to submit a stale forecast. "
+                f"Re-run when ENTSO-E is reachable."
+            )
+
+    first_pred = last_full_hour + pd.Timedelta(hours=1)
+    n_steps = int((dates.last_target - first_pred).total_seconds() // 3600) + 1
+    logger.info(
+        "end_train=%s  first_pred=%s  last_target=%s  predict_size=%d  [mode=%s]",
+        last_full_hour,
+        first_pred,
+        dates.last_target,
+        n_steps,
+        mode,
+    )
+    return SubmissionCoverage(
+        last_full_hour=last_full_hour,
+        first_pred=first_pred,
+        n_steps=n_steps,
+    )
+
+
+# Sentinel for default deviation threshold; matches the scripts' MAX_DEVIATION_MW = 10_000
+MAX_DEVIATION_MW_DEFAULT = 10_000
