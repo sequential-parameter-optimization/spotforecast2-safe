@@ -1,3 +1,10 @@
+## [22.10.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.9.0...v22.10.0) (2026-06-15)
+
+
+### Features
+
+* submission helpers (load_interim, compute_submission_dates, assert_submission_coverage, download_combined_with_fallback) ([#390](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/390)) ([f832ac3](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/f832ac33e2291f5db40cec62580e664b2d3b5eec))
+
 ## [22.9.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.8.0...v22.9.0) (2026-06-14)
 
 
