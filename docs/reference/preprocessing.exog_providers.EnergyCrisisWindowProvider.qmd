@@ -67,3 +67,56 @@ idx_out = pd.date_range("2022-07-01", periods=24, freq="h", tz="UTC")
 out_out = EnergyCrisisWindowProvider().build(idx_out)
 assert (out_out["energy_saving_window"] == 0.0).all()
 ```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [build](#spotforecast2_safe.preprocessing.exog_providers.EnergyCrisisWindowProvider.build) | Return a single-column ``float32`` frame with event-window values. |
+
+### build { #spotforecast2_safe.preprocessing.exog_providers.EnergyCrisisWindowProvider.build }
+
+```python
+preprocessing.exog_providers.EnergyCrisisWindowProvider.build(index)
+```
+
+Return a single-column ``float32`` frame with event-window values.
+
+For each timestamp ``t`` in *index* the value is
+``max(intensity)`` over all rows whose window contains ``t``
+(``start_utc <= t <= end_utc``), or ``0.0`` when no row covers ``t``.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                   | Description                                                                                       | Default    |
+|--------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------|------------|
+| index  | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | ``DatetimeIndex`` (any cadence, tz-aware or tz-naive) covering the training-plus-forecast window. | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                                                                                                |
+|--------|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: One column (named by ``self.column``), ``float32``, indexed exactly by *index*. NaN-free; ``0.0`` outside all event windows. |
+
+#### Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                                     | Description                                |
+|--------|------------------------------------------------------------------------------------------|--------------------------------------------|
+|        | [ExogProviderError](`spotforecast2_safe.preprocessing.exog_providers.ExogProviderError`) | If the bundled CSV is absent or malformed. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.exog_providers import (
+    FootballMatchWindowProvider,
+)
+
+idx = pd.date_range("2024-06-14", periods=48, freq="h", tz="UTC")
+provider = FootballMatchWindowProvider()
+out = provider.build(idx)
+print(out.columns.tolist(), out.shape, out.dtypes.iloc[0].name)
+assert out.shape == (48, 1)
+assert not out.isna().any().any()
+assert out.loc["2024-06-14T19:00:00Z", "football_match_window"] == 1.0
+```

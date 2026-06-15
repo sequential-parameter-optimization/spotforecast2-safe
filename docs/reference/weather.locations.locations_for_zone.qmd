@@ -1,0 +1,44 @@
+# weather.locations.locations_for_zone { #spotforecast2_safe.weather.locations.locations_for_zone }
+
+```python
+weather.locations.locations_for_zone(zone, *, override=None)
+```
+
+Return the `WeatherLocation` objects assigned to a German TSO control zone.
+
+When ``override`` is provided and contains ``zone``, its value is returned
+directly (allows callers to inject custom location sets without modifying
+the registry). Otherwise the zone is resolved from `GERMAN_TSO_ZONE_CITIES`
+by looking up each city name in `GERMAN_LOAD_CENTERS`.
+
+Each returned location reuses the population weight from the registry, so
+the result can be passed directly to `coordinates` and `weights`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                                                                                                                                                               | Description                                                                                                                                                                                                          | Default    |
+|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| zone     | [str](`str`)                                                                                                                                                                       | One of the four German TSO zone keys: ``"load_50hertz"``, ``"load_amprion"``, ``"load_tennet"``, or ``"load_transnetbw"``.                                                                                           | _required_ |
+| override | [Optional](`typing.Optional`)\[[Dict](`typing.Dict`)\[[str](`str`), [Sequence](`typing.Sequence`)\[[WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`)\]\]\] | Optional mapping from zone key to a sequence of `WeatherLocation` objects. When the key is present, its value is returned as a tuple and the registry is not consulted. ``None`` (default) always uses the registry. | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                      | Description                                                           |
+|--------|---------------------------------------------------------------------------|-----------------------------------------------------------------------|
+|        | [WeatherLocation](`spotforecast2_safe.weather.locations.WeatherLocation`) | Tuple[WeatherLocation, ...]: Ordered tuple of locations for the zone, |
+|        | ...                                                                       | in registry order (descending by population weight).                  |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                              |
+|--------|----------------------------|----------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If ``zone`` is not in `GERMAN_TSO_ZONE_CITIES` (and no override covers it), listing the valid zone keys. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.weather.locations import locations_for_zone
+
+locs = locations_for_zone("load_50hertz")
+print([l.name for l in locs])
+```

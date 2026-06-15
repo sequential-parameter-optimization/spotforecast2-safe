@@ -176,6 +176,7 @@ print(predictions)
 | [fit](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.fit) | Fit the forecaster to the training data. |
 | [get_feature_importances](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_feature_importances) | Return feature importances of the estimator stored in the forecaster. |
 | [get_params](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_params) | Get parameters for this forecaster. |
+| [get_tags](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_tags) | Return the tags that characterize the behavior of the forecaster. |
 | [predict](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict) | Predict future values recursively for the specified number of steps. |
 | [predict_bootstrapping](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_bootstrapping) | Generate multiple forecasting predictions using a bootstrapping process. |
 | [predict_dist](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict_dist) | Fit a given probability distribution for each step. After generating |
@@ -187,6 +188,7 @@ print(predictions)
 | [set_out_sample_residuals](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_out_sample_residuals) | Set new values to the attribute `out_sample_residuals_`. |
 | [set_params](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_params) | Set the parameters of this forecaster. |
 | [set_window_features](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.set_window_features) | Set new value to the attribute `window_features`. |
+| [summary](#spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.summary) | Show forecaster information. |
 
 ### create_predict_X { #spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.create_predict_X }
 
@@ -475,6 +477,31 @@ forecaster = ForecasterRecursive(estimator=LinearRegression(), lags=3)
 params = forecaster.get_params()
 print(params['lags'])
 print(params['differentiation'])
+```
+
+### get_tags { #spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_tags }
+
+```python
+forecaster.recursive._forecaster_recursive.ForecasterRecursive.get_tags()
+```
+
+Return the tags that characterize the behavior of the forecaster.
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                | Description                                                           |
+|--------|-----------------------------------------------------|-----------------------------------------------------------------------|
+|        | [dict](`dict`)\[[str](`str`), [Any](`typing.Any`)\] | Dictionary with forecaster tags describing behavior and capabilities. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+tags = forecaster.get_tags()
+print(tags['forecaster_task'])
 ```
 
 ### predict { #spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.predict }
@@ -1117,4 +1144,28 @@ rolling = RollingFeatures(stats=['mean', 'std'], window_sizes=[3, 5])
 forecaster.set_window_features(window_features=rolling)
 print(forecaster.window_features_names)
 print(forecaster.window_size)
+```
+
+### summary { #spotforecast2_safe.forecaster.recursive._forecaster_recursive.ForecasterRecursive.summary }
+
+```python
+forecaster.recursive._forecaster_recursive.ForecasterRecursive.summary()
+```
+
+Show forecaster information.
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description   |
+|--------|--------|---------------|
+|        | None   | None          |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from sklearn.linear_model import Ridge
+from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
+
+forecaster = ForecasterRecursive(estimator=Ridge(), lags=3)
+forecaster.summary()
 ```

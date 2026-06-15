@@ -137,3 +137,80 @@ config = ConfigEntsoe(
 print("ephemeris:", config.include_ephemeris_features)
 print("predict_size:", config.predict_size)
 ```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [get_params](#spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe.get_params) | Get parameters for this configuration object. |
+| [set_params](#spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe.set_params) | Set the parameters of this configuration object. |
+
+### get_params { #spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe.get_params }
+
+```python
+configurator.config_entsoe.ConfigEntsoe.get_params(deep=True)
+```
+
+Get parameters for this configuration object.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type           | Description                                                                                               | Default   |
+|--------|----------------|-----------------------------------------------------------------------------------------------------------|-----------|
+| deep   | [bool](`bool`) | If True, will return the parameters for this configuration and contained sub-objects that are estimators. | `True`    |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                      | Description                                           |
+|--------|-----------------------------------------------------------|-------------------------------------------------------|
+| params | [Dict](`typing.Dict`)\[[str](`str`), [object](`object`)\] | Dictionary of parameter names mapped to their values. |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+config = ConfigMulti(country_code="FR")
+p = config.get_params()
+print(f"country_code: {p['country_code']}")
+print(f"Predict size: {p['predict_size']}")
+print(f"Random state: {p['random_state']}")
+print(f"index_name: {p['index_name']}")
+print(f"bounds: {p['bounds']}")
+print(f"agg_weights: {p['agg_weights']}")
+```
+
+### set_params { #spotforecast2_safe.configurator.config_entsoe.ConfigEntsoe.set_params }
+
+```python
+configurator.config_entsoe.ConfigEntsoe.set_params(params=None, **kwargs)
+```
+
+Set the parameters of this configuration object.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                                      | Description                                                                                                                                           | Default   |
+|----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| params   | [Dict](`typing.Dict`)\[[str](`str`), [object](`object`)\] | Optional dictionary of parameter names mapped to their new values.                                                                                    | `None`    |
+| **kwargs | [object](`object`)                                        | Additional parameter names mapped to their new values. It supports configuring nested 'Period' objects using the `periods__<name>__<param>` notation. | `{}`      |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name        | Type                                                                      | Description                                                                    |
+|-------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| ConfigMulti | [ConfigMulti](`spotforecast2_safe.configurator.config_multi.ConfigMulti`) | The configuration instance with updated parameters (supports method chaining). |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.configurator.config_multi import ConfigMulti
+config = ConfigMulti()
+_ = config.set_params(country_code="FR", predict_size=48)
+print(f"country_code: {config.country_code}")
+print(f"Predict size: {config.predict_size}")
+print(f"Random state: {config.random_state}")
+
+# Deep parameter setting
+_ = config.set_params(periods__daily__n_periods=24)
+print(next(p.n_periods for p in config.periods if p.name == "daily"))
+```

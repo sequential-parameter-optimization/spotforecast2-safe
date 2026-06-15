@@ -1,0 +1,62 @@
+# downloader.entsoe.load_interim { #spotforecast2_safe.downloader.entsoe.load_interim }
+
+```python
+downloader.entsoe.load_interim(mode='combined', *, data_home=None)
+```
+
+Read the ENTSO-E interim CSV(s) written by the downloader.
+
+This is the library-level counterpart of the inline ``load_interim()``
+helpers that every submission script defines identically.  The two modes
+reproduce the exact CSV-reading logic from those scripts so callers can
+replace their local copies with a single import.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default      |
+|-----------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| mode      | [str](`str`) | Which interim layout to read.  ``"combined"`` (default) — reads ``<data_home>/interim/energy_load.csv`` (written by ``download_new_data``).  This is the single DE-total series path used by chronos, optuna, and spotoptim submission scripts.  ``"four_zone"`` — assembles the per-zone QC frame via ``build_zone_qc_frame`` and also writes the zones-only modelling CSV (``interim/energy_load_zones.csv``).  This is the normal four-zone path used by team4_4zones_submit. | `'combined'` |
+| data_home |              | Root data directory.  If ``None``, resolved via ``get_data_home()``.                                                                                                                                                                                                                                                                                                                                                                                                             | `None`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                                         |
+|--------|------------------------------------------------|-------------------------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: A UTC-indexed interim frame ready for ``assert_submission_coverage``, |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``select_key_lags``, and ``entsoe_predictions``.  In ``"combined"`` mode the        |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | frame contains at least ``Actual Load`` and ``Forecasted Load``.  In                |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``"four_zone"`` mode the frame additionally contains the per-zone columns           |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | (``load_amprion``, ``load_tennet``, ``load_transnetbw``, ``load_50hertz``).         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                     | Description                                             |
+|--------|------------------------------------------|---------------------------------------------------------|
+|        | [FileNotFoundError](`FileNotFoundError`) | When the required interim file(s) are missing.          |
+|        | [ValueError](`ValueError`)               | When ``mode`` is not ``"combined"`` or ``"four_zone"``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import os, shutil, tempfile
+import pandas as pd
+from spotforecast2_safe.downloader.entsoe import get_data_home, load_interim
+
+tmp = tempfile.mkdtemp()
+os.environ["SPOTFORECAST2_DATA"] = tmp
+interim_dir = os.path.join(tmp, "interim")
+os.makedirs(interim_dir, exist_ok=True)
+
+idx = pd.date_range("2026-06-01", periods=48, freq="h", tz="UTC")
+df = pd.DataFrame(
+    {"Actual Load": 40000.0, "Forecasted Load": 41000.0}, index=idx
+)
+df.index.name = "Time (UTC)"
+df.to_csv(os.path.join(interim_dir, "energy_load.csv"))
+
+frame = load_interim(mode="combined")
+print(frame.index.tz, len(frame))
+
+shutil.rmtree(tmp)
+del os.environ["SPOTFORECAST2_DATA"]
+```

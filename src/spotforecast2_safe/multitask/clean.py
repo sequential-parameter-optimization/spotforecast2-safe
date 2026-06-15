@@ -56,6 +56,7 @@ def execute_clean(
         import tempfile
         from pathlib import Path
         from spotforecast2_safe.multitask import CleanTask
+        from spotforecast2_safe.multitask.clean import execute_clean
         from spotforecast2_safe.configurator.config_multi import ConfigMulti
 
         with tempfile.TemporaryDirectory() as tmp:
