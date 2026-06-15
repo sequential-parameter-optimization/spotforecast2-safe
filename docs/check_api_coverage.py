@@ -219,7 +219,9 @@ def check_listing_coverage(rendered: dict) -> list[str]:
             wholesale.add(dotted)  # whole module documented -> all members included
             continue
         except ImportError:
-            pass
+            # Not a module path (likely a module.symbol leaf); fall back to
+            # symbol-level listing checks below.
+            ...
         module, _, symbol = dotted.rpartition(".")
         if module:
             listed_by_module.setdefault(module, set()).add(symbol)
