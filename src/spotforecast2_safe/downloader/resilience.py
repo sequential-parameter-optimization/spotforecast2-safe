@@ -120,12 +120,9 @@ logger = logging.getLogger(__name__)
 
 # Single source of truth for the four zone column names.
 # The scripts import this instead of defining their own ZONE_COLUMNS constant.
-ZONE_COLUMNS: list[str] = [
-    "load_amprion",
-    "load_tennet",
-    "load_transnetbw",
-    "load_50hertz",
-]
+# Defined in the leaf module _zones so both resilience and entsoe can depend
+# on it without closing an import cycle.
+from spotforecast2_safe.downloader._zones import ZONE_COLUMNS  # noqa: E402
 
 # Snapshot time-to-live: files older than this relative to ``now`` are ignored.
 SNAPSHOT_TTL = pd.Timedelta(hours=72)
@@ -699,7 +696,9 @@ def download_combined_with_fallback(
         logger.warning(
             "live download failed; restored snapshot %s (%s old)",
             snap.name,
-            f"{age / pd.Timedelta(hours=1):.1f} h" if age is not None else "unknown age",
+            f"{age / pd.Timedelta(hours=1):.1f} h"
+            if age is not None
+            else "unknown age",
         )
         store.prune(now)
         return DownloadResult(

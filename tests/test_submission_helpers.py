@@ -4,7 +4,7 @@
 """Tests for the four ENTSO-E submission helpers.
 
 Covers all public symbols added in the feat/submission-helpers branch:
-- `spotforecast2_safe.data.fetch_data.load_interim`
+- `spotforecast2_safe.downloader.entsoe.load_interim`
 - `spotforecast2_safe.downloader.entsoe.SubmissionDates`
 - `spotforecast2_safe.downloader.entsoe.compute_submission_dates`
 - `spotforecast2_safe.downloader.resilience.download_combined_with_fallback`
@@ -83,7 +83,7 @@ def clean_interim() -> pd.DataFrame:
 
 
 class TestLoadInterim:
-    """Tests for spotforecast2_safe.data.fetch_data.load_interim."""
+    """Tests for spotforecast2_safe.downloader.entsoe.load_interim."""
 
     def _write_combined_csv(self, interim_dir: Path, df: pd.DataFrame) -> None:
         df.index.name = "Time (UTC)"
@@ -91,7 +91,7 @@ class TestLoadInterim:
 
     def test_combined_reads_utc_indexed_frame(self, tmp_path, monkeypatch):
         """combined mode: returns UTC DatetimeIndex frame."""
-        from spotforecast2_safe.data.fetch_data import load_interim
+        from spotforecast2_safe.downloader.entsoe import load_interim
 
         monkeypatch.setenv("SPOTFORECAST2_DATA", str(tmp_path))
         interim_dir = tmp_path / "interim"
@@ -108,7 +108,7 @@ class TestLoadInterim:
 
     def test_combined_is_default_mode(self, tmp_path, monkeypatch):
         """Default mode is 'combined'."""
-        from spotforecast2_safe.data.fetch_data import load_interim
+        from spotforecast2_safe.downloader.entsoe import load_interim
 
         monkeypatch.setenv("SPOTFORECAST2_DATA", str(tmp_path))
         interim_dir = tmp_path / "interim"
@@ -122,7 +122,7 @@ class TestLoadInterim:
         self, tmp_path, monkeypatch
     ):
         """combined mode raises FileNotFoundError when energy_load.csv absent."""
-        from spotforecast2_safe.data.fetch_data import load_interim
+        from spotforecast2_safe.downloader.entsoe import load_interim
 
         monkeypatch.setenv("SPOTFORECAST2_DATA", str(tmp_path))
         (tmp_path / "interim").mkdir()
@@ -134,7 +134,7 @@ class TestLoadInterim:
         self, tmp_path, monkeypatch
     ):
         """four_zone mode raises FileNotFoundError when per-zone CSVs absent."""
-        from spotforecast2_safe.data.fetch_data import load_interim
+        from spotforecast2_safe.downloader.entsoe import load_interim
 
         monkeypatch.setenv("SPOTFORECAST2_DATA", str(tmp_path))
         (tmp_path / "interim").mkdir()
@@ -144,7 +144,7 @@ class TestLoadInterim:
 
     def test_invalid_mode_raises_value_error(self, tmp_path, monkeypatch):
         """Unknown mode must raise ValueError."""
-        from spotforecast2_safe.data.fetch_data import load_interim
+        from spotforecast2_safe.downloader.entsoe import load_interim
 
         monkeypatch.setenv("SPOTFORECAST2_DATA", str(tmp_path))
 
@@ -153,7 +153,7 @@ class TestLoadInterim:
 
     def test_combined_data_home_kwarg(self, tmp_path):
         """data_home kwarg overrides SPOTFORECAST2_DATA."""
-        from spotforecast2_safe.data.fetch_data import load_interim
+        from spotforecast2_safe.downloader.entsoe import load_interim
 
         interim_dir = tmp_path / "interim"
         interim_dir.mkdir()
@@ -162,9 +162,9 @@ class TestLoadInterim:
         result = load_interim(mode="combined", data_home=tmp_path)
         assert "Actual Load" in result.columns
 
-    def test_combined_exported_from_data_init(self):
-        """load_interim is exported from spotforecast2_safe.data."""
-        from spotforecast2_safe.data import load_interim as _load_interim  # noqa: F401
+    def test_combined_exported_from_downloader_init(self):
+        """load_interim is exported from spotforecast2_safe.downloader."""
+        from spotforecast2_safe.downloader import load_interim as _load_interim  # noqa: F401
 
         assert callable(_load_interim)
 
@@ -377,7 +377,9 @@ class TestDownloadCombinedWithFallback:
 
         csv_path = tmp_path / "interim" / "energy_load.csv"
         idx = pd.date_range("2026-06-10", periods=24, freq="h", tz="UTC")
-        df = pd.DataFrame({"Actual Load": 40_000.0, "Forecasted Load": 41_000.0}, index=idx)
+        df = pd.DataFrame(
+            {"Actual Load": 40_000.0, "Forecasted Load": 41_000.0}, index=idx
+        )
         df.index.name = "Time (UTC)"
         df.to_csv(csv_path)
 
@@ -413,7 +415,9 @@ class TestDownloadCombinedWithFallback:
         def fake_download(**kwargs):
             csv = tmp_path / "interim" / "energy_load.csv"
             idx = pd.date_range("2026-06-10", periods=24, freq="h", tz="UTC")
-            df = pd.DataFrame({"Actual Load": 40_000.0, "Forecasted Load": 41_000.0}, index=idx)
+            df = pd.DataFrame(
+                {"Actual Load": 40_000.0, "Forecasted Load": 41_000.0}, index=idx
+            )
             df.index.name = "Time (UTC)"
             df.to_csv(csv)
 
@@ -460,7 +464,7 @@ class TestDownloadCombinedWithFallback:
         )
         # 3 attempts -> 2 sleeps (no sleep after last attempt)
         assert len(sleeps) == 2
-        assert sleeps[0] == 5.0   # backoff * 2^0
+        assert sleeps[0] == 5.0  # backoff * 2^0
         assert sleeps[1] == 10.0  # backoff * 2^1
 
 
@@ -533,9 +537,7 @@ class TestAssertSubmissionCoverage:
             idx < pd.Timestamp("2026-06-03", tz="UTC")
         )
         gapped_actual = actual[~drop]
-        df = pd.DataFrame(
-            {"Actual Load": gapped_actual, "Forecasted Load": 41_000.0}
-        )
+        df = pd.DataFrame({"Actual Load": gapped_actual, "Forecasted Load": 41_000.0})
         with pytest.raises(CoverageError, match="interior gap"):
             assert_submission_coverage(df, dates, fallback=False)
 
@@ -618,9 +620,7 @@ class TestAssertSubmissionCoverage:
         # yesterday 23:00 = 2026-06-13 23:00 UTC
         gate = YESTERDAY + pd.Timedelta(hours=23)
         # Build frame ending exactly at gate using tz-aware start/end.
-        idx = pd.date_range(
-            pd.Timestamp("2026-06-10 00:00", tz="UTC"), gate, freq="h"
-        )
+        idx = pd.date_range(pd.Timestamp("2026-06-10 00:00", tz="UTC"), gate, freq="h")
         df = pd.DataFrame(
             {"Actual Load": 40_000.0, "Forecasted Load": 41_000.0}, index=idx
         )
@@ -662,9 +662,7 @@ class TestAssertSubmissionCoverage:
         """fallback=False skips the D-1 23:00 gate entirely."""
         # clean_interim ends at 09:00, well after gate — but this should
         # also pass when clean_interim ended BEFORE the gate (gate not checked).
-        result = assert_submission_coverage(
-            clean_interim, dates, fallback=False
-        )
+        result = assert_submission_coverage(clean_interim, dates, fallback=False)
         assert isinstance(result, SubmissionCoverage)
 
     # --- combined vs four_zone mode label ---
