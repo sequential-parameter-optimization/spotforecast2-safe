@@ -1,3 +1,10 @@
+## [22.10.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.10.0...v22.10.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* **preprocessing:** let assert_submission_coverage take the corruption-policy knobs ([#391](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/391)) ([3f19f3c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/3f19f3c8eb351e3a72bc01bb7a5f048d134bf2ac))
+
 ## [22.10.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.9.0...v22.10.0) (2026-06-15)
 
 
