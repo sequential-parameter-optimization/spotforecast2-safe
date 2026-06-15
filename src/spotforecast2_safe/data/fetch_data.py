@@ -852,6 +852,8 @@ def load_school_holidays_de() -> tuple[pd.DataFrame, pd.Timestamp, pd.Timestamp]
 
     Examples:
         ```{python}
+        import pandas as pd
+
         from spotforecast2_safe.data.fetch_data import load_school_holidays_de
 
         df, valid_from, valid_to = load_school_holidays_de()
