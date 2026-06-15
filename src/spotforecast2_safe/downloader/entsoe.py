@@ -2066,17 +2066,20 @@ def compute_submission_dates(
         print(dates.end_dl)      # 202606160000  (today + 2 days)
         ```
     """
-    today = now.normalize()
-    yesterday = today - pd.Timedelta(days=1)
-    tomorrow = today + pd.Timedelta(days=1)
-    last_target = tomorrow + pd.Timedelta(hours=23)
-
+    # Delegate type and tz validation to derive_download_window which already
+    # enforces these constraints; this also validates train_years / start_margin_days.
+    # We call it first so that all parameter errors surface before we touch `now`.
     start_dl, end_dl = derive_download_window(
         now,
         train_years=train_years,
         start_margin_days=start_margin_days,
         data_end=data_end,
     )
+
+    today = now.normalize()
+    yesterday = today - pd.Timedelta(days=1)
+    tomorrow = today + pd.Timedelta(days=1)
+    last_target = tomorrow + pd.Timedelta(hours=23)
 
     return SubmissionDates(
         now=now,

@@ -902,13 +902,11 @@ def load_interim(
         return interim
 
     # --- four_zone mode ---
-    from pathlib import Path as _Path
-
-    from spotforecast2_safe.downloader.entsoe import (
-        ZONE_MODEL_CSV,
-        build_zone_qc_frame,
-    )
+    from spotforecast2_safe.downloader.entsoe import build_zone_qc_frame
     from spotforecast2_safe.downloader.resilience import ZONE_COLUMNS
+
+    # The zones-only modelling CSV filename (mirrors the script constant ZONE_MODEL_CSV).
+    _ZONE_MODEL_FILENAME = "energy_load_zones.csv"
 
     try:
         interim = build_zone_qc_frame()
@@ -922,7 +920,7 @@ def load_interim(
     # Contains only per-zone Actual Load columns so the bottom-up total cannot
     # leak in as a feature.
     zone_cols = [c for c in interim.columns if c in ZONE_COLUMNS]
-    model_csv = interim_dir / _Path(ZONE_MODEL_CSV).name
+    model_csv = interim_dir / _ZONE_MODEL_FILENAME
     interim[zone_cols].rename_axis("Time (UTC)").to_csv(model_csv)
 
     if (
