@@ -502,6 +502,67 @@ class TestAssertSubmissionCoverage:
         )
         assert result.n_steps == expected
 
+    # --- value-sanity (corruption) policy knobs ---
+
+    @staticmethod
+    def _capture_policy(monkeypatch):
+        """Patch apply_target_corruption_policy to record its kwargs."""
+        captured: dict = {}
+
+        class _Report:
+            fired = False
+
+        def _fake_policy(frame, **kwargs):
+            captured.update(kwargs)
+            return frame, _Report()
+
+        monkeypatch.setattr(
+            "spotforecast2_safe.preprocessing.target_corruption."
+            "apply_target_corruption_policy",
+            _fake_policy,
+        )
+        return captured
+
+    def test_corruption_knobs_forwarded(
+        self, clean_interim: pd.DataFrame, dates: SubmissionDates, monkeypatch
+    ):
+        """Script-tuned thresholds reach apply_target_corruption_policy verbatim."""
+        captured = self._capture_policy(monkeypatch)
+        assert_submission_coverage(
+            clean_interim,
+            dates,
+            fallback=False,
+            deviation_ref="Forecasted Load",
+            corruption_policy="truncate",
+            range_mw=8_000,
+            step_mw=6_000,
+            qc_window_days=3,
+            deviation_mw=11_000,
+            deviation_slots=1,
+        )
+        assert captured["policy"] == "truncate"
+        assert captured["range_mw"] == 8_000
+        assert captured["step_mw"] == 6_000
+        assert captured["window_days"] == 3
+        assert captured["deviation_mw"] == 11_000
+        assert captured["deviation_slots"] == 1
+        assert captured["deviation_ref"] == "Forecasted Load"
+
+    def test_corruption_knob_defaults_unchanged(
+        self, clean_interim: pd.DataFrame, dates: SubmissionDates, monkeypatch
+    ):
+        """With no knobs passed, the 22.10.0 defaults still forward (back-compat)."""
+        captured = self._capture_policy(monkeypatch)
+        assert_submission_coverage(
+            clean_interim, dates, fallback=False, deviation_ref="Forecasted Load"
+        )
+        assert captured["policy"] == "truncate"
+        assert captured["range_mw"] == 15_000
+        assert captured["step_mw"] == 13_000
+        assert captured["window_days"] == 14
+        assert captured["deviation_mw"] == 10_000  # MAX_DEVIATION_MW_DEFAULT
+        assert captured["deviation_slots"] == 3
+
     # --- Guard 1: frontier freshness ---
 
     def test_raises_coverage_error_when_frontier_stale(self, dates: SubmissionDates):

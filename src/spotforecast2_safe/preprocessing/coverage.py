@@ -355,6 +355,12 @@ def assert_submission_coverage(
     max_actual_lag_hours: int = 36,
     gap_scan_days: int = 28,
     max_actual_gap_hours: int = 12,
+    corruption_policy: str = "truncate",
+    range_mw: float = 15_000,
+    step_mw: float = 13_000,
+    qc_window_days: int = 14,
+    deviation_mw: float | None = None,
+    deviation_slots: int = 3,
 ) -> SubmissionCoverage:
     """Orchestrate all operational coverage guards for one submission run.
 
@@ -418,6 +424,23 @@ def assert_submission_coverage(
             Defaults to ``28``.
         max_actual_gap_hours: Maximum acceptable consecutive index difference
             inside the scan window, in hours.  Defaults to ``12``.
+        corruption_policy: Policy forwarded to `apply_target_corruption_policy`
+            for the value-sanity check (e.g. ``"truncate"`` or ``"abort"``).
+            Defaults to ``"truncate"``.
+        range_mw: Intra-hour range threshold (MW) for the value-sanity QC.
+            Defaults to ``15_000``.  The ENTSO-E submission scripts pass their
+            own tuned value (``8_000``).
+        step_mw: Adjacent-step threshold (MW) for the value-sanity QC.
+            Defaults to ``13_000`` (scripts pass ``6_000``).
+        qc_window_days: Scan window (days) for the value-sanity QC.  Defaults to
+            ``14`` (scripts pass ``3``).
+        deviation_mw: Deviation-rule magnitude (MW).  ``None`` (default) keeps
+            the legacy behaviour — `MAX_DEVIATION_MW_DEFAULT` when a
+            ``deviation_ref`` is given, else ``0`` (rule disabled).  An explicit
+            value is honoured only when ``deviation_ref`` is set (scripts pass
+            ``11_000``).
+        deviation_slots: Minimum number of flagged deviation slots before the
+            rule fires.  Defaults to ``3`` (scripts pass ``1``).
 
     Returns:
         SubmissionCoverage: Frozen dataclass with ``last_full_hour``,
@@ -513,21 +536,29 @@ def assert_submission_coverage(
         qc_cols.append(deviation_ref)
     qc_frame = interim[qc_cols]
 
+    # Resolve the deviation magnitude: an explicit caller value wins; otherwise
+    # fall back to the package default when a deviation_ref is given, or disable
+    # the deviation rule entirely (0) when there is no reference column.
+    if deviation_mw is None:
+        _deviation_mw = MAX_DEVIATION_MW_DEFAULT if deviation_ref is not None else 0
+    else:
+        _deviation_mw = deviation_mw if deviation_ref is not None else 0
+
     try:
         _, qc_report = apply_target_corruption_policy(
             qc_frame,
             targets=["Actual Load"],
-            policy="truncate",
-            range_mw=15_000,
-            step_mw=13_000,
-            window_days=14,
+            policy=corruption_policy,
+            range_mw=range_mw,
+            step_mw=step_mw,
+            window_days=qc_window_days,
             max_heal_hours=0,
             anchor_zone_hours=168,
             cutoff=None,
             logger=logger,
-            deviation_mw=MAX_DEVIATION_MW_DEFAULT if deviation_ref is not None else 0,
+            deviation_mw=_deviation_mw,
             deviation_ref=deviation_ref,
-            deviation_slots=3,
+            deviation_slots=deviation_slots,
         )
     except TargetCorruptionError as exc:
         raise CoverageError(str(exc)) from exc
