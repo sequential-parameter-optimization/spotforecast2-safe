@@ -10,7 +10,9 @@ Checks three surfaces independently:
 
 1. **Training frame** — ``mt.data_with_exog.columns``
 2. **Selected exogenous features** — ``mt.exog_feature_names``
-3. **Fitted model features** — ``estimator.feature_name_`` for every
+3. **Fitted model features** — the fitted estimator's input feature names
+   (LightGBM ``feature_name_``, CatBoost ``feature_names_``, or the
+   sklearn-standard ``feature_names_in_`` / XGBoost booster) for every
    target in ``mt.run_state.targets``
 
 All three surfaces are checked so a single call reports every violation at once.
@@ -28,10 +30,10 @@ skipping: an unreadable feature list is itself a verifiability violation.
 
 ## Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                                                         | Description                                                                                                                                                                                       |
-|--------|--------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|        | [LeakageError](`spotforecast2_safe.exceptions.LeakageError`) | When any forbidden column appears in the training frame, the selected exogenous feature names, or any fitted model's feature list.  The message names the surface and the offending columns.      |
-|        | [RuntimeError](`RuntimeError`)                               | When ``mt.results[task][target]["forecaster"].estimator`` cannot be read or does not expose ``feature_name_``.  This signals a verifiability invariant violation rather than a leakage violation. |
+| Name   | Type                                                         | Description                                                                                                                                                                                                                                                |
+|--------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [LeakageError](`spotforecast2_safe.exceptions.LeakageError`) | When any forbidden column appears in the training frame, the selected exogenous feature names, or any fitted model's feature list.  The message names the surface and the offending columns.                                                               |
+|        | [RuntimeError](`RuntimeError`)                               | When ``mt.results[task][target]["forecaster"].estimator`` cannot be read or exposes none of the supported fitted-feature-name attributes (see `_fitted_feature_names`).  This signals a verifiability invariant violation rather than a leakage violation. |
 
 ## Examples {.doc-section .doc-section-examples}
 
