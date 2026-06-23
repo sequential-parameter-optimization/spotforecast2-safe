@@ -3059,7 +3059,7 @@
     "href": "docs/reference/multitask.guards.assert_no_leakage.html#raises",
     "title": "multitask.guards.assert_no_leakage",
     "section": "Raises",
-    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nLeakageError\nWhen any forbidden column appears in the training frame, the selected exogenous feature names, or any fitted model’s feature list. The message names the surface and the offending columns.\n\n\n\nRuntimeError\nWhen mt.results[task][target][\"forecaster\"].estimator cannot be read or does not expose feature_name_. This signals a verifiability invariant violation rather than a leakage violation.",
+    "text": "Raises\n\n\n\nName\nType\nDescription\n\n\n\n\n\nLeakageError\nWhen any forbidden column appears in the training frame, the selected exogenous feature names, or any fitted model’s feature list. The message names the surface and the offending columns.\n\n\n\nRuntimeError\nWhen mt.results[task][target][\"forecaster\"].estimator cannot be read or exposes none of the supported fitted-feature-name attributes (see _fitted_feature_names). This signals a verifiability invariant violation rather than a leakage violation.",
     "crumbs": [
       "API Reference",
       "Multitask",

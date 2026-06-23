@@ -1964,7 +1964,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><strong>Training frame</strong> — <code>mt.data_with_exog.columns</code></li>
 <li><strong>Selected exogenous features</strong> — <code>mt.exog_feature_names</code></li>
-<li><strong>Fitted model features</strong> — <code>estimator.feature_name_</code> for every target in <code>mt.run_state.targets</code></li>
+<li><strong>Fitted model features</strong> — the fitted estimator’s input feature names (LightGBM <code>feature_name_</code>, CatBoost <code>feature_names_</code>, or the sklearn-standard <code>feature_names_in_</code> / XGBoost booster) for every target in <code>mt.run_state.targets</code></li>
 </ol>
 <p>All three surfaces are checked so a single call reports every violation at once. If reading the fitted features fails (<code>estimator</code> missing, not fitted, etc.) a <code>RuntimeError</code> is raised immediately rather than silently skipping: an unreadable feature list is itself a verifiability violation.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -2019,14 +2019,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td></td>
 <td><a href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></td>
-<td>When <code>mt.results[task][target]["forecaster"].estimator</code> cannot be read or does not expose <code>feature_name_</code>. This signals a verifiability invariant violation rather than a leakage violation.</td>
+<td>When <code>mt.results[task][target]["forecaster"].estimator</code> cannot be read or exposes none of the supported fitted-feature-name attributes (see <code>_fitted_feature_names</code>). This signals a verifiability invariant violation rather than a leakage violation.</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="d8597409" class="cell" data-execution_count="1">
+<div id="569bca1f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> types <span class="im">import</span> SimpleNamespace</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask.guards <span class="im">import</span> assert_no_leakage</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.exceptions <span class="im">import</span> LeakageError</span>
