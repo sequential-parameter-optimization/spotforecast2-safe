@@ -1,0 +1,29 @@
+# submission_cli.AbortReason { #spotforecast2_safe.submission_cli.AbortReason }
+
+```python
+submission_cli.AbortReason()
+```
+
+Named failure categories for :class:`SubmissionAbort`.
+
+These correspond to the gate-check steps in the submission pipeline;
+the mapping to numeric exit codes is left to the caller.
+
+Members:
+
+- ``DATE`` — ``compute_submission_dates`` raised (bad date arithmetic).
+- ``INTERIM_MISSING`` — the combined interim CSV does not exist yet.
+- ``COVERAGE`` — a data-quality guard fired (gaps, staleness, corruption).
+- ``STALE_CACHE`` — a snapshot was restored and the data is older than
+  yesterday 23:00 UTC (the ``"yesterday 23:00 UTC"`` message substring).
+- ``DOWNLOAD_UNRECOVERABLE`` — live download exhausted and no valid
+  snapshot within the TTL.
+
+Examples:
+
+    ```{python}
+    from spotforecast2_safe.submission_cli import AbortReason
+
+    print(list(AbortReason))
+    print(AbortReason.DATE.name)
+    ```

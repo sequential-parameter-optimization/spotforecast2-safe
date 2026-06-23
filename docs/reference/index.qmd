@@ -326,6 +326,25 @@ Data downloaders for external data sources (e.g. ENTSO-E).
 | [downloader.resilience.ZoneOutcome](downloader.resilience.ZoneOutcome.qmd#spotforecast2_safe.downloader.resilience.ZoneOutcome) | Result for one zone's download attempt. |
 | [downloader.resilience.make_store](downloader.resilience.make_store.qmd#spotforecast2_safe.downloader.resilience.make_store) | Build a ``SnapshotStore`` rooted at ``<data_home>/snapshots/``. |
 
+## Submission CLI
+
+Shared, torch-free gate helpers for ENTSO-E day-ahead submission scripts.
+Pure dispatch: all network and filesystem work is delegated to
+``downloader.entsoe``, ``downloader.resilience``, and
+``preprocessing.coverage``.
+
+
+| | |
+| --- | --- |
+| [submission_cli](submission_cli.qmd#spotforecast2_safe.submission_cli) | Shared CLI helpers for ENTSO-E day-ahead submission scripts. |
+| [submission_cli.AbortReason](submission_cli.AbortReason.qmd#spotforecast2_safe.submission_cli.AbortReason) | Named failure categories for :class:`SubmissionAbort`. |
+| [submission_cli.SubmissionAbort](submission_cli.SubmissionAbort.qmd#spotforecast2_safe.submission_cli.SubmissionAbort) | Raised by the five gate helpers when a submission cannot proceed. |
+| [submission_cli.compute_dates_or_abort](submission_cli.compute_dates_or_abort.qmd#spotforecast2_safe.submission_cli.compute_dates_or_abort) | Compute the submission date window, aborting on invalid inputs. |
+| [submission_cli.load_interim_or_abort](submission_cli.load_interim_or_abort.qmd#spotforecast2_safe.submission_cli.load_interim_or_abort) | Read the combined DE-total interim CSV, aborting if it is missing. |
+| [submission_cli.assert_coverage_or_abort](submission_cli.assert_coverage_or_abort.qmd#spotforecast2_safe.submission_cli.assert_coverage_or_abort) | Assert data-quality coverage, aborting on guard violations. |
+| [submission_cli.entsoe_predictions](submission_cli.entsoe_predictions.qmd#spotforecast2_safe.submission_cli.entsoe_predictions) | Return the ENTSO-E day-ahead hourly forecast series (tolerant). |
+| [submission_cli.download_combined_or_abort](submission_cli.download_combined_or_abort.qmd#spotforecast2_safe.submission_cli.download_combined_or_abort) | Download the combined DE-total series with snapshot fallback, or abort. |
+
 ## Exceptions
 
 Custom exception types for safety-critical failure signalling.

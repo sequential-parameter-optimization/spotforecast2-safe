@@ -1,0 +1,38 @@
+# submission_cli.SubmissionAbort { #spotforecast2_safe.submission_cli.SubmissionAbort }
+
+```python
+submission_cli.SubmissionAbort(reason, message)
+```
+
+Raised by the five gate helpers when a submission cannot proceed.
+
+Carries the :attr:`reason` enum member so callers can map to an
+integer exit code without parsing message strings.  No exit code is
+stored here — that is caller policy.
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+reason : AbortReason
+    The category of the failure.
+message : str
+    Human-readable description forwarded from the underlying exception.
+
+
+
+## Attributes {.doc-section .doc-section-attributes}
+
+reason : AbortReason
+    The named failure category.
+
+Examples:
+
+    ```{python}
+    from spotforecast2_safe.submission_cli import AbortReason, SubmissionAbort
+
+    try:
+        raise SubmissionAbort(AbortReason.DATE, "bad date arithmetic")
+    except SubmissionAbort as exc:
+        print(exc.reason, str(exc))
+    ```

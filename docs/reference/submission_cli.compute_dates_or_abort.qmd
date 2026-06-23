@@ -1,0 +1,73 @@
+# submission_cli.compute_dates_or_abort { #spotforecast2_safe.submission_cli.compute_dates_or_abort }
+
+```python
+submission_cli.compute_dates_or_abort(
+    now,
+    data_end,
+    train_years,
+    start_margin_days,
+    logger,
+)
+```
+
+Compute the submission date window, aborting on invalid inputs.
+
+Delegates to
+:func:`spotforecast2_safe.downloader.entsoe.compute_submission_dates`
+(sf2-safe 22.10.0).  Wraps :exc:`ValueError` / :exc:`TypeError` in
+:exc:`SubmissionAbort` with ``reason=AbortReason.DATE`` so callers
+map that to their exit-code 1.
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+now : pd.Timestamp
+    Current UTC timestamp (``pd.Timestamp.now(tz="UTC")``).
+data_end : str or None
+    Override for ``END_DOWNLOAD`` in ``"YYYYMMDDHHMM"`` format, or
+    ``None`` to derive automatically.
+train_years : int
+    Training window length in years (drives the derived download start).
+start_margin_days : int
+    Extra days subtracted from ``today - 365*train_years`` to cover
+    leap-year shortfall, staleness, and truncation retraction.
+logger : logging.Logger
+    Accepted for API symmetry with the other helpers; this function does
+    not log.
+
+
+
+## Returns {.doc-section .doc-section-returns}
+
+SubmissionDates
+    Named tuple with ``now``, ``today``, ``tomorrow``, ``last_target``,
+    ``start_dl``, ``end_dl`` fields.
+
+
+
+## Raises {.doc-section .doc-section-raises}
+
+SubmissionAbort
+    With ``reason=AbortReason.DATE`` when
+    ``compute_submission_dates`` raises ``ValueError`` or ``TypeError``.
+
+Examples:
+
+    ```{python}
+    #| eval: false
+    import logging
+    import pandas as pd
+
+    from spotforecast2_safe.submission_cli import compute_dates_or_abort
+
+    logger = logging.getLogger("example")
+    dates = compute_dates_or_abort(
+        now=pd.Timestamp.now(tz="UTC"),
+        data_end=None,
+        train_years=3,
+        start_margin_days=45,
+        logger=logger,
+    )
+    print(dates.tomorrow.date())
+    ```

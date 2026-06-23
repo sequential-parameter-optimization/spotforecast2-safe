@@ -1,0 +1,48 @@
+# submission_cli.load_interim_or_abort { #spotforecast2_safe.submission_cli.load_interim_or_abort }
+
+```python
+submission_cli.load_interim_or_abort(logger)
+```
+
+Read the combined DE-total interim CSV, aborting if it is missing.
+
+Delegates to
+:func:`spotforecast2_safe.downloader.entsoe.load_interim`
+(sf2-safe 22.10.0) with ``mode="combined"``.  Wraps
+:exc:`FileNotFoundError` in :exc:`SubmissionAbort` with
+``reason=AbortReason.INTERIM_MISSING``.
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+logger : logging.Logger
+    Script-level logger; emits an INFO line with row count and index
+    bounds (byte-identical to the lecture-script log line).
+
+
+
+## Returns {.doc-section .doc-section-returns}
+
+pd.DataFrame
+    The combined DE-total interim DataFrame indexed by UTC timestamps.
+
+
+
+## Raises {.doc-section .doc-section-raises}
+
+SubmissionAbort
+    With ``reason=AbortReason.INTERIM_MISSING`` when the interim CSV
+    does not exist.
+
+Examples:
+
+    ```{python}
+    #| eval: false
+    import logging
+    from spotforecast2_safe.submission_cli import load_interim_or_abort
+
+    logger = logging.getLogger("example")
+    interim = load_interim_or_abort(logger)
+    print(interim.shape)
+    ```
