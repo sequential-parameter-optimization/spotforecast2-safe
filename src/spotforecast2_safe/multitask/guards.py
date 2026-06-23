@@ -33,6 +33,42 @@ from __future__ import annotations
 from spotforecast2_safe.exceptions import LeakageError
 
 
+def _fitted_feature_names(estimator: object) -> list[str] | None:
+    """Return a fitted estimator's input feature names, or ``None``.
+
+    Reads whichever attribute the estimator's backend populates after a fit on
+    a named ``DataFrame``, trying the gradient-boosting-specific names first and
+    the sklearn-standard one last:
+
+    - ``feature_name_`` — LightGBM (``LGBMRegressor``)
+    - ``feature_names_`` — CatBoost (``CatBoostRegressor``)
+    - ``feature_names_in_`` — the sklearn convention (``XGBRegressor`` and
+      ``LGBMRegressor`` set it too when fit on a ``DataFrame``)
+    - ``get_booster().feature_names`` — XGBoost booster fallback
+
+    Returns ``None`` only when none of these are available, which
+    `assert_no_leakage` treats as a verifiability violation. Reading every
+    supported backend (not just LightGBM's ``feature_name_``) lets the leakage
+    guard run on XGBoost / CatBoost models instead of silently skipping them.
+    """
+    for attr in ("feature_name_", "feature_names_"):
+        names = getattr(estimator, attr, None)
+        if names is not None:
+            return list(names)
+    names = getattr(estimator, "feature_names_in_", None)
+    if names is not None:
+        return list(names)
+    get_booster = getattr(estimator, "get_booster", None)
+    if callable(get_booster):
+        try:
+            booster_names = get_booster().feature_names
+        except Exception:  # noqa: BLE001 - booster may be unset / API drift
+            booster_names = None
+        if booster_names is not None:
+            return list(booster_names)
+    return None
+
+
 def assert_no_leakage(
     mt: object,
     forbidden: set[str],
@@ -45,7 +81,9 @@ def assert_no_leakage(
 
     1. **Training frame** — ``mt.data_with_exog.columns``
     2. **Selected exogenous features** — ``mt.exog_feature_names``
-    3. **Fitted model features** — ``estimator.feature_name_`` for every
+    3. **Fitted model features** — the fitted estimator's input feature names
+       (LightGBM ``feature_name_``, CatBoost ``feature_names_``, or the
+       sklearn-standard ``feature_names_in_`` / XGBoost booster) for every
        target in ``mt.run_state.targets``
 
     All three surfaces are checked so a single call reports every violation at once.
@@ -69,8 +107,9 @@ def assert_no_leakage(
             the selected exogenous feature names, or any fitted model's feature
             list.  The message names the surface and the offending columns.
         RuntimeError: When ``mt.results[task][target]["forecaster"].estimator``
-            cannot be read or does not expose ``feature_name_``.  This signals
-            a verifiability invariant violation rather than a leakage violation.
+            cannot be read or exposes none of the supported fitted-feature-name
+            attributes (see `_fitted_feature_names`).  This signals a
+            verifiability invariant violation rather than a leakage violation.
 
     Examples:
         ```{python}
@@ -119,13 +158,22 @@ def assert_no_leakage(
     for target in targets:
         try:
             fc = mt.results[task][target]["forecaster"]
-            fitted_features |= set(fc.estimator.feature_name_)
+            names = _fitted_feature_names(fc.estimator)
         except Exception as exc:
             raise RuntimeError(
                 f"Cannot read fitted feature names for target {target!r} "
                 f"in task {task!r}: {exc}.  "
                 f"The fitted feature list is required for leakage verification."
             ) from exc
+        if names is None:
+            raise RuntimeError(
+                f"Cannot read fitted feature names for target {target!r} in "
+                f"task {task!r}: estimator {type(fc.estimator).__name__!r} "
+                f"exposes none of feature_name_ / feature_names_ / "
+                f"feature_names_in_ / get_booster().feature_names.  "
+                f"The fitted feature list is required for leakage verification."
+            )
+        fitted_features |= set(names)
 
     # Surface 2: training frame columns.
     dwe = getattr(mt, "data_with_exog", None)

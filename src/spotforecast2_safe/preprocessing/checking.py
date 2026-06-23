@@ -834,6 +834,28 @@ def check_residuals_input(
     return
 
 
+def _estimator_is_fitted(estimator: object) -> bool:
+    """Best-effort fitted check for the supported gradient-boosting backends.
+
+    CatBoost exposes ``is_fitted()``; LightGBM / XGBoost follow the sklearn
+    convention detected by ``check_is_fitted``. Returns ``False`` when the state
+    cannot be determined, so a genuine failure is still reported.
+    """
+    is_fitted = getattr(estimator, "is_fitted", None)
+    if callable(is_fitted):
+        try:
+            return bool(is_fitted())
+        except Exception:  # noqa: BLE001 - unreadable state -> treat as unfitted
+            return False
+    try:
+        from sklearn.utils.validation import check_is_fitted
+
+        check_is_fitted(estimator)
+        return True
+    except Exception:  # noqa: BLE001 - NotFittedError or non-sklearn estimator
+        return False
+
+
 def set_cpu_gpu_device(estimator: object, device: str | None = "cpu") -> str | None:
     """
     Set the device for the estimator to either 'cpu', 'gpu', 'cuda', or None.
@@ -902,7 +924,13 @@ def set_cpu_gpu_device(estimator: object, device: str | None = "cpu") -> str | N
     }
 
     param_name = device_names[estimator_name]
-    original_device = getattr(estimator, param_name, None)
+    # Read the current value via the sklearn API rather than getattr: CatBoost
+    # does not expose constructor params as plain attributes, so getattr always
+    # returned None and forced the set_params attempt below on every call.
+    try:
+        original_device = estimator.get_params().get(param_name)
+    except Exception:  # noqa: BLE001 - non-sklearn estimator -> fall back
+        original_device = getattr(estimator, param_name, None)
 
     if device is None:
         return original_device
@@ -912,11 +940,18 @@ def set_cpu_gpu_device(estimator: object, device: str | None = "cpu") -> str | N
     if original_device != new_device:
         try:
             estimator.set_params(**{param_name: new_device})
-        except Exception as exc:
-            warnings.warn(
-                f"Failed to set device parameter '{param_name}' to '{new_device}' "
-                f"for estimator '{estimator_name}': {exc}",
-                UserWarning,
-            )
+        except Exception as exc:  # noqa: BLE001
+            # A fitted estimator (notably CatBoost, which locks its params after
+            # fit) cannot have its device changed.  For the supported estimators
+            # CPU is the default, so an already-fitted model is on CPU and the
+            # failure is a benign no-op.  Warn only for a genuine (unfitted)
+            # failure -- otherwise backtesting, which calls this around every
+            # fold's predict, floods the log with one warning per fold.
+            if not _estimator_is_fitted(estimator):
+                warnings.warn(
+                    f"Failed to set device parameter '{param_name}' to "
+                    f"'{new_device}' for estimator '{estimator_name}': {exc}",
+                    UserWarning,
+                )
 
     return original_device
