@@ -1172,7 +1172,7 @@ class ForecasterRecursiveModel:
     def get_feature_importance(self) -> Optional[pd.DataFrame]:
         """Return feature importances from the underlying estimator.
 
-        Only supported for tree-based models (``xgb``, ``lgbm``).
+        Only supported for tree-based models (``xgb``, ``lgbm``, ``catboost``).
 
         Returns:
             pd.DataFrame or None: Feature importances, or *None* if the
@@ -1215,7 +1215,7 @@ class ForecasterRecursiveModel:
             print(fi)
             ```
         """
-        if self.name not in ["xgb", "lgbm"]:
+        if self.name not in ["xgb", "lgbm", "catboost"]:
             logger.error("Regressor does not support feature importance!")
             return None
         if self.forecaster is None:
