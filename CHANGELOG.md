@@ -1,3 +1,16 @@
+## [24.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.0.0...v24.0.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* **multitask:** read fitted feature names from XGBoost/CatBoost in leakage guard ([547fc6a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/547fc6a884042c433ca3fe83451186732de61703))
+* **preprocessing:** skip benign device-set warning on fitted estimators ([099dd1a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/099dd1a3e9f2e45e303384fbcacb65403b1bccf0))
+
+
+### Documentation
+
+* regenerate assert_no_leakage API page for the leakage-guard fix ([fa22cf2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/fa22cf27dd980d665c7f243460eb80660c9acbea))
+
 ## [24.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v23.1.0...v24.0.0) (2026-06-23)
 
 
