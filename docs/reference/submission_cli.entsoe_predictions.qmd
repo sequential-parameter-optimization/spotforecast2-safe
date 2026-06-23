@@ -1,0 +1,48 @@
+# submission_cli.entsoe_predictions { #spotforecast2_safe.submission_cli.entsoe_predictions }
+
+```python
+submission_cli.entsoe_predictions(interim, logger)
+```
+
+Return the ENTSO-E day-ahead hourly forecast series (tolerant).
+
+Delegates to
+:func:`spotforecast2_safe.downloader.entsoe.extract_entsoe_hourly_forecast`
+(sf2-safe 22.7.0).  An all-NaN column is **tolerated**: the library
+raises :exc:`ValueError` in that case; this function logs a WARNING and
+returns an empty :class:`~pandas.Series` instead.  A genuinely missing
+column (:exc:`KeyError`) propagates unchanged.
+
+This function does **not** abort.  ``preds_entsoe`` feeds only warn-only
+shape checks and diagnostics, never the model or the submission CSV.
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+interim : pd.DataFrame
+    The combined DE-total interim DataFrame.
+logger : logging.Logger
+    Script-level logger; emits a WARNING when the forecast is all-NaN
+    (byte-identical to the lecture-script log line).
+
+
+
+## Returns {.doc-section .doc-section-returns}
+
+pd.Series
+    Hourly ENTSO-E day-ahead forecast indexed by UTC timestamps, or an
+    empty ``pd.Series(name="Forecasted Load", dtype="float64")`` when
+    the column is all-NaN.
+
+Examples:
+
+    ```{python}
+    #| eval: false
+    import logging
+    from spotforecast2_safe.submission_cli import entsoe_predictions
+
+    logger = logging.getLogger("example")
+    preds = entsoe_predictions(interim, logger)
+    print(preds.head())
+    ```
