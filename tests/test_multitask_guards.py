@@ -13,7 +13,10 @@ import pandas as pd
 import pytest
 
 from spotforecast2_safe.exceptions import LeakageError
-from spotforecast2_safe.multitask.guards import assert_no_leakage
+from spotforecast2_safe.multitask.guards import (
+    _fitted_feature_names,
+    assert_no_leakage,
+)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -240,3 +243,72 @@ class TestUnreadableFittedFeatures:
         )
         with pytest.raises(RuntimeError, match="Cannot read fitted feature names"):
             assert_no_leakage(mt, forbidden=FORBIDDEN, task="defaults")
+
+
+# ---------------------------------------------------------------------------
+# Fitted-feature-name reading across estimator backends
+# ---------------------------------------------------------------------------
+
+
+class TestFittedFeatureNameSources:
+    """``_fitted_feature_names`` reads every supported backend, not just LightGBM.
+
+    Without this the leakage guard would silently skip XGBoost / CatBoost models
+    (their fitted feature names live on different attributes than LightGBM's
+    ``feature_name_``).
+    """
+
+    def test_lightgbm_feature_name_(self):
+        est = SimpleNamespace(feature_name_=["lag_1", "hour_sin"])
+        assert _fitted_feature_names(est) == ["lag_1", "hour_sin"]
+
+    def test_catboost_feature_names_(self):
+        est = SimpleNamespace(feature_names_=["lag_1", "hour_sin"])
+        assert _fitted_feature_names(est) == ["lag_1", "hour_sin"]
+
+    def test_sklearn_feature_names_in_(self):
+        import numpy as np
+
+        est = SimpleNamespace(feature_names_in_=np.array(["lag_1", "hour_sin"]))
+        assert _fitted_feature_names(est) == ["lag_1", "hour_sin"]
+
+    def test_xgboost_booster_feature_names(self):
+        booster = SimpleNamespace(feature_names=["lag_1", "hour_sin"])
+        est = SimpleNamespace(get_booster=lambda: booster)
+        assert _fitted_feature_names(est) == ["lag_1", "hour_sin"]
+
+    def test_none_when_no_attrs(self):
+        assert _fitted_feature_names(SimpleNamespace()) is None
+
+    def test_guard_detects_leak_in_catboost_style_estimator(self):
+        """A CatBoost-style estimator (``feature_names_``) is read, so a forbidden
+        column in it is detected instead of silently skipped."""
+        run_state = SimpleNamespace(targets=["load"])
+        estimator = SimpleNamespace(feature_names_=["lag_1", "Forecasted Load"])
+        forecaster = SimpleNamespace(estimator=estimator)
+        results = {"defaults": {"load": {"forecaster": forecaster}}}
+        mt = SimpleNamespace(
+            run_state=run_state,
+            results=results,
+            data_with_exog=pd.DataFrame({"load": [1.0]}, index=IDX[:1]),
+            exog_feature_names=["lag_1"],
+        )
+        with pytest.raises(LeakageError, match="fitted model features"):
+            assert_no_leakage(mt, forbidden=FORBIDDEN, task="defaults")
+
+    def test_guard_passes_for_clean_xgb_booster_estimator(self):
+        """An XGB-style estimator (``get_booster().feature_names``) is read; a clean
+        model passes (no longer skipped)."""
+        run_state = SimpleNamespace(targets=["load"])
+        booster = SimpleNamespace(feature_names=["lag_1", "lag_24"])
+        estimator = SimpleNamespace(get_booster=lambda: booster)
+        forecaster = SimpleNamespace(estimator=estimator)
+        results = {"defaults": {"load": {"forecaster": forecaster}}}
+        mt = SimpleNamespace(
+            run_state=run_state,
+            results=results,
+            data_with_exog=pd.DataFrame({"load": [1.0]}, index=IDX[:1]),
+            exog_feature_names=["lag_1"],
+        )
+        # No forbidden column anywhere -> no exception (previously silently skipped).
+        assert_no_leakage(mt, forbidden=FORBIDDEN, task="defaults")
