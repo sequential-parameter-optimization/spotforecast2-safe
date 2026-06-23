@@ -1,3 +1,17 @@
+## [24.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v23.1.0...v24.0.0) (2026-06-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **forecaster:** ForecasterRecursiveCatBoost is added to the top-level
+__all__, changing the pinned public API.
+
+Co-authored-by: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **forecaster:** add ForecasterRecursiveCatBoost optional wrapper ([#395](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/395)) ([21213c6](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/21213c6c02fc08027e8f3ae0110d2a8b5de2dac5))
+
 ## [23.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v23.0.0...v23.1.0) (2026-06-23)
 
 
