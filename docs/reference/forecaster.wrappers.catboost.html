@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>forecaster.wrappers.xgb – spotforecast2-safe</title>
+<title>forecaster.wrappers.catboost – spotforecast2-safe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,7 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -106,10 +106,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
 
 </head>
@@ -309,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.model.html">Wrappers</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.xgb.html">ForecasterRecursiveXGB</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.model.html">Wrappers</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.catboost.html">ForecasterRecursiveCatBoost</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -875,13 +875,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.wrappers.xgb.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../docs/reference/forecaster.wrappers.xgb.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ForecasterRecursiveXGB</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../docs/reference/forecaster.wrappers.catboost.html" class="sidebar-item-text sidebar-link">
+  <a href="../../docs/reference/forecaster.wrappers.catboost.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">ForecasterRecursiveCatBoost</span></a>
   </div>
 </li>
@@ -1876,18 +1876,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#classes" id="toc-classes" class="nav-link active" data-scroll-target="#classes">Classes</a>
   <ul class="collapse">
-  <li><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB" id="toc-spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB">ForecasterRecursiveXGB</a></li>
+  <li><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost" id="toc-spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost" class="nav-link" data-scroll-target="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost">ForecasterRecursiveCatBoost</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.wrappers.xgb.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.wrappers.catboost.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.model.html">Wrappers</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.xgb.html">ForecasterRecursiveXGB</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.base.html">Forecaster</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.model.html">Wrappers</a></li><li class="breadcrumb-item"><a href="../../docs/reference/forecaster.wrappers.catboost.html">ForecasterRecursiveCatBoost</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">forecaster.wrappers.xgb</h1>
+<h1 class="title">forecaster.wrappers.catboost</h1>
 </div>
 
 
@@ -1904,8 +1904,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><code>forecaster.wrappers.xgb</code></p>
-<p>Recursive forecaster model wrappers for different estimators.</p>
+<p><code>forecaster.wrappers.catboost</code></p>
+<p>Recursive forecaster wrapper using CatBoost.</p>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="caption-top table">
@@ -1917,18 +1917,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB">ForecasterRecursiveXGB</a></td>
-<td>ForecasterRecursive specialization using XGBoost.</td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost">ForecasterRecursiveCatBoost</a></td>
+<td>ForecasterRecursive specialization using CatBoost.</td>
 </tr>
 </tbody>
 </table>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB" class="level3">
-<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB">ForecasterRecursiveXGB</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB(iteration, lags<span class="op">=</span><span class="dv">12</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>ForecasterRecursive specialization using XGBoost.</p>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost" class="level3">
+<h3 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost">ForecasterRecursiveCatBoost</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    iteration,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    lags<span class="op">=</span><span class="dv">12</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>ForecasterRecursive specialization using CatBoost.</p>
+<p>CatBoost is an optional dependency. When it is not installed the wrapper still constructs, but leaves <code>forecaster</code> as <code>None</code> and logs a warning; any subsequent fit/predict call then fails explicitly instead of silently degrading.</p>
+<p>The estimator is pinned for bit-level reproducibility and to avoid filesystem side effects: a fixed <code>random_seed</code>, single-threaded summation (<code>thread_count=1</code>) so the result does not depend on the host core count, and <code>allow_writing_files=False</code> so training never writes a <code>catboost_info</code> directory.</p>
 <section id="attributes" class="level4 doc-section doc-section-attributes">
 <h4 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h4>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 77%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -1940,36 +1951,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>forecaster</td>
 <td></td>
-<td>The XGBoost forecaster.</td>
+<td>The CatBoost forecaster, or <code>None</code> if CatBoost is not installed.</td>
 </tr>
 <tr class="even">
 <td>name</td>
 <td></td>
-<td>The name of the forecaster.</td>
+<td>The name of the forecaster (<code>"catboost"</code>).</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="examples" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div id="77b5e5af" class="cell" data-execution_count="1">
+<div id="e9974db9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> (</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveModel,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveXGB,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveCatBoost,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    ForecasterRecursiveModel,</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveXGB(iteration<span class="op">=</span><span class="dv">0</span>, lags<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> model.name <span class="op">==</span> <span class="st">"xgb"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveCatBoost(iteration<span class="op">=</span><span class="dv">0</span>, lags<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> model.name <span class="op">==</span> <span class="st">"catboost"</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(model, ForecasterRecursiveModel)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"name: </span><span class="sc">{</span>model<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"random_state: </span><span class="sc">{</span>model<span class="sc">.</span>random_state<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># When xgboost is not installed, substitute a Ridge estimator so the</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># When catboost is not installed, substitute a Ridge estimator so the</span></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># fit/predict lifecycle can still be demonstrated end-to-end.</span></span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> model.forecaster <span class="kw">is</span> <span class="va">None</span>:</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    model.forecaster <span class="op">=</span> ForecasterRecursive(</span>
@@ -1988,10 +1999,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"is_fitted: </span><span class="sc">{</span>model<span class="sc">.</span>forecaster<span class="sc">.</span>is_fitted<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"forecast horizon: </span><span class="sc">{</span><span class="bu">len</span>(pred)<span class="sc">}</span><span class="ss"> steps"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>XGBoost not installed. This model will fail during fit/predict.</code></pre>
+<pre><code>CatBoost not installed. This model will fail during fit/predict.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>name: xgb
+<pre><code>name: catboost
 random_state: 123456789
 is_fitted: True
 forecast horizon: 2 steps</code></pre>
@@ -2009,66 +2020,66 @@ forecast horizon: 2 steps</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.backtest">backtest</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest">backtest</a></td>
 <td>Back-test the forecaster on the test data.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit">fit</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit">fit</a></td>
 <td>Fit the underlying forecaster.</td>
 </tr>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit_with_best">fit_with_best</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best">fit_with_best</a></td>
 <td>Fit the forecaster using the recorded best hyperparameters.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.from_config">from_config</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config">from_config</a></td>
 <td>Create a model instance with defaults drawn from a config object.</td>
 </tr>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_forecast">get_error_forecast</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast">get_error_forecast</a></td>
 <td>Compute the error of the ENTSO-E benchmark forecast.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_training">get_error_training</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training">get_error_training</a></td>
 <td>Compute in-sample error on the training data.</td>
 </tr>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_feature_importance">get_feature_importance</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance">get_feature_importance</a></td>
 <td>Return feature importances from the underlying estimator.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_global_shap_feature_importance">get_global_shap_feature_importance</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance">get_global_shap_feature_importance</a></td>
 <td>Return global SHAP-based feature importances.</td>
 </tr>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_params">get_params</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params">get_params</a></td>
 <td>Get parameters for this forecaster model.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.package_prediction">package_prediction</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction">package_prediction</a></td>
 <td>Package predictions, training errors, and benchmarks for the UI.</td>
 </tr>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.predict">predict</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict">predict</a></td>
 <td>Generate predictions and compute error metrics.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.save_to_file">save_to_file</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file">save_to_file</a></td>
 <td>Serialize the model to disk via <code>joblib.dump()</code>.</td>
 </tr>
 <tr class="odd">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.set_params">set_params</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params">set_params</a></td>
 <td>Set the parameters of this forecaster model.</td>
 </tr>
 <tr class="even">
-<td><a href="#spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.tune">tune</a></td>
+<td><a href="#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune">tune</a></td>
 <td>Simulate hyperparameter tuning.</td>
 </tr>
 </tbody>
 </table>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.backtest" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.backtest">backtest</h5>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.backtest()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest">backtest</h5>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Back-test the forecaster on the test data.</p>
 <section id="returns" class="level6 doc-section doc-section-returns">
 <h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h6>
@@ -2110,7 +2121,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-1" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h6>
-<div id="65f875ac" class="cell" data-execution_count="2">
+<div id="32fa7c48" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2158,7 +2169,7 @@ forecast horizon: 2 steps</code></pre>
 <span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> os.environ[<span class="st">"SPOTFORECAST2_DATA"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"ef2500b87f544c4aaae0329b642998eb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"688c6631f2b14c7c875c32bf59342a62","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -2168,9 +2179,9 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit">fit</h5>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit(y, exog<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit">fit</h5>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit(y, exog<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fit the underlying forecaster.</p>
 <section id="parameters" class="level6 doc-section doc-section-parameters">
 <h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h6>
@@ -2220,7 +2231,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-2" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h6>
-<div id="52dce8dd" class="cell" data-execution_count="3">
+<div id="a6132413" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
@@ -2240,7 +2251,7 @@ forecast horizon: 2 steps</code></pre>
 <pre><code>True</code></pre>
 </div>
 </div>
-<div id="b8e56174" class="cell" data-execution_count="4">
+<div id="43a4035b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
@@ -2267,9 +2278,9 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit_with_best" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit_with_best">fit_with_best</h5>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.fit_with_best()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best">fit_with_best</h5>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fit the forecaster using the recorded best hyperparameters.</p>
 <p>After tuning (or manually setting <code>best_params</code> and <code>best_lags</code>), this method loads the data, sets the optimal parameters/lags, and fits the forecaster on the full training + dev set up to <code>end_dev</code>.</p>
 <section id="raises-2" class="level6 doc-section doc-section-raises">
@@ -2293,7 +2304,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-3" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-3">Examples</h6>
-<div id="3b1c9d4a" class="cell" data-execution_count="5">
+<div id="6fdce06c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2345,9 +2356,9 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.from_config" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.from_config">from_config</h5>
-<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.from_config(</span>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config">from_config</h5>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    iteration,</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    config,</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>overrides,</span>
@@ -2408,7 +2419,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-4" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-4">Examples</h6>
-<div id="b17518d4" class="cell" data-execution_count="6">
+<div id="6a7e5686" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.configurator.config_multi <span class="im">import</span> ConfigMulti</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2421,9 +2432,9 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_forecast" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_forecast">get_error_forecast</h5>
-<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_forecast(</span>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast">get_error_forecast</h5>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    delta_predict<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Compute the error of the ENTSO-E benchmark forecast.</p>
@@ -2469,7 +2480,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-5" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-5">Examples</h6>
-<div id="3b5426d6" class="cell" data-execution_count="7">
+<div id="1524f554" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2517,9 +2528,9 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_training" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_training">get_error_training</h5>
-<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_error_training()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training">get_error_training</h5>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Compute in-sample error on the training data.</p>
 <section id="returns-3" class="level6 doc-section doc-section-returns">
 <h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h6>
@@ -2542,7 +2553,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-6" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-6">Examples</h6>
-<div id="739c5d58" class="cell" data-execution_count="8">
+<div id="333e0bba" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2605,9 +2616,10 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_feature_importance" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_feature_importance">get_feature_importance</h5>
-<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_feature_importance()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance">get_feature_importance</h5>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return feature importances from the underlying estimator.</p>
 <p>Only supported for tree-based models (<code>xgb</code>, <code>lgbm</code>, <code>catboost</code>).</p>
 <section id="returns-4" class="level6 doc-section doc-section-returns">
@@ -2631,7 +2643,7 @@ forecast horizon: 2 steps</code></pre>
 </section>
 <section id="examples-7" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-7">Examples</h6>
-<div id="b6396f11" class="cell" data-execution_count="9">
+<div id="336e1091" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMRegressor</span>
@@ -2659,10 +2671,10 @@ forecast horizon: 2 steps</code></pre>
 <pre><code>feature  importance
   lag_3          85
   lag_4           7
-  lag_2           4</code></pre>
+  lag_1           4</code></pre>
 </div>
 </div>
-<div id="aea3ee37" class="cell" data-execution_count="10">
+<div id="fc2bf04f" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>model_no_tree <span class="op">=</span> ForecasterRecursiveModel(iteration<span class="op">=</span><span class="dv">0</span>)</span>
@@ -2679,9 +2691,9 @@ forecast horizon: 2 steps</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_global_shap_feature_importance" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_global_shap_feature_importance">get_global_shap_feature_importance</h5>
-<div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_global_shap_feature_importance(</span>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance">get_global_shap_feature_importance</h5>
+<div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance(</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    frac<span class="op">=</span><span class="fl">0.1</span>,</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return global SHAP-based feature importances.</p>
@@ -2732,7 +2744,7 @@ dependency list per ``MODEL_CARD.md``.</code></pre>
 </section>
 <section id="examples-8" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-8">Examples</h6>
-<div id="431d76e0" class="cell" data-execution_count="11">
+<div id="470ea746" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveModel(iteration<span class="op">=</span><span class="dv">0</span>, name<span class="op">=</span><span class="st">"lgbm"</span>)</span>
@@ -2748,9 +2760,9 @@ dependency list per ``MODEL_CARD.md``.</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_params" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_params">get_params</h5>
-<div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.get_params(deep<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params">get_params</h5>
+<div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params(deep<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get parameters for this forecaster model.</p>
 <p>Collects wrapper-level parameters (<code>iteration</code>, <code>end_dev</code>, <code>train_size</code>, <code>random_state</code>, <code>predict_size</code>, <code>refit_size</code>, <code>name</code>) and, when a forecaster is attached, delegates to <code>ForecasterRecursive.get_params()</code> for forecaster-level parameters (<code>estimator</code>, <code>lags</code>, <code>window_features</code>, etc.).</p>
 <section id="parameters-4" class="level6 doc-section doc-section-parameters">
@@ -2795,7 +2807,7 @@ dependency list per ``MODEL_CARD.md``.</code></pre>
 </section>
 <section id="examples-9" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-9">Examples</h6>
-<div id="7fe82cbc" class="cell" data-execution_count="12">
+<div id="d621ae3b" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveModel(iteration<span class="op">=</span><span class="dv">0</span>)</span>
@@ -2811,7 +2823,7 @@ base
 True</code></pre>
 </div>
 </div>
-<div id="66880a86" class="cell" data-execution_count="13">
+<div id="ae6775c7" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
@@ -2832,9 +2844,9 @@ True</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.package_prediction" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.package_prediction">package_prediction</h5>
-<div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.package_prediction(</span>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction">package_prediction</h5>
+<div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction(</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    predict_size<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Package predictions, training errors, and benchmarks for the UI.</p>
@@ -2905,7 +2917,7 @@ True</code></pre>
 </section>
 <section id="examples-10" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-10">Examples</h6>
-<div id="d3e02a8e" class="cell" data-execution_count="14">
+<div id="76173367" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -2954,8 +2966,8 @@ True</code></pre>
 <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>                                                                                      <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
 <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Category : spotforecast2.exceptions.IgnoredArgumentWarning                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
 <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Location :                                                                           <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /home/runner/work/spotforecast2-safe/spotforecast2-safe/src/spotforecast2_safe/prepr <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
-<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> ocessing/_binner.py:259                                                              <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> /Users/bartz/workspace/spotforecast2-safe/src/spotforecast2_safe/preprocessing/_binn <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
+<span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> er.py:259                                                                            <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
 <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span> Suppress : warnings.simplefilter('ignore', category=IgnoredArgumentWarning)          <span style="color: #ffaf00; text-decoration-color: #ffaf00">│</span>
 <span style="color: #ffaf00; text-decoration-color: #ffaf00">╰──────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
@@ -2966,9 +2978,11 @@ True</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.predict" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.predict">predict</h5>
-<div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.predict(delta_predict<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict">predict</h5>
+<div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    delta_predict<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Generate predictions and compute error metrics.</p>
 <section id="parameters-6" class="level6 doc-section doc-section-parameters">
 <h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h6>
@@ -3031,7 +3045,7 @@ True</code></pre>
 </section>
 <section id="examples-11" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-11">Examples</h6>
-<div id="aad4ef27" class="cell" data-execution_count="15">
+<div id="0f4c798d" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -3095,9 +3109,11 @@ True</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.save_to_file" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.save_to_file">save_to_file</h5>
-<div class="sourceCode" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.save_to_file(model_dir<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file">save_to_file</h5>
+<div class="sourceCode" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file(</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    model_dir<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Serialize the model to disk via <code>joblib.dump()</code>.</p>
 <section id="parameters-7" class="level6 doc-section doc-section-parameters">
 <h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h6>
@@ -3122,7 +3138,7 @@ True</code></pre>
 </section>
 <section id="examples-12" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-12">Examples</h6>
-<div id="34eb2d7f" class="cell" data-execution_count="16">
+<div id="a9be1987" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
@@ -3137,9 +3153,12 @@ True</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.set_params" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.set_params">set_params</h5>
-<div class="sourceCode" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.set_params(params<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params">set_params</h5>
+<div class="sourceCode" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Set the parameters of this forecaster model.</p>
 <p>Wrapper-level keys (<code>iteration</code>, <code>name</code>, <code>predict_size</code>, …) are set directly on the model. Keys prefixed with <code>forecaster__</code> are forwarded to <code>ForecasterRecursive.set_params()</code>.</p>
 <section id="parameters-8" class="level6 doc-section doc-section-parameters">
@@ -3190,7 +3209,7 @@ True</code></pre>
 </section>
 <section id="examples-13" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-13">Examples</h6>
-<div id="556c2299" class="cell" data-execution_count="17">
+<div id="472bb6d7" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveModel(iteration<span class="op">=</span><span class="dv">0</span>)</span>
@@ -3202,7 +3221,7 @@ True</code></pre>
 48</code></pre>
 </div>
 </div>
-<div id="f9090dce" class="cell" data-execution_count="18">
+<div id="9d631c0c" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.recursive <span class="im">import</span> ForecasterRecursive</span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
@@ -3217,14 +3236,14 @@ True</code></pre>
 </div>
 </section>
 </section>
-<section id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.tune" class="level5">
-<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.xgb.ForecasterRecursiveXGB.tune">tune</h5>
-<div class="sourceCode" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.xgb.ForecasterRecursiveXGB.tune()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune" class="level5">
+<h5 class="anchored" data-anchor-id="spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune">tune</h5>
+<div class="sourceCode" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Simulate hyperparameter tuning.</p>
 <p>In <code>spotforecast2-safe</code> this is a simulated stub that marks the model as tuned without performing an actual Bayesian search. The real implementation (using <code>bayesian_search_forecaster</code>) belongs in the sibling package <code>spotforecast2</code>; sf2-safe deliberately excludes auto-tuning per <code>MODEL_CARD.md</code>.</p>
 <section id="examples-14" class="level6 doc-section doc-section-examples">
 <h6 class="doc-section doc-section-examples anchored" data-anchor-id="examples-14">Examples</h6>
-<div id="d097a3a4" class="cell" data-execution_count="19">
+<div id="54aeea5c" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.forecaster.wrappers <span class="im">import</span> ForecasterRecursiveModel</span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ForecasterRecursiveModel(iteration<span class="op">=</span><span class="dv">0</span>, name<span class="op">=</span><span class="st">"ridge"</span>)</span>
@@ -3246,7 +3265,7 @@ True</code></pre>
 
 </main> <!-- /main -->
 <script type="application/vnd.jupyter.widget-state+json">
-{"state":{"0ef43d7392ca41b9ae4d424318c25d31":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"4388ec0029484cddb75d4d10a312ccd0":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"8e4bb2705e5648ce83e7e537460b2e89":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"9f3d03bc68314f4ba80a8d1f6ed0bee4":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"a52bbb1740bd4d439aeebec4558e3026":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_a925274de2aa4438abb0b4ca198e0605","placeholder":"​","style":"IPY_MODEL_e78300c2bf2f4a72be8794b3291cde5f","tabbable":null,"tooltip":null,"value":" 37/37 [00:00&lt;00:00, 794.01it/s]"}},"a925274de2aa4438abb0b4ca198e0605":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"ba4764aae4e642cdabf48d631db2cbcc":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"c85536f60fde40479f38e1f1adab2e7e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_4388ec0029484cddb75d4d10a312ccd0","placeholder":"​","style":"IPY_MODEL_ba4764aae4e642cdabf48d631db2cbcc","tabbable":null,"tooltip":null,"value":"100%"}},"dc8ecadbdba54110b92752d65d74603e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_9f3d03bc68314f4ba80a8d1f6ed0bee4","max":37,"min":0,"orientation":"horizontal","style":"IPY_MODEL_0ef43d7392ca41b9ae4d424318c25d31","tabbable":null,"tooltip":null,"value":37}},"e78300c2bf2f4a72be8794b3291cde5f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"ef2500b87f544c4aaae0329b642998eb":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_c85536f60fde40479f38e1f1adab2e7e","IPY_MODEL_dc8ecadbdba54110b92752d65d74603e","IPY_MODEL_a52bbb1740bd4d439aeebec4558e3026"],"layout":"IPY_MODEL_8e4bb2705e5648ce83e7e537460b2e89","tabbable":null,"tooltip":null}}},"version_major":2,"version_minor":0}
+{"state":{"1fe64d4233454036a08a85034831da65":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"21c63a08c2a546edbf72349f6c19f60b":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"2e2f59d5763c423f84a8af2094dd167e":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"398fa2be08124599af107526a4f6ef20":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_21c63a08c2a546edbf72349f6c19f60b","placeholder":"​","style":"IPY_MODEL_aac03eb09994486987c89478c4c6ada4","tabbable":null,"tooltip":null,"value":" 37/37 [00:00&lt;00:00, 2615.56it/s]"}},"3d5924310aee49369833441c00b3b0b2":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_538753fa303141618e93601a95c01b67","max":37,"min":0,"orientation":"horizontal","style":"IPY_MODEL_429cfb42a2404e22a02ab29b9db6170f","tabbable":null,"tooltip":null,"value":37}},"429cfb42a2404e22a02ab29b9db6170f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"538753fa303141618e93601a95c01b67":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"688c6631f2b14c7c875c32bf59342a62":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_d6e749932a8b48fbbd280e3affd8f33b","IPY_MODEL_3d5924310aee49369833441c00b3b0b2","IPY_MODEL_398fa2be08124599af107526a4f6ef20"],"layout":"IPY_MODEL_1fe64d4233454036a08a85034831da65","tabbable":null,"tooltip":null}},"aac03eb09994486987c89478c4c6ada4":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"c19f6c34f1b642719e6f30590e63d75b":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"d6e749932a8b48fbbd280e3affd8f33b":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_2e2f59d5763c423f84a8af2094dd167e","placeholder":"​","style":"IPY_MODEL_c19f6c34f1b642719e6f30590e63d75b","tabbable":null,"tooltip":null,"value":"100%"}}},"version_major":2,"version_minor":0}
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -3675,7 +3694,7 @@ True</code></pre>
     </div>   
     <div class="nav-footer-center">
 <p>Copyright © 2024-2026 bartzbeielstein | <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0-or-later</a></p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.wrappers.xgb.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/edit/main/docs/reference/forecaster.wrappers.catboost.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
