@@ -1,0 +1,100 @@
+# submission_cli.download_combined_or_abort { #spotforecast2_safe.submission_cli.download_combined_or_abort }
+
+```python
+submission_cli.download_combined_or_abort(
+    api_key,
+    dates,
+    *,
+    max_retries,
+    backoff,
+    timeout,
+    fallback_enabled,
+    country_code,
+    logger,
+)
+```
+
+Download the combined DE-total series with snapshot fallback, or abort.
+
+Delegates to
+:func:`spotforecast2_safe.downloader.resilience.download_combined_with_fallback`
+(sf2-safe 22.10.0).  Returns ``True`` when a snapshot was restored
+(triggers the yesterday-23:00 freshness gate downstream via
+``result.fallback_gate``).  Raises :exc:`SubmissionAbort` with
+``reason=AbortReason.DOWNLOAD_UNRECOVERABLE`` when ``result.mode is
+None`` (live download exhausted and no valid combined snapshot within
+the TTL).
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+api_key : str
+    ENTSO-E Web API security token.
+dates : SubmissionDates
+    Date window from :func:`compute_dates_or_abort`; supplies
+    ``start_dl``, ``end_dl``, and ``now``.
+max_retries : int
+    Number of outer download attempts.
+backoff : float
+    Base seconds for exponential backoff between outer attempts
+    (``backoff * 2**(attempt-1)``).
+timeout : float or None
+    Per-socket read timeout (seconds); ``None`` disables.
+fallback_enabled : bool
+    When ``False``, cached snapshots are never READ as a fallback
+    (live data or abort), but they are still written on success.
+country_code : str
+    ENTSO-E country code (e.g. ``"DE"``).
+logger : logging.Logger
+    Accepted for API symmetry with the other helpers; this function does
+    not log.
+
+
+
+## Returns {.doc-section .doc-section-returns}
+
+bool
+    ``True`` when ``result.fallback_gate`` is set (a snapshot was
+    restored); ``False`` when fresh live data was used.
+
+
+
+## Raises {.doc-section .doc-section-raises}
+
+SubmissionAbort
+    With ``reason=AbortReason.DOWNLOAD_UNRECOVERABLE`` when the live
+    download is exhausted and no valid snapshot is available.
+
+Examples:
+
+    ```{python}
+    #| eval: false
+    import logging
+    import pandas as pd
+
+    from spotforecast2_safe.submission_cli import (
+        compute_dates_or_abort,
+        download_combined_or_abort,
+    )
+
+    logger = logging.getLogger("example")
+    dates = compute_dates_or_abort(
+        now=pd.Timestamp.now(tz="UTC"),
+        data_end=None,
+        train_years=3,
+        start_margin_days=45,
+        logger=logger,
+    )
+    fallback_gate = download_combined_or_abort(
+        api_key="YOUR_API_KEY",
+        dates=dates,
+        max_retries=5,
+        backoff=5.0,
+        timeout=60.0,
+        fallback_enabled=True,
+        country_code="DE",
+        logger=logger,
+    )
+    print("snapshot restored:", fallback_gate)
+    ```

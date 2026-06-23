@@ -1,0 +1,120 @@
+# submission_cli.assert_coverage_or_abort { #spotforecast2_safe.submission_cli.assert_coverage_or_abort }
+
+```python
+submission_cli.assert_coverage_or_abort(
+    interim,
+    dates,
+    *,
+    fallback,
+    corruption_mode,
+    deviation_ref,
+    max_actual_lag_hours,
+    gap_scan_days,
+    max_actual_gap_hours,
+    corruption_policy,
+    range_mw,
+    step_mw,
+    qc_window_days,
+    deviation_mw,
+    deviation_slots,
+    logger,
+)
+```
+
+Assert data-quality coverage, aborting on guard violations.
+
+Delegates to
+:func:`spotforecast2_safe.preprocessing.coverage.assert_submission_coverage`
+(sf2-safe 22.10.0).  The ``corruption_mode`` parameter is **mandatory**:
+team4 passes ``"preview"`` (the authoritative QC happens later inside
+``prepare_data``), while chronos / macl2l pass ``"authoritative"`` (they
+have no ``prepare_data``, so the coverage check is the only place the
+value-sanity policy applies).
+
+The ``COVERAGE`` vs ``STALE_CACHE`` split is decided internally by
+checking whether the :exc:`~spotforecast2_safe.exceptions.CoverageError`
+message contains the substring ``"yesterday 23:00 UTC"`` — the same heuristic
+the lecture scripts use.  Callers do NOT need to inspect the message.
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+interim : pd.DataFrame
+    The combined DE-total interim DataFrame.
+dates : SubmissionDates
+    Date window from :func:`compute_dates_or_abort`.
+fallback : bool
+    ``True`` when a snapshot was restored (enables the staleness gate).
+corruption_mode : str
+    ``"preview"`` or ``"authoritative"``; forwarded verbatim to
+    ``assert_submission_coverage``.
+deviation_ref : str
+    Column name for the deviation reference series (e.g.
+    ``"Forecasted Load"``).
+max_actual_lag_hours : int
+    Maximum allowed lag between the current time and the last actual.
+gap_scan_days : int
+    Number of days back to scan for interior gaps.
+max_actual_gap_hours : int
+    Maximum allowed interior gap length (hours).
+corruption_policy : str
+    Target-corruption policy (``"truncate"``, ``"heal"``, or ``"abort"``).
+range_mw : float
+    Maximum allowed intra-hour MW range (value-sanity guard).
+step_mw : float
+    Maximum allowed adjacent-step MW jump (value-sanity guard).
+qc_window_days : int
+    QC window length (days) for the deviation guard.
+deviation_mw : float
+    Maximum allowed deviation from the reference series (MW).
+deviation_slots : int
+    Number of consecutive slots that may exceed ``deviation_mw``.
+logger : logging.Logger
+    Accepted for API symmetry with the other helpers; this function does
+    not log.
+
+
+
+## Returns {.doc-section .doc-section-returns}
+
+SubmissionCoverage
+    Coverage object whose ``n_steps`` and ``last_full_hour`` drive the
+    downstream pipeline.
+
+
+
+## Raises {.doc-section .doc-section-raises}
+
+SubmissionAbort
+    With ``reason=AbortReason.STALE_CACHE`` when the ``CoverageError``
+    message contains ``"yesterday 23:00 UTC"`` (stale-snapshot gate);
+    ``reason=AbortReason.COVERAGE`` for all other guard violations.
+
+Examples:
+
+    ```{python}
+    #| eval: false
+    import logging
+    from spotforecast2_safe.submission_cli import assert_coverage_or_abort
+
+    logger = logging.getLogger("example")
+    cov = assert_coverage_or_abort(
+        interim=interim,
+        dates=dates,
+        fallback=False,
+        corruption_mode="preview",
+        deviation_ref="Forecasted Load",
+        max_actual_lag_hours=36,
+        gap_scan_days=28,
+        max_actual_gap_hours=12,
+        corruption_policy="truncate",
+        range_mw=8_000,
+        step_mw=6_000,
+        qc_window_days=3,
+        deviation_mw=11_000,
+        deviation_slots=1,
+        logger=logger,
+    )
+    print(cov.n_steps)
+    ```

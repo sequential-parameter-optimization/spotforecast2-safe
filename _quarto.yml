@@ -526,6 +526,25 @@ website:
               - text: "task_safe_zone_load_demo"
                 file: docs/reference/tasks.task_safe_zone_load_demo.qmd
 
+          - section: "Submission CLI"
+            contents:
+              - text: "submission_cli"
+                file: docs/reference/submission_cli.qmd
+              - text: "AbortReason"
+                file: docs/reference/submission_cli.AbortReason.qmd
+              - text: "SubmissionAbort"
+                file: docs/reference/submission_cli.SubmissionAbort.qmd
+              - text: "compute_dates_or_abort"
+                file: docs/reference/submission_cli.compute_dates_or_abort.qmd
+              - text: "load_interim_or_abort"
+                file: docs/reference/submission_cli.load_interim_or_abort.qmd
+              - text: "assert_coverage_or_abort"
+                file: docs/reference/submission_cli.assert_coverage_or_abort.qmd
+              - text: "entsoe_predictions"
+                file: docs/reference/submission_cli.entsoe_predictions.qmd
+              - text: "download_combined_or_abort"
+                file: docs/reference/submission_cli.download_combined_or_abort.qmd
+
       - section: "Processing Guides"
         contents:
           - text: "Model Persistence"
@@ -932,6 +951,23 @@ quartodoc:
         - downloader.resilience.DownloadResult
         - downloader.resilience.ZoneOutcome
         - downloader.resilience.make_store
+
+    # ── Submission CLI ────────────────────────────────────────────────────────
+    - title: "Submission CLI"
+      desc: |
+        Shared, torch-free gate helpers for ENTSO-E day-ahead submission scripts.
+        Pure dispatch: all network and filesystem work is delegated to
+        ``downloader.entsoe``, ``downloader.resilience``, and
+        ``preprocessing.coverage``.
+      contents:
+        - submission_cli
+        - submission_cli.AbortReason
+        - submission_cli.SubmissionAbort
+        - submission_cli.compute_dates_or_abort
+        - submission_cli.load_interim_or_abort
+        - submission_cli.assert_coverage_or_abort
+        - submission_cli.entsoe_predictions
+        - submission_cli.download_combined_or_abort
 
     # ── Exceptions ────────────────────────────────────────────────────────────
     - title: "Exceptions"

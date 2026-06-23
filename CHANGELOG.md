@@ -1,3 +1,10 @@
+## [23.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v23.0.0...v23.1.0) (2026-06-23)
+
+
+### Features
+
+* **submission_cli:** add exit-code-neutral submission CLI mappers ([#397](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/397)) ([5a434ae](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/5a434aef66031b809db0902d8372ddc9d163226e))
+
 ## [23.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v22.10.1...v23.0.0) (2026-06-23)
 
 
