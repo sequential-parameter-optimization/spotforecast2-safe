@@ -9,6 +9,7 @@
 from spotforecast2_safe.data import Period
 from spotforecast2_safe.configurator import ConfigEntsoe
 from spotforecast2_safe.forecaster.wrappers import (
+    ForecasterRecursiveCatBoost,
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
     ForecasterRecursiveXGB,
@@ -46,6 +47,7 @@ __all__ = [
     "ForecasterRecursiveModel",
     "ForecasterRecursiveLGBM",
     "ForecasterRecursiveXGB",
+    "ForecasterRecursiveCatBoost",
     "ConfigEntsoe",
     "Config",
 ]

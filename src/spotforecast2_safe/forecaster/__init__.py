@@ -8,6 +8,7 @@ from .recursive import (
     ForecasterRecursiveMultiSeries,
 )
 from .wrappers import (
+    ForecasterRecursiveCatBoost,
     ForecasterRecursiveLGBM,
     ForecasterRecursiveModel,
     ForecasterRecursiveXGB,
@@ -21,4 +22,5 @@ __all__ = [
     "ForecasterRecursiveModel",
     "ForecasterRecursiveLGBM",
     "ForecasterRecursiveXGB",
+    "ForecasterRecursiveCatBoost",
 ]

@@ -66,3 +66,18 @@ def test_package_prediction_interface():
     """Test package_prediction method exists."""
     model = ForecasterRecursiveXGB(iteration=0)
     assert hasattr(model, "package_prediction")
+
+
+def test_xgb_determinism_flags_are_pinned():
+    """The XGBoost backend must be instantiated with a fixed ``random_state``
+    tied to the model seed; silently dropping it would break the bit-level
+    determinism claim in the compliance narrative. This test fails loudly when
+    that happens. Skipped when xgboost is not installed (optional dependency)."""
+    from spotforecast2_safe.forecaster.wrappers.xgb import XGBRegressor
+
+    if XGBRegressor is None:
+        pytest.skip("XGBoost not installed, skipping determinism-flag test")
+
+    model = ForecasterRecursiveXGB(iteration=0)
+    params = model.forecaster.estimator.get_params()
+    assert params["random_state"] == model.random_state
