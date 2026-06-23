@@ -256,7 +256,7 @@ def get_model_prediction(
     set of predictions and metrics.
 
     Args:
-        model_name: Name of the model to use (e.g., 'lgbm', 'xgb').
+        model_name: Name of the model to use (e.g., 'lgbm', 'xgb', 'catboost').
         model_dir: Directory where models are stored. If None, defaults to
             the library's cache home.
         predict_size: Optional override for the prediction horizon.

@@ -27,7 +27,7 @@ def get_path_model(
     """Yield the path to a model file for a given iteration and model name.
 
     Args:
-        name: Model name (e.g. ``"lgbm"``, ``"xgb"``).
+        name: Model name (e.g. ``"lgbm"``, ``"xgb"``, ``"catboost"``).
         iteration: Iteration of the model.
         model_dir: Directory where models are stored.
             If *None*, defaults to `get_cache_home()`.

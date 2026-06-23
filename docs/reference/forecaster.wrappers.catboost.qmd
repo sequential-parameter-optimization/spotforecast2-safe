@@ -1,87 +1,107 @@
-# forecaster.wrappers.lgbm { #spotforecast2_safe.forecaster.wrappers.lgbm }
+# forecaster.wrappers.catboost { #spotforecast2_safe.forecaster.wrappers.catboost }
 
-`forecaster.wrappers.lgbm`
+`forecaster.wrappers.catboost`
 
-Recursive forecaster wrapper using LightGBM.
+Recursive forecaster wrapper using CatBoost.
 
 ## Classes
 
 | Name | Description |
 | --- | --- |
-| [ForecasterRecursiveLGBM](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM) | ForecasterRecursive specialization using LightGBM. |
+| [ForecasterRecursiveCatBoost](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost) | ForecasterRecursive specialization using CatBoost. |
 
-### ForecasterRecursiveLGBM { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM }
+### ForecasterRecursiveCatBoost { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM(iteration, lags=12, **kwargs)
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost(
+    iteration,
+    lags=12,
+    **kwargs,
+)
 ```
 
-ForecasterRecursive specialization using LightGBM.
+ForecasterRecursive specialization using CatBoost.
+
+CatBoost is an optional dependency. When it is not installed the wrapper
+still constructs, but leaves ``forecaster`` as ``None`` and logs a
+warning; any subsequent fit/predict call then fails explicitly instead of
+silently degrading.
+
+The estimator is pinned for bit-level reproducibility and to avoid
+filesystem side effects: a fixed ``random_seed``, single-threaded
+summation (``thread_count=1``) so the result does not depend on the host
+core count, and ``allow_writing_files=False`` so training never writes a
+``catboost_info`` directory.
+
+#### Attributes {.doc-section .doc-section-attributes}
+
+| Name       | Type   | Description                                                        |
+|------------|--------|--------------------------------------------------------------------|
+| forecaster |        | The CatBoost forecaster, or ``None`` if CatBoost is not installed. |
+| name       |        | The name of the forecaster (``"catboost"``).                       |
 
 #### Examples {.doc-section .doc-section-examples}
 
 ```{python}
-import warnings
 import numpy as np
 import pandas as pd
-from lightgbm import LGBMRegressor
+from sklearn.linear_model import Ridge
 
-from spotforecast2_safe.exceptions import IgnoredArgumentWarning
 from spotforecast2_safe.forecaster.recursive import ForecasterRecursive
-from spotforecast2_safe.forecaster.wrappers import ForecasterRecursiveLGBM
+from spotforecast2_safe.forecaster.wrappers import (
+    ForecasterRecursiveCatBoost,
+    ForecasterRecursiveModel,
+)
 
-warnings.simplefilter("ignore", IgnoredArgumentWarning)
+model = ForecasterRecursiveCatBoost(iteration=0, lags=3)
+assert model.name == "catboost"
+assert isinstance(model, ForecasterRecursiveModel)
+print(f"name: {model.name}")
+print(f"random_state: {model.random_state}")
+
+# When catboost is not installed, substitute a Ridge estimator so the
+# fit/predict lifecycle can still be demonstrated end-to-end.
+if model.forecaster is None:
+    model.forecaster = ForecasterRecursive(
+        estimator=Ridge(random_state=1234), lags=3
+    )
 
 rng = np.random.default_rng(0)
-n = 50
-idx = pd.date_range("2023-01-01", periods=n, freq="h")
-vals = 100 + 10 * np.sin(np.linspace(0, 4 * np.pi, n)) + rng.normal(0, 1, n)
-y = pd.Series(vals, index=idx)
-
-# Use a fast, small estimator for the example
-model = ForecasterRecursiveLGBM(iteration=0, lags=3)
-model.forecaster = ForecasterRecursive(
-    estimator=LGBMRegressor(
-        n_estimators=10, n_jobs=1, verbose=-1, random_state=0,
-        deterministic=True, force_col_wise=True,
-    ),
-    lags=3,
+y = pd.Series(
+    rng.random(20),
+    index=pd.date_range("2023-01-01", periods=20, freq="h"),
 )
 model.fit(y=y)
-pred = model.forecaster.predict(steps=2)
-
-assert model.name == "lgbm"
 assert model.forecaster.is_fitted
+pred = model.forecaster.predict(steps=2)
 assert len(pred) == 2
-assert pred.dtype == float
-print(f"model.name: {model.name}")
 print(f"is_fitted: {model.forecaster.is_fitted}")
-print(f"prediction steps: {len(pred)}")
+print(f"forecast horizon: {len(pred)} steps")
 ```
 
 #### Methods
 
 | Name | Description |
 | --- | --- |
-| [backtest](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.backtest) | Back-test the forecaster on the test data. |
-| [fit](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.fit) | Fit the underlying forecaster. |
-| [fit_with_best](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.fit_with_best) | Fit the forecaster using the recorded best hyperparameters. |
-| [from_config](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.from_config) | Create a model instance with defaults drawn from a config object. |
-| [get_error_forecast](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_error_forecast) | Compute the error of the ENTSO-E benchmark forecast. |
-| [get_error_training](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_error_training) | Compute in-sample error on the training data. |
-| [get_feature_importance](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_feature_importance) | Return feature importances from the underlying estimator. |
-| [get_global_shap_feature_importance](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_global_shap_feature_importance) | Return global SHAP-based feature importances. |
-| [get_params](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_params) | Get parameters for this forecaster model. |
-| [package_prediction](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.package_prediction) | Package predictions, training errors, and benchmarks for the UI. |
-| [predict](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.predict) | Generate predictions and compute error metrics. |
-| [save_to_file](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.save_to_file) | Serialize the model to disk via `joblib.dump()`. |
-| [set_params](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.set_params) | Set the parameters of this forecaster model. |
-| [tune](#spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.tune) | Simulate hyperparameter tuning. |
+| [backtest](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest) | Back-test the forecaster on the test data. |
+| [fit](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit) | Fit the underlying forecaster. |
+| [fit_with_best](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best) | Fit the forecaster using the recorded best hyperparameters. |
+| [from_config](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config) | Create a model instance with defaults drawn from a config object. |
+| [get_error_forecast](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast) | Compute the error of the ENTSO-E benchmark forecast. |
+| [get_error_training](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training) | Compute in-sample error on the training data. |
+| [get_feature_importance](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance) | Return feature importances from the underlying estimator. |
+| [get_global_shap_feature_importance](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance) | Return global SHAP-based feature importances. |
+| [get_params](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params) | Get parameters for this forecaster model. |
+| [package_prediction](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction) | Package predictions, training errors, and benchmarks for the UI. |
+| [predict](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict) | Generate predictions and compute error metrics. |
+| [save_to_file](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file) | Serialize the model to disk via `joblib.dump()`. |
+| [set_params](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params) | Set the parameters of this forecaster model. |
+| [tune](#spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune) | Simulate hyperparameter tuning. |
 
-##### backtest { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.backtest }
+##### backtest { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.backtest()
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.backtest()
 ```
 
 Back-test the forecaster on the test data.
@@ -148,10 +168,10 @@ shutil.rmtree(tmp)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### fit { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.fit }
+##### fit { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.fit(y, exog=None)
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit(y, exog=None)
 ```
 
 Fit the underlying forecaster.
@@ -212,10 +232,10 @@ model_exog.fit(y=y, exog=exog)
 print(model_exog.forecaster.is_fitted)
 ```
 
-##### fit_with_best { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.fit_with_best }
+##### fit_with_best { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.fit_with_best()
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.fit_with_best()
 ```
 
 Fit the forecaster using the recorded best hyperparameters.
@@ -281,10 +301,10 @@ shutil.rmtree(tmp)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### from_config { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.from_config }
+##### from_config { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.from_config(
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.from_config(
     iteration,
     config,
     **overrides,
@@ -323,10 +343,10 @@ model = ForecasterRecursiveModel.from_config(iteration=1, config=cfg)
 print(model.predict_size)
 ```
 
-##### get_error_forecast { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_error_forecast }
+##### get_error_forecast { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_error_forecast(
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_forecast(
     delta_predict=None,
 )
 ```
@@ -391,10 +411,10 @@ shutil.rmtree(tmp)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### get_error_training { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_error_training }
+##### get_error_training { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_error_training()
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_error_training()
 ```
 
 Compute in-sample error on the training data.
@@ -466,10 +486,11 @@ shutil.rmtree(tmp)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### get_feature_importance { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_feature_importance }
+##### get_feature_importance { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_feature_importance()
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_feature_importance(
+)
 ```
 
 Return feature importances from the underlying estimator.
@@ -520,10 +541,10 @@ assert fi is None
 print(fi)
 ```
 
-##### get_global_shap_feature_importance { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_global_shap_feature_importance }
+##### get_global_shap_feature_importance { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_global_shap_feature_importance(
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_global_shap_feature_importance(
     frac=0.1,
 )
 ```
@@ -560,10 +581,10 @@ assert shap_vals.empty
 print(type(shap_vals), shap_vals.empty)
 ```
 
-##### get_params { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_params }
+##### get_params { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.get_params(deep=True)
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.get_params(deep=True)
 ```
 
 Get parameters for this forecaster model.
@@ -614,10 +635,10 @@ p3 = model2.get_params(deep=True)
 print("forecaster__estimator__fit_intercept" in p3)
 ```
 
-##### package_prediction { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.package_prediction }
+##### package_prediction { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.package_prediction(
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.package_prediction(
     predict_size=None,
 )
 ```
@@ -693,10 +714,12 @@ shutil.rmtree(tmp_dir)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### predict { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.predict }
+##### predict { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.predict(delta_predict=None)
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.predict(
+    delta_predict=None,
+)
 ```
 
 Generate predictions and compute error metrics.
@@ -781,10 +804,12 @@ shutil.rmtree(tmp)
 del os.environ["SPOTFORECAST2_DATA"]
 ```
 
-##### save_to_file { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.save_to_file }
+##### save_to_file { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.save_to_file(model_dir=None)
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.save_to_file(
+    model_dir=None,
+)
 ```
 
 Serialize the model to disk via `joblib.dump()`.
@@ -808,10 +833,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
     print(any("test_forecaster_0" in f for f in os.listdir(tmpdir)))
 ```
 
-##### set_params { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.set_params }
+##### set_params { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.set_params(
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.set_params(
     params=None,
     **kwargs,
 )
@@ -858,10 +883,10 @@ _ = model2.set_params(params={"forecaster__estimator__fit_intercept": False})
 print(model2.forecaster.estimator.fit_intercept)
 ```
 
-##### tune { #spotforecast2_safe.forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.tune }
+##### tune { #spotforecast2_safe.forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune }
 
 ```python
-forecaster.wrappers.lgbm.ForecasterRecursiveLGBM.tune()
+forecaster.wrappers.catboost.ForecasterRecursiveCatBoost.tune()
 ```
 
 Simulate hyperparameter tuning.
