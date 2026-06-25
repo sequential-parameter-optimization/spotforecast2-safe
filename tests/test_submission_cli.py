@@ -22,6 +22,7 @@ Monkeypatch style mirrors tests/downloader/test_resilience.py:
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
 from typing import NamedTuple
 from unittest.mock import MagicMock
@@ -508,7 +509,7 @@ def test_download_combined_no_fallback_message(monkeypatch, tmp_path):
 
 def test_public_names_present():
     """All mandated public names are accessible on the module."""
-    import spotforecast2_safe.submission_cli as m
+    m = sys.modules["spotforecast2_safe.submission_cli"]
 
     assert hasattr(m, "AbortReason")
     assert hasattr(m, "SubmissionAbort")
