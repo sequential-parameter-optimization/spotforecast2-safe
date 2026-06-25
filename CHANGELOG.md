@@ -1,3 +1,11 @@
+## [24.0.2-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.0.1...v24.0.2-rc.1) (2026-06-25)
+
+
+### Bug Fixes
+
+* **ci:** upgrade github/codeql-action from v3 to v4 ([e767a79](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/e767a7901746c5a5e8ec8ad90ef839028a216e91))
+* resolve py/import-and-import-from code scanning alert ([#401](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/401)) ([67db4f8](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/67db4f803a322ee6236494b70a761ea37bbc8d5a)), closes [#232](https://github.com/sequential-parameter-optimization/spotforecast2-safe/issues/232)
+
 ## [24.0.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.0.0...v24.0.1) (2026-06-23)
 
 
