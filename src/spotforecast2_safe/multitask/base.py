@@ -958,6 +958,13 @@ class BaseTask:
           Fetch failures are handled per ``config.on_weather_failure``:
           ``"raise"`` re-raises ``WeatherFetchError``; ``"skip"`` logs a
           warning and continues with an empty weather frame (fail-safe).
+          When ``config.zone_weather_columns`` is set (opt-in, mutually
+          exclusive with ``per_zone_weather`` /
+          ``use_population_weighted_weather``), this step instead calls
+          ``weather.zone_columns.build_zone_weather_columns`` and
+          concatenates population-weighted weather for each of the four
+          German TSO zones as ``__<zone_short>``-suffixed columns (e.g.
+          ``temperature_2m__50hertz``) for the single target.
         * 4b — Calendar features, via ``get_calendar_features``.
         * 4c — Day/night (solar) features, via ``get_day_night_features``
           (computed with ``astral`` from ``config.latitude`` /
@@ -965,7 +972,18 @@ class BaseTask:
         * 4d — Holiday features, via ``get_holiday_features`` for
           ``config.country_code`` / ``config.state``.
         * 5 — The four frames are concatenated along the columns and any
-          residual gaps are back- then forward-filled.  Provider-based
+          residual gaps are back- then forward-filled.
+        * 4f — Lagged-load exog (opt-in, default OFF, gated by
+          ``config.include_load_lag_exog``), via
+          ``preprocessing.load_lags.build_load_lag_features``.  Runs AFTER
+          the Step-5 backfill so a load-lag coverage failure is never masked
+          by it.  Appends ``load_lag_<L>`` /
+          ``load_<zone>_lag_<L>`` / ``share_<zone>_lag_<L>`` columns per
+          ``config.load_lag_hours`` / ``config.load_lag_sources``.  A
+          coverage or staleness failure (or a missing zone-interim file for
+          the ``"zones"``/``"zone_shares"`` sources) is governed by
+          ``config.on_load_lag_failure``: ``"raise"`` re-raises; ``"skip"``
+          logs a warning and omits the columns (fail-safe).  Provider-based
           exogenous columns are then appended via
           ``build_providers_from_config`` (requires ``spotforecast2-safe``
           >= 15.7.0).  The active providers are governed by the config flags
@@ -981,8 +999,8 @@ class BaseTask:
           primary target and capped to ``config.max_poly_features`` via
           ``select_top_poly_features``.
         * 6 — The training feature set is chosen via
-          ``select_exogenous_features``, with provider columns appended
-          (order-preserving, de-duplicated).
+          ``select_exogenous_features``, with provider and load-lag columns
+          appended (order-preserving, de-duplicated).
         * 7 — Targets and covariates are merged via
           ``merge_data_and_covariates`` into ``self.data_with_exog`` and the
           forecast-horizon covariates ``self.exo_pred``.
@@ -1004,7 +1022,8 @@ class BaseTask:
             exogenous_features (pd.DataFrame): Full combined, encoded, and
                 capped exogenous feature matrix.
             exog_feature_names (List[str]): Names of the exogenous features
-                selected for training (including provider columns).
+                selected for training (including provider and load-lag
+                columns).
             data_with_exog (pd.DataFrame): Target data merged with the
                 selected exogenous covariates.
             exo_pred (pd.DataFrame): Exogenous covariates spanning the
@@ -1015,8 +1034,17 @@ class BaseTask:
 
         Raises:
             RuntimeError: If ``prepare_data`` has not been called.
-            WeatherFetchError: If the Open-Meteo fetch fails and
-                ``config.on_weather_failure == "raise"``.
+            WeatherFetchError: If the Open-Meteo fetch fails (single-point,
+                population-weighted, per-zone, or ``zone_weather_columns``
+                path) and ``config.on_weather_failure == "raise"``.
+            LoadLagError: If ``config.include_load_lag_exog`` is set, the
+                load-lag builder cannot produce NaN-free columns (stale
+                source, excessive staleness), and
+                ``config.on_load_lag_failure == "raise"``.
+            FileNotFoundError: If ``config.include_load_lag_exog`` is set
+                with ``load_lag_sources`` in ``{"zones", "zone_shares"}``, the
+                zone-interim CSV is missing, and
+                ``config.on_load_lag_failure == "raise"``.
 
         Examples:
             With exogenous features disabled the method is a no-op, so the
@@ -1332,6 +1360,67 @@ class BaseTask:
             )
             self.exogenous_features = self.exogenous_features.bfill().ffill()
 
+        # provider_feature_names collects column names that bypass
+        # select_exogenous_features' name-pattern matching (provider columns
+        # and, below, load-lag columns) and are appended to exog_feature_names
+        # explicitly (order-preserving, de-duplicated) at Step 6.
+        provider_feature_names: list = []
+
+        # 4f. Lagged-load exog (opt-in, default OFF). Deliberately placed
+        # AFTER the generic missing-exog backfill above so a load-lag coverage
+        # failure is never masked by that bfill/ffill.
+        if getattr(self.config, "include_load_lag_exog", False):
+            on_load_lag_failure = getattr(self.config, "on_load_lag_failure", "raise")
+            load_lag_sources = getattr(self.config, "load_lag_sources", "total")
+            zone_frame = None
+            # Imported unconditionally BEFORE the try block (rather than
+            # inside it) so LoadLagError is always bound in this scope: a
+            # missing zone-interim file raises FileNotFoundError before this
+            # import would otherwise run, which would leave the name in the
+            # except clause below unresolved (UnboundLocalError masking the
+            # real failure).
+            from spotforecast2_safe.preprocessing.load_lags import (
+                LoadLagError,
+                build_load_lag_features,
+            )
+
+            try:
+                if load_lag_sources in ("zones", "zone_shares"):
+                    from spotforecast2_safe.downloader.entsoe import load_interim
+
+                    zone_frame = load_interim(mode="four_zone")
+
+                lag_frame, lag_names = build_load_lag_features(
+                    target_series=self.df_pipeline[self.run_state.targets[0]],
+                    zone_frame=zone_frame,
+                    index=self.exogenous_features.index,
+                    data_end=self.run_state.data_end,
+                    cov_end=self.run_state.cov_end,
+                    load_lag_hours=tuple(self.config.load_lag_hours),
+                    load_lag_sources=load_lag_sources,
+                    max_staleness_hours=self.config.load_lag_max_staleness_hours,
+                )
+            except (LoadLagError, FileNotFoundError) as exc:
+                if on_load_lag_failure == "raise":
+                    raise
+                self.logger.warning(
+                    "Load-lag exog dropped (%s); continuing without it because "
+                    "config.on_load_lag_failure='skip'.",
+                    exc,
+                )
+                lag_frame = pd.DataFrame(index=self.exogenous_features.index)
+                lag_names = []
+            if lag_names:
+                self.exogenous_features = pd.concat(
+                    [self.exogenous_features, lag_frame], axis=1
+                )
+                provider_feature_names.extend(lag_names)
+                self.logger.info(
+                    "  Load-lag features: +%d columns (%s)",
+                    len(lag_names),
+                    ", ".join(lag_names),
+                )
+
         # Provider-based exogenous features (requires sf2-safe >= 15.7.0):
         # append the columns produced by the ConfigEntsoe/ConfigMulti provider
         # flags — covid_infection_rate and the ENTSO-E day-ahead
@@ -1339,7 +1428,6 @@ class BaseTask:
         # older sf2-safe installs (without it) stay importable; a provider that
         # cannot cover the full exogenous index is re-raised or skipped per
         # config.on_exog_provider_failure (fail-safe).
-        provider_feature_names: list = []
         try:
             from spotforecast2_safe.preprocessing.exog_providers import (
                 ExogProviderError,

@@ -218,8 +218,13 @@ def validate_config(config: object) -> None:
             ``"raise"`` or ``"skip"``, a negative ``exog_max_gap_hours``, a
             negative ``exog_max_tail_gap_hours``, an
             ``exog_provider_window`` that is not ``"full"`` or ``"train"``,
-            or a ``zone_weather_columns=True`` combined with
-            ``per_zone_weather``, ``use_population_weighted_weather``,
+            an ``on_load_lag_failure`` that is not ``"raise"`` or ``"skip"``,
+            a ``load_lag_sources`` outside ``{"total", "zones",
+            "zone_shares"}``, a negative ``load_lag_max_staleness_hours``, an
+            empty/None ``load_lag_hours`` or one containing an entry below
+            168 when ``include_load_lag_exog`` is set, or a
+            ``zone_weather_columns=True`` combined with ``per_zone_weather``,
+            ``use_population_weighted_weather``,
             ``use_exogenous_features=False``, or ``poly_features_degree>=2``.
         TypeError: If ``zone_weather_locations`` is set to something other
             than a ``dict`` while ``zone_weather_columns`` (or
@@ -439,4 +444,47 @@ def validate_config(config: object) -> None:
         if zwl is not None and not isinstance(zwl, dict):
             raise TypeError(
                 f"zone_weather_locations must be a dict or None; got {type(zwl).__name__!r}."
+            )
+
+    on_load_lag_failure = getattr(config, "on_load_lag_failure", None)
+    if on_load_lag_failure is not None and on_load_lag_failure not in (
+        "raise",
+        "skip",
+    ):
+        raise ValueError(
+            f"on_load_lag_failure must be 'raise' or 'skip'; got {on_load_lag_failure!r}."
+        )
+
+    load_lag_sources = getattr(config, "load_lag_sources", None)
+    if load_lag_sources is not None and load_lag_sources not in (
+        "total",
+        "zones",
+        "zone_shares",
+    ):
+        raise ValueError(
+            "load_lag_sources must be 'total', 'zones', or 'zone_shares'; "
+            f"got {load_lag_sources!r}."
+        )
+
+    load_lag_max_staleness_hours = getattr(config, "load_lag_max_staleness_hours", None)
+    if load_lag_max_staleness_hours is not None and load_lag_max_staleness_hours < 0:
+        raise ValueError(
+            "load_lag_max_staleness_hours must be >= 0; "
+            f"got {load_lag_max_staleness_hours}."
+        )
+
+    if getattr(config, "include_load_lag_exog", False):
+        if not getattr(config, "use_exogenous_features", True):
+            raise ValueError(
+                "include_load_lag_exog requires exogenous features "
+                "(use_exogenous_features must be True)."
+            )
+        hours = getattr(config, "load_lag_hours", None)
+        if not hours:
+            raise ValueError("load_lag_hours must be a non-empty tuple of ints.")
+        if any(int(h) < 168 for h in hours):
+            raise ValueError(
+                "every load_lag_hours entry must be >= 168 (horizon-availability "
+                "safety: the lagged value must already be published at forecast "
+                "time)."
             )
