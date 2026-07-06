@@ -226,6 +226,31 @@ class TestZoneShares:
         assert len(names) == 6
         assert not lag_frame.isna().any().any()
 
+    def test_zero_total_from_negative_cancellation_raises_on_inf(self):
+        """A zero (or near-zero) four-zone total -- e.g. from negative-value
+        cancellation across zones -- must raise rather than silently
+        propagate +/-inf shares (inf is NOT NaN, so it would otherwise sail
+        past every downstream NaN fail-safe check)."""
+        idx = _hourly_index(200)
+        zone_frame = _zone_frame_hourly(idx.copy())
+        t = idx[100]
+        zone_frame.loc[t, "load_50hertz"] = 100.0
+        zone_frame.loc[t, "load_amprion"] = -100.0
+        zone_frame.loc[t, "load_tennet"] = 50.0
+        zone_frame.loc[t, "load_transnetbw"] = -50.0  # four-zone sum == 0
+        target = _target_series(idx)
+        with pytest.raises(LoadLagError, match="inf"):
+            build_load_lag_features(
+                target_series=target,
+                zone_frame=zone_frame,
+                index=idx,
+                data_end=idx[190],
+                cov_end=idx[199],
+                load_lag_hours=(168,),
+                load_lag_sources="zone_shares",
+                max_staleness_hours=48,
+            )
+
 
 # ---------------------------------------------------------------------------
 # (d) staleness: source ending more than max_staleness_hours before data_end
@@ -268,6 +293,32 @@ class TestStaleness:
         )
         assert not lag_frame.isna().any().any()
 
+    def test_single_stale_column_named_in_error(self):
+        """Per-column staleness: three zones stay live, one goes stale.
+
+        An aggregate ``dropna(how='all')`` check would be masked by the
+        three still-live columns (a row survives as long as ANY column has
+        a value); the per-column check must catch the one stale column and
+        name it.
+        """
+        idx = _hourly_index(400)
+        zone_frame = _zone_frame_hourly(idx.copy())
+        # Only transnetbw goes stale (NaN for its last 100 hours); the other
+        # three zones keep reporting all the way to idx[-1].
+        zone_frame.loc[idx[300] :, "load_transnetbw"] = np.nan
+        target = _target_series(idx)
+        with pytest.raises(LoadLagError, match="load_transnetbw"):
+            build_load_lag_features(
+                target_series=target,
+                zone_frame=zone_frame,
+                index=idx,
+                data_end=idx[390],
+                cov_end=idx[399],
+                load_lag_hours=(168,),
+                load_lag_sources="zones",
+                max_staleness_hours=48,
+            )
+
 
 # ---------------------------------------------------------------------------
 # (e) horizon-NaN hard-check: a coverage gap in the horizon slice raises
@@ -289,6 +340,52 @@ class TestHorizonNaNHardCheck:
                 index=idx[:100],
                 data_end=idx[90],
                 cov_end=idx[99],
+                load_lag_hours=(168,),
+                load_lag_sources="total",
+                max_staleness_hours=10_000,  # disable the staleness gate
+            )
+
+    def test_short_history_span_isolated_gap_in_horizon_must_raise(self):
+        """BLOCKER regression (review finding).
+
+        When the index[0]->data_end span is much shorter than
+        max(load_lag_hours), the (buggy, unbounded) warm-up mask used to
+        cover the WHOLE index -- including the forecast-horizon slice. A
+        ``bfill()`` over that mask could then silently patch a genuine,
+        isolated source gap that maps into the horizon with a value pulled
+        forward from a LATER position, and the horizon hard-check below
+        would see no NaN and pass silently -- a wrong value with no
+        exception. The fix bounds the warm-up mask to ``index <= data_end``
+        and sources the backfill from historical values only, so a horizon
+        gap is never masked and always reaches the hard-check.
+        """
+        idx = _hourly_index(50)  # only 50 hours total: far shorter than 168h
+        data_end = idx[9]  # only 10 hours of "history"
+        cov_end = idx[49]  # 40-hour horizon >> the 10-hour history span
+
+        # Continuous hourly source covering every lagged position needed by
+        # BOTH the historical and horizon slices of `idx`
+        # ([idx[0]-168h, idx[49]-168h]), except an ISOLATED one-hour gap at
+        # the exact source position that the HORIZON timestamp idx[20]
+        # maps back to.
+        source_start = idx[0] - pd.Timedelta(hours=168)
+        source_end = idx[49] - pd.Timedelta(hours=168)
+        source_idx = pd.date_range(source_start, source_end, freq="h", tz="UTC")
+        rng = np.random.default_rng(99)
+        target = pd.Series(
+            rng.normal(50000, 2000, len(source_idx)), index=source_idx, name="load"
+        )
+        gap_source_ts = idx[20] - pd.Timedelta(hours=168)
+        assert gap_source_ts in target.index
+        target.loc[gap_source_ts] = np.nan
+
+        with pytest.raises(LoadLagError, match="forecast-horizon"):
+            build_load_lag_features(
+                target_series=target,
+                zone_frame=None,
+                index=idx,
+                data_end=data_end,
+                cov_end=cov_end,
                 load_lag_hours=(168,),
                 load_lag_sources="total",
                 max_staleness_hours=10_000,  # disable the staleness gate
@@ -366,6 +463,38 @@ class TestBuilderValidation:
                 max_staleness_hours=48,
             )
 
+    def test_empty_zone_frame_raises(self):
+        """A zero-row zone_frame must raise (pinned), not silently produce
+        an empty/degenerate result."""
+        idx = _hourly_index(200)
+        target = _target_series(idx)
+        empty_zone_frame = pd.DataFrame(
+            columns=list(ZONE_LOAD_COLUMNS),
+            index=pd.DatetimeIndex([], tz="UTC"),
+            dtype="float64",
+        )
+        with pytest.raises(LoadLagError, match="no valid observations"):
+            build_load_lag_features(
+                target_series=target,
+                zone_frame=empty_zone_frame,
+                index=idx,
+                data_end=idx[190],
+                cov_end=idx[199],
+                load_lag_hours=(168,),
+                load_lag_sources="zones",
+                max_staleness_hours=48,
+            )
+
+    def test_zone_load_columns_matches_expected_hardcoded_names(self):
+        """Drift guard: pin the exact four TSO-zone column names (no
+        downloader import -- this module must stay dependency-free)."""
+        assert ZONE_LOAD_COLUMNS == (
+            "load_50hertz",
+            "load_amprion",
+            "load_tennet",
+            "load_transnetbw",
+        )
+
 
 # ---------------------------------------------------------------------------
 # ConfigMulti validation guards (config-construction time)
@@ -413,6 +542,13 @@ class TestConfigLoadLagGuards:
             on_load_lag_failure="skip",
         )
         assert cfg.load_lag_hours == (168, 336)
+
+    def test_raises_via_set_params_too(self):
+        """Mirrors test_zone_weather_columns.py's set_params parity check:
+        the guard must not be bypassable by mutating an existing instance."""
+        cfg = ConfigMulti()
+        with pytest.raises(ValueError, match=">= 168"):
+            cfg.set_params(include_load_lag_exog=True, load_lag_hours=(24,))
 
 
 # ---------------------------------------------------------------------------

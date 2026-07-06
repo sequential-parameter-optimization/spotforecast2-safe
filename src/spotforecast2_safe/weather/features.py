@@ -141,7 +141,11 @@ def get_weather_features(
         - **weather_features** – DataFrame with rolling-window weather
             features aligned to the ``[start, cov_end]`` index.
         - **weather_aligned** – Raw weather DataFrame reindexed to the
-            same ``[start, cov_end]`` hourly grid (forward-filled).
+            same ``[start, cov_end]`` hourly grid (forward-filled). Also
+            carries any columns requested via *derived_features* (e.g.
+            ``hdh``, ``cdh``, ``apparent_temperature``, ``dew_point``), so
+            they are selectable downstream via raw-weather membership in
+            ``weather_aligned.columns``.
 
     Raises:
         ValueError: If no numeric weather columns are found, or if

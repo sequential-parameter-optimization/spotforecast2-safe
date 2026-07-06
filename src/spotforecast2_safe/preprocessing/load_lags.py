@@ -23,19 +23,22 @@ published — no future leakage). Three source families
 Fail-safe contract (mirrors `spotforecast2_safe.preprocessing.exog_providers`):
 a source that cannot supply a NaN-free value for every requested timestamp —
 after backfilling only the unavoidable leading warm-up gap the shift itself
-creates — raises :class:`LoadLagError` rather than silently imputing or
-forward-filling across the leakage boundary. The forecast-horizon slice
-(``(data_end, cov_end]``) is always hard-checked for NaN. A stale source (its
-last observation lags ``data_end`` by more than ``max_staleness_hours``) also
-raises. ``multitask.base.build_exogenous_features`` governs the failure via
-``ConfigMulti.on_load_lag_failure`` (``"raise"`` propagates;
-``"skip"`` logs and omits the whole block).
+creates, bounded to history (never past ``data_end``) — raises
+:class:`LoadLagError` rather than silently imputing or forward-filling across
+the leakage boundary. The forecast-horizon slice (``(data_end, cov_end]``) is
+always hard-checked for NaN. Staleness is checked PER SOURCE COLUMN (a
+quietly-stopped zone cannot hide behind its still-live siblings): any column
+whose last observation lags ``data_end`` by more than ``max_staleness_hours``
+raises, naming that column. ``multitask.base.build_exogenous_features``
+governs the failure via ``ConfigMulti.on_load_lag_failure`` (``"raise"``
+propagates; ``"skip"`` logs and omits the whole block).
 """
 
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
+import numpy as np
 import pandas as pd
 
 # The four German TSO-zone column names, as written by
@@ -120,8 +123,9 @@ def _resolve_source(
 
     Raises:
         LoadLagError: If *load_lag_sources* is not one of the three known
-            values, ``zone_frame`` is required but missing, or is missing one
-            of the four required zone columns.
+            values, ``zone_frame`` is required but missing, is missing one
+            of the four required zone columns, or (for ``"zone_shares"``)
+            the share division produces ``+/-inf``.
     """
     if load_lag_sources not in ("total", "zones", "zone_shares"):
         raise LoadLagError(
@@ -156,6 +160,18 @@ def _resolve_source(
     # top-of-function guard already rejected anything else).
     total = zf_hourly.sum(axis=1, skipna=False)
     shares = zf_hourly.div(total, axis=0)
+    # A zero (or near-zero) four-zone total -- e.g. negative-value
+    # cancellation across zones -- produces +/-inf shares from a nonzero
+    # numerator divided by zero. inf is NOT NaN, so it would silently sail
+    # past every downstream ``isna()`` fail-safe check; catch it explicitly
+    # here, at the source, with a clear diagnosis.
+    if np.isinf(shares.to_numpy(dtype="float64")).any():
+        raise LoadLagError(
+            "load_lags (zone_shares): share computation produced +/-inf "
+            "values (a zero or near-zero four-zone total, most likely from "
+            "negative-value cancellation across zones); cannot safely "
+            "compute shares."
+        )
     keep_cols = [c for c in ZONE_LOAD_COLUMNS if c != _DROPPED_SHARE_ZONE]
     source_hourly = shares[keep_cols]
     name_prefix = {c: f"share_{c.removeprefix('load_')}" for c in keep_cols}
@@ -180,12 +196,16 @@ def build_load_lag_features(
     column by each entry of *load_lag_hours* via
     ``series.shift(freq=pd.Timedelta(hours=L))`` and reindexes onto *index*
     (``[data_start, cov_end]``). Only the unavoidable leading warm-up NaN run
-    (``t < index[0] + max(load_lag_hours)``) is back-filled; the
-    forecast-horizon slice ``(data_end, cov_end]`` is hard-checked for NaN and
-    raises :class:`LoadLagError` rather than silently filling across the
-    leakage boundary, as is any remaining NaN elsewhere in the frame. The
-    source is also checked for staleness: its last valid observation must not
-    lag *data_end* by more than *max_staleness_hours*.
+    (``t < index[0] + max(load_lag_hours)``, bounded to ``t <= data_end`` so
+    it can never reach into or draw from the forecast horizon) is
+    back-filled from historical values only; the forecast-horizon slice
+    ``(data_end, cov_end]`` is hard-checked for NaN and raises
+    :class:`LoadLagError` rather than silently filling across the leakage
+    boundary, as is any remaining NaN elsewhere in the frame. Each source
+    column is also checked for staleness individually: its last valid
+    observation must not lag *data_end* by more than *max_staleness_hours*
+    (a per-column check, so one quietly-stopped zone cannot hide behind
+    still-live siblings).
 
     Args:
         target_series: The primary target series (``df_pipeline[target]``),
@@ -216,9 +236,11 @@ def build_load_lag_features(
 
     Raises:
         LoadLagError: If *load_lag_sources* is invalid, ``zone_frame`` is
-            required but missing (or missing a required zone column), the
-            source is stale, or any column contains NaN after the warm-up
-            backfill (including within the forecast-horizon slice).
+            required but missing (or missing a required zone column), any
+            source column is stale, the ``"zone_shares"`` division produces
+            ``+/-inf`` (zero or near-zero four-zone total), or any column
+            contains NaN after the (history-bounded) warm-up backfill
+            (including within the forecast-horizon slice).
 
     Examples:
         ```{python}
@@ -267,25 +289,39 @@ def build_load_lag_features(
     # Staleness gate: independent of the mechanical NaN check below — a
     # 168h+ lag may not actually *need* very recent source data, but a source
     # that has silently stopped updating is a data-quality signal in its own
-    # right and must not be masked.
-    source_valid = source_hourly.dropna(how="all")
-    if source_valid.empty:
-        raise LoadLagError(
-            f"load_lags ({load_lag_sources}): source series has no valid "
-            "observations."
-        )
-    source_last_ts = source_valid.index.max()
-    staleness = data_end_ts - source_last_ts
-    if staleness > pd.Timedelta(hours=max_staleness_hours):
-        raise LoadLagError(
-            f"load_lags ({load_lag_sources}): source data is stale — last "
-            f"observation {source_last_ts} is {staleness} behind data_end "
-            f"{data_end_ts} (max {max_staleness_hours}h allowed)."
-        )
+    # right and must not be masked. Checked PER COLUMN: an aggregate
+    # ``dropna(how="all")`` would let one quietly-stopped zone hide behind
+    # its still-live siblings (a row survives the "all" drop as long as at
+    # least one column has a value), so each column's own last valid
+    # observation is checked and named individually in the error.
+    for col in source_hourly.columns:
+        col_valid = source_hourly[col].dropna()
+        if col_valid.empty:
+            raise LoadLagError(
+                f"load_lags ({load_lag_sources}): source column {col!r} has "
+                "no valid observations."
+            )
+        col_last_ts = col_valid.index.max()
+        staleness = data_end_ts - col_last_ts
+        if staleness > pd.Timedelta(hours=max_staleness_hours):
+            raise LoadLagError(
+                f"load_lags ({load_lag_sources}): source column {col!r} is "
+                f"stale — last observation {col_last_ts} is {staleness} "
+                f"behind data_end {data_end_ts} (max {max_staleness_hours}h "
+                "allowed)."
+            )
 
     max_lag_hours = max(int(h) for h in load_lag_hours)
     warmup_end = index[0] + pd.Timedelta(hours=max_lag_hours)
-    warmup_mask = index < warmup_end
+    # Bound the warm-up window to HISTORY ONLY (never past data_end). Without
+    # the ``index <= data_end_ts`` bound, a short index[0]->data_end span
+    # relative to max_lag_hours would let the mask reach into the
+    # forecast-horizon slice (data_end, cov_end] too; the bfill below would
+    # then be free to silently patch a genuine horizon coverage gap with a
+    # value pulled forward from a LATER position in the (short) index,
+    # before the horizon hard-check further down ever runs -- a wrong value
+    # with no exception (reviewer-reproduced regression).
+    warmup_mask = (index < warmup_end) & (index <= data_end_ts)
 
     result = pd.DataFrame(index=index)
     names: List[str] = []
@@ -294,7 +330,12 @@ def build_load_lag_features(
         for col in source_hourly.columns:
             shifted = source_hourly[col].shift(freq=shift).reindex(index)
             if warmup_mask.any():
-                filled = shifted.bfill()
+                # The backfill source must itself never reach past data_end:
+                # mask out anything at/after the horizon BEFORE bfilling, so
+                # a warm-up cell can only ever be filled from a genuine
+                # historical value, never from a horizon-side position.
+                historical_only = shifted.where(index <= data_end_ts)
+                filled = historical_only.bfill()
                 shifted = shifted.where(~warmup_mask, filled)
             colname = f"{name_prefix[col]}_lag_{int(lag_hours)}"
             result[colname] = shifted
