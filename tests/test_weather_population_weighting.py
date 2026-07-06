@@ -169,6 +169,65 @@ class TestCombinedPath:
         # weighted temp = (10 + 30) / 2 == 20; cdh with base 18 == 2.
         assert (aligned["temperature_2m"].round(6) == 20.0).all()
         assert (features["cdh"].round(6) == 2.0).all()
+        # Regression: the derived column must also survive in the raw-aligned
+        # frame (weather_aligned), not just the rolling-window frame
+        # (weather_features) -- see TestDerivedColumnsSurviveAlignedFrame.
+        assert (aligned["cdh"].round(6) == 2.0).all()
+
+
+class TestDerivedColumnsSurviveAlignedFrame:
+    """Regression: derived weather columns must reach ``weather_aligned``.
+
+    ``manager.features.select_exogenous_features`` selects raw weather
+    columns purely by membership in ``weather_aligned.columns``
+    (``col in weather_aligned.columns``). Before this fix, the derived
+    columns (hdh/cdh/apparent_temperature/dew_point) were appended only to
+    the internal ``weather_aligned_filled`` copy used for the rolling-window
+    transform, so they reached ``weather_features`` but NOT the returned
+    ``weather_aligned`` -- silently dropping them from the final exog matrix
+    even with ``include_degree_hours=True`` / ``include_apparent_temperature=True``.
+    """
+
+    def test_hdh_cdh_present_in_both_returned_frames(self):
+        with patch(
+            "spotforecast2_safe.data.fetch_data.fetch_weather_data",
+            return_value=_raw(temperature=25.0),
+        ):
+            features, aligned = get_weather_features(
+                data=_data(),
+                start=START,
+                cov_end=COV_END,
+                forecast_horizon=FORECAST_HORIZON,
+                derived_features=["hdh", "cdh"],
+            )
+        for col in ("hdh", "cdh"):
+            assert col in features.columns, f"{col} missing from weather_features"
+            assert col in aligned.columns, f"{col} missing from weather_aligned"
+        assert not aligned[["hdh", "cdh"]].isna().any().any()
+
+    def test_raw_columns_and_index_unchanged_by_the_join(self):
+        """The fix must not disturb the raw (non-derived) aligned columns."""
+        with patch(
+            "spotforecast2_safe.data.fetch_data.fetch_weather_data",
+            return_value=_raw(temperature=12.0, humidity=55.0, wind=4.0),
+        ):
+            _, aligned_plain = get_weather_features(
+                data=_data(),
+                start=START,
+                cov_end=COV_END,
+                forecast_horizon=FORECAST_HORIZON,
+            )
+            _, aligned_derived = get_weather_features(
+                data=_data(),
+                start=START,
+                cov_end=COV_END,
+                forecast_horizon=FORECAST_HORIZON,
+                derived_features=["hdh", "cdh"],
+            )
+        raw_cols = list(aligned_plain.columns)
+        assert raw_cols == [c for c in aligned_derived.columns if c in raw_cols]
+        pd.testing.assert_frame_equal(aligned_derived[raw_cols], aligned_plain)
+        assert aligned_derived.index.equals(aligned_plain.index)
 
 
 if __name__ == "__main__":
