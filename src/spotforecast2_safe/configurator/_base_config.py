@@ -216,8 +216,14 @@ def validate_config(config: object) -> None:
             ``poly_mi_sample_size`` below 1 (``None`` is allowed), an
             ``on_weather_failure`` / ``on_exog_provider_failure`` that is not
             ``"raise"`` or ``"skip"``, a negative ``exog_max_gap_hours``, a
-            negative ``exog_max_tail_gap_hours``, or an
-            ``exog_provider_window`` that is not ``"full"`` or ``"train"``.
+            negative ``exog_max_tail_gap_hours``, an
+            ``exog_provider_window`` that is not ``"full"`` or ``"train"``,
+            or a ``zone_weather_columns=True`` combined with
+            ``per_zone_weather``, ``use_population_weighted_weather``,
+            ``use_exogenous_features=False``, or ``poly_features_degree>=2``.
+        TypeError: If ``zone_weather_locations`` is set to something other
+            than a ``dict`` while ``zone_weather_columns`` (or
+            ``per_zone_weather``) is ``True``.
 
     Examples:
         ```{python}
@@ -402,4 +408,35 @@ def validate_config(config: object) -> None:
             raise TypeError(
                 "zone_weather_locations must be a dict or None; "
                 f"got {type(zone_weather_locations).__name__!r}."
+            )
+
+    zone_weather_columns = getattr(config, "zone_weather_columns", False)
+    if zone_weather_columns:
+        if getattr(config, "per_zone_weather", False):
+            raise ValueError(
+                "zone_weather_columns and per_zone_weather are mutually exclusive "
+                "(per_zone_weather overwrites weather per multi-zone target; "
+                "zone_weather_columns concatenates all zones for one target)."
+            )
+        if getattr(config, "use_population_weighted_weather", False):
+            raise ValueError(
+                "zone_weather_columns and use_population_weighted_weather are "
+                "mutually exclusive (zone_weather_columns already supplies "
+                "population-weighted weather per zone)."
+            )
+        if not getattr(config, "use_exogenous_features", True):
+            raise ValueError(
+                "zone_weather_columns requires exogenous features "
+                "(use_exogenous_features must be True)."
+            )
+        if getattr(config, "poly_features_degree", 1) >= 2:
+            raise ValueError(
+                "zone_weather_columns does not support polynomial interaction "
+                "features (poly_features_degree>=2), whose products are "
+                "precomputed from the shared weather."
+            )
+        zwl = getattr(config, "zone_weather_locations", None)
+        if zwl is not None and not isinstance(zwl, dict):
+            raise TypeError(
+                f"zone_weather_locations must be a dict or None; got {type(zwl).__name__!r}."
             )

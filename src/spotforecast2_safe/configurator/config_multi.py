@@ -104,6 +104,19 @@ class ConfigMulti:
             mapping from zone key (e.g. ``"load_50hertz"``) to a list of
             ``WeatherLocation`` objects.  ``None`` (default) uses the built-in
             registry partition from ``GERMAN_TSO_ZONE_CITIES``.
+        zone_weather_columns (bool): For a single-series target, fetch
+            population-weighted weather for each of the four German TSO zones
+            and concatenate every zone's raw (plus derived/window) columns
+            with a ``__<zone_short>`` suffix (e.g. ``temperature_2m__50hertz``,
+            with ``<zone_short>`` the zone key minus its ``load_`` prefix),
+            replacing the single-point weather block.  Unlike
+            ``per_zone_weather`` (which overwrites weather per *target* for a
+            multi-zone pipeline), this concatenates all four zones' weather
+            as extra columns for *one* target.  Mutually exclusive with
+            ``per_zone_weather`` and ``use_population_weighted_weather``;
+            requires ``use_exogenous_features=True``; not compatible with
+            ``poly_features_degree >= 2``.  Default ``False`` -> byte-identical
+            to the shared-weather baseline.
         poly_features_degree (int): Polynomial-interaction degree. ``1`` (default)
             generates no interactions; ``2`` adds pairwise bilinear terms; ``3+``
             higher order.
@@ -239,6 +252,13 @@ class ConfigMulti:
         zone_weather_locations (Optional[Dict[str, Any]]): Override mapping
             from zone key to a list of ``WeatherLocation`` objects.  ``None``
             uses the built-in ``GERMAN_TSO_ZONE_CITIES`` partition.
+        zone_weather_columns (bool): For a single-series target, concatenate
+            population-weighted weather per German TSO zone as
+            ``__<zone_short>``-suffixed column groups instead of the
+            single-point weather block.  Mutually exclusive with
+            ``per_zone_weather`` and ``use_population_weighted_weather``;
+            requires ``use_exogenous_features=True``; not compatible with
+            ``poly_features_degree >= 2``.  Default ``False``.
         poly_features_degree (int): Polynomial-interaction degree (1 = off).
         max_poly_features (int): Cap on kept ``poly_*`` columns (top-K by MI).
         poly_mi_n_jobs (Optional[int]): Parallel jobs for the MI ranking
@@ -405,6 +425,14 @@ class ConfigMulti:
     # None uses the built-in registry partition (GERMAN_TSO_ZONE_CITIES).
     # Not a mutable default — the field is None, not [].
     zone_weather_locations: Optional[Dict[str, Any]] = None
+    # Zone-weather-as-columns: for a SINGLE target, fetch population-weighted
+    # weather per German TSO zone and concatenate every zone's columns with a
+    # __<zone_short> suffix instead of the single-point weather block.
+    # Mutually exclusive with per_zone_weather and
+    # use_population_weighted_weather; requires use_exogenous_features=True;
+    # not compatible with poly_features_degree>=2. Default OFF → byte-identical
+    # to today.
+    zone_weather_columns: bool = False
     include_degree_hours: bool = False
     include_apparent_temperature: bool = False
     degree_hours_base_heating: float = 15.0

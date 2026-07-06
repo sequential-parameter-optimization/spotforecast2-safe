@@ -1073,23 +1073,53 @@ class BaseTask:
         if getattr(self.config, "include_apparent_temperature", False):
             weather_derived.extend(["apparent_temperature", "dew_point"])
         try:
-            weather_features, self.weather_aligned = get_weather_features(
-                data=self.df_pipeline,
-                start=self.run_state.data_start,
-                cov_end=self.run_state.cov_end,
-                forecast_horizon=self.config.predict_size,
-                latitude=self.config.latitude,
-                longitude=self.config.longitude,
-                timezone=self.config.timezone,
-                freq="h",
-                cache_home=self.config.cache_home,
-                verbose=self.config.verbose,
-                locations=weather_locations,
-                location_weights=weather_location_weights,
-                derived_features=weather_derived or None,
-                hdh_base=getattr(self.config, "degree_hours_base_heating", 15.0),
-                cdh_base=getattr(self.config, "degree_hours_base_cooling", 22.0),
-            )
+            if getattr(self.config, "zone_weather_columns", False):
+                # Concatenated per-TSO-zone weather for a single target
+                # (opt-in, mutually exclusive with per_zone_weather and
+                # use_population_weighted_weather — enforced by
+                # validate_config). Replaces the single-point weather block
+                # below with four zones' worth of __<zone_short>-suffixed
+                # columns.
+                from spotforecast2_safe.weather.zone_columns import (
+                    build_zone_weather_columns,
+                )
+
+                weather_features, self.weather_aligned = build_zone_weather_columns(
+                    data=self.df_pipeline,
+                    start=self.run_state.data_start,
+                    cov_end=self.run_state.cov_end,
+                    forecast_horizon=self.config.predict_size,
+                    latitude=self.config.latitude,
+                    longitude=self.config.longitude,
+                    timezone=self.config.timezone,
+                    freq="h",
+                    cache_home=self.config.cache_home,
+                    verbose=self.config.verbose,
+                    derived_features=weather_derived or None,
+                    hdh_base=getattr(self.config, "degree_hours_base_heating", 15.0),
+                    cdh_base=getattr(self.config, "degree_hours_base_cooling", 22.0),
+                    zone_locations_override=getattr(
+                        self.config, "zone_weather_locations", None
+                    ),
+                )
+            else:
+                weather_features, self.weather_aligned = get_weather_features(
+                    data=self.df_pipeline,
+                    start=self.run_state.data_start,
+                    cov_end=self.run_state.cov_end,
+                    forecast_horizon=self.config.predict_size,
+                    latitude=self.config.latitude,
+                    longitude=self.config.longitude,
+                    timezone=self.config.timezone,
+                    freq="h",
+                    cache_home=self.config.cache_home,
+                    verbose=self.config.verbose,
+                    locations=weather_locations,
+                    location_weights=weather_location_weights,
+                    derived_features=weather_derived or None,
+                    hdh_base=getattr(self.config, "degree_hours_base_heating", 15.0),
+                    cdh_base=getattr(self.config, "degree_hours_base_cooling", 22.0),
+                )
         except WeatherFetchError as exc:
             if self.config.on_weather_failure == "raise":
                 raise
