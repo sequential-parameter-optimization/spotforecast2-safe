@@ -137,7 +137,7 @@ class TestLeakageZones:
             zone_frame=zone_frame,
             index=idx,
             data_end=idx[390],
-            cov_end=idx[396] if 396 < 400 else idx[399],
+            cov_end=idx[396],
             load_lag_hours=(168,),
             load_lag_sources="zones",
             max_staleness_hours=48,
