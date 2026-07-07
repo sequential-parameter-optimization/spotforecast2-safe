@@ -13,11 +13,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import spotforecast2_safe.weather.zone_columns as zc
 from spotforecast2_safe.configurator.config_multi import ConfigMulti
 from spotforecast2_safe.manager.features import select_exogenous_features
 from spotforecast2_safe.weather import WeatherFetchError
 from spotforecast2_safe.weather.locations import GERMAN_TSO_ZONE_CITIES
-from spotforecast2_safe.weather.zone_columns import build_zone_weather_columns
 
 ZONE_ORDER = tuple(GERMAN_TSO_ZONE_CITIES)  # deterministic dict order
 ZONE_SHORTS = tuple(z.removeprefix("load_") for z in ZONE_ORDER)
@@ -55,12 +55,10 @@ def _fake_weather_factory():
 
 class TestBuildZoneWeatherColumns:
     def _call(self, monkeypatch):
-        import spotforecast2_safe.weather.zone_columns as zc
-
         monkeypatch.setattr(zc, "get_weather_features", _fake_weather_factory())
         idx = pd.date_range("2024-01-01", periods=72, freq="h", tz="UTC")
         ref = pd.DataFrame({"load": range(len(idx))}, index=idx)
-        return build_zone_weather_columns(
+        return zc.build_zone_weather_columns(
             data=ref,
             start=idx[0],
             cov_end=idx[-1],
@@ -98,14 +96,12 @@ class TestBuildZoneWeatherColumns:
         assert not temp_50hertz.equals(temp_transnetbw)
 
     def test_index_spans_forecast_horizon(self, monkeypatch):
-        import spotforecast2_safe.weather.zone_columns as zc
-
         monkeypatch.setattr(zc, "get_weather_features", _fake_weather_factory())
         idx = pd.date_range("2024-01-01", periods=72, freq="h", tz="UTC")
         ref = pd.DataFrame({"load": range(len(idx))}, index=idx)
         data_end = idx[65]
         cov_end = idx[-1]
-        wf, wa = build_zone_weather_columns(
+        wf, wa = zc.build_zone_weather_columns(
             data=ref,
             start=idx[0],
             cov_end=cov_end,
@@ -117,8 +113,6 @@ class TestBuildZoneWeatherColumns:
         assert cov_end > data_end
 
     def test_any_zone_failure_raises_weatherfetcherror(self, monkeypatch):
-        import spotforecast2_safe.weather.zone_columns as zc
-
         base_fake = _fake_weather_factory()
 
         def failing_for_tennet(*, data, start, cov_end, locations=None, **kwargs):
@@ -133,7 +127,7 @@ class TestBuildZoneWeatherColumns:
         idx = pd.date_range("2024-01-01", periods=72, freq="h", tz="UTC")
         ref = pd.DataFrame({"load": range(len(idx))}, index=idx)
         with pytest.raises(WeatherFetchError, match="tennet"):
-            build_zone_weather_columns(
+            zc.build_zone_weather_columns(
                 data=ref,
                 start=idx[0],
                 cov_end=idx[-1],
@@ -143,7 +137,6 @@ class TestBuildZoneWeatherColumns:
             )
 
     def test_override_locations_honoured(self, monkeypatch):
-        import spotforecast2_safe.weather.zone_columns as zc
         from spotforecast2_safe.weather.locations import WeatherLocation
 
         seen_lats: list[float] = []
@@ -159,7 +152,7 @@ class TestBuildZoneWeatherColumns:
         idx = pd.date_range("2024-01-01", periods=48, freq="h", tz="UTC")
         ref = pd.DataFrame({"load": range(len(idx))}, index=idx)
         custom = [WeatherLocation("Custom", 12.34, 5.67, 100.0)]
-        build_zone_weather_columns(
+        zc.build_zone_weather_columns(
             data=ref,
             start=idx[0],
             cov_end=idx[-1],
@@ -179,12 +172,10 @@ class TestBuildZoneWeatherColumns:
 
 class TestSelectionCompatibility:
     def test_all_suffixed_raw_columns_selected(self, monkeypatch):
-        import spotforecast2_safe.weather.zone_columns as zc
-
         monkeypatch.setattr(zc, "get_weather_features", _fake_weather_factory())
         idx = pd.date_range("2024-01-01", periods=48, freq="h", tz="UTC")
         ref = pd.DataFrame({"load": range(len(idx))}, index=idx)
-        _, weather_aligned = build_zone_weather_columns(
+        _, weather_aligned = zc.build_zone_weather_columns(
             data=ref,
             start=idx[0],
             cov_end=idx[-1],
@@ -303,7 +294,6 @@ class TestZoneWeatherColumnsPipelineIntegration:
     def _build_task(
         self, monkeypatch, tmp_path, *, on_weather_failure="raise", fetch_fn=None
     ):
-        import spotforecast2_safe.weather.zone_columns as zc
         from spotforecast2_safe.multitask import LazyTask
 
         monkeypatch.setattr(
