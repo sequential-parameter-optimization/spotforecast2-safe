@@ -104,6 +104,19 @@ class ConfigMulti:
             mapping from zone key (e.g. ``"load_50hertz"``) to a list of
             ``WeatherLocation`` objects.  ``None`` (default) uses the built-in
             registry partition from ``GERMAN_TSO_ZONE_CITIES``.
+        zone_weather_columns (bool): For a single-series target, fetch
+            population-weighted weather for each of the four German TSO zones
+            and concatenate every zone's raw (plus derived/window) columns
+            with a ``__<zone_short>`` suffix (e.g. ``temperature_2m__50hertz``,
+            with ``<zone_short>`` the zone key minus its ``load_`` prefix),
+            replacing the single-point weather block.  Unlike
+            ``per_zone_weather`` (which overwrites weather per *target* for a
+            multi-zone pipeline), this concatenates all four zones' weather
+            as extra columns for *one* target.  Mutually exclusive with
+            ``per_zone_weather`` and ``use_population_weighted_weather``;
+            requires ``use_exogenous_features=True``; not compatible with
+            ``poly_features_degree >= 2``.  Default ``False`` -> byte-identical
+            to the shared-weather baseline.
         poly_features_degree (int): Polynomial-interaction degree. ``1`` (default)
             generates no interactions; ``2`` adds pairwise bilinear terms; ``3+``
             higher order.
@@ -197,6 +210,32 @@ class ConfigMulti:
             ``[start_train_ts, cov_end]``, tolerating missing values before the
             training window. Honoured by the MultiTask pipeline; the
             forecaster-wrapper path currently always validates the full span.
+        include_load_lag_exog (bool): Append lagged-load exogenous columns,
+            shifted by each entry in ``load_lag_hours``.  Every lag must be
+            ``>= 168`` hours so the value at forecast time ``t`` is the raw
+            series at ``t - L``, already published.  ``load_lag_sources``
+            selects the source series: ``"total"`` lags the primary target
+            (``load_lag_<L>``); ``"zones"`` lags the four
+            ``load_interim(mode="four_zone")`` TSO-zone series
+            (``load_<zone>_lag_<L>``); ``"zone_shares"`` computes each zone's
+            bottom-up load share *before* lagging and lags three of the four
+            (dropping ``transnetbw``, the smallest) (``share_<zone>_lag_<L>``).
+            A coverage failure (stale source, missing zone interim file) is
+            governed by ``on_load_lag_failure`` rather than silently
+            backfilled. Default ``False`` -> byte-identical to the baseline.
+        load_lag_hours (tuple): Lag lengths in hours, each ``>= 168``.
+            Defaults to ``(168,)``.
+        load_lag_sources (Literal["total", "zones", "zone_shares"]): Which
+            series ``include_load_lag_exog`` lags. Defaults to ``"total"``.
+        on_load_lag_failure (Literal["raise", "skip"]): Policy when the
+            load-lag builder cannot produce NaN-free columns over the
+            forecast horizon (stale source, excessive staleness, or a missing
+            zone-interim file for ``"zones"``/``"zone_shares"``). ``"raise"``
+            (default) propagates the failure; ``"skip"`` logs a warning and
+            omits the load-lag columns (fail-safe).
+        load_lag_max_staleness_hours (int): Maximum age, in hours, the load
+            (or zone) source series may lag behind ``data_end`` before
+            ``on_load_lag_failure`` governs the failure. Defaults to ``48``.
 
     Attributes:
         country_code (str): ISO country code for API queries and holiday generation.
@@ -239,6 +278,13 @@ class ConfigMulti:
         zone_weather_locations (Optional[Dict[str, Any]]): Override mapping
             from zone key to a list of ``WeatherLocation`` objects.  ``None``
             uses the built-in ``GERMAN_TSO_ZONE_CITIES`` partition.
+        zone_weather_columns (bool): For a single-series target, concatenate
+            population-weighted weather per German TSO zone as
+            ``__<zone_short>``-suffixed column groups instead of the
+            single-point weather block.  Mutually exclusive with
+            ``per_zone_weather`` and ``use_population_weighted_weather``;
+            requires ``use_exogenous_features=True``; not compatible with
+            ``poly_features_degree >= 2``.  Default ``False``.
         poly_features_degree (int): Polynomial-interaction degree (1 = off).
         max_poly_features (int): Cap on kept ``poly_*`` columns (top-K by MI).
         poly_mi_n_jobs (Optional[int]): Parallel jobs for the MI ranking
@@ -298,6 +344,17 @@ class ConfigMulti:
             will heal before raising (0 = strict fail-safe).
         exog_provider_window (Literal["full", "train"]): Validation window for
             exog providers: ``"full"`` (default) or ``"train"``.
+        include_load_lag_exog (bool): Append lagged-load exogenous columns
+            (see ``load_lag_hours`` / ``load_lag_sources``). Default ``False``.
+        load_lag_hours (tuple): Lag lengths in hours, each ``>= 168``.
+            Defaults to ``(168,)``.
+        load_lag_sources (Literal["total", "zones", "zone_shares"]): Source
+            series lagged by ``include_load_lag_exog``. Defaults to ``"total"``.
+        on_load_lag_failure (Literal["raise", "skip"]): Load-lag coverage/
+            staleness failure policy: ``"raise"`` (default) or ``"skip"``.
+        load_lag_max_staleness_hours (int): Maximum source-series age, in
+            hours, tolerated before ``on_load_lag_failure`` governs the
+            failure. Defaults to ``48``.
 
     Notes:
         The default period configurations use specific `n_periods` to balance resolution and smoothing:
@@ -405,6 +462,14 @@ class ConfigMulti:
     # None uses the built-in registry partition (GERMAN_TSO_ZONE_CITIES).
     # Not a mutable default — the field is None, not [].
     zone_weather_locations: Optional[Dict[str, Any]] = None
+    # Zone-weather-as-columns: for a SINGLE target, fetch population-weighted
+    # weather per German TSO zone and concatenate every zone's columns with a
+    # __<zone_short> suffix instead of the single-point weather block.
+    # Mutually exclusive with per_zone_weather and
+    # use_population_weighted_weather; requires use_exogenous_features=True;
+    # not compatible with poly_features_degree>=2. Default OFF → byte-identical
+    # to today.
+    zone_weather_columns: bool = False
     include_degree_hours: bool = False
     include_apparent_temperature: bool = False
     degree_hours_base_heating: float = 15.0
@@ -497,6 +562,16 @@ class ConfigMulti:
     exog_max_tail_gap_hours: int = 0
     # Validation window for exog providers ("full" or "train")
     exog_provider_window: Literal["full", "train"] = "full"
+    # Lagged-load exogenous features (consumed by
+    # spotforecast2_safe.preprocessing.load_lags via multitask.base). Appends
+    # load_lag_<L> / load_<zone>_lag_<L> / share_<zone>_lag_<L> columns shifted
+    # by each entry in load_lag_hours (all >= 168h so the value at forecast
+    # time t is already published). Default OFF → byte-identical to today.
+    include_load_lag_exog: bool = False
+    load_lag_hours: tuple = (168,)
+    load_lag_sources: Literal["total", "zones", "zone_shares"] = "total"
+    on_load_lag_failure: Literal["raise", "skip"] = "raise"
+    load_lag_max_staleness_hours: int = 48
     # Target-side corruption detector knobs. Detector active only when
     # target_qc_window_days AND at least one of target_qc_range_mw /
     # target_qc_step_mw / target_qc_deviation_mw are set. Defaults are all

@@ -1,0 +1,28 @@
+# preprocessing.load_lags.LoadLagError { #spotforecast2_safe.preprocessing.load_lags.LoadLagError }
+
+```python
+preprocessing.load_lags.LoadLagError()
+```
+
+A lagged-load exog source could not be built NaN-free over the window.
+
+Raised when the requested source (target total, per-zone loads, or
+zone shares) cannot supply a value for every requested timestamp after
+the leading warm-up backfill, when the forecast-horizon slice contains
+NaN, or when the source series is stale (its last observation lags
+``data_end`` by more than ``max_staleness_hours``).
+``multitask.base.build_exogenous_features`` translates this into either a
+hard failure or a skipped feature block, governed by
+``ConfigMulti.on_load_lag_failure``.
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+from spotforecast2_safe.preprocessing.load_lags import LoadLagError
+
+try:
+    raise LoadLagError("load_lags: source stale.")
+except LoadLagError as exc:
+    print(type(exc).__name__, str(exc))
+assert issubclass(LoadLagError, Exception)
+```

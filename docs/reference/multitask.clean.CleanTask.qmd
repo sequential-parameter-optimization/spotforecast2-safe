@@ -134,6 +134,13 @@ it onto the target data.  The orchestration proceeds in order:
   Fetch failures are handled per ``config.on_weather_failure``:
   ``"raise"`` re-raises ``WeatherFetchError``; ``"skip"`` logs a
   warning and continues with an empty weather frame (fail-safe).
+  When ``config.zone_weather_columns`` is set (opt-in, mutually
+  exclusive with ``per_zone_weather`` /
+  ``use_population_weighted_weather``), this step instead calls
+  ``weather.zone_columns.build_zone_weather_columns`` and
+  concatenates population-weighted weather for each of the four
+  German TSO zones as ``__<zone_short>``-suffixed columns (e.g.
+  ``temperature_2m__50hertz``) for the single target.
 * 4b — Calendar features, via ``get_calendar_features``.
 * 4c — Day/night (solar) features, via ``get_day_night_features``
   (computed with ``astral`` from ``config.latitude`` /
@@ -141,7 +148,18 @@ it onto the target data.  The orchestration proceeds in order:
 * 4d — Holiday features, via ``get_holiday_features`` for
   ``config.country_code`` / ``config.state``.
 * 5 — The four frames are concatenated along the columns and any
-  residual gaps are back- then forward-filled.  Provider-based
+  residual gaps are back- then forward-filled.
+* 4f — Lagged-load exog (opt-in, default OFF, gated by
+  ``config.include_load_lag_exog``), via
+  ``preprocessing.load_lags.build_load_lag_features``.  Runs AFTER
+  the Step-5 backfill so a load-lag coverage failure is never masked
+  by it.  Appends ``load_lag_<L>`` /
+  ``load_<zone>_lag_<L>`` / ``share_<zone>_lag_<L>`` columns per
+  ``config.load_lag_hours`` / ``config.load_lag_sources``.  A
+  coverage or staleness failure (or a missing zone-interim file for
+  the ``"zones"``/``"zone_shares"`` sources) is governed by
+  ``config.on_load_lag_failure``: ``"raise"`` re-raises; ``"skip"``
+  logs a warning and omits the columns (fail-safe).  Provider-based
   exogenous columns are then appended via
   ``build_providers_from_config`` (requires ``spotforecast2-safe``
   >= 15.7.0).  The active providers are governed by the config flags
@@ -157,8 +175,8 @@ it onto the target data.  The orchestration proceeds in order:
   primary target and capped to ``config.max_poly_features`` via
   ``select_top_poly_features``.
 * 6 — The training feature set is chosen via
-  ``select_exogenous_features``, with provider columns appended
-  (order-preserving, de-duplicated).
+  ``select_exogenous_features``, with provider and load-lag columns
+  appended (order-preserving, de-duplicated).
 * 7 — Targets and covariates are merged via
   ``merge_data_and_covariates`` into ``self.data_with_exog`` and the
   forecast-horizon covariates ``self.exo_pred``.
@@ -174,7 +192,7 @@ target-only.
 | weather_aligned      | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                        | Weather frame aligned to the pipeline index, reused by the interaction and selection steps.                                                                                                                                                                                                                                                                                  |
 | zone_weather_aligned | [Dict](`typing.Dict`)\[[str](`str`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | Per-zone weather frames keyed by target name, indexed over ``[data_start, cov_end]`` (covering the forecast horizon). Populated only when ``config.per_zone_weather`` is True and every zone fetch succeeded; empty otherwise (including the fail-safe "skip" degradation). Consumed at the per-target seam in ``_get_target_data`` to overwrite the shared weather columns. |
 | exogenous_features   | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                        | Full combined, encoded, and capped exogenous feature matrix.                                                                                                                                                                                                                                                                                                                 |
-| exog_feature_names   | [List](`typing.List`)\[[str](`str`)\]                                                 | Names of the exogenous features selected for training (including provider columns).                                                                                                                                                                                                                                                                                          |
+| exog_feature_names   | [List](`typing.List`)\[[str](`str`)\]                                                 | Names of the exogenous features selected for training (including provider and load-lag columns).                                                                                                                                                                                                                                                                             |
 | data_with_exog       | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                        | Target data merged with the selected exogenous covariates.                                                                                                                                                                                                                                                                                                                   |
 | exo_pred             | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                        | Exogenous covariates spanning the forecast horizon, supplied to the forecaster at predict time.                                                                                                                                                                                                                                                                              |
 
@@ -186,10 +204,12 @@ target-only.
 
 #### Raises {.doc-section .doc-section-raises}
 
-| Name   | Type                                                                | Description                                                                 |
-|--------|---------------------------------------------------------------------|-----------------------------------------------------------------------------|
-|        | [RuntimeError](`RuntimeError`)                                      | If ``prepare_data`` has not been called.                                    |
-|        | [WeatherFetchError](`spotforecast2_safe.weather.WeatherFetchError`) | If the Open-Meteo fetch fails and ``config.on_weather_failure == "raise"``. |
+| Name   | Type                                                                | Description                                                                                                                                                                           |
+|--------|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [RuntimeError](`RuntimeError`)                                      | If ``prepare_data`` has not been called.                                                                                                                                              |
+|        | [WeatherFetchError](`spotforecast2_safe.weather.WeatherFetchError`) | If the Open-Meteo fetch fails (single-point, population-weighted, per-zone, or ``zone_weather_columns`` path) and ``config.on_weather_failure == "raise"``.                           |
+|        | [LoadLagError](`LoadLagError`)                                      | If ``config.include_load_lag_exog`` is set, the load-lag builder cannot produce NaN-free columns (stale source, excessive staleness), and ``config.on_load_lag_failure == "raise"``.  |
+|        | [FileNotFoundError](`FileNotFoundError`)                            | If ``config.include_load_lag_exog`` is set with ``load_lag_sources`` in ``{"zones", "zone_shares"}``, the zone-interim CSV is missing, and ``config.on_load_lag_failure == "raise"``. |
 
 #### Examples {.doc-section .doc-section-examples}
 

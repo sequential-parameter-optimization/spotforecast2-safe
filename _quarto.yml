@@ -149,6 +149,10 @@ website:
                 file: docs/reference/preprocessing.forecaster_config.qmd
               - text: "ExogProviderError"
                 file: docs/reference/preprocessing.exog_providers.ExogProviderError.qmd
+              - text: "build_load_lag_features"
+                file: docs/reference/preprocessing.load_lags.build_load_lag_features.qmd
+              - text: "LoadLagError"
+                file: docs/reference/preprocessing.load_lags.LoadLagError.qmd
               - section: "Curate Data"
                 contents:
                   - text: "agg_and_resample_data"
@@ -470,6 +474,8 @@ website:
                 file: docs/reference/weather.features.get_weather_features.qmd
               - text: "locations_for_zone"
                 file: docs/reference/weather.locations.locations_for_zone.qmd
+              - text: "build_zone_weather_columns"
+                file: docs/reference/weather.zone_columns.build_zone_weather_columns.qmd
 
           - section: "Downloader"
             contents:
@@ -717,6 +723,8 @@ quartodoc:
         - preprocessing.exog_providers.FootballMatchWindowProvider
         - preprocessing.exog_providers.EnergyCrisisWindowProvider
         - preprocessing.exog_providers.build_providers
+        - preprocessing.load_lags.build_load_lag_features
+        - preprocessing.load_lags.LoadLagError
         - preprocessing.exog_providers.build_providers_from_config
         - preprocessing.exog_providers.ExogProviderError
         - preprocessing.imputation.apply_imputation
@@ -924,6 +932,7 @@ quartodoc:
         - weather.locations.coordinates
         - weather.locations.weights
         - weather.locations.locations_for_zone
+        - weather.zone_columns.build_zone_weather_columns
 
     # ── Downloader ────────────────────────────────────────────────────────────
     - title: "Downloader"

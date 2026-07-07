@@ -1,0 +1,91 @@
+# preprocessing.load_lags.build_load_lag_features { #spotforecast2_safe.preprocessing.load_lags.build_load_lag_features }
+
+```python
+preprocessing.load_lags.build_load_lag_features(
+    target_series,
+    zone_frame,
+    index,
+    data_end,
+    cov_end,
+    load_lag_hours,
+    load_lag_sources='total',
+    max_staleness_hours=48,
+)
+```
+
+Build NaN-free lagged-load exogenous columns aligned to *index*.
+
+Pure-pandas builder (no I/O). Resamples the requested source to an hourly
+mean, computes zone shares first when requested, then shifts each source
+column by each entry of *load_lag_hours* via
+``series.shift(freq=pd.Timedelta(hours=L))`` and reindexes onto *index*
+(``[data_start, cov_end]``). Only the unavoidable leading warm-up NaN run
+(``t < index[0] + max(load_lag_hours)``, bounded to ``t <= data_end`` so
+it can never reach into or draw from the forecast horizon) is
+back-filled from historical values only; the forecast-horizon slice
+``(data_end, cov_end]`` is hard-checked for NaN and raises
+:class:`LoadLagError` rather than silently filling across the leakage
+boundary, as is any remaining NaN elsewhere in the frame. Each source
+column is also checked for staleness individually: its last valid
+observation must not lag *data_end* by more than *max_staleness_hours*
+(a per-column check, so one quietly-stopped zone cannot hide behind
+still-live siblings).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                | Type                                                                            | Description                                                                                                                                                                                                             | Default    |
+|---------------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| target_series       | [pd](`pandas`).[Series](`pandas.Series`)                                        | The primary target series (``df_pipeline[target]``), used when ``load_lag_sources == "total"``.                                                                                                                         | _required_ |
+| zone_frame          | [Optional](`typing.Optional`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | The four-TSO-zone frame from ``load_interim(mode="four_zone")`` (columns :data:`ZONE_LOAD_COLUMNS`), used when *load_lag_sources* is ``"zones"`` or ``"zone_shares"``. ``None`` when *load_lag_sources* is ``"total"``. | _required_ |
+| index               | [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`)                          | The target output ``DatetimeIndex`` (typically ``exogenous_features.index``, spanning ``[data_start, cov_end]``).                                                                                                       | _required_ |
+| data_end            | [pd](`pandas`).[Timestamp](`pandas.Timestamp`)                                  | Last timestamp of observed (historical) data; the forecast horizon is ``(data_end, cov_end]``.                                                                                                                          | _required_ |
+| cov_end             | [pd](`pandas`).[Timestamp](`pandas.Timestamp`)                                  | Inclusive end of the covariate window (spans the forecast horizon beyond *data_end*).                                                                                                                                   | _required_ |
+| load_lag_hours      | [Sequence](`typing.Sequence`)\[[int](`int`)\]                                   | Lag lengths in hours; every entry should be ``>= 168`` (enforced by ``ConfigMulti`` validation, not re-checked here) so the lagged value is already published at forecast time.                                         | _required_ |
+| load_lag_sources    | [str](`str`)                                                                    | One of ``"total"``, ``"zones"``, ``"zone_shares"``. Defaults to ``"total"``.                                                                                                                                            | `'total'`  |
+| max_staleness_hours | [int](`int`)                                                                    | Maximum age, in hours, the source's last valid observation may lag behind *data_end*. Defaults to ``48``.                                                                                                               | `48`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                             | Description                                                     |
+|--------|------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                                                   | tuple[pd.DataFrame, list[str]]: ``(lag_frame, lag_names)`` — a  |
+|        | [List](`typing.List`)\[[str](`str`)\]                                                                            | ``float32``, NaN-free frame indexed exactly by *index*, and the |
+|        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`), [List](`typing.List`)\[[str](`str`)\]\] | ordered list of its column names.                               |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                      | Description                                                                                                                                                                                                                                                                                                                                              |
+|--------|---------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | [LoadLagError](`spotforecast2_safe.preprocessing.load_lags.LoadLagError`) | If *load_lag_sources* is invalid, ``zone_frame`` is required but missing (or missing a required zone column), any source column is stale, the ``"zone_shares"`` division produces ``+/-inf`` (zero or near-zero four-zone total), or any column contains NaN after the (history-bounded) warm-up backfill (including within the forecast-horizon slice). |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.preprocessing.load_lags import (
+    build_load_lag_features,
+)
+
+# 300 hours of history + a 6-hour forecast horizon.
+idx = pd.date_range("2024-01-01", periods=306, freq="h", tz="UTC")
+data_end = idx[299]
+cov_end = idx[-1]
+target = pd.Series(range(300), index=idx[:300], dtype="float64", name="load")
+
+lag_frame, lag_names = build_load_lag_features(
+    target_series=target,
+    zone_frame=None,
+    index=idx,
+    data_end=data_end,
+    cov_end=cov_end,
+    load_lag_hours=(168,),
+    load_lag_sources="total",
+    max_staleness_hours=48,
+)
+print(lag_names)
+assert lag_names == ["load_lag_168"]
+assert not lag_frame.isna().any().any()
+# Leakage check: value at t equals the raw series at t - 168h.
+t = idx[250]
+assert lag_frame.loc[t, "load_lag_168"] == target.loc[t - pd.Timedelta(hours=168)]
+```
