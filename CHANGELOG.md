@@ -1,3 +1,22 @@
+## [24.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.0.2...v24.1.0-rc.1) (2026-07-07)
+
+
+### Features
+
+* **exog:** include_load_lag_exog lagged-load features (opt-in) ([40de856](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/40de8562f0bb56e1f99ea608c5644b333bafbd02))
+* **weather:** zone_weather_columns concatenated per-TSO-zone weather (opt-in) ([4166412](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4166412d6cc5515d49aa23fcfca46933f9bd2669))
+
+
+### Bug Fixes
+
+* **exog:** bound load-lag warm-up fill to history + per-column staleness (review findings) ([b18cd6c](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b18cd6c52edc9527cf5361a3ca91980f9feb2353))
+* **weather:** derived weather features survive exog selection (return aligned frame incl. derived columns) ([7715014](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7715014f5e86831809d813af06533c227ce3289e))
+
+
+### Documentation
+
+* register zone_columns + load_lags in API reference; sync generated pages ([06909ed](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/06909ed6ba481f6b01eb450caf28b762ccb35dda))
+
 ## [24.0.2](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.0.1...v24.0.2) (2026-06-25)
 
 

@@ -141,7 +141,11 @@ def get_weather_features(
         - **weather_features** – DataFrame with rolling-window weather
             features aligned to the ``[start, cov_end]`` index.
         - **weather_aligned** – Raw weather DataFrame reindexed to the
-            same ``[start, cov_end]`` hourly grid (forward-filled).
+            same ``[start, cov_end]`` hourly grid (forward-filled). Also
+            carries any columns requested via *derived_features* (e.g.
+            ``hdh``, ``cdh``, ``apparent_temperature``, ``dew_point``), so
+            they are selectable downstream via raw-weather membership in
+            ``weather_aligned.columns``.
 
     Raises:
         ValueError: If no numeric weather columns are found, or if
@@ -301,6 +305,21 @@ def get_weather_features(
             wind_speed_unit=wind_speed_unit,
         )
         weather_columns = weather_aligned_filled.columns.tolist()
+        # Join the newly-derived columns onto the RETURNED weather_aligned (not
+        # just the internal *_filled copy used for the window transform) so
+        # they are also selectable as raw-weather columns downstream: the
+        # raw-column membership test in
+        # manager.features.select_exogenous_features matches
+        # ``col in weather_aligned.columns``. Without this, hdh/cdh/apparent
+        # temperature/dew point were silently dropped from the final exog
+        # matrix even though the caller opted in via
+        # ``include_degree_hours`` / ``include_apparent_temperature``.
+        derived_cols = [
+            c
+            for c in weather_aligned_filled.columns
+            if c not in weather_aligned.columns
+        ]
+        weather_aligned = weather_aligned.join(weather_aligned_filled[derived_cols])
 
     wf_transformer = WindowFeatures(
         variables=weather_columns,

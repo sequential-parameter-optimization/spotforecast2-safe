@@ -1,0 +1,96 @@
+# weather.zone_columns.build_zone_weather_columns { #spotforecast2_safe.weather.zone_columns.build_zone_weather_columns }
+
+```python
+weather.zone_columns.build_zone_weather_columns(
+    data,
+    start,
+    cov_end,
+    forecast_horizon,
+    latitude,
+    longitude,
+    timezone='UTC',
+    freq='h',
+    cache_home=None,
+    verbose=False,
+    derived_features=None,
+    hdh_base=15.0,
+    cdh_base=22.0,
+    zone_locations_override=None,
+)
+```
+
+Fetch and concatenate population-weighted weather for all four TSO zones.
+
+Loops the four German TSO zones in
+`spotforecast2_safe.weather.locations.GERMAN_TSO_ZONE_CITIES` order.  For
+each zone, resolves its regional cities via
+`spotforecast2_safe.weather.locations.locations_for_zone` and fetches a
+population-weighted weather frame via
+`spotforecast2_safe.weather.features.get_weather_features`.  Every zone's
+columns are then suffixed ``__<zone_short>`` (the zone key with its
+``load_`` prefix stripped, e.g. ``50hertz``) and concatenated along the
+columns axis, in zone-registry order, giving a deterministic column
+layout.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                    | Type                                                                                             | Description                                                                                                                                                                                                                                           | Default    |
+|-------------------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| data                    | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                                   | Reference DataFrame forwarded to `get_weather_features` for shape/coverage validation.                                                                                                                                                                | _required_ |
+| start                   | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]          | Start of the feature window (native window, not truncated to *data*'s extent — it must span the forecast horizon).                                                                                                                                    | _required_ |
+| cov_end                 | [Union](`typing.Union`)\[[str](`str`), [pd](`pandas`).[Timestamp](`pandas.Timestamp`)\]          | Inclusive end of the feature window (covers the forecast horizon beyond the last observed target row).                                                                                                                                                | _required_ |
+| forecast_horizon        | [int](`int`)                                                                                     | Number of forecast steps, forwarded to `get_weather_features`.                                                                                                                                                                                        | _required_ |
+| latitude                | [float](`float`)                                                                                 | Unused by the per-zone fetch itself (each zone supplies its own coordinates); kept for API symmetry with the single-point path and forwarded to `get_weather_features` as the fallback point (never exercised because ``locations`` is always given). | _required_ |
+| longitude               | [float](`float`)                                                                                 | See *latitude*.                                                                                                                                                                                                                                       | _required_ |
+| timezone                | [str](`str`)                                                                                     | IANA timezone label for the generated index.                                                                                                                                                                                                          | `'UTC'`    |
+| freq                    | [str](`str`)                                                                                     | Pandas-compatible frequency string. Defaults to ``"h"``.                                                                                                                                                                                              | `'h'`      |
+| cache_home              | [Optional](`typing.Optional`)\[[Union](`typing.Union`)\[[str](`str`), [Path](`pathlib.Path`)\]\] | Optional weather-cache directory, forwarded to `get_weather_features`.                                                                                                                                                                                | `None`     |
+| verbose                 | [bool](`bool`)                                                                                   | If ``True``, forward progress messages to stdout.                                                                                                                                                                                                     | `False`    |
+| derived_features        | [Optional](`typing.Optional`)\[[Sequence](`typing.Sequence`)\[[str](`str`)\]\]                   | Optional derived-feature subset (``hdh``, ``cdh``, ``apparent_temperature``, ``dew_point``), forwarded verbatim to every zone's fetch.                                                                                                                | `None`     |
+| hdh_base                | [float](`float`)                                                                                 | Heating base temperature (°C) for ``hdh``.                                                                                                                                                                                                            | `15.0`     |
+| cdh_base                | [float](`float`)                                                                                 | Cooling base temperature (°C) for ``cdh``.                                                                                                                                                                                                            | `22.0`     |
+| zone_locations_override | [Optional](`typing.Optional`)\[[dict](`dict`)\]                                                  | Optional override mapping zone key -> a sequence of `spotforecast2_safe.weather.locations.WeatherLocation` objects, forwarded to `locations_for_zone` for each zone.                                                                                  | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                                                      | Description                                                          |
+|--------|---------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                                                            | tuple[pd.DataFrame, pd.DataFrame]: ``(weather_features_concat,       |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                                                                            | weather_aligned_concat)`` — the rolling-window feature frame and the |
+|        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | raw aligned frame, both column-suffixed per zone and concatenated in |
+|        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | `GERMAN_TSO_ZONE_CITIES` order. Both keep the native ``[start,       |
+|        | [Tuple](`typing.Tuple`)\[[pd](`pandas`).[DataFrame](`pandas.DataFrame`), [pd](`pandas`).[DataFrame](`pandas.DataFrame`)\] | cov_end]`` index (spans the forecast horizon).                       |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                                                                       | Description                                                                                                  |
+|--------|----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+|        | [WeatherFetchError](`spotforecast2_safe.weather.client.WeatherFetchError`) | If any single zone's fetch fails; the whole block is refused rather than silently mixing a partial zone set. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.weather import zone_columns as zc
+
+def fake_weather(*, data, start, cov_end, locations=None, **kwargs):
+    idx = pd.date_range(start, cov_end, freq="h")
+    offset = sum(lat for lat, _ in locations) / len(locations)
+    frame = pd.DataFrame({"temperature_2m": offset + idx.hour * 0.0}, index=idx)
+    return frame, frame
+
+zc.get_weather_features = fake_weather  # monkeypatch for this example
+
+idx = pd.date_range("2024-01-01", periods=48, freq="h", tz="UTC")
+ref = pd.DataFrame({"load": range(len(idx))}, index=idx)
+wf, wa = zc.build_zone_weather_columns(
+    data=ref,
+    start=idx[0],
+    cov_end=idx[-1],
+    forecast_horizon=6,
+    latitude=51.5,
+    longitude=7.5,
+)
+print(sorted(wa.columns))
+assert wa.shape[1] == 4  # one temperature_2m__<zone> column per zone
+```

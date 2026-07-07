@@ -65,6 +65,8 @@ feature engineering, and temporal train/test splitting.
 | [preprocessing.exog_providers.FootballMatchWindowProvider](preprocessing.exog_providers.FootballMatchWindowProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.FootballMatchWindowProvider) | German football match event-window provider. |
 | [preprocessing.exog_providers.EnergyCrisisWindowProvider](preprocessing.exog_providers.EnergyCrisisWindowProvider.qmd#spotforecast2_safe.preprocessing.exog_providers.EnergyCrisisWindowProvider) | German energy-saving regulatory window provider. |
 | [preprocessing.exog_providers.build_providers](preprocessing.exog_providers.build_providers.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers) | Construct the providers whose flags are truthy, in registry order. |
+| [preprocessing.load_lags.build_load_lag_features](preprocessing.load_lags.build_load_lag_features.qmd#spotforecast2_safe.preprocessing.load_lags.build_load_lag_features) | Build NaN-free lagged-load exogenous columns aligned to *index*. |
+| [preprocessing.load_lags.LoadLagError](preprocessing.load_lags.LoadLagError.qmd#spotforecast2_safe.preprocessing.load_lags.LoadLagError) | A lagged-load exog source could not be built NaN-free over the window. |
 | [preprocessing.exog_providers.build_providers_from_config](preprocessing.exog_providers.build_providers_from_config.qmd#spotforecast2_safe.preprocessing.exog_providers.build_providers_from_config) | Construct providers by reading the registry flags off a config object. |
 | [preprocessing.exog_providers.ExogProviderError](preprocessing.exog_providers.ExogProviderError.qmd#spotforecast2_safe.preprocessing.exog_providers.ExogProviderError) | A provider could not produce features covering the requested index. |
 | [preprocessing.imputation.apply_imputation](preprocessing.imputation.apply_imputation.qmd#spotforecast2_safe.preprocessing.imputation.apply_imputation) | Apply imputation to a DataFrame based on the method specified in config. |
@@ -296,6 +298,7 @@ population-weighted multi-city spatial aggregation.
 | [weather.locations.coordinates](weather.locations.coordinates.qmd#spotforecast2_safe.weather.locations.coordinates) | Extract ``(latitude, longitude)`` pairs in order. |
 | [weather.locations.weights](weather.locations.weights.qmd#spotforecast2_safe.weather.locations.weights) | Extract the raw (un-normalised) weights in order. |
 | [weather.locations.locations_for_zone](weather.locations.locations_for_zone.qmd#spotforecast2_safe.weather.locations.locations_for_zone) | Return the `WeatherLocation` objects assigned to a German TSO control zone. |
+| [weather.zone_columns.build_zone_weather_columns](weather.zone_columns.build_zone_weather_columns.qmd#spotforecast2_safe.weather.zone_columns.build_zone_weather_columns) | Fetch and concatenate population-weighted weather for all four TSO zones. |
 
 ## Downloader
 
