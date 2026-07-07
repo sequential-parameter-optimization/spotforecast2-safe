@@ -484,6 +484,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">ExogProviderError</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.load_lags.build_load_lag_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">build_load_lag_features</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/preprocessing.load_lags.LoadLagError.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LoadLagError</span></a>
+  </div>
+</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
@@ -1528,6 +1540,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">locations_for_zone</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs/reference/weather.zone_columns.build_zone_weather_columns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">build_zone_weather_columns</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1988,7 +2006,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Passing <code>dry_run=True</code> to <code>run()</code> reports what would be deleted without actually removing anything, which is useful for inspecting cache contents before committing to removal.</p>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="b165f108" class="cell" data-execution_count="1">
+<div id="4c83e43c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> CleanTask</span>
@@ -2132,7 +2150,7 @@ Task name: clean</code></pre>
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="cb5f0148" class="cell" data-execution_count="2">
+<div id="9af5bd68" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2169,12 +2187,13 @@ Task name: clean</code></pre>
 <p>Build, combine, encode, and merge exogenous feature covariates.</p>
 <p>This is step 4-7 of the pipeline (run after <code>prepare_data</code>, <code>detect_outliers</code>, and <code>impute</code>). It assembles the full exogenous-covariate matrix that the forecaster consumes, then merges it onto the target data. The orchestration proceeds in order:</p>
 <ul>
-<li>4a — Weather, via <code>get_weather_features</code> (Open-Meteo). The response is parquet-cached only when <code>config.cache_home</code> is set. Fetch failures are handled per <code>config.on_weather_failure</code>: <code>"raise"</code> re-raises <code>WeatherFetchError</code>; <code>"skip"</code> logs a warning and continues with an empty weather frame (fail-safe).</li>
+<li>4a — Weather, via <code>get_weather_features</code> (Open-Meteo). The response is parquet-cached only when <code>config.cache_home</code> is set. Fetch failures are handled per <code>config.on_weather_failure</code>: <code>"raise"</code> re-raises <code>WeatherFetchError</code>; <code>"skip"</code> logs a warning and continues with an empty weather frame (fail-safe). When <code>config.zone_weather_columns</code> is set (opt-in, mutually exclusive with <code>per_zone_weather</code> / <code>use_population_weighted_weather</code>), this step instead calls <code>weather.zone_columns.build_zone_weather_columns</code> and concatenates population-weighted weather for each of the four German TSO zones as <code>__&lt;zone_short&gt;</code>-suffixed columns (e.g. <code>temperature_2m__50hertz</code>) for the single target.</li>
 <li>4b — Calendar features, via <code>get_calendar_features</code>.</li>
 <li>4c — Day/night (solar) features, via <code>get_day_night_features</code> (computed with <code>astral</code> from <code>config.latitude</code> / <code>config.longitude</code>).</li>
 <li>4d — Holiday features, via <code>get_holiday_features</code> for <code>config.country_code</code> / <code>config.state</code>.</li>
-<li>5 — The four frames are concatenated along the columns and any residual gaps are back- then forward-filled. Provider-based exogenous columns are then appended via <code>build_providers_from_config</code> (requires <code>spotforecast2-safe</code> &gt;= 15.7.0). The active providers are governed by the config flags <code>include_covid_infection_rate</code>, <code>include_entsoe_forecast_load</code>, <code>include_entsoe_renewable_forecast</code>, <code>include_entsoe_net_load</code>, and <code>include_entsoe_day_ahead_price</code>. Cyclical (sine/cosine) encoding is then applied via <code>apply_cyclical_encoding</code>, and degree-<code>config.poly_features_degree</code> interaction terms are added via <code>create_interaction_features</code>. When the degree is at least 2, the polynomial columns are ranked by mutual information with the primary target and capped to <code>config.max_poly_features</code> via <code>select_top_poly_features</code>.</li>
-<li>6 — The training feature set is chosen via <code>select_exogenous_features</code>, with provider columns appended (order-preserving, de-duplicated).</li>
+<li>5 — The four frames are concatenated along the columns and any residual gaps are back- then forward-filled.</li>
+<li>4f — Lagged-load exog (opt-in, default OFF, gated by <code>config.include_load_lag_exog</code>), via <code>preprocessing.load_lags.build_load_lag_features</code>. Runs AFTER the Step-5 backfill so a load-lag coverage failure is never masked by it. Appends <code>load_lag_&lt;L&gt;</code> / <code>load_&lt;zone&gt;_lag_&lt;L&gt;</code> / <code>share_&lt;zone&gt;_lag_&lt;L&gt;</code> columns per <code>config.load_lag_hours</code> / <code>config.load_lag_sources</code>. A coverage or staleness failure (or a missing zone-interim file for the <code>"zones"</code>/<code>"zone_shares"</code> sources) is governed by <code>config.on_load_lag_failure</code>: <code>"raise"</code> re-raises; <code>"skip"</code> logs a warning and omits the columns (fail-safe). Provider-based exogenous columns are then appended via <code>build_providers_from_config</code> (requires <code>spotforecast2-safe</code> &gt;= 15.7.0). The active providers are governed by the config flags <code>include_covid_infection_rate</code>, <code>include_entsoe_forecast_load</code>, <code>include_entsoe_renewable_forecast</code>, <code>include_entsoe_net_load</code>, and <code>include_entsoe_day_ahead_price</code>. Cyclical (sine/cosine) encoding is then applied via <code>apply_cyclical_encoding</code>, and degree-<code>config.poly_features_degree</code> interaction terms are added via <code>create_interaction_features</code>. When the degree is at least 2, the polynomial columns are ranked by mutual information with the primary target and capped to <code>config.max_poly_features</code> via <code>select_top_poly_features</code>.</li>
+<li>6 — The training feature set is chosen via <code>select_exogenous_features</code>, with provider and load-lag columns appended (order-preserving, de-duplicated).</li>
 <li>7 — Targets and covariates are merged via <code>merge_data_and_covariates</code> into <code>self.data_with_exog</code> and the forecast-horizon covariates <code>self.exo_pred</code>.</li>
 </ul>
 <p>When <code>config.use_exogenous_features</code> is <code>False</code> the method is a no-op and returns <code>self</code> immediately, leaving the pipeline target-only.</p>
@@ -2207,7 +2226,7 @@ Task name: clean</code></pre>
 <tr class="even">
 <td>exog_feature_names</td>
 <td><a href="https://docs.python.org/3/library/typing.html#typing.List">List</a>[<a href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</td>
-<td>Names of the exogenous features selected for training (including provider columns).</td>
+<td>Names of the exogenous features selected for training (including provider and load-lag columns).</td>
 </tr>
 <tr class="odd">
 <td>data_with_exog</td>
@@ -2260,7 +2279,17 @@ Task name: clean</code></pre>
 <tr class="even">
 <td></td>
 <td><code>WeatherFetchError</code></td>
-<td>If the Open-Meteo fetch fails and <code>config.on_weather_failure == "raise"</code>.</td>
+<td>If the Open-Meteo fetch fails (single-point, population-weighted, per-zone, or <code>zone_weather_columns</code> path) and <code>config.on_weather_failure == "raise"</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>LoadLagError</code></td>
+<td>If <code>config.include_load_lag_exog</code> is set, the load-lag builder cannot produce NaN-free columns (stale source, excessive staleness), and <code>config.on_load_lag_failure == "raise"</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><a href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError">FileNotFoundError</a></td>
+<td>If <code>config.include_load_lag_exog</code> is set with <code>load_lag_sources</code> in <code>{"zones", "zone_shares"}</code>, the zone-interim CSV is missing, and <code>config.on_load_lag_failure == "raise"</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -2268,7 +2297,7 @@ Task name: clean</code></pre>
 <section id="examples-2" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
 <p>With exogenous features disabled the method is a no-op, so the example below runs without any network access and leaves the pipeline target-only.</p>
-<div id="a3132448" class="cell" data-execution_count="3">
+<div id="827d2e32" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -2345,7 +2374,7 @@ Selected exog feature names: []</code></pre>
 </section>
 <section id="examples-3" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="919c7b1f" class="cell" data-execution_count="4">
+<div id="f4d4d74d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> LazyTask</span>
@@ -2421,7 +2450,7 @@ Lags: [ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23]</co
 </section>
 <section id="examples-4" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="42e8ea39" class="cell" data-execution_count="5">
+<div id="8249af46" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2501,7 +2530,7 @@ initial_train_size: 324</code></pre>
 </section>
 <section id="examples-5" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-5">Examples</h4>
-<div id="a7ad2fd9" class="cell" data-execution_count="6">
+<div id="d9371c8a" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2577,7 +2606,7 @@ initial_train_size: 324</code></pre>
 </section>
 <section id="examples-6" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-6">Examples</h4>
-<div id="25f05e44" class="cell" data-execution_count="7">
+<div id="94b35ec3" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2679,7 +2708,7 @@ initial_train_size: 324</code></pre>
 </section>
 <section id="examples-7" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-7">Examples</h4>
-<div id="83bc2bc8" class="cell" data-execution_count="8">
+<div id="7f375384" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> LazyTask</span>
@@ -2780,7 +2809,7 @@ initial_train_size: 324</code></pre>
 </section>
 <section id="examples-8" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-8">Examples</h4>
-<div id="166cfd48" class="cell" data-execution_count="9">
+<div id="987d1d34" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> LazyTask</span>
@@ -2809,7 +2838,7 @@ initial_train_size: 324</code></pre>
 <p>Log a summary of the current pipeline configuration.</p>
 <section id="examples-9" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-9">Examples</h4>
-<div id="9b55a266" class="cell" data-execution_count="10">
+<div id="561229b0" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2872,7 +2901,7 @@ initial_train_size: 324</code></pre>
 </section>
 <section id="examples-10" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-10">Examples</h4>
-<div id="8a97537a" class="cell" data-execution_count="11">
+<div id="24040d73" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -2987,7 +3016,7 @@ initial_train_size: 324</code></pre>
 </section>
 <section id="examples-11" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-11">Examples</h4>
-<div id="37fbd6ef" class="cell" data-execution_count="12">
+<div id="ccda4ca1" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -3100,7 +3129,7 @@ Targets: ['a']</code></pre>
 </section>
 <section id="examples-12" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-12">Examples</h4>
-<div id="4988bf6f" class="cell" data-execution_count="13">
+<div id="35c652a6" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> CleanTask</span>
@@ -3112,7 +3141,7 @@ Targets: ['a']</code></pre>
 <span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> task.run(dry_run<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result[<span class="st">"status"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[clean] Dry run — would delete: /tmp/tmpzln6ai_w/test_cache
+<pre><code>[clean] Dry run — would delete: /tmp/tmpzbkh7pxr/test_cache
   Would remove: logging
 dry_run</code></pre>
 </div>
@@ -3199,7 +3228,7 @@ dry_run</code></pre>
 </section>
 <section id="examples-13" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-13">Examples</h4>
-<div id="c3ae54c0" class="cell" data-execution_count="14">
+<div id="89ad14d5" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> LazyTask</span>
@@ -3298,7 +3327,7 @@ dry_run</code></pre>
 </section>
 <section id="examples-14" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-14">Examples</h4>
-<div id="8b4873ca" class="cell" data-execution_count="15">
+<div id="7ca6e51c" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.multitask <span class="im">import</span> LazyTask</span>
