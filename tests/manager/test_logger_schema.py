@@ -180,7 +180,7 @@ class TestEndToEnd:
     def test_file_handler_writes_json_records(
         self, schema: dict[str, Any], tmp_path: Path
     ) -> None:
-        logger = logging.getLogger("task_safe_n_to_1")
+        logger = logging.getLogger("sf2-safe-logger")
         for h in list(logger.handlers):
             logger.removeHandler(h)
 
