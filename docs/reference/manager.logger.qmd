@@ -155,10 +155,10 @@ even when the operator silences the console.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                                    | Description                                                                                                                                                         | Default        |
-|---------|---------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| level   | [int](`int`)                                            | Logging level for console output. Default: ``logging.INFO``.                                                                                                        | `logging.INFO` |
-| log_dir | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Optional directory for the audit log file. If provided, a timestamped ``task_safe_n_to_1_YYYYMMDD_HHMMSS.log`` file is created and receives JSON-formatted records. | `None`         |
+| Name    | Type                                                    | Description                                                                                                                                                        | Default        |
+|---------|---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| level   | [int](`int`)                                            | Logging level for console output. Default: ``logging.INFO``.                                                                                                       | `logging.INFO` |
+| log_dir | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Optional directory for the audit log file. If provided, a timestamped ``sf2-safe-logger_YYYYMMDD_HHMMSS.log`` file is created and receives JSON-formatted records. | `None`         |
 
 #### Returns {.doc-section .doc-section-returns}
 
@@ -185,7 +185,7 @@ from spotforecast2_safe.manager.logger import setup_logging
 
 # Reset the named logger so the example is idempotent when the notebook
 # kernel re-runs this cell.
-named = logging.getLogger("task_safe_n_to_1")
+named = logging.getLogger("sf2-safe-logger")
 named.handlers.clear()
 
 with tempfile.TemporaryDirectory() as tmp:
