@@ -166,7 +166,7 @@ def setup_logging(
     Args:
         level: Logging level for console output. Default: ``logging.INFO``.
         log_dir: Optional directory for the audit log file. If provided, a
-            timestamped ``task_safe_n_to_1_YYYYMMDD_HHMMSS.log`` file is
+            timestamped ``sf2-safe-logger_YYYYMMDD_HHMMSS.log`` file is
             created and receives JSON-formatted records.
 
     Returns:
@@ -191,7 +191,7 @@ def setup_logging(
 
         # Reset the named logger so the example is idempotent when the notebook
         # kernel re-runs this cell.
-        named = logging.getLogger("task_safe_n_to_1")
+        named = logging.getLogger("sf2-safe-logger")
         named.handlers.clear()
 
         with tempfile.TemporaryDirectory() as tmp:
@@ -214,7 +214,7 @@ def setup_logging(
         named.handlers.clear()
         ```
     """
-    logger = logging.getLogger("task_safe_n_to_1")
+    logger = logging.getLogger("sf2-safe-logger")
     logger.setLevel(logging.DEBUG)
 
     if logger.handlers:
@@ -237,7 +237,7 @@ def setup_logging(
         try:
             log_dir.mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_file_path = log_dir / f"task_safe_n_to_1_{timestamp}.log"
+            log_file_path = log_dir / f"sf2-safe-logger_{timestamp}.log"
 
             file_handler = logging.FileHandler(log_file_path)
             file_handler.setFormatter(JsonAuditFormatter())
