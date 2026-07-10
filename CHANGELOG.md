@@ -1,3 +1,19 @@
+## [25.0.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.1.0...v25.0.0) (2026-07-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **manager:** logging.getLogger("task_safe_n_to_1") no longer
+returns the configured audit logger; use
+logging.getLogger("sf2-safe-logger") instead. Audit-log files are now
+named sf2-safe-logger_YYYYMMDD_HHMMSS.log.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+### Code Refactoring
+
+* **manager:** rename audit logger to sf2-safe-logger ([9cb8e2a](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/9cb8e2a93ed4ff353293ae193d36e8e5b7fca527))
+
 ## [25.0.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v24.1.0...v25.0.0-rc.1) (2026-07-10)
 
 
