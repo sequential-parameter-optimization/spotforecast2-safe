@@ -76,9 +76,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bcbce66894bfa8e7e94e40e0186b9bb8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-655808e3c14d9b59497a1b5a58e1ce29.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-2dd548ee3eab68bd851dd9e3d9c9a811.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-655808e3c14d9b59497a1b5a58e1ce29.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-4b08eba964c7bf3f346e1a184fa4788f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-9ea81ee511bf51e21913ffb437acef44.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-4b08eba964c7bf3f346e1a184fa4788f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -1983,9 +1983,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    include_weather_windows<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    include_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    include_holiday_adjacency_features<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    include_school_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    poly_features_degree<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    include_day_type_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    include_school_holiday_features<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    poly_features_degree<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Select and deduplicate exogenous feature columns for model training.</p>
 <p>Builds a prioritised, deduplicated list of column names from <em>exogenous_features</em> suitable for passing as <code>exog</code> to a recursive forecaster. The selection order is:</p>
 <ol type="1">
@@ -1994,6 +1995,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Raw weather columns shared with <em>weather_aligned</em>.</li>
 <li>Holiday-related columns: <code>is_holiday</code> plus any column starting with <code>"holiday"</code> (optional, <code>include_holiday_features</code>).</li>
 <li>Holiday-adjacency columns: <code>is_brueckentag</code>, <code>is_before_holiday</code>, <code>is_after_holiday</code> (optional, <code>include_holiday_adjacency_features</code>).</li>
+<li>Day-type columns: <code>is_workday</code>, <code>day_type</code> (optional, <code>include_day_type_features</code>).</li>
 <li>School-holiday column: <code>is_school_holiday</code> (optional, <code>include_school_holiday_features</code>).</li>
 <li>Polynomial interaction columns starting with <code>"poly_"</code> (included when <code>poly_features_degree &gt;= 2</code>).</li>
 </ol>
@@ -2047,12 +2049,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
+<td>include_day_type_features</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>If <code>True</code>, include the two day-type columns <code>is_workday</code> and <code>day_type</code> when present in <em>exogenous_features</em>. <code>day_type</code> is an integer-coded four-class categorical (<code>0</code> working day, <code>1</code> Saturday, <code>2</code> Sunday, <code>3</code> public holiday, holiday precedence) consumed by tree models as a numeric feature. Defaults to <code>False</code>.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
 <td>include_school_holiday_features</td>
 <td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
 <td>If <code>True</code>, include the <code>is_school_holiday</code> column when present in <em>exogenous_features</em>. Defaults to <code>False</code>.</td>
 <td><code>False</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>poly_features_degree</td>
 <td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
 <td>Polynomial-interaction degree. Interaction columns (names starting with <code>"poly_"</code>) are included only when this is <code>&gt;= 2</code>; at <code>1</code> no interactions exist. Defaults to <code>1</code>.</td>
@@ -2088,7 +2096,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Select cyclical and raw weather columns from a feature matrix:</p>
-<div id="241aaf15" class="cell" data-execution_count="1">
+<div id="4eeeb628" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotforecast2_safe.manager.features <span class="im">import</span> select_exogenous_features</span>
