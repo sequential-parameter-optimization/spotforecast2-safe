@@ -475,6 +475,87 @@ class TestSelectExogenousFeatures:
         )
         assert selected_implicit == selected_explicit
 
+    # --- Day-type-feature tests ---
+
+    def _day_type_exog(self, hourly_idx, weather_df):
+        """Exogenous DataFrame that includes both day-type columns."""
+        return pd.DataFrame(
+            {
+                "hour_sin": np.sin(2 * np.pi * hourly_idx.hour / 24),
+                "hour_cos": np.cos(2 * np.pi * hourly_idx.hour / 24),
+                "temperature": weather_df["temperature"].values,
+                "is_holiday": 0,
+                "is_workday": 1,
+                "day_type": 0,
+            },
+            index=hourly_idx,
+        )
+
+    def test_day_type_excluded_by_default(self, hourly_idx, weather_df):
+        """Day-type columns must not appear in the selection unless the flag is set."""
+        exog = self._day_type_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+        )
+        for col in ["is_workday", "day_type"]:
+            assert col not in selected
+
+    def test_day_type_included_when_flag_set(self, hourly_idx, weather_df):
+        """Both day-type columns appear when include_day_type_features=True."""
+        exog = self._day_type_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_day_type_features=True,
+        )
+        for col in ["is_workday", "day_type"]:
+            assert col in selected
+
+    def test_flag_independence_day_type_true_holiday_false(
+        self, hourly_idx, weather_df
+    ):
+        """day-type flag True + holiday False → day-type selected, is_holiday not."""
+        exog = self._day_type_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=False,
+            include_day_type_features=True,
+        )
+        assert "is_holiday" not in selected
+        for col in ["is_workday", "day_type"]:
+            assert col in selected
+
+    def test_flag_independence_day_type_false_holiday_true(
+        self, hourly_idx, weather_df
+    ):
+        """holiday flag True + day-type False → is_holiday selected, no day-type."""
+        exog = self._day_type_exog(hourly_idx, weather_df)
+        selected = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_holiday_features=True,
+            include_day_type_features=False,
+        )
+        assert "is_holiday" in selected
+        for col in ["is_workday", "day_type"]:
+            assert col not in selected
+
+    def test_day_type_default_arg_identity(self, hourly_idx, weather_df):
+        """Calling without include_day_type_features is identical to False."""
+        exog = self._day_type_exog(hourly_idx, weather_df)
+        selected_implicit = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+        )
+        selected_explicit = select_exogenous_features(
+            exogenous_features=exog,
+            weather_aligned=weather_df,
+            include_day_type_features=False,
+        )
+        assert selected_implicit == selected_explicit
+
 
 # =============================================================================
 # merge_data_and_covariates
