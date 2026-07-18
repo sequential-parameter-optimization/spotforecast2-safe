@@ -999,7 +999,9 @@ class BaseTask:
           primary target and capped to ``config.max_poly_features`` via
           ``select_top_poly_features``.
         * 6 — The training feature set is chosen via
-          ``select_exogenous_features``, with provider and load-lag columns
+          ``select_exogenous_features`` (including, when
+          ``config.include_day_type_features`` is set, the day-type columns
+          ``is_workday`` / ``day_type``), with provider and load-lag columns
           appended (order-preserving, de-duplicated).
         * 7 — Targets and covariates are merged via
           ``merge_data_and_covariates`` into ``self.data_with_exog`` and the
@@ -1539,6 +1541,9 @@ class BaseTask:
             include_weather_windows=self.config.include_weather_windows,
             include_holiday_features=self.config.include_holiday_features,
             include_holiday_adjacency_features=self.config.include_holiday_adjacency_features,
+            include_day_type_features=getattr(
+                self.config, "include_day_type_features", False
+            ),
             include_school_holiday_features=self.config.include_school_holiday_features,
             poly_features_degree=self.config.poly_features_degree,
         )

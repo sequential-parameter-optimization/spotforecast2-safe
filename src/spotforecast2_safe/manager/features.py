@@ -281,6 +281,7 @@ def select_exogenous_features(
     include_weather_windows: bool = False,
     include_holiday_features: bool = False,
     include_holiday_adjacency_features: bool = False,
+    include_day_type_features: bool = False,
     include_school_holiday_features: bool = False,
     poly_features_degree: int = 1,
 ) -> List[str]:
@@ -297,9 +298,11 @@ def select_exogenous_features(
        with ``"holiday"`` (optional, ``include_holiday_features``).
     5. Holiday-adjacency columns: ``is_brueckentag``, ``is_before_holiday``,
        ``is_after_holiday`` (optional, ``include_holiday_adjacency_features``).
-    6. School-holiday column: ``is_school_holiday`` (optional,
+    6. Day-type columns: ``is_workday``, ``day_type`` (optional,
+       ``include_day_type_features``).
+    7. School-holiday column: ``is_school_holiday`` (optional,
        ``include_school_holiday_features``).
-    7. Polynomial interaction columns starting with ``"poly_"`` (included
+    8. Polynomial interaction columns starting with ``"poly_"`` (included
        when ``poly_features_degree >= 2``).
 
     Duplicates are removed while preserving insertion order.
@@ -322,6 +325,13 @@ def select_exogenous_features(
             adjacency columns ``is_brueckentag``, ``is_before_holiday``, and
             ``is_after_holiday`` when present in *exogenous_features*.
             Defaults to ``False``.
+        include_day_type_features: If ``True``, include the two day-type
+            columns ``is_workday`` and ``day_type`` when present in
+            *exogenous_features*.  ``day_type`` is an integer-coded
+            four-class categorical (``0`` working day, ``1`` Saturday,
+            ``2`` Sunday, ``3`` public holiday, holiday precedence)
+            consumed by tree models as a numeric feature.  Defaults to
+            ``False``.
         include_school_holiday_features: If ``True``, include the
             ``is_school_holiday`` column when present in *exogenous_features*.
             Defaults to ``False``.
@@ -399,6 +409,16 @@ def select_exogenous_features(
             col for col in adjacency_allowlist if col in exogenous_features.columns
         ]
         exog_list.extend(adjacency_cols)
+
+    if include_day_type_features:
+        day_type_allowlist = [
+            "is_workday",
+            "day_type",
+        ]
+        day_type_cols = [
+            col for col in day_type_allowlist if col in exogenous_features.columns
+        ]
+        exog_list.extend(day_type_cols)
 
     if include_school_holiday_features:
         if "is_school_holiday" in exogenous_features.columns:
