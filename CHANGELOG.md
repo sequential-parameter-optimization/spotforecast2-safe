@@ -1,3 +1,15 @@
+## [25.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v25.0.0...v25.1.0) (2026-07-18)
+
+
+### Features
+
+* **features:** add include_day_type_features selection bucket to select_exogenous_features ([4cb88c1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4cb88c1e011c83d1b11e1d23c978c7340130e180))
+
+
+### Documentation
+
+* **reference:** regenerate quartodoc API pages for the day-type selection bucket ([4009c09](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/4009c09ca15679d8d7d812904d327d5ce28fa5bc))
+
 ## [25.1.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v25.0.0...v25.1.0-rc.1) (2026-07-18)
 
 
