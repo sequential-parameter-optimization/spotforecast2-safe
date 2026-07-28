@@ -1,3 +1,16 @@
+## [25.2.0-rc.1](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v25.1.0...v25.2.0-rc.1) (2026-07-28)
+
+
+### Features
+
+* **processing:** add upr metric and per-period forecast scoring ([7bee04e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/7bee04e1786dfa2f2763def86f9db383c185e1fc))
+* **stats:** add error summaries and model-comparison statistics ([c94066e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/c94066ec42bd79ea0f04fd0cfc8d69838836f0f9))
+
+
+### Documentation
+
+* **api:** regenerate API reference for the new scoring and stats symbols ([b99730e](https://github.com/sequential-parameter-optimization/spotforecast2-safe/commit/b99730ed737f8c37900426a552774dd78bbe7015))
+
 ## [25.1.0](https://github.com/sequential-parameter-optimization/spotforecast2-safe/compare/v25.0.0...v25.1.0) (2026-07-18)
 
 
