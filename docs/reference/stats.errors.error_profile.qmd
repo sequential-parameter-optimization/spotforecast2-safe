@@ -1,0 +1,49 @@
+# stats.errors.error_profile { #spotforecast2_safe.stats.errors.error_profile }
+
+```python
+stats.errors.error_profile(errors, *, by='hour', agg='mean')
+```
+
+Aggregate forecast errors by a calendar key, one column per entry.
+
+Groups every error series by an attribute of its ``DatetimeIndex``
+(hour of day, by default) and aggregates each group — the systematic
+hour-of-day error profile of a day-ahead forecaster, for example.
+Render the result with `spotforecast2.plots.evaluation.plot_error_profile`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                                                           | Description                                                                                                                                                                                                            | Default    |
+|--------|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| errors | [Mapping](`collections.abc.Mapping`)\[[str](`str`), [pd](`pandas`).[Series](`pandas.Series`)\] | Mapping of entry name to its error series (``forecast - actual``), each with a ``DatetimeIndex``.                                                                                                                      | _required_ |
+| by     | [str](`str`)                                                                                   | Calendar key to group by. Options: - ``"hour"``: hour of day (0-23). - ``"dayofweek"``: day of week (0 = Monday). - ``"month"``: month of year (1-12). - ``"dayofyear"``: day of year (1-366). Defaults to ``"hour"``. | `'hour'`   |
+| agg    | [str](`str`)                                                                                   | Aggregation applied per group (any pandas aggregation name, e.g. ``"mean"``, ``"median"``, ``"std"``). Defaults to ``"mean"``.                                                                                         | `'mean'`   |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                  |
+|--------|------------------------------------------------|--------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Indexed by the sorted grouping-key values, one |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | column per entry, in mapping order.                          |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                          |
+|--------|----------------------------|----------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When an entry value is not a ``pd.Series`` with a ``DatetimeIndex``. |
+|        | [ValueError](`ValueError`) | When ``errors`` is empty or ``by`` is not a supported key.           |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.stats.errors import error_profile
+
+idx = pd.date_range("2026-06-10", periods=48, freq="h", tz="UTC")
+errors = {"model": pd.Series(np.tile(np.arange(24.0), 2), index=idx)}
+profile = error_profile(errors, by="hour")
+print(profile.head(3).to_string())
+assert list(profile.index) == list(range(24))
+assert (profile["model"] == np.arange(24.0)).all()
+```

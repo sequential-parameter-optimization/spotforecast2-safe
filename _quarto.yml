@@ -252,6 +252,12 @@ website:
                 file: docs/reference/processing.blend.blend_with_prior.qmd
               - text: "score_forecasts"
                 file: docs/reference/processing.forecast_scoring.score_forecasts.qmd
+              - text: "score_forecasts_by_period"
+                file: docs/reference/processing.forecast_scoring.score_forecasts_by_period.qmd
+              - text: "mase_scaling_factors"
+                file: docs/reference/processing.forecast_scoring.mase_scaling_factors.qmd
+              - text: "aggregate_period_scores"
+                file: docs/reference/processing.forecast_scoring.aggregate_period_scores.qmd
 
           - section: "Forecaster"
             contents:
@@ -431,6 +437,26 @@ website:
                 file: docs/reference/stats.spectral.compute_periodogram.qmd
               - text: "PeriodogramResult"
                 file: docs/reference/stats.spectral.PeriodogramResult.qmd
+              - text: "error_summary"
+                file: docs/reference/stats.errors.error_summary.qmd
+              - text: "error_profile"
+                file: docs/reference/stats.errors.error_profile.qmd
+              - text: "PairedComparison"
+                file: docs/reference/stats.comparison.PairedComparison.qmd
+              - text: "paired_comparison"
+                file: docs/reference/stats.comparison.paired_comparison.qmd
+              - text: "holm_adjust"
+                file: docs/reference/stats.comparison.holm_adjust.qmd
+              - text: "pairwise_paired_t"
+                file: docs/reference/stats.comparison.pairwise_paired_t.qmd
+              - text: "RepeatedMeasuresAnova"
+                file: docs/reference/stats.comparison.RepeatedMeasuresAnova.qmd
+              - text: "repeated_measures_anova"
+                file: docs/reference/stats.comparison.repeated_measures_anova.qmd
+              - text: "rank_table"
+                file: docs/reference/stats.comparison.rank_table.qmd
+              - text: "rank_concordance"
+                file: docs/reference/stats.comparison.rank_concordance.qmd
 
           - section: "Security"
             contents:
@@ -755,6 +781,9 @@ quartodoc:
         - processing.shape_check.apply_level_correction
         - processing.blend.blend_with_prior
         - processing.forecast_scoring.score_forecasts
+        - processing.forecast_scoring.score_forecasts_by_period
+        - processing.forecast_scoring.mase_scaling_factors
+        - processing.forecast_scoring.aggregate_period_scores
 
     # ── Forecaster ────────────────────────────────────────────────────────────
     - title: "Forecaster"
@@ -883,6 +912,16 @@ quartodoc:
         - stats.stationarity.augmented_dickey_fuller
         - stats.spectral.compute_periodogram
         - stats.spectral.PeriodogramResult
+        - stats.errors.error_summary
+        - stats.errors.error_profile
+        - stats.comparison.PairedComparison
+        - stats.comparison.paired_comparison
+        - stats.comparison.holm_adjust
+        - stats.comparison.pairwise_paired_t
+        - stats.comparison.RepeatedMeasuresAnova
+        - stats.comparison.repeated_measures_anova
+        - stats.comparison.rank_table
+        - stats.comparison.rank_concordance
 
     # ── Security ──────────────────────────────────────────────────────────────
     - title: "Security"

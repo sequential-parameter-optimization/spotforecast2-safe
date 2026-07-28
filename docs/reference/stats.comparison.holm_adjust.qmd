@@ -1,0 +1,41 @@
+# stats.comparison.holm_adjust { #spotforecast2_safe.stats.comparison.holm_adjust }
+
+```python
+stats.comparison.holm_adjust(p_values)
+```
+
+Adjust p-values for multiple testing with the Holm step-down method.
+
+Sorts the raw p-values ascending (stable sort), multiplies the
+``i``-th smallest by ``m - i`` remaining hypotheses, enforces
+monotonicity with a running maximum, and caps at 1.0.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                     | Description                                                         | Default    |
+|----------|------------------------------------------|---------------------------------------------------------------------|------------|
+| p_values | [pd](`pandas`).[Series](`pandas.Series`) | Raw p-values; the index identifies the hypotheses and is preserved. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                               |
+|--------|------------------------------------------|-----------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: Adjusted p-values in the original index order. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                 |
+|--------|----------------------------|---------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``p_values`` is empty or contains NaN. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.comparison import holm_adjust
+
+raw = pd.Series([0.01, 0.02, 0.03, 0.04], index=list("abcd"))
+adjusted = holm_adjust(raw)
+print(adjusted.to_string())
+assert list(adjusted) == [0.04, 0.06, 0.06, 0.06]
+```

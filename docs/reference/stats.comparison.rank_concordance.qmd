@@ -1,0 +1,45 @@
+# stats.comparison.rank_concordance { #spotforecast2_safe.stats.comparison.rank_concordance }
+
+```python
+stats.comparison.rank_concordance(ranks, *, reference=None)
+```
+
+Kendall's tau between a reference ranking and every other column.
+
+Quantifies how stable a leaderboard is across metrics: a tau of 1.0
+means a metric reproduces the reference ranking exactly.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                           | Description                                                                               | Default    |
+|-----------|------------------------------------------------|-------------------------------------------------------------------------------------------|------------|
+| ranks     | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | Frame of ranks (or scores), one column per metric — typically the output of `rank_table`. | _required_ |
+| reference | [str](`str`) \| None                           | Column the others are compared against.  Defaults to None, which uses the first column.   | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                  |
+|--------|------------------------------------------|--------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: Kendall's tau per non-reference column, in column |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | order, name ``"kendall_tau"``.                               |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                 |
+|--------|----------------------------|-----------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``ranks`` has fewer than two columns or ``reference`` is not a column. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.comparison import rank_concordance
+
+ranks = pd.DataFrame(
+    {"mae": [1, 2, 3, 4], "rmse": [1, 2, 3, 4], "mape": [4, 3, 2, 1]},
+    index=["a", "b", "c", "d"],
+)
+tau = rank_concordance(ranks, reference="mae")
+print(tau.to_string())
+assert tau["rmse"] == 1.0 and tau["mape"] == -1.0
+```

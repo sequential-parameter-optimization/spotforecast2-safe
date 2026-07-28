@@ -1,0 +1,53 @@
+# stats.comparison.pairwise_paired_t { #spotforecast2_safe.stats.comparison.pairwise_paired_t }
+
+```python
+stats.comparison.pairwise_paired_t(panel, *, correction='holm')
+```
+
+Pairwise two-sided paired t-tests over the columns of a panel.
+
+Runs a paired t-test for every pair of entries (columns) over the
+shared blocks (rows) and returns the p-values as a square symmetric
+matrix — the pairwise stage of the blocked comparison protocol,
+rendered with
+`spotforecast2.plots.comparison.plot_critical_difference`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                                           | Description                                                                                                                                                                 | Default    |
+|------------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| panel      | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | Complete block-by-entry frame (e.g. one row per target day, one column per entry, daily MAE values).  Must contain no NaN — subset to shared blocks first.                  | _required_ |
+| correction | [str](`str`)                                   | Multiple-testing correction applied across the pairs. Options: - ``"holm"``: Holm step-down adjustment (`holm_adjust`). - ``"none"``: raw p-values. Defaults to ``"holm"``. | `'holm'`   |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                        |
+|--------|------------------------------------------------|----------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Square symmetric p-value matrix over |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``panel.columns`` with 1.0 on the diagonal.        |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                    |
+|--------|----------------------------|------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``panel`` has fewer than two columns or rows, contains NaN, or ``correction`` is unknown. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.comparison import pairwise_paired_t
+
+days = pd.date_range("2026-06-10", periods=8, freq="D")
+panel = pd.DataFrame(
+    {
+        "alpha": [500.0, 520, 480, 510, 490, 505, 515, 495],
+        "beta": [540.0, 565, 515, 555, 530, 545, 560, 535],
+        "gamma": [502.0, 519, 483, 508, 493, 504, 517, 496],
+    },
+    index=days,
+)
+p = pairwise_paired_t(panel)
+print(p.round(4).to_string())
+assert (p.values == p.values.T).all()
+```

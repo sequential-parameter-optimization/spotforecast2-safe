@@ -1,0 +1,77 @@
+# processing.forecast_scoring.score_forecasts_by_period { #spotforecast2_safe.processing.forecast_scoring.score_forecasts_by_period }
+
+```python
+processing.forecast_scoring.score_forecasts_by_period(
+    forecasts,
+    actual,
+    *,
+    freq='D',
+    metrics=SUPPORTED_METRICS,
+    min_obs=None,
+    entry_col='entry',
+    period_col='period',
+)
+```
+
+Score several forecasts against a shared actual, per calendar period.
+
+Each forecast is aligned to ``actual`` on the index intersection, the
+aligned pairs are grouped into calendar periods of length ``freq``
+(per day, by default), and every period is scored on the requested
+``metrics`` with the same metric kernel as `score_forecasts`.  The
+result is one long tidy frame — one row per (entry, period) — ready
+for `aggregate_period_scores` or for paired statistical comparison
+with `spotforecast2_safe.stats.comparison`.
+
+This is **pure**: no logging, no plotting, no mutation.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                                                                                           | Description                                                                                                                                                                   | Default             |
+|------------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| forecasts  | [Mapping](`collections.abc.Mapping`)\[[str](`str`), [pd](`pandas`).[Series](`pandas.Series`)\] | Mapping of entry name to its forecast series.  Every series needs a tz-consistent ``DatetimeIndex`` compatible with ``actual``.                                               | _required_          |
+| actual     | [pd](`pandas`).[Series](`pandas.Series`)                                                       | The ground-truth series every forecast is scored against. Must have a ``DatetimeIndex``.                                                                                      | _required_          |
+| metrics    | [tuple](`tuple`)\[[str](`str`), ...\]                                                          | Subset of `SUPPORTED_METRICS` to compute, in output order. Defaults to `SUPPORTED_METRICS`.                                                                                   | `SUPPORTED_METRICS` |
+| freq       | [str](`str`)                                                                                   | Pandas offset alias defining the period length.  Defaults to ``"D"`` (one calendar day per row).                                                                              | `'D'`               |
+| min_obs    | [int](`int`) \| None                                                                           | When given, periods with fewer than ``min_obs`` aligned observations are dropped (e.g. ``24`` keeps only complete days of hourly data).  Defaults to None (keep all periods). | `None`              |
+| entry_col  | [str](`str`)                                                                                   | Name of the entry column in the result. Defaults to ``"entry"``.                                                                                                              | `'entry'`           |
+| period_col | [str](`str`)                                                                                   | Name of the period column in the result. Defaults to ``"period"``.                                                                                                            | `'period'`          |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                   |
+|--------|------------------------------------------------|---------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Long frame with columns                         |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``[entry_col, period_col, *metrics, "n"]``, sorted by         |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``(entry, period)``.  ``period`` holds the period-start       |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``pd.Timestamp`` (tz-aware when the inputs are); ``n`` is the |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | number of aligned observations inside the period.             |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                               |
+|--------|----------------------------|-----------------------------------------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``actual`` or a forecast is not a ``pd.Series``, or ``actual`` has no ``DatetimeIndex``.             |
+|        | [ValueError](`ValueError`) | When ``actual`` is empty, ``forecasts`` is empty, or ``metrics`` contains an unsupported name / is empty. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing.forecast_scoring import (
+    score_forecasts_by_period,
+)
+
+idx = pd.date_range("2026-06-10", periods=48, freq="h", tz="UTC")
+actual = pd.Series([40_000.0] * 48, index=idx)
+forecasts = {
+    "over": actual + 100.0,   # constant over-prediction
+    "under": actual - 200.0,  # constant under-prediction
+}
+daily = score_forecasts_by_period(
+    forecasts, actual, metrics=("mae", "bias", "upr"), min_obs=24
+)
+print(daily.round(1).to_string(index=False))
+assert set(daily["entry"]) == {"over", "under"}
+assert (daily.loc[daily["entry"] == "under", "upr"] == 100.0).all()
+```
