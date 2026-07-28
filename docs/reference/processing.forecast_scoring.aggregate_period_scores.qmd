@@ -1,0 +1,68 @@
+# processing.forecast_scoring.aggregate_period_scores { #spotforecast2_safe.processing.forecast_scoring.aggregate_period_scores }
+
+```python
+processing.forecast_scoring.aggregate_period_scores(
+    period_scores,
+    *,
+    entry_col='entry',
+    period_col='period',
+    metrics=None,
+    rank_by='mae',
+    ascending=True,
+)
+```
+
+Aggregate per-period scores into a ranked leaderboard table.
+
+Takes the long frame produced by `score_forecasts_by_period` (or any
+frame with an entry column, a period column, and numeric metric
+columns), averages every metric over each entry's own periods, and
+ranks entries by ``rank_by`` with the number of scored periods
+breaking ties (more periods rank higher).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name          | Type                                                           | Description                                                                                                                         | Default    |
+|---------------|----------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|------------|
+| period_scores | [pd](`pandas`).[DataFrame](`pandas.DataFrame`)                 | Long frame with one row per (entry, period).                                                                                        | _required_ |
+| entry_col     | [str](`str`)                                                   | Name of the entry column. Defaults to ``"entry"``.                                                                                  | `'entry'`  |
+| period_col    | [str](`str`)                                                   | Name of the period column. Defaults to ``"period"``.                                                                                | `'period'` |
+| metrics       | [Sequence](`collections.abc.Sequence`)\[[str](`str`)\] \| None | Metric columns to average.  Defaults to None, which selects every numeric column except ``entry_col``, ``period_col``, and ``"n"``. | `None`     |
+| rank_by       | [str](`str`)                                                   | Metric that determines the ranking. Defaults to ``"mae"``.                                                                          | `'mae'`    |
+| ascending     | [bool](`bool`)                                                 | Whether lower ``rank_by`` is better. Defaults to True.                                                                              | `True`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                    |
+|--------|------------------------------------------------|----------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Indexed by entry, columns                        |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``[*metrics, "n_periods", "rank"]``, sorted by rank.  ``rank`` |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | is 1-based.                                                    |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                                                          |
+|--------|----------------------------|------------------------------------------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``period_scores`` is empty, a named column is missing, or ``rank_by`` is not among ``metrics``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.processing.forecast_scoring import (
+    aggregate_period_scores,
+    score_forecasts_by_period,
+)
+
+idx = pd.date_range("2026-06-10", periods=72, freq="h", tz="UTC")
+actual = pd.Series([40_000.0] * 72, index=idx)
+daily = score_forecasts_by_period(
+    {"good": actual + 50.0, "bad": actual + 900.0},
+    actual,
+    metrics=("mae", "bias"),
+)
+board = aggregate_period_scores(daily, rank_by="mae")
+print(board.round(1).to_string())
+assert list(board.index) == ["good", "bad"]
+assert list(board["rank"]) == [1, 2]
+```

@@ -1,0 +1,52 @@
+# stats.comparison.repeated_measures_anova { #spotforecast2_safe.stats.comparison.repeated_measures_anova }
+
+```python
+stats.comparison.repeated_measures_anova(panel)
+```
+
+Run a one-way repeated-measures ANOVA on a complete panel.
+
+Tests equality of the column (entry) means of a complete
+block-by-entry matrix, treating the rows (e.g. target days) as
+blocks — the parametric omnibus test run before pairwise comparison
+with `pairwise_paired_t`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                           | Description                                                                                        | Default    |
+|--------|------------------------------------------------|----------------------------------------------------------------------------------------------------|------------|
+| panel  | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | Complete block-by-entry frame (one row per block, one column per treatment).  Must contain no NaN. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                                 | Description                                            |
+|--------|--------------------------------------------------------------------------------------|--------------------------------------------------------|
+|        | [RepeatedMeasuresAnova](`spotforecast2_safe.stats.comparison.RepeatedMeasuresAnova`) | A `RepeatedMeasuresAnova` with the F test and the full |
+|        | [RepeatedMeasuresAnova](`spotforecast2_safe.stats.comparison.RepeatedMeasuresAnova`) | sum-of-squares decomposition.                          |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                         |
+|--------|----------------------------|---------------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``panel`` has fewer than two rows or columns, or contains NaN. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.comparison import repeated_measures_anova
+
+days = pd.date_range("2026-06-10", periods=5, freq="D")
+panel = pd.DataFrame(
+    {
+        "alpha": [500.0, 700, 400, 650, 550],
+        "beta": [540.0, 745, 435, 690, 595],
+        "gamma": [505.0, 702, 405, 653, 552],
+    },
+    index=days,
+)
+anova = repeated_measures_anova(panel)
+print(f"F({anova.df_treatment}, {anova.df_error}) = "
+      f"{anova.f_statistic:.2f}, p = {anova.p_value:.4f}")
+assert anova.n_blocks == 5 and anova.n_treatments == 3
+```

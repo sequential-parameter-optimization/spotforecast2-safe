@@ -1,0 +1,12 @@
+{
+  "hash": "5328e7eadd282a2394a2838a5d25909d",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: stats.comparison.holm_adjust\n---\n\n\n\n```python\nstats.comparison.holm_adjust(p_values)\n```\n\nAdjust p-values for multiple testing with the Holm step-down method.\n\nSorts the raw p-values ascending (stable sort), multiplies the\n``i``-th smallest by ``m - i`` remaining hypotheses, enforces\nmonotonicity with a running maximum, and caps at 1.0.\n\n## Parameters {.doc-section .doc-section-parameters}\n\n| Name     | Type                                     | Description                                                         | Default    |\n|----------|------------------------------------------|---------------------------------------------------------------------|------------|\n| p_values | [pd](`pandas`).[Series](`pandas.Series`) | Raw p-values; the index identifies the hypotheses and is preserved. | _required_ |\n\n## Returns {.doc-section .doc-section-returns}\n\n| Name   | Type                                     | Description                                               |\n|--------|------------------------------------------|-----------------------------------------------------------|\n|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: Adjusted p-values in the original index order. |\n\n## Raises {.doc-section .doc-section-raises}\n\n| Name   | Type                       | Description                                 |\n|--------|----------------------------|---------------------------------------------|\n|        | [ValueError](`ValueError`) | When ``p_values`` is empty or contains NaN. |\n\n## Examples {.doc-section .doc-section-examples}\n\n\n::: {#2ef45dbb .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nfrom spotforecast2_safe.stats.comparison import holm_adjust\n\nraw = pd.Series([0.01, 0.02, 0.03, 0.04], index=list(\"abcd\"))\nadjusted = holm_adjust(raw)\nprint(adjusted.to_string())\nassert list(adjusted) == [0.04, 0.06, 0.06, 0.06]\n```\n\n::: {.cell-output .cell-output-stdout}\n```\na    0.04\nb    0.06\nc    0.06\nd    0.06\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "stats.comparison.holm_adjust_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

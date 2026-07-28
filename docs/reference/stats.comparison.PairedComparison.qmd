@@ -1,0 +1,18 @@
+# stats.comparison.PairedComparison { #spotforecast2_safe.stats.comparison.PairedComparison }
+
+```python
+stats.comparison.PairedComparison(n, mean_a, mean_b, wins_a, statistic, p_value)
+```
+
+Result of `paired_comparison()` — two entries on shared periods.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name      | Type             | Description                                                            |
+|-----------|------------------|------------------------------------------------------------------------|
+| n         | [int](`int`)     | Number of shared (paired) periods.                                     |
+| mean_a    | [float](`float`) | Mean of the first entry over the shared periods.                       |
+| mean_b    | [float](`float`) | Mean of the second entry over the shared periods.                      |
+| wins_a    | [int](`int`)     | Number of shared periods on which the first entry was strictly better. |
+| statistic | [float](`float`) | Paired t-test statistic.                                               |
+| p_value   | [float](`float`) | Two-sided paired t-test p-value.                                       |
