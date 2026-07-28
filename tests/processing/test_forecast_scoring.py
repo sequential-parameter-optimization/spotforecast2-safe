@@ -46,7 +46,25 @@ class TestScoreForecasts:
         assert table.loc["p", "n"] == 10
 
     def test_supported_metrics_constant(self):
-        assert set(SUPPORTED_METRICS) == {"mae", "rmse", "bias", "mape"}
+        assert set(SUPPORTED_METRICS) == {"mae", "rmse", "bias", "mape", "upr"}
+
+    def test_upr_all_under_prediction(self):
+        table = score_forecasts({"low": ACTUAL - 10.0}, ACTUAL, metrics=("upr",))
+        assert table.loc["low", "upr"] == 100.0
+
+    def test_upr_no_under_prediction(self):
+        table = score_forecasts({"high": ACTUAL + 10.0}, ACTUAL, metrics=("upr",))
+        assert table.loc["high", "upr"] == 0.0
+
+    def test_upr_mixed(self):
+        mixed = ACTUAL.copy()
+        mixed.iloc[:6] -= 5.0  # 6 of 24 hours under-predicted
+        table = score_forecasts({"m": mixed}, ACTUAL, metrics=("upr",))
+        assert table.loc["m", "upr"] == pytest.approx(25.0)
+
+    def test_default_columns_are_all_supported_metrics(self):
+        table = score_forecasts({"a": ACTUAL + 1.0}, ACTUAL)
+        assert list(table.columns) == [*SUPPORTED_METRICS, "n"]
 
     def test_no_overlap_yields_nan_metrics(self):
         other = pd.Series(
