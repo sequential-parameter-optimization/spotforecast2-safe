@@ -1,0 +1,48 @@
+# stats.comparison.paired_comparison { #spotforecast2_safe.stats.comparison.paired_comparison }
+
+```python
+stats.comparison.paired_comparison(a, b, *, lower_is_better=True)
+```
+
+Compare two entries on their shared periods with a paired t-test.
+
+Aligns the two per-period score series on their common index, drops
+periods where either is missing, and reports the per-side means, the
+win count of the first entry, and a two-sided paired t-test — the
+shared-days comparison protocol for leaderboard entries with
+different coverage.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type                                     | Description                                                                      | Default    |
+|-----------------|------------------------------------------|----------------------------------------------------------------------------------|------------|
+| a               | [pd](`pandas`).[Series](`pandas.Series`) | Per-period scores of the first entry (e.g. daily MAE).                           | _required_ |
+| b               | [pd](`pandas`).[Series](`pandas.Series`) | Per-period scores of the second entry.                                           | _required_ |
+| lower_is_better | [bool](`bool`)                           | Whether a strictly smaller score is a win for the first entry. Defaults to True. | `True`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                       | Description                                   |
+|--------|----------------------------------------------------------------------------|-----------------------------------------------|
+|        | [PairedComparison](`spotforecast2_safe.stats.comparison.PairedComparison`) | A `PairedComparison` over the shared periods. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                |
+|--------|----------------------------|------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``a`` or ``b`` is not a ``pd.Series``.                |
+|        | [ValueError](`ValueError`) | When fewer than two shared periods remain after alignment. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.comparison import paired_comparison
+
+days = pd.date_range("2026-06-10", periods=6, freq="D")
+a = pd.Series([500.0, 520.0, 480.0, 510.0, 490.0, 505.0], index=days)
+b = a + 40.0  # consistently worse
+result = paired_comparison(a, b)
+print(result.n, result.wins_a, round(result.p_value, 6))
+assert result.wins_a == 6
+```

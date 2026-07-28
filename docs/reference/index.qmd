@@ -99,6 +99,9 @@ Utilities for aggregated and n-to-n predictions.
 | [processing.shape_check.apply_level_correction](processing.shape_check.apply_level_correction.qmd#spotforecast2_safe.processing.shape_check.apply_level_correction) | Shift a forecast so its central level matches a reference (debias). |
 | [processing.blend.blend_with_prior](processing.blend.blend_with_prior.qmd#spotforecast2_safe.processing.blend.blend_with_prior) | Convex-blend a model forecast with an external prior. |
 | [processing.forecast_scoring.score_forecasts](processing.forecast_scoring.score_forecasts.qmd#spotforecast2_safe.processing.forecast_scoring.score_forecasts) | Score several forecasts against a shared actual and rank them. |
+| [processing.forecast_scoring.score_forecasts_by_period](processing.forecast_scoring.score_forecasts_by_period.qmd#spotforecast2_safe.processing.forecast_scoring.score_forecasts_by_period) | Score several forecasts against a shared actual, per calendar period. |
+| [processing.forecast_scoring.mase_scaling_factors](processing.forecast_scoring.mase_scaling_factors.qmd#spotforecast2_safe.processing.forecast_scoring.mase_scaling_factors) | Compute the day-ahead MASE scaling factor for each target period. |
+| [processing.forecast_scoring.aggregate_period_scores](processing.forecast_scoring.aggregate_period_scores.qmd#spotforecast2_safe.processing.forecast_scoring.aggregate_period_scores) | Aggregate per-period scores into a ranked leaderboard table. |
 
 ## Forecaster
 
@@ -243,6 +246,16 @@ no plotting dependencies — safety-critical-friendly.
 | [stats.stationarity.augmented_dickey_fuller](stats.stationarity.augmented_dickey_fuller.qmd#spotforecast2_safe.stats.stationarity.augmented_dickey_fuller) | Run an Augmented Dickey-Fuller test on a time series. |
 | [stats.spectral.compute_periodogram](stats.spectral.compute_periodogram.qmd#spotforecast2_safe.stats.spectral.compute_periodogram) | Compute the periodogram of a time series. |
 | [stats.spectral.PeriodogramResult](stats.spectral.PeriodogramResult.qmd#spotforecast2_safe.stats.spectral.PeriodogramResult) | Container for the output of `compute_periodogram()`. |
+| [stats.errors.error_summary](stats.errors.error_summary.qmd#spotforecast2_safe.stats.errors.error_summary) | Summarise the distribution of forecast errors, one column per entry. |
+| [stats.errors.error_profile](stats.errors.error_profile.qmd#spotforecast2_safe.stats.errors.error_profile) | Aggregate forecast errors by a calendar key, one column per entry. |
+| [stats.comparison.PairedComparison](stats.comparison.PairedComparison.qmd#spotforecast2_safe.stats.comparison.PairedComparison) | Result of `paired_comparison()` — two entries on shared periods. |
+| [stats.comparison.paired_comparison](stats.comparison.paired_comparison.qmd#spotforecast2_safe.stats.comparison.paired_comparison) | Compare two entries on their shared periods with a paired t-test. |
+| [stats.comparison.holm_adjust](stats.comparison.holm_adjust.qmd#spotforecast2_safe.stats.comparison.holm_adjust) | Adjust p-values for multiple testing with the Holm step-down method. |
+| [stats.comparison.pairwise_paired_t](stats.comparison.pairwise_paired_t.qmd#spotforecast2_safe.stats.comparison.pairwise_paired_t) | Pairwise two-sided paired t-tests over the columns of a panel. |
+| [stats.comparison.RepeatedMeasuresAnova](stats.comparison.RepeatedMeasuresAnova.qmd#spotforecast2_safe.stats.comparison.RepeatedMeasuresAnova) | Result of `repeated_measures_anova()` — one-way RM-ANOVA. |
+| [stats.comparison.repeated_measures_anova](stats.comparison.repeated_measures_anova.qmd#spotforecast2_safe.stats.comparison.repeated_measures_anova) | Run a one-way repeated-measures ANOVA on a complete panel. |
+| [stats.comparison.rank_table](stats.comparison.rank_table.qmd#spotforecast2_safe.stats.comparison.rank_table) | Rank entries under each metric column. |
+| [stats.comparison.rank_concordance](stats.comparison.rank_concordance.qmd#spotforecast2_safe.stats.comparison.rank_concordance) | Kendall's tau between a reference ranking and every other column. |
 
 ## Security
 

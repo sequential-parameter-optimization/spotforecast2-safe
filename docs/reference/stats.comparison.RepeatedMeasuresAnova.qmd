@@ -1,0 +1,31 @@
+# stats.comparison.RepeatedMeasuresAnova { #spotforecast2_safe.stats.comparison.RepeatedMeasuresAnova }
+
+```python
+stats.comparison.RepeatedMeasuresAnova(
+    f_statistic,
+    p_value,
+    df_treatment,
+    df_error,
+    n_blocks,
+    n_treatments,
+    ss_treatment,
+    ss_block,
+    ss_error,
+)
+```
+
+Result of `repeated_measures_anova()` — one-way RM-ANOVA.
+
+## Attributes {.doc-section .doc-section-attributes}
+
+| Name         | Type             | Description                                                                |
+|--------------|------------------|----------------------------------------------------------------------------|
+| f_statistic  | [float](`float`) | F statistic of the treatment effect.                                       |
+| p_value      | [float](`float`) | Right-tail p-value of ``f_statistic`` under ``F(df_treatment, df_error)``. |
+| df_treatment | [int](`int`)     | Treatment degrees of freedom (entries - 1).                                |
+| df_error     | [int](`int`)     | Error degrees of freedom ((entries - 1) * (blocks - 1)).                   |
+| n_blocks     | [int](`int`)     | Number of blocks (rows; e.g. target days).                                 |
+| n_treatments | [int](`int`)     | Number of treatments (columns; e.g. entries).                              |
+| ss_treatment | [float](`float`) | Treatment sum of squares.                                                  |
+| ss_block     | [float](`float`) | Block sum of squares.                                                      |
+| ss_error     | [float](`float`) | Error sum of squares.                                                      |

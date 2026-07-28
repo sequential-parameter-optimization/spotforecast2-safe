@@ -1,0 +1,46 @@
+# stats.errors.error_summary { #spotforecast2_safe.stats.errors.error_summary }
+
+```python
+stats.errors.error_summary(errors, *, quantiles=(0.05, 0.95))
+```
+
+Summarise the distribution of forecast errors, one column per entry.
+
+For each entry the summary reports mean, median, the requested
+quantiles, standard deviation (``ddof=1``), minimum, and maximum —
+the row layout of a manuscript error-statistics table.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                                                           | Description                                                                   | Default        |
+|-----------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------|
+| errors    | [Mapping](`collections.abc.Mapping`)\[[str](`str`), [pd](`pandas`).[Series](`pandas.Series`)\] | Mapping of entry name to its error series (``forecast - actual``).            | _required_     |
+| quantiles | [tuple](`tuple`)\[[float](`float`), ...\]                                                      | Quantile levels to include, each in ``(0, 1)``. Defaults to ``(0.05, 0.95)``. | `(0.05, 0.95)` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                                      |
+|--------|------------------------------------------------|------------------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Indexed by statistic name                          |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | (``["mean", "median", *[f"q{q:g}"], "std", "min", "max"]``), one |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | column per entry, in mapping order.                              |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                   |
+|--------|----------------------------|---------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When an entry value is not a ``pd.Series``.                   |
+|        | [ValueError](`ValueError`) | When ``errors`` is empty or a quantile is outside ``(0, 1)``. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.errors import error_summary
+
+errors = {"model": pd.Series([-2.0, -1.0, 0.0, 1.0, 2.0])}
+table = error_summary(errors)
+print(table.round(2).to_string())
+assert table.loc["mean", "model"] == 0.0
+assert table.loc["min", "model"] == -2.0
+```

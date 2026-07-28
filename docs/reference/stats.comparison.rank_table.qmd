@@ -1,0 +1,48 @@
+# stats.comparison.rank_table { #spotforecast2_safe.stats.comparison.rank_table }
+
+```python
+stats.comparison.rank_table(scores, *, method='min', ascending=True)
+```
+
+Rank entries under each metric column.
+
+Converts a per-entry score table (e.g. mean MAE / RMSE / MAPE / MASE
+per entry) into integer ranks per metric, for concordance analysis
+(`rank_concordance`) or a rank-stability chart
+(`spotforecast2.plots.comparison.plot_rank_stability`).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                           | Description                                                                                                                 | Default    |
+|-----------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|------------|
+| scores    | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | Frame indexed by entry, one numeric column per metric.                                                                      | _required_ |
+| method    | [str](`str`)                                   | Tie-breaking method forwarded to ``pd.DataFrame.rank`` (e.g. ``"min"``, ``"average"``, ``"dense"``). Defaults to ``"min"``. | `'min'`    |
+| ascending | [bool](`bool`)                                 | Whether lower scores rank first. Defaults to True.                                                                          | `True`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                           | Description                                           |
+|--------|------------------------------------------------|-------------------------------------------------------|
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | pd.DataFrame: Integer ranks, same shape and labels as |
+|        | [pd](`pandas`).[DataFrame](`pandas.DataFrame`) | ``scores``.                                           |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                               |
+|--------|----------------------------|-------------------------------------------|
+|        | [ValueError](`ValueError`) | When ``scores`` is empty or contains NaN. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import pandas as pd
+from spotforecast2_safe.stats.comparison import rank_table
+
+scores = pd.DataFrame(
+    {"mae": [510.0, 462.0, 891.0], "rmse": [640.0, 655.0, 1024.0]},
+    index=["alpha", "beta", "gamma"],
+)
+ranks = rank_table(scores)
+print(ranks.to_string())
+assert list(ranks["mae"]) == [2, 1, 3]
+```

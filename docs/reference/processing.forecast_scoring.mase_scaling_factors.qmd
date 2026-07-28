@@ -1,0 +1,62 @@
+# processing.forecast_scoring.mase_scaling_factors { #spotforecast2_safe.processing.forecast_scoring.mase_scaling_factors }
+
+```python
+processing.forecast_scoring.mase_scaling_factors(
+    actual,
+    periods,
+    *,
+    seasonality=1,
+)
+```
+
+Compute the day-ahead MASE scaling factor for each target period.
+
+For every entry in ``periods`` the factor is the mean absolute
+``seasonality``-step difference of ``actual`` over all observations
+**strictly before** that period's start:
+$\text{mean}\, |y_t - y_{t-s}|$ for $t < \text{period}$.
+Dividing a period's MAE by its factor yields the MASE of the
+manuscript-style expanding-history definition — for a single
+``(y_true, y_pred, y_train)`` triple this equals the denominator
+`spotforecast2_safe.forecaster.metrics.mean_absolute_scaled_error`
+computes internally.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type                                                                                                                   | Description                                                                                                                                                     | Default    |
+|-------------|------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| actual      | [pd](`pandas`).[Series](`pandas.Series`)                                                                               | Ground-truth series with a ``DatetimeIndex``, ordered in time.                                                                                                  | _required_ |
+| periods     | [Sequence](`collections.abc.Sequence`)\[[object](`object`)\] \| [pd](`pandas`).[DatetimeIndex](`pandas.DatetimeIndex`) | Period starts to compute factors for.  Entries may be ``pd.Timestamp`` values or strings; tz-naive entries are localized to the timezone of ``actual``'s index. | _required_ |
+| seasonality | [int](`int`)                                                                                                           | Step of the naive difference. Defaults to 1 (one-step naive).                                                                                                   | `1`        |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                     | Description                                                     |
+|--------|------------------------------------------|-----------------------------------------------------------------|
+|        | [pd](`pandas`).[Series](`pandas.Series`) | pd.Series: Factors indexed by ``periods`` exactly as given      |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | (strings stay strings), name ``"mase_scaling"``.  A period with |
+|        | [pd](`pandas`).[Series](`pandas.Series`) | no preceding observations gets ``NaN``.                         |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type                       | Description                                                            |
+|--------|----------------------------|------------------------------------------------------------------------|
+|        | [TypeError](`TypeError`)   | When ``actual`` is not a ``pd.Series`` with a ``DatetimeIndex``.       |
+|        | [ValueError](`ValueError`) | When ``actual`` is empty or ``seasonality`` is not a positive integer. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```{python}
+import numpy as np
+import pandas as pd
+from spotforecast2_safe.processing.forecast_scoring import (
+    mase_scaling_factors,
+)
+
+idx = pd.date_range("2026-06-01", periods=96, freq="h", tz="UTC")
+ramp = pd.Series(np.arange(96, dtype=float), index=idx)
+factors = mase_scaling_factors(ramp, ["2026-06-03", "2026-06-04"])
+print(factors.to_string())
+# every one-step difference of a ramp is exactly 1.0
+assert (factors == 1.0).all()
+```
